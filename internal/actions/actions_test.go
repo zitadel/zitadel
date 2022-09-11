@@ -29,7 +29,7 @@ func TestRun(t *testing.T) {
 		api    *API
 		script string
 		name   string
-		opts   []runOpt
+		opts   []Option
 	}
 	tests := []struct {
 		name    string
@@ -45,7 +45,7 @@ function testFunc() {
 	for (i = 0; i < 10; i++) {}
 }`,
 				name: "testFunc",
-				opts: []runOpt{},
+				opts: []Option{},
 			},
 			wantErr: func(err error) bool { return err == nil },
 		},
@@ -55,7 +55,7 @@ function testFunc() {
 				api:    nil,
 				script: "function testFunc() {throw 'verkackt'}",
 				name:   "testFunc",
-				opts:   []runOpt{},
+				opts:   []Option{},
 			},
 			wantErr: func(err error) bool {
 				gojaErr := new(goja.Exception)
@@ -98,7 +98,7 @@ function testFunc(){
 } 
 `,
 				name: "testFunc",
-				opts: []runOpt{
+				opts: []Option{
 					WithTimeout(50 * time.Millisecond),
 				},
 			},
@@ -119,7 +119,7 @@ function testFunc(){
 } 
 `,
 				name: "testFunc",
-				opts: []runOpt{
+				opts: []Option{
 					WithHTTP(http.DefaultClient),
 					WithLogger(l),
 				},

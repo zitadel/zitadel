@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/logging"
 )
 
-func WithHTTP(client *http.Client) runOpt {
+func WithHTTP(client *http.Client) Option {
 	return func(c *runConfig) {
 		c.modules["zitadel/http"] = func(runtime *goja.Runtime, module *goja.Object) {
 			requireHTTP(client, c.end, runtime, module)

@@ -19,7 +19,7 @@ type runConfig struct {
 	end     time.Time
 }
 
-func newRunConfig(opts ...runOpt) *runConfig {
+func newRunConfig(opts ...Option) *runConfig {
 	config := &runConfig{
 		timeout:        maxTimeout,
 		prepareTimeout: maxPrepareTimeout,
@@ -39,12 +39,12 @@ func newRunConfig(opts ...runOpt) *runConfig {
 	return config
 }
 
-type runOpt func(*runConfig)
+type Option func(*runConfig)
 
 // WithTimeout sets the passed timeout for the execution
 // timeout has to be between 0 and 20 seconds
 // values out of range are ignored
-func WithTimeout(timeout time.Duration) runOpt {
+func WithTimeout(timeout time.Duration) Option {
 	return func(c *runConfig) {
 		if timeout <= 0 || timeout > maxTimeout {
 			return
@@ -57,7 +57,7 @@ func WithTimeout(timeout time.Duration) runOpt {
 	}
 }
 
-func WithAllowedToFail() runOpt {
+func WithAllowedToFail() Option {
 	return func(c *runConfig) {
 		c.allowedToFail = true
 	}

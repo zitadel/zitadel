@@ -27,7 +27,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	actionCtx := (&actions.Context{}).SetToken(tokens)
 	api := (&actions.API{}).SetExternalUser(user).SetMetadata(&user.Metadatas)
 	for _, a := range triggerActions {
-		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
+		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Options()...)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +43,7 @@ func (l *Login) customExternalUserToLoginUserMapping(ctx context.Context, user *
 	actionCtx := (&actions.Context{}).SetToken(tokens)
 	api := (&actions.API{}).SetHuman(user).SetMetadata(&metadata)
 	for _, a := range triggerActions {
-		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
+		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Options()...)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -60,7 +60,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.To
 	actionUserGrants := make([]actions.UserGrant, 0)
 	api := (&actions.API{}).SetUserGrants(&actionUserGrants)
 	for _, a := range triggerActions {
-		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Timeout, a.AllowedToFail)
+		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Options()...)
 		if err != nil {
 			return nil, err
 		}

@@ -14,7 +14,7 @@ var (
 
 type jsAction func(*Context, *API) error
 
-func Run(ctx *Context, api *API, script, name string, opts ...runOpt) error {
+func Run(ctx *Context, api *API, script, name string, opts ...Option) error {
 	config := newRunConfig(opts...)
 
 	vm, err := prepareRun(script, config)

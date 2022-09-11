@@ -255,7 +255,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		}
 	}
 
-	queriedActions, _ := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation, "orgid")
+	queriedActions, _ := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, "orgid")
 	for _, action := range queriedActions {
 		if err = actions.Run(nil, nil, action.Script, action.Name); err != nil {
 			return err

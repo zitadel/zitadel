@@ -8,8 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -82,6 +82,17 @@ type Action struct {
 	Script        string
 	Timeout       time.Duration
 	AllowedToFail bool
+}
+
+func (a *Action) Options() []actions.Option {
+	opts := make([]actions.Option, 0, 2)
+	if a.Timeout > 0 {
+		opts = append(opts, actions.WithTimeout(a.Timeout))
+	}
+	if a.AllowedToFail {
+		opts = append(opts, actions.WithAllowedToFail())
+	}
+	return opts
 }
 
 type ActionSearchQueries struct {
