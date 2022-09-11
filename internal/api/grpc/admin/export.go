@@ -640,8 +640,8 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 			}
 
 			triggerActions = append(triggerActions, &management_pb.SetTriggerActionsRequest{
-				FlowType:    flowType.String(),
-				TriggerType: triggerType.String(),
+				FlowType:    flowType.ID(),
+				TriggerType: triggerType.ID(),
 				ActionIds:   actions,
 			})
 		}

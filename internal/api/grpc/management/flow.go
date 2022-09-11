@@ -10,18 +10,13 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
-	msg_pb "github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
 func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequest) (*mgmt_pb.ListFlowTypesResponse, error) {
 	return &mgmt_pb.ListFlowTypesResponse{
 		Result: []*action_pb.FlowType{
-			{
-				Id: "1",
-				Name: &msg_pb.LocalizedMessage{
-					Key: "Action.Flow.Type.ExternalAuthentication",
-				},
-			},
+			action_grpc.FlowTypeToPb(domain.FlowTypeExternalAuthentication),
+			action_grpc.FlowTypeToPb(domain.FlowTypeCustomiseToken),
 		},
 	}, nil
 }
@@ -29,24 +24,13 @@ func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequ
 var (
 	flowTriggerTypes = map[domain.FlowType][]*action_pb.TriggerType{
 		domain.FlowTypeExternalAuthentication: {
-			{
-				Id: "1",
-				Name: &msg_pb.LocalizedMessage{
-					Key: "Action.TriggerType.PostAuthentication",
-				},
-			},
-			{
-				Id: "2",
-				Name: &msg_pb.LocalizedMessage{
-					Key: "Action.TriggerType.PreCreation",
-				},
-			},
-			{
-				Id: "3",
-				Name: &msg_pb.LocalizedMessage{
-					Key: "Action.TriggerType.PostCreation",
-				},
-			},
+			action_grpc.TriggerTypeToPb(domain.TriggerTypePostAuthentication),
+			action_grpc.TriggerTypeToPb(domain.TriggerTypePreCreation),
+			action_grpc.TriggerTypeToPb(domain.TriggerTypePostCreation),
+		},
+		domain.FlowTypeCustomiseToken: {
+			action_grpc.TriggerTypeToPb(domain.TriggerTypePreUserinfoCreation),
+			action_grpc.TriggerTypeToPb(domain.TriggerTypePreAccessTokenCreation),
 		},
 	}
 )

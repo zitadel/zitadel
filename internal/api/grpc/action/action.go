@@ -12,8 +12,10 @@ import (
 
 func FlowTypeToDomain(flowType string) domain.FlowType {
 	switch flowType {
-	case "FLOW_TYPE_EXTERNAL_AUTHENTICATION", "1":
+	case "FLOW_TYPE_EXTERNAL_AUTHENTICATION", domain.FlowTypeExternalAuthentication.ID():
 		return domain.FlowTypeExternalAuthentication
+	case domain.FlowTypeCustomiseToken.ID():
+		return domain.FlowTypeCustomiseToken
 	default:
 		return domain.FlowTypeUnspecified
 	}
@@ -21,32 +23,36 @@ func FlowTypeToDomain(flowType string) domain.FlowType {
 
 func FlowTypeToPb(typ domain.FlowType) *action_pb.FlowType {
 	return &action_pb.FlowType{
-		Id: typ.String(),
+		Id: typ.ID(),
 		Name: &message_pb.LocalizedMessage{
-			Key: typ.String(),
+			Key: typ.LocalizationKey(),
 		},
 	}
 }
 
 // TriggerTypeToDomain maps the pb type to domain
-// for backward compatability the old enum identifiers are mapped as well
+// for backward compatability: old enum identifiers are mapped as well
 func TriggerTypeToDomain(triggerType string) domain.TriggerType {
 	switch triggerType {
-	case "TRIGGER_TYPE_POST_AUTHENTICATION", "1":
+	case "TRIGGER_TYPE_POST_AUTHENTICATION", domain.TriggerTypePostAuthentication.ID():
 		return domain.TriggerTypePostAuthentication
-	case "TRIGGER_TYPE_PRE_CREATION", "2":
+	case "TRIGGER_TYPE_PRE_CREATION", domain.TriggerTypePreCreation.ID():
 		return domain.TriggerTypePreCreation
-	case "TRIGGER_TYPE_POST_CREATION", "3":
+	case "TRIGGER_TYPE_POST_CREATION", domain.TriggerTypePostCreation.ID():
 		return domain.TriggerTypePostCreation
+	case domain.TriggerTypePreAccessTokenCreation.ID():
+		return domain.TriggerTypePreAccessTokenCreation
+	case domain.TriggerTypePreUserinfoCreation.ID():
+		return domain.TriggerTypePreUserinfoCreation
 	default:
 		return domain.TriggerTypeUnspecified
 	}
 }
 func TriggerTypeToPb(typ domain.TriggerType) *action_pb.TriggerType {
 	return &action_pb.TriggerType{
-		Id: typ.String(),
+		Id: typ.ID(),
 		Name: &message_pb.LocalizedMessage{
-			Key: typ.String(),
+			Key: typ.LocalizationKey(),
 		},
 	}
 }

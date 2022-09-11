@@ -905,6 +905,7 @@ Action:
     Type:
       Unspecified: Unspecified
       ExternalAuthentication: External Authentication
+      CustomiseToken: Complement Token
   TriggerType:
     Unspecified: Unspecified
     PostAuthentication: Post Authentication

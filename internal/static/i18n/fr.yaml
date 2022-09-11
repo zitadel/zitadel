@@ -905,6 +905,7 @@ Action:
     Type:
       Unspecified: Non spécifié
       ExternalAuthentication: Authentification externe
+      CustomiseToken: Compléter Token
   TriggerType:
     Unspecified: Non spécifié
     PostAuthentication: Authentification postérieure

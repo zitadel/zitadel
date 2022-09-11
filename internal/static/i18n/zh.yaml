@@ -904,6 +904,7 @@ Action:
     Type:
       Unspecified: 未指定的
       ExternalAuthentication: 外部认证
+      CustomiseToken: Complement Token
   TriggerType:
     Unspecified: 未指定的
     PostAuthentication: 后期认证
