@@ -17,6 +17,7 @@ import (
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -693,9 +694,9 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 
 		if org.TriggerActions != nil {
 			for _, triggerAction := range org.GetTriggerActions() {
-				_, err := s.command.SetTriggerActions(ctx, domain.FlowType(triggerAction.FlowType), domain.TriggerType(triggerAction.TriggerType), triggerAction.ActionIds, org.GetOrgId())
+				_, err := s.command.SetTriggerActions(ctx, action_grpc.FlowTypeToDomain(triggerAction.FlowType), action_grpc.TriggerTypeToDomain(triggerAction.TriggerType), triggerAction.ActionIds, org.GetOrgId())
 				if err != nil {
-					errors = append(errors, &admin_pb.ImportDataError{Type: "trigger_action", Id: triggerAction.FlowType.String() + "_" + triggerAction.TriggerType.String(), Message: err.Error()})
+					errors = append(errors, &admin_pb.ImportDataError{Type: "trigger_action", Id: triggerAction.FlowType + "_" + triggerAction.TriggerType, Message: err.Error()})
 					continue
 				}
 				successOrg.TriggerActions = append(successOrg.TriggerActions, &management_pb.SetTriggerActionsRequest{FlowType: triggerAction.FlowType, TriggerType: triggerAction.TriggerType, ActionIds: triggerAction.GetActionIds()})

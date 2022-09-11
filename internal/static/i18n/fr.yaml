@@ -899,3 +899,17 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Le jeton de rafraîchissement n'est autorisé qu'en combinaison avec le code d'autorisation.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Non spécifié
+      ExternalAuthentication: Authentification externe
+      CustomiseToken: Compléter Token
+  TriggerType:
+    Unspecified: Non spécifié
+    PostAuthentication: Authentification postérieure
+    PreCreation: Pré création
+    PostCreation: Post-création
+    PreUserinfoCreation: Pré Userinfo création
+    PreAccessTokenCreation: Pré access token création
