@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/op"
 	"gopkg.in/square/go-jose.v2"
 
+	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -253,6 +254,14 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			}
 		}
 	}
+
+	queriedActions, _ := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation, "orgid")
+	for _, action := range queriedActions {
+		if err = actions.Run(nil, nil, action.Script, action.Name); err != nil {
+			return err
+		}
+	}
+
 	if len(roles) == 0 || applicationID == "" {
 		return nil
 	}
@@ -264,12 +273,11 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
 
-	//TODO: search for action and execute it
-
 	return nil
 }
 
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
+	//TODO: search for action and execute it
 	roles := make([]string, 0)
 	for _, scope := range scopes {
 		switch scope {
