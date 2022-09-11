@@ -2843,7 +2843,7 @@ service ManagementService {
 
     rpc ListFlowTypes(ListFlowTypesRequest) returns (ListFlowTypesResponse) {
         option (google.api.http) = {
-            post: "/flows/types"
+            post: "/flows/types/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2853,7 +2853,7 @@ service ManagementService {
 
     rpc ListFlowTriggerTypes(ListFlowTriggerTypesRequest) returns (ListFlowTriggerTypesResponse) {
         option (google.api.http) = {
-            post: "/flows/{type}/triggers"
+            post: "/flows/{type}/triggers/_search"
         };
 
         option (zitadel.v1.auth_option) = {

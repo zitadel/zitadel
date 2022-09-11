@@ -2868,7 +2868,7 @@ Change JWT identity provider configuration of the organisation
 
 
 
-    POST: /flows/types
+    POST: /flows/types/_search
 
 
 ### ListFlowTriggerTypes
@@ -2880,7 +2880,7 @@ Change JWT identity provider configuration of the organisation
 
 
 
-    POST: /flows/{type}/triggers
+    POST: /flows/{type}/triggers/_search
 
 
 ### GetFlow

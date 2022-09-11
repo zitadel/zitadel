@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
@@ -26,9 +27,8 @@ func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequ
 }
 
 var (
-	flowTriggerTypes = map[string][]*action_pb.TriggerType{
-		// FLOW_TYPE_EXTERNAL_AUTHENTICATION
-		"1": {
+	flowTriggerTypes = map[domain.FlowType][]*action_pb.TriggerType{
+		domain.FlowTypeExternalAuthentication: {
 			{
 				Id: "1",
 				Name: &msg_pb.LocalizedMessage{
@@ -52,19 +52,12 @@ var (
 )
 
 func (s *Server) ListFlowTriggerTypes(ctx context.Context, req *mgmt_pb.ListFlowTriggerTypesRequest) (*mgmt_pb.ListFlowTriggerTypesResponse, error) {
-	triggerTypes := flowTriggerTypes[req.Type]
+	triggerTypes := flowTriggerTypes[action_grpc.FlowTypeToDomain(req.Type)]
 	if len(triggerTypes) == 0 {
 		return nil, errors.ThrowNotFound(nil, "MANAG-P2OBk", "Errors.NotFound")
 	}
 	return &mgmt_pb.ListFlowTriggerTypesResponse{
-		Result: []*action_pb.TriggerType{
-			{
-				Id: "1",
-				Name: &msg_pb.LocalizedMessage{
-					Key: "Flow.Type.External_Authentication",
-				},
-			},
-		},
+		Result: triggerTypes,
 	}, nil
 }
 
