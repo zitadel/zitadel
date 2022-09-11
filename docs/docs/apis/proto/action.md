@@ -66,7 +66,7 @@ ActionStateQuery is always equals
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| type |  string | id of the flow type |  |
+| type |  FlowType | id of the flow type |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | state |  FlowState | - |  |
 | trigger_actions | repeated TriggerAction | - |  |
@@ -92,7 +92,7 @@ ActionStateQuery is always equals
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| trigger_type |  string | id of the trigger type |  |
+| trigger_type |  TriggerType | id of the trigger type |  |
 | actions | repeated Action | - |  |
 
 

@@ -93,7 +93,7 @@ enum ActionFieldName {
 
 message Flow {
     // id of the flow type
-    string type = 1 [
+    FlowType type = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "\"the type of the flow\"";
         }
@@ -129,6 +129,6 @@ message TriggerType {
 
 message TriggerAction {
     // id of the trigger type
-    string trigger_type = 1;
+    TriggerType trigger_type = 1;
     repeated Action actions = 2;
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
+	message_pb "github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
 func FlowTypeToDomain(flowType string) domain.FlowType {
@@ -15,6 +16,15 @@ func FlowTypeToDomain(flowType string) domain.FlowType {
 		return domain.FlowTypeExternalAuthentication
 	default:
 		return domain.FlowTypeUnspecified
+	}
+}
+
+func FlowTypeToPb(typ domain.FlowType) *action_pb.FlowType {
+	return &action_pb.FlowType{
+		Id: typ.String(),
+		Name: &message_pb.LocalizedMessage{
+			Key: typ.String(),
+		},
 	}
 }
 
@@ -32,10 +42,18 @@ func TriggerTypeToDomain(triggerType string) domain.TriggerType {
 		return domain.TriggerTypeUnspecified
 	}
 }
+func TriggerTypeToPb(typ domain.TriggerType) *action_pb.TriggerType {
+	return &action_pb.TriggerType{
+		Id: typ.String(),
+		Name: &message_pb.LocalizedMessage{
+			Key: typ.String(),
+		},
+	}
+}
 
 func FlowToPb(flow *query.Flow) *action_pb.Flow {
 	return &action_pb.Flow{
-		Type:           flow.Type.String(),
+		Type:           FlowTypeToPb(flow.Type),
 		Details:        object_grpc.ChangeToDetailsPb(flow.Sequence, flow.ChangeDate, flow.ResourceOwner),
 		State:          action_pb.FlowState_FLOW_STATE_ACTIVE, //TODO: state in next release
 		TriggerActions: TriggerActionsToPb(flow.TriggerActions),
@@ -44,7 +62,7 @@ func FlowToPb(flow *query.Flow) *action_pb.Flow {
 
 func TriggerActionToPb(trigger domain.TriggerType, actions []*query.Action) *action_pb.TriggerAction {
 	return &action_pb.TriggerAction{
-		TriggerType: trigger.String(),
+		TriggerType: TriggerTypeToPb(trigger),
 		Actions:     ActionsToPb(actions),
 	}
 }
