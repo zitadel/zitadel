@@ -654,15 +654,6 @@
       "1": "inattivo",
       "2": "attivo"
     },
-    "TYPES": {
-      "0": "Non specifico",
-      "1": "Autenticazione esterna"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post autenticazione",
-      "2": "Pre creazione",
-      "3": "Post creazione"
-    },
     "ADDTRIGGER": "Aggiungi trigger",
     "FLOWCHANGED": "Il processo è stato modificato con successo.",
     "FLOWCLEARED": "Il processo è stato eliminato con successo.",
@@ -689,6 +680,10 @@
       "CLEAR": {
         "TITLE": "Elimina processo",
         "DESCRIPTION": "Stai per eliminare un processo. Questa azione non può essere annullata. Vuoi continuare?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Elimina le azioni selezionate?",
+        "DESCRIPTION": "Sei sicuro di voler eliminare le azioni selezionate dal processo?"
       }
     },
     "TOAST": {

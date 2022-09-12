@@ -654,15 +654,6 @@
       "1": "inactive",
       "2": "active"
     },
-    "TYPES": {
-      "0": "Unspecified Type",
-      "1": "External Authentication"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post Authentication",
-      "2": "Pre Creation",
-      "3": "Post Creation"
-    },
     "ADDTRIGGER": "Add trigger",
     "FLOWCHANGED": "The flow was changed successfully",
     "FLOWCLEARED": "The flow was reset successfully",
@@ -689,6 +680,10 @@
       "CLEAR": {
         "TITLE": "Clear flow?",
         "DESCRIPTION": "You are about to reset the flow along with its triggers and actions. This change cannot be restored. Are you sure?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Delete selected Actions?",
+        "DESCRIPTION": "Are you sure you want to delete the selected actions from the flow?"
       }
     },
     "TOAST": {
