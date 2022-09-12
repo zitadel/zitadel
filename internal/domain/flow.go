@@ -106,7 +106,7 @@ func (s TriggerType) LocalizationKey() string {
 
 	switch s {
 	case TriggerTypePostAuthentication:
-		return "Action.TriggerType.ExternalAuthentication"
+		return "Action.TriggerType.PostAuthentication"
 	case TriggerTypePreCreation:
 		return "Action.TriggerType.PreCreation"
 	case TriggerTypePostCreation:
