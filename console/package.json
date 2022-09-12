@@ -43,7 +43,7 @@
     "moment": "^2.29.4",
     "ng-qrcode": "^7.0.0",
     "ngx-color": "^8.0.2",
-    "ngx-quicklink": "^0.2.6",
+    "ngx-quicklink": "^0.3.0",
     "rxjs": "~7.5.2",
     "tinycolor2": "^1.4.2",
     "tslib": "^2.2.0",
