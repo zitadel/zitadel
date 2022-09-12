@@ -111,7 +111,6 @@ export class ActionsComponent implements OnDestroy {
     const dialogRef = this.dialog.open(AddFlowDialogComponent, {
       data: {
         flowType: flow,
-        // triggerType: TriggerType.TRIGGER_TYPE_POST_AUTHENTICATION,
         actions: this.selection && this.selection.length ? this.selection : [],
       },
       width: '400px',
