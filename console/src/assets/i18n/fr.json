@@ -654,15 +654,6 @@
       "1": "inactif",
       "2": "actif"
     },
-    "TYPES": {
-      "0": "Type non spécifié",
-      "1": "Authentification externe"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post Authentification",
-      "2": "Pré création",
-      "3": "Post création"
-    },
     "ADDTRIGGER": "Ajouter un déclencheur",
     "FLOWCHANGED": "Le processus a été modifié",
     "FLOWCLEARED": "Le processus a été supprimé avec succès",
@@ -689,6 +680,10 @@
       "CLEAR": {
         "TITLE": "Effacer le flux ?",
         "DESCRIPTION": "Vous êtes sur le point de réinitialiser le flux ainsi que ses déclencheurs et actions. Ce changement ne peut pas être restauré. Etes-vous sûr ?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Supprimer les actions sélectionnées ?",
+        "DESCRIPTION": "Voulez-vous vraiment supprimer les actions sélectionnées du flux ?"
       }
     },
     "TOAST": {
