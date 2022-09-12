@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"golang.org/x/text/language"
 )
@@ -101,5 +102,29 @@ func (a *API) SetMetadata(metadata *[]*domain.Metadata) *API {
 
 func (a *API) SetUserGrants(usergrants *[]UserGrant) *API {
 	a.set("userGrants", usergrants)
+	return a
+}
+
+func (a *API) SetClaims(claims *map[string]interface{}, logs *[]string) *API {
+	a.set("setClaim", func(key string, value interface{}) {
+		if _, ok := (*claims)[key]; !ok {
+			(*claims)[key] = value
+		}
+	})
+	a.set("appendLogIntoClaims", func(entry string) {
+		*logs = append(*logs, entry)
+	})
+	return a
+}
+
+func (a *API) SetUserinfo(userInfo oidc.UserInfoSetter, logs *[]string) *API {
+	a.set("setClaim", func(key string, value interface{}) {
+		if userInfo.GetClaim(key) == nil {
+			userInfo.AppendClaims(key, value)
+		}
+	})
+	a.set("appendLogIntoClaims", func(entry string) {
+		*logs = append(*logs, entry)
+	})
 	return a
 }

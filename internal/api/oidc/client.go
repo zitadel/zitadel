@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"strings"
 
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -26,6 +27,7 @@ const (
 	ClaimUserMetaData      = ScopeUserMetaData
 	ScopeResourceOwner     = "urn:zitadel:iam:user:resourceowner"
 	ClaimResourceOwner     = ScopeResourceOwner + ":"
+	ClaimActionLogFormat   = "urn:zitadel:action:%s:log"
 
 	oidcCtx = "oidc"
 )
@@ -255,13 +257,6 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		}
 	}
 
-	queriedActions, _ := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, "orgid")
-	for _, action := range queriedActions {
-		if err = actions.Run(nil, nil, action.Script, action.Name); err != nil {
-			return err
-		}
-	}
-
 	if len(roles) == 0 || applicationID == "" {
 		return nil
 	}
@@ -273,11 +268,26 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
 
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner)
+	if err != nil {
+		return err
+	}
+	var claimLogs []string
+	api := (&actions.API{}).SetUserinfo(userInfo, &claimLogs)
+	for _, action := range queriedActions {
+		if err = actions.Run(nil, api, action.Script, action.Name); err != nil {
+			return err
+		}
+		if len(claimLogs) > 0 {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
+			claimLogs = nil
+		}
+	}
+
 	return nil
 }
 
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
-	//TODO: search for action and execute it
 	roles := make([]string, 0)
 	for _, scope := range scopes {
 		switch scope {
@@ -304,6 +314,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 			claims = appendClaim(claims, domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 		}
 	}
+
 	if len(roles) == 0 || clientID == "" {
 		return claims, nil
 	}
@@ -314,6 +325,27 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 	if len(projectRoles) > 0 {
 		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
+
+	user, err := o.query.GetUserByID(ctx, true, userID)
+	if err != nil {
+		return nil, err
+	}
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	var claimLogs []string
+	api := (&actions.API{}).SetClaims(&claims, &claimLogs)
+	for _, action := range queriedActions {
+		if err = actions.Run(nil, api, action.Script, action.Name); err != nil {
+			return nil, err
+		}
+		if len(claimLogs) > 0 {
+			claims = appendClaim(claims, fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
+			claimLogs = nil
+		}
+	}
+
 	return claims, err
 }
 
