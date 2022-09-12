@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -12,7 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/http"
+	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -131,7 +132,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 		if err != nil {
 			return err
 		}
-		if origin != "" && !http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
+		if origin != "" && !api_http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
 			return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 		}
 	}
@@ -257,6 +258,22 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		}
 	}
 
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner)
+	if err != nil {
+		return err
+	}
+	claimLogs := []string{}
+	api := (&actions.API{}).SetUserinfo(userInfo, &claimLogs)
+	for _, action := range queriedActions {
+		if err = actions.Run(nil, api, action.Script, action.Name, actions.WithHTTP(http.DefaultClient)); err != nil {
+			return err
+		}
+		if len(claimLogs) > 0 {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
+			claimLogs = nil
+		}
+	}
+
 	if len(roles) == 0 || applicationID == "" {
 		return nil
 	}
@@ -266,22 +283,6 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 	}
 	if len(projectRoles) > 0 {
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
-	}
-
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner)
-	if err != nil {
-		return err
-	}
-	var claimLogs []string
-	api := (&actions.API{}).SetUserinfo(userInfo, &claimLogs)
-	for _, action := range queriedActions {
-		if err = actions.Run(nil, api, action.Script, action.Name); err != nil {
-			return err
-		}
-		if len(claimLogs) > 0 {
-			userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
-			claimLogs = nil
-		}
 	}
 
 	return nil
@@ -315,17 +316,6 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 	}
 
-	if len(roles) == 0 || clientID == "" {
-		return claims, nil
-	}
-	projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
-	if err != nil {
-		return nil, err
-	}
-	if len(projectRoles) > 0 {
-		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
-	}
-
 	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return nil, err
@@ -334,7 +324,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 	if err != nil {
 		return nil, err
 	}
-	var claimLogs []string
+	claimLogs := []string{}
 	api := (&actions.API{}).SetClaims(&claims, &claimLogs)
 	for _, action := range queriedActions {
 		if err = actions.Run(nil, api, action.Script, action.Name); err != nil {
@@ -344,6 +334,17 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 			claims = appendClaim(claims, fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
 			claimLogs = nil
 		}
+	}
+
+	if len(roles) == 0 || clientID == "" {
+		return claims, nil
+	}
+	projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
+	if err != nil {
+		return nil, err
+	}
+	if len(projectRoles) > 0 {
+		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
 
 	return claims, err
