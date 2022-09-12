@@ -240,7 +240,8 @@ func ProjectReactivatedEventMapper(event *repository.Event) (eventstore.Event, e
 type ProjectRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name string
+	Name                     string
+	entityIDUniqueContraints []*eventstore.EventUniqueConstraint
 }
 
 func (e *ProjectRemovedEvent) Data() interface{} {
@@ -248,13 +249,20 @@ func (e *ProjectRemovedEvent) Data() interface{} {
 }
 
 func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	constraints := []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	if e.entityIDUniqueContraints != nil {
+		for _, constraint := range e.entityIDUniqueContraints {
+			constraints = append(constraints, constraint)
+		}
+	}
+	return constraints
 }
 
 func NewProjectRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name string,
+	entityIDUniqueContraints []*eventstore.EventUniqueConstraint,
 ) *ProjectRemovedEvent {
 	return &ProjectRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -262,7 +270,8 @@ func NewProjectRemovedEvent(
 			aggregate,
 			ProjectRemovedType,
 		),
-		Name: name,
+		Name:                     name,
+		entityIDUniqueContraints: entityIDUniqueContraints,
 	}
 }
 

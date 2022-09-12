@@ -750,6 +750,9 @@ EventTypes:
           added: 添加应用 Key
           removed: 删除应用 Key
       config:
+        saml:
+          added: 添加 SAML 配置
+          changed: 更改 SAML 配置
         oidc:
           added: 添加 OIDC 配置
           changed: 更改 OIDC 配置

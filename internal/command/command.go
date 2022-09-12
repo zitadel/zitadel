@@ -1,10 +1,11 @@
 package command
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/http"
+	api_http "github.com/zitadel/zitadel/internal/api/http"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -23,6 +24,8 @@ import (
 )
 
 type Commands struct {
+	httpClient *http.Client
+
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
 	idGenerator    id.Generator
@@ -40,14 +43,17 @@ type Commands struct {
 	applicationKeySize          int
 	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
-	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
+	domainVerificationValidator func(domain, token, verifier string, checkType api_http.CheckType) error
 
-	multifactors       domain.MultifactorConfigs
-	webauthnConfig     *webauthn_helper.Config
-	keySize            int
-	keyAlgorithm       crypto.EncryptionAlgorithm
-	privateKeyLifetime time.Duration
-	publicKeyLifetime  time.Duration
+	multifactors         domain.MultifactorConfigs
+	webauthnConfig       *webauthn_helper.Config
+	keySize              int
+	keyAlgorithm         crypto.EncryptionAlgorithm
+	certificateAlgorithm crypto.EncryptionAlgorithm
+	certKeySize          int
+	privateKeyLifetime   time.Duration
+	publicKeyLifetime    time.Duration
+	certificateLifetime  time.Duration
 }
 
 func StartCommands(es *eventstore.Eventstore,
@@ -64,7 +70,9 @@ func StartCommands(es *eventstore.Eventstore,
 	smsEncryption,
 	userEncryption,
 	domainVerificationEncryption,
-	oidcEncryption crypto.EncryptionAlgorithm,
+	oidcEncryption,
+	samlEncryption crypto.EncryptionAlgorithm,
+	httpClient *http.Client,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
@@ -78,15 +86,19 @@ func StartCommands(es *eventstore.Eventstore,
 		externalSecure:        externalSecure,
 		externalPort:          externalPort,
 		keySize:               defaults.KeyConfig.Size,
+		certKeySize:           defaults.KeyConfig.CertificateSize,
 		privateKeyLifetime:    defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:     defaults.KeyConfig.PublicKeyLifetime,
+		certificateLifetime:   defaults.KeyConfig.CertificateLifetime,
 		idpConfigEncryption:   idpConfigEncryption,
 		smtpEncryption:        smtpEncryption,
 		smsEncryption:         smsEncryption,
 		userEncryption:        userEncryption,
 		domainVerificationAlg: domainVerificationEncryption,
 		keyAlgorithm:          oidcEncryption,
+		certificateAlgorithm:  samlEncryption,
 		webauthnConfig:        webAuthN,
+		httpClient:            httpClient,
 	}
 
 	instance_repo.RegisterEventMappers(repo.eventstore)
@@ -109,7 +121,7 @@ func StartCommands(es *eventstore.Eventstore,
 	}
 
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
-	repo.domainVerificationValidator = http.ValidateDomain
+	repo.domainVerificationValidator = api_http.ValidateDomain
 	return repo, nil
 }
 

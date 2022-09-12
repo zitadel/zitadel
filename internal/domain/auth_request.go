@@ -119,6 +119,8 @@ func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
 	switch requestType {
 	case AuthRequestTypeOIDC:
 		return &AuthRequest{Request: &AuthRequestOIDC{}}, nil
+	case AuthRequestTypeSAML:
+		return &AuthRequest{Request: &AuthRequestSAML{}}, nil
 	}
 	return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
 }

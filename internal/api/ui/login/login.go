@@ -37,6 +37,7 @@ type Login struct {
 	externalSecure      bool
 	consolePath         string
 	oidcAuthCallbackURL func(context.Context, string) string
+	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
 }
@@ -61,10 +62,12 @@ func CreateLogin(config Config,
 	staticStorage static.Storage,
 	consolePath string,
 	oidcAuthCallbackURL func(context.Context, string) string,
+	samlAuthCallbackURL func(context.Context, string) string,
 	externalSecure bool,
 	userAgentCookie,
 	issuerInterceptor,
-	instanceHandler,
+	oidcInstanceHandler,
+	samlInstanceHandler mux.MiddlewareFunc,
 	assetCache mux.MiddlewareFunc,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
@@ -73,6 +76,7 @@ func CreateLogin(config Config,
 
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
+		samlAuthCallbackURL: samlAuthCallbackURL,
 		externalSecure:      externalSecure,
 		consolePath:         consolePath,
 		command:             command,
@@ -91,7 +95,7 @@ func CreateLogin(config Config,
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), instanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor)
+	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor)
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil

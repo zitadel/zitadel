@@ -118,7 +118,13 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name))
+	entityID := ""
+	samlWriteModel, err := c.getSAMLAppWriteModel(ctx, projectID, appID, resourceOwner)
+	if err == nil && samlWriteModel.State != domain.AppStateUnspecified && samlWriteModel.State != domain.AppStateRemoved && samlWriteModel.saml {
+		entityID = samlWriteModel.EntityID
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, entityID))
 	if err != nil {
 		return nil, err
 	}
