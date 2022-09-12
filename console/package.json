@@ -60,7 +60,7 @@
     "@angular/cli": "^14.2.1",
     "@angular/compiler-cli": "^14.2.0",
     "@angular/language-service": "^14.2.0",
-    "@types/jasmine": "~4.0.3",
+    "@types/jasmine": "~4.3.0",
     "@types/jasminewd2": "~2.0.10",
     "@types/jsonwebtoken": "^8.5.5",
     "@types/node": "^17.0.42",
