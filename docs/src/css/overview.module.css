@@ -1,0 +1,42 @@
+.overview {
+  display: flex;
+  flex-direction: row;
+  margin: 0 -0.5rem;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  padding: 0.5rem 0;
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  background-color: #00000010;
+}
+
+.item {
+  border-radius: 1rem;
+  margin: 0 0.5rem;
+  padding: 1rem;
+  /* min-width: 150px; */
+  display: block;
+  font-weight: 700;
+}
+
+.itemtitle {
+  font-size: 16px;
+  margin-bottom: 1.5rem;
+  text-decoration: none;
+}
+
+.ul {
+  list-style: none;
+  margin-top: 1rem;
+  padding-left: 1rem;
+}
+.li {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* @media (min-width: 1180px) {
+  .column {
+    grid-template-columns: 1fr 1fr;
+  }
+} */

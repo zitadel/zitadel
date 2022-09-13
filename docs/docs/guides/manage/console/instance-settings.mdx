@@ -1,0 +1,38 @@
+---
+title: Instance Settings
+---
+
+Instance settings work as a default or fallback settings for your organizational settings. Most of the time you only have to set instance settings for the cases where you don't need specific behaviour in the organizations themselves.
+
+To access instance settings, use the instance page at {instanceDomain}/settings or click at the instance button on the top-right of the page and then navigate to settings in the navigation.
+When you configure your instance, you can set the following:
+
+- **General**: Default Language for the UI
+- **Notification providers and SMTP**: Email Server settings, so initialization-, verification- and other mails are sent from your own domain. For SMS, Twilio is supported as notification provider.
+- **Login Behaviour and Access**: Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
+- **Identity Providers**: Define IDPs which are available for all organizations
+- **Password Complexity**: Requirements for Passwords ex. Symbols, Numbers, min length and more.
+- **Lockout**: Set the maximum attempts a user can try to enter the password. When the number is exceeded, the user gets locked out and has to be unlocked.
+- **Domain settings**: Whether users use their email or the generated username to login. Other Validation, SMTP settings
+- **Branding**: Appearance of the login interface, Learn more [here](./branding.mdx).
+- **Message Texts**: Text and internationalization for emails
+- **Login Interface Texts**: Text and internationalization for the login interface
+- **Privacy Policy**: Links to your own Terms of Service and Privacy Policy regulations. Link to Help Page.
+- **OIDC Token Lifetimes and Expiration**: Token lifetime and expiration settings.
+- **Secret Appearance**: Appearance of the generated codes and secrets used in mails for verification etc.
+
+## Branding
+
+We recommend setting your Branding and SMTP settings initially as it will comfort your customers having a familiar UI for login and receiving notifications from your domain and mail addresses.
+
+In the Branding settings, you can upload you Logo for the login interface, set your own colors for buttons, background, links, modify UI components in their size, border-radius and choose between multiple behavours. For example you can choose if social logins are shown before the username field or vice versa. You don't need to be an expert as those settings can all be set without any knowledge of CSS.
+
+Branding settings applied on you instance act as a default for all your organizations. If you need custom branding on a organization (for example in a B2B scenario, where organizations are allowed to use their custom design), navigate back to the home page, choose your organization in the header above, navigate to the organization settings and set the custom design here.
+
+The behaviour of the login page, applyling custom design, is then defined on your projects detail page.
+
+<img
+  src="/img/guides/console/projectbranding.png"
+  alt="Project branding"
+  width="400px"
+/>
