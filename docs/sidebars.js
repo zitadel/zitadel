@@ -297,7 +297,10 @@ module.exports = {
       type: "category",
       label: "Features",
       collapsed: false,
-      items: ["concepts/features/actions"],
+      items: [
+        "concepts/features/actions",
+        "concepts/features/selfservice"
+      ],
     },
   ],
   manuals: [
