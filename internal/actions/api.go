@@ -106,6 +106,9 @@ func (a *API) SetUserGrants(usergrants *[]UserGrant) *API {
 }
 
 func (a *API) SetClaims(claims *map[string]interface{}, logs *[]string) *API {
+	if *claims == nil {
+		*claims = make(map[string]interface{})
+	}
 	a.set("setClaim", func(key string, value interface{}) {
 		if _, ok := (*claims)[key]; !ok {
 			(*claims)[key] = value
