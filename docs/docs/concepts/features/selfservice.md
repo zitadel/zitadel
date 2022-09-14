@@ -16,11 +16,38 @@ For example you can create an organization and assign a user from that organizat
 Given this role the user could perform actions like configuring their own SSO/Identity Provider, set security policy for their organization, or assign roles to other users.
 :::
 
+All self-service interfaces are available in different [languages](http://localhost:3000/docs/guides/manage/customize/texts#internationalization).
+
 ## Registration
 
-Unauthenticated users (pre-login).
+:::info
+You can pre-select a given organization by passing the scope `urn:zitadel:iam:org:domain:primary:{domainname}` in the authorization request.
+This will force users to register only with the specified organization.
+Also the branding and login settings (e.g. Social Login Providers) are directly shown to the user.
+:::
 
-- Email
+### Local account
+
+Allows unauthenticated and users, who are not yet in the given organization, to create an account (register) themselves.
+
+- Mandatory profile fields
+- Set password
+- Accept terms of service and privacy policy
+- User receives an email with an one-time code
+- User has to enter the one-time code to finish registration
+- User can re-quest a new one-time code
+
+The user is prompted on first login to setup MFA.
+This step is mandatory in case MFA is enforced in the login policy.
+
+### Existing Identity / SSO / Social Login
+
+Allows unauthenticated and users, who are not yet in the given organization, to register with an external identity provider.
+An external identity provider can be a Social Login Provider or a pre-configured identity provider.
+
+- Information from the external identity provider is used to pre-fill the profile information
+- User can update the profile information
+- An account is created within ZITADEL and linked with the external identity provider
 
 ## Login
 
@@ -38,9 +65,9 @@ Unauthenticated users (pre-login).
 - Embedded Browser
 - Redirect protocol (guide?)
 
-### SSO / External IdP
+### SSO, External IdP, Social Logins
 
-### Social Login
+- Unkown: register + account linking
 
 ### APIs
 
