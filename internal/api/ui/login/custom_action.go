@@ -24,10 +24,12 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	if err != nil {
 		return nil, err
 	}
-	actionCtx := (&actions.Context{}).SetToken(tokens)
+	runtimeCtx := (&actions.Context{}).SetToken(tokens)
 	api := (&actions.API{}).SetExternalUser(user).SetMetadata(&user.Metadatas)
 	for _, a := range triggerActions {
-		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Options()...)
+		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
+		err = actions.Run(actionCtx, runtimeCtx, api, a.Script, a.Name, actions.ActionToOptions(a)...)
+		cancel()
 		if err != nil {
 			return nil, err
 		}
@@ -40,10 +42,12 @@ func (l *Login) customExternalUserToLoginUserMapping(ctx context.Context, user *
 	if err != nil {
 		return nil, nil, err
 	}
-	actionCtx := (&actions.Context{}).SetToken(tokens)
+	runtimeCtx := (&actions.Context{}).SetToken(tokens)
 	api := (&actions.API{}).SetHuman(user).SetMetadata(&metadata)
 	for _, a := range triggerActions {
-		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Options()...)
+		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
+		err = actions.Run(actionCtx, runtimeCtx, api, a.Script, a.Name, actions.ActionToOptions(a)...)
+		cancel()
 		if err != nil {
 			return nil, nil, err
 		}
@@ -56,11 +60,13 @@ func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.To
 	if err != nil {
 		return nil, err
 	}
-	actionCtx := (&actions.Context{}).SetToken(tokens)
+	runtimeCtx := (&actions.Context{}).SetToken(tokens)
 	actionUserGrants := make([]actions.UserGrant, 0)
 	api := (&actions.API{}).SetUserGrants(&actionUserGrants)
 	for _, a := range triggerActions {
-		err = actions.Run(actionCtx, api, a.Script, a.Name, a.Options()...)
+		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
+		err = actions.Run(actionCtx, runtimeCtx, api, a.Script, a.Name, actions.ActionToOptions(a)...)
+		cancel()
 		if err != nil {
 			return nil, err
 		}

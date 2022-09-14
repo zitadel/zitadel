@@ -1,11 +1,15 @@
 package actions
 
 import (
+	"context"
 	"errors"
 	"time"
 
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
+
+	z_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 var (
@@ -14,8 +18,11 @@ var (
 
 type jsAction func(*Context, *API) error
 
-func Run(ctx *Context, api *API, script, name string, opts ...Option) error {
-	config := newRunConfig(opts...)
+func Run(ctx context.Context, runtimeCtx *Context, api *API, script, name string, opts ...Option) error {
+	config := newRunConfig(ctx, opts...)
+	if config.timeout == 0 {
+		return z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
+	}
 
 	vm, err := prepareRun(script, config)
 	if err != nil {
@@ -55,7 +62,7 @@ func Run(ctx *Context, api *API, script, name string, opts ...Option) error {
 			}
 		}()
 
-		err = fn(ctx, api)
+		err = fn(runtimeCtx, api)
 		if err != nil && !config.allowedToFail {
 			errCh <- err
 			return
@@ -67,6 +74,7 @@ func Run(ctx *Context, api *API, script, name string, opts ...Option) error {
 
 func newRuntime(config *runConfig) *goja.Runtime {
 	vm := goja.New()
+	vm.SetFieldNameMapper(goja.UncapFieldNameMapper())
 
 	registry := new(require.Registry)
 	registry.Enable(vm)
@@ -108,4 +116,12 @@ func setInterrupt(vm *goja.Runtime, timeout time.Duration) *time.Timer {
 	return time.AfterFunc(timeout, func() {
 		vm.Interrupt(ErrHalt)
 	})
+}
+
+func ActionToOptions(a *query.Action) []Option {
+	opts := make([]Option, 0, 1)
+	if a.AllowedToFail {
+		opts = append(opts, WithAllowedToFail())
+	}
+	return opts
 }

@@ -105,7 +105,7 @@ func ActionToPb(action *query.Action) *action_pb.Action {
 		State:         ActionStateToPb(action.State),
 		Name:          action.Name,
 		Script:        action.Script,
-		Timeout:       durationpb.New(action.Timeout),
+		Timeout:       durationpb.New(action.Timeout()),
 		AllowedToFail: action.AllowedToFail,
 	}
 }

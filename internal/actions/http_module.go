@@ -2,21 +2,23 @@ package actions
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/dop251/goja"
+
 	"github.com/zitadel/logging"
 )
 
-func WithHTTP(client *http.Client) Option {
+func WithHTTP(ctx context.Context, client *http.Client) Option {
 	return func(c *runConfig) {
 		c.modules["zitadel/http"] = func(runtime *goja.Runtime, module *goja.Object) {
-			requireHTTP(client, c.end, runtime, module)
+			requireHTTP(ctx, client, runtime, module)
 		}
 	}
 }
@@ -24,19 +26,15 @@ func WithHTTP(client *http.Client) Option {
 type HTTP struct {
 	runtime *goja.Runtime
 	client  *http.Client
-	maxEnd  time.Time
 }
 
-func requireHTTP(client *http.Client, maxEnd time.Time, runtime *goja.Runtime, module *goja.Object) {
+func requireHTTP(ctx context.Context, client *http.Client, runtime *goja.Runtime, module *goja.Object) {
 	c := &HTTP{
 		client:  client,
 		runtime: runtime,
-		maxEnd:  maxEnd,
 	}
 	o := module.Get("exports").(*goja.Object)
-	logging.OnError(
-		o.Set("fetch", c.fetch),
-	).Warn("somesing happened")
+	logging.OnError(o.Set("fetch", c.fetch(ctx))).Warn("unable to set module")
 }
 
 type fetchConfig struct {
@@ -49,6 +47,7 @@ var defaultFetchConfig = fetchConfig{
 	Method: http.MethodGet,
 	Headers: http.Header{
 		"Content-Type": []string{"application/json"},
+		"Accept":       []string{"application/json"},
 	},
 }
 
@@ -73,65 +72,71 @@ func (c *HTTP) fetchConfigFromArg(arg *goja.Object) (config fetchConfig, err err
 }
 
 type response struct {
-	Body       interface{} `json:"body"`
-	StatusCode int         `json:"status"`
-	//TODO: add headers
+	Body       string              `json:"body"`
+	StatusCode int                 `json:"status"`
+	Headers    map[string][]string `json:"headers"`
+	runtime    *goja.Runtime
 }
 
-func (c *HTTP) fetch(call goja.FunctionCall) goja.Value {
-	req, err := c.buildHTTPRequest(call.Arguments)
-	if err != nil {
-		// handle error
-		logging.WithError(err).Warn("new req failed")
+func (r *response) Json() goja.Value {
+	var val interface{}
+
+	if err := json.Unmarshal([]byte(r.Body), &val); err != nil {
+		panic(err)
 	}
 
-	c.client.Timeout = time.Until(c.maxEnd)
-	res, err := c.client.Do(req)
-	if err != nil {
-		logging.WithError(err).Warn("call failed")
-		return nil
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		// TODO: do something meaningfull with the body
-		logging.WithError(err).Warn("unable to parse body")
-	}
-	return c.runtime.ToValue(response{StatusCode: res.StatusCode, Body: string(body)})
+	return r.runtime.ToValue(val)
 }
 
-func (c *HTTP) buildHTTPRequest(args []goja.Value) (req *http.Request, err error) {
+func (c *HTTP) fetch(ctx context.Context) func(call goja.FunctionCall) goja.Value {
+	return func(call goja.FunctionCall) goja.Value {
+		req := c.buildHTTPRequest(call.Arguments)
+		if deadline, ok := ctx.Deadline(); ok {
+			c.client.Timeout = time.Until(deadline)
+		}
+
+		res, err := c.client.Do(req)
+		if err != nil {
+			logging.WithError(err).Debug("call failed")
+			panic(err)
+		}
+		defer res.Body.Close()
+
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			logging.WithError(err).Warn("unable to parse body")
+			panic("unable to read response body")
+		}
+		return c.runtime.ToValue(&response{StatusCode: res.StatusCode, Body: string(body), runtime: c.runtime})
+	}
+}
+
+func (c *HTTP) buildHTTPRequest(args []goja.Value) (req *http.Request) {
 	if len(args) > 2 {
-		//TODO: thow error too many args
-		logging.WithFields("count", len(args)).Error("more than 2 args provided")
+		logging.WithFields("count", len(args)).Debug("more than 2 args provided")
+		panic("too many args")
 	}
 
 	if len(args) < 1 {
-		//TODO: thow error no url provided
-		logging.Error("no args provided")
-	}
-
-	url, ok := args[0].Export().(string)
-	if !ok {
-		logging.Error("url was not a string")
+		panic("no url provided")
 	}
 
 	config := defaultFetchConfig
+	var err error
 	if len(args) == 2 {
 		config, err = c.fetchConfigFromArg(args[1].ToObject(c.runtime))
 		if err != nil {
-			return nil, err
+			panic(err)
 		}
 	}
 
-	req, err = http.NewRequest(config.Method, url, config.Body)
+	req, err = http.NewRequest(config.Method, args[0].Export().(string), config.Body)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	req.Header = config.Headers
 
-	return req, nil
+	return req
 }
 
 func parseHeaders(headers *goja.Object) http.Header {

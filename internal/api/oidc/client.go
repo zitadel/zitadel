@@ -258,24 +258,8 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		}
 	}
 
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner)
-	if err != nil {
-		return err
-	}
-	claimLogs := []string{}
-	api := (&actions.API{}).SetUserinfo(userInfo, &claimLogs)
-	for _, action := range queriedActions {
-		if err = actions.Run(nil, api, action.Script, action.Name, actions.WithHTTP(http.DefaultClient)); err != nil {
-			return err
-		}
-		if len(claimLogs) > 0 {
-			userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
-			claimLogs = nil
-		}
-	}
-
 	if len(roles) == 0 || applicationID == "" {
-		return nil
+		return o.userinfoFlows(ctx, user.ResourceOwner, userInfo)
 	}
 	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
 	if err != nil {
@@ -283,6 +267,38 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 	}
 	if len(projectRoles) > 0 {
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
+	}
+
+	return o.userinfoFlows(ctx, user.ResourceOwner, userInfo)
+}
+
+func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userInfo oidc.UserInfoSetter) error {
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, resourceOwner)
+	if err != nil {
+		return err
+	}
+	claimLogs := []string{}
+	api := (&actions.API{}).SetUserinfo(userInfo, &claimLogs)
+	for _, action := range queriedActions {
+		actionCtx, cancel := context.WithTimeout(ctx, action.Timeout())
+		err = actions.Run(
+			actionCtx,
+			nil,
+			api,
+			action.Script,
+			action.Name,
+			actions.WithHTTP(actionCtx, http.DefaultClient),
+			actions.WithUserMetadata(actionCtx, o.query, o.command, userInfo.GetSubject(), resourceOwner),
+			actions.WithLogger(actions.ServerLog),
+		)
+		cancel()
+		if err != nil {
+			return err
+		}
+		if len(claimLogs) > 0 {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
+			claimLogs = nil
+		}
 	}
 
 	return nil
@@ -316,28 +332,8 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 	}
 
-	user, err := o.query.GetUserByID(ctx, true, userID)
-	if err != nil {
-		return nil, err
-	}
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	claimLogs := []string{}
-	api := (&actions.API{}).SetClaims(&claims, &claimLogs)
-	for _, action := range queriedActions {
-		if err = actions.Run(nil, api, action.Script, action.Name); err != nil {
-			return nil, err
-		}
-		if len(claimLogs) > 0 {
-			claims = appendClaim(claims, fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
-			claimLogs = nil
-		}
-	}
-
 	if len(roles) == 0 || clientID == "" {
-		return claims, nil
+		return o.privateClaimsFlows(ctx, userID, claims)
 	}
 	projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
 	if err != nil {
@@ -347,7 +343,43 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
 
-	return claims, err
+	return o.privateClaimsFlows(ctx, userID, claims)
+}
+
+func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claims map[string]interface{}) (map[string]interface{}, error) {
+	user, err := o.query.GetUserByID(ctx, true, userID)
+	if err != nil {
+		return nil, err
+	}
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	claimLogs := []string{}
+	api := (&actions.API{}).SetClaims(&claims, &claimLogs)
+	for _, action := range queriedActions {
+		actionCtx, cancel := context.WithTimeout(ctx, action.Timeout())
+		err = actions.Run(
+			actionCtx,
+			nil,
+			api,
+			action.Script,
+			action.Name,
+			actions.WithHTTP(actionCtx, http.DefaultClient),
+			actions.WithUserMetadata(actionCtx, o.query, o.command, userID, user.ResourceOwner),
+			actions.WithLogger(actions.ServerLog),
+		)
+		cancel()
+		if err != nil {
+			return nil, err
+		}
+		if len(claimLogs) > 0 {
+			claims = appendClaim(claims, fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
+			claimLogs = nil
+		}
+	}
+
+	return claims, nil
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {

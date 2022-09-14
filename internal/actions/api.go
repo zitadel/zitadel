@@ -1,9 +1,12 @@
 package actions
 
 import (
+	"fmt"
+
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
-	"golang.org/x/text/language"
 )
 
 type API map[string]interface{}
@@ -112,7 +115,9 @@ func (a *API) SetClaims(claims *map[string]interface{}, logs *[]string) *API {
 	a.set("setClaim", func(key string, value interface{}) {
 		if _, ok := (*claims)[key]; !ok {
 			(*claims)[key] = value
+			return
 		}
+		*logs = append(*logs, fmt.Sprintf("key %q already exists", key))
 	})
 	a.set("appendLogIntoClaims", func(entry string) {
 		*logs = append(*logs, entry)
@@ -124,7 +129,9 @@ func (a *API) SetUserinfo(userInfo oidc.UserInfoSetter, logs *[]string) *API {
 	a.set("setClaim", func(key string, value interface{}) {
 		if userInfo.GetClaim(key) == nil {
 			userInfo.AppendClaims(key, value)
+			return
 		}
+		*logs = append(*logs, fmt.Sprintf("key %q already exists", key))
 	})
 	a.set("appendLogIntoClaims", func(entry string) {
 		*logs = append(*logs, entry)

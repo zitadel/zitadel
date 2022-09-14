@@ -1,13 +1,14 @@
 package actions
 
 import (
+	"context"
 	"time"
 
 	"github.com/dop251/goja_nodejs/require"
+	"github.com/zitadel/logging"
 )
 
 const (
-	maxTimeout        = 20 * time.Second
 	maxPrepareTimeout = 5 * time.Second
 )
 
@@ -19,9 +20,14 @@ type runConfig struct {
 	end     time.Time
 }
 
-func newRunConfig(opts ...Option) *runConfig {
+func newRunConfig(ctx context.Context, opts ...Option) *runConfig {
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		logging.Warn("no timeout set on action run")
+	}
+
 	config := &runConfig{
-		timeout:        maxTimeout,
+		timeout:        time.Until(deadline),
 		prepareTimeout: maxPrepareTimeout,
 		modules:        map[string]require.ModuleLoader{},
 	}
@@ -40,22 +46,6 @@ func newRunConfig(opts ...Option) *runConfig {
 }
 
 type Option func(*runConfig)
-
-// WithTimeout sets the passed timeout for the execution
-// timeout has to be between 0 and 20 seconds
-// values out of range are ignored
-func WithTimeout(timeout time.Duration) Option {
-	return func(c *runConfig) {
-		if timeout <= 0 || timeout > maxTimeout {
-			return
-		}
-		c.timeout = timeout
-		if timeout > maxPrepareTimeout {
-			return
-		}
-		c.prepareTimeout = timeout
-	}
-}
 
 func WithAllowedToFail() Option {
 	return func(c *runConfig) {

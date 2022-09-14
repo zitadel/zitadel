@@ -663,7 +663,7 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*v1_pb.DataActio
 		return actions, nil
 	}
 	for i, action := range queriedActions.Actions {
-		timeout := durationpb.New(action.Timeout)
+		timeout := durationpb.New(action.Timeout())
 
 		actions[i] = &v1_pb.DataAction{
 			ActionId: action.ID,
