@@ -51,21 +51,11 @@ An external identity provider can be a Social Login Provider or a pre-configured
 
 ## Login
 
-Unauthenticated users (pre-login).
-
 ### Web, Mobile, and Single-Page Applications
 
 [This guide](/docs/guides/integrate/login-users) explains in more detail the login-flows for different application types.
 Human users are redirected to ZITADEL's login page and complete sign-in with the interactive login flow.
 It is important to understand that ZITADEL provides a hosted login page and the device of the users opens this login page in a browser, even on Native/Mobile apps.
-
-#### Customization
-
-The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
-
-:::info
-By default, the displayed branding is defined based on the user's domain. In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
-:::
 
 #### MFA / 2FA
 
@@ -105,24 +95,43 @@ Given an external identity provider is configured on the instance or on the orga
 Machine accounts can't use an interactive login but require other means of authentication, such as privately-signed JWT or personal access tokens.
 Read more about [Service Users](/docs/guides/integrate/serviceusers) and recommended [OpenID Connect Flows](/docs/guides/integrate/oauth-recommended-flows#different-client-profiles).
 
-### Others
+### Other Clients
 
 We currently do not expose the Login APIs.
 Whereas you can register users via the management API, you can't login users with our APIs.
 This might be important in cases where you can't use a website (eg, Games, VR, ...).
 
+### Customization
+
+The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
+
+:::info
+By default, the displayed branding is defined based on the user's domain. In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
+:::
+
+### Account picker
+
+A list of accounts that were used to log-in are shown to the user.
+The user can click the account in the list and does not need to type the username.
+
+:::info
+This behavior can be changed with the authorization request. Please refer to our [guide](/docs/guides/integrate/login-users).
+:::
+
 ## Logout
 
-Authenticated users.
-
-- End all sessions
-- SLO
+Users can terminate all their sessions (logout).
+A client will implement this by calling the [specific endpoint](http://localhost:3000/docs/apis/openidoauth/endpoints#end_session_endpoint).
 
 ## Secrets
 
-Authenticated users.
-
 ### Password reset
+
+Unauthenticated users can request a password reset after providing the loginname during the login flow.
+
+- User selects reset password
+- An email will be sent to the verified email address
+- User has 
 
 ### Change password
 
