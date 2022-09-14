@@ -6,4 +6,5 @@ import (
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(AddedEventType, AddedEventMapper)
+	es.RegisterFilterEventMapper(AddedCertificateEventType, AddedCertificateEventMapper)
 }

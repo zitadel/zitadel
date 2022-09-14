@@ -51,7 +51,7 @@ func SonyFlakeGenerator() Generator {
 }
 
 // the following is a copy of sonyflake (https://github.com/sony/sonyflake/blob/master/sonyflake.go)
-//with the change of using the "POD-IP" if no private ip is found
+// with the change of using the "POD-IP" if no private ip is found
 func privateIPv4() (net.IP, error) {
 	as, err := net.InterfaceAddrs()
 	if err != nil {
@@ -88,7 +88,7 @@ func isPrivateIPv4(ip net.IP) bool {
 
 func machineID() (uint16, error) {
 	if GeneratorConfig == nil {
-		return 0, errors.New("Cannot create a unique ID for the machine, generator has not been configured.")
+		return 0, errors.New("cannot create a unique id for the machine, generator has not been configured")
 	}
 
 	errors := []string{}

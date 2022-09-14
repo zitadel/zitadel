@@ -19,7 +19,7 @@ import { OrgMembersDataSource } from './org-members-datasource';
 })
 export class OrgMembersComponent {
   public INITIALPAGESIZE: number = 25;
-  public org!: Org.AsObject;
+  public org?: Org.AsObject;
   public disableWrite: boolean = false;
   public dataSource!: OrgMembersDataSource;
 

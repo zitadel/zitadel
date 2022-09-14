@@ -13,6 +13,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/zitadel/saml/pkg/provider"
+
+	"github.com/zitadel/zitadel/internal/api/saml"
+
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -100,12 +104,12 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, config.SystemDefaults, keys.IDPConfig, keys.OTP, keys.OIDC, config.InternalAuthZ.RolePermissionMappings)
+	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, config.SystemDefaults, keys.IDPConfig, keys.OTP, keys.OIDC, keys.SAML, config.InternalAuthZ.RolePermissionMappings)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC)
+	authZRepo, err := authz.Start(queries, dbClient, keys.OIDC, config.ExternalSecure)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
@@ -134,6 +138,8 @@ func startZitadel(config *Config, masterKey string) error {
 		keys.User,
 		keys.DomainVerification,
 		keys.OIDC,
+		keys.SAML,
+		&http.Client{},
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
@@ -208,13 +214,19 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 
+	samlProvider, err := saml.NewProvider(ctx, config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor)
+	if err != nil {
+		return fmt.Errorf("unable to start saml provider: %w", err)
+	}
+	apis.RegisterHandler(saml.HandlerPrefix, samlProvider.HttpHandler())
+
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcProvider.IssuerFromRequest, instanceInterceptor.Handler, config.CustomerPortal)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, console.HandlerPrefix+"/", op.AuthCallbackURL(oidcProvider), provider.AuthCallbackURL(samlProvider), config.ExternalSecure, userAgentInterceptor, op.NewIssuerInterceptor(oidcProvider.IssuerFromRequest).Handler, provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler, instanceInterceptor.Handler, assetsCache.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

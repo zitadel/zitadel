@@ -27,7 +27,7 @@ export class UserMfaComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatTable) public table!: MatTable<AuthFactor.AsObject>;
   @ViewChild(MatSort) public sort!: MatSort;
-  public dataSource!: MatTableDataSource<AuthFactor.AsObject>;
+  public dataSource: MatTableDataSource<AuthFactor.AsObject> = new MatTableDataSource<AuthFactor.AsObject>([]);
 
   public AuthFactorState: any = AuthFactorState;
 

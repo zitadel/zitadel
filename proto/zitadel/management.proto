@@ -1368,14 +1368,28 @@ service ManagementService {
         };
     }
 
-    // Adds a new api application
-    // Returns a client id
-    // Returns a new generated secret if needed (Depending on the configuration)
-    rpc AddAPIApp(AddAPIAppRequest) returns (AddAPIAppResponse) {
-        option (google.api.http) = {
-            post: "/projects/{project_id}/apps/api"
-            body: "*"
-        };
+  // Adds a new saml service provider
+  // Returns a entityID
+  rpc AddSAMLApp(AddSAMLAppRequest) returns (AddSAMLAppResponse) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/apps/saml"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  // Adds a new api application
+  // Returns a client id
+  // Returns a new generated secret if needed (Depending on the configuration)
+  rpc AddAPIApp(AddAPIAppRequest) returns (AddAPIAppResponse) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/apps/api"
+      body: "*"
+    };
 
         option (zitadel.v1.auth_option) = {
             permission: "project.app.write"
@@ -1409,12 +1423,25 @@ service ManagementService {
         };
     }
 
-    // Changes the configuration of the api application
-    rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
-        option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{app_id}/api_config"
-            body: "*"
-        };
+  // Changes the configuration of the saml application
+  rpc UpdateSAMLAppConfig(UpdateSAMLAppConfigRequest) returns (UpdateSAMLAppConfigResponse) {
+    option (google.api.http) = {
+      put: "/projects/{project_id}/apps/{app_id}/saml_config"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  // Changes the configuration of the api application
+  rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
+    option (google.api.http) = {
+      put: "/projects/{project_id}/apps/{app_id}/api_config"
+      body: "*"
+    };
 
         option (zitadel.v1.auth_option) = {
             permission: "project.app.write"
@@ -4086,6 +4113,21 @@ message AddOIDCAppResponse {
     repeated zitadel.v1.LocalizedMessage compliance_problems = 6;
 }
 
+message AddSAMLAppRequest {
+  string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  oneof metadata {
+      option (validate.required) = true;
+      bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+      string metadata_url = 4 [(validate.rules).string.max_len = 200];
+  }
+}
+
+message AddSAMLAppResponse {
+  string app_id = 1;
+  zitadel.v1.ObjectDetails details = 2;
+}
+
 message AddAPIAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -4139,7 +4181,22 @@ message UpdateOIDCAppConfigRequest {
 }
 
 message UpdateOIDCAppConfigResponse {
-    zitadel.v1.ObjectDetails details = 1;
+  zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSAMLAppConfigRequest {
+  string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+  oneof metadata {
+      option (validate.required) = true;
+      bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+      string metadata_url = 4 [(validate.rules).string.max_len = 200];
+  }
+}
+
+message UpdateSAMLAppConfigResponse {
+  zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateAPIAppConfigRequest {

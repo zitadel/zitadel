@@ -6,8 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
@@ -365,7 +363,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 			res: res{
 				clause: " WHERE ( aggregate_type = ANY(?) )",
-				values: []interface{}{pq.Array([]es_models.AggregateType{"user", "org"})},
+				values: []interface{}{[]es_models.AggregateType{"user", "org"}},
 			},
 		},
 		{
@@ -381,7 +379,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 			res: res{
 				clause: " WHERE ( aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) )",
-				values: []interface{}{pq.Array([]es_models.AggregateType{"user", "org"}), "1234", pq.Array([]es_models.EventType{"user.created", "org.created"})},
+				values: []interface{}{[]es_models.AggregateType{"user", "org"}, "1234", []es_models.EventType{"user.created", "org.created"}},
 			},
 		},
 	}

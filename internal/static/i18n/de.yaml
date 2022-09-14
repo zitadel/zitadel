@@ -247,9 +247,14 @@ Errors:
       NotExisting: Applikation existiert nicht
       IsNotOIDC: Applikation ist nicht vom Typ OIDC
       IsNotAPI: Applikation ist nicht vom Typ API
+      IsNotSAML: Applikation ist nicht vom Typ SAML
       NotActive: Applikation ist nicht aktiv
       NotInactive: Applikation ist nickt inaktiv
       OIDCConfigInvalid: OIDC Konfiguration ist ungültig
+      SAMLConfigInvalid: SAML Konfiguration ist ungültig
+      SAMLMetadataMissing: SAML Metadata ist nicht vorhanden
+      SAMLMetadataFormat: SAML Metadata Formatfehler
+      SAMLEntityIDAlreadyExisting: SAML EntityID existiert bereits
       APIConfigInvalid: API Konfiguration ist ungültig
       OIDCAuthMethodNoSecret: Gewählte OIDC Auth Method benötigt kein Secret
       APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
@@ -265,6 +270,7 @@ Errors:
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
   IAM:
+    NotFound: Instanz nicht gefunden
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig
@@ -750,6 +756,9 @@ EventTypes:
           added: Applikations Schlüssel hinzugefügt
           removed: Applikations Schlüssel entfernt
       config:
+        saml:
+          added: SAML Konfiguration hinzugefügt
+          changed: SAML Konfiguration geändert
         oidc:
           added: OIDC Konfiguration hinzugefügt
           changed: OIDC Konfiguration geändert

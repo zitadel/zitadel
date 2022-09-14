@@ -22,6 +22,10 @@ import (
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
+var (
+	testNow = time.Now()
+)
+
 type mockViewNoUserSession struct{}
 
 func (m *mockViewNoUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
@@ -191,7 +195,7 @@ type mockUserGrants struct {
 	userGrants int
 }
 
-func (m *mockUserGrants) ProjectByOIDCClientID(ctx context.Context, s string) (*query.Project, error) {
+func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
@@ -208,7 +212,7 @@ type mockProject struct {
 	projectCheck bool
 }
 
-func (m *mockProject) ProjectByOIDCClientID(ctx context.Context, s string) (*query.Project, error) {
+func (m *mockProject) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
 	return &query.Project{HasProjectCheck: m.projectCheck}, nil
 }
 
@@ -615,8 +619,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"passwordless verified, email not verified, email verification step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordlessVerification: time.Now().Add(-5 * time.Minute),
-					MultiFactorVerification:  time.Now().Add(-5 * time.Minute),
+					PasswordlessVerification: testNow.Add(-5 * time.Minute),
+					MultiFactorVerification:  testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:            true,
@@ -667,7 +671,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"external user (no external verification), external login step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					IsEmailVerified: true,
@@ -699,8 +703,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"external user (external verification set), callback",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					ExternalLoginVerification: time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification:  time.Now().UTC().Add(-5 * time.Minute),
+					ExternalLoginVerification: testNow.Add(-5 * time.Minute),
+					SecondFactorVerification:  testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					IsEmailVerified: true,
@@ -759,8 +763,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"external user (no password check needed), callback",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					SecondFactorVerification:  time.Now().UTC().Add(-5 * time.Minute),
-					ExternalLoginVerification: time.Now().UTC().Add(-5 * time.Minute),
+					SecondFactorVerification:  testNow.Add(-5 * time.Minute),
+					ExternalLoginVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -795,7 +799,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"password verified, passwordless set up, mfa not verified, mfa check step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:        true,
@@ -829,7 +833,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"mfa not verified, mfa check step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
@@ -862,8 +866,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"external user, mfa not verified, mfa check step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:      time.Now().UTC().Add(-5 * time.Minute),
-					ExternalLoginVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:      testNow.Add(-5 * time.Minute),
+					ExternalLoginVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
@@ -898,8 +902,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"password change required and email verified, password change step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:            true,
@@ -931,8 +935,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"email not verified and no password change required, mail verification step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet: true,
@@ -961,8 +965,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"email not verified and password change required, mail verification step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:            true,
@@ -992,8 +996,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"email verified and no password change required, redirect to callback step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1027,8 +1031,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"prompt none, checkLoggedIn true and authenticated, redirect to callback step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1063,8 +1067,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"prompt none, checkLoggedIn true, authenticated and native, login succeeded step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1099,8 +1103,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"prompt none, checkLoggedIn true, authenticated and required user grants missing, grant required step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1137,8 +1141,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"prompt none, checkLoggedIn true, authenticated and required user grants exist, redirect to callback step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1176,8 +1180,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"prompt none, checkLoggedIn true, authenticated and required project missing, project required step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1214,8 +1218,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"prompt none, checkLoggedIn true, authenticated and required project exist, redirect to callback step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1253,7 +1257,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"linking users, password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1287,8 +1291,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			"linking users, linking step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
-					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
-					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
 				},
 				userViewProvider: &mockViewUser{
 					PasswordSet:     true,
@@ -1463,7 +1467,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MFAMaxSetUp:    domain.MFALevelNotSetUp,
-						MFAInitSkipped: time.Now().UTC(),
+						MFAInitSkipped: testNow,
 					},
 				},
 			},
@@ -1486,7 +1490,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 						OTPState:    user_model.MFAStateReady,
 					},
 				},
-				userSession: &user_model.UserSessionView{SecondFactorVerification: time.Now().UTC().Add(-5 * time.Hour)},
+				userSession: &user_model.UserSessionView{SecondFactorVerification: testNow.Add(-5 * time.Hour)},
 			},
 			nil,
 			true,
@@ -1569,7 +1573,7 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MFAMaxSetUp:    -1,
-						MFAInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
+						MFAInitSkipped: testNow.Add(-10 * time.Hour),
 					},
 				},
 				request: &domain.AuthRequest{
@@ -1587,7 +1591,7 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MFAMaxSetUp:    -1,
-						MFAInitSkipped: time.Now().UTC().Add(-40 * 24 * time.Hour),
+						MFAInitSkipped: testNow.Add(-40 * 24 * time.Hour),
 					},
 				},
 				request: &domain.AuthRequest{
@@ -1645,13 +1649,13 @@ func Test_userSessionByIDs(t *testing.T) {
 			"error user events, old view model state",
 			args{
 				userProvider: &mockViewUserSession{
-					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+					PasswordVerification: testNow,
 				},
 				user:          &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserSessionView{
-				PasswordVerification:     time.Now().UTC().Round(1 * time.Second),
+				PasswordVerification:     testNow,
 				SecondFactorVerification: time.Time{},
 				MultiFactorVerification:  time.Time{},
 			},
@@ -1661,7 +1665,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			"new user events but error, old view model state",
 			args{
 				userProvider: &mockViewUserSession{
-					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
@@ -1669,12 +1673,12 @@ func Test_userSessionByIDs(t *testing.T) {
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
-						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						CreationDate:  testNow,
 					},
 				},
 			},
 			&user_model.UserSessionView{
-				PasswordVerification:     time.Now().UTC().Round(1 * time.Second),
+				PasswordVerification:     testNow,
 				SecondFactorVerification: time.Time{},
 				MultiFactorVerification:  time.Time{},
 			},
@@ -1684,7 +1688,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			"new user events but other agentID, old view model state",
 			args{
 				userProvider: &mockViewUserSession{
-					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id"},
@@ -1692,7 +1696,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
-						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						CreationDate:  testNow,
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
 							return data
@@ -1701,7 +1705,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				},
 			},
 			&user_model.UserSessionView{
-				PasswordVerification:     time.Now().UTC().Round(1 * time.Second),
+				PasswordVerification:     testNow,
 				SecondFactorVerification: time.Time{},
 				MultiFactorVerification:  time.Time{},
 			},
@@ -1711,7 +1715,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			"new user events, new view model state",
 			args{
 				userProvider: &mockViewUserSession{
-					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
@@ -1719,7 +1723,7 @@ func Test_userSessionByIDs(t *testing.T) {
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
-						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						CreationDate:  testNow,
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
 							return data
@@ -1728,9 +1732,9 @@ func Test_userSessionByIDs(t *testing.T) {
 				},
 			},
 			&user_model.UserSessionView{
-				PasswordVerification:     time.Now().UTC().Round(1 * time.Second),
-				SecondFactorVerification: time.Now().UTC().Round(1 * time.Second),
-				ChangeDate:               time.Now().UTC().Round(1 * time.Second),
+				PasswordVerification:     testNow,
+				SecondFactorVerification: testNow,
+				ChangeDate:               testNow,
 			},
 			nil,
 		},
@@ -1738,7 +1742,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			"new user events (user deleted), precondition failed error",
 			args{
 				userProvider: &mockViewUserSession{
-					PasswordVerification: time.Now().UTC().Round(1 * time.Second),
+					PasswordVerification: testNow,
 				},
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id"},
@@ -1816,7 +1820,7 @@ func Test_userByID(t *testing.T) {
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Type:          es_models.EventType(user_repo.UserV1PasswordChangedType),
-						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						CreationDate:  testNow,
 						Data:          nil,
 					},
 				},
@@ -1842,7 +1846,7 @@ func Test_userByID(t *testing.T) {
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Type:          es_models.EventType(user_repo.UserV1PasswordChangedType),
-						CreationDate:  time.Now().UTC().Round(1 * time.Second),
+						CreationDate:  testNow,
 						Data: func() []byte {
 							data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})
 							return data
@@ -1851,13 +1855,13 @@ func Test_userByID(t *testing.T) {
 				},
 			},
 			&user_model.UserView{
-				ChangeDate: time.Now().UTC().Round(1 * time.Second),
+				ChangeDate: testNow,
 				State:      user_model.UserStateActive,
 				UserName:   "UserName",
 				HumanView: &user_model.HumanView{
 					PasswordSet:            true,
 					PasswordChangeRequired: false,
-					PasswordChanged:        time.Now().UTC().Round(1 * time.Second),
+					PasswordChanged:        testNow,
 					FirstName:              "FirstName",
 				},
 			},

@@ -374,7 +374,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 			return
 		}
 		linkingUser = l.mapExternalNotFoundOptionFormDataToLoginUser(data)
-	} 
+	}
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
 

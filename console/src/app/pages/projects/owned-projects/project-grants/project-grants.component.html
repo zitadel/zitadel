@@ -2,12 +2,12 @@
   <div class="project-grants-wrapper">
     <div class="project-grants">
       <cnsl-refresh-table
-        [loading]="dataSource?.loading$ | async"
+        [loading]="dataSource.loading$ | async"
         *ngIf="projectId"
         (refreshed)="loadGrantsPage()"
         [dataSize]="dataSource.totalResult"
         [selection]="selection"
-        [timestamp]="dataSource?.viewTimestamp"
+        [timestamp]="dataSource.viewTimestamp"
         (refreshed)="getRoleOptions(projectId)"
       >
         <div actions>
@@ -149,7 +149,7 @@
           class="paginator"
           #paginator
           [pageSize]="50"
-          [timestamp]="dataSource?.viewTimestamp"
+          [timestamp]="dataSource.viewTimestamp"
           [pageSizeOptions]="[25, 50, 100, 250]"
           [length]="dataSource.totalResult"
           (page)="loadGrantsPage($event.pageIndex, $event.pageSize)"

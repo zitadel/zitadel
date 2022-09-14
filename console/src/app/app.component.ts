@@ -265,22 +265,22 @@ export class AppComponent implements OnDestroy {
 
   public changedOrg(org: Org.AsObject): void {
     this.themeService.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
+    this.authService.zitadelPermissions$.pipe(take(1)).subscribe(() => {
       this.router.navigate(['/org'], { fragment: org.id });
     });
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['en', 'de']);
+    this.translate.addLangs(['en', 'de', 'zh']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
         // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de|it/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/en|de|it|zh/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it|zh/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

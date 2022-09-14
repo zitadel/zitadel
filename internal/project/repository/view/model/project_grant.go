@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -24,18 +24,18 @@ const (
 )
 
 type ProjectGrantView struct {
-	GrantID           string         `json:"-" gorm:"column:grant_id;primary_key"`
-	ProjectID         string         `json:"-" gorm:"column:project_id"`
-	OrgID             string         `json:"-" gorm:"column:org_id"`
-	Name              string         `json:"name" gorm:"column:project_name"`
-	CreationDate      time.Time      `json:"-" gorm:"column:creation_date"`
-	ChangeDate        time.Time      `json:"-" gorm:"column:change_date"`
-	State             int32          `json:"-" gorm:"column:project_state"`
-	ResourceOwner     string         `json:"-" gorm:"column:resource_owner"`
-	ResourceOwnerName string         `json:"-" gorm:"column:resource_owner_name"`
-	OrgName           string         `json:"-" gorm:"column:org_name"`
-	Sequence          uint64         `json:"-" gorm:"column:sequence"`
-	GrantedRoleKeys   pq.StringArray `json:"-" gorm:"column:granted_role_keys"`
+	GrantID           string               `json:"-" gorm:"column:grant_id;primary_key"`
+	ProjectID         string               `json:"-" gorm:"column:project_id"`
+	OrgID             string               `json:"-" gorm:"column:org_id"`
+	Name              string               `json:"name" gorm:"column:project_name"`
+	CreationDate      time.Time            `json:"-" gorm:"column:creation_date"`
+	ChangeDate        time.Time            `json:"-" gorm:"column:change_date"`
+	State             int32                `json:"-" gorm:"column:project_state"`
+	ResourceOwner     string               `json:"-" gorm:"column:resource_owner"`
+	ResourceOwnerName string               `json:"-" gorm:"column:resource_owner_name"`
+	OrgName           string               `json:"-" gorm:"column:org_name"`
+	Sequence          uint64               `json:"-" gorm:"column:sequence"`
+	GrantedRoleKeys   database.StringArray `json:"-" gorm:"column:granted_role_keys"`
 }
 
 type ProjectGrant struct {

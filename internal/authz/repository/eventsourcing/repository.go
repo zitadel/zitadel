@@ -18,7 +18,7 @@ type EsRepository struct {
 	eventstore.TokenVerifierRepo
 }
 
-func Start(queries *query.Queries, dbClient *sql.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) (repository.Repository, error) {
+func Start(queries *query.Queries, dbClient *sql.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -39,6 +39,7 @@ func Start(queries *query.Queries, dbClient *sql.DB, keyEncryptionAlgorithm cryp
 			Eventstore:           es,
 			View:                 view,
 			Query:                queries,
+			ExternalSecure:       externalSecure,
 		},
 	}, nil
 }

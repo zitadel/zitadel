@@ -33,7 +33,7 @@ export class ToastService {
     }
   }
 
-  public showError(error: any | string, isGrpc: boolean = true): void {
+  public showError(error: any | string, isGrpc: boolean = true, i18nKey: boolean = false): void {
     if (isGrpc) {
       const { message, code, metadata } = error;
       if (code !== 16) {
@@ -44,6 +44,13 @@ export class ToastService {
             this.showMessage(decodeURI(message), value, false);
           });
       }
+    } else if (i18nKey) {
+      this.translate
+        .get(error)
+        .pipe(take(1))
+        .subscribe((value) => {
+          this.showMessage(value, '', false);
+        });
     } else {
       this.showMessage(error as string, '', false);
     }

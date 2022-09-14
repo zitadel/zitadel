@@ -26,7 +26,7 @@ export function ensureSomethingExists(api: apiCallProperties, searchPath: string
             }
         })
     }).then((data) => {
-        awaitDesired(30, (entity) => !!entity, data.initialSequence, api, searchPath, find)
+        awaitDesired(90, (entity) => !!entity, data.initialSequence, api, searchPath, find)
         return cy.wrap<number>(data.id)
     })
 }
@@ -49,7 +49,7 @@ export function ensureSomethingDoesntExist(api: apiCallProperties, searchPath: s
             return sRes.sequence
         })
     }).then((initialSequence) => {
-        awaitDesired(30, (entity) => !entity , initialSequence, api, searchPath, find)
+        awaitDesired(90, (entity) => !entity , initialSequence, api, searchPath, find)
         return null
     })
 }
@@ -77,10 +77,13 @@ function searchSomething(api: apiCallProperties, searchPath: string, find: (enti
 
 function awaitDesired(trials: number, expectEntity: (entity: any) => boolean, initialSequence: number, api: apiCallProperties, searchPath: string, find: (entity: any) => boolean) {
     searchSomething(api, searchPath, find).then(resp => {
-        if (!expectEntity(resp.entity) || resp.sequence <= initialSequence) {
+        const foundExpectedEntity = expectEntity(resp.entity)
+        const foundExpectedSequence = resp.sequence > initialSequence
+
+        if (!foundExpectedEntity || !foundExpectedSequence) {
             expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
             cy.wait(1000)
             awaitDesired(trials - 1, expectEntity, initialSequence, api, searchPath, find)
-        }            
+        }
     })
 }

@@ -78,6 +78,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
 
+	steps.s4EventstoreIndexes = &EventstoreIndexes{dbClient: dbClient, dbType: config.Database.Type()}
+
 	repeatableSteps := []migration.RepeatableMigration{
 		&externalConfigChange{
 			es:             eventstoreClient,
@@ -94,6 +96,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 2")
 	err = migration.Migrate(ctx, eventstoreClient, steps.FirstInstance)
 	logging.OnError(err).Fatal("unable to migrate step 3")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s4EventstoreIndexes)
+	logging.OnError(err).Fatal("unable to migrate step 4")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

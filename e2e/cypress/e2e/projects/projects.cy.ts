@@ -14,7 +14,7 @@ describe("projects", () => {
       apiAuth().then((api) => {
         ensureProjectDoesntExist(api, testProjectNameCreate);
       });
-      cy.visit(`/ui/console/projects`);
+      cy.visit(`/projects`);
     });
 
     it("should add a project", () => {
@@ -27,13 +27,13 @@ describe("projects", () => {
     });
   });
 
-  describe.skip("remove project", () => {
+  describe("remove project", () => {
     describe("list view", () => {
       beforeEach("ensure it exists", () => {
         apiAuth().then((api) => {
           ensureProjectExists(api, testProjectNameDeleteList);
         });
-        cy.visit(`/ui/console/projects`);
+        cy.visit(`/projects`);
       });
 
       it("removes the project", () => {
@@ -42,9 +42,9 @@ describe("projects", () => {
         cy.contains("tr", testProjectNameDeleteList, { timeout: 1000 })
           .find('[data-e2e="delete-project-button"]')
           .click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').type(
-          testProjectNameDeleteList
-        );
+        cy.get('[data-e2e="confirm-dialog-input"]')
+          .focus()
+          .type(testProjectNameDeleteList);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.get(".data-e2e-success");
         cy.wait(200);
@@ -57,17 +57,16 @@ describe("projects", () => {
         apiAuth().then((api) => {
           ensureProjectExists(api, testProjectNameDeleteGrid);
         });
-        cy.visit(`/ui/console/projects`);
+        cy.visit(`/projects`);
       });
 
       it("removes the project", () => {
         cy.contains('[data-e2e="grid-card"]', testProjectNameDeleteGrid)
           .find('[data-e2e="delete-project-button"]')
-          .trigger("mouseover")
-          .click();
-        cy.get('[data-e2e="confirm-dialog-input"]').type(
-          testProjectNameDeleteGrid
-        );
+          .click({force: true});
+        cy.get('[data-e2e="confirm-dialog-input"]')
+          .focus()
+          .type(testProjectNameDeleteGrid);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.get(".data-e2e-success");
         cy.wait(200);

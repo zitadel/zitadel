@@ -19,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: 1.19
       - name: Source checkout
         uses: actions/checkout@v2
         with:
@@ -65,7 +65,7 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           distribution: goreleaser
-          version: v1.8.3
+          version: v1.11.0
           args: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

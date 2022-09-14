@@ -31,14 +31,14 @@ func Test_FlowPrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script,`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script,`+
 						` projections.flows_triggers.trigger_type,`+
 						` projections.flows_triggers.trigger_sequence,`+
 						` projections.flows_triggers.flow_type,`+
@@ -46,7 +46,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.flows_triggers.sequence,`+
 						` projections.flows_triggers.resource_owner`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					nil,
 					nil,
 				),
@@ -63,14 +63,14 @@ func Test_FlowPrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script,`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script,`+
 						` projections.flows_triggers.trigger_type,`+
 						` projections.flows_triggers.trigger_sequence,`+
 						` projections.flows_triggers.flow_type,`+
@@ -78,7 +78,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.flows_triggers.sequence,`+
 						` projections.flows_triggers.resource_owner`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -144,14 +144,14 @@ func Test_FlowPrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script,`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script,`+
 						` projections.flows_triggers.trigger_type,`+
 						` projections.flows_triggers.trigger_sequence,`+
 						` projections.flows_triggers.flow_type,`+
@@ -159,7 +159,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.flows_triggers.sequence,`+
 						` projections.flows_triggers.resource_owner`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -253,14 +253,14 @@ func Test_FlowPrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script,`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script,`+
 						` projections.flows_triggers.trigger_type,`+
 						` projections.flows_triggers.trigger_sequence,`+
 						` projections.flows_triggers.flow_type,`+
@@ -268,7 +268,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.flows_triggers.sequence,`+
 						` projections.flows_triggers.resource_owner`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -321,14 +321,14 @@ func Test_FlowPrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script,`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script,`+
 						` projections.flows_triggers.trigger_type,`+
 						` projections.flows_triggers.trigger_sequence,`+
 						` projections.flows_triggers.flow_type,`+
@@ -336,7 +336,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.flows_triggers.sequence,`+
 						` projections.flows_triggers.resource_owner`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -353,16 +353,16 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					nil,
 					nil,
 				),
@@ -374,16 +374,16 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -426,16 +426,16 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -498,16 +498,16 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareTriggerActionsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.actions.id,`+
-						` projections.actions.creation_date,`+
-						` projections.actions.change_date,`+
-						` projections.actions.resource_owner,`+
-						` projections.actions.action_state,`+
-						` projections.actions.sequence,`+
-						` projections.actions.name,`+
-						` projections.actions.script`+
+					regexp.QuoteMeta(`SELECT projections.actions2.id,`+
+						` projections.actions2.creation_date,`+
+						` projections.actions2.change_date,`+
+						` projections.actions2.resource_owner,`+
+						` projections.actions2.action_state,`+
+						` projections.actions2.sequence,`+
+						` projections.actions2.name,`+
+						` projections.actions2.script`+
 						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions ON projections.flows_triggers.action_id = projections.actions.id`),
+						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

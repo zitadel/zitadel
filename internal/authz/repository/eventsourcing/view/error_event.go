@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	errTable = "authz.failed_events"
+	errTable = "auth.failed_events"
 )
 
 func (v *View) saveFailedEvent(failedEvent *repository.FailedEvent) error {

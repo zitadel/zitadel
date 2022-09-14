@@ -111,8 +111,12 @@ func ActionStateToPb(state domain.ActionState) action_pb.ActionState {
 func ActionNameQuery(q *action_pb.ActionNameQuery) (query.SearchQuery, error) {
 	return query.NewActionNameSearchQuery(object_grpc.TextMethodToQuery(q.Method), q.Name)
 }
+
 func ActionStateQuery(q *action_pb.ActionStateQuery) (query.SearchQuery, error) {
 	return query.NewActionStateSearchQuery(ActionStateToDomain(q.State))
+}
+func ActionIDQuery(q *action_pb.ActionIDQuery) (query.SearchQuery, error) {
+	return query.NewActionIDSearchQuery(q.Id)
 }
 
 func ActionStateToDomain(state action_pb.ActionState) domain.ActionState {

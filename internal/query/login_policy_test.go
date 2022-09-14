@@ -9,8 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
@@ -51,14 +50,14 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
 						` projections.login_policies.multi_factor_check_lifetime,`+
-						` projections.idp_login_policy_links.idp_id,`+
-						` projections.idps.name,`+
-						` projections.idps.type`+
+						` projections.idp_login_policy_links3.idp_id,`+
+						` projections.idps2.name,`+
+						` projections.idps2.type`+
 						` FROM projections.login_policies`+
-						` LEFT JOIN projections.idp_login_policy_links ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
-						` LEFT JOIN projections.idps ON`+
-						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
+						` LEFT JOIN projections.idp_login_policy_links3 ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
+						` LEFT JOIN projections.idps2 ON`+
+						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					nil,
 					nil,
 				),
@@ -96,14 +95,14 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
 						` projections.login_policies.multi_factor_check_lifetime,`+
-						` projections.idp_login_policy_links.idp_id,`+
-						` projections.idps.name,`+
-						` projections.idps.type`+
+						` projections.idp_login_policy_links3.idp_id,`+
+						` projections.idps2.name,`+
+						` projections.idps2.type`+
 						` FROM projections.login_policies`+
-						` LEFT JOIN projections.idp_login_policy_links ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
-						` LEFT JOIN projections.idps ON`+
-						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
+						` LEFT JOIN projections.idp_login_policy_links3 ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
+						` LEFT JOIN projections.idps2 ON`+
+						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					[]string{
 						"aggregate_id",
 						"creation_date",
@@ -138,8 +137,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						true,
-						pq.Int32Array{int32(domain.SecondFactorTypeOTP)},
-						pq.Int32Array{int32(domain.MultiFactorTypeU2FWithPIN)},
+						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
+						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 						domain.PasswordlessTypeAllowed,
 						true,
 						true,
@@ -165,8 +164,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				AllowUsernamePassword:      true,
 				AllowExternalIDPs:          true,
 				ForceMFA:                   true,
-				SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeOTP},
-				MultiFactors:               []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+				SecondFactors:              database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
+				MultiFactors:               database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 				PasswordlessType:           domain.PasswordlessTypeAllowed,
 				IsDefault:                  true,
 				HidePasswordReset:          true,
@@ -211,14 +210,14 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies.mfa_init_skip_lifetime,`+
 						` projections.login_policies.second_factor_check_lifetime,`+
 						` projections.login_policies.multi_factor_check_lifetime,`+
-						` projections.idp_login_policy_links.idp_id,`+
-						` projections.idps.name,`+
-						` projections.idps.type`+
+						` projections.idp_login_policy_links3.idp_id,`+
+						` projections.idps2.name,`+
+						` projections.idps2.type`+
 						` FROM projections.login_policies`+
-						` LEFT JOIN projections.idp_login_policy_links ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links.aggregate_id`+
-						` LEFT JOIN projections.idps ON`+
-						` projections.idp_login_policy_links.idp_id = projections.idps.id`),
+						` LEFT JOIN projections.idp_login_policy_links3 ON `+
+						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
+						` LEFT JOIN projections.idps2 ON`+
+						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -262,7 +261,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"second_factors",
 					},
 					[]driver.Value{
-						pq.Int32Array{int32(domain.SecondFactorTypeOTP)},
+						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 					},
 				),
 			},
@@ -270,7 +269,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Factors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+				Factors: database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 			},
 		},
 		{
@@ -284,11 +283,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"second_factors",
 					},
 					[]driver.Value{
-						pq.Int32Array{},
+						database.EnumArray[domain.SecondFactorType]{},
 					},
 				),
 			},
-			object: &SecondFactors{Factors: []domain.SecondFactorType{}},
+			object: &SecondFactors{Factors: database.EnumArray[domain.SecondFactorType]{}},
 		},
 		{
 			name:    "prepareLoginPolicy2FAsQuery sql err",
@@ -308,7 +307,6 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			},
 			object: nil,
 		},
-
 		{
 			name:    "prepareLoginPolicyMFAsQuery no result",
 			prepare: prepareLoginPolicyMFAsQuery,
@@ -341,7 +339,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"multi_factors",
 					},
 					[]driver.Value{
-						pq.Int32Array{int32(domain.MultiFactorTypeU2FWithPIN)},
+						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 					},
 				),
 			},
@@ -349,7 +347,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Factors: []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+				Factors: database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 			},
 		},
 		{
@@ -363,11 +361,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"multi_factors",
 					},
 					[]driver.Value{
-						pq.Int32Array{},
+						database.EnumArray[domain.MultiFactorType]{},
 					},
 				),
 			},
-			object: &MultiFactors{Factors: []domain.MultiFactorType{}},
+			object: &MultiFactors{Factors: database.EnumArray[domain.MultiFactorType]{}},
 		},
 		{
 			name:    "prepareLoginPolicyMFAsQuery sql err",

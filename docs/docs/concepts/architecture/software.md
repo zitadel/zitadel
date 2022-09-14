@@ -40,6 +40,7 @@ All APIs of ZITADEL are always available as gRCP, gRPC-web and REST service.
 The only exception is the [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoints) and [Asset API](/docs/apis/introduction#assets) due their unique nature.
 
 - [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoints) - allows to request authentication and authorization of ZITADEL
+- [SAML](/docs/apis/saml/endpoints) - allows to request authentication and authorization of ZITADEL through the SAML standard
 - [Authentication API](/docs/apis/introduction#authentication) - allow a user to do operation in its own context
 - [Management API](/docs/apis/introduction#management) - allows an admin or machine to manage the ZITADEL resources on an organization level
 - [Administration API](/docs/apis/introduction#administration) - allows an admin or machine to manage the ZITADEL resources on an instance level
@@ -144,4 +145,4 @@ The storage layer of ZITADEL is responsible for multiple things. For example:
 - Backup and restore operation for disaster recovery purpose
 
 ZITADEL currently supports CockroachDB as first choice of storage due to its perfect match for ZITADELs needs.
-Postgresql support is work in progress and should be available soon as well.
+PostgreSQL support is currently in beta.

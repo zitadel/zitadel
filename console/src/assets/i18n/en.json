@@ -482,7 +482,7 @@
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
-      "MINLENGTHERROR": "The password has to be at least {{value}} characters long.",
+      "MINLENGTHERROR": "Has to be at least {{value}} characters long.",
       "NOTEQUAL": "The passwords provided do not match."
     },
     "ID": "ID",
@@ -542,10 +542,10 @@
       "REQUIRED": "The input field is empty.",
       "MINLENGTH": "The password has to be at least {{requiredLength}} characters long.",
       "NOEMAIL": "The user name cannot be an e-mail address.",
-      "UPPERCASEMISSING": "The password must include an uppercase character.",
-      "LOWERCASEMISSING": "The password must include a lowercase character.",
-      "SYMBOLERROR": "The password must include a symbol or punctuation mark.",
-      "NUMBERERROR": "The password must include a digit."
+      "UPPERCASEMISSING": "Must include an uppercase character.",
+      "LOWERCASEMISSING": "Must include a lowercase character.",
+      "SYMBOLERROR": "Must include a symbol or punctuation mark.",
+      "NUMBERERROR": "Must include a digit."
     },
     "STATE": {
       "0": "Unknown",
@@ -664,6 +664,8 @@
       "3": "Post Creation"
     },
     "ADDTRIGGER": "Add trigger",
+    "FLOWCHANGED": "The flow was changed successfully",
+    "FLOWCLEARED": "The flow was reset successfully",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
@@ -890,7 +892,8 @@
       "de": "Deutsch",
       "it": "Italiano",
       "en": "English",
-      "fr": "Français"
+      "fr": "Français",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -976,9 +979,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Password Complexity",
       "DESCRIPTION": "Ensures that all set passwords correspond to a specific pattern",
-      "SYMBOLANDNUMBERERROR": "The password must consist of a digit and a symbol/punctuation mark.",
-      "SYMBOLERROR": "The password must include a symbol/punctuation mark.",
-      "NUMBERERROR": "The password must include a digit.",
+      "SYMBOLANDNUMBERERROR": "Must consist of a digit and a symbol/punctuation mark.",
+      "SYMBOLERROR": "Must include a symbol/punctuation mark.",
+      "NUMBERERROR": "Must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
     },
     "PRIVATELABELING": {
@@ -1003,6 +1006,7 @@
       "MAXSIZE": "The maximum size is limited to 524kB",
       "EMAILNOSVG": "The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
+      "NOSVGSUPPORTED": "SVG are not supported!",
       "FONTINLOGINONLY": "The font is currently only displayed in the login interface.",
       "VIEWS": {
         "PREVIEW": "Preview",
@@ -1069,7 +1073,8 @@
         "de": "Deutsch",
         "en": "English",
         "it": "Italiano",
-        "fr": "Français"
+        "fr": "Français",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1517,11 +1522,11 @@
     "DEACTIVATE": "Deactivate",
     "ACTIVATE": "Activate",
     "DELETE": "Delete",
-    "DELETE_TITLE": "Delete Idp",
+    "DELETE_TITLE": "Delete IDP",
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "DELETE_SELECTION_TITLE": "Delete Idp",
+    "DELETE_SELECTION_TITLE": "Delete IDP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "EMPTY": "No IPD available",
+    "EMPTY": "No IDP available",
     "OIDC": {
       "GENERAL": "General Information",
       "TITLE": "OIDC Configuration",
@@ -1604,9 +1609,9 @@
       "TITLE": "Application",
       "ID": "ID",
       "DESCRIPTION": "Here you can edit your application data and it's configuration.",
-      "CREATE_OIDC": "OIDC Application",
-      "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
-      "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
+      "CREATE": "Create application",
+      "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
+      "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
       "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
@@ -1659,6 +1664,10 @@
     "ADDITIONALORIGINSDESC": "If you want to add additional Origins to your app which is not used as a redirect you can do that here.",
     "ORIGINS": "Origins",
     "NOTANORIGIN": "The entered value is not an origin",
+    "PROSWITCH": "I'm a pro. Skip this wizard.",
+    "NAMEANDTYPESECTION": "Name and Type",
+    "TITLEFIRST": "Name of the application",
+    "TYPETITLE": "Type of application",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1667,10 +1676,6 @@
       "CURRENT": "Current Config",
       "TOKENSECTIONTITLE": "AuthToken Options",
       "REDIRECTSECTIONTITLE": "Redirect Settings",
-      "PROSWITCH": "I'm a pro. Skip this wizard.",
-      "NAMEANDTYPESECTION": "Name and Type",
-      "TITLEFIRST": "Insert a name first.",
-      "TYPETITLE": "What type of application do you want to create?",
       "REDIRECTTITLE": "Specify the URIs where the login will redirect to.",
       "POSTREDIRECTTITLE": "This is the redirect URI after logout.",
       "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
@@ -1762,6 +1767,18 @@
         "1": "Private Key JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML Applications"
+      },
+      "CONFIGSECTION": "SAML Configuration",
+      "URL": "Url where Metadata file is located",
+      "OR": "or",
+      "XML": "Upload Metadata XML",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata from File"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
@@ -1814,7 +1831,8 @@
     "de": "Deutsch",
     "en": "English",
     "it": "Italiano",
-    "fr": "Français"
+    "fr": "Français",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

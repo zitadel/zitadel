@@ -1,1 +1,0 @@
-SET experimental_enable_hash_sharded_indexes = on

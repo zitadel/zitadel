@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	KeyProjectionTable = "projections.keys"
+	KeyProjectionTable = "projections.keys3"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
+	CertificateTable   = KeyProjectionTable + "_" + certificateTableSuffix
 
 	KeyColumnID            = "id"
 	KeyColumnCreationDate  = "creation_date"
@@ -37,14 +38,21 @@ const (
 	KeyPublicColumnInstanceID = "instance_id"
 	KeyPublicColumnExpiry     = "expiry"
 	KeyPublicColumnKey        = "key"
+
+	certificateTableSuffix       = "certificate"
+	CertificateColumnID          = "id"
+	CertificateColumnInstanceID  = "instance_id"
+	CertificateColumnExpiry      = "expiry"
+	CertificateColumnCertificate = "certificate"
 )
 
 type keyProjection struct {
 	crdb.StatementHandler
-	encryptionAlgorithm crypto.EncryptionAlgorithm
+	encryptionAlgorithm     crypto.EncryptionAlgorithm
+	certEncryptionAlgorithm crypto.EncryptionAlgorithm
 }
 
-func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) *keyProjection {
+func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) *keyProjection {
 	p := new(keyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
@@ -59,8 +67,8 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
 		},
-			crdb.NewPrimaryKey(KeyColumnID, KeyColumnInstanceID),
-			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{KeyColumnID})),
+			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
+			crdb.WithConstraint(crdb.NewConstraint("key_id_unique", []string{KeyColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText),
@@ -68,7 +76,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
 		},
-			crdb.NewPrimaryKey(KeyPrivateColumnID, KeyPrivateColumnInstanceID),
+			crdb.NewPrimaryKey(KeyPrivateColumnInstanceID, KeyPrivateColumnID),
 			privateKeyTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_private_ref_keys")),
 		),
@@ -78,12 +86,23 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
 		},
-			crdb.NewPrimaryKey(KeyPublicColumnID, KeyPublicColumnInstanceID),
+			crdb.NewPrimaryKey(KeyPublicColumnInstanceID, KeyPublicColumnID),
 			publicKeyTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_public_ref_keys")),
 		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(CertificateColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(CertificateColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(CertificateColumnExpiry, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(CertificateColumnCertificate, crdb.ColumnTypeBytes),
+		},
+			crdb.NewPrimaryKey(CertificateColumnInstanceID, CertificateColumnID),
+			certificateTableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_certificate_ref_keys")),
+		),
 	)
 	p.encryptionAlgorithm = keyEncryptionAlgorithm
+	p.certEncryptionAlgorithm = certEncryptionAlgorithm
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 
 	return p
@@ -97,6 +116,10 @@ func (p *keyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  keypair.AddedEventType,
 					Reduce: p.reduceKeyPairAdded,
+				},
+				{
+					Event:  keypair.AddedCertificateEventType,
+					Reduce: p.reduceCertificateAdded,
 				},
 			},
 		},
@@ -151,5 +174,34 @@ func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			crdb.WithTableSuffix(publicKeyTableSuffix),
 		))
 	}
+
+	return crdb.NewMultiStatement(e, creates...), nil
+}
+
+func (p *keyProjection) reduceCertificateAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*keypair.AddedCertificateEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAbr09", "reduce.wrong.event.type %s", keypair.AddedCertificateEventType)
+	}
+
+	if e.Certificate.Expiry.Before(time.Now()) {
+		return crdb.NewNoOpStatement(e), nil
+	}
+
+	certificate, err := crypto.Decrypt(e.Certificate.Key, p.certEncryptionAlgorithm)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "HANDL-Dajwig2f", "cannot decrypt certificate")
+	}
+
+	creates := []func(eventstore.Event) crdb.Exec{crdb.AddCreateStatement(
+		[]handler.Column{
+			handler.NewCol(CertificateColumnID, e.Aggregate().ID),
+			handler.NewCol(CertificateColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(CertificateColumnExpiry, e.Certificate.Expiry),
+			handler.NewCol(CertificateColumnCertificate, certificate),
+		},
+		crdb.WithTableSuffix(certificateTableSuffix),
+	)}
+
 	return crdb.NewMultiStatement(e, creates...), nil
 }
