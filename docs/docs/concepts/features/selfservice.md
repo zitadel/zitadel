@@ -53,27 +53,63 @@ An external identity provider can be a Social Login Provider or a pre-configured
 
 Unauthenticated users (pre-login).
 
-### Browser
+### Web, Mobile, and Single-Page Applications
 
-- Explain hosted login
-- Explain basic flow
-- Branding: Trigger based on domain/org, or primary domain scope
-- Link to Login user Guide, Scopes, etc.
+[This guide](/docs/guides/integrate/login-users) explains in more detail the login-flows for different application types.
+Human users are redirected to ZITADEL's login page and complete sign-in with the interactive login flow.
+It is important to understand that ZITADEL provides a hosted login page and the device of the users opens this login page in a browser, even on Native/Mobile apps.
 
-### Mobile Applications
+#### Customization
 
-- Embedded Browser
-- Redirect protocol (guide?)
+The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
 
-### SSO, External IdP, Social Logins
+:::info
+By default, the displayed branding is defined based on the user's domain. In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
+:::
 
-- Unkown: register + account linking
+#### MFA / 2FA
 
-### APIs
+Users are automatically prompted to provide a second factor, when
+
+- Instance or organization [login policy](https://docs.zitadel.com/docs/concepts/structure/policies#login-policy)
+- Requested by the client
+- A multi-factor is setup for the user
+
+When a multi-factor is required, but not set-up, then the user is requested to set-up an additional factor.
+
+#### FIDO Passkeys
+
+Users can select a button to initiate passwordless login or use a fall-back method (ie. login with username/password), if available.
+
+The passwordless login flow follows the FIDO 2 / WebAuthN standard.
+Briefly explained the following happens:
+
+- User selects button
+- User's device will ask the user to provide a gesture (eg, FaceID, Windows Hello, Fingerprint, PIN)
+- The user is being redirected to the application
+
+With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
+This is not strictly the device where the login flow is being executed (eg, push notification on a mobile device).
+The user experience depends mainly on the used operating system and browser.
+
+### SSO / Social Logins
+
+Given an external identity provider is configured on the instance or on the organization, then: 
+
+- the user will be shown a button for each identity provider as alternative to login with a [local account](#local-account)
+- when clicking the button the user will be redirected to the identity provider
+- after successful login the user will be redirected to the application
+
+### Machines
+
+Machine accounts can't use an interactive login but require other means of authentication, such as privately-signed JWT or personal access tokens.
+Read more about [Service Users](/docs/guides/integrate/serviceusers) and recommended [OpenID Connect Flows](/docs/guides/integrate/oauth-recommended-flows#different-client-profiles).
 
 ### Others
 
-- Games etc.
+We currently do not expose the Login APIs.
+Whereas you can register users via the management API, you can't login users with our APIs.
+This might be important in cases where you can't use a website (eg, Games, VR, ...).
 
 ## Logout
 
