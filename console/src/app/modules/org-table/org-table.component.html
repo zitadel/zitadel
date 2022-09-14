@@ -23,18 +23,9 @@
     matSort
     (matSortChange)="sortChange($event)"
   >
-    <ng-container matColumnDef="select">
-      <th class="selection" mat-header-cell *matHeaderCellDef>
-        {{ 'ORG.PAGES.ACTIVE' | translate }}
-      </th>
-      <td class="selection" mat-cell *matCellDef="let org">
-        <mat-radio-button (change)="selectOrg(org)" color="primary" [checked]="org.id === activeOrg.id"> </mat-radio-button>
-      </td>
-    </ng-container>
-
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef>{{ 'ORG.PAGES.ID' | translate }}</th>
-      <td mat-cell *matCellDef="let org" (change)="selectOrg(org)">{{ org.id }}</td>
+      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">{{ org.id }}</td>
     </ng-container>
 
     <ng-container matColumnDef="primaryDomain">
@@ -58,7 +49,6 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <!-- mat-sort-header -->
       <th mat-header-cell *matHeaderCellDef>
         {{ 'ORG.PAGES.NAME' | translate }}
       </th>
