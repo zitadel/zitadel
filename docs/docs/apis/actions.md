@@ -55,44 +55,141 @@ This flow is executed if the user logs in using an identity provider or using a 
 
 #### Post Authentication
 
-This trigger is called after the oidc tokens are created.
+A user has authenticated externally. ZITADEL retrieved and mapped the external information.
 
-<!-- 
 ##### Parameters of Post Authentication
 
 `ctx`:
 
-| field name | description | type | methods |
+**Fields:**
+
+| name | description | type |
+|---|---|---|
+| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | string |
+| idToken | the id token which will be returned to the user | string |
+
+**Methods:**
+
+| name | description | return value |
 |---|---|---|---|
-| accessToken | the access token which will be returned to the user | string |  |
-| idToken | the id token which will be returned to the user | string |  |
+| getClaims(string) | returns the requested `claim` | `any` |
+| claimsJSON() | Returns the complete payload of the `ctx.idToken` | `Object` |
 
 `api`:
 
-| field name | description | type | methods |
-|---|---|---|---|
-|  |  |  |  |
-|  |  |  |  |
+**Fields:** none
 
-##### Functions of Post Authentication
+| name | description |
+|---|---|
+| metadata | array of metadata `{key: string, value: bytes}` |
 
-The following functions are available if `id token claims` are available.
+**Methods:**
 
-| name | description | parameters | return types |
-|---|---|---|---|
-| getClaims(claim) | returns the requested `claim` | claim string representation of the claim | Object |
-| claimsJSON() | returns all claims of the `id token` | none | Object |
-
-##### Modules of Post Authentication
--->
+| name | description | return value |
+|---|---|---|
+| setFirstName(string) | sets the first name | none |
+| setLastName(string) | sets the last name | none |
+| setNickName(string) | sets the nick name | none |
+| setDisplayName(string) | sets the display name | none |
+| setPreferredLanguage(string) | sets the preferred language, the string has to be a valid language tag | none |
+| setGender(int) | sets the gender. <br/><ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul> | none |
+| setPreferredUsername(string) | sets the preferred username | none |
+| setEmail(string) | sets the email | |
+| setEmailVerified(bool) | if true the email set is verified without user interaction | |
+| setPhone(string) | sets the phone number | |
+| setPhoneVerified(bool) | if true the phone number set is verified without user interaction | |
 
 #### Pre Creation
 
-This trigger is called before the oidc tokens are created.
+A user selected **Register** on the overview page after external authentication. ZITADEL did not create the user yet.
+
+##### Parameters of Pre Creation
+
+`ctx`:
+
+**Fields:**
+
+| name | description | type |
+|---|---|---|
+| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | string |
+| idToken | the id token which will be returned to the user | string |
+
+**Methods:**
+
+| name | description | return value |
+|---|---|---|---|
+| getClaims(string) | returns the requested `claim` | `any` |
+| claimsJSON() | Returns the complete payload of the `ctx.idToken` | `Object` |
+
+`api`:
+
+**Fields:** none
+
+| name | description |
+|---|---|
+| metadata | array of metadata `{key: string, value: bytes}` |
+
+**Methods:**
+
+| name | description | return value |
+|---|---|---|
+| setFirstName(string) | sets the first name | none |
+| setLastName(string) | sets the last name | none |
+| setNickName(string) | sets the nick name | none |
+| setDisplayName(string) | sets the display name | none |
+| setPreferredLanguage(string) | sets the preferred language, the string has to be a valid language tag | none |
+| setGender(int) | sets the gender. <br/><ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul> | none |
+| setUsername(string) | sets the username | none |
+| setEmail(string) | sets the email | |
+| setEmailVerified(bool) | if true the email set is verified without user interaction | |
+| setPhone(string) | sets the phone number | |
+| setPhoneVerified(bool) | if true the phone number set is verified without user interaction | |
 
 #### Post Creation
 
-This trigger is called after the oidc tokens are created.
+A user selected **Register** on the overview page after external authentication. ZITADEL created the user.
+
+##### Parameters of Post Creation
+
+`ctx`:
+
+**Fields:**
+
+| name | description | type |
+|---|---|---|
+| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | string |
+| idToken | the id token which will be returned to the user | string |
+
+**Methods:**
+
+| name | description | return value |
+|---|---|---|---|
+| getClaims(string) | returns the requested `claim` | `any` |
+| claimsJSON() | Returns the complete payload of the `ctx.idToken` | `Object` |
+
+`api`:
+
+**Fields:** none
+
+| name | description |
+|---|---|
+| metadata | array of metadata `{key: string, value: bytes}` |
+| userGrants | array of user grants `{projectID: string, projectGrantID: (optional)string, roles: [string]}` |
+
+**Methods:**
+
+| name | description | return value |
+|---|---|---|
+| setFirstName(string) | sets the first name | none |
+| setLastName(string) | sets the last name | none |
+| setNickName(string) | sets the nick name | none |
+| setDisplayName(string) | sets the display name | none |
+| setPreferredLanguage(string) | sets the preferred language, the string has to be a valid language tag | none |
+| setGender(int) | sets the gender. <br/><ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul> | none |
+| setEmail(string) | sets the email | |
+| setEmailVerified(bool) | if true the email set is verified without user interaction | |
+| setPhone(string) | sets the phone number | |
+| setPhoneVerified(bool) | if true the phone number set is verified without user interaction | |
 
 ### Complement Token
 
@@ -108,9 +205,7 @@ This trigger is called before userinfo are set in the token or response.
 
 `api`:
 
-**Fields**
-
-None
+**Fields**: None
 
 **Methods**
 
@@ -134,9 +229,7 @@ This trigger is called before the claims are set in the access token and the tok
 
 `api`:
 
-**Fields**
-
-None
+**Fields**: None
 
 **Methods**
 
@@ -171,7 +264,7 @@ parameters:
     - one of `GET`, `POST`, `PUT`, `DELETE`
   - body: `Object`
 
-response: Object
+response: `Object`
 
 - body: `string`
 - statusCode: `int`
@@ -194,13 +287,51 @@ function callPostman() {
 
 This library abstracts the storage of metadata of the given user.
 
+#### set
+
 parameters:
 
-- asdf
+- key: `string`
+  - it's recommended to use urn-annotated keys
+- value: `any`
+  - The value will be json-marshalled before its stored
 
-response: Object
+response: none
 
-- asdf
+example:
+
+```javascript
+let userMD = require('zitadel/metadata/user')
+
+const KEY = 'urn:mycorp:example'
+
+function example() {
+  let myNewMD = md.get().metadata.find(md => md.key === KEY)
+}
+```
+
+#### get
+
+parameters: none
+
+response: `Object`
+
+- count: `int`
+  - amount of metadata found
+- sequence: `int`
+  - the sequence of the last event processed to calculate the response
+- timestamp: `Date`
+  - the timestamp of the last event processed to calculate the response
+- metadata: `array of object`
+  - creationDate: `Date`
+  - changeDate: `Date`
+  - resourceOwner: `string`
+    - org id of the owner of this key
+  - sequence: `int`
+    - last event sequence which changed this key
+  - key: `string`
+  - value: `Object`
+    - json representation of the value stored
 
 example:
 
@@ -211,97 +342,8 @@ const KEY = 'urn:mycorp:example'
 
 function example() {
   userMD.set(KEY, {key: 'value'})
-  let myNewMD = md.get().metadata.find(md => md.key === KEY)
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-Each flow type supports its own set of:
-
-- Triggers
-- Readable information
-- Writable information
-- Libraries provided by ZITADEL
-
-### External Authentication
-
-The external authentication flow 
-
-ZITADEL supports only the external authentication flow at the moment.
-[More flows are coming soon](https://zitadel.com/roadmap).
-
-### External authentication flow triggers
-
-- Post authentication: A user has authenticated externally. ZITADEL retrieved and mapped the external information.
-- Pre creation:  A user selected **Register** on the overview page after external authentication. ZITADEL did not create the user yet.
-- Post creation: A user selected **Register** on the overview page after external authentication. ZITADEL created the user.
-
-### External authentication flow context
-
-- `ctx.accessToken string`  
-  This can be an opaque token or a JWT
-- `ctx.idToken string`
-- `ctx.getClaim(string) any`  
-  Returns the requested claim
-- `ctx.claimsJSON() object`  
-  Returns the complete payload of the `ctx.idToken`
-
-### External authentication flow api
-
-- `api.setFirstName(string)`
-- `api.setLastName(string)`
-- `api.setNickName(string)`
-- `api.setDisplayName(string)`
-- `api.setPreferredLanguage(string)`
-- `api.setGender(Gender)`  
-- `api.setUsername(string)`  
-  This function is only available for the pre creation trigger
-- `api.setPreferredUsername(string)`  
-  This function is only available for the post authentication trigger
-- `api.setEmail(string)`
-- `api.setEmailVerified(bool)`
-- `api.setPhone(string)`
-- `api.setPhoneVerified(bool)`
-- `api.metadata array<Metadata>`  
-  Push entries.  
-- `api.userGrants array<UserGrant>`  
-  Push entries.  
-  This field is only available for the post creation trigger
-
-
-### External authentication flow types <!-- TODO: Are these types correct? -->
-
-- `Gender` is a code number
-
-| code | gender |
-| ---- | ------ |
-| 0 | unspecified |
-| 1 | female |
-| 2 | male |
-| 3 | diverse |
-
-- `UserGrant` is a JavaScript object
-
-```ts
-{
-    ProjectID: string,
-    ProjectGrantID: string,
-    Roles: Array<string>,
-}
-```
-
-- `Metadata` is a JavaScript object with string values.
-  The string values must be Base64 encoded
 
 ## Further reading
 
