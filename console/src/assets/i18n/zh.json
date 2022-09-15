@@ -1,0 +1,1895 @@
+{
+  "APP_NAME": "ZITADEL",
+  "PAGINATOR": {
+    "PREVIOUS": "上一页",
+    "NEXT": "下一页",
+    "COUNT": "总数"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "联系",
+      "TOS": "服务条款",
+      "PP": "隐私政策"
+    },
+    "THEME": {
+      "DARK": "深色",
+      "LIGHT": "浅色"
+    }
+  },
+  "HOME": {
+    "WELCOME": "开始使用 ZITADEL",
+    "DISCLAIMER": "ZITADEL 对您的数据进行保密和安全处理。",
+    "DISCLAIMERLINK": "更多的信息",
+    "DOCUMENTATION": {
+      "TITLE": "文档",
+      "DESCRIPTION": "快速开始使用 ZITADEL。"
+    },
+    "GETSTARTED": {
+      "TITLE": "开始使用 ZITADEL",
+      "DESCRIPTION": "快速开始使用 ZITADEL。"
+    },
+    "QUICKSTARTS": {
+      "LABEL": "第一步",
+      "TITLE": "快速入门",
+      "DESCRIPTION": "快速开始使用 ZITADEL。"
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "快捷方式",
+      "SETTINGS": "可用的快捷方式",
+      "PROJECTS": "项目",
+      "REORDER": "按住并拖动来移动它",
+      "ADD": "按住并拖动来添加"
+    }
+  },
+  "MENU": {
+    "INSTANCE": "实例",
+    "DASHBOARD": "首页",
+    "PERSONAL_INFO": "个人信息",
+    "DOCUMENTATION": "文档",
+    "INSTANCEOVERVIEW": "实例",
+    "ORGS": "组织",
+    "VIEWS": "数据表",
+    "FAILEDEVENTS": "失败事件",
+    "ORGANIZATION": "组织",
+    "DOMAINS": "域名",
+    "PROJECT": "项目",
+    "PROJECTOVERVIEW": "概览",
+    "PROJECTGRANTS": "授予",
+    "ROLES": "角色",
+    "GRANTEDPROJECT": "已授予的项目",
+    "HUMANUSERS": "用户",
+    "MACHINEUSERS": "服务用户",
+    "LOGOUT": "退出所有账户",
+    "NEWORG": "创建组织",
+    "IAMADMIN": "您是 IAM 管理员。请注意您具有扩展权限。",
+    "SHOWORGS": "查看所有组织",
+    "GRANTS": "授权",
+    "ACTIONS": "认证流程",
+    "PRIVACY": "隐私",
+    "TOS": "服务条款",
+    "OPENSHORTCUTSTOOLTIP": "按下 ？键查看快捷键",
+    "SETTINGS": "设置",
+    "CUSTOMERPORTAL": "客户门户网站"
+  },
+  "ACTIONS": {
+    "ACTIONS": "操作",
+    "FILTER": "过滤",
+    "RENAME": "重命名",
+    "SET": "设置",
+    "COPY": "复制到剪切板",
+    "COPIED": "已复制到剪切板.",
+    "RESET": "重置",
+    "RESETDEFAULT": "恢复默认",
+    "RESETTO": "重置为: ",
+    "RESETCURRENT": "重置当前",
+    "SHOW": "展示",
+    "HIDE": "隐藏",
+    "SAVE": "保存",
+    "SAVENOW": "立即保存",
+    "NEW": "创建",
+    "ADD": "添加",
+    "CREATE": "创建",
+    "CONTINUE": "继续",
+    "BACK": "返回",
+    "CLOSE": "关闭",
+    "CLEAR": "清除",
+    "CANCEL": "取消",
+    "INFO": "信息",
+    "OK": "确认",
+    "SELECT": "选择",
+    "VIEW": "展示",
+    "SELECTIONDELETE": "删除选中内容",
+    "DELETE": "删除",
+    "REMOVE": "删除",
+    "VERIFY": "Verify",
+    "FINISH": "完成",
+    "FINISHED": "关闭",
+    "CHANGE": "修改",
+    "REACTIVATE": "重新启用",
+    "ACTIVATE": "启用",
+    "DEACTIVATE": "停用",
+    "REFRESH": "刷新",
+    "LOGIN": "登录",
+    "EDIT": "编辑",
+    "PIN": "固定 / 取消固定",
+    "CONFIGURE": "配置",
+    "SEND": "发送",
+    "NEWVALUE": "新增值",
+    "RESTORE": "恢复",
+    "CONTINUEWITHOUTSAVE": "忽略并继续",
+    "OF": "of",
+    "PREVIOUS": "上一页",
+    "NEXT": "下一页",
+    "MORE": "更多",
+    "STEP": "Step",
+    "TABLE": {
+      "SHOWUSER": "Show user {{value}}"
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "控制整个实例，包括所有组织",
+    "IAM_OWNER_VIEWER": "有权审查整个实例，包括所有组织",
+    "IAM_ORG_MANAGER": "有权创建和管理组织",
+    "IAM_USER_MANAGER": "有权创建和管理用户",
+    "ORG_OWNER": "拥有整个组织的权限",
+    "ORG_USER_MANAGER": "有权创建和管理组织的用户",
+    "ORG_OWNER_VIEWER": "有权审查整个组织",
+    "ORG_USER_PERMISSION_EDITOR": "有权管理用户授权",
+    "ORG_PROJECT_PERMISSION_EDITOR": "有权管理项目授权",
+    "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",
+    "PROJECT_OWNER": "拥有整个项目的权限",
+    "PROJECT_OWNER_VIEWER": "有权审查整个项目",
+    "PROJECT_OWNER_GLOBAL": "拥有整个项目的权限",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "有权审查整个项目",
+    "PROJECT_GRANT_OWNER": "有权管理项目授权",
+    "PROJECT_GRANT_OWNER_VIEWER": "有权审查项目授权"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "控制台中的所有组织设置和表格都基于选定的组织。单击此按钮可切换组织或创建新组织。"
+    },
+    "INSTANCE": {
+      "TEXT": "单击此处进入实例设置。请注意，如果您具有增强的权限，您只能访问此按钮。"
+    },
+    "PROFILE": {
+      "TEXT": "在这里，您可以在您的用户帐户之间切换并管理您的会话和个人资料。"
+    },
+    "NAV": {
+      "TEXT": "此导航会根据您在上面选择的组织或您的实例而改变"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "注意！组织环境发生了变化。"
+    }
+  },
+  "FILTER": {
+    "TITLE": "过滤",
+    "STATE": "状态",
+    "DISPLAYNAME": "展示名称",
+    "EMAIL": "邮箱",
+    "USERNAME": "用户名",
+    "ORGNAME": "组织名称",
+    "PROJECTNAME": "项目名称",
+    "RESOURCEOWNER": "资源所有者",
+    "METHODS": {
+      "5": "包含",
+      "7": "结尾是",
+      "1": "等于"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "快捷键",
+    "UNDERORGCONTEXT": "在组织管理页面中",
+    "SIDEWIDE": "站点快捷方式",
+    "SHORTCUTS": {
+      "HOME": "前往首页",
+      "INSTANCE": "前往实例",
+      "ORG": "前往组织",
+      "ORGSETTINGS": "前往组织设置",
+      "ORGSWITCHER": "更改组织",
+      "ME": "前往个人资料",
+      "PROJECTS": "前往项目",
+      "USERS": "前往用户",
+      "USERGRANTS": "前往授权",
+      "ACTIONS": "前往认证流程",
+      "DOMAINS": "前往域名"
+    }
+  },
+  "RESOURCEID": "资源ID",
+  "NAME": "名称",
+  "VERSION": "版本",
+  "TABLE": {
+    "NOROWS": "没有数据"
+  },
+  "ERRORS": {
+    "REQUIRED": "缺少一些必填字段。",
+    "TOKENINVALID": {
+      "TITLE": "您的授权令牌已过期。",
+      "DESCRIPTION": "点击下方按钮再次登录。"
+    }
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "设置",
+      "GENERAL": "通用",
+      "IDP": "身份提供者",
+      "MFA": "多因素认证",
+      "KEYS": "秘钥",
+      "PAT": "个人访问令牌",
+      "PASSWORDLESS": "无密码认证",
+      "USERGRANTS": "授权",
+      "MEMBERSHIPS": "成员身份",
+      "METADATA": "元数据"
+    },
+    "TITLE": "个人信息",
+    "DESCRIPTION": "管理您的信息和安全设置。",
+    "PAGES": {
+      "LIST": "用户列表",
+      "TITLE": "用户",
+      "DESCRIPTION": "在您的组织中创建新用户并管理现有用户。",
+      "LISTMACHINE": "服务用户",
+      "DESCRIPTIONMACHINE": "创建和管理组织的服务用户",
+      "DETAIL": "详情",
+      "CREATE": "创建",
+      "MY": "我的信息",
+      "LOGINNAMES": "登录名称",
+      "LOGINNAMESDESC": "这些是您的登录名:",
+      "NOUSER": "没有关联的用户。",
+      "REACTIVATE": "重新启用",
+      "DEACTIVATE": "停用",
+      "FILTER": "过滤",
+      "STATE": "状态",
+      "DELETE": "删除用户",
+      "UNLOCK": "解锁用户",
+      "LOCKEDDESCRIPTION": "此用户因超过最大登录尝试次数而被锁定，必须解锁才能再次使用。",
+      "DELETEACCOUNT": "删除账户",
+      "DELETEACCOUNT_DESC": "如果您执行此操作，您将被注销并且无法再访问您的帐户。此操作不可逆，因此请谨慎操作。",
+      "DELETEACCOUNT_BTN": "删除账户",
+      "DELETEACCOUNT_SUCCESS": "账号删除成功！"
+    },
+    "DETAILS": {
+      "DATECREATED": "创建于",
+      "DATECHANGED": "修改于"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "删除用户",
+      "DELETE_SELF_TITLE": "删除帐户",
+      "DELETE_DESCRIPTION": "您即将永久删除用户。你确定吗？",
+      "DELETE_SELF_DESCRIPTION": "您即将永久删除您的个人帐户。这将使您注销并删除您的用户。此操作无法撤消！",
+      "DELETE_AUTH_DESCRIPTION": "您即将永久删除您的个人帐户。你确定吗？",
+      "TYPEUSERNAME": "输入 '{{value}}'，确认并删除该用户。",
+      "DELETE_BTN": "永久删除"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "发送电子邮件通知",
+      "DESCRIPTION": "单击下面的按钮可向当前电子邮件地址发送通知或更改电子邮件地址。",
+      "NEWEMAIL": "新的电子邮件地址"
+    },
+    "TABLE": {
+      "DEACTIVATE": "停用",
+      "ACTIVATE": "启用",
+      "CHANGEDATE": "最后修改于",
+      "CREATIONDATE": "创建于",
+      "TYPES": {
+        "HUMAN": "用户",
+        "MACHINE": "服务用户"
+      },
+      "FILTER": {
+        "0": "筛选展示名称",
+        "1": "筛选用户名",
+        "2": "筛选展示名称",
+        "3": "筛选用户名",
+        "4": "筛选邮件地址",
+        "5": "筛选展示名称",
+        "10": "筛选组织名称",
+        "12": "筛选项目名称"
+      },
+      "EMPTY": "没有条目"
+    },
+    "PASSWORDLESS": {
+      "SEND": "发送注册链接",
+      "TABLETYPE": "类型",
+      "TABLESTATE": "状态",
+      "NAME": "名称",
+      "EMPTY": "没有可用的设备",
+      "TITLE": "无密码身份验证",
+      "DESCRIPTION": "添加基于 WebAuthn 的身份验证方法以无密码登录 ZITADEL。",
+      "MANAGE_DESCRIPTION": "管理用户的第二因素认证方式。",
+      "U2F": "添加验证器",
+      "U2F_DIALOG_TITLE": "身份验证器",
+      "U2F_DIALOG_DESCRIPTION": "输入您使用的无密码登录名",
+      "U2F_SUCCESS": "无密码验证创建成功！",
+      "U2F_ERROR": "安装过程中发生错误！",
+      "U2F_NAME": "身份验证器名称",
+      "TYPE": {
+        "0": "未定义 MFA",
+        "1": "一次性密码 (OTP)",
+        "2": "指纹、安全密钥、Face ID 等"
+      },
+      "STATE": {
+        "0": "无状态",
+        "1": "不可用",
+        "2": "可使用",
+        "3": "已删除"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "删除无密码身份验证方式",
+        "DELETE_DESCRIPTION": "您即将删除无密码身份验证方法。你确定吗？",
+        "ADD_TITLE": "无密码身份验证",
+        "ADD_DESCRIPTION": "选择用于创建无密码身份验证方法的可用选项之一。",
+        "SEND_DESCRIPTION": "将无密码身份认证方式注册链接发送到您的电子邮件地址。",
+        "SEND": "发送注册链接",
+        "SENT": "电子邮件已成功发送。检查您的邮箱以继续设置。",
+        "QRCODE_DESCRIPTION": "生成二维码以使用其他设备进行扫描。",
+        "QRCODE": "生成二维码",
+        "QRCODE_SCAN": "扫描此 QR 码以继续在您的设备上进行设置。",
+        "NEW_DESCRIPTION": "使用此设备设置无密码身份验证。",
+        "NEW": "添加"
+      }
+    },
+    "METADATA": {
+      "TITLE": "元数据",
+      "DESCRIPTION": "",
+      "KEY": "键",
+      "VALUE": "值",
+      "ADD": "新条目",
+      "SAVE": "保存",
+      "EMPTY": "暂无元数据",
+      "SETSUCCESS": "键值对保存成功",
+      "REMOVESUCCESS": "键值对删除成功"
+    },
+    "MFA": {
+      "TABLETYPE": "类型",
+      "TABLESTATE": "状态",
+      "NAME": "名称",
+      "EMPTY": "无多因素认证方式",
+      "TITLE": "多因素身份验证",
+      "DESCRIPTION": "添加第二个因素以确保您帐户的最佳安全性。",
+      "MANAGE_DESCRIPTION": "管理用户的第二因素身份认证方式。",
+      "ADD": "添加因子",
+      "OTP": "一次性密码 (OTP)",
+      "OTP_DIALOG_TITLE": "添加 OTP",
+      "OTP_DIALOG_DESCRIPTION": "使用验证器应用程序扫描二维码并输入下面的代码以验证并激活 OTP 方法。",
+      "U2F": "指纹、安全密钥、Face ID 等",
+      "U2F_DIALOG_TITLE": "验证因子",
+      "U2F_DIALOG_DESCRIPTION": "输入您使用的通用 Multifactor 的名称。",
+      "U2F_SUCCESS": "身份验证因子添加成功！",
+      "U2F_ERROR": "安装过程中发生错误！",
+      "U2F_NAME": "身份验证器名称",
+      "TYPE": {
+        "0": "未定义 MFA",
+        "1": "一次性密码 (OTP)",
+        "2": "指纹、安全密钥、Face ID 等"
+      },
+      "STATE": {
+        "0": "无状态",
+        "1": "不可用",
+        "2": "可使用",
+        "3": "已删除"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "删除第二因素身份验证",
+        "MFA_DELETE_DESCRIPTION": "您即将删除第二因素身份验证。你确定吗？",
+        "ADD_MFA_TITLE": "添加第二身份验证因素",
+        "ADD_MFA_DESCRIPTION": "从下面的选项中选择一个。"
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "外部身份提供者",
+      "DESC": "",
+      "IDPCONFIGID": "身份提供者 ID",
+      "IDPNAME": "身份提供者名称",
+      "USERDISPLAYNAME": "外部名称",
+      "EXTERNALUSERID": "外部用户 ID",
+      "EMPTY": "未找到外部身份提供者",
+      "DIALOG": {
+        "DELETE_TITLE": "删除外部身份提供者",
+        "DELETE_DESCRIPTION": "您即将从用户中删除身份提供者。你真的要继续吗？"
+      }
+    },
+    "CREATE": {
+      "TITLE": "创建一个新用户",
+      "DESCRIPTION": "请提供必要的信息。",
+      "NAMEANDEMAILSECTION": "姓名和电子邮件",
+      "GENDERLANGSECTION": "性别和语言",
+      "PHONESECTION": "手机号码",
+      "PASSWORDSECTION": "初始密码",
+      "ADDRESSANDPHONESECTION": "手机号码",
+      "INITMAILDESCRIPTION": "如果选择了这两个选项，则不会发送初始化电子邮件。如果只选择了其中一个选项，将发送一封提供/验证数据的邮件。"
+    },
+    "CODEDIALOG": {
+      "TITLE": "验证手机号码",
+      "DESCRIPTION": "输入您通过短信收到的验证码以验证您的手机号码。",
+      "CODE": "验证码"
+    },
+    "DATA": {
+      "STATE": "状态",
+      "STATE0": "未知",
+      "STATE1": "启用",
+      "STATE2": "停用",
+      "STATE3": "已删除",
+      "STATE4": "已锁定",
+      "STATE5": "已暂停",
+      "STATE6": "初始化"
+    },
+    "PROFILE": {
+      "TITLE": "信息",
+      "EMAIL": "电子邮件",
+      "PHONE": "手机号码",
+      "USERNAME": "用户名",
+      "CHANGEUSERNAME": "修改",
+      "CHANGEUSERNAME_TITLE": "修改用户名称",
+      "CHANGEUSERNAME_DESC": "在下面的字段中输入新名称。",
+      "FIRSTNAME": "名字",
+      "LASTNAME": "姓",
+      "NICKNAME": "昵称",
+      "DISPLAYNAME": "展示名称",
+      "PREFERRED_LANGUAGE": "语言",
+      "GENDER": "性别",
+      "PASSWORD": "密码",
+      "AVATAR": {
+        "UPLOADTITLE": "上传您的头像",
+        "UPLOADBTN": "选择文件",
+        "UPLOAD": "上传",
+        "CURRENT": "当前图片",
+        "PREVIEW": "预览",
+        "DELETESUCCESS": "删除成功！",
+        "CROPPERERROR": "上传文件时出错。如有必要，请尝试不同的格式和大小。"
+      }
+    },
+    "MACHINE": {
+      "TITLE": "服务用户详情",
+      "USERNAME": "用户名",
+      "NAME": "名称",
+      "DESCRIPTION": "描述",
+      "KEYSTITLE": "秘钥",
+      "KEYSDESC": "定义您的密钥并添加可选的到期日期。",
+      "TOKENSTITLE": "个人访问令牌",
+      "TOKENSDESC": "个人访问令牌的功能类似于普通的 OAuth 访问令牌。",
+      "ID": "秘钥 ID",
+      "TYPE": "类型",
+      "EXPIRATIONDATE": "截止日期",
+      "CHOOSEDATEAFTER": "输入一个有效的过期时间",
+      "CHOOSEEXPIRY": "选择过期时间",
+      "CREATIONDATE": "创建于",
+      "KEYDETAILS": "秘钥详情",
+      "ADD": {
+        "TITLE": "添加秘钥",
+        "DESCRIPTION": "选择您的密钥类型并选择一个可选的到期日期。"
+      },
+      "ADDED": {
+        "TITLE": "密钥已创建",
+        "DESCRIPTION": "您必须下载并保存密钥，因为关闭此对话框后将无法再查看！"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "删除秘钥",
+          "DESCRIPTION": "是否要删除选定的密钥？这不能被撤消。"
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "密码",
+      "DESCRIPTION": "根据以下策略输入新密码。",
+      "OLD": "当前密码",
+      "NEW": "新密码",
+      "CONFIRM": "确认新密码",
+      "NEWINITIAL": "密码",
+      "CONFIRMINITIAL": "确认密码",
+      "RESET": "重置当前密码",
+      "SET": "设置新密码",
+      "RESENDNOTIFICATION": "发送重置密码链接",
+      "REQUIRED": "缺少必填字段。",
+      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
+      "NOTEQUAL": "提供的密码不匹配。"
+    },
+    "ID": "ID",
+    "EMAIL": "电子邮件",
+    "PHONE": "手机号码",
+    "PHONEEMPTY": "未定义手机号码",
+    "PHONEVERIFIED": "手机号码已验证。",
+    "EMAILVERIFIED": "电子邮件已验证",
+    "NOTVERIFIED": "未验证",
+    "PREFERRED_LOGINNAME": "首选登录名",
+    "LOGINMETHODS": {
+      "TITLE": "联系信息",
+      "DESCRIPTION": "提供的信息用于向您发送重要信息，例如密码重置电子邮件。",
+      "EMAIL": {
+        "TITLE": "电子邮件",
+        "VALID": "已验证",
+        "ISVERIFIED": "电子邮件已验证",
+        "ISVERIFIEDDESC": "如果电子邮件显示为已验证，则不会发出电子邮件验证请求。",
+        "RESEND": "重新发送验证电子邮件",
+        "EDITTITLE": "更改电子邮件",
+        "EDITDESC": "在下面的字段中输入新电子邮件。"
+      },
+      "PHONE": {
+        "TITLE": "手机号码",
+        "VALID": "已验证",
+        "RESEND": "重新发送验证短信",
+        "EDITTITLE": "更改手机号码",
+        "EDITVALUE": "手机号码",
+        "EDITDESC": "在下面的字段中输入新的手机号码。",
+        "DELETETITLE": "删除手机号码",
+        "DELETEDESC": "你真的要删除手机号码吗"
+      },
+      "RESENDCODE": "重新发送验证码",
+      "ENTERCODE": "验证",
+      "ENTERCODE_DESC": "验证码"
+    },
+    "GRANTS": {
+      "TITLE": "用户授权",
+      "DESCRIPTION": "授予此用户对某些项目的访问权限",
+      "CREATE": {
+        "TITLE": "创建用户授权",
+        "DESCRIPTION": "搜索组织、项目和相应的项目角色。"
+      },
+      "PROJECTNAME": "项目名称",
+      "PROJECT-OWNED": "项目",
+      "PROJECT-GRANTED": "已授权项目",
+      "FILTER": {
+        "0": "过滤用户",
+        "1": "过滤域名",
+        "2": "过滤项目名称",
+        "3": "过滤角色名称"
+      }
+    },
+    "VALIDATION": {
+      "INVALIDPATTERN": "密码不符合定义的规则。",
+      "NOTANEMAIL": "给定的值不是合法电子邮件地址",
+      "REQUIRED": "输入字段为空。",
+      "MINLENGTH": "密码长度必须至少为 {{requiredLength}} 个字符。",
+      "NOEMAIL": "用户名不能是电子邮件地址。",
+      "UPPERCASEMISSING": "密码必须包含大写字符。",
+      "LOWERCASEMISSING": "密码必须包含小写字符。",
+      "SYMBOLERROR": "密码必须包含符号或标点符号。",
+      "NUMBERERROR": "密码必须包含数字。"
+    },
+    "STATE": {
+      "0": "未知",
+      "1": "启用",
+      "2": "停用",
+      "3": "已删除",
+      "4": "已锁定",
+      "5": "已暂停",
+      "6": "初始化"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "登录名 (当前组织)",
+      "ADDITIONAL-EXTERNAL": "登录名 (外部组织)"
+    },
+    "TARGET": {
+      "SELF": "如果您想授予其他组织的用户",
+      "EXTERNAL": "授予您组织的用户",
+      "CLICKHERE": "点击这里"
+    },
+    "SIGNEDOUT": "您已退出登录。 点击 \"登录\" 按钮再次登录。",
+    "SIGNEDOUT_BTN": "登录",
+    "EDITACCOUNT": "编辑账户",
+    "ADDACCOUNT": "登录其他账户",
+    "RESENDINITIALEMAIL": "发送新的初始化邮件",
+    "RESENDEMAILNOTIFICATION": "重新发送电子邮件通知",
+    "TOAST": {
+      "CREATED": "用户创建成功。",
+      "SAVED": "用户信息已成功保存。",
+      "USERNAMECHANGED": "用户名已更改。",
+      "EMAILSAVED": "电子邮件已成功保存。",
+      "INITEMAILSENT": "初始化邮件已发送。",
+      "PHONESAVED": "手机号码保存成功。",
+      "PHONEREMOVED": "手机号码已被移除。",
+      "PHONEVERIFIED": "手机号码验证成功。",
+      "PHONEVERIFICATIONSENT": "手机验证码已发送。",
+      "EMAILVERIFICATIONSENT": "电子邮件验证码已发送。",
+      "OTPREMOVED": "OTP (一次性密码) 已删除。",
+      "U2FREMOVED": "认证因子已删除。",
+      "PASSWORDLESSREMOVED": "无密码登录设备已删除。",
+      "INITIALPASSWORDSET": "初始密码已设置。",
+      "PASSWORDNOTIFICATIONSENT": "已发送密码更改通知。",
+      "PASSWORDCHANGED": "密码修改成功。",
+      "REACTIVATED": "用户已重新激活。",
+      "DEACTIVATED": "用户已停用。",
+      "SELECTEDREACTIVATED": "选中的用户已被重新激活。",
+      "SELECTEDDEACTIVATED": "选中的用户已被停用。",
+      "SELECTEDKEYSDELETED": "选中的 Keys 已被删除。",
+      "KEYADDED": "Key 已添加！",
+      "MACHINEADDED": "服务用户已创建成功!",
+      "DELETED": "用户删除成功!",
+      "UNLOCKED": "用户解锁成功!",
+      "PASSWORDLESSREGISTRATIONSENT": "注册链接发送成功。"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "CITADEL 管理角色",
+      "DESCRIPTION": "这些都是用户成员授权。您还可以在组织、项目或 IAM 详细信息页面上修改它们。",
+      "ORGCONTEXT": "您会看到与当前所选组织相关的所有组织和项目。",
+      "USERCONTEXT": "您会看到您被授权的所有组织和项目。包括其他组织。",
+      "CREATIONDATE": "创建于",
+      "CHANGEDATE": "最后修改于",
+      "DISPLAYNAME": "展示名称",
+      "REMOVE": "删除",
+      "TYPE": "类型",
+      "ORGID": "组织 ID",
+      "UPDATED": "成员授权已更新。",
+      "NOPERMISSIONTOEDIT": "您缺少编辑角色所需的权限！",
+      "TYPES": {
+        "UNKNOWN": "未知",
+        "ORG": "组织",
+        "PROJECT": "项目",
+        "GRANTEDPROJECT": "授权项目"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "令牌",
+      "ADD": {
+        "TITLE": "生成新的个人访问令牌",
+        "DESCRIPTION": "为令牌定义自定义过期时间。",
+        "CHOOSEEXPIRY": "选择到期日期",
+        "CHOOSEDATEAFTER": "输入一个有效的过期时间"
+      },
+      "ADDED": {
+        "TITLE": "个人访问令牌",
+        "DESCRIPTION": "请确保复制您的个人访问令牌并保存。关闭后将不在展示!"
+      },
+      "DELETE": {
+        "TITLE": "删除访问令牌",
+        "DESCRIPTION": "您即将删除个人访问令牌。你确定吗？"
+      },
+      "DELETED": "成功删除令牌。"
+    }
+  },
+  "FLOWS": {
+    "TITLE": "动作和流程",
+    "DESCRIPTION": "定义要在特定事件上需要执行的脚本。",
+    "ACTIONSTITLE": "动作",
+    "ACTIONSDESCRIPTION": "这些是您可以在流程中运行的脚本。",
+    "FLOWSTITLE": "流程",
+    "FLOWSDESCRIPTION": "某种类型的流在触发时执行动作。",
+    "ID": "ID",
+    "NAME": "名称",
+    "STATE": "状态",
+    "STATES": {
+      "0": "无状态",
+      "1": "停用",
+      "2": "激活"
+    },
+    "TYPES": {
+      "0": "未指定类型",
+      "1": "外部认证"
+    },
+    "TRIGGERTYPES": {
+      "1": "身份验证后",
+      "2": "创建之前",
+      "3": "创建时"
+    },
+    "ADDTRIGGER": "添加触发器",
+    "TIMEOUT": "超时时间",
+    "TIMEOUTINSEC": "以秒为单位的超时时间",
+    "ALLOWEDTOFAIL": "允许失败",
+    "SCRIPT": "脚本",
+    "FLOWTYPE": "流程类型",
+    "TRIGGERTYPE": "触发器类型",
+    "ACTIONS": "动作",
+    "ACTIONSMAX": "根据您的等级，您可以使用有限数量的动作 ({{value}})。确保停用您不需要的那些或考虑升级您的等级。",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "创建动作"
+      },
+      "UPDATE": {
+        "TITLE": "更新动作"
+      },
+      "DELETEACTION": {
+        "TITLE": "删除动作？",
+        "DESCRIPTION": "您将要删除一个动作。这是无法恢复的。你确定吗？",
+        "DELETE_SUCCESS": "动作已成功删除。"
+      },
+      "CLEAR": {
+        "TITLE": "清理流程？",
+        "DESCRIPTION": "您即将重置流程及其触发器和动作。此更改无法恢复。你确定吗？"
+      }
+    },
+    "TOAST": {
+      "ACTIONSSET": "动作设置",
+      "ACTIONREACTIVATED": "动作已被重新激活",
+      "ACTIONDEACTIVATED": "动作已被停用"
+    }
+  },
+  "IAM": {
+    "TITLE": "实例",
+    "DESCRIPTION": "管理您的实例设置和组织",
+    "POLICIES": {
+      "TITLE": "系统策略和访问设置",
+      "DESCRIPTION": "管理您的全局策略和管理访问设置。"
+    },
+    "EVENTSTORE": {
+      "TITLE": "IAM 存储管理",
+      "DESCRIPTION": "管理您的 ZITADEL 视图和失败的事件。"
+    },
+    "MEMBER": {
+      "TITLE": "管理者",
+      "DESCRIPTION": "这些管理者可以在您的实例中进行更改。"
+    },
+    "PAGES": {
+      "STATE": "状态",
+      "DOMAINLIST": "域名"
+    },
+    "STATE": {
+      "0": "未指定",
+      "1": "创建中",
+      "2": "运行中",
+      "3": "停止中",
+      "4": "已停止"
+    },
+    "VIEWS": {
+      "TITLE": "数据表",
+      "DESCRIPTION": "此卡片显示您的 ZITADEL 数据表。",
+      "VIEWNAME": "名称",
+      "DATABASE": "数据库",
+      "SEQUENCE": "序列",
+      "EVENTTIMESTAMP": "时间",
+      "LASTSPOOL": "成功的 spool",
+      "ACTIONS": "操作",
+      "CLEAR": "清理",
+      "CLEARED": "视图已成功清除！",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "清除视图",
+        "VIEW_CLEAR_DESCRIPTION": "您即将清除视图。清除视图会创建一个过程，在此过程中数据可能对最终用户不可用。你真的确定吗？"
+      }
+    },
+    "FAILEDEVENTS": {
+      "TITLE": "失败事件",
+      "DESCRIPTION": "这里显示了你失败的事件。",
+      "VIEWNAME": "名称",
+      "DATABASE": "数据库",
+      "FAILEDSEQUENCE": "失败的序列",
+      "FAILURECOUNT": "失败计数",
+      "ERRORMESSAGE": "错误消息",
+      "ACTIONS": "操作",
+      "DELETE": "删除",
+      "DELETESUCCESS": "失败的事件被移除。"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "管理者已删除。",
+      "MEMBERSADDED": "已添加多个管理者。",
+      "MEMBERADDED": "管理者已添加。",
+      "MEMBERCHANGED": "管理者已改变。",
+      "ROLEREMOVED": "角色已删除。",
+      "ROLECHANGED": "角色已更改。",
+      "REACTIVATED": "重新激活",
+      "DEACTIVATED": "已停用"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "名称",
+      "ID": "ID",
+      "CREATIONDATE": "创建于",
+      "DATECHANGED": "修改于",
+      "FILTER": "筛选",
+      "FILTERPLACEHOLDER": "筛选名称",
+      "LIST": "组织",
+      "LISTDESCRIPTION": "选择一个组织。",
+      "ACTIVE": "启用",
+      "CREATE": "创建组织",
+      "DEACTIVATE": "停用组织",
+      "REACTIVATE": "重新启用组织",
+      "NOPERMISSION": "您没有访问组织设置的权限。",
+      "USERSELFACCOUNT": "使用您的个人帐户作为组织所有者",
+      "ORGDETAIL_TITLE": "输入新组织的名称和域名。",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
+      "ORGDETAILUSER_TITLE": "配置组织所有者",
+      "ORGDOMAIN": {
+        "TITLE": "组织域所有权验证",
+        "VERIFICATION": "要验证您对域的所有权，您需要下载验证文件并将其上传到下面列出的提供的 URL，或者为提供的域名添加一条类型为TXT的DNS解析记录。完成后请单击按钮进行验证。",
+        "VERIFICATION_SKIP": "您现在可以跳过验证并继续创建您的组织，但要使用您的组织，必须完成此步骤！",
+        "VERIFICATION_VALIDATION_DESC": "定期检查令牌以确保您仍然是域的所有者。",
+        "VERIFICATION_NEWTOKEN_TITLE": "请求新令牌",
+        "VERIFICATION_NEWTOKEN_DESC": "如果您想请求新令牌，请选择您喜欢的方法。如果要验证持久性令牌，请单击上面的按钮。",
+        "VERIFICATION_VALIDATION_ONGOING": "已请求验证令牌，单击按钮以触发验证检查。",
+        "VERIFICATION_VALIDATION_ONGOING_TYPE": "输入令牌：",
+        "VERIFICATION_SUCCESSFUL": "域名验证成功！",
+        "REQUESTNEWTOKEN": "请求新令牌",
+        "TYPES": {
+          "1": "HTTP",
+          "2": "DNS"
+        }
+      },
+      "DOWNLOAD_FILE": "下载文件",
+      "SELECTORGTOOLTIP": "选择此组织。",
+      "PRIMARYDOMAIN": "主域名",
+      "STATE": "状态",
+      "USEPASSWORD": "设置初始密码",
+      "USEPASSWORDDESC": "用户初始化时无需设置密码。"
+    },
+    "LIST": {
+      "TITLE": "组织",
+      "DESCRIPTION": "这些是您实例上的组织"
+    },
+    "DOMAINS": {
+      "NEW": "添加域名",
+      "TITLE": "域名",
+      "DESCRIPTION": "配置您的域名。此域名可用于您的用户登录。",
+      "SETPRIMARY": "设置为主域名",
+      "DELETE": {
+        "TITLE": "删除域名",
+        "DESCRIPTION": "您即将删除您的一个域名。请注意，您的用户不能再使用此域进行登录。"
+      },
+      "ADD": {
+        "TITLE": "添加域名",
+        "DESCRIPTION": "您即将为您的组织添加一个域名。成功完成后，您的用户将能够使用该域进行登录。"
+      }
+    },
+    "STATE": {
+      "0": "未定义",
+      "1": "启用",
+      "2": "停用"
+    },
+    "MEMBER": {
+      "TITLE": "组织管理者",
+      "DESCRIPTION": "定义可以更改组织首选项的用户。"
+    },
+    "TOAST": {
+      "DEACTIVATED": "组织已停用。",
+      "REACTIVATED": "组织重新启用。",
+      "DOMAINADDED": "域名已添加。",
+      "DOMAINREMOVED": "域名已删除。",
+      "MEMBERADDED": "管理者已添加。",
+      "MEMBERREMOVED": "管理者已删除。",
+      "MEMBERCHANGED": "管理者以改变。",
+      "SETPRIMARY": "已设为主域名。"
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "停用组织",
+        "DESCRIPTION": "您即将停用您的组织。之后用户将无法登录。你确定要继续吗？"
+      },
+      "REACTIVATE": {
+        "TITLE": "重新启用组织",
+        "DESCRIPTION": "您即将重新启用您的组织。用户将能够再次登录。你确定要继续吗？"
+      }
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "实例设置",
+      "DESCRIPTION": "这些设置将应用于您的所有组织，除非它们已被覆盖。"
+    },
+    "ORG": {
+      "TITLE": "组织设置",
+      "DESCRIPTION": "这些设置将扩展或覆盖您的实例设置。"
+    },
+    "LIST": {
+      "GENERAL": "通用",
+      "LOGIN": "登录行为和安全",
+      "LOCKOUT": "安全锁策略",
+      "COMPLEXITY": "密码复杂性",
+      "NOTIFICATIONS": "通知服务商",
+      "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
+      "MESSAGETEXTS": "消息文本",
+      "IDP": "身份提供者",
+      "DOMAIN": "域名设置",
+      "LOGINTEXTS": "登录界面文本",
+      "BRANDING": "品牌标识",
+      "PRIVACYPOLICY": "隐私政策",
+      "OIDC": "OIDC 令牌有效期和过期时间",
+      "SECRETS": "验证码外观"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "通知",
+      "LOGIN": "登录和访问",
+      "DOMAIN": "域名",
+      "TEXTS": "文本和语言",
+      "APPEARANCE": "外观",
+      "OTHER": "其他"
+    }
+  },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "默认语言",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "it": "Italiano",
+      "en": "English",
+      "fr": "Français",
+      "zh": "简体中文"
+    },
+    "SMTP": {
+      "TITLE": "SMTP 设置",
+      "SENDERADDRESS": "发件人地址",
+      "SENDERNAME": "发件人名称",
+      "HOST": "服务器地址",
+      "USER": "用户名",
+      "PASSWORD": "密码",
+      "SETPASSWORD": "设置 SMTP 密码",
+      "PASSWORDSET": "SMTP 密码设置成功。",
+      "TLS": "使用安全传输层 (TLS)",
+      "SAVED": "保存成功！",
+      "REQUIREDWARN": "要从您的域发送通知，您必须输入您的 SMTP 数据。"
+    },
+    "SMS": {
+      "TITLE": "SMS 设置",
+      "PROVIDERS": "服务商",
+      "PROVIDER": "SMS 服务商",
+      "ADDPROVIDER": "添加 SMS 服务商",
+      "ADDPROVIDERDESCRIPTION": "选择可用的提供商之一并输入所需的数据。",
+      "REMOVEPROVIDER": "移除提供者",
+      "REMOVEPROVIDER_DESC": "您即将删除服务商的配置。你想继续吗？",
+      "SMSPROVIDERSTATE": {
+        "0": "未指定",
+        "1": "启用",
+        "2": "停用"
+      },
+      "ACTIVATED": "服务商已激活。",
+      "DEACTIVATED": "服务商已停用。",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "令牌",
+        "SENDERNUMBER": "发件人号码",
+        "ADDED": "Twilio 添加成功。",
+        "REMOVED": "Twilio 已删除",
+        "CHANGETOKEN": "更改令牌",
+        "SETTOKEN": "设置令牌",
+        "TOKENSET": "令牌设置成功。"
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC 设置",
+      "ACCESSTOKENLIFETIME": "访问令牌有效时间",
+      "IDTOKENLIFETIME": "Id Token 有效时间",
+      "REFRESHTOKENEXPIRATION": "Refresh Token 有效期",
+      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token 闲置有效期",
+      "INHOURS": "小时",
+      "INDAYS": "天"
+    },
+    "SECRETS": {
+      "TITLE": "验证码外观",
+      "TYPES": "验证码类型",
+      "TYPE": {
+        "1": "初始化邮件",
+        "2": "电子邮件验证",
+        "3": "电话号码验证",
+        "4": "重置密码",
+        "5": "无密码认证初始化",
+        "6": "App 验证"
+      },
+      "ADDGENERATOR": "定义验证码外观",
+      "GENERATORTYPE": "类型",
+      "EXPIRY": "过期时间 (in hours)",
+      "INCLUDEDIGITS": "包含数字",
+      "INCLUDESYMBOLS": "包含特殊符号",
+      "INCLUDELOWERLETTERS": "包含小写字母",
+      "INCLUDEUPPERLETTERS": "包含大写字母",
+      "LENGTH": "长度",
+      "UPDATED": "设置已更新。"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "重置设置",
+        "DEFAULTDESCRIPTION": "您即将将设置重置为实例的默认配置。你确定你要继续吗？",
+        "LOGINPOLICY_DESCRIPTION": "警告：如果您继续，身份提供程序设置也将重置为实例设置。"
+      }
+    }
+  },
+  "POLICY": {
+    "TITLE": "探索设置",
+    "DESCRIPTION": "增强安全性的预设置。",
+    "APPLIEDTO": "应用于",
+    "PWD_COMPLEXITY": {
+      "TITLE": "密码复杂性",
+      "DESCRIPTION": "确保所有设置的密码对应于特定模式",
+      "SYMBOLANDNUMBERERROR": "密码必须由数字和符号/标点符号组成。",
+      "SYMBOLERROR": "密码必须包含符号/标点符号。",
+      "NUMBERERROR": "密码必须包含数字。",
+      "PATTERNERROR": "密码不符合要求。"
+    },
+    "PRIVATELABELING": {
+      "TITLE": "品牌标识",
+      "DESCRIPTION": "为登录提供您的个性化风格并修改其行为。",
+      "PREVIEW_DESCRIPTION": "策略的更改将自动部署到预览环境。",
+      "BTN": "选择文件",
+      "ACTIVATEPREVIEW": "应用配置",
+      "DARK": "深色模式",
+      "LIGHT": "浅色模式",
+      "CHANGEVIEW": "改变视图",
+      "ACTIVATED": "策略变更现已生效",
+      "THEME": "主题",
+      "COLORS": "颜色",
+      "FONT": "字体",
+      "ADVANCEDBEHAVIOR": "高级行为",
+      "DROP": "将图像拖放到此处或",
+      "RELEASE": "Release",
+      "DROPFONT": "将字体文件放入这里",
+      "RELEASEFONT": "Release",
+      "USEOFLOGO": "您的徽标将用于登录和电子邮件，而图标用于较小的 UI 元素，例如控制台中的组织切换器",
+      "MAXSIZE": "图片最大支持 524kB",
+      "EMAILNOSVG": "电子邮件不支持 SVG 文件格式。因此建议以 PNG 或其他支持的格式上传您的 Logo。",
+      "MAXSIZEEXCEEDED": "文件大小超过了 524kB。",
+      "FONTINLOGINONLY": "该字体仅在当前登录界面中显示。",
+      "VIEWS": {
+        "PREVIEW": "预览",
+        "CURRENT": "当前配置"
+      },
+      "PREVIEW": {
+        "TITLE": "登录",
+        "SECOND": "使用您的 ZITADEL 帐户登录。",
+        "ERROR": "找不到用户！",
+        "PRIMARYBUTTON": "下一步",
+        "SECONDARYBUTTON": "注册"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "密码过期",
+      "DESCRIPTION": "您可以设置密码过期策略。此策略会在特定过期时间过后发出警告。"
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "锁定策略",
+      "DESCRIPTION": "设置密码重试的最大次数，之后帐户将被阻止。"
+    },
+    "DOMAIN_POLICY": {
+      "TITLE": "域设置"
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "品牌标识",
+      "BTN": "选择文件",
+      "DESCRIPTION": "自定义登录界面的外观",
+      "ACTIVATEPREVIEW": "激活配置"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "登录设置",
+      "DESCRIPTION": "定义如何对用户进行身份验证和配置身份提供者",
+      "DESCRIPTIONCREATEADMIN": "用户可以从以下可用的身份提供者中进行选择。",
+      "DESCRIPTIONCREATEMGMT": "用户可以从以下可用的身份提供者中进行选择。注意：您可为系统设置提供者也可以仅为您的组织单独设置提供者。",
+      "ADVANCED": "高级设置",
+      "LIFETIMEDURATIONS": "登录状态有效期",
+      "SAVED": "保存成功！"
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "隐私政策和服务条款",
+      "DESCRIPTION": "设置您的隐私政策和服务条款链接",
+      "TOSLINK": "链接到服务条款",
+      "POLICYLINK": "链接到隐私政策",
+      "HELPLINK": "链接到帮助",
+      "SAVED": "保存成功！",
+      "RESET_TITLE": "恢复默认值",
+      "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "登录界面文本",
+      "DESCRIPTION": "定义登录界面的文本。如果文本为空，将使用显示为占位符的默认值。",
+      "DESCRIPTION_SHORT": "定义登录界面的文本。",
+      "NEWERVERSIONEXISTS": "存在较新版本",
+      "CURRENTDATE": "当前配置",
+      "CHANGEDATE": "较新版本来自",
+      "KEYNAME": "登录屏幕/界面",
+      "RESET_TITLE": "恢复默认值",
+      "RESET_DESCRIPTION": "您即将恢复所有默认值。您所做的所有更改都将被永久删除。你真的要继续吗？",
+      "UNSAVED_TITLE": "继续但不保存？",
+      "UNSAVED_DESCRIPTION": "您在未保存的情况下进行了更改。您现在要保存吗？",
+      "LOCALE": "本地化",
+      "LOCALES": {
+        "de": "德语",
+        "en": "英语",
+        "it": "意大利语",
+        "fr": "法语",
+        "zh": "简体中文"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "电子邮件验证完成",
+        "emailVerificationText": "电子邮件验证",
+        "externalUserNotFoundText": "未找到外部用户",
+        "footerText": "页脚",
+        "initMfaDoneText": "初始化 MFA 完成",
+        "initMfaOtpText": "初始化 MFA",
+        "initMfaPromptText": "初始化 MFA 提示",
+        "initMfaU2fText": "初始化通用第二身份验证因子",
+        "initPasswordDoneText": "初始化密码完成",
+        "initPasswordText": "初始化密码",
+        "initializeDoneText": "初始化用户完成",
+        "initializeUserText": "初始化用户",
+        "linkingUserDoneText": "链接用户完成",
+        "loginText": "登录",
+        "logoutText": "登出",
+        "mfaProvidersText": "MFA 提供者",
+        "passwordChangeDoneText": "密码修改完成",
+        "passwordChangeText": "更改密码",
+        "passwordResetDoneText": "密码重置完成",
+        "passwordText": "密码",
+        "registrationOptionText": "注册选项",
+        "registrationOrgText": "注册组织",
+        "registrationUserText": "注册用户",
+        "selectAccountText": "选择账户",
+        "successLoginText": "登录成功",
+        "usernameChangeDoneText": "用户名更改完成",
+        "usernameChangeText": "更改用户名",
+        "verifyMfaOtpText": "OTP 验证",
+        "verifyMfaU2fText": "通用第二身份因素验证",
+        "passwordlessPromptText": "无密码身份验证提示",
+        "passwordlessRegistrationDoneText": "无密码身份验证注册完成",
+        "passwordlessRegistrationText": "无密码身份验证注册",
+        "passwordlessText": "无密码身份验证",
+        "externalRegistrationUserOverviewText": "外部注册用户概述"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TITLE": "消息文本",
+      "DESCRIPTION": "定义通知邮件的文本。",
+      "TYPE": "通知",
+      "TYPES": {
+        "INIT": "初始化",
+        "VE": "验证电子邮箱",
+        "VP": "验证手机号码",
+        "PR": "重置密码",
+        "DC": "域名声明",
+        "PL": "无密码身份验证"
+      },
+      "CHIPS": {
+        "firstname": "名",
+        "lastname": "姓",
+        "code": "Code",
+        "preferredLoginName": "首选登录名",
+        "displayName": "展示名称",
+        "nickName": "昵称",
+        "loginnames": "登录名",
+        "domain": "域名",
+        "lastEmail": "电子邮箱",
+        "lastPhone": "手机号码",
+        "verifiedEmail": "已验证的电子邮件",
+        "verifiedPhone": "已验证的手机号码",
+        "changedate": "修改于",
+        "username": "用户名",
+        "tempUsername": "临时用户名"
+      },
+      "TOAST": {
+        "UPDATED": "自定义文本已保存。"
+      }
+    },
+    "DEFAULTLABEL": "当前设置与您的实例的标准相对应。",
+    "BTN_INSTALL": "设置",
+    "BTN_EDIT": "修改",
+    "DATA": {
+      "DESCRIPTION": "描述",
+      "MINLENGTH": "最小长度",
+      "HASNUMBER": "包含数字",
+      "HASSYMBOL": "包含符号",
+      "HASLOWERCASE": "包含小写字母",
+      "HASUPPERCASE": "包含大写字母",
+      "SHOWLOCKOUTFAILURES": "显示锁定失败",
+      "MAXATTEMPTS": "密码最大尝试次数",
+      "EXPIREWARNDAYS": "密码过期警告",
+      "MAXAGEDAYS": "Max Age in days",
+      "USERLOGINMUSTBEDOMAIN": "用户名必须包含组织域名",
+      "VALIDATEORGDOMAINS": "验证组织域名",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP 发件人地址与实例域名匹配",
+      "ALLOWUSERNAMEPASSWORD": "允许用户名密码",
+      "ALLOWEXTERNALIDP": "允许外部身份提供者",
+      "ALLOWREGISTER": "允许注册",
+      "ALLOWUSERNAMEPASSWORD_DESC": "允许使用用户名和密码进行登录。",
+      "ALLOWEXTERNALIDP_DESC": "允许外部身份提供者进行登录",
+      "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",
+      "FORCEMFA": "强制使用 MFA",
+      "FORCEMFA_DESC": "如果选择该选项，用户必须配置第二身份认证登录因素。",
+      "HIDEPASSWORDRESET": "隐藏密码重置按钮",
+      "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
+      "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
+      "IGNOREUNKNOWNUSERNAMES": "忽略未知用户名",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "如果选择该选项，即使未找到用户，登录过程中也会显示密码屏幕。如果用户名或密码错误，密码检查的错误不会透露。",
+      "DEFAULTREDIRECTURI": "默认重定向 URI",
+      "DEFAULTREDIRECTURI_DESC": "定义如果在没有应用程序上下文的情况下开始登录（例如来自邮件），用户将被重定向到哪里。",
+      "ERRORMSGPOPUP": "在对话框中显示错误",
+      "DISABLEWATERMARK": "隐藏水印",
+      "PASSWORDCHECKLIFETIME": "密码登录状态有效期",
+      "EXTERNALLOGINCHECKLIFETIME": "外部身份提供者登录状态有效期",
+      "MFAINITSKIPLIFETIME": "多因素身份认证初始化有效期",
+      "SECONDFACTORCHECKLIFETIME": "第二因素身份认证有效期",
+      "MULTIFACTORCHECKLIFETIME": "多因素身份认证有效期",
+      "INHOURS": "小时"
+    },
+    "RESET": "重置为实例默认值",
+    "CREATECUSTOM": "创建自定义策略",
+    "TOAST": {
+      "SET": "策略设置成功！",
+      "RESETSUCCESS": "策略重置成功！",
+      "UPLOADSUCCESS": "上传成功！",
+      "DELETESUCCESS": "删除成功！",
+      "UPLOADFAILED": "上传失败！"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "组织",
+    "DESCRIPTION": "您可以在此处编辑组织的配置并管理成员。",
+    "DETAIL": {
+      "TITLE": "详情",
+      "NAME": "名称",
+      "DOMAIN": "域名",
+      "STATE": {
+        "0": "未定义",
+        "1": "启用",
+        "2": "停用"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "成员",
+      "USERNAME": "用户名",
+      "DISPLAYNAME": "展示名称",
+      "LOGINNAME": "登录名称",
+      "EMAIL": "电子邮件",
+      "ROLES": "角色",
+      "ADD": "添加成员",
+      "ADDDESCRIPTION": "输入要添加的用户的名称。"
+    },
+    "TABLE": {
+      "TOTAL": "条目总数",
+      "SELECTION": "选中条目",
+      "DEACTIVATE": "停用用户",
+      "ACTIVATE": "激活用户",
+      "DELETE": "删除用户",
+      "CLEAR": "清空选择"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "项目",
+      "DESCRIPTION": "在这里，您可以定义应用程序、管理角色并授权其他组织使用您的项目。",
+      "DELETE": "删除项目",
+      "LIST": "项目列表",
+      "LISTDESCRIPTION": "如果找不到项目，请联系项目所有者或具有相应权限的人员以获取项目访问权限。",
+      "DETAIL": "详情",
+      "CREATE": "创建项目",
+      "CREATE_DESC": "插入您的项目名称。",
+      "ROLE": "角色",
+      "NOITEMS": "没有项目",
+      "ZITADELPROJECT": "这属于 ZITADEL 项目。注意：如果您修改了设置，ZITADEL 可能无法正常运行。",
+      "TYPE": {
+        "OWNED": "拥有的项目",
+        "GRANTED": "被授权的项目",
+        "OWNED_SINGULAR": "拥有项目",
+        "GRANTED_SINGULAR": "被授予的项目"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "品牌标识设置",
+        "0": {
+          "TITLE": "未指定",
+          "DESC": "识别用户后，将显示已识别用户的组织品牌，然后显示系统默认值。"
+        },
+        "1": {
+          "TITLE": "使用项目设置",
+          "DESC": "将显示拥有该项目的组织的品牌。"
+        },
+        "2": {
+          "TITLE": "使用用户组织设置",
+          "DESC": "将显示项目组织的品牌，但一旦识别用户，将显示已识别用户的组织设置。"
+        },
+        "DIALOG": {
+          "TITLE": "品牌标识设置",
+          "DESCRIPTION": "选择项目登录时使用的行为。"
+        }
+      },
+      "PINNED": "固定",
+      "ALL": "所有",
+      "CREATEDON": "创建于",
+      "LASTMODIFIED": "最后更改于",
+      "ADDNEW": "创建新项目",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "重新启用项目",
+          "DESCRIPTION": "您真的要重新启用您的项目吗？"
+        },
+        "DEACTIVATE": {
+          "TITLE": "停用项目",
+          "DESCRIPTION": "您真的要停用您的项目吗？"
+        },
+        "DELETE": {
+          "TITLE": "删除项目",
+          "DESCRIPTION": "您真的要删除您的项目吗？",
+          "TYPENAME": "键入项目的名称以将其永久删除。"
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "设置",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "状态",
+      "0": "未定义",
+      "1": "启用",
+      "2": "停用"
+    },
+    "TYPE": {
+      "TITLE": "类型",
+      "0": "未知类型",
+      "1": "拥有的",
+      "2": "被授权的"
+    },
+    "NAME": "名称",
+    "NAMEDIALOG": {
+      "TITLE": "重命名项目",
+      "DESCRIPTION": "输入项目的新名称",
+      "NAME": "新名称"
+    },
+    "MEMBER": {
+      "TITLE": "管理者",
+      "TITLEDESC": "管理者可以根据他们的角色对此项目进行更改。",
+      "DESCRIPTION": "这些管理者可能能够编辑您的项目。",
+      "USERNAME": "用户名",
+      "DISPLAYNAME": "展示名称",
+      "LOGINNAME": "登录名称",
+      "EMAIL": "电子邮件",
+      "ROLES": "角色",
+      "USERID": "用户 ID"
+    },
+    "GRANT": {
+      "EMPTY": "没有被授权的组织。",
+      "TITLE": "项目授权",
+      "DESCRIPTION": "允许其他组织使用您的项目。",
+      "EDITTITLE": "编辑角色",
+      "CREATE": {
+        "TITLE": "创建组织授权",
+        "SEL_USERS": "选择您要授予访问权限的用户",
+        "SEL_PROJECT": "搜索项目",
+        "SEL_ROLES": "选择要添加到授权中的角色",
+        "SEL_USER": "选择一个或多个用户",
+        "SEL_ORG": "选择一个组织",
+        "SEL_ORG_DESC": "输入完整的域以指定要授予的组织。",
+        "ORG_TITLE": "组织",
+        "ORG_DESCRIPTION": "您即将授予组织 {{name}} 的用户。",
+        "ORG_DESCRIPTION_DESC": "切换上面标题中的上下文以授予另一个组织的用户。",
+        "SEL_ORG_FORMFIELD": "完整域名",
+        "SEL_ORG_BUTTON": "搜索组织",
+        "FOR_ORG": "授予组织:"
+      },
+      "DETAIL": {
+        "TITLE": "项目授权",
+        "DESC": "您可以选择指定组织可以使用哪些角色，并选择管理者",
+        "MEMBERTITLE": "管理者",
+        "MEMBERDESC": "这些是被授予组织的管理者。在此处添加应有权编辑项目数据的用户。",
+        "PROJECTNAME": "项目名称",
+        "GRANTEDORG": "授予组织",
+        "RESOURCEOWNER": "资源所有者"
+      },
+      "STATE": "状态",
+      "STATES": {
+        "1": "启用",
+        "2": "停用"
+      },
+      "ALL": "所有",
+      "SHOWDETAIL": "显示详细资料",
+      "USER": "用户",
+      "MEMBERS": "管理者",
+      "ORG": "组织",
+      "PROJECTNAME": "项目名称",
+      "GRANTEDORG": "授予组织",
+      "GRANTEDORGDOMAIN": "域名",
+      "RESOURCEOWNER": "资源所有者",
+      "GRANTEDORGNAME": "组织名称",
+      "CREATIONDATE": "创建于",
+      "CHANGEDATE": "最后更新于",
+      "DATES": "日期",
+      "ROLENAMESLIST": "角色",
+      "NOROLES": "没有角色",
+      "TYPE": "类型",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "项目授权已创建。",
+        "PROJECTGRANTADDED": "项目授权已创建。",
+        "PROJECTGRANTCHANGED": "项目授权已更改",
+        "PROJECTGRANTMEMBERADDED": "授权管理者已添加",
+        "PROJECTGRANTMEMBERCHANGED": "授权管理者已更改。",
+        "PROJECTGRANTMEMBERREMOVED": "授权管理者已删除。",
+        "PROJECTGRANTUPDATED": "项目授权已更新。"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "删除项目授权",
+        "DELETE_DESCRIPTION": "您即将删除项目授权。你确定吗？"
+      },
+      "ROLES": "项目角色"
+    },
+    "APP": {
+      "TITLE": "应用",
+      "NAME": "名称",
+      "NAMEREQUIRED": "应用名称是必需的。"
+    },
+    "ROLE": {
+      "EMPTY": "尚未创建任何角色。",
+      "ADDNEWLINE": "添加角色",
+      "KEY": "关键字",
+      "TITLE": "角色",
+      "DESCRIPTION": "定义一些可用于创建项目授权的角色。",
+      "NAME": "名称",
+      "DISPLAY_NAME": "展示名称",
+      "GROUP": "组名",
+      "ACTIONS": "操作",
+      "ADDTITLE": "创建角色",
+      "ADDDESCRIPTION": "输入新角色的数据。",
+      "EDITTITLE": "编辑角色",
+      "EDITDESCRIPTION": "输入角色的新数据。",
+      "DELETE": "删除角色",
+      "CREATIONDATE": "创建于",
+      "CHANGEDATE": "最后修改于",
+      "SELECTGROUPTOOLTIP": "选择组 {{group}} 的所有角色。",
+      "OPTIONS": "选项",
+      "ASSERTION": "身份验证时附加角色信息",
+      "ASSERTION_DESCRIPTION": "角色信息将包含在用户信息中，具体取决于令牌类型和应用程序设置。",
+      "CHECK": "身份验证时检查用户授权",
+      "CHECK_DESCRIPTION": "如果设置，则只有在为其帐户分配了任何角色时才允许用户进行身份验证。",
+      "DIALOG": {
+        "DELETE_TITLE": "删除角色",
+        "DELETE_DESCRIPTION": "您即将删除项目角色。你确定吗？"
+      }
+    },
+    "HAS_PROJECT": "身份验证时检查是否拥有项目",
+    "HAS_PROJECT_DESCRIPTION": "检查用户或组织是否有这个项目。如果没有则用户身份验证失败。",
+    "TABLE": {
+      "TOTAL": "条目总数:",
+      "SELECTION": "选定条目",
+      "DEACTIVATE": "停用项目",
+      "ACTIVATE": "启用项目",
+      "DELETE": "删除项目",
+      "ORGNAME": "组织名称",
+      "ORGDOMAIN": "组织域名",
+      "STATE": "状态",
+      "TYPE": "类型",
+      "CREATIONDATE": "创建于",
+      "CHANGEDATE": "最后更改于",
+      "RESOURCEOWNER": "所有者",
+      "SHOWTABLE": "表视图",
+      "SHOWGRID": "网格视图",
+      "EMPTY": "未找到项目"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "管理者已删除。",
+      "MEMBERSADDED": "管理者已添加。",
+      "MEMBERADDED": "管理者已添加。",
+      "MEMBERCHANGED": "管理者已更改。",
+      "ROLESCREATED": "角色已创建。",
+      "ROLEREMOVED": "角色已删除。",
+      "ROLECHANGED": "角色已更改。",
+      "REACTIVATED": "已重新启用。",
+      "DEACTIVATED": "已停用。",
+      "CREATED": "项目已创建。",
+      "UPDATED": "项目已修改。",
+      "GRANTUPDATED": "授权已更新。",
+      "DELETED": "项目已删除"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "下一步"
+  },
+  "IDP": {
+    "LIST": {
+      "TITLE": "身份提供者",
+      "DESCRIPTION": "管理您的身份提供者配置，然后可以在您的登录设置中激活。",
+      "ACTIVETITLE": "启用的身份提供者"
+    },
+    "CREATE": {
+      "TITLE": "创建身份提供者",
+      "DESCRIPTION": "选择以下身份提供者类型之一。"
+    },
+    "DETAIL": {
+      "TITLE": "身份提供者",
+      "DESCRIPTION": "身份提供者的常规配置。",
+      "DATECREATED": "已创建",
+      "DATECHANGED": "已更新"
+    },
+    "OWNERTYPES": {
+      "0": "未知",
+      "1": "实例",
+      "2": "组织"
+    },
+    "TYPES": {
+      "0": "未知",
+      "1": "OIDC",
+      "3": "JWT"
+    },
+    "STATES": {
+      "1": "启用",
+      "2": "停用"
+    },
+    "MAPPINGFIELD": {
+      "1": "首选用户名",
+      "2": "电子邮箱"
+    },
+    "STYLE": "样式",
+    "STYLEFIELD": {
+      "0": "没有样式",
+      "1": "Google"
+    },
+    "ADD": "添加身份提供者",
+    "AUTOREGISTER": "自动注册",
+    "AUTOREGISTER_DESC": "如果勾选，当使用 IDP 登录且用户不存在时，则会创建一个。",
+    "TYPE": "类型",
+    "OWNER": "所有者",
+    "ID": "ID",
+    "NAME": "名称",
+    "AVAILABILITY": "可用性",
+    "AVAILABLE": "可用的",
+    "AVAILABLEBUTINACTIVE": "可用但已停用",
+    "SETAVAILABLE": "设置为可用",
+    "SETUNAVAILABLE": "设置为不可用",
+    "CONFIG": "配置",
+    "STATE": "状态",
+    "ISSUER": "Issuer",
+    "SCOPESLIST": "Scopes List",
+    "CLIENTID": "Client ID",
+    "CLIENTSECRET": "Client Secret",
+    "IDPDISPLAYNAMMAPPING": "IDP 展示名称映射",
+    "USERNAMEMAPPING": "用户名映射",
+    "DATES": "日期",
+    "CREATIONDATE": "创建于",
+    "CHANGEDATE": "最后修改于",
+    "DEACTIVATE": "停用",
+    "ACTIVATE": "启用",
+    "DELETE": "删除",
+    "DELETE_TITLE": "删除 IDP",
+    "DELETE_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
+    "DELETE_SELECTION_TITLE": "删除 IDP",
+    "DELETE_SELECTION_DESCRIPTION": "您即将删除身份提供者。由此产生的变化是不可撤销的。你真的想这样做吗？",
+    "EMPTY": "没有可用的 IDP",
+    "OIDC": {
+      "GENERAL": "通用信息",
+      "TITLE": "OIDC 配置",
+      "DESCRIPTION": "输入 OIDC 身份提供者的数据。"
+    },
+    "JWT": {
+      "TITLE": "JWT 配置",
+      "DESCRIPTION": "输入 JWT 身份提供者的数据。",
+      "HEADERNAME": "请求头名称",
+      "JWTENDPOINT": "JWT 端点",
+      "JWTKEYSENDPOINT": "JWT Keys 端点"
+    },
+    "TOAST": {
+      "SAVED": "成功保存。",
+      "REACTIVATED": "IDP 已重新启用.",
+      "DEACTIVATED": "IDP 已停用.",
+      "SELECTEDREACTIVATED": "选定的 IDPs 已重新启用。",
+      "SELECTEDDEACTIVATED": "选定的 IDPs 已停用。",
+      "SELECTEDKEYSDELETED": "已删除选定的 IDPs。",
+      "DELETED": "IDP 删除成功！",
+      "ADDED": "添加成功。",
+      "REMOVED": "成功删除。"
+    }
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "无密码身份认证",
+      "MULTIFACTORDESCRIPTION": "在此处为您的无密码身份认证定义多因素。",
+      "SECONDFACTORTITLE": "多因素身份认证",
+      "SECONDFACTORDESCRIPTION": "进一步定义您可以用来保护您的密码身份认证的可能因素。"
+    },
+    "CREATE": {
+      "TITLE": "创建身份认证因素",
+      "DESCRIPTION": "选择您的新身份认证因素类型。"
+    },
+    "DELETE": {
+      "TITLE": "删除身份认证因素 Factor",
+      "DESCRIPTION": "您即将从登录设置中删除一个身份认证因素。你确定吗？"
+    },
+    "TOAST": {
+      "ADDED": "添加成功。",
+      "SAVED": "保存成功。",
+      "DELETED": "成功移除。"
+    },
+    "TYPE": "类型",
+    "MULTIFACTORTYPES": {
+      "0": "未知",
+      "1": "指纹、安全密钥、Face ID 等"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "未知",
+      "1": "一次性密码 (OTP)",
+      "2": "指纹、安全密钥、Face ID 等"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "登录设置",
+      "DESCRIPTION": "定义如何在您的组织中对您的用户进行身份验证。"
+    },
+    "IDPS": "身份提供者",
+    "ADDIDP": {
+      "TITLE": "添加身份提供者",
+      "DESCRIPTION": "您可以选择预定义或自行创建的提供程序进行身份验证。",
+      "SELECTIDPS": "身份提供者"
+    },
+    "PASSWORDLESS": "无密码登录",
+    "PASSWORDLESSTYPE": {
+      "0": "不允许",
+      "1": "允许"
+    }
+  },
+  "APP": {
+    "LIST": "应用",
+    "COMPLIANCE": "OIDC 兼容性",
+    "URLS": "Urls",
+    "CONFIGURATION": "配置",
+    "TOKEN": "令牌设置",
+    "PAGES": {
+      "TITLE": "应用",
+      "ID": "ID",
+      "DESCRIPTION": "在这里您可以编辑您的应用程序数据及其配置。",
+      "CREATE_OIDC": "OIDC 应用",
+      "CREATE_OIDC_DESC_TITLE": "逐步输入您的应用详情",
+      "CREATE_OIDC_DESC_SUB": "将自动生成推荐的配置。",
+      "STATE": "状态",
+      "DATECREATED": "创建于",
+      "DATECHANGED": "修改于",
+      "URLS": "Urls",
+      "DELETE": "删除应用",
+      "DETAIL": {
+        "TITLE": "详情",
+        "STATE": {
+          "0": "未定义",
+          "1": "启用",
+          "2": "停用"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "变更OIDC配置"
+        },
+        "DELETE": {
+          "TITLE": "删除应用",
+          "DESCRIPTION": "您真的要删除此应用程序吗？"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "下一步",
+        "0": {
+          "TITLE": "添加角色",
+          "DESC": "输入您的项目角色"
+        },
+        "1": {
+          "TITLE": "添加用户",
+          "DESC": "为添加新用户"
+        },
+        "2": {
+          "TITLE": "帮助支持",
+          "DESC": "阅读我们关于创建应用程序的文档或联系我们的支持"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "重命名应用",
+      "DESCRIPTION": "为您的应用输入新名称",
+      "NAME": "新名称"
+    },
+    "NAME": "名称",
+    "TYPE": "应用类型",
+    "AUTHMETHOD": "身份验证方式",
+    "AUTHMETHODSECTION": "身份验证方式",
+    "GRANT": "授权类型",
+    "ADDITIONALORIGINS": "其他来源",
+    "ADDITIONALORIGINSDESC": "如果您想向您的应用程序添加不用作重定向的其他来源，您可以在此处执行此操作。",
+    "ORIGINS": "其他来源",
+    "NOTANORIGIN": "输入的值不是有效来源",
+    "OIDC": {
+      "INFO": {
+        "ISSUER": "Issuer",
+        "CLIENTID": "Client Id"
+      },
+      "CURRENT": "当前配置",
+      "TOKENSECTIONTITLE": "AuthToken 选项",
+      "REDIRECTSECTIONTITLE": "重定向设置",
+      "PROSWITCH": "我是专业人士。跳过此向导。",
+      "NAMEANDTYPESECTION": "名称和类型",
+      "TITLEFIRST": "先录入一个名字。",
+      "TYPETITLE": "您要创建什么类型的应用程序？",
+      "REDIRECTTITLE": "指定登录将重定向到的 URL。",
+      "POSTREDIRECTTITLE": "这是退出登录后的重定向 URL。",
+      "REDIRECTDESCRIPTIONWEB": "重定向 URI 必须以 https:// 开头。 http:// 仅对启用的开发模式有效。",
+      "REDIRECTDESCRIPTIONNATIVE": "重定向 URI 必须以您自己的协议、http://127.0.0.1、http://[::1] 或 http://localhost 开头。",
+      "REDIRECTNOTVALID": "此重定向 URL 无效。",
+      "COMMAORENTERSEPERATION": "separate with ↵",
+      "TYPEREQUIRED": "类型是必填的。",
+      "TITLE": "OIDC 配置",
+      "CLIENTID": "客户端 ID",
+      "CLIENTSECRET": "客户端秘钥",
+      "CLIENTSECRET_NOSECRET": "使用您选择的身份验证流程，不需要任何秘密，因此不可用。",
+      "CLIENTSECRET_DESCRIPTION": "将您的客户保密在一个安全的地方，因为一旦对话框关闭，便无法再次查看。",
+      "REGENERATESECRET": "重新生成客户端密钥",
+      "DEVMODE": "开发模式",
+      "DEVMODEDESC": "注意：启用开发模式的重定向 URI 将不会被验证。",
+      "REDIRECT": "重定向 URLs",
+      "REDIRECTSECTION": "重定向 URLs",
+      "POSTLOGOUTREDIRECT": "退出登录重定向 URLs",
+      "RESPONSESECTION": "响应类型",
+      "GRANTSECTION": "授权类型",
+      "GRANTTITLE": "选择您的授权类型。注意：隐式仅适用于基于浏览器的应用程序。",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "响应类型",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Refresh Token",
+      "GRANTTYPE": "授权类型",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "None",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "身份验证令牌类型",
+      "TOKENTYPE0": "Bearer Token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "我当然希望你知道你在做什么。",
+      "OVERVIEWSECTION": "概览",
+      "OVERVIEWTITLE": "你现在完成了。检查您的配置。",
+      "ACCESSTOKENROLEASSERTION": "将用户角色添加到访问令牌",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "如果勾选，则将经过身份验证的用户的请求角色添加到访问令牌中。",
+      "IDTOKENROLEASSERTION": "在 ID Token 中包含用户角色",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "如果勾选，则已验证用户的请求角色将添加到 ID Token 中。",
+      "IDTOKENUSERINFOASSERTION": "在 ID Token 中包含用户信息",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "使客户端能够从 ID Token 中读取个人资料、电子邮件、电话和地址声明。",
+      "CLOCKSKEW": "使客户端能够处理 OP 和客户端的时钟偏差。持续时间（0-5 秒）将添加到 exp 声明中，并从 iats、auth_time 和 nbf 中减去。",
+      "RECOMMENDED": "推荐的",
+      "NOTRECOMMENDED": "不推荐的",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "常规 Web 应用程序，如：.net，PHP，Node.js，Java 等。"
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "移动端应用, 桌面应用, 智能终端设备等"
+          },
+          "USERAGENT": {
+            "TITLE": "User Agent",
+            "DESCRIPTION": "单页应用程序 (SPA) 以及通常在浏览器中执行的所有 JS 框架"
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Client Id"
+      },
+      "REGENERATESECRET": "重新生成客户端密钥",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "通用的 APIs 服务"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "交换访问令牌的授权码"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "使用随机哈希而不是静态客户端密码以提高安全性"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "发送 client_id 和 client_secret 作为表单的一部分"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "使用私钥授权您的应用程序"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "使用用户名和密码进行身份验证"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "直接从授权端点获取令牌"
+      },
+      "CUSTOM": {
+        "TITLE": "Custom",
+        "DESCRIPTION": "您的设置与任何其他选项都不对应。"
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "应用程序已重新启用。",
+      "DEACTIVATED": "应用程序已停用。",
+      "OIDCUPDATED": "应用已更新。",
+      "APIUPDATED": "应用已更新。",
+      "UPDATED": "应用已更新。",
+      "CREATED": "应用已创建。",
+      "CLIENTSECRETREGENERATED": "客户端秘钥已生成。",
+      "DELETED": "应用已删除。",
+      "CONFIGCHANGED": "检测到变化！"
+    }
+  },
+  "GENDERS": {
+    "0": "未知",
+    "1": "女性",
+    "2": "男性",
+    "3": "其他"
+  },
+  "LANGUAGES": {
+    "de": "德语",
+    "en": "英语",
+    "it": "意大利语",
+    "fr": "法语",
+    "zh": "简体中文"
+  },
+  "MEMBER": {
+    "ADD": "添加管理者",
+    "CREATIONTYPE": "创建类型",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organization",
+      "0": "Owned Project",
+      "1": "Granted Project",
+      "4": "Project"
+    },
+    "EDITROLE": "编辑角色",
+    "EDITFOR": "编辑用户：{{value}} 的角色",
+    "DIALOG": {
+      "DELETE_TITLE": "删除管理者",
+      "DELETE_DESCRIPTION": "您即将删除管理者。你确定吗？"
+    }
+  },
+  "ROLESLABEL": "角色",
+  "GRANTS": {
+    "TITLE": "授权",
+    "DESC": "这里列出的是当前组织已授权的用户列表",
+    "DELETE": "删除授权",
+    "EMPTY": "没有用户授权数据",
+    "ADD": "创建用户授权",
+    "ADD_BTN": "创建",
+    "PROJECT": {
+      "TITLE": "授权",
+      "DESCRIPTION": "为指定项目定义授权。请注意：您只能查看您拥有权限的项目和用户的条目。"
+    },
+    "USER": {
+      "TITLE": "授权",
+      "DESCRIPTION": "为指定用户定义授权。请注意，您只能查看您拥有权限的项目和用户的条目。"
+    },
+    "CREATE": {
+      "TITLE": "创建授权",
+      "DESCRIPTION": "搜索组织、项目和相应的角色。"
+    },
+    "EDIT": {
+      "TITLE": "更改授权"
+    },
+    "DETAIL": {
+      "TITLE": "授权详情",
+      "DESCRIPTION": "在这里您可以看到授权的所有详细信息。"
+    },
+    "TOAST": {
+      "UPDATED": "授权已更新。",
+      "REMOVED": "已移除授权。",
+      "BULKREMOVED": "已移除授权。"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "删除授权",
+      "DELETE_DESCRIPTION": "您即将删除授权。你想继续吗？",
+      "BULK_DELETE_TITLE": "删除授权",
+      "BULK_DELETE_DESCRIPTION": "您将要删除多个授权。你想继续吗？"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "最后变更",
+    "BOTTOM": "您已到达列表的末尾。",
+    "LOADMORE": "加载更多",
+    "ORG": {
+      "TITLE": "当前组织事件",
+      "DESCRIPTION": "在这里您可以看到组织变更的最新事件。"
+    },
+    "PROJECT": {
+      "TITLE": "当前项目事件",
+      "DESCRIPTION": "在这里您可以看到项目变更的最新事件。"
+    },
+    "USER": {
+      "TITLE": "当前用户事件",
+      "DESCRIPTION": "在这里您可以看到用户变更的最新事件。"
+    }
+  }
+}

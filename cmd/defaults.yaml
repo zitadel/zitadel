@@ -200,6 +200,25 @@ OIDC:
     Keys:
       Path: /oauth/v2/keys
 
+SAML:
+  ProviderConfig:
+    MetadataConfig:
+      Path: "/metadata"
+      SignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+    IDPConfig:
+      SignatureAlgorithm: "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+      WantAuthRequestsSigned: true
+      Endpoints:
+    #Organisation:
+    #  Name: ZITADEL
+    #  URL: https://zitadel.com
+    #ContactPerson:
+    #  ContactType: "technical"
+    #  Company: ZITADEL
+    #  EmailAddress: hi@zitadel.com
+
+
+
 Login:
   LanguageCookieName: zitadel.login.lang
   CSRFCookieName: zitadel.login.csrf
@@ -233,6 +252,9 @@ EncryptionKeys:
     DecryptionKeyIDs:
   OIDC:
     EncryptionKeyID: "oidcKey"
+    DecryptionKeyIDs:
+  SAML:
+    EncryptionKeyID: "samlKey"
     DecryptionKeyIDs:
   OTP:
     EncryptionKeyID: "otpKey"
@@ -277,8 +299,10 @@ SystemDefaults:
     FileSystemPath: ".notifications/"
   KeyConfig:
     Size: 2048
+    CertificateSize: 4096
     PrivateKeyLifetime: 6h
     PublicKeyLifetime: 30h
+    CertificateLifetime: 8766h
 
 DefaultInstance:
   InstanceName:

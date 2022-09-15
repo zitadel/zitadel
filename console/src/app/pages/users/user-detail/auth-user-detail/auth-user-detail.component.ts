@@ -25,7 +25,7 @@ import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.c
 export class AuthUserDetailComponent implements OnDestroy {
   public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'it'];
+  public languages: string[] = ['de', 'en', 'fr', 'it', 'zh'];
 
   private subscription: Subscription = new Subscription();
 

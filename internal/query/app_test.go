@@ -15,80 +15,93 @@ import (
 )
 
 var (
-	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps2.id,` +
-		` projections.apps2.name,` +
-		` projections.apps2.project_id,` +
-		` projections.apps2.creation_date,` +
-		` projections.apps2.change_date,` +
-		` projections.apps2.resource_owner,` +
-		` projections.apps2.state,` +
-		` projections.apps2.sequence,` +
+	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps3.id,` +
+		` projections.apps3.name,` +
+		` projections.apps3.project_id,` +
+		` projections.apps3.creation_date,` +
+		` projections.apps3.change_date,` +
+		` projections.apps3.resource_owner,` +
+		` projections.apps3.state,` +
+		` projections.apps3.sequence,` +
 		// api config
-		` projections.apps2_api_configs.app_id,` +
-		` projections.apps2_api_configs.client_id,` +
-		` projections.apps2_api_configs.auth_method,` +
+		` projections.apps3_api_configs.app_id,` +
+		` projections.apps3_api_configs.client_id,` +
+		` projections.apps3_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps2_oidc_configs.app_id,` +
-		` projections.apps2_oidc_configs.version,` +
-		` projections.apps2_oidc_configs.client_id,` +
-		` projections.apps2_oidc_configs.redirect_uris,` +
-		` projections.apps2_oidc_configs.response_types,` +
-		` projections.apps2_oidc_configs.grant_types,` +
-		` projections.apps2_oidc_configs.application_type,` +
-		` projections.apps2_oidc_configs.auth_method_type,` +
-		` projections.apps2_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps2_oidc_configs.is_dev_mode,` +
-		` projections.apps2_oidc_configs.access_token_type,` +
-		` projections.apps2_oidc_configs.access_token_role_assertion,` +
-		` projections.apps2_oidc_configs.id_token_role_assertion,` +
-		` projections.apps2_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps2_oidc_configs.clock_skew,` +
-		` projections.apps2_oidc_configs.additional_origins` +
-		` FROM projections.apps2` +
-		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
-		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
-	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps2.id,` +
-		` projections.apps2.name,` +
-		` projections.apps2.project_id,` +
-		` projections.apps2.creation_date,` +
-		` projections.apps2.change_date,` +
-		` projections.apps2.resource_owner,` +
-		` projections.apps2.state,` +
-		` projections.apps2.sequence,` +
+		` projections.apps3_oidc_configs.app_id,` +
+		` projections.apps3_oidc_configs.version,` +
+		` projections.apps3_oidc_configs.client_id,` +
+		` projections.apps3_oidc_configs.redirect_uris,` +
+		` projections.apps3_oidc_configs.response_types,` +
+		` projections.apps3_oidc_configs.grant_types,` +
+		` projections.apps3_oidc_configs.application_type,` +
+		` projections.apps3_oidc_configs.auth_method_type,` +
+		` projections.apps3_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps3_oidc_configs.is_dev_mode,` +
+		` projections.apps3_oidc_configs.access_token_type,` +
+		` projections.apps3_oidc_configs.access_token_role_assertion,` +
+		` projections.apps3_oidc_configs.id_token_role_assertion,` +
+		` projections.apps3_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps3_oidc_configs.clock_skew,` +
+		` projections.apps3_oidc_configs.additional_origins,` +
+		//saml config
+		` projections.apps3_saml_configs.app_id,` +
+		` projections.apps3_saml_configs.entity_id,` +
+		` projections.apps3_saml_configs.metadata,` +
+		` projections.apps3_saml_configs.metadata_url` +
+		` FROM projections.apps3` +
+		` LEFT JOIN projections.apps3_api_configs ON projections.apps3.id = projections.apps3_api_configs.app_id` +
+		` LEFT JOIN projections.apps3_oidc_configs ON projections.apps3.id = projections.apps3_oidc_configs.app_id` +
+		` LEFT JOIN projections.apps3_saml_configs ON projections.apps3.id = projections.apps3_saml_configs.app_id`)
+	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps3.id,` +
+		` projections.apps3.name,` +
+		` projections.apps3.project_id,` +
+		` projections.apps3.creation_date,` +
+		` projections.apps3.change_date,` +
+		` projections.apps3.resource_owner,` +
+		` projections.apps3.state,` +
+		` projections.apps3.sequence,` +
 		// api config
-		` projections.apps2_api_configs.app_id,` +
-		` projections.apps2_api_configs.client_id,` +
-		` projections.apps2_api_configs.auth_method,` +
+		` projections.apps3_api_configs.app_id,` +
+		` projections.apps3_api_configs.client_id,` +
+		` projections.apps3_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps2_oidc_configs.app_id,` +
-		` projections.apps2_oidc_configs.version,` +
-		` projections.apps2_oidc_configs.client_id,` +
-		` projections.apps2_oidc_configs.redirect_uris,` +
-		` projections.apps2_oidc_configs.response_types,` +
-		` projections.apps2_oidc_configs.grant_types,` +
-		` projections.apps2_oidc_configs.application_type,` +
-		` projections.apps2_oidc_configs.auth_method_type,` +
-		` projections.apps2_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps2_oidc_configs.is_dev_mode,` +
-		` projections.apps2_oidc_configs.access_token_type,` +
-		` projections.apps2_oidc_configs.access_token_role_assertion,` +
-		` projections.apps2_oidc_configs.id_token_role_assertion,` +
-		` projections.apps2_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps2_oidc_configs.clock_skew,` +
-		` projections.apps2_oidc_configs.additional_origins,` +
+		` projections.apps3_oidc_configs.app_id,` +
+		` projections.apps3_oidc_configs.version,` +
+		` projections.apps3_oidc_configs.client_id,` +
+		` projections.apps3_oidc_configs.redirect_uris,` +
+		` projections.apps3_oidc_configs.response_types,` +
+		` projections.apps3_oidc_configs.grant_types,` +
+		` projections.apps3_oidc_configs.application_type,` +
+		` projections.apps3_oidc_configs.auth_method_type,` +
+		` projections.apps3_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps3_oidc_configs.is_dev_mode,` +
+		` projections.apps3_oidc_configs.access_token_type,` +
+		` projections.apps3_oidc_configs.access_token_role_assertion,` +
+		` projections.apps3_oidc_configs.id_token_role_assertion,` +
+		` projections.apps3_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps3_oidc_configs.clock_skew,` +
+		` projections.apps3_oidc_configs.additional_origins,` +
+		//saml config
+		` projections.apps3_saml_configs.app_id,` +
+		` projections.apps3_saml_configs.entity_id,` +
+		` projections.apps3_saml_configs.metadata,` +
+		` projections.apps3_saml_configs.metadata_url,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.apps2` +
-		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
-		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
-	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps2_api_configs.client_id,` +
-		` projections.apps2_oidc_configs.client_id` +
-		` FROM projections.apps2` +
-		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
-		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
-	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps2.project_id` +
-		` FROM projections.apps2` +
-		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
-		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
+		` FROM projections.apps3` +
+		` LEFT JOIN projections.apps3_api_configs ON projections.apps3.id = projections.apps3_api_configs.app_id` +
+		` LEFT JOIN projections.apps3_oidc_configs ON projections.apps3.id = projections.apps3_oidc_configs.app_id` +
+		` LEFT JOIN projections.apps3_saml_configs ON projections.apps3.id = projections.apps3_saml_configs.app_id`)
+	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps3_api_configs.client_id,` +
+		` projections.apps3_oidc_configs.client_id` +
+		` FROM projections.apps3` +
+		` LEFT JOIN projections.apps3_api_configs ON projections.apps3.id = projections.apps3_api_configs.app_id` +
+		` LEFT JOIN projections.apps3_oidc_configs ON projections.apps3.id = projections.apps3_oidc_configs.app_id`)
+	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps3.project_id` +
+		` FROM projections.apps3` +
+		` LEFT JOIN projections.apps3_api_configs ON projections.apps3.id = projections.apps3_api_configs.app_id` +
+		` LEFT JOIN projections.apps3_oidc_configs ON projections.apps3.id = projections.apps3_oidc_configs.app_id` +
+		` LEFT JOIN projections.apps3_saml_configs ON projections.apps3.id = projections.apps3_saml_configs.app_id`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects2.id,` +
 		` projections.projects2.creation_date,` +
 		` projections.projects2.change_date,` +
@@ -101,9 +114,10 @@ var (
 		` projections.projects2.has_project_check,` +
 		` projections.projects2.private_labeling_setting` +
 		` FROM projections.projects2` +
-		` JOIN projections.apps2 ON projections.projects2.id = projections.apps2.project_id` +
-		` LEFT JOIN projections.apps2_api_configs ON projections.apps2.id = projections.apps2_api_configs.app_id` +
-		` LEFT JOIN projections.apps2_oidc_configs ON projections.apps2.id = projections.apps2_oidc_configs.app_id`)
+		` JOIN projections.apps3 ON projections.projects2.id = projections.apps3.project_id` +
+		` LEFT JOIN projections.apps3_api_configs ON projections.apps3.id = projections.apps3_api_configs.app_id` +
+		` LEFT JOIN projections.apps3_oidc_configs ON projections.apps3.id = projections.apps3_oidc_configs.app_id` +
+		` LEFT JOIN projections.apps3_saml_configs ON projections.apps3.id = projections.apps3_saml_configs.app_id`)
 
 	appCols = database.StringArray{
 		"id",
@@ -135,6 +149,11 @@ var (
 		"id_token_userinfo_assertion",
 		"clock_skew",
 		"additional_origins",
+		//saml config
+		"app_id",
+		"entity_id",
+		"metadata",
+		"metadata_url",
 	}
 	appsCols = append(appCols, "count")
 )
@@ -200,6 +219,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -260,6 +284,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -281,6 +310,75 @@ func Test_AppsPrepare(t *testing.T) {
 						APIConfig: &APIApp{
 							ClientID:       "api-client-id",
 							AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+						},
+					},
+				},
+			},
+		}, {
+			name:    "prepareAppsQuery saml app",
+			prepare: prepareAppsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedAppsQuery,
+					appsCols,
+					[][]driver.Value{
+						{
+							"app-id",
+							"app-name",
+							"project-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.AppStateActive,
+							uint64(20211109),
+							// api config
+							nil,
+							nil,
+							nil,
+							// oidc config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml config
+							"app-id",
+							"https://test.com/saml/metadata",
+							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							"https://test.com/saml/metadata",
+						},
+					},
+				),
+			},
+			object: &Apps{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Apps: []*App{
+					{
+						ID:            "app-id",
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						ResourceOwner: "ro",
+						State:         domain.AppStateActive,
+						Sequence:      20211109,
+						Name:          "app-name",
+						ProjectID:     "project-id",
+						SAMLConfig: &SAMLApp{
+							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							MetadataURL: "https://test.com/saml/metadata",
+							EntityID:    "https://test.com/saml/metadata",
 						},
 					},
 				},
@@ -324,6 +422,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -403,6 +506,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -482,6 +590,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -561,6 +674,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -640,6 +758,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -719,6 +842,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"api-app-id",
@@ -750,13 +878,54 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+						{
+							"saml-app-id",
+							"app-name",
+							"project-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.AppStateActive,
+							uint64(20211109),
+							// api config
+							nil,
+							nil,
+							nil,
+							// oidc config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml config
+							"saml-app-id",
+							"https://test.com/saml/metadata",
+							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							"https://test.com/saml/metadata",
 						},
 					},
 				),
 			},
 			object: &Apps{
 				SearchResponse: SearchResponse{
-					Count: 2,
+					Count: 3,
 				},
 				Apps: []*App{
 					{
@@ -800,6 +969,21 @@ func Test_AppsPrepare(t *testing.T) {
 						APIConfig: &APIApp{
 							ClientID:       "api-client-id",
 							AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+						},
+					},
+					{
+						ID:            "saml-app-id",
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						ResourceOwner: "ro",
+						State:         domain.AppStateActive,
+						Sequence:      20211109,
+						Name:          "app-name",
+						ProjectID:     "project-id",
+						SAMLConfig: &SAMLApp{
+							Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							MetadataURL: "https://test.com/saml/metadata",
+							EntityID:    "https://test.com/saml/metadata",
 						},
 					},
 				},
@@ -896,6 +1080,11 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						// saml config
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -944,6 +1133,11 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml config
 							nil,
 							nil,
 							nil,
@@ -1005,6 +1199,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1036,6 +1235,68 @@ func Test_AppPrepare(t *testing.T) {
 					AdditionalOrigins:      database.StringArray{"additional.origin"},
 					ComplianceProblems:     nil,
 					AllowedOrigins:         database.StringArray{"https://redirect.to", "additional.origin"},
+				},
+			},
+		}, {
+			name:    "prepareAppQuery saml app",
+			prepare: prepareAppQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedAppQuery,
+					appCols,
+					[][]driver.Value{
+						{
+							"app-id",
+							"app-name",
+							"project-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.AppStateActive,
+							uint64(20211109),
+							// api config
+							nil,
+							nil,
+							nil,
+							// oidc config
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// saml config
+							"app-id",
+							"https://test.com/saml/metadata",
+							[]byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+							"https://test.com/saml/metadata",
+						},
+					},
+				),
+			},
+			object: &App{
+				ID:            "app-id",
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "ro",
+				State:         domain.AppStateActive,
+				Sequence:      20211109,
+				Name:          "app-name",
+				ProjectID:     "project-id",
+				SAMLConfig: &SAMLApp{
+					Metadata:    []byte("<?xml version=\"1.0\"?>\n<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\"\n                     validUntil=\"2022-08-26T14:08:16Z\"\n                     cacheDuration=\"PT604800S\"\n                     entityID=\"https://test.com/saml/metadata\">\n    <md:SPSSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>\n        <md:AssertionConsumerService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"\n                                     Location=\"https://test.com/saml/acs\"\n                                     index=\"1\" />\n        \n    </md:SPSSODescriptor>\n</md:EntityDescriptor>"),
+					MetadataURL: "https://test.com/saml/metadata",
+					EntityID:    "https://test.com/saml/metadata",
 				},
 			},
 		},
@@ -1077,6 +1338,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1149,6 +1415,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1221,6 +1492,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1293,6 +1569,11 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							1 * time.Second,
 							database.StringArray{"additional.origin"},
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),

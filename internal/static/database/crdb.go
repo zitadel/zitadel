@@ -44,7 +44,7 @@ func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resou
 	}
 	stmt, args, err := squirrel.Insert(assetsTable).
 		Columns(AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColType, AssetColContentType, AssetColData, AssetColUpdatedAt).
-		Values(instanceID, resourceOwner, name, objectType, contentType, data, "now()").
+		Values(instanceID, resourceOwner, name, objectType.String(), contentType, data, "now()").
 		Suffix(fmt.Sprintf(
 			"ON CONFLICT (%s, %s, %s) DO UPDATE"+
 				" SET %s = $5, %s = $6"+
@@ -167,7 +167,7 @@ func (c *crdbStorage) RemoveObjects(ctx context.Context, instanceID, resourceOwn
 		Where(squirrel.Eq{
 			AssetColInstanceID:    instanceID,
 			AssetColResourceOwner: resourceOwner,
-			AssetColType:          objectType,
+			AssetColType:          objectType.String(),
 		}).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()

@@ -1,6 +1,10 @@
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
+import localeZh from '@angular/common/locales/zh';
+import localeFr from '@angular/common/locales/fr';
+import localeIt from '@angular/common/locales/it';
+import localeEn from '@angular/common/locales/en';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -55,6 +59,10 @@ import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 
 registerLocaleData(localeDe);
+registerLocaleData(localeZh);
+registerLocaleData(localeFr);
+registerLocaleData(localeIt);
+registerLocaleData(localeEn);
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
@@ -78,6 +86,7 @@ const authConfig: AuthConfig = {
   scope: 'openid profile email', // offline_access
   responseType: 'code',
   oidc: true,
+  requireHttps: false,
 };
 
 @NgModule({

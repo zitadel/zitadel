@@ -63,6 +63,8 @@ import {
     AddProjectResponse,
     AddProjectRoleRequest,
     AddProjectRoleResponse,
+    AddSAMLAppRequest,
+    AddSAMLAppResponse,
     AddSecondFactorToLoginPolicyRequest,
     AddSecondFactorToLoginPolicyResponse,
     AddUserGrantRequest,
@@ -423,6 +425,8 @@ import {
     UpdateProjectResponse,
     UpdateProjectRoleRequest,
     UpdateProjectRoleResponse,
+    UpdateSAMLAppConfigRequest,
+    UpdateSAMLAppConfigResponse,
     UpdateUserGrantRequest,
     UpdateUserGrantResponse,
     UpdateUserNameRequest,
@@ -2268,25 +2272,16 @@ export class ManagementService {
     return this.grpcService.mgmt.reactivateProjectGrant(req, null).then((resp) => resp.toObject());
   }
 
-  public addOIDCApp(app: AddOIDCAppRequest.AsObject): Promise<AddOIDCAppResponse.AsObject> {
-    const req: AddOIDCAppRequest = new AddOIDCAppRequest();
-    req.setAuthMethodType(app.authMethodType);
-    req.setName(app.name);
-    req.setProjectId(app.projectId);
-    req.setResponseTypesList(app.responseTypesList);
-    req.setGrantTypesList(app.grantTypesList);
-    req.setAppType(app.appType);
-    req.setPostLogoutRedirectUrisList(app.postLogoutRedirectUrisList);
-    req.setRedirectUrisList(app.redirectUrisList);
+  public addOIDCApp(req: AddOIDCAppRequest): Promise<AddOIDCAppResponse.AsObject> {
     return this.grpcService.mgmt.addOIDCApp(req, null).then((resp) => resp.toObject());
   }
 
-  public addAPIApp(app: AddAPIAppRequest.AsObject): Promise<AddAPIAppResponse.AsObject> {
-    const req: AddAPIAppRequest = new AddAPIAppRequest();
-    req.setAuthMethodType(app.authMethodType);
-    req.setName(app.name);
-    req.setProjectId(app.projectId);
+  public addAPIApp(req: AddAPIAppRequest): Promise<AddAPIAppResponse.AsObject> {
     return this.grpcService.mgmt.addAPIApp(req, null).then((resp) => resp.toObject());
+  }
+
+  public addSAMLApp(req: AddSAMLAppRequest): Promise<AddSAMLAppResponse.AsObject> {
+    return this.grpcService.mgmt.addSAMLApp(req, null).then((resp) => resp.toObject());
   }
 
   public regenerateAPIClientSecret(appId: string, projectId: string): Promise<RegenerateAPIClientSecretResponse.AsObject> {
@@ -2310,6 +2305,10 @@ export class ManagementService {
 
   public updateAPIAppConfig(req: UpdateAPIAppConfigRequest): Promise<UpdateAPIAppConfigResponse.AsObject> {
     return this.grpcService.mgmt.updateAPIAppConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSAMLAppConfig(req: UpdateSAMLAppConfigRequest): Promise<UpdateSAMLAppConfigResponse.AsObject> {
+    return this.grpcService.mgmt.updateSAMLAppConfig(req, null).then((resp) => resp.toObject());
   }
 
   public removeApp(projectId: string, appId: string): Promise<RemoveAppResponse.AsObject> {

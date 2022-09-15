@@ -20,7 +20,7 @@ Prereqesits:
 - cockroachDB or postgreSQL
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.New())
+			config := MustNewConfig(viper.GetViper())
 
 			err := initialise(config.Database, VerifyGrant(config.Database.Database(), config.Database.Username()))
 			logging.OnError(err).Fatal("unable to set grant")

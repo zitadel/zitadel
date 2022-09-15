@@ -7,6 +7,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Buffer } from 'buffer';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -27,11 +28,13 @@ import {
   OIDCGrantType,
   OIDCResponseType,
   OIDCTokenType,
+  SAMLConfig,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
   GetOIDCInformationResponse,
   UpdateAPIAppConfigRequest,
   UpdateOIDCAppConfigRequest,
+  UpdateSAMLAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -51,6 +54,8 @@ import {
   POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
+
+const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 
 @Component({
   selector: 'cnsl-app-detail',
@@ -104,6 +109,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public oidcForm!: UntypedFormGroup;
   public oidcTokenForm!: UntypedFormGroup;
   public apiForm!: UntypedFormGroup;
+  public samlForm!: UntypedFormGroup;
 
   public redirectUrisList: string[] = [];
   public postLogoutRedirectUrisList: string[] = [];
@@ -160,6 +166,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     this.apiForm = this.fb.group({
       authMethodType: [{ value: '', disabled: true }],
+    });
+
+    this.samlForm = this.fb.group({
+      metadataUrl: [{ value: '', disabled: true }],
+      metadataXml: [{ value: '', disabled: true }],
     });
 
     this.http.get('./assets/environment.json').subscribe((env: any) => {
@@ -290,12 +301,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 } else {
                   this.authMethods = this.authMethods.filter((element) => element !== CUSTOM_METHOD);
                 }
+              } else if (this.app.samlConfig) {
+                this.settingsList = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
               }
 
               if (allowed) {
                 this.oidcForm.enable();
                 this.oidcTokenForm.enable();
                 this.apiForm.enable();
+                this.samlForm.enable();
               }
 
               if (this.app.oidcConfig?.redirectUrisList) {
@@ -367,6 +381,30 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
     if (type === 'API') {
       this.authMethods = [PK_JWT_METHOD, BASIC_AUTH_METHOD];
+    }
+  }
+
+  public onDropXML(filelist: FileList): void {
+    const file = filelist.item(0);
+    if (file) {
+      if (file.size > MAX_ALLOWED_SIZE) {
+        this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
+      } else {
+        this.metadataUrl?.setValue('');
+        const reader = new FileReader();
+        reader.onload = ((aXML) => {
+          return (e) => {
+            const xmlBase64 = e.target?.result;
+            if (xmlBase64 && typeof xmlBase64 === 'string' && this.app?.samlConfig) {
+              const samlConfig = new SAMLConfig();
+              const cropped = xmlBase64.replace('data:text/xml;base64,', '');
+              samlConfig.setMetadataXml(cropped);
+              this.app.samlConfig.metadataXml = cropped;
+            }
+          };
+        })(file);
+        reader.readAsDataURL(file);
+      }
     }
   }
 
@@ -581,6 +619,28 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  public saveSAMLApp(): void {
+    if (this.samlForm.valid && this.app?.samlConfig) {
+      const req = new UpdateSAMLAppConfigRequest();
+      req.setProjectId(this.projectId);
+      req.setAppId(this.app.id);
+
+      if (this.app.samlConfig) {
+        req.setMetadataUrl(this.app.samlConfig?.metadataUrl);
+        req.setMetadataXml(this.app.samlConfig?.metadataXml);
+      }
+
+      this.mgmtService
+        .updateSAMLAppConfig(req)
+        .then(() => {
+          this.toast.showInfo('APP.TOAST.APIUPDATED', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
+  }
+
   public regenerateOIDCClientSecret(): void {
     if (this.app) {
       this.mgmtService
@@ -692,5 +752,32 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get clockSkewSeconds(): AbstractControl | null {
     return this.oidcTokenForm.get('clockSkewSeconds');
+  }
+
+  public get metadataUrl(): AbstractControl | null {
+    return this.samlForm.get('metadataUrl');
+  }
+
+  get decodedBase64(): string {
+    if (
+      this.app &&
+      this.app.samlConfig &&
+      this.app.samlConfig.metadataXml &&
+      typeof this.app.samlConfig.metadataXml === 'string'
+    ) {
+      return Buffer.from(this.app?.samlConfig.metadataXml, 'base64').toString('ascii');
+    } else {
+      return '';
+    }
+  }
+
+  set decodedBase64(xmlString: string) {
+    if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
+      const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
+
+      if (this.app.samlConfig) {
+        this.app.samlConfig.metadataXml = base64;
+      }
+    }
   }
 }
