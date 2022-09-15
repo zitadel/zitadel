@@ -10,12 +10,6 @@ It is important to understand that, depending on your use case, there will exist
 - `User` are the end-users of your application. Users should be able to perform tasks like register/join, update their profile, manage authenticators etc.There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
 - `Manager` are users with a [special manager role within ZITADEL](/docs/concepts/structure/managers) and can perform administrative actions such as system configuration or granting access rights to users.
 
-:::info
-It is important to note that a `Manager` is not simply an administrative user, but can be used to create much more advanced self-service scenarios.
-For example you can create an organization and assign a user from that organization the Manager Role `ORG_OWNER`.
-Given this role the user could perform actions like configuring their own SSO/Identity Provider, set security policy for their organization, or assign roles to other users.
-:::
-
 All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization).
 
 ## Registration
@@ -188,8 +182,29 @@ The user can login with any of the linked accounts.
 
 ## Managers
 
-[Roles](/docs/concepts/structure/managers#roles)
+It is important to note that a `Manager` is not simply an administrative user, but can be used to create much more advanced scenarios such as delegating administration of a whole organization to a user, acting then as administrator and permission manager of that user group.
 
-Can be human users or also service users (eg, to manage programmatically)
+Thus we will explain service for two very common scenarios in ZITADEL:
 
-- Manager of a delegated org
+- `Managers in isolation`: Granting administrative permissions within a single organization context.
+- `Managers in delegation`: Granting administrative permissions to a user from a different organization where the organizations depend on each other
+
+A list of [Manager Roles](/docs/concepts/structure/managers#roles) is available with a description of permissions.
+Managers can be assigned to both human users and service users eg, for managing certain tasks programmatically.
+
+### Managers in isolation
+
+An user with the Manager roles `IAM_OWNER` or `ORG_OWNER` might want to assign other users from their organization elevated permissions to handle certain aspects of the IAM tasks.
+This could be permission to assign authorizations within this isolated organization (`ORG_USER_MANAGER`) or handling setup of projects and applications (`PROJECT_OWNER`).
+
+### Managers in delegation
+
+In a setup like described in the [B2B Scenario](/docs/guides/solution-scenarios/b2b), there exists an organization of the project owner and a customer organization.
+The project is granted to the customer organization, such that the customer can access the project and assign authorization to their users.
+
+Given such as setup the owner might want to give one administrative user of the customer organization the role `ORG_OWNER`.
+Equipped with this Manager Role, the user can perform actions like configuring their own SSO/Identity Provider, set security policy for their organization, customize branding, or assign project or Manager roles to other users.
+
+An `ORG_OWNER` can also not only delegate Manager roles to other users [as described in the earlier section](#managers-in-isolation) but also manage all aspects of her own organization as well as authorize users to use the granted project.
+With ZITADEL there is no need to replicate all settings and projects across organizations.
+Instead you set-up the project in one organization, delegate it to different organizations, and then appoint users as Managers of that organization to allow for self-service in a multi-tenancy scenario.
