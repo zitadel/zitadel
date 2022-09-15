@@ -147,7 +147,7 @@ A user selected **Register** on the overview page after external authentication.
 
 #### Post Creation
 
-A user selected **Register** on the overview page after external authentication. ZITADEL created the user.
+A user selected **Register** on the overview page after external authentication and ZITADEL successfully created the user.
 
 ##### Parameters of Post Creation
 
