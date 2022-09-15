@@ -7,10 +7,14 @@ For these tasks we either provide an user interface, or the tasks can be initiat
 
 It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:  
 
-- `User` are the end-users of your application. Users should be able to perform tasks like register/join, update their profile, manage authenticators etc.There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
+- `User` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators etc.There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
 - `Manager` are users with a [special manager role within ZITADEL](/docs/concepts/structure/managers) and can perform administrative actions such as system configuration or granting access rights to users.
 
 All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization).
+
+:::info
+ZTIADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
+:::
 
 ## Registration
 
