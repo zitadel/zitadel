@@ -38,9 +38,9 @@ func requireHTTP(ctx context.Context, client *http.Client, runtime *goja.Runtime
 }
 
 type fetchConfig struct {
-	Method  string      `json:"method"`
-	Headers http.Header `json:"headers"`
-	Body    io.Reader   `json:"body"`
+	Method  string
+	Headers http.Header
+	Body    io.Reader
 }
 
 var defaultFetchConfig = fetchConfig{
@@ -72,9 +72,9 @@ func (c *HTTP) fetchConfigFromArg(arg *goja.Object) (config fetchConfig, err err
 }
 
 type response struct {
-	Body       string              `json:"body"`
-	StatusCode int                 `json:"status"`
-	Headers    map[string][]string `json:"headers"`
+	Body       string
+	StatusCode int
+	Headers    map[string][]string
 	runtime    *goja.Runtime
 }
 
@@ -86,6 +86,10 @@ func (r *response) Json() goja.Value {
 	}
 
 	return r.runtime.ToValue(val)
+}
+
+func (r *response) Text() goja.Value {
+	return r.runtime.ToValue(r.Body)
 }
 
 func (c *HTTP) fetch(ctx context.Context) func(call goja.FunctionCall) goja.Value {

@@ -8,34 +8,23 @@ import (
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func WithUserMetadata(ctx context.Context, q *query.Queries, cmd *command.Commands, userID, resourceOwner string) Option {
+func WithUserMetadata(ctx context.Context, getter userMetadataGetter, setter userMetadataSetter, userID, resourceOwner string) Option {
 	return func(c *runConfig) {
 		c.modules["zitadel/metadata/user"] = func(runtime *goja.Runtime, module *goja.Object) {
 			config := &userMetadataRuntime{
 				runtime:    runtime,
 				module:     module,
-				query:      q,
-				command:    cmd,
+				getter:     getter,
+				setter:     setter,
 				maxEndTime: c.end,
 			}
 			userMetadataModule(ctx, userID, resourceOwner, config)
 		}
 	}
-}
-
-type userMetadataRuntime struct {
-	runtime *goja.Runtime
-	module  *goja.Object
-
-	query   *query.Queries
-	command *command.Commands
-
-	maxEndTime time.Time
 }
 
 func userMetadataModule(ctx context.Context, userID, resourceOwner string, c *userMetadataRuntime) {
@@ -44,48 +33,22 @@ func userMetadataModule(ctx context.Context, userID, resourceOwner string, c *us
 	logging.OnError(o.Set("set", c.setFn(ctx, userID, resourceOwner))).Warn("unable to set module")
 }
 
-func (c *userMetadataRuntime) userMetadataListFromQuery(metadata *query.UserMetadataList) *userMetadataList {
-	result := &userMetadataList{
-		Count:     metadata.Count,
-		Sequence:  metadata.Sequence,
-		Timestamp: metadata.Timestamp,
-		Metadata:  make([]*userMetadata, len(metadata.Metadata)),
-	}
+type userMetadataRuntime struct {
+	runtime *goja.Runtime
+	module  *goja.Object
 
-	for i, md := range metadata.Metadata {
-		var value interface{}
-		err := json.Unmarshal(md.Value, &value)
-		if err != nil {
-			logging.WithError(err).Debug("unable to unmarshal into map")
-			panic(err)
-		}
-		result.Metadata[i] = &userMetadata{
-			CreationDate:  md.CreationDate,
-			ChangeDate:    md.ChangeDate,
-			ResourceOwner: md.ResourceOwner,
-			Sequence:      md.Sequence,
-			Key:           md.Key,
-			Value:         c.runtime.ToValue(value),
-		}
-	}
+	getter userMetadataGetter
+	setter userMetadataSetter
 
-	return result
+	maxEndTime time.Time
 }
 
-type userMetadataList struct {
-	Count     uint64          `json:"count"`
-	Sequence  uint64          `json:"sequence"`
-	Timestamp time.Time       `json:"timestamp"`
-	Metadata  []*userMetadata `json:"metadata"`
+type userMetadataGetter interface {
+	SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *query.UserMetadataSearchQueries) (*query.UserMetadataList, error)
 }
 
-type userMetadata struct {
-	CreationDate  time.Time  `json:"creationDate"`
-	ChangeDate    time.Time  `json:"changeDate"`
-	ResourceOwner string     `json:"resourceOwner"`
-	Sequence      uint64     `json:"sequence"`
-	Key           string     `json:"key"`
-	Value         goja.Value `json:"value"`
+type userMetadataSetter interface {
+	SetUserMetadata(ctx context.Context, metadata *domain.Metadata, userID, resourceOwner string) (*domain.Metadata, error)
 }
 
 func (c *userMetadataRuntime) getFn(ctx context.Context, userID, resourceOwner string) func(call goja.FunctionCall) goja.Value {
@@ -95,7 +58,7 @@ func (c *userMetadataRuntime) getFn(ctx context.Context, userID, resourceOwner s
 			logging.WithError(err).Debug("unable to create search query")
 			panic(err)
 		}
-		metadata, err := c.query.SearchUserMetadata(
+		metadata, err := c.getter.SearchUserMetadata(
 			ctx,
 			true,
 			userID,
@@ -127,10 +90,54 @@ func (c *userMetadataRuntime) setFn(ctx context.Context, userID, resourceOwner s
 			Key:   key,
 			Value: value,
 		}
-		if _, err = c.command.SetUserMetadata(ctx, metadata, userID, resourceOwner); err != nil {
+		if _, err = c.setter.SetUserMetadata(ctx, metadata, userID, resourceOwner); err != nil {
 			logging.WithError(err).Info("unable to set md in action")
 			panic(err)
 		}
 		return nil
 	}
+}
+
+func (c *userMetadataRuntime) userMetadataListFromQuery(metadata *query.UserMetadataList) *userMetadataList {
+	result := &userMetadataList{
+		Count:     metadata.Count,
+		Sequence:  metadata.Sequence,
+		Timestamp: metadata.Timestamp,
+		Metadata:  make([]*userMetadata, len(metadata.Metadata)),
+	}
+
+	for i, md := range metadata.Metadata {
+		var value interface{}
+		err := json.Unmarshal(md.Value, &value)
+		if err != nil {
+			logging.WithError(err).Debug("unable to unmarshal into map")
+			panic(err)
+		}
+		result.Metadata[i] = &userMetadata{
+			CreationDate:  md.CreationDate,
+			ChangeDate:    md.ChangeDate,
+			ResourceOwner: md.ResourceOwner,
+			Sequence:      md.Sequence,
+			Key:           md.Key,
+			Value:         c.runtime.ToValue(value),
+		}
+	}
+
+	return result
+}
+
+type userMetadataList struct {
+	Count     uint64
+	Sequence  uint64
+	Timestamp time.Time
+	Metadata  []*userMetadata
+}
+
+type userMetadata struct {
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	Sequence      uint64
+	Key           string
+	Value         goja.Value
 }
