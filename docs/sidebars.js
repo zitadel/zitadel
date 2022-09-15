@@ -252,6 +252,7 @@ module.exports = {
       collapsed: false,
       items: [
         "apis/observability/metrics",
+        "apis/observability/health",
       ],
     },
     {
