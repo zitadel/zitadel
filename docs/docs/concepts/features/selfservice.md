@@ -49,10 +49,10 @@ An external identity provider can be a Social Login Provider or a pre-configured
 
 #### Account Linking
 
-When you login with an external identity provider, and the user does not exist in ZITADEL, then the user is presented with two options: 
+When you login with an external identity provider, and the user does not exist in ZITADEL, then an autoregister flow is triggered. The user is presented with two options: 
 
 - Create a new account: A new account will be created as stated above
-- Link an existing account: The user is prompted to login with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A user can now login with either the local account or any of the linked external accounts.
+- Autolinking: The user is prompted to login with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A user can now login with either the local account or any of the linked external accounts.
 
 ## Login
 
