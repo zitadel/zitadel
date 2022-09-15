@@ -472,6 +472,7 @@
     },
     "PASSWORD": {
       "TITLE": "Passwort",
+      "LABEL": "Ein sicheres Passwort trägt zum Schutz des Accounts bei.",
       "DESCRIPTION": "Gebe das neue Passwort unter Einhaltung der Richtlinie für die Komplexität ein.",
       "OLD": "Aktuelles Passwort",
       "NEW": "Neues Passwort",

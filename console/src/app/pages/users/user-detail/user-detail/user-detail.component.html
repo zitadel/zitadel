@@ -75,6 +75,30 @@
               </cnsl-detail-form>
             </cnsl-card>
 
+            <cnsl-card *ngIf="user.human" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
+              <div class="contact-method-col">
+                <div class="contact-method-row">
+                  <div class="left">
+                    <span class="label cnsl-secondary-text">{{ 'USER.PASSWORD.LABEL' | translate }}</span>
+                    <span>*********</span>
+
+                    <ng-content select="[pwdAction]"></ng-content>
+                  </div>
+
+                  <div class="right">
+                    <a
+                      matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
+                      [disabled]="['user.write:' + user.id, 'user.write$'] | hasRole | async"
+                      [routerLink]="['password']"
+                      mat-icon-button
+                    >
+                      <i class="las la-pen"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </cnsl-card>
+
             <cnsl-card
               *ngIf="user.human"
               title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"

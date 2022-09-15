@@ -472,6 +472,7 @@
     },
     "PASSWORD": {
       "TITLE": "Password",
+      "LABEL": "A secure password helps to protect the account",
       "DESCRIPTION": "Enter the new password according to the policy below.",
       "OLD": "Current Password",
       "NEW": "New Password",

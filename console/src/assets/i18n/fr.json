@@ -472,6 +472,7 @@
     },
     "PASSWORD": {
       "TITLE": "Mot de passe",
+      "LABEL": "Un mot de passe sécurisé permet de protéger le compte",
       "DESCRIPTION": "Saisissez le nouveau mot de passe conformément à la politique ci-dessous.",
       "OLD": "Mot de passe actuel",
       "NEW": "Nouveau mot de passe",
