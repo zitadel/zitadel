@@ -9,8 +9,7 @@ describe('ProjectPrivateLabelingDialogComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ProjectPrivateLabelingDialogComponent],
-    })
-      .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {

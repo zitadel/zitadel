@@ -11,23 +11,20 @@ import { InputModule } from 'src/app/modules/input/input.module';
 
 import { SearchRolesAutocompleteComponent } from './search-roles-autocomplete.component';
 
-
 @NgModule({
-    declarations: [SearchRolesAutocompleteComponent],
-    imports: [
-        CommonModule,
-        MatAutocompleteModule,
-        MatChipsModule,
-        MatButtonModule,
-        InputModule,
-        MatIconModule,
-        ReactiveFormsModule,
-        MatProgressSpinnerModule,
-        FormsModule,
-        TranslateModule,
-    ],
-    exports: [
-        SearchRolesAutocompleteComponent,
-    ],
+  declarations: [SearchRolesAutocompleteComponent],
+  imports: [
+    CommonModule,
+    MatAutocompleteModule,
+    MatChipsModule,
+    MatButtonModule,
+    InputModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    FormsModule,
+    TranslateModule,
+  ],
+  exports: [SearchRolesAutocompleteComponent],
 })
-export class SearchRolesAutocompleteModule { }
+export class SearchRolesAutocompleteModule {}

@@ -4,17 +4,17 @@ import { RouterModule, Routes } from '@angular/router';
 import { PasswordComplexityPolicyComponent } from './password-complexity-policy.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: PasswordComplexityPolicyComponent,
-        data: {
-            animation: 'DetailPage',
-        },
+  {
+    path: '',
+    component: PasswordComplexityPolicyComponent,
+    data: {
+      animation: 'DetailPage',
     },
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class PasswordComplexityPolicyRoutingModule { }
+export class PasswordComplexityPolicyRoutingModule {}

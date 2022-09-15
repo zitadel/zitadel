@@ -5,13 +5,19 @@
 <div class="scroll-container">
   <li class="item" *ngFor="let hist of data | async; index as histindex">
     <span *ngIf="hist.values[0].dates[0]" class="date">
-      {{ hist.values[0].dates[0]| timestampToDate | localizedDate: 'dd. MMM YYYY' }}
+      {{ hist.values[0].dates[0] | timestampToDate | localizedDate: 'dd. MMM YYYY' }}
     </span>
     <div class="item" *ngFor="let dayelement of hist.values; index as i">
       <div class="row">
-        <cnsl-avatar matTooltip="{{ dayelement.editorDisplayName }}" *ngIf="dayelement.editorDisplayName; else spacer"
-          class="avatar" [name]="dayelement.editorDisplayName" [size]="32"
-          [forColor]="dayelement?.editorPreferredLoginName ?? 'A'" [avatarUrl]="dayelement.editorAvatarUrl || ''">
+        <cnsl-avatar
+          matTooltip="{{ dayelement.editorDisplayName }}"
+          *ngIf="dayelement.editorDisplayName; else spacer"
+          class="avatar"
+          [name]="dayelement.editorDisplayName"
+          [size]="32"
+          [forColor]="dayelement?.editorPreferredLoginName ?? 'A'"
+          [avatarUrl]="dayelement.editorAvatarUrl || ''"
+        >
         </cnsl-avatar>
         <ng-template #spacer>
           <div class="spacer"></div>
@@ -20,10 +26,11 @@
           <div class="change-action" *ngFor="let action of dayelement.eventTypes; index as j">
             <div>
               <span class="msg">{{ action.localizedMessage }}</span>
-              <span class="block"
-                matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MM YYYY, HH:mm' }}">{{
-                dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm'
-                }}</span>
+              <span
+                class="block"
+                matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MM YYYY, HH:mm' }}"
+                >{{ dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm' }}</span
+              >
             </div>
           </div>
         </div>
@@ -35,10 +42,10 @@
   </div>
 
   <button (click)="more()" class="load-more-button" *ngIf="!bottom" mat-stroked-button>
-    {{'CHANGES.LOADMORE' | translate}}
+    {{ 'CHANGES.LOADMORE' | translate }}
   </button>
 
   <div *ngIf="bottom" class="end-container">
-    <span class="cnsl-secondary-text">{{'CHANGES.BOTTOM' | translate}}</span>
+    <span class="cnsl-secondary-text">{{ 'CHANGES.BOTTOM' | translate }}</span>
   </div>
 </div>

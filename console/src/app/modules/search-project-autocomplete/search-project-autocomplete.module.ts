@@ -13,24 +13,20 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { SearchProjectAutocompleteComponent } from './search-project-autocomplete.component';
 
 @NgModule({
-    declarations: [
-        SearchProjectAutocompleteComponent,
-    ],
-    imports: [
-        CommonModule,
-        MatAutocompleteModule,
-        MatChipsModule,
-        MatButtonModule,
-        InputModule,
-        MatIconModule,
-        ReactiveFormsModule,
-        MatProgressSpinnerModule,
-        FormsModule,
-        TranslateModule,
-        MatSelectModule,
-    ],
-    exports: [
-        SearchProjectAutocompleteComponent,
-    ],
+  declarations: [SearchProjectAutocompleteComponent],
+  imports: [
+    CommonModule,
+    MatAutocompleteModule,
+    MatChipsModule,
+    MatButtonModule,
+    InputModule,
+    MatIconModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    FormsModule,
+    TranslateModule,
+    MatSelectModule,
+  ],
+  exports: [SearchProjectAutocompleteComponent],
 })
-export class SearchProjectAutocompleteModule { }
+export class SearchProjectAutocompleteModule {}

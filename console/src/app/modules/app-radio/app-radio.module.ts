@@ -8,20 +8,8 @@ import { AppAuthMethodRadioComponent } from './app-auth-method-radio/app-auth-me
 import { AppTypeRadioComponent } from './app-type-radio/app-type-radio.component';
 
 @NgModule({
-    declarations: [
-        AppTypeRadioComponent,
-        AppAuthMethodRadioComponent,
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        MatRippleModule,
-        TranslateModule,
-    ],
-    exports: [
-        AppAuthMethodRadioComponent,
-        AppTypeRadioComponent,
-    ],
+  declarations: [AppTypeRadioComponent, AppAuthMethodRadioComponent],
+  imports: [CommonModule, FormsModule, MatRippleModule, TranslateModule],
+  exports: [AppAuthMethodRadioComponent, AppTypeRadioComponent],
 })
-export class AppRadioModule { }
-
+export class AppRadioModule {}

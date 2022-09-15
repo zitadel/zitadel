@@ -41,9 +41,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { InfoRowModule } from '../../../modules/info-row/info-row.module';
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
-import {
-    DialogPasswordlessComponent,
-} from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
+import { DialogPasswordlessComponent } from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';

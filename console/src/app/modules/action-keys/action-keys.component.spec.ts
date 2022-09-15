@@ -8,9 +8,8 @@ describe('ActionKeysComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ActionKeysComponent ]
-    })
-    .compileComponents();
+      declarations: [ActionKeysComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
