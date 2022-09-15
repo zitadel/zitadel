@@ -1,8 +1,4 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# testing
-/coverage
-
-# next.js
-/.next/
+# grpc output
 /src/app/proto
