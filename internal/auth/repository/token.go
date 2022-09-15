@@ -8,5 +8,5 @@ import (
 
 type TokenRepository interface {
 	IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error)
-	TokenByID(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error)
+	TokenByIDs(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error)
 }

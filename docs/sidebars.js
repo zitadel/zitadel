@@ -107,6 +107,13 @@ module.exports = {
             "guides/manage/customize/behavior",
             "guides/manage/customize/user-metadata",
           ]
+        },
+        {
+          type: 'category',
+          label: 'Terraform',
+          items: [
+            "guides/manage/terraform/basics",
+          ]
         }
       ],
     },
@@ -237,6 +244,15 @@ module.exports = {
       collapsed: false,
       items: [
         "apis/saml/endpoints",
+      ],
+    },
+    {
+      type: "category",
+      label: "Observability",
+      collapsed: false,
+      items: [
+        "apis/observability/metrics",
+        "apis/observability/health",
       ],
     },
     {

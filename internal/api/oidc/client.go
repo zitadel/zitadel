@@ -119,7 +119,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.UserInfoSetter, tokenID, subject, origin string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
+	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
@@ -154,7 +154,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 }
 
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
+	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
