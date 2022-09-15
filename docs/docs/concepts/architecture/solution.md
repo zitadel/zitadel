@@ -60,7 +60,7 @@ CockroachDB needs to be configured with locality flags to proper distribute data
 ## Zero Downtime Updates
 
 Since an Identity system tends to be a critical piece of infrastructure, the "in place zero downtime update" is a well needed feature.
-ZITADEL is built in a way that version can be updated without downtime by just updating to a more recent version.
+ZITADEL is built in a way that upgrades can be executed without downtime by just updating to a more recent version.
 
 The common update involves the following steps and do not need manual intervention of the operator:
 
