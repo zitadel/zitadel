@@ -65,8 +65,8 @@ A user has authenticated externally. ZITADEL retrieved and mapped the external i
 
 | name | description | type |
 |---|---|---|
-| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | string |
-| idToken | the id token which will be returned to the user | string |
+| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | `string` |
+| idToken | the id token which will be returned to the user | `string` |
 
 **Methods:**
 
@@ -111,8 +111,8 @@ A user selected **Register** on the overview page after external authentication.
 
 | name | description | type |
 |---|---|---|
-| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | string |
-| idToken | the id token which will be returned to the user | string |
+| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | `string` |
+| idToken | the id token which will be returned to the user | `string` |
 
 **Methods:**
 
@@ -157,8 +157,8 @@ A user selected **Register** on the overview page after external authentication.
 
 | name | description | type |
 |---|---|---|
-| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | string |
-| idToken | the id token which will be returned to the user | string |
+| accessToken | the access token which will be returned to the user. This can be an opaque token or a JWT | `string` |
+| idToken | the id token which will be returned to the user | `string` |
 
 **Methods:**
 
@@ -186,10 +186,10 @@ A user selected **Register** on the overview page after external authentication.
 | setDisplayName(string) | sets the display name | none |
 | setPreferredLanguage(string) | sets the preferred language, the string has to be a valid language tag | none |
 | setGender(int) | sets the gender. <br/><ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul> | none |
-| setEmail(string) | sets the email | |
-| setEmailVerified(bool) | if true the email set is verified without user interaction | |
-| setPhone(string) | sets the phone number | |
-| setPhoneVerified(bool) | if true the phone number set is verified without user interaction | |
+| setEmail(string) | sets the email | none |
+| setEmailVerified(bool) | if true the email set is verified without user interaction | none |
+| setPhone(string) | sets the phone number | none |
+| setPhoneVerified(bool) | if true the phone number set is verified without user interaction | none |
 
 ### Complement Token
 
@@ -269,8 +269,8 @@ response: `Object`
 - body: `string`
 - statusCode: `int`
 - headers `map[string][]string`
-- json(): Object representation of `body`
-- text(): string representation of `body`
+- json(): `Object` representation of `body`
+- text(): `string` representation of `body`
 
 example:
 
