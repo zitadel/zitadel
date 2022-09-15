@@ -42,6 +42,8 @@
 
     .show-all {
       width: 100%;
+      color: mat.get-color-from-palette($foreground, text);
+      border-top: 1px solid map-get($foreground, divider);
     }
 
     .org-wrapper {
