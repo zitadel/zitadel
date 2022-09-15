@@ -2,13 +2,13 @@
 title: Self-Service
 ---
 
-ZITADEL allows users to perform certain tasks themselves.
-For these tasks we either provide an user interface, or the tasks can be initiated or completed through our APIs.
+ZITADEL allows users to perform many tasks themselves.
+For these tasks we either provide an user interface, or the tasks can be initiated or completed through ZITADEL's APIs.
 
 It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:  
 
-- `User` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators etc.There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
-- `Manager` are users with a [special manager role within ZITADEL](/docs/concepts/structure/managers) and can perform administrative actions such as system configuration or granting access rights to users.
+- `Users` are the end-users of your application. Like with any CIAM solution, users should be able to perform tasks like register/join, update their profile, manage authenticators etc. There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
+- `Managers` are users with a [special manager role within ZITADEL](/docs/concepts/structure/managers) and can perform administrative actions such as system configuration or granting access rights to users.
 
 All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization).
 
@@ -21,26 +21,26 @@ ZTIADEL covers the typical "CIAM" self-service capabilities as well as delegated
 :::info
 You can pre-select a given organization by passing the scope `urn:zitadel:iam:org:domain:primary:{domainname}` in the authorization request.
 This will force users to register only with the specified organization.
-Also the branding and login settings (e.g. Social Login Providers) are directly shown to the user.
+Furthermore the branding and login settings (e.g. Social Login Providers) are directly shown to the user.
 :::
 
 ### Local account
 
-Allows unauthenticated and users, who are not yet in the given organization, to create an account (register) themselves.
+Allows anonymous users and authenticated users, who are not yet in the given organization, to create an account (register) themselves.
 
 - Mandatory profile fields
 - Set password
 - Accept terms of service and privacy policy
-- User receives an email with an one-time code
+- User receives an email with an one-time code for verfication purpose
 - User has to enter the one-time code to finish registration
-- User can re-quest a new one-time code
+- User can re-request a new one-time code
 
 The user is prompted on first login to setup MFA.
-This step is mandatory in case MFA is enforced in the login policy.
+This step can be made mandatory if MFA is enforced in the login policy.
 
 ### Existing Identity / SSO / Social Login
 
-Allows unauthenticated and users, who are not yet in the given organization, to register with an external identity provider.
+anonymous users and authenticated users, who are not yet in the given organization, to register with an external identity provider.
 An external identity provider can be a Social Login Provider or a pre-configured identity provider.
 
 - Information from the external identity provider is used to pre-fill the profile information
@@ -72,7 +72,7 @@ It is important to understand that ZITADEL provides a hosted login page and the 
 
 Users are automatically prompted to provide a second factor, when
 
-- Instance or organization [login policy](/docs/concepts/structure/policies#login-policy)
+- Instance or organization [login policy](/docs/concepts/structure/policies#login-policy) is set
 - Requested by the client
 - A multi-factor is setup for the user
 
@@ -82,15 +82,15 @@ When a multi-factor is required, but not set-up, then the user is requested to s
 
 Users can select a button to initiate passwordless login or use a fall-back method (ie. login with username/password), if available.
 
-The passwordless login flow follows the FIDO 2 / WebAuthN standard.
+The passwordless login flow follows the FIDO2 / WebAuthN standard.
 Briefly explained the following happens:
 
 - User selects button
-- User's device will ask the user to provide a gesture (eg, FaceID, Windows Hello, Fingerprint, PIN)
+- User's device will ask the user to provide a gesture (e.g., FaceID, Windows Hello, Fingerprint, PIN)
 - The user is being redirected to the application
 
 With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
-This is not strictly the device where the login flow is being executed (eg, push notification on a mobile device).
+This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
 The user experience depends mainly on the used operating system and browser.
 
 ### SSO / Social Logins
@@ -108,7 +108,7 @@ Read more about [Service Users](/docs/guides/integrate/serviceusers) and recomme
 
 ### Other Clients
 
-We currently do not expose the Login APIs.
+We currently do not expose the Login API.
 Whereas you can register users via the management API, you can't login users with our APIs.
 This might be important in cases where you can't use a website (eg, Games, VR, ...).
 
@@ -133,7 +133,7 @@ Unauthenticated users can request a password reset after providing the loginname
 ## Logout
 
 Users can terminate the session for all their users (logout).
-A client will implement this by calling the [specific endpoint](/docs/apis/openidoauth/endpoints#end_session_endpoint).
+A client can also implement this, by calling the [specific endpoint](/docs/apis/openidoauth/endpoints#end_session_endpoint).
 
 ## Profile
 
