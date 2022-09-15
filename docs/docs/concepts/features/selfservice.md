@@ -8,7 +8,7 @@ For these tasks we either provide an user interface, or the tasks can be initiat
 It is important to understand that, depending on your use case, there will exist different user-types that want to perform different actions:  
 
 - `User` are the end-users of your application. Users should be able to perform tasks like register/join, update their profile, manage authenticators etc.There are certain actions that can be executed pre-login, yet others require the user to have a valid session.
-- `Manager` are users with a [special manager role within ZITADEL](http://localhost:3000/docs/concepts/structure/managers) and can perform administrative actions such as system configuration or granting access rights to users.
+- `Manager` are users with a [special manager role within ZITADEL](/docs/concepts/structure/managers) and can perform administrative actions such as system configuration or granting access rights to users.
 
 :::info
 It is important to note that a `Manager` is not simply an administrative user, but can be used to create much more advanced self-service scenarios.
@@ -16,7 +16,7 @@ For example you can create an organization and assign a user from that organizat
 Given this role the user could perform actions like configuring their own SSO/Identity Provider, set security policy for their organization, or assign roles to other users.
 :::
 
-All self-service interfaces are available in different [languages](http://localhost:3000/docs/guides/manage/customize/texts#internationalization).
+All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization).
 
 ## Registration
 
@@ -49,7 +49,20 @@ An external identity provider can be a Social Login Provider or a pre-configured
 - User can update the profile information
 - An account is created within ZITADEL and linked with the external identity provider
 
+#### Account Linking
+
+When you login with an external identity provider, and the user does not exist in ZITADEL, then the user is presented with two options: 
+
+- Create a new account: A new account will be created as stated above
+- Link an existing account: The user is prompted to login with an existing [local account](#local-account). If successful, the existing identity from the external identity provider will be linked with the local account. A user can now login with either the local account or any of the linked external accounts.
+
 ## Login
+
+:::info Customization and Branding
+The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
+
+By default, the displayed branding is defined based on the user's domain. In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
+:::
 
 ### Web, Mobile, and Single-Page Applications
 
@@ -61,7 +74,7 @@ It is important to understand that ZITADEL provides a hosted login page and the 
 
 Users are automatically prompted to provide a second factor, when
 
-- Instance or organization [login policy](https://docs.zitadel.com/docs/concepts/structure/policies#login-policy)
+- Instance or organization [login policy](/docs/concepts/structure/policies#login-policy)
 - Requested by the client
 - A multi-factor is setup for the user
 
@@ -84,7 +97,7 @@ The user experience depends mainly on the used operating system and browser.
 
 ### SSO / Social Logins
 
-Given an external identity provider is configured on the instance or on the organization, then: 
+Given an external identity provider is configured on the instance or on the organization, then:
 
 - the user will be shown a button for each identity provider as alternative to login with a [local account](#local-account)
 - when clicking the button the user will be redirected to the identity provider
@@ -101,29 +114,15 @@ We currently do not expose the Login APIs.
 Whereas you can register users via the management API, you can't login users with our APIs.
 This might be important in cases where you can't use a website (eg, Games, VR, ...).
 
-### Customization
-
-The login page can be changed by customizing different branding aspects and you can define a custom domain for the login (eg, login.acme.com).
-
-:::info
-By default, the displayed branding is defined based on the user's domain. In case you want to show the branding of a specific organization by default, you need to either pass a primary domain scope (`urn:zitadel:iam:org:domain:primary:{domainname}`) with the authorization request, or define the behavior on your Project's settings.
-:::
-
 ### Account picker
 
 A list of accounts that were used to log-in are shown to the user.
 The user can click the account in the list and does not need to type the username.
+Users can still login with a different user that is not in the list.
 
 :::info
 This behavior can be changed with the authorization request. Please refer to our [guide](/docs/guides/integrate/login-users).
 :::
-
-## Logout
-
-Users can terminate all their sessions (logout).
-A client will implement this by calling the [specific endpoint](http://localhost:3000/docs/apis/openidoauth/endpoints#end_session_endpoint).
-
-## Secrets
 
 ### Password reset
 
@@ -131,31 +130,66 @@ Unauthenticated users can request a password reset after providing the loginname
 
 - User selects reset password
 - An email will be sent to the verified email address
-- User has 
+- User opens a link and has to provide a new password
 
-### Change password
+## Logout
 
-### MFA / FIDO Passkeys
-
-- Add & remove second factor
-- Add & remove passwordless authenticator
+Users can terminate the session for all their users (logout).
+A client will implement this by calling the [specific endpoint](/docs/apis/openidoauth/endpoints#end_session_endpoint).
 
 ## Profile
 
-Authenticated users.
+These actions are available for authenticated users only.
+ZITADEL provides a self-service UI for the user profile out-of-the box under the path *{your_domain}/ui/console/users/me*.
+You can also implement your own version in your application by using our APIs.
+
+### Change password
+
+Users can change their passwords.
+The current password must be entered first.
+
+### MFA / FIDO Passkeys
+
+Users can setup and delete a second factor and FIDO Passkeys (Passwordless).
+Available authenticators are:
+
+- Mobile one-time password (OTP) (Authenticator Apps, SMS)
+- FIDO Universal Second Factor (U2F) (Security Keys, Device, etc.)
+- FIDO2 WebAuthN (Passkeys)
 
 ### Update Information
 
+Users can change their profile information. This includes
+
+- UserName
+- First- and Last name
+- Nickname
+- Display Name
+- Gender
+- Language
+- Email address
+- Phone number
+
 ### Email Verification
+
+Users can change their email address.
+The user receives a one-time password and can verify control over the given email address.
 
 ### Phone Verification
 
-### Account Linking
+Users can change their phone number.
+The user receives a one-time password and can verify control over the given phone number.
 
-- Add external identity providers
+### Identity providers
+
+Users can create a connection between a [local user account](#local-account) and an [external identity](#existing-identity--sso--social-login).
+The user can login with any of the linked accounts.
+[Linking of external accounts](#account-linking) is done during the login process.
 
 ## Managers
 
 [Roles](/docs/concepts/structure/managers#roles)
 
 Can be human users or also service users (eg, to manage programmatically)
+
+- Manager of a delegated org
