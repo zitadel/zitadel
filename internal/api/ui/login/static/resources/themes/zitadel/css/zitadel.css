@@ -377,7 +377,8 @@ input:not([type=radio]):not([type=checkbox])::placeholder,
   font-style: italic;
 }
 
-select, .lgn-select {
+select,
+.lgn-select {
   display: block;
   box-sizing: border-box;
   padding-inline-start: 10px;
@@ -396,7 +397,8 @@ select, .lgn-select {
   width: 100%;
   margin: 0 0 2px 0;
 }
-select::placeholder, .lgn-select::placeholder {
+select::placeholder,
+.lgn-select::placeholder {
   font-size: 14px;
   font-style: italic;
 }
@@ -410,6 +412,9 @@ select::placeholder, .lgn-select::placeholder {
   top: 9px;
   height: inherit;
   vertical-align: middle;
+  max-width: 150px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .lgn-label {
@@ -1300,7 +1305,8 @@ input:not([type=radio]):not([type=checkbox])::placeholder,
   font-style: italic;
 }
 
-select, .lgn-select {
+select,
+.lgn-select {
   display: block;
   box-sizing: border-box;
   padding-inline-start: 10px;
@@ -1319,7 +1325,8 @@ select, .lgn-select {
   width: 100%;
   margin: 0 0 2px 0;
 }
-select::placeholder, .lgn-select::placeholder {
+select::placeholder,
+.lgn-select::placeholder {
   font-size: 14px;
   font-style: italic;
 }
@@ -1333,6 +1340,9 @@ select::placeholder, .lgn-select::placeholder {
   top: 9px;
   height: inherit;
   vertical-align: middle;
+  max-width: 150px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .lgn-label {
