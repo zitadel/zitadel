@@ -205,7 +205,14 @@ response: Object
 example:
 
 ```javascript
+let userMD = require('zitadel/metadata/user')
 
+const KEY = 'urn:mycorp:example'
+
+function example() {
+  userMD.set(KEY, {key: 'value'})
+  let myNewMD = md.get().metadata.find(md => md.key === KEY)
+}
 ```
 
 
