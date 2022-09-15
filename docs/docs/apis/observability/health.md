@@ -2,7 +2,7 @@
 title: Ready / Healthy
 ---
 
-ZITADEL exposes a `Ready`- and `Health` endpoint to allow external systems like load balancers, orchestration systems, uptime probes and others to check the status.
+ZITADEL exposes a `Ready`- and `Healthy` endpoint to allow external systems like load balancers, orchestration systems, uptime probes and others to check the status.
 
 ## Ready
 
