@@ -216,8 +216,8 @@ This trigger is called before userinfo are set in the token or response.
 
 ##### Available modules of Pre Userinfo creation
 
-- [zitadel/http](#zitadel/http)
-- [zitadel/metadata/user](#zitadel/metadata/user)
+- [zitadel/http](#zitadelhttp)
+- [zitadel/metadata/user](#zitadelmetadatauser)
 
 #### Pre access token creation
 
@@ -240,8 +240,8 @@ This trigger is called before the claims are set in the access token and the tok
 
 ##### Available modules of Pre access token creation
 
-- [zitadel/http](#zitadel/http)
-- [zitadel/metadata/user](#zitadel/metadata/user)
+- [zitadel/http](#zitadelhttp)
+- [zitadel/metadata/user](#zitadelmetadatauser)
 
 ## Provided Modules
 
