@@ -65,7 +65,7 @@ ZITADEL is built in a way that upgrades can be executed without downtime by just
 The common update involves the following steps and do not need manual intervention of the operator:
 
 - Keep the old version running
-- Deploy the version parallel to the old version
+- Deploy the version in parallel to the old version
 - The new version will start ...
   - by updating databases schemas if needed
   - participate in the leader election for background jobs
