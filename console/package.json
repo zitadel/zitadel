@@ -7,7 +7,7 @@
     "build": "ng build",
     "prodbuild": "ng build --configuration production --base-href=/ui/console/",
     "lint": "ng lint && prettier --check src",
-    "format": "prettier --write src",
+    "lint:fix": "prettier --write src",
     "generate": "DOCKER_BUILDKIT=1 docker build -f ../build/grpc/Dockerfile -t zitadel-base:local .. && DOCKER_BUILDKIT=1 docker build -f ../build/console/Dockerfile .. --target npm-copy -o .."
   },
   "private": true,
