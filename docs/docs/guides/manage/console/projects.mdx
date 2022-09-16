@@ -4,33 +4,38 @@ title: Projects
 
 ## What is a project?
 
-import ProjectDescription from '../../../concepts/structure/_project_description.mdx';
+import ProjectDescription from "../../../concepts/structure/_project_description.mdx";
 
 <ProjectDescription name="ProjectDescription" />
 
-The goal of this module is to give you an overview, but not dive too deep into details around managing access rights and delegating management of roles to third parties. So let’s create a straightforward example project first.
+### Example
+
+If you'd build a Point of Sales Platform, you would have one Project (maybe called `POS`) and all your applications (one Webapplication for administration, and your mobile applications for your users iOS and Android), would be part of it.
+You would have to create roles for administration and your clients in this very project, and then create authorizations based on them.
+
+![POS Project](/img/guides/console/posproject.png)
 
 ## Create a project
 
-Visit <https://{your_domain}.zitadel.cloud/ui/console/projects> or select “Projects” within your organization, then click the button to create a new project.
+To create a project, navigate to your organization, then projects or directly via <https://{your_domain}.zitadel.cloud/ui/console/projects>, and then click the button to create a new project.
 
-![Empty Project](/img/console_projects_empty.png)
+<img alt="Empty Project" src="/img/console_projects_empty.png" width="270px" />
 
-Enter the name “ My first project” and continue.
+then enter your project name and continue.
 
 Let’s make this more interesting and add some basic roles and authorizations to your project and then confirm the scope of the roles and authorizations.
 
 Jump to the section ROLES and create two new roles with the following values
 
-* Key: reader
-* Display Name: Reader
-* Group: user
+- Key: reader
+- Display Name: Reader
+- Group: user
 
 and
 
-* Key: editor
-* Display Name: Editor
-* Group: user
+- Key: editor
+- Display Name: Editor
+- Group: user
 
 ![Add New Roles](/img/console_projects_add_new_roles.gif)
 
@@ -50,7 +55,7 @@ Now create another project (eg. “My second project”) and verify that there a
 
 ## What is a granted project?
 
-import GrantedProjectDescription from '../../../concepts/structure/_granted_project_description.mdx';
+import GrantedProjectDescription from "../../../concepts/structure/_granted_project_description.mdx";
 
 <GrantedProjectDescription name="GrantedProjectDescription" />
 

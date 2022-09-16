@@ -272,12 +272,12 @@ module.exports = {
         "concepts/structure/overview",
         "concepts/structure/instance",
         "concepts/structure/organizations",
-        "concepts/structure/policies",
         "concepts/structure/projects",
         "concepts/structure/applications",
         "concepts/structure/granted_projects",
         "concepts/structure/users",
         "concepts/structure/managers",
+        "concepts/structure/policies",
       ],
     },
     {
