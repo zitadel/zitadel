@@ -16,6 +16,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
@@ -89,6 +90,7 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     InputModule,
     MetaLayoutModule,
     MatSliderModule,
+    CodemirrorModule,
     ChangesModule,
     InfoSectionModule,
   ],

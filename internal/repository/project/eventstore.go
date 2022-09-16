@@ -41,5 +41,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(APIConfigChangedType, APIConfigChangedEventMapper).
 		RegisterFilterEventMapper(APIConfigSecretChangedType, APIConfigSecretChangedEventMapper).
 		RegisterFilterEventMapper(ApplicationKeyAddedEventType, ApplicationKeyAddedEventMapper).
-		RegisterFilterEventMapper(ApplicationKeyRemovedEventType, ApplicationKeyRemovedEventMapper)
+		RegisterFilterEventMapper(ApplicationKeyRemovedEventType, ApplicationKeyRemovedEventMapper).
+		RegisterFilterEventMapper(SAMLConfigAddedType, SAMLConfigAddedEventMapper).
+		RegisterFilterEventMapper(SAMLConfigChangedType, SAMLConfigChangedEventMapper)
 }
