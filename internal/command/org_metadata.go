@@ -9,12 +9,12 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
-func (c *Commands) SetOrgMetadata(ctx context.Context, metadata *domain.Metadata, orgID, resourceOwner string) (_ *domain.Metadata, err error) {
+func (c *Commands) SetOrgMetadata(ctx context.Context, orgID string, metadata *domain.Metadata) (_ *domain.Metadata, err error) {
 	err = c.checkOrgExists(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	setMetadata := NewOrgMetadataWriteModel(orgID, resourceOwner, metadata.Key)
+	setMetadata := NewOrgMetadataWriteModel(orgID, metadata.Key)
 	orgAgg := OrgAggregateFromWriteModel(&setMetadata.WriteModel)
 	event, err := c.setOrgMetadata(ctx, orgAgg, metadata)
 	if err != nil {
@@ -32,7 +32,7 @@ func (c *Commands) SetOrgMetadata(ctx context.Context, metadata *domain.Metadata
 	return writeModelToOrgMetadata(setMetadata), nil
 }
 
-func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID, resourceOwner string, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
 	if len(metadatas) == 0 {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
@@ -42,7 +42,7 @@ func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID, resourceOwner 
 	}
 
 	events := make([]eventstore.Command, len(metadatas))
-	setMetadata := NewOrgMetadataListWriteModel(orgID, resourceOwner)
+	setMetadata := NewOrgMetadataListWriteModel(orgID)
 	orgAgg := OrgAggregateFromWriteModel(&setMetadata.WriteModel)
 	for i, data := range metadatas {
 		event, err := c.setOrgMetadata(ctx, orgAgg, data)
@@ -76,7 +76,7 @@ func (c *Commands) setOrgMetadata(ctx context.Context, orgAgg *eventstore.Aggreg
 	), nil
 }
 
-func (c *Commands) RemoveOrgMetadata(ctx context.Context, metadataKey, orgID, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) RemoveOrgMetadata(ctx context.Context, orgID, metadataKey string) (_ *domain.ObjectDetails, err error) {
 	if metadataKey == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2n0f1", "Errors.Metadata.Invalid")
 	}
@@ -84,7 +84,7 @@ func (c *Commands) RemoveOrgMetadata(ctx context.Context, metadataKey, orgID, re
 	if err != nil {
 		return nil, err
 	}
-	removeMetadata, err := c.getOrgMetadataModelByID(ctx, orgID, resourceOwner, metadataKey)
+	removeMetadata, err := c.getOrgMetadataModelByID(ctx, orgID, metadataKey)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Commands) RemoveOrgMetadata(ctx context.Context, metadataKey, orgID, re
 	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
-func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID, resourceOwner string, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID string, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
 	if len(metadataKeys) == 0 {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "META-9mw2d", "Errors.Metadata.NoData")
 	}
@@ -118,7 +118,7 @@ func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID, resourceOwn
 	}
 
 	events := make([]eventstore.Command, len(metadataKeys))
-	removeMetadata, err := c.getOrgMetadataListModelByID(ctx, orgID, resourceOwner)
+	removeMetadata, err := c.getOrgMetadataListModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -158,8 +158,8 @@ func (c *Commands) removeOrgMetadata(ctx context.Context, orgAgg *eventstore.Agg
 	return command, nil
 }
 
-func (c *Commands) getOrgMetadataModelByID(ctx context.Context, orgID, resourceOwner, key string) (*OrgMetadataWriteModel, error) {
-	orgMetadataWriteModel := NewOrgMetadataWriteModel(orgID, resourceOwner, key)
+func (c *Commands) getOrgMetadataModelByID(ctx context.Context, orgID, key string) (*OrgMetadataWriteModel, error) {
+	orgMetadataWriteModel := NewOrgMetadataWriteModel(orgID, key)
 	err := c.eventstore.FilterToQueryReducer(ctx, orgMetadataWriteModel)
 	if err != nil {
 		return nil, err
@@ -167,8 +167,8 @@ func (c *Commands) getOrgMetadataModelByID(ctx context.Context, orgID, resourceO
 	return orgMetadataWriteModel, nil
 }
 
-func (c *Commands) getOrgMetadataListModelByID(ctx context.Context, orgID, resourceOwner string) (*OrgMetadataListWriteModel, error) {
-	orgMetadataWriteModel := NewOrgMetadataListWriteModel(orgID, resourceOwner)
+func (c *Commands) getOrgMetadataListModelByID(ctx context.Context, orgID string) (*OrgMetadataListWriteModel, error) {
+	orgMetadataWriteModel := NewOrgMetadataListWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, orgMetadataWriteModel)
 	if err != nil {
 		return nil, err

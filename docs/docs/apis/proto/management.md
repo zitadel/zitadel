@@ -813,7 +813,7 @@ Sets a org metadata by key
 
 
 
-    POST: /orgs/{id}/metadata/{key}
+    POST: /orgs/me/metadata/{key}
 
 
 ### BulkSetOrgMetadata
@@ -825,7 +825,7 @@ Set a list of org metadata
 
 
 
-    POST: /orgs/{id}/metadata/_bulk
+    POST: /orgs/me/metadata/_bulk
 
 
 ### ListOrgMetadata
@@ -837,7 +837,7 @@ Returns the org metadata
 
 
 
-    POST: /orgs/{id}/metadata/_search
+    POST: /orgs/me/metadata/_search
 
 
 ### GetOrgMetadata
@@ -849,7 +849,7 @@ Returns the org metadata by key
 
 
 
-    GET: /orgs/{id}/metadata/{key}
+    GET: /orgs/me/metadata/{key}
 
 
 ### RemoveOrgMetadata
@@ -861,7 +861,7 @@ Removes a org metadata by key
 
 
 
-    DELETE: /orgs/{id}/metadata/{key}
+    DELETE: /orgs/me/metadata/{key}
 
 
 ### BulkRemoveOrgMetadata
@@ -873,7 +873,7 @@ Set a list of org metadata
 
 
 
-    DELETE: /orgs/{id}/metadata/_bulk
+    DELETE: /orgs/me/metadata/_bulk
 
 
 ### ListOrgDomains
@@ -3883,7 +3883,6 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
 
 
@@ -3946,7 +3945,6 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | metadata | repeated BulkSetOrgMetadataRequest.Metadata | - |  |
 
 
@@ -5081,7 +5079,6 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
@@ -5933,7 +5930,6 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | query |  zitadel.v1.ListQuery | - |  |
 | queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
 
@@ -6959,7 +6955,6 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
@@ -7855,7 +7850,6 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
 
@@ -7868,7 +7862,6 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 

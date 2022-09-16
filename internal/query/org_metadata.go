@@ -70,7 +70,7 @@ var (
 	}
 )
 
-func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk bool, orgID, key string, queries ...SearchQuery) (*OrgMetadata, error) {
+func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk bool, orgID string, key string, queries ...SearchQuery) (*OrgMetadata, error) {
 	if shouldTriggerBulk {
 		projection.OrgMetadataProjection.Trigger(ctx)
 	}
@@ -170,7 +170,7 @@ func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, 
 
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-Rph32", "Errors.Org.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-Rph32", "Errors.Metadata.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Hajt2", "Errors.Internal")
 			}

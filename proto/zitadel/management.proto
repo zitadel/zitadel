@@ -844,7 +844,7 @@ service ManagementService {
     // Sets a org metadata by key
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
         option (google.api.http) = {
-            post: "/orgs/{id}/metadata/{key}"
+            post: "/orgs/me/metadata/{key}"
             body: "*"
         };
 
@@ -856,7 +856,7 @@ service ManagementService {
     // Set a list of org metadata
     rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
         option (google.api.http) = {
-            post: "/orgs/{id}/metadata/_bulk"
+            post: "/orgs/me/metadata/_bulk"
             body: "*"
         };
 
@@ -868,7 +868,7 @@ service ManagementService {
     // Returns the org metadata
     rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
         option (google.api.http) = {
-            post: "/orgs/{id}/metadata/_search"
+            post: "/orgs/me/metadata/_search"
             body: "*"
         };
 
@@ -880,7 +880,7 @@ service ManagementService {
     // Returns the org metadata by key
     rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
         option (google.api.http) = {
-            get: "/orgs/{id}/metadata/{key}"
+            get: "/orgs/me/metadata/{key}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -891,7 +891,7 @@ service ManagementService {
     // Removes a org metadata by key
     rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
         option (google.api.http) = {
-            delete: "/orgs/{id}/metadata/{key}"
+            delete: "/orgs/me/metadata/{key}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -902,7 +902,7 @@ service ManagementService {
     // Set a list of org metadata
     rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
         option (google.api.http) = {
-            delete: "/orgs/{id}/metadata/_bulk"
+            delete: "/orgs/me/metadata/_bulk"
             body: "*"
         };
 
@@ -3751,9 +3751,8 @@ message RemoveOrgMemberResponse {
 }
 
 message ListOrgMetadataRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.v1.ListQuery query = 2;
-    repeated zitadel.metadata.v1.MetadataQuery queries = 3;
+    zitadel.v1.ListQuery query = 1;
+    repeated zitadel.metadata.v1.MetadataQuery queries = 2;
 }
 
 message ListOrgMetadataResponse {
@@ -3762,8 +3761,7 @@ message ListOrgMetadataResponse {
 }
 
 message GetOrgMetadataRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetOrgMetadataResponse {
@@ -3771,23 +3769,20 @@ message GetOrgMetadataResponse {
 }
 
 message SetOrgMetadataRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    bytes value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
 }
 
 message SetOrgMetadataResponse {
-    string id = 1;
-    zitadel.v1.ObjectDetails details = 2;
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message BulkSetOrgMetadataRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     message Metadata {
         string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
         bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
     }
-    repeated Metadata metadata = 2;
+    repeated Metadata metadata = 1;
 }
 
 message BulkSetOrgMetadataResponse {
@@ -3795,8 +3790,7 @@ message BulkSetOrgMetadataResponse {
 }
 
 message RemoveOrgMetadataRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveOrgMetadataResponse {
@@ -3804,8 +3798,7 @@ message RemoveOrgMetadataResponse {
 }
 
 message BulkRemoveOrgMetadataRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string keys = 2 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+    repeated string keys = 1 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
 }
 
 message BulkRemoveOrgMetadataResponse {

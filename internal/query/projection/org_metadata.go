@@ -84,13 +84,18 @@ func (p *orgMetadataProjection) reduceMetadataSet(event eventstore.Event) (*hand
 	return crdb.NewUpsertStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(OrgMetadataColumnOrgID, e.Aggregate().ID),
-			handler.NewCol(OrgMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(OrgMetadataColumnInstanceID, nil),
+			handler.NewCol(OrgMetadataColumnOrgID, nil),
+			handler.NewCol(OrgMetadataColumnKey, e.Key),
+		},
+		[]handler.Column{
 			handler.NewCol(OrgMetadataColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(OrgMetadataColumnOrgID, e.Aggregate().ID),
+			handler.NewCol(OrgMetadataColumnKey, e.Key),
+			handler.NewCol(OrgMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(OrgMetadataColumnCreationDate, e.CreationDate()),
 			handler.NewCol(OrgMetadataColumnChangeDate, e.CreationDate()),
 			handler.NewCol(OrgMetadataColumnSequence, e.Sequence()),
-			handler.NewCol(OrgMetadataColumnKey, e.Key),
 			handler.NewCol(OrgMetadataColumnValue, e.Value),
 		},
 	), nil

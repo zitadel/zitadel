@@ -9,12 +9,12 @@ type OrgMetadataWriteModel struct {
 	MetadataWriteModel
 }
 
-func NewOrgMetadataWriteModel(orgID, resourceOwner, key string) *OrgMetadataWriteModel {
+func NewOrgMetadataWriteModel(orgID, key string) *OrgMetadataWriteModel {
 	return &OrgMetadataWriteModel{
 		MetadataWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   orgID,
-				ResourceOwner: resourceOwner,
+				ResourceOwner: orgID,
 			},
 			Key: key,
 		},
@@ -51,12 +51,12 @@ type OrgMetadataListWriteModel struct {
 	MetadataListWriteModel
 }
 
-func NewOrgMetadataListWriteModel(orgID, resourceOwner string) *OrgMetadataListWriteModel {
+func NewOrgMetadataListWriteModel(orgID string) *OrgMetadataListWriteModel {
 	return &OrgMetadataListWriteModel{
 		MetadataListWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   orgID,
-				ResourceOwner: resourceOwner,
+				ResourceOwner: orgID,
 			},
 			metadataList: make(map[string][]byte),
 		},

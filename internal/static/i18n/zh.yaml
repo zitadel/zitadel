@@ -388,7 +388,7 @@ Errors:
     ReadError: 读取翻译文件时出错
     MergeError: 翻译文件无法与自定义翻译合并
     NotFound: 翻译文件不存在
-  MetaData:
+  Metadata:
     NotFound: 元数据不存在
     NoData: 元数据列表为空
     Invalid: 元数据无效

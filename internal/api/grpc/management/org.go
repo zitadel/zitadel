@@ -305,11 +305,7 @@ func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetada
 	if err != nil {
 		return nil, err
 	}
-	err = metadataQueries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	res, err := s.query.SearchOrgMetadata(ctx, true, req.Id, metadataQueries)
+	res, err := s.query.SearchOrgMetadata(ctx, true, authz.GetCtxData(ctx).OrgID, metadataQueries)
 	if err != nil {
 		return nil, err
 	}
@@ -320,11 +316,7 @@ func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetada
 }
 
 func (s *Server) GetOrgMetadata(ctx context.Context, req *mgmt_pb.GetOrgMetadataRequest) (*mgmt_pb.GetOrgMetadataResponse, error) {
-	owner, err := query.NewOrgMetadataResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	data, err := s.query.GetOrgMetadataByKey(ctx, true, req.Id, req.Key, owner)
+	data, err := s.query.GetOrgMetadataByKey(ctx, true, authz.GetCtxData(ctx).OrgID, req.Key)
 	if err != nil {
 		return nil, err
 	}
@@ -334,8 +326,7 @@ func (s *Server) GetOrgMetadata(ctx context.Context, req *mgmt_pb.GetOrgMetadata
 }
 
 func (s *Server) SetOrgMetadata(ctx context.Context, req *mgmt_pb.SetOrgMetadataRequest) (*mgmt_pb.SetOrgMetadataResponse, error) {
-	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.SetOrgMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.OrgID)
+	result, err := s.command.SetOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, &domain.Metadata{Key: req.Key, Value: req.Value})
 	if err != nil {
 		return nil, err
 	}
@@ -349,8 +340,7 @@ func (s *Server) SetOrgMetadata(ctx context.Context, req *mgmt_pb.SetOrgMetadata
 }
 
 func (s *Server) BulkSetOrgMetadata(ctx context.Context, req *mgmt_pb.BulkSetOrgMetadataRequest) (*mgmt_pb.BulkSetOrgMetadataResponse, error) {
-	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkSetOrgMetadata(ctx, req.Id, ctxData.OrgID, BulkSetOrgMetadataToDomain(req)...)
+	result, err := s.command.BulkSetOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, BulkSetOrgMetadataToDomain(req)...)
 	if err != nil {
 		return nil, err
 	}
@@ -360,8 +350,7 @@ func (s *Server) BulkSetOrgMetadata(ctx context.Context, req *mgmt_pb.BulkSetOrg
 }
 
 func (s *Server) RemoveOrgMetadata(ctx context.Context, req *mgmt_pb.RemoveOrgMetadataRequest) (*mgmt_pb.RemoveOrgMetadataResponse, error) {
-	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.RemoveOrgMetadata(ctx, req.Key, req.Id, ctxData.OrgID)
+	result, err := s.command.RemoveOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, req.Key)
 	if err != nil {
 		return nil, err
 	}
@@ -371,8 +360,7 @@ func (s *Server) RemoveOrgMetadata(ctx context.Context, req *mgmt_pb.RemoveOrgMe
 }
 
 func (s *Server) BulkRemoveOrgMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveOrgMetadataRequest) (*mgmt_pb.BulkRemoveOrgMetadataResponse, error) {
-	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkRemoveOrgMetadata(ctx, req.Id, ctxData.OrgID, req.Keys...)
+	result, err := s.command.BulkRemoveOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, req.Keys...)
 	if err != nil {
 		return nil, err
 	}
