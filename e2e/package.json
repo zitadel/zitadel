@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.7.13",
-    "cypress": "^10.3.0"
+    "cypress": "^10.3.0",
+    "prettier": "^2.7.1"
   }
 }
