@@ -280,6 +280,12 @@ SystemDefaults:
     PrivateKeyLifetime: 6h
     PublicKeyLifetime: 30h
 
+Actions:
+  HTTP:
+    DenyList:
+      - localhost
+      - '127.0.0.1'
+
 DefaultInstance:
   InstanceName:
   DefaultLanguage: en

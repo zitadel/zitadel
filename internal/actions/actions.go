@@ -12,6 +12,10 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
+type Config struct {
+	HTTP HTTPConfig
+}
+
 var (
 	ErrHalt = errors.New("interrupt")
 )

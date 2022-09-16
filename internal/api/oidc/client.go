@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -287,7 +286,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 			api,
 			action.Script,
 			action.Name,
-			actions.WithHTTP(actionCtx, http.DefaultClient),
+			actions.WithHTTP(actionCtx),
 			actions.WithUserMetadata(actionCtx, o.query, o.command, userInfo.GetSubject(), resourceOwner),
 			actions.WithLogger(actions.ServerLog),
 		)
@@ -365,7 +364,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 			api,
 			action.Script,
 			action.Name,
-			actions.WithHTTP(actionCtx, http.DefaultClient),
+			actions.WithHTTP(actionCtx),
 			actions.WithUserMetadata(actionCtx, o.query, o.command, userID, user.ResourceOwner),
 			actions.WithLogger(actions.ServerLog),
 		)
