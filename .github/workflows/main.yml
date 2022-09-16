@@ -1,2 +1,20 @@
-- name: Add To GitHub projects
-  uses: actions/add-to-project@v0.3.0
+name: Add new isssues to kanban project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.3.0
+        with:
+          # You can target a repository in a different organization
+          # to the issue
+          project-url: https://github.com/orgs/zitadel/projects/1
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          labeled: OKR
+          label-operator: NOT
