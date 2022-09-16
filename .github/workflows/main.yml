@@ -1,0 +1,2 @@
+- name: Add To GitHub projects
+  uses: actions/add-to-project@v0.3.0
