@@ -184,20 +184,6 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
     );
 
-    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((route) => {
-      const { org } = route;
-      if (org) {
-        this.authService
-          .getActiveOrg(org)
-          .then((queriedOrg) => {
-            this.org = queriedOrg;
-          })
-          .catch((error) => {
-            this.router.navigate(['/users/me']);
-          });
-      }
-    });
-
     this.getProjectCount();
 
     this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
@@ -265,9 +251,7 @@ export class AppComponent implements OnDestroy {
 
   public changedOrg(org: Org.AsObject): void {
     this.themeService.loadPrivateLabelling();
-    this.authService.zitadelPermissions$.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/org'], { fragment: org.id });
-    });
+    this.router.navigate(['/org']);
   }
 
   private setLanguage(): void {
@@ -276,7 +260,6 @@ export class AppComponent implements OnDestroy {
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
-        // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
         const fallbackLang = cropped.match(/en|de|it|zh/) ? cropped : 'en';
 

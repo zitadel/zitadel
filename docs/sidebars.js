@@ -248,6 +248,15 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Observability",
+      collapsed: false,
+      items: [
+        "apis/observability/metrics",
+        "apis/observability/health",
+      ],
+    },
+    {
+      type: "category",
       label: "Rate Limits",
       collapsed: false,
       items: [
@@ -304,7 +313,10 @@ module.exports = {
       type: "category",
       label: "Features",
       collapsed: false,
-      items: ["concepts/features/actions"],
+      items: [
+        "concepts/features/actions",
+        "concepts/features/selfservice"
+      ],
     },
   ],
   manuals: [
