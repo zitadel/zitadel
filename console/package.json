@@ -20,7 +20,7 @@
     "@angular/material": "^14.2.0",
     "@angular/material-moment-adapter": "^14.2.0",
     "@angular/platform-browser": "^14.2.0",
-    "@angular/platform-browser-dynamic": "^14.2.0",
+    "@angular/platform-browser-dynamic": "^14.2.2",
     "@angular/router": "^14.2.0",
     "@angular/service-worker": "^14.2.0",
     "@ctrl/ngx-codemirror": "^5.1.1",
