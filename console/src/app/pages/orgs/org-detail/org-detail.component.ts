@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, take } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -12,6 +12,7 @@ import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -36,12 +37,12 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
   public InfoSectionType: any = InfoSectionType;
   constructor(
+    auth: GrpcAuthService,
     private dialog: MatDialog,
     public mgmtService: ManagementService,
     private toast: ToastService,
     private router: Router,
     breadcrumbService: BreadcrumbService,
-    activatedRoute: ActivatedRoute,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -49,8 +50,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     };
     breadcrumbService.setBreadcrumb([bread]);
 
-    activatedRoute.fragment.pipe(takeUntil(this.destroy$)).subscribe((orgId) => {
-      if (this.org && orgId) {
+    auth.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
+      if (this.org && org) {
         this.getData();
       }
     });

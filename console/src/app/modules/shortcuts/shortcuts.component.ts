@@ -48,7 +48,7 @@ const CREATE_ORG: ShortcutItem = {
   id: 'create_org',
   type: ShortcutType.ROUTE,
   i18nTitle: 'ORG.PAGES.CREATE',
-  routerLink: ['/org', 'create'],
+  routerLink: ['/orgs', 'create'],
   withRole: ['org.create', 'iam.write'],
   icon: 'las la-plus',
   disabled: false,

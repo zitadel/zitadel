@@ -34,7 +34,7 @@ export function ensureSomething(api: apiCallProperties, searchPath: string, find
             }
         })
     }).then((data) => {
-        awaitDesired(30, expectEntity, data.initialSequence, api, searchPath, find)
+        awaitDesired(90, expectEntity, data.initialSequence, api, searchPath, find)
         return cy.wrap<number>(data.id)
     })
 }
@@ -45,7 +45,7 @@ export function ensureSomethingExists(api: apiCallProperties, searchPath: string
 
 export function ensureSomethingDoesntExist(api: apiCallProperties, searchPath: string, find: (entity: Entity) => boolean, deletePath: (entity: Entity) => string): Cypress.Chainable<null> {
     return ensureSomething(api, searchPath, find, deletePath, 'DELETE', null, entity => !entity)
-        .then(() => { return null })
+        .then(() => {return null })
 }
 
 type SearchResult = {
@@ -71,7 +71,10 @@ export function searchSomething(api: apiCallProperties, searchPath: string, find
 
 function awaitDesired(trials: number, expectEntity: (entity: Entity) => boolean, initialSequence: number, api: apiCallProperties, searchPath: string, find: (entity: Entity) => boolean) {
     searchSomething(api, searchPath, find).then(resp => {
-        if (!expectEntity(resp.entity) || resp.sequence <= initialSequence) {
+        const foundExpectedEntity = expectEntity(resp.entity)
+        const foundExpectedSequence = resp.sequence > initialSequence
+
+        if (!foundExpectedEntity || !foundExpectedSequence) {
             expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
             cy.wait(1000)
             awaitDesired(trials - 1, expectEntity, initialSequence, api, searchPath, find)

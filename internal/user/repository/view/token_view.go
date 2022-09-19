@@ -10,10 +10,11 @@ import (
 	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
-func TokenByID(db *gorm.DB, table, tokenID, instanceID string) (*usr_model.TokenView, error) {
+func TokenByIDs(db *gorm.DB, table, tokenID, userID, instanceID string) (*usr_model.TokenView, error) {
 	token := new(usr_model.TokenView)
 	query := repository.PrepareGetByQuery(table,
 		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyTokenID, Method: domain.SearchMethodEquals, Value: tokenID},
+		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyUserID, Method: domain.SearchMethodEquals, Value: userID},
 		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID},
 	)
 	err := query(db, token)

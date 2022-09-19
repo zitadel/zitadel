@@ -142,7 +142,7 @@ goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifac
 > For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
 > Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`  
 > Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`  
-> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . -t zitadel-npm-console --target angular-export -o internal/api/ui/console/static/`  
+> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . --target angular-export -o internal/api/ui/console/static/`  
 > Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`  
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
