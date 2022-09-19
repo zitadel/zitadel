@@ -1,5 +1,5 @@
 ---
-title: Connect with AzureAD
+title: Connect with AzureAD through OIDC
 ---
 
 ## AzureAD Tenant as Identity Provider for ZITADEL

@@ -2,7 +2,7 @@
   title="{{ app?.name }}"
   [hasActions]="isZitadel === false && (['project.app.write:' + projectId, 'project.app.write'] | hasRole | async)"
   docLink="https://docs.zitadel.com/docs/guides/basics/projects"
-  [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : 'API'"
+  [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.' + app?.oidcConfig?.appType | translate) : app?.apiConfig ? 'API' : 'SAML'"
   [isActive]="app?.state === AppState.APP_STATE_ACTIVE"
   [isInactive]="app?.state === AppState.APP_STATE_INACTIVE"
   stateTooltip="{{ 'APP.PAGES.DETAIL.STATE.' + app?.state | translate }}"
@@ -155,6 +155,60 @@
                 </button>
               </div>
             </form>
+          </cnsl-card>
+
+          <cnsl-card *ngIf="samlForm && app?.samlConfig">
+            <form [formGroup]="samlForm">
+              <cnsl-form-field class="formfield">
+                <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
+                <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+              </cnsl-form-field>
+            </form>
+
+            <div class="cnsl-saml-config-line">
+              <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+
+              <input
+                #xmlFileInput
+                style="display: none"
+                class="file-input"
+                type="file"
+                accept="text/xml,application/xml"
+                (change)="onDropXML($any($event.target).files)"
+              />
+              <button mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
+                {{ 'APP.SAML.XML' | translate }}
+              </button>
+            </div>
+
+            <div
+              class="saml-xml"
+              [ngClass]="{ disabled: !!metadataUrl?.value }"
+              *ngIf="decodedBase64 && app && app.samlConfig && !app.samlConfig.metadataUrl"
+            >
+              <ngx-codemirror
+                [(ngModel)]="decodedBase64"
+                [disabled]="!!metadataUrl?.value"
+                [options]="{
+                  lineNumbers: true,
+                  theme: 'material',
+                  mode: 'application/xml'
+                }"
+              ></ngx-codemirror>
+            </div>
+
+            <div class="btn-container">
+              <button
+                class="submit-button"
+                type="submit"
+                color="primary"
+                (click)="saveSAMLApp()"
+                [disabled]="samlForm.invalid || !canWrite"
+                mat-raised-button
+              >
+                {{ 'ACTIONS.SAVE' | translate }}
+              </button>
+            </div>
           </cnsl-card>
         </ng-container>
 

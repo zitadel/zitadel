@@ -1,5 +1,5 @@
 ---
-title: Connect with Auth0
+title: Connect with Auth0 through OIDC
 ---
 
 This guide shows how to enable login with ZITADEL on Auth0.
@@ -16,7 +16,7 @@ Prerequisites:
 - existing ZITADEL project, if not present follow the first 3 steps [here](../../guides/manage/console/projects)
 - existing Auth0 tenant as described [here](https://auth0.com/docs/get-started/auth0-overview/create-tenants)
 
-> We have to switch between ZITADEL and a Auth0. If the headings begin with "ZITADEL" switch to the ZITADEL Console and if the headings start with Auth0 please switch to the Auth0 GUI.
+> We have to switch between ZITADEL and a Auth0. If the headings begin with "ZITADEL" switch to the ZITADEL Console and if the headings start with "Auth0" please switch to the Auth0 GUI.
 
 ## **Auth0**: Create a new connection
 

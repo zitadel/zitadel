@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -50,6 +51,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 							project.NewProjectRemovedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"projectname1",
+								nil,
 							),
 						),
 					),
@@ -253,6 +255,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 							project.NewProjectRemovedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"projectname1",
+								nil,
 							),
 						),
 					),
@@ -503,6 +506,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 							project.NewProjectRemovedEvent(context.Background(),
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"projectname1",
+								nil,
 							),
 						),
 					),
