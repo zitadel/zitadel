@@ -75,7 +75,7 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 
 type transport struct{}
 
-func (_ *transport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (*transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if httpConfig == nil {
 		return http.DefaultTransport.RoundTrip(req)
 	}

@@ -7,23 +7,7 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
-
-	"github.com/zitadel/logging"
 )
-
-var l logger
-
-type logger struct{}
-
-func (logger) Log(arg string) {
-	logging.Info(arg)
-}
-func (logger) Warn(arg string) {
-	logging.Warn(arg)
-}
-func (logger) Error(arg string) {
-	logging.Error(arg)
-}
 
 func TestRun(t *testing.T) {
 	type args struct {
