@@ -2,3 +2,6 @@
 
 # grpc output
 /src/app/proto
+
+# dev environment
+src/assets/environment.json
