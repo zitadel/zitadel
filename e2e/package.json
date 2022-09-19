@@ -5,7 +5,7 @@
     "open": "npx cypress open",
     "e2e": "npx cypress run",
     "open:dev": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 npm run open",
-    "e2e:dev": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 npm run e2e"
+    "e2e:dev": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 npm run e2e --"
   },
   "private": true,
   "dependencies": {

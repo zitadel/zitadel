@@ -20,13 +20,13 @@ describe("humans", () => {
       cy.visit(humansPath);
     });
 
-    it("should add a user", () => {
+    it.only("should add a user", () => {
       cy.get('[data-e2e="create-user-button"]')
         .click();
       cy.url()
         .should("contain", "users/create");
       cy.get('[formcontrolname="email"]')
-        .type(loginname("e2ehuman", Cypress.env("ORGANIZATION")));
+        .type("dummy@dummy.com");
       //force needed due to the prefilled username prefix
       cy.get('[formcontrolname="userName"]')
         .type(testHumanUserNameAdd);
@@ -39,9 +39,12 @@ describe("humans", () => {
       cy.get('[data-e2e="create-button"]')
         .click();
       cy.get(".data-e2e-success");
-      cy.wait(200);
+      const loginName = loginname(testHumanUserNameAdd, Cypress.env("ORGANIZATION"))
+      cy.contains('[data-e2e="copy-loginname"]', loginName)
+        .click()
+      cy.clipboardMatches(loginName)
       cy.get(".data-e2e-failure", { timeout: 0 })
-        .should("not.exist");
+        .should("not.exist")
     });
   });
 
@@ -53,9 +56,8 @@ describe("humans", () => {
 
     it("should delete a human user", () => {
       cy.contains("tr", testHumanUserNameRemove)
-        // doesn't work, need to force click.
-        // .trigger('mouseover')
-        .find('[data-e2e="enabled-delete-button"]')
+      .as("humanUserRow")
+      .find('[data-e2e="enabled-delete-button"]')
         .click({force: true});
       cy.get('[data-e2e="confirm-dialog-input"]')
         .focus()
@@ -63,9 +65,9 @@ describe("humans", () => {
       cy.get('[data-e2e="confirm-dialog-button"]')
         .click();
       cy.get(".data-e2e-success");
-      cy.wait(200);
-      cy.get(".data-e2e-failure", { timeout: 0 })
-        .should("not.exist");
+      cy.get("$humanUserRow")
+        .shouldNotExist()
+      cy.shouldNotExist({selector: ".data-e2e-failure"})
     });
   });
 });

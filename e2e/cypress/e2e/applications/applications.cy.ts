@@ -20,12 +20,12 @@ describe("applications", () => {
 
   describe("add app", function() {
     beforeEach(`ensure it doesn't exist already`, function() {
-      ensureProjectResourceDoesntExist(
+/*      ensureProjectResourceDoesntExist(
         this.api,
         this.projectId,
         Apps,
         testAppName
-      )
+      )*/
       cy.visit(`/projects/${this.projectId}`);
     });
 
@@ -58,17 +58,11 @@ describe("applications", () => {
       cy.get("[id*=overlay]")
         .should("exist");
       cy.get(".data-e2e-success");
+      const expectClientId = new RegExp(`^.*[0-9]+\\@${testProjectName}.*$`)
       cy.get('[data-e2e="client-id-copy"]')
         .click()
-      const expectClientId = new RegExp(`^.*[0-9]+\\\@${testProjectName}.*$`)
       cy.contains('[data-e2e="client-id"]', expectClientId)
-      cy.window()
-        .then(win => {
-            win.navigator.clipboard.readText().then(copiedClientId => {
-              win.focus()
-              expect(expectClientId.test(copiedClientId)).to.be.true
-            })
-        })
+      cy.clipboardMatches(expectClientId)
       cy.get(".data-e2e-failure", { timeout: 0 })
         .should("not.exist");
     });

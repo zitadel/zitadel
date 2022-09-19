@@ -1,28 +1,87 @@
 import 'cypress-wait-until';
+//
+//namespace Cypress {
+//    interface Chainable {
+//        /**
+//         * Custom command that authenticates a user.
+//         *
+//         * @example cy.consolelogin('hodor', 'hodor1234')
+//         */
+//        consolelogin(username: string, password: string): void
+//    }
+//}
+//
+//Cypress.Commands.add('consolelogin', { prevSubject: false }, (username: string, password: string) => {
+//
+//    window.sessionStorage.removeItem("zitadel:access_token")
+//    cy.visit(Cypress.config('baseUrl')/ui/console).then(() => {
+//        // fill the fields and push button
+//        cy.get('#loginName').type(username, { log: false })
+//        cy.get('#submit-button').click()
+//        cy.get('#password').type(password, { log: false })
+//        cy.get('#submit-button').click()
+//        cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
+//    })
+//})
+//
 
-/*
-namespace Cypress {
-    interface Chainable {
-*/
-        /**
-         * Custom command that authenticates a user.
-         *
-         * @example cy.consolelogin('hodor', 'hodor1234')
-         */
-/*        consolelogin(username: string, password: string): void
+interface ShouldNotExistOptions {
+    selector?: string
+    timeout?: number
+}
+
+declare global {
+    namespace Cypress {
+        interface Chainable {
+            /**
+             * Custom command that asserts on clipboard text.
+             *
+             * @example cy.clipboardMatches('hodor', 'hodor1234')
+             */
+            clipboardMatches(pattern: RegExp | string): Cypress.Chainable<null>
+
+            /**
+             * Custom command that waits until the selector finds zero elements.
+             * If no selector is provided, shouldNotExists tries to defer the
+             * selector from the previous JQuery subject.
+             */
+             shouldNotExist(options?: ShouldNotExistOptions): Cypress.Chainable<null>
+             shouldNotExist(subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions): Cypress.Chainable<null>
+        }
     }
 }
 
-Cypress.Commands.add('consolelogin', { prevSubject: false }, (username: string, password: string) => {
-
-    window.sessionStorage.removeItem("zitadel:access_token")
-    cy.visit(Cypress.config('baseUrl')/ui/console).then(() => {
-        // fill the fields and push button
-        cy.get('#loginName').type(username, { log: false })
-        cy.get('#submit-button').click()
-        cy.get('#password').type(password, { log: false })
-        cy.get('#submit-button').click()
-        cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
-    })
+Cypress.Commands.add("clipboardMatches", { prevSubject: false }, (pattern: RegExp | string) => {
+    /* doesn't work reliably
+    return cy.window()
+        .then(win => {
+            win.focus()
+            return cy.waitUntil(() => win.navigator.clipboard.readText()
+                .then(clipboadText => {
+                    win.focus()
+                    const matches = typeof pattern === "string"
+                    ? clipboadText.includes(pattern)
+                    : pattern.test(clipboadText)
+                    if (!matches) {
+                        cy.log(`text in clipboard ${clipboadText} doesn't match the pattern ${pattern}, yet`)
+                    }
+                    return matches
+                })
+            )
+        })
+        .then(() => null)
+    */
 })
-*/
+
+Cypress.Commands.add("shouldNotExist", { prevSubject: ['optional', 'element'] }, (subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions) => {
+    return cy.waitUntil(
+        () => {
+            return Cypress.$(options?.selector || subject?.selector).length === 0
+        },
+        { timeout:
+            typeof options?.timeout === 'number'
+            ? options.timeout
+            : 500
+        },
+    )
+})

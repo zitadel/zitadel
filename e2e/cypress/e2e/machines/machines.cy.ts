@@ -21,7 +21,7 @@ describe("machines", () => {
       cy.visit(machinesPath);
     });
 
-    it("should add a machine", () => {
+    it.only("should add a machine", () => {
       cy.get('[data-e2e="create-user-button"]')
         .click();
       cy.url()
@@ -36,9 +36,11 @@ describe("machines", () => {
       cy.get('[data-e2e="create-button"]')
         .click();
       cy.get(".data-e2e-success");
-      cy.wait(200);
-      cy.get(".data-e2e-failure", { timeout: 0 })
-        .should("not.exist");
+      const loginName = loginname(testMachineUserNameAdd, Cypress.env("ORGANIZATION"))
+      cy.contains('[data-e2e="copy-loginname"]', loginName)
+        .click()
+      cy.clipboardMatches(loginName)
+      cy.shouldNotExist({selector: '.data-e2e-failure'})
     });
   });
 
@@ -50,8 +52,7 @@ describe("machines", () => {
 
     it("should delete a machine", () => {
       cy.contains("tr", testMachineUserNameRemove)
-        // doesn't work, need to force click.
-        // .trigger('mouseover')
+        .as("machineUserRow")
         .find('[data-e2e="enabled-delete-button"]')
         .click({force: true});
       cy.get('[data-e2e="confirm-dialog-input"]')
@@ -60,9 +61,9 @@ describe("machines", () => {
       cy.get('[data-e2e="confirm-dialog-button"]')
         .click();
       cy.get(".data-e2e-success");
-      cy.wait(200);
-      cy.get(".data-e2e-failure", { timeout: 0 })
-        .should("not.exist");
+      cy.get("$machineUserRow")
+        .shouldNotExist()
+      cy.shouldNotExist({selector: ".data-e2e-failure"})
     });
 
     it("should create a personal access token")
