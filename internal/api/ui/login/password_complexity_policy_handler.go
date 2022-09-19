@@ -28,7 +28,7 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *domain.Aut
 	if err != nil {
 		return nil, err.Error(), err
 	}
-	description, err := l.generatePolicyDescription(r, authReq, policy)
+	description := l.generatePolicyDescription(r, authReq, policy)
 	return policy, description, nil
 }
 
@@ -41,11 +41,11 @@ func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, authReq *do
 	if err != nil {
 		return nil, err.Error(), err
 	}
-	description, err := l.generatePolicyDescription(r, authReq, policy)
+	description := l.generatePolicyDescription(r, authReq, policy)
 	return policy, description, nil
 }
 
-func (l *Login) generatePolicyDescription(r *http.Request, authReq *domain.AuthRequest, policy *iam_model.PasswordComplexityPolicyView) (string, error) {
+func (l *Login) generatePolicyDescription(r *http.Request, authReq *domain.AuthRequest, policy *iam_model.PasswordComplexityPolicyView) string {
 	description := "<ul class=\"lgn-no-dots lgn-policy\" id=\"passwordcomplexity\">"
 	translator := l.getTranslator(r.Context(), authReq)
 	minLength := l.renderer.LocalizeFromRequest(translator, r, "Password.MinLength", nil)
@@ -70,5 +70,5 @@ func (l *Login) generatePolicyDescription(r *http.Request, authReq *domain.AuthR
 	description += "<li id=\"confirmation\" class=\"invalid\"><i class=\"lgn-icon-times-solid lgn-warn\"></i><span>" + confirmation + "</span></li>"
 
 	description += "</ul>"
-	return description, nil
+	return description
 }
