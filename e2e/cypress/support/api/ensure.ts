@@ -43,10 +43,6 @@ export function ensureSomething(
     .then((data) => {
       awaitDesired(90, expectEntity, data.initialSequence, api, searchPath, find);
       return cy.wrap<number>(data.id);
-    })
-    .then((data) => {
-      awaitDesired(90, (entity) => !!entity, data.initialSequence, api, searchPath, find);
-      return cy.wrap<number>(data.id);
     });
 }
 
@@ -96,12 +92,6 @@ export function searchSomething(
       headers: {
         Authorization: api.authHeader,
       },
-    })
-    .then((res) => {
-      return {
-        entity: res.body.result?.find(find) || null,
-        sequence: res.body.details.processedSequence,
-      };
     })
     .then((res) => {
       return {
