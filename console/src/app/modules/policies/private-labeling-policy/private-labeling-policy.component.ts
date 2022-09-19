@@ -564,6 +564,11 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
                   this.applyToConsole(data.policy);
                 }
               });
+              this.getPreviewData().then((data) => {
+                if (data.policy) {
+                  this.previewData = data.policy;
+                }
+              });
             }, 1000);
           })
           .catch((error) => {

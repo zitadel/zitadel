@@ -3,16 +3,9 @@ import { NgModule } from '@angular/core';
 
 import { RedirectPipe } from './redirect.pipe';
 
-
 @NgModule({
-    declarations: [
-        RedirectPipe,
-    ],
-    imports: [
-        CommonModule,
-    ],
-    exports: [
-        RedirectPipe,
-    ],
+  declarations: [RedirectPipe],
+  imports: [CommonModule],
+  exports: [RedirectPipe],
 })
-export class RedirectPipeModule { }
+export class RedirectPipeModule {}

@@ -2,9 +2,9 @@ import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import {
-    AddSMSProviderTwilioRequest,
-    UpdateSMSProviderTwilioRequest,
-    UpdateSMSProviderTwilioTokenRequest,
+  AddSMSProviderTwilioRequest,
+  UpdateSMSProviderTwilioRequest,
+  UpdateSMSProviderTwilioTokenRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { SMSProvider, TwilioConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';

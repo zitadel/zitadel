@@ -3,16 +3,9 @@ import { NgModule } from '@angular/core';
 
 import { OriginPipe } from './origin.pipe';
 
-
 @NgModule({
-    declarations: [
-        OriginPipe,
-    ],
-    imports: [
-        CommonModule,
-    ],
-    exports: [
-        OriginPipe,
-    ],
+  declarations: [OriginPipe],
+  imports: [CommonModule],
+  exports: [OriginPipe],
 })
-export class OriginPipeModule { }
+export class OriginPipeModule {}

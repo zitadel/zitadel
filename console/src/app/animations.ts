@@ -1,13 +1,13 @@
 import {
-    animate,
-    animateChild,
-    AnimationTriggerMetadata,
-    group,
-    query,
-    stagger,
-    style,
-    transition,
-    trigger,
+  animate,
+  animateChild,
+  AnimationTriggerMetadata,
+  group,
+  query,
+  stagger,
+  style,
+  transition,
+  trigger,
 } from '@angular/animations';
 
 export const toolbarAnimation: AnimationTriggerMetadata = trigger('toolbar', [
