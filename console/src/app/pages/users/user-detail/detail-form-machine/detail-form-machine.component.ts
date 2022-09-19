@@ -20,9 +20,7 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
 
   constructor(private fb: UntypedFormBuilder) {
     this.machineForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [
-        Validators.required,
-      ]],
+      userName: [{ value: '', disabled: true }, [Validators.required]],
       name: [{ value: '', disabled: this.disabled }, Validators.required],
       description: [{ value: '', disabled: this.disabled }],
     });

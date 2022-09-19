@@ -4,12 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import {
-    DisplayNameQuery,
-    EmailQuery,
-    SearchQuery as UserSearchQuery,
-    StateQuery,
-    UserNameQuery,
-    UserState,
+  DisplayNameQuery,
+  EmailQuery,
+  SearchQuery as UserSearchQuery,
+  StateQuery,
+  UserNameQuery,
+  UserState,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';

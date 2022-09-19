@@ -28,41 +28,48 @@ export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
     super();
   }
 
-  public loadMembers(projectId: string, projectType: ProjectType, pageIndex: number, pageSize: number, grantId?: string): void {
+  public loadMembers(
+    projectId: string,
+    projectType: ProjectType,
+    pageIndex: number,
+    pageSize: number,
+    grantId?: string,
+  ): void {
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);
 
     const promise:
-      Promise<ListProjectMembersResponse.AsObject> |
-      Promise<ListProjectGrantMembersResponse.AsObject>
+      | Promise<ListProjectMembersResponse.AsObject>
+      | Promise<ListProjectGrantMembersResponse.AsObject>
       | undefined =
-      projectType === ProjectType.PROJECTTYPE_OWNED ?
-        this.service.listProjectMembers(projectId, pageSize, offset) :
-        projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
-          this.service.listProjectGrantMembers(projectId,
-            grantId, pageSize, offset) : undefined;
+      projectType === ProjectType.PROJECTTYPE_OWNED
+        ? this.service.listProjectMembers(projectId, pageSize, offset)
+        : projectType === ProjectType.PROJECTTYPE_GRANTED && grantId
+        ? this.service.listProjectGrantMembers(projectId, grantId, pageSize, offset)
+        : undefined;
     if (promise) {
-      from(promise).pipe(
-        map(resp => {
-          if (resp.details?.totalResult) {
-            this.totalResult = resp.details?.totalResult;
-          } else {
-            this.totalResult = 0;
-          }
-          if (resp.details?.viewTimestamp) {
-            this.viewTimestamp = resp.details.viewTimestamp;
-          }
-          return resp.resultList;
-        }),
-        catchError(() => of([])),
-        finalize(() => this.loadingSubject.next(false)),
-      ).subscribe(members => {
-        this.membersSubject.next(members);
-      });
+      from(promise)
+        .pipe(
+          map((resp) => {
+            if (resp.details?.totalResult) {
+              this.totalResult = resp.details?.totalResult;
+            } else {
+              this.totalResult = 0;
+            }
+            if (resp.details?.viewTimestamp) {
+              this.viewTimestamp = resp.details.viewTimestamp;
+            }
+            return resp.resultList;
+          }),
+          catchError(() => of([])),
+          finalize(() => this.loadingSubject.next(false)),
+        )
+        .subscribe((members) => {
+          this.membersSubject.next(members);
+        });
     }
   }
-
 
   /**
    * Connect this data source to the table. The table will only update when
