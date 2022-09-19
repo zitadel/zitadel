@@ -104,6 +104,12 @@ type InstanceSetup struct {
 	EmailTemplate     []byte
 	MessageTexts      []*domain.CustomMessageText
 	SMTPConfiguration *smtp.EmailConfig
+	OIDCSettings      *struct {
+		AccessTokenLifetime        time.Duration
+		IdTokenLifetime            time.Duration
+		RefreshTokenIdleExpiration time.Duration
+		RefreshTokenExpiration     time.Duration
+	}
 }
 
 type ZitadelConfig struct {
@@ -346,6 +352,35 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
+	accessTokenLifetime := time.Duration(0)
+	idTokenLifetime := time.Duration(0)
+	refreshTokenIdleExpiration := time.Duration(0)
+	refreshTokenExpiration := time.Duration(0)
+
+	if setup.OIDCSettings != nil {
+		if setup.OIDCSettings.AccessTokenLifetime != time.Duration(0) {
+			accessTokenLifetime = setup.OIDCSettings.AccessTokenLifetime
+		}
+		if setup.OIDCSettings.IdTokenLifetime != time.Duration(0) {
+			idTokenLifetime = setup.OIDCSettings.IdTokenLifetime
+		}
+		if setup.OIDCSettings.RefreshTokenIdleExpiration != time.Duration(0) {
+			refreshTokenIdleExpiration = setup.OIDCSettings.RefreshTokenIdleExpiration
+		}
+		if setup.OIDCSettings.RefreshTokenExpiration != time.Duration(0) {
+			refreshTokenExpiration = setup.OIDCSettings.RefreshTokenExpiration
+		}
+	}
+	validations = append(validations,
+		c.prepareAddOIDCSettings(
+			instanceAgg,
+			accessTokenLifetime,
+			idTokenLifetime,
+			refreshTokenIdleExpiration,
+			refreshTokenExpiration,
+		),
+	)
+
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return "", nil, err
@@ -444,7 +479,7 @@ func prepareAddInstance(a *instance.Aggregate, instanceName string, defaultLangu
 	}
 }
 
-//SetIAMProject defines the command to set the id of the IAM project onto the instance
+// SetIAMProject defines the command to set the id of the IAM project onto the instance
 func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -455,7 +490,7 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 	}
 }
 
-//SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+// SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
 func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
