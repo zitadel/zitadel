@@ -212,6 +212,11 @@
   </div>
 
   <div class="info-wrapper">
+    <p class="info-row-title">{{ 'PROJECT.GRANT.GRANTID' | translate }}</p>
+    <p *ngIf="grantedProject && grantedProject.grantId" class="info-row-desc">{{ grantedProject.grantId }}</p>
+  </div>
+
+  <div class="info-wrapper">
     <p class="info-row-title">{{ 'PROJECT.PAGES.CREATEDON' | translate }}</p>
     <p *ngIf="grantedProject && grantedProject.details && grantedProject.details.creationDate" class="info-row-desc">
       {{ grantedProject.details.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}

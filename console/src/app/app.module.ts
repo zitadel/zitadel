@@ -50,8 +50,8 @@ import { OverlayService } from './services/overlay/overlay.service';
 import { RefreshService } from './services/refresh.service';
 import { SeoService } from './services/seo.service';
 import {
-    StatehandlerProcessorService,
-    StatehandlerProcessorServiceImpl,
+  StatehandlerProcessorService,
+  StatehandlerProcessorServiceImpl,
 } from './services/statehandler/statehandler-processor.service';
 import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler/statehandler.service';
 import { StorageService } from './services/storage.service';

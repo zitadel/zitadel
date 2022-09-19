@@ -26,33 +26,33 @@ import 'cypress-wait-until';
 //
 
 interface ShouldNotExistOptions {
-    selector?: string
-    timeout?: number
+  selector?: string;
+  timeout?: number;
 }
 
 declare global {
-    namespace Cypress {
-        interface Chainable {
-            /**
-             * Custom command that asserts on clipboard text.
-             *
-             * @example cy.clipboardMatches('hodor', 'hodor1234')
-             */
-            clipboardMatches(pattern: RegExp | string): Cypress.Chainable<null>
+  namespace Cypress {
+    interface Chainable {
+      /**
+       * Custom command that asserts on clipboard text.
+       *
+       * @example cy.clipboardMatches('hodor', 'hodor1234')
+       */
+      clipboardMatches(pattern: RegExp | string): Cypress.Chainable<null>;
 
-            /**
-             * Custom command that waits until the selector finds zero elements.
-             * If no selector is provided, shouldNotExists tries to defer the
-             * selector from the previous JQuery subject.
-             */
-             shouldNotExist(options?: ShouldNotExistOptions): Cypress.Chainable<null>
-             shouldNotExist(subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions): Cypress.Chainable<null>
-        }
+      /**
+       * Custom command that waits until the selector finds zero elements.
+       * If no selector is provided, shouldNotExists tries to defer the
+       * selector from the previous JQuery subject.
+       */
+      shouldNotExist(options?: ShouldNotExistOptions): Cypress.Chainable<null>;
+      shouldNotExist(subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions): Cypress.Chainable<null>;
     }
+  }
 }
 
-Cypress.Commands.add("clipboardMatches", { prevSubject: false }, (pattern: RegExp | string) => {
-    /* doesn't work reliably
+Cypress.Commands.add('clipboardMatches', { prevSubject: false }, (pattern: RegExp | string) => {
+  /* doesn't work reliably
     return cy.window()
         .then(win => {
             win.focus()
@@ -71,17 +71,17 @@ Cypress.Commands.add("clipboardMatches", { prevSubject: false }, (pattern: RegEx
         })
         .then(() => null)
     */
-})
+});
 
-Cypress.Commands.add("shouldNotExist", { prevSubject: ['optional', 'element'] }, (subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions) => {
+Cypress.Commands.add(
+  'shouldNotExist',
+  { prevSubject: ['optional', 'element'] },
+  (subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions) => {
     return cy.waitUntil(
-        () => {
-            return Cypress.$(options?.selector || subject?.selector).length === 0
-        },
-        { timeout:
-            typeof options?.timeout === 'number'
-            ? options.timeout
-            : 500
-        },
-    )
-})
+      () => {
+        return Cypress.$(options?.selector || subject?.selector).length === 0;
+      },
+      { timeout: typeof options?.timeout === 'number' ? options.timeout : 500 },
+    );
+  },
+);

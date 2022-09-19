@@ -1,73 +1,58 @@
-import { apiAuth } from "../../support/api/apiauth";
-import {
-  ensureHumanUserExists,
-  ensureUserDoesntExist,
-} from "../../support/api/users";
-import { loginname } from "../../support/login/users";
+import { apiAuth } from '../../support/api/apiauth';
+import { ensureHumanUserExists, ensureUserDoesntExist } from '../../support/api/users';
+import { loginname } from '../../support/login/users';
 
-describe("humans", () => {
+describe('humans', () => {
   const humansPath = `/users?type=human`;
-  const testHumanUserNameAdd = "e2ehumanusernameadd";
-  const testHumanUserNameRemove = "e2ehumanusernameremove";
+  const testHumanUserNameAdd = 'e2ehumanusernameadd';
+  const testHumanUserNameRemove = 'e2ehumanusernameremove';
 
   beforeEach(() => {
-    apiAuth().as("api")
-  })
+    apiAuth().as('api');
+  });
 
-  describe("add", () => {
-    beforeEach(`ensure it doesn't exist already`, function() {
-      ensureUserDoesntExist(this.api, testHumanUserNameAdd)
+  describe('add', () => {
+    beforeEach(`ensure it doesn't exist already`, function () {
+      ensureUserDoesntExist(this.api, testHumanUserNameAdd);
       cy.visit(humansPath);
     });
 
-    it.only("should add a user", () => {
-      cy.get('[data-e2e="create-user-button"]')
-        .click();
-      cy.url()
-        .should("contain", "users/create");
-      cy.get('[formcontrolname="email"]')
-        .type("dummy@dummy.com");
+    it.only('should add a user', () => {
+      cy.get('[data-e2e="create-user-button"]').click();
+      cy.url().should('contain', 'users/create');
+      cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
       //force needed due to the prefilled username prefix
-      cy.get('[formcontrolname="userName"]')
-        .type(testHumanUserNameAdd);
-      cy.get('[formcontrolname="firstName"]')
-        .type("e2ehumanfirstname");
-      cy.get('[formcontrolname="lastName"]')
-        .type("e2ehumanlastname");
-      cy.get('[formcontrolname="phone"]')
-        .type("+41 123456789");
-      cy.get('[data-e2e="create-button"]')
-        .click();
-      cy.get(".data-e2e-success");
-      const loginName = loginname(testHumanUserNameAdd, Cypress.env("ORGANIZATION"))
-      cy.contains('[data-e2e="copy-loginname"]', loginName)
-        .click()
-      cy.clipboardMatches(loginName)
-      cy.get(".data-e2e-failure", { timeout: 0 })
-        .should("not.exist")
+      cy.get('[formcontrolname="userName"]').type(testHumanUserNameAdd);
+      cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
+      cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
+      cy.get('[formcontrolname="phone"]').type('+41 123456789');
+      cy.get('[data-e2e="create-button"]').click();
+      cy.get('.data-e2e-success');
+      const loginName = loginname(testHumanUserNameAdd, Cypress.env('ORGANIZATION'));
+      cy.contains('[data-e2e="copy-loginname"]', loginName).click();
+      cy.clipboardMatches(loginName);
+      cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
     });
   });
 
-  describe("remove", () => {
-    beforeEach("ensure it exists", function() {
-      ensureHumanUserExists(this.api, testHumanUserNameRemove)
+  describe('remove', () => {
+    beforeEach('ensure it exists', function () {
+      ensureHumanUserExists(this.api, testHumanUserNameRemove);
       cy.visit(humansPath);
     });
 
-    it("should delete a human user", () => {
-      cy.contains("tr", testHumanUserNameRemove)
-      .as("humanUserRow")
-      .find('[data-e2e="enabled-delete-button"]')
-        .click({force: true});
+    it('should delete a human user', () => {
+      cy.contains('tr', testHumanUserNameRemove)
+        .as('humanUserRow')
+        .find('[data-e2e="enabled-delete-button"]')
+        .click({ force: true });
       cy.get('[data-e2e="confirm-dialog-input"]')
         .focus()
-        .type(loginname(testHumanUserNameRemove, Cypress.env("ORGANIZATION")));
-      cy.get('[data-e2e="confirm-dialog-button"]')
-        .click();
-      cy.get(".data-e2e-success");
-      cy.get("$humanUserRow")
-        .shouldNotExist()
-      cy.shouldNotExist({selector: ".data-e2e-failure"})
+        .type(loginname(testHumanUserNameRemove, Cypress.env('ORGANIZATION')));
+      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.get('.data-e2e-success');
+      cy.get('$humanUserRow').shouldNotExist();
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
   });
 });

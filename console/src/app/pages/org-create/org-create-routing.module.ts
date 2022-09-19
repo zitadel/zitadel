@@ -4,15 +4,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { OrgCreateComponent } from './org-create.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: OrgCreateComponent,
-        data: { animation: 'DetailPage' },
-    },
+  {
+    path: '',
+    component: OrgCreateComponent,
+    data: { animation: 'DetailPage' },
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class OrgCreateRoutingModule { }
+export class OrgCreateRoutingModule {}
