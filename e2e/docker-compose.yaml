@@ -39,7 +39,8 @@ services:
     user: '$UID'
     volumes:
       - .:/e2e
-    command: 'sh -c "npm ci --omit=dev && npm run lint && npx run wait-on http://localhost:8080"'
+    command: 'sh -c "npm ci --omit=dev && npm run lint && npx wait-on http://localhost:8080/debug/ready"'
+    network_mode: host
 
   e2e:
     image: cypress/included:10.3.0
