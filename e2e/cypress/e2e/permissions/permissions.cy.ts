@@ -1,40 +1,40 @@
-import { ensureHumanIsMember, ensureHumanIsNotMember } from 'support/api/members';
-import { ensureHumanUserExists } from 'support/api/users';
+import {
+  ensureHumanIsOrgMember,
+  ensureHumanIsNotOrgMember,
+  ensureHumanIsNotProjectMember,
+  ensureHumanIsProjectMember,
+} from 'support/api/members';
+import { ensureHumanUserExists, ensureUserDoesntExist } from 'support/api/users';
 import { apiAuth } from '../../support/api/apiauth';
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from '../../support/api/projects';
 
 describe('permissions', () => {
-  const testProjectName = 'e2eprojectpermission';
-  const testAppName = 'e2eapppermission';
-  const testRoleName = 'e2eroleundertestname';
-  const testRoleDisplay = 'e2eroleundertestdisplay';
-  const testRoleGroup = 'e2eroleundertestgroup';
-  const testGrantName = 'e2egrantundertest';
-
   beforeEach(() => {
     apiAuth().as('api');
   });
 
   describe('management', () => {
-    describe('organizations', () => {
-      const testManagerName = 'e2ehumanmanager';
-
+    const testManagerName = 'e2ehumanmanager';
+    function testAuthorizations(
+      roles: string[],
+      beforeCreate: Mocha.HookFunction,
+      beforeMutate: Mocha.HookFunction,
+      navigate: Mocha.HookFunction,
+    ) {
       beforeEach(function () {
+        ensureUserDoesntExist(this.api, testManagerName);
         ensureHumanUserExists(this.api, testManagerName);
       });
 
-      describe('add manager', () => {
-        beforeEach(function () {
-          ensureHumanIsNotMember(this.api, testManagerName);
-          cy.visit('/orgs');
-        });
+      describe('create authorization', () => {
+        beforeEach(beforeCreate);
+        beforeEach(navigate);
 
-        it('should add an organization manager', () => {
-          cy.contains('tr', Cypress.env('ORGANIZATION')).click();
+        it('should add a manager', () => {
           cy.get('[data-e2e="add-member-button"]').click();
           cy.get('[data-e2e="add-member-input"]').type(testManagerName);
           cy.get('[data-e2e="user-option"]').click();
-          cy.contains('[data-e2e="role-checkbox"]', 'Org Owner').click();
+          cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
           cy.get('[data-e2e="confirm-add-member-button"]').click();
           cy.get('.data-e2e-success');
           cy.contains('[data-e2e="member-avatar"]', 'ee');
@@ -42,11 +42,11 @@ describe('permissions', () => {
         });
       });
 
-      describe('edit authorizations', () => {
-        beforeEach(function () {
-          ensureHumanIsMember(this.api, testManagerName, ['ORG_OWNER', 'ORG_OWNER_VIEWER']);
-          cy.visit('/orgs');
-          cy.contains('tr', Cypress.env('ORGANIZATION')).click();
+      describe('mutate authorization', () => {
+        beforeEach(beforeMutate);
+        beforeEach(navigate);
+
+        beforeEach(() => {
           cy.contains('[data-e2e="member-avatar"]', 'ee').click();
           cy.contains('tr', testManagerName).as('managerRow');
         });
@@ -60,54 +60,95 @@ describe('permissions', () => {
           cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
         });
 
-        describe('roles', () => {
-          it('should remove a managers authorization', () => {
-            cy.get('@managerRow').find('[data-e2e="role"]').should('have.length', 2);
-            cy.get('@managerRow')
-              .contains('[data-e2e="role"]', 'Org Owner Viewer')
-              .find('[data-e2e="remove-role-button"]')
-              .click();
-            cy.get('[data-e2e="confirm-dialog-button"]').click();
-            cy.get('.data-e2e-success');
-            cy.get('@managerRow').find('[data-e2e="remove-role-button"]').should('have.length', 1);
-            cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
-          });
+        it('should remove a managers authorization', () => {
+          cy.get('@managerRow').find('[data-e2e="role"]').should('have.length', roles.length);
+          cy.get('@managerRow')
+            .contains('[data-e2e="role"]', roles[0])
+            .find('[data-e2e="remove-role-button"]')
+            .click({ force: true }); // TODO: Is this a bug?
+          cy.get('[data-e2e="confirm-dialog-button"]').click();
+          cy.get('.data-e2e-success');
+          cy.get('@managerRow')
+            .find('[data-e2e="remove-role-button"]')
+            .should('have.length', roles.length - 1);
+          cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
         });
       });
+    }
+
+    describe('organizations', () => {
+      const roles = [
+        { internal: 'ORG_OWNER', display: 'Org Owner' },
+        { internal: 'ORG_OWNER_VIEWER', display: 'Org Owner Viewer' },
+      ];
+
+      testAuthorizations(
+        roles.map((role) => role.display),
+        function () {
+          ensureHumanIsNotOrgMember(this.api, testManagerName);
+        },
+        function () {
+          ensureHumanIsOrgMember(
+            this.api,
+            testManagerName,
+            roles.map((role) => role.internal),
+          );
+        },
+        () => {
+          cy.visit('/orgs');
+          cy.contains('tr', Cypress.env('ORGANIZATION')).click();
+        },
+      );
     });
 
     describe('projects', () => {
-      const testProjectName = 'e2eprojectpermission';
-      const testRoleName = 'e2eroleundertestname';
-      const testRoleDisplay = 'e2eroleundertestdisplay';
-      const testRoleGroup = 'e2eroleundertestgroup';
-
-      beforeEach(function () {
-        ensureProjectExists(this.api, testProjectName).as('projectId');
-      });
-
-      describe('managers', () => {
-        it('should add a project manager');
-        it('should remove a project manager');
-      });
-
-      describe('authorizations', () => {
-        it('should add an authorization');
-        it('should remove an authorization');
-      });
-
       describe('owned projects', () => {
+        beforeEach(function () {
+          ensureProjectExists(this.api, 'e2eprojectpermission').as('projectId');
+        });
+
+        const visitOwnedProject: Mocha.HookFunction = function () {
+          cy.visit(`/projects/${this.projectId}`);
+        };
+
+        describe('authorizations', () => {
+          const roles = [
+            { internal: 'PROJECT_OWNER_GLOBAL', display: 'Project Owner Global' },
+            { internal: 'PROJECT_OWNER_VIEWER_GLOBAL', display: 'Project Owner Viewer Global' },
+          ];
+
+          testAuthorizations(
+            roles.map((role) => role.display),
+            function () {
+              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerName);
+            },
+            function () {
+              ensureHumanIsProjectMember(
+                this.api,
+                this.projectId,
+                testManagerName,
+                roles.map((role) => role.internal),
+              );
+            },
+            visitOwnedProject,
+          );
+        });
+
         describe('roles', () => {
+          const testRoleName = 'e2eroleundertestname';
+
           beforeEach(function () {
             ensureProjectResourceDoesntExist(this.api, this.projectId, Roles, testRoleName);
-            cy.visit(`/projects/${this.projectId}?id=roles`);
           });
 
+          beforeEach(visitOwnedProject);
+
           it('should add a role', () => {
+            cy.get('[data-e2e="sidenav-element-roles"]').click();
             cy.get('[data-e2e="add-new-role"]').click();
             cy.get('[formcontrolname="key"]').type(testRoleName);
-            cy.get('[formcontrolname="displayName"]').type(testRoleDisplay);
-            cy.get('[formcontrolname="group"]').type(testRoleGroup);
+            cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
+            cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
             cy.get('[data-e2e="save-button"]').click();
             cy.get('.data-e2e-success');
             cy.contains('tr', testRoleName);
@@ -115,11 +156,10 @@ describe('permissions', () => {
           });
           it('should remove a role');
         });
-
-        describe('grants', () => {
-          it('should add a grant');
-          it('should remove a grant');
-        });
+      });
+      describe('granted projects', () => {
+        it('should add a grant');
+        it('should remove a grant');
       });
     });
   });

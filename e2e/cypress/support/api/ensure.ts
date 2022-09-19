@@ -1,3 +1,4 @@
+import { toNumber } from 'cypress/types/lodash';
 import { apiCallProperties } from './apiauth';
 
 // Entity is an object but not a function
@@ -17,7 +18,7 @@ export function ensureSomething(
       if (expectEntity(sRes.entity)) {
         return cy.wrap({
           id: sRes?.entity?.id,
-          initialSequence: 0,
+          expectSequenceFrom: sRes.sequence,
         });
       }
 
@@ -36,12 +37,12 @@ export function ensureSomething(
         expect(cRes.status).to.equal(200);
         return {
           id: cRes.body.id,
-          initialSequence: sRes.sequence,
+          expectSequenceFrom: sRes.sequence,
         };
       });
     })
     .then((data) => {
-      awaitDesired(90, expectEntity, data.initialSequence, api, searchPath, find);
+      awaitDesired(90, expectEntity, data.expectSequenceFrom, api, searchPath, find);
       return cy.wrap<number>(data.id);
     });
 }
@@ -96,7 +97,7 @@ export function searchSomething(
     .then((res) => {
       return {
         entity: res.body.result?.find(find) || null,
-        sequence: res.body.details.processedSequence,
+        sequence: parseInt(<string>res.body.details.processedSequence),
       };
     });
 }
@@ -111,7 +112,7 @@ function awaitDesired(
 ) {
   searchSomething(api, searchPath, find).then((resp) => {
     const foundExpectedEntity = expectEntity(resp.entity);
-    const foundExpectedSequence = resp.sequence > initialSequence;
+    const foundExpectedSequence = resp.sequence >= initialSequence;
 
     if (!foundExpectedEntity || !foundExpectedSequence) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
