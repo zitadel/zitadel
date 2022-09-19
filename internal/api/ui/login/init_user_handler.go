@@ -119,7 +119,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 		Code:        code,
 		PasswordSet: passwordSet,
 	}
-	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, nil, userID)
+	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, authReq, userID)
 	if policy != nil {
 		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
