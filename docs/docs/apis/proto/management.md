@@ -813,7 +813,7 @@ Sets a org metadata by key
 
 
 
-    POST: /orgs/me/metadata/{key}
+    POST: /metadata/{key}
 
 
 ### BulkSetOrgMetadata
@@ -825,7 +825,7 @@ Set a list of org metadata
 
 
 
-    POST: /orgs/me/metadata/_bulk
+    POST: /metadata/_bulk
 
 
 ### ListOrgMetadata
@@ -837,7 +837,7 @@ Returns the org metadata
 
 
 
-    POST: /orgs/me/metadata/_search
+    POST: /metadata/_search
 
 
 ### GetOrgMetadata
@@ -849,7 +849,7 @@ Returns the org metadata by key
 
 
 
-    GET: /orgs/me/metadata/{key}
+    GET: /metadata/{key}
 
 
 ### RemoveOrgMetadata
@@ -861,7 +861,7 @@ Removes a org metadata by key
 
 
 
-    DELETE: /orgs/me/metadata/{key}
+    DELETE: /metadata/{key}
 
 
 ### BulkRemoveOrgMetadata
@@ -873,7 +873,7 @@ Set a list of org metadata
 
 
 
-    DELETE: /orgs/me/metadata/_bulk
+    DELETE: /metadata/_bulk
 
 
 ### ListOrgDomains

@@ -844,7 +844,7 @@ service ManagementService {
     // Sets a org metadata by key
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/metadata/{key}"
+            post: "/metadata/{key}"
             body: "*"
         };
 
@@ -856,7 +856,7 @@ service ManagementService {
     // Set a list of org metadata
     rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/metadata/_bulk"
+            post: "/metadata/_bulk"
             body: "*"
         };
 
@@ -868,7 +868,7 @@ service ManagementService {
     // Returns the org metadata
     rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
         option (google.api.http) = {
-            post: "/orgs/me/metadata/_search"
+            post: "/metadata/_search"
             body: "*"
         };
 
@@ -880,7 +880,7 @@ service ManagementService {
     // Returns the org metadata by key
     rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
         option (google.api.http) = {
-            get: "/orgs/me/metadata/{key}"
+            get: "/metadata/{key}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -891,7 +891,7 @@ service ManagementService {
     // Removes a org metadata by key
     rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/metadata/{key}"
+            delete: "/metadata/{key}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -902,7 +902,7 @@ service ManagementService {
     // Set a list of org metadata
     rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
         option (google.api.http) = {
-            delete: "/orgs/me/metadata/_bulk"
+            delete: "/metadata/_bulk"
             body: "*"
         };
 
