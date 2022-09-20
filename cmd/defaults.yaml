@@ -426,6 +426,7 @@ DefaultInstance:
   # Sets the default values for lifetime and expiration for OIDC in each newly created instance
   # This default can be overwritten for each instance during runtime
   # Overwrites the system defaults
+  # If defined but not all durations are set it will result in an error
   OIDCSettings:
     AccessTokenLifetime: 12h
     IdTokenLifetime: 12h

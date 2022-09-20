@@ -352,34 +352,17 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
-	accessTokenLifetime := time.Duration(0)
-	idTokenLifetime := time.Duration(0)
-	refreshTokenIdleExpiration := time.Duration(0)
-	refreshTokenExpiration := time.Duration(0)
-
 	if setup.OIDCSettings != nil {
-		if setup.OIDCSettings.AccessTokenLifetime != time.Duration(0) {
-			accessTokenLifetime = setup.OIDCSettings.AccessTokenLifetime
-		}
-		if setup.OIDCSettings.IdTokenLifetime != time.Duration(0) {
-			idTokenLifetime = setup.OIDCSettings.IdTokenLifetime
-		}
-		if setup.OIDCSettings.RefreshTokenIdleExpiration != time.Duration(0) {
-			refreshTokenIdleExpiration = setup.OIDCSettings.RefreshTokenIdleExpiration
-		}
-		if setup.OIDCSettings.RefreshTokenExpiration != time.Duration(0) {
-			refreshTokenExpiration = setup.OIDCSettings.RefreshTokenExpiration
-		}
+		validations = append(validations,
+			c.prepareAddOIDCSettings(
+				instanceAgg,
+				setup.OIDCSettings.AccessTokenLifetime,
+				setup.OIDCSettings.IdTokenLifetime,
+				setup.OIDCSettings.RefreshTokenIdleExpiration,
+				setup.OIDCSettings.RefreshTokenExpiration,
+			),
+		)
 	}
-	validations = append(validations,
-		c.prepareAddOIDCSettings(
-			instanceAgg,
-			accessTokenLifetime,
-			idTokenLifetime,
-			refreshTokenIdleExpiration,
-			refreshTokenExpiration,
-		),
-	)
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {

@@ -261,23 +261,14 @@ func setContextUserSystem(ctx context.Context) context.Context {
 	return authz.SetCtxData(ctx, data)
 }
 
-func (o *OPStorage) getOIDCSettings(ctx context.Context) (accessTokenLifetime, idTokenLifetime, refreshTokenIdleExpiration, refreshTokenExpiration time.Duration, err error) {
-	accessTokenLifetime = o.defaultAccessTokenLifetime
-	idTokenLifetime = o.defaultIdTokenLifetime
-	refreshTokenIdleExpiration = o.defaultRefreshTokenIdleExpiration
-	refreshTokenExpiration = o.defaultRefreshTokenExpiration
-
+func (o *OPStorage) getOIDCSettings(ctx context.Context) (accessTokenLifetime, idTokenLifetime, refreshTokenIdleExpiration, refreshTokenExpiration time.Duration, _ error) {
 	oidcSettings, err := o.query.OIDCSettingsByAggID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil && !errors.IsNotFound(err) {
-		err = nil
-		return
+		return time.Duration(0), time.Duration(0), time.Duration(0), time.Duration(0), err
 	}
 
 	if oidcSettings != nil {
-		accessTokenLifetime = oidcSettings.AccessTokenLifetime
-		idTokenLifetime = oidcSettings.IdTokenLifetime
-		refreshTokenIdleExpiration = oidcSettings.RefreshTokenIdleExpiration
-		refreshTokenExpiration = oidcSettings.RefreshTokenExpiration
+		return oidcSettings.AccessTokenLifetime, oidcSettings.IdTokenLifetime, oidcSettings.RefreshTokenIdleExpiration, oidcSettings.RefreshTokenExpiration, nil
 	}
-	return
+	return o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, nil
 }
