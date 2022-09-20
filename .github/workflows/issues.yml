@@ -1,4 +1,4 @@
-name: Add new isssues to kanban project
+name: Add new issues to kanban project
 
 on:
   issues:
