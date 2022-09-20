@@ -394,7 +394,7 @@ Errors:
     ReadError: Erreur de lecture du fichier de traduction
     MergeError: Le fichier de traduction n'a pas pu être fusionné avec les traductions personnalisées.
     NotFound: Le fichier de traduction n'existe pas
-  MetaData:
+  Metadata:
     NotFound: Métadonnées non trouvées
     NoData: La liste des métadonnées est vide
     Invalid: Les métadonnées ne sont pas valides
