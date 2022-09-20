@@ -12,7 +12,7 @@ import (
 func TestRun(t *testing.T) {
 	type args struct {
 		timeout time.Duration
-		api     *API
+		api     *apiParam
 		script  string
 		name    string
 		opts    []Option

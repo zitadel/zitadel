@@ -276,18 +276,31 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 	if err != nil {
 		return err
 	}
-	claimLogs := []string{}
-	api := (&actions.API{}).SetUserinfo(userInfo, &claimLogs)
 	for _, action := range queriedActions {
 		actionCtx, cancel := context.WithTimeout(ctx, action.Timeout())
+		claimLogs := []string{}
 		err = actions.Run(
 			actionCtx,
-			nil,
-			api,
 			action.Script,
 			action.Name,
 			actions.WithHTTP(actionCtx),
-			actions.WithUserMetadata(actionCtx, o.query, o.command, userInfo.GetSubject(), resourceOwner),
+			actions.WithAPIOptions(
+				actions.SetUserinfo(userInfo, &claimLogs),
+				actions.SetUserMetadataSetter(
+					ctx,
+					o.command,
+					userInfo.GetSubject(),
+					resourceOwner,
+				),
+			),
+			actions.WithContextOptions(
+				actions.SetUserMetadataGetter(
+					ctx,
+					o.query,
+					userInfo.GetSubject(),
+					resourceOwner,
+				),
+			),
 			actions.WithLogger(actions.ServerLog),
 		)
 		cancel()
@@ -296,7 +309,6 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 		}
 		if len(claimLogs) > 0 {
 			userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
-			claimLogs = nil
 		}
 	}
 
@@ -355,17 +367,30 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 		return nil, err
 	}
 	claimLogs := []string{}
-	api := (&actions.API{}).SetClaims(&claims, &claimLogs)
 	for _, action := range queriedActions {
 		actionCtx, cancel := context.WithTimeout(ctx, action.Timeout())
 		err = actions.Run(
 			actionCtx,
-			nil,
-			api,
 			action.Script,
 			action.Name,
 			actions.WithHTTP(actionCtx),
-			actions.WithUserMetadata(actionCtx, o.query, o.command, userID, user.ResourceOwner),
+			actions.WithAPIOptions(
+				actions.SetClaims(&claims, &claimLogs),
+				actions.SetUserMetadataSetter(
+					ctx,
+					o.command,
+					userID,
+					user.ResourceOwner,
+				),
+			),
+			actions.WithContextOptions(
+				actions.SetUserMetadataGetter(
+					ctx,
+					o.query,
+					userID,
+					user.ResourceOwner,
+				),
+			),
 			actions.WithLogger(actions.ServerLog),
 		)
 		cancel()
