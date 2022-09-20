@@ -24,11 +24,21 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	if err != nil {
 		return nil, err
 	}
-	runtimeCtx := (&actions.Context{}).SetToken(tokens)
-	api := (&actions.API{}).SetExternalUser(user).SetMetadata(&user.Metadatas)
+	ctxOpts := actions.WithContextOptions(
+		actions.SetToken(tokens),
+	)
+	apiOpts := actions.WithAPIOptions(
+		actions.SetExternalUser(user),
+		actions.SetMetadata(&user.Metadatas),
+	)
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
-		err = actions.Run(actionCtx, runtimeCtx, api, a.Script, a.Name, actions.ActionToOptions(a)...)
+		err = actions.Run(
+			actionCtx,
+			a.Script,
+			a.Name,
+			append(actions.ActionToOptions(a), ctxOpts, apiOpts)...,
+		)
 		cancel()
 		if err != nil {
 			return nil, err
@@ -42,11 +52,23 @@ func (l *Login) customExternalUserToLoginUserMapping(ctx context.Context, user *
 	if err != nil {
 		return nil, nil, err
 	}
-	runtimeCtx := (&actions.Context{}).SetToken(tokens)
-	api := (&actions.API{}).SetHuman(user).SetMetadata(&metadata)
+	ctxOpts := actions.WithContextOptions(
+		actions.SetToken(tokens),
+	)
+	apiOpts := actions.WithAPIOptions(
+		actions.SetHuman(user),
+		actions.SetMetadata(&metadata),
+	)
+	// runtimeCtx := (&actions.Context{}).SetToken(tokens)
+	// api := (&actions.API{}).SetHuman(user).SetMetadata(&metadata)
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
-		err = actions.Run(actionCtx, runtimeCtx, api, a.Script, a.Name, actions.ActionToOptions(a)...)
+		err = actions.Run(
+			actionCtx,
+			a.Script,
+			a.Name,
+			append(actions.ActionToOptions(a), ctxOpts, apiOpts)...,
+		)
 		cancel()
 		if err != nil {
 			return nil, nil, err
@@ -60,12 +82,23 @@ func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.To
 	if err != nil {
 		return nil, err
 	}
-	runtimeCtx := (&actions.Context{}).SetToken(tokens)
+	// runtimeCtx := (&actions.Context{}).SetToken(tokens)
 	actionUserGrants := make([]actions.UserGrant, 0)
-	api := (&actions.API{}).SetUserGrants(&actionUserGrants)
+	// api := (&actions.API{}).SetUserGrants(&actionUserGrants)
+	ctxOpts := actions.WithContextOptions(
+		actions.SetToken(tokens),
+	)
+	apiOpts := actions.WithAPIOptions(
+		actions.SetUserGrants(&actionUserGrants),
+	)
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
-		err = actions.Run(actionCtx, runtimeCtx, api, a.Script, a.Name, actions.ActionToOptions(a)...)
+		err = actions.Run(
+			actionCtx,
+			a.Script,
+			a.Name,
+			append(actions.ActionToOptions(a), ctxOpts, apiOpts)...,
+		)
 		cancel()
 		if err != nil {
 			return nil, err
