@@ -169,6 +169,9 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 			return formData.Gender == g
 		},
 	}
+	if authRequest == nil {
+		l.customTexts(r.Context(), translator, resourceOwner)
+	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegister], data, funcs)
 }
 
