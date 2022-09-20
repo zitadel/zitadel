@@ -6,13 +6,11 @@ describe('AddMemberRolesDialogComponent', () => {
   let component: AddMemberRolesDialogComponent;
   let fixture: ComponentFixture<AddMemberRolesDialogComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [AddMemberRolesDialogComponent],
-      }).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [AddMemberRolesDialogComponent],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AddMemberRolesDialogComponent);
