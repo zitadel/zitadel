@@ -4,17 +4,17 @@ import { RouterModule, Routes } from '@angular/router';
 import { PasswordLockoutPolicyComponent } from './password-lockout-policy.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: PasswordLockoutPolicyComponent,
-        data: {
-            animation: 'DetailPage',
-        },
+  {
+    path: '',
+    component: PasswordLockoutPolicyComponent,
+    data: {
+      animation: 'DetailPage',
     },
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class PasswordLockoutPolicyRoutingModule { }
+export class PasswordLockoutPolicyRoutingModule {}

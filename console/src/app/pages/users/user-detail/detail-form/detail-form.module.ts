@@ -14,10 +14,7 @@ import { DetailFormComponent } from './detail-form.component';
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
 
 @NgModule({
-  declarations: [
-    DetailFormComponent,
-    ProfilePictureComponent,
-  ],
+  declarations: [DetailFormComponent, ProfilePictureComponent],
   imports: [
     DropzoneModule,
     AvatarModule,
@@ -32,8 +29,6 @@ import { ProfilePictureComponent } from './profile-picture/profile-picture.compo
     TranslateModule,
     InputModule,
   ],
-  exports: [
-    DetailFormComponent,
-  ],
+  exports: [DetailFormComponent],
 })
-export class DetailFormModule { }
+export class DetailFormModule {}

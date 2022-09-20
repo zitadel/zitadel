@@ -4,15 +4,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProjectGrantCreateComponent } from './project-grant-create.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: ProjectGrantCreateComponent,
-        data: { animation: 'AddPage' },
-    },
+  {
+    path: '',
+    component: ProjectGrantCreateComponent,
+    data: { animation: 'AddPage' },
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class ProjectGrantCreateRoutingModule { }
+export class ProjectGrantCreateRoutingModule {}

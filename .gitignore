@@ -65,3 +65,5 @@ migrations/cockroach/migrate_cloud.go
 !/.artifacts/zitadel
 /zitadel
 
+go.work
+go.work.sum

@@ -6,17 +6,9 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { PasswordComplexityViewComponent } from './password-complexity-view.component';
 
-
 @NgModule({
-    declarations: [PasswordComplexityViewComponent],
-    imports: [
-        CommonModule,
-        MatProgressSpinnerModule,
-        TranslateModule,
-        FormsModule,
-    ],
-    exports: [
-        PasswordComplexityViewComponent,
-    ],
+  declarations: [PasswordComplexityViewComponent],
+  imports: [CommonModule, MatProgressSpinnerModule, TranslateModule, FormsModule],
+  exports: [PasswordComplexityViewComponent],
 })
-export class PasswordComplexityViewModule { }
+export class PasswordComplexityViewModule {}

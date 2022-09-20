@@ -174,7 +174,7 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 		}
 		return oidc.ErrServerError().WithParent(err)
 	}
-	accessToken, err := o.repo.TokenByID(ctx, userID, token)
+	accessToken, err := o.repo.TokenByIDs(ctx, userID, token)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return nil

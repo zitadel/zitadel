@@ -12,8 +12,8 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) TokenByID(tokenID, instanceID string) (*usr_view_model.TokenView, error) {
-	return usr_view.TokenByID(v.Db, tokenTable, tokenID, instanceID)
+func (v *View) TokenByIDs(tokenID, userID, instanceID string) (*usr_view_model.TokenView, error) {
+	return usr_view.TokenByIDs(v.Db, tokenTable, tokenID, userID, instanceID)
 }
 
 func (v *View) PutToken(token *usr_view_model.TokenView, event *models.Event) error {

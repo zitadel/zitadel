@@ -49,7 +49,7 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		OnError(err).
 		Errorf("could not get current sequence for token check")
 
-	token, viewErr := repo.View.TokenByID(tokenID, instanceID)
+	token, viewErr := repo.View.TokenByIDs(tokenID, userID, instanceID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
@@ -146,7 +146,7 @@ func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instan
 	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
-//getTokenIDAndSubject returns the TokenID and Subject of both opaque tokens and JWTs
+// getTokenIDAndSubject returns the TokenID and Subject of both opaque tokens and JWTs
 func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessToken string) (tokenID string, subject string, valid bool) {
 	// accessToken can be either opaque or JWT
 	// let's try opaque first:
@@ -188,8 +188,8 @@ type openIDKeySet struct {
 	*query.Queries
 }
 
-//VerifySignature implements the oidc.KeySet interface
-//providing an implementation for the keys retrieved directly from Queries
+// VerifySignature implements the oidc.KeySet interface
+// providing an implementation for the keys retrieved directly from Queries
 func (o *openIDKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) ([]byte, error) {
 	keySet, err := o.Queries.ActivePublicKeys(ctx, time.Now())
 	if err != nil {

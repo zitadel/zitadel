@@ -19,7 +19,7 @@ export enum ChangeType {
   USER = 'user',
   ORG = 'org',
   PROJECT = 'project',
-  PROJECT_GRANT= 'project-grant',
+  PROJECT_GRANT = 'project-grant',
   APP = 'app',
 }
 
