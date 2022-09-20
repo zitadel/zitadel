@@ -97,7 +97,7 @@
         </div>
 
         <div class="lgn-field">
-            {{ .PasswordPolicyDescription }}
+            {{ template "password-complexity-policy-description" . }}
         </div>
 
         {{ if or .TOSLink .PrivacyLink }}

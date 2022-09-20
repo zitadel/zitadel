@@ -90,9 +90,8 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		baseData:            l.getBaseData(r, authRequest, "Register", errID, errMessage),
 		registerOrgFormData: *formData,
 	}
-	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, "0")
+	pwPolicy := l.getPasswordComplexityPolicy(r, "0")
 	if pwPolicy != nil {
-		data.PasswordPolicyDescription = description
 		data.MinLength = pwPolicy.MinLength
 		if pwPolicy.HasUppercase {
 			data.HasUppercase = UpperCaseRegex

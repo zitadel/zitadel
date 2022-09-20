@@ -611,12 +611,11 @@ type profileData struct {
 type passwordData struct {
 	baseData
 	profileData
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
+	MinLength    uint64
+	HasUppercase string
+	HasLowercase string
+	HasNumber    string
+	HasSymbol    string
 }
 
 type userSelectionData struct {
