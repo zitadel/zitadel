@@ -145,7 +145,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPI(config.ExternalSecure), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
