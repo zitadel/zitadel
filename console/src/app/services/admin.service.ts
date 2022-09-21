@@ -180,6 +180,8 @@ import {
     UpdateLockoutPolicyResponse,
     UpdateLoginPolicyRequest,
     UpdateLoginPolicyResponse,
+    AddOIDCSettingsRequest,
+    AddOIDCSettingsResponse,
     UpdateOIDCSettingsRequest,
     UpdateOIDCSettingsResponse,
     UpdatePasswordAgePolicyRequest,
@@ -621,6 +623,10 @@ export class AdminService {
 
   public updateOIDCSettings(req: UpdateOIDCSettingsRequest): Promise<UpdateOIDCSettingsResponse.AsObject> {
     return this.grpcService.admin.updateOIDCSettings(req, null).then((resp) => resp.toObject());
+  }
+
+  public addOIDCSettings(req: AddOIDCSettingsRequest): Promise<AddOIDCSettingsResponse.AsObject> {
+    return this.grpcService.admin.addOIDCSettings(req, null).then((resp) => resp.toObject());
   }
 
   /* LOG and FILE Notifications */

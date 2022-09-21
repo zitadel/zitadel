@@ -2,7 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { take } from 'rxjs';
-import { SetDefaultLanguageResponse, UpdateOIDCSettingsRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import {
+  AddOIDCSettingsRequest,
+  AddOIDCSettingsResponse,
+  UpdateOIDCSettingsRequest,
+  UpdateOIDCSettingsResponse
+} from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCSettings } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -15,6 +20,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class OIDCConfigurationComponent implements OnInit {
   public oidcSettings!: OIDCSettings.AsObject;
+  private settingsSet: boolean = false;
 
   public loading: boolean = false;
   public form!: UntypedFormGroup;
@@ -25,10 +31,10 @@ export class OIDCConfigurationComponent implements OnInit {
     private authService: GrpcAuthService,
   ) {
     this.form = this.fb.group({
-      accessTokenLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
-      idTokenLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
-      refreshTokenExpiration: [{ disabled: true, value: 30 }, [Validators.required]],
-      refreshTokenIdleExpiration: [{ disabled: true, value: 90 }, [Validators.required]],
+      accessTokenLifetime: [{ disabled: true }, [Validators.required]],
+      idTokenLifetime: [{ disabled: true }, [Validators.required]],
+      refreshTokenExpiration: [{ disabled: true }, [Validators.required]],
+      refreshTokenIdleExpiration: [{ disabled: true }, [Validators.required]],
     });
   }
 
@@ -50,6 +56,7 @@ export class OIDCConfigurationComponent implements OnInit {
       .then((oidcConfiguration) => {
         if (oidcConfiguration.settings) {
           this.oidcSettings = oidcConfiguration.settings;
+          this.settingsSet = true;
 
           this.accessTokenLifetime?.setValue(
             oidcConfiguration.settings.accessTokenLifetime?.seconds
@@ -81,31 +88,59 @@ export class OIDCConfigurationComponent implements OnInit {
       });
   }
 
-  private updateData(): Promise<SetDefaultLanguageResponse.AsObject> {
+  private updateData(): Promise<UpdateOIDCSettingsResponse.AsObject> {
     const req = new UpdateOIDCSettingsRequest();
 
-    const accessToken = new Duration().setSeconds((this.accessTokenLifetime?.value ?? 12) * 60 * 60);
+    const accessToken = new Duration().setSeconds((this.accessTokenLifetime?.value ?? 0) * 60 * 60);
     req.setAccessTokenLifetime(accessToken);
 
-    const idToken = new Duration().setSeconds((this.idTokenLifetime?.value ?? 12) * 60 * 60);
+    const idToken = new Duration().setSeconds((this.idTokenLifetime?.value ?? 0) * 60 * 60);
     req.setIdTokenLifetime(idToken);
 
-    const refreshToken = new Duration().setSeconds((this.refreshTokenExpiration?.value ?? 30) * 60 * 60 * 24);
+    const refreshToken = new Duration().setSeconds((this.refreshTokenExpiration?.value ?? 0) * 60 * 60 * 24);
     req.setRefreshTokenExpiration(refreshToken);
 
-    const refreshIdleToken = new Duration().setSeconds((this.refreshTokenIdleExpiration?.value ?? 90) * 60 * 60 * 24);
+    const refreshIdleToken = new Duration().setSeconds((this.refreshTokenIdleExpiration?.value ?? 0) * 60 * 60 * 24);
     req.setRefreshTokenIdleExpiration(refreshIdleToken);
 
     return (this.service as AdminService).updateOIDCSettings(req);
   }
 
+  private addData(): Promise<AddOIDCSettingsResponse.AsObject> {
+    const req = new AddOIDCSettingsRequest();
+
+    const accessToken = new Duration().setSeconds((this.accessTokenLifetime?.value ?? 0) * 60 * 60);
+    req.setAccessTokenLifetime(accessToken);
+
+    const idToken = new Duration().setSeconds((this.idTokenLifetime?.value ?? 0) * 60 * 60);
+    req.setIdTokenLifetime(idToken);
+
+    const refreshToken = new Duration().setSeconds((this.refreshTokenExpiration?.value ?? 0) * 60 * 60 * 24);
+    req.setRefreshTokenExpiration(refreshToken);
+
+    const refreshIdleToken = new Duration().setSeconds((this.refreshTokenIdleExpiration?.value ?? 0) * 60 * 60 * 24);
+    req.setRefreshTokenIdleExpiration(refreshIdleToken);
+
+    return (this.service as AdminService).addOIDCSettings(req);
+  }
+
+
   public savePolicy(): void {
-    const prom = this.updateData();
-    if (prom) {
-      prom
+    if (this.settingsSet) {
+      this.updateData()
         .then(() => {
           this.toast.showInfo('SETTING.SMTP.SAVED', true);
-          this.loading = true;
+          setTimeout(() => {
+            this.fetchData();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    } else {
+      this.addData()
+        .then(() => {
+          this.toast.showInfo('SETTING.SMTP.SAVED', true);
           setTimeout(() => {
             this.fetchData();
           }, 2000);
