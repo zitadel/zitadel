@@ -134,10 +134,10 @@ func (c *HTTP) fetchConfigFromArg(arg *goja.Object) (config fetchConfig, err err
 }
 
 type response struct {
-	Body       string
-	StatusCode int
-	Headers    map[string][]string
-	runtime    *goja.Runtime
+	Body    string
+	Status  int
+	Headers map[string][]string
+	runtime *goja.Runtime
 }
 
 func (r *response) Json() goja.Value {
@@ -173,7 +173,7 @@ func (c *HTTP) fetch(ctx context.Context) func(call goja.FunctionCall) goja.Valu
 			logging.WithError(err).Warn("unable to parse body")
 			panic("unable to read response body")
 		}
-		return c.runtime.ToValue(&response{StatusCode: res.StatusCode, Body: string(body), runtime: c.runtime})
+		return c.runtime.ToValue(&response{Status: res.StatusCode, Body: string(body), runtime: c.runtime})
 	}
 }
 
