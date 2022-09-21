@@ -21,22 +21,6 @@ func WithAllowedToFail() Option {
 	}
 }
 
-func WithContextOptions(opts ...ContextOption) Option {
-	return func(c *runConfig) {
-		for _, opt := range opts {
-			opt(c.ctxParam)
-		}
-	}
-}
-
-func WithAPIOptions(opts ...APIOption) Option {
-	return func(c *runConfig) {
-		for _, opt := range opts {
-			opt(c.apiParam)
-		}
-	}
-}
-
 type runConfig struct {
 	allowedToFail bool
 	timeout,
@@ -45,8 +29,8 @@ type runConfig struct {
 	end     time.Time
 
 	vm       *goja.Runtime
-	ctxParam *contextParam
-	apiParam *apiParam
+	ctxParam *ctxConfig
+	apiParam *apiConfig
 }
 
 func newRunConfig(ctx context.Context, opts ...Option) *runConfig {
@@ -63,13 +47,17 @@ func newRunConfig(ctx context.Context, opts ...Option) *runConfig {
 		prepareTimeout: maxPrepareTimeout,
 		modules:        map[string]require.ModuleLoader{},
 		vm:             vm,
-		ctxParam: &contextParam{
-			runtime:   vm,
-			parameter: parameter{},
+		ctxParam: &ctxConfig{
+			FieldConfig: FieldConfig{
+				Runtime: vm,
+				fields:  fields{},
+			},
 		},
-		apiParam: &apiParam{
-			runtime:   vm,
-			parameter: parameter{},
+		apiParam: &apiConfig{
+			FieldConfig: FieldConfig{
+				Runtime: vm,
+				fields:  fields{},
+			},
 		},
 	}
 

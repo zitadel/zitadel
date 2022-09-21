@@ -17,10 +17,10 @@ var (
 	ErrHalt = errors.New("interrupt")
 )
 
-type jsAction func(parameter, parameter) error
+type jsAction func(fields, fields) error
 
-func Run(ctx context.Context, script, name string, opts ...Option) error {
-	config, err := prepareRun(ctx, script, opts)
+func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) error {
+	config, err := prepareRun(ctx, ctxParam, apiParam, script, opts)
 	if err != nil {
 		return err
 	}
@@ -57,8 +57,7 @@ func Run(ctx context.Context, script, name string, opts ...Option) error {
 				return
 			}
 		}()
-
-		err = fn(config.ctxParam.parameter, config.apiParam.parameter)
+		err = fn(config.ctxParam.fields, config.apiParam.fields)
 		if err != nil && !config.allowedToFail {
 			errCh <- err
 			return
@@ -68,7 +67,7 @@ func Run(ctx context.Context, script, name string, opts ...Option) error {
 	return <-errCh
 }
 
-func prepareRun(ctx context.Context, script string, opts []Option) (*runConfig, error) {
+func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields, script string, opts []Option) (*runConfig, error) {
 	config := newRunConfig(ctx, opts...)
 	if config.timeout == 0 {
 		return nil, z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
@@ -77,6 +76,9 @@ func prepareRun(ctx context.Context, script string, opts []Option) (*runConfig, 
 	defer func() {
 		t.Stop()
 	}()
+
+	ctxParam(config.ctxParam)
+	apiParam(config.apiParam)
 
 	registry := new(require.Registry)
 	registry.Enable(config.vm)

@@ -1,28 +1,65 @@
 package actions
 
 import (
-	"strings"
-
+	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
 )
 
-type parameter map[string]interface{}
+type fields map[string]interface{}
 
-func (param parameter) set(name string, value interface{}) {
-	param[name] = value
+type FieldOption func(*FieldConfig)
+
+type FieldConfig struct {
+	fields
+
+	Runtime *goja.Runtime
 }
 
-func (param parameter) setPath(path []string, value interface{}) {
-	parent := param
-	var ok bool
-	for _, p := range path[:len(path)-1] {
-		if _, ok := parent[p]; !ok {
-			parent[p] = parameter{}
+func SetFields(name string, values ...interface{}) FieldOption {
+	return func(p *FieldConfig) {
+		if len(values) == 0 {
+			return
 		}
-		if parent, ok = parent[p].(parameter); !ok {
-			logging.WithFields("path", strings.Join(path, "/")).Warn("overwritten path")
-			panic("non parameter type overwritten")
+
+		for _, value := range values {
+			val, ok := value.(FieldOption)
+			// should be a primitive type or function
+			if !ok {
+				p.set(name, value)
+				continue
+			}
+
+			// another SetFields call
+			// type of current fields value must be parameter{}
+			var field fields
+			if f, ok := p.fields[name]; ok {
+				if field, ok = f.(fields); !ok {
+					logging.WithFields("sub", name).Warn("sub is not a parameter{}")
+					panic("unable to prepare parameter")
+				}
+			} else {
+				field = fields{}
+				p.fields[name] = field
+			}
+
+			fieldParam := FieldConfig{
+				Runtime: p.Runtime,
+				fields:  field,
+			}
+			val(&fieldParam)
 		}
 	}
-	parent[path[len(path)-1]] = value
+}
+
+func (f *FieldConfig) set(name string, value interface{}) {
+	if _, ok := f.fields[name]; ok {
+		logging.WithFields("name", name).Error("tried to overwrite field")
+		panic("tried to overwrite field")
+	}
+	v, ok := value.(func(*FieldConfig) interface{})
+	if ok {
+		f.fields[name] = v(f)
+		return
+	}
+	f.fields[name] = value
 }
