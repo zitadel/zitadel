@@ -64,12 +64,12 @@ InitPasswordDone:
 
 InitUser:
   Title: Activate User
-  Description: You have received a code, which you have to enter in the form below, to verify your email and set your new password.
+  Description: Verify your e-mail with the code below and set your password.
   CodeLabel: Code
   NewPasswordLabel: New Password
   NewPasswordConfirmLabel: Confirm Password
   NextButtonText: next
-  ResendButtonText: resend
+  ResendButtonText: resend code
 
 InitUserDone:
   Title: User activated

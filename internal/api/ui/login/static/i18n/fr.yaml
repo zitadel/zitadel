@@ -64,12 +64,12 @@ InitPasswordDone:
 
 InitUser:
   Title: Activer l'utilisateur
-  Description: Vous avez reçu un code, que vous devez entrer dans le formulaire ci-dessous, pour vérifier votre e-mail et définir votre nouveau mot de passe.
+  Description: Vérifiez votre e-mail avec le code ci-dessous et définissez votre mot de passe.
   CodeLabel: Code
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirmLabel: Confirmer le mot de passe
   NextButtonText: Suivant
-  ResendButtonText: envoyer à nouveau
+  ResendButtonText: code de réexpédition
 
 InitUserDone:
   Title: User Utilisateur activé

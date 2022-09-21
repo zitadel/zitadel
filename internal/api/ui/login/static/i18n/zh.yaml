@@ -64,12 +64,12 @@ InitPasswordDone:
 
 InitUser:
   Title: 激活用户
-  Description: 您将收到一个验证码，您必须在下面输入该验证码，以验证您的电子邮件并设置您的新密码。
+  Description: 用下面的代码验证您的电子邮件，并设置您的密码。
   CodeLabel: 验证码
   NewPasswordLabel: 新密码
   NewPasswordConfirmLabel: 确认密码
   NextButtonText: 继续
-  ResendButtonText: 重新发送
+  ResendButtonText: 重发代码
 
 InitUserDone:
   Title: 用户已激活
