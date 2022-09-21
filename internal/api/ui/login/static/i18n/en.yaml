@@ -96,10 +96,10 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: Multifactor Setup U2F / WebAuthN
-  Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
-  TokenNameLabel: Name of the token / machine
+  Description: Add your multifactor by providing a name (e.g MyPhone, MacBook) and then clicking on the 'Register multifactor' button below.
+  TokenNameLabel: Name of the multifactor / device
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Register Token
+  RegisterTokenButtonText: Register multifactor
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 InitMFADone:
@@ -124,19 +124,19 @@ VerifyMFAU2F:
   Description: Verify your multifactor U2F / WebAuthN token
   NotSupported: WebAuthN is not supported by your browser. Make sure you are using the newest version or change your browser to a supported one (Chrome, Safari, Firefox)
   ErrorRetry: Retry, create a new request or choose a other method.
-  ValidateTokenButtonText: Validate Token
+  ValidateTokenButtonText: Login with passwordless
 
 Passwordless:
   Title: Login passwordless
-  Description: Verify your token
+  Description: Login with authentication methods provided by your device like FaceID, Windows Hello or Fingerprint.
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
   ErrorRetry: Retry, create a new challenge or choose a different method.
   LoginWithPwButtonText: Login with password
-  ValidateTokenButtonText: Validate Token
+  ValidateTokenButtonText: Login with passwordless
 
 PasswordlessPrompt:
   Title: Passwordless setup
-  Description: Would you like to setup passwordless login?
+  Description: Would you like to setup passwordless login? (Authenticationmethods of your device like FaceID, Windows Hello or Fingerprint)
   DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
   PasswordlessButtonText: Go passwordless
   NextButtonText: next
@@ -144,15 +144,15 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: Passwordless setup
-  Description: Add your Token by providing a name and then clicking on the 'Register Token' button below.
-  TokenNameLabel: Name of the token / machine
+  Description: Add your authentication by providing a name (e.g MyMobilePhone, MacBook, etc) and then clicking on the 'Register passwordless' button below.
+  TokenNameLabel: Name of the device
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Register Token
+  RegisterTokenButtonText: Register passwordless
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 PasswordlessRegistrationDone:
   Title: Passwordless set up
-  Description: Token for passwordless successfully added.
+  Description: Device for passwordless successfully added.
   DescriptionClose: You can now close this window.
   NextButtonText: next
   CancelButtonText: cancel
@@ -202,8 +202,8 @@ RegistrationUser:
   DescriptionOrgRegister: Enter your Userdata.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Firstname
-  LastnameLabel: Lastname
+  FirstnameLabel: First name
+  LastnameLabel: Surname
   LanguageLabel: Language
   German: Deutsch
   English: English
@@ -230,8 +230,8 @@ ExternalRegistrationUserOverview:
   Description: We have taken your user details from the selected provider. You can now change or complete them.
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Firstname
-  LastnameLabel: Lastname
+  FirstnameLabel: First name
+  LastnameLabel: Surname
   NicknameLabel: Nickname
   PhoneLabel: Phonenumber
   LanguageLabel: Language
@@ -254,8 +254,8 @@ RegistrationOrg:
   OrgNameLabel: Organisationname
   EmailLabel: E-Mail
   UsernameLabel: Username
-  FirstnameLabel: Firstname
-  LastnameLabel: Lastname
+  FirstnameLabel: First name
+  LastnameLabel: Surname
   PasswordLabel: Password
   PasswordConfirmLabel: Password confirmation
   TosAndPrivacyLabel: Terms and conditions

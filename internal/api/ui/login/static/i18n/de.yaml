@@ -96,10 +96,10 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: Multifaktor U2F / WebAuthN hinzufügen
-  Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
-  TokenNameLabel: Name des Tokens / Geräts
+  Description: Füge deinen Multifaktor hinzu, indem du einen Namen (z.B. MyPhone, MacBook, etc.) eingibst und den 'Multifaktor registrieren' Button drückst.
+  TokenNameLabel: Name des Multifaktors / Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Token registrieren
+  RegisterTokenButtonText: Multifaktor registrieren
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
 
 InitMFADone:
@@ -124,19 +124,19 @@ VerifyMFAU2F:
   Description: Verifiziere deinen Multifaktor U2F / WebAuthN Token
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
-  ValidateTokenButtonText: Token validieren
+  ValidateTokenButtonText: Passwortlos anmelden
 
 Passwordless:
   Title: Passwortlos einloggen
-  Description: Verifiziere dein Token
+  Description: Melden Sie sich mit den von Ihrem Gerät bereitgestellten Authentifizierungsmethoden wie FaceID, Windows Hello oder Fingerabdruck an.
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
   LoginWithPwButtonText: Mit Passwort anmelden
-  ValidateTokenButtonText: Token validieren
+  ValidateTokenButtonText: Passwortlos anmelden
 
 PasswordlessPrompt:
   Title: Passwortloser Login hinzufügen
-  Description: Möchtest du einen passwortlosen Login hinzufügen?
+  Description: Möchtest du einen passwortlosen Login hinzufügen? (Authentifizierungsmethoden deines Gerätes wie FaceID, Windows Hello oder Fingerprint)
   DescriptionInit: Du musst zuerst den Passwortlosen Login hinzufügen. Nutze dazu den Link, den du erhalten hast um dein Gerät zu registrieren.
   PasswordlessButtonText: Werde Passwortlos
   NextButtonText: weiter
@@ -144,15 +144,15 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: Passwortloser Login hinzufügen
-  Description: Füge dein Token hinzu, indem du einen Namen eingibst und den 'Token registrieren' Button drückst.
-  TokenNameLabel: Name des Tokens / Geräts
+  Description: Füge dein Authentifizierung hinzu, indem du einen Namen eingibst (eg. MyPhone, MacBook, etc) und den 'Passwortlos registrieren' Button drückst.
+  TokenNameLabel: Name des Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Token registrieren
+  RegisterTokenButtonText: Passwortlos registrieren
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle eine andere Methode.
 
 PasswordlessRegistrationDone:
   Title: Passwortloser Login erstellt
-  Description: Token für passwortlosen Login erfolgreich hinzugefügt.
+  Description: Gerät für passwortlosen Login erfolgreich hinzugefügt.
   DescriptionClose: Du kannst das Fenster nun schliessen.
   NextButtonText: weiter
   CancelButtonText: abbrechen

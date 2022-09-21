@@ -96,10 +96,10 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: Configurazione a più fattori U2F / WebAuthN
-  Description: Aggiungi il tuo Token fornendo un nome e cliccando sul pulsante 'Registra'.
-  TokenNameLabel: Nome del token / dispositivo
+  Description: Aggiungete il vostro multifattore fornendo un nome (ad es. MyPhone, MacBook) e cliccando sul pulsante "Registra multifattore".
+  TokenNameLabel: Nome del multifattore/dispositivo
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Registra
+  RegisterTokenButtonText: Registro multifattoriale
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
 
 InitMFADone:
@@ -124,19 +124,19 @@ VerifyMFAU2F:
   Description: Verifica il tuo token U2F / WebAuthN
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati di avere l'ultima versione installata o usane una diversa (per esempio Chrome, Safari, Firefox).
   ErrorRetry: Prova di nuovo, crea una nuova richiesta o scegli un metodo diverso.
-  ValidateTokenButtonText: Verifica
+  ValidateTokenButtonText: Accedi senza password
 
 Passwordless:
   Title: Accesso senza password
-  Description: Verifica il tuo token
+  Description: Accedere con i metodi di autenticazione forniti dal dispositivo, come FaceID, Windows Hello o impronta digitale.
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
   LoginWithPwButtonText: Accedi con password
-  ValidateTokenButtonText: Verifica
+  ValidateTokenButtonText: Accedi senza password
 
 PasswordlessPrompt:
   Title: Autenticazione passwordless
-  Description: Vuoi impostare il login senza password?
+  Description: Vuoi impostare il login senza password? Metodi di autenticazione del dispositivo, come FaceID, Windows Hello o impronte digitali.
   DescriptionInit: Devi impostare il login senza password. Usa il link che ti è stato inviato per registrare il tuo dispositivo.
   PasswordlessButtonText: Continua
   NextButtonText: Avanti
@@ -144,15 +144,15 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: Configurazione dell'autenticazione senza password
-  Description: Aggiungi il tuo Token fornendo un nome e poi cliccando sul pulsante 'Registra'.
-  TokenNameLabel: Nome del token / dispositivo
+  Description: Add your authentication by providing a name (e.g MyMobilePhone, MacBook, etc) and then clicking on the 'Register passwordless' button below.
+  TokenNameLabel: Nome del dispositivo
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Registra
+  RegisterTokenButtonText: Registrazione senza password
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
 
 PasswordlessRegistrationDone:
   Title: Configurazione dell'autenticazione senza password
-  Description: Token per lautenticazione passwordless aggiunto con successo.
+  Description: Dispositivo per passwordless aggiunto con successo.
   DescriptionClose: Ora puoi chiudere questa finestra.
   NextButtonText: Avanti
   CancelButtonText: annulla

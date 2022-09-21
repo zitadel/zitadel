@@ -96,10 +96,10 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: Configuration multifactorielle U2F / WebAuthN
-  Description: Ajoutez votre Token en fournissant un nom et en cliquant sur le bouton "Enregistrer un Token" ci-dessous.
-  TokenNameLabel: Nom du jeton / de la machine
+  Description: Ajoutez votre multifacteur en lui donnant un nom (par exemple MyPhone, MacBook), puis cliquez sur le bouton "Enregistrer le multifacteur" ci-dessous.
+  TokenNameLabel: Nom du multifacteur / dispositif
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
-  RegisterTokenButtonText: Enregistrer le jeton
+  RegisterTokenButtonText: Registre multifactoriel
   ErrorRetry: Réessayez, créez un nouveau défi ou choisissez une autre méthode.
 
 InitMFADone:
@@ -124,19 +124,19 @@ VerifyMFAU2F:
   Description: Vérifiez votre jeton multifactoriel U2F / WebAuthN.
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Assurez-vous que vous utilisez la dernière version ou changez votre navigateur pour un navigateur pris en charge (Chrome, Safari, Firefox).
   ErrorRetry: Réessayer, créer une nouvelle demande ou choisir une autre méthode.
-  ValidateTokenButtonText: Valider le jeton
+  ValidateTokenButtonText: Connexion sans mot de passe
 
 Passwordless:
   Title: Connexion sans mot de passe
-  Description: Vérifiez votre jeton
+  Description: Connectez-vous avec les méthodes d'authentification fournies par votre appareil, comme FaceID, Windows Hello ou les empreintes digitales.
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
   ErrorRetry: Réessayez, créez un nouveau défi ou choisissez une autre méthode.
   LoginWithPwButtonText: Connectez-vous avec le mot de passe
-  ValidateTokenButtonText: Valider le jeton
+  ValidateTokenButtonText: Connexion sans mot de passe
 
 PasswordlessPrompt:
   Title: Configuration sans mot de passe
-  Description: Souhaitez-vous configurer une connexion sans mot de passe ?
+  Description: Souhaitez-vous configurer une connexion sans mot de passe? Méthodes d'authentification de votre appareil comme FaceID, Windows Hello ou Fingerprint.
   DescriptionInit: Vous devez configurer la connexion sans mot de passe. Utilisez le lien qui vous a été donné pour enregistrer votre appareil.
   PasswordlessButtonText: Aller sans mot de passe
   NextButtonText: suivant
@@ -144,15 +144,15 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: Configuration sans mot de passe
-  Description: Ajoutez votre Token en fournissant un nom et en cliquant sur le bouton 'Enregistrer le jeton' ci-dessous.
-  TokenNameLabel: Nom du jeton / de la machine
+  Description: Ajoutez votre authentification en fournissant un nom (par exemple MyMobilePhone, MacBook, etc.) et cliquez ensuite sur le bouton "Register passwordless" ci-dessous.
+  TokenNameLabel: Nom de l'appareil
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
-  RegisterTokenButtonText: Register Token
+  RegisterTokenButtonText: Enregistrement sans mot de passe
   ErrorRetry: Réessayer, créer un nouveau défi ou choisir une autre méthode.
 
 PasswordlessRegistrationDone:
   Title: Configuration sans mot de passe
-  Description: Le jeton pour le système sans mot de passe a été ajouté avec succès.
+  Description: Le dispositif sans mot de passe a été ajouté avec succès.
   DescriptionClose: Vous pouvez maintenant fermer cette fenêtre.
   NextButtonText: suivant
   CancelButtonText: annuler
