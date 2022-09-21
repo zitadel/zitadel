@@ -6,7 +6,7 @@ import {
   AddOIDCSettingsRequest,
   AddOIDCSettingsResponse,
   UpdateOIDCSettingsRequest,
-  UpdateOIDCSettingsResponse
+  UpdateOIDCSettingsResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCSettings } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -61,22 +61,22 @@ export class OIDCConfigurationComponent implements OnInit {
           this.accessTokenLifetime?.setValue(
             oidcConfiguration.settings.accessTokenLifetime?.seconds
               ? oidcConfiguration.settings.accessTokenLifetime?.seconds / 60 / 60
-              : 12,
+              : 0,
           );
           this.idTokenLifetime?.setValue(
             oidcConfiguration.settings.idTokenLifetime?.seconds
               ? oidcConfiguration.settings.idTokenLifetime?.seconds / 60 / 60
-              : 12,
+              : 0,
           );
           this.refreshTokenExpiration?.setValue(
             oidcConfiguration.settings.refreshTokenExpiration?.seconds
               ? oidcConfiguration.settings.refreshTokenExpiration?.seconds / 60 / 60 / 24
-              : 30,
+              : 0,
           );
           this.refreshTokenIdleExpiration?.setValue(
             oidcConfiguration.settings.refreshTokenIdleExpiration?.seconds
               ? oidcConfiguration.settings.refreshTokenIdleExpiration?.seconds / 60 / 60 / 24
-              : 90,
+              : 0,
           );
         }
       })
@@ -120,7 +120,6 @@ export class OIDCConfigurationComponent implements OnInit {
 
     return (this.service as AdminService).addOIDCSettings(req);
   }
-
 
   public savePolicy(): void {
     if (this.settingsSet) {
