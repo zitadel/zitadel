@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/pkg/grpc/user"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/pkg/grpc/user"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/authn"
@@ -60,7 +61,7 @@ func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 	}
 }
 
-func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {
+func BulkSetUserMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {
 	metadata := make([]*domain.Metadata, len(req.Metadata))
 	for i, data := range req.Metadata {
 		metadata[i] = &domain.Metadata{

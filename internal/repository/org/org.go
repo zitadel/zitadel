@@ -191,13 +191,7 @@ func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, na
 }
 
 func OrgRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	orgChanged := &OrgRemovedEvent{
+	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, orgChanged)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-DAfbs", "unable to unmarshal org deactivated")
-	}
-
-	return orgChanged, nil
+	}, nil
 }

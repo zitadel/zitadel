@@ -7,15 +7,36 @@ import (
 	meta_pb "github.com/zitadel/zitadel/pkg/grpc/metadata"
 )
 
-func MetadataListToPb(dataList []*query.UserMetadata) []*meta_pb.Metadata {
+func UserMetadataListToPb(dataList []*query.UserMetadata) []*meta_pb.Metadata {
 	mds := make([]*meta_pb.Metadata, len(dataList))
 	for i, data := range dataList {
-		mds[i] = DomainMetadataToPb(data)
+		mds[i] = UserMetadataToPb(data)
 	}
 	return mds
 }
 
-func DomainMetadataToPb(data *query.UserMetadata) *meta_pb.Metadata {
+func UserMetadataToPb(data *query.UserMetadata) *meta_pb.Metadata {
+	return &meta_pb.Metadata{
+		Key:   data.Key,
+		Value: data.Value,
+		Details: object.ToViewDetailsPb(
+			data.Sequence,
+			data.CreationDate,
+			data.ChangeDate,
+			data.ResourceOwner,
+		),
+	}
+}
+
+func OrgMetadataListToPb(dataList []*query.OrgMetadata) []*meta_pb.Metadata {
+	mds := make([]*meta_pb.Metadata, len(dataList))
+	for i, data := range dataList {
+		mds[i] = OrgMetadataToPb(data)
+	}
+	return mds
+}
+
+func OrgMetadataToPb(data *query.OrgMetadata) *meta_pb.Metadata {
 	return &meta_pb.Metadata{
 		Key:   data.Key,
 		Value: data.Value,
