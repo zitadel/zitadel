@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
-    APIAuthMethodType,
-    OIDCAuthMethodType,
-    OIDCGrantType,
-    OIDCResponseType,
+  APIAuthMethodType,
+  OIDCAuthMethodType,
+  OIDCGrantType,
+  OIDCResponseType,
 } from 'src/app/proto/generated/zitadel/app_pb';
 
 export interface RadioItemAuthType {

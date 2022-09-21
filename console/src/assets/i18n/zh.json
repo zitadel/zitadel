@@ -664,6 +664,8 @@
       "3": "创建时"
     },
     "ADDTRIGGER": "添加触发器",
+    "FLOWCHANGED": "流量已成功更改",
+    "FLOWCLEARED": "流已成功删除",
     "TIMEOUT": "超时时间",
     "TIMEOUTINSEC": "以秒为单位的超时时间",
     "ALLOWEDTOFAIL": "允许失败",
@@ -1362,6 +1364,7 @@
       "GRANTEDORGDOMAIN": "域名",
       "RESOURCEOWNER": "资源所有者",
       "GRANTEDORGNAME": "组织名称",
+      "GRANTID": "授权编号",
       "CREATIONDATE": "创建于",
       "CHANGEDATE": "最后更新于",
       "DATES": "日期",

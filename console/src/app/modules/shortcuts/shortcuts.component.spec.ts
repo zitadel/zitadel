@@ -8,9 +8,8 @@ describe('ShortcutsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ShortcutsComponent ]
-    })
-    .compileComponents();
+      declarations: [ShortcutsComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

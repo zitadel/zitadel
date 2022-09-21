@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func TestCommandSide_SetMetadata(t *testing.T) {
+func TestCommandSide_SetUserMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -168,7 +168,7 @@ func TestCommandSide_SetMetadata(t *testing.T) {
 	}
 }
 
-func TestCommandSide_BulkSetMetadata(t *testing.T) {
+func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -504,7 +504,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 	}
 }
 
-func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
+func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}

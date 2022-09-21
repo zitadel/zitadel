@@ -9,14 +9,12 @@ describe('MembershipsTableComponent', () => {
   let component: MembershipsTableComponent;
   let fixture: ComponentFixture<MembershipsTableComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [MembershipsTableComponent],
-        imports: [NoopAnimationsModule, MatSortModule, MatTableModule],
-      }).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [MembershipsTableComponent],
+      imports: [NoopAnimationsModule, MatSortModule, MatTableModule],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MembershipsTableComponent);

@@ -81,10 +81,7 @@ export class OIDCConfigurationComponent implements OnInit {
         }
       })
       .catch((error) => {
-        if (error.code === 5) {
-        } else {
-          this.toast.showError(error);
-        }
+        this.toast.showError(error);
       });
   }
 
