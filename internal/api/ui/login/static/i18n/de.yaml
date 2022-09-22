@@ -53,7 +53,7 @@ InitPassword:
   CodeLabel: Code
   NewPasswordLabel: Neues Passwort
   NewPasswordConfirmLabel: Passwort bestätigen
-  ResendButtonText: erneut senden
+  ResendButtonText: Code erneut senden
   NextButtonText: weiter
 
 InitPasswordDone:
@@ -78,53 +78,53 @@ InitUserDone:
   CancelButtonText: abbrechen
 
 InitMFAPrompt:
-  Title: Multifaktor hinzufügen
-  Description: Möchtest du einen Mulitfaktor hinzufügen?
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
+  Title: 2-Faktor hinzufügen
+  Description: Möchtest du einen 2-Faktor hinzufügen?
+  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
+  Provider1: Geräte abhängig (e.g FaceID, Windows Hello, Fingerprint)
   NextButtonText: weiter
   SkipButtonText: überspringen
 
 InitMFAOTP:
-  Title: Multifaktor Verifizierung
-  Description: Verifiziere deinen Multifaktor
-  OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google Authenticator) oder kopiere das Secret und gib anschliessend den Code ein.
+  Title: 2-Faktor Verifizierung
+  Description: Verifiziere deinen 2-Faktor
+  OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google/Mircorsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
   SecretLabel: Secret
   CodeLabel: Code
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
 InitMFAU2F:
-  Title: Multifaktor U2F / WebAuthN hinzufügen
-  Description: Füge deinen Multifaktor hinzu, indem du einen Namen (z.B. MyPhone, MacBook, etc.) eingibst und den 'Multifaktor registrieren' Button drückst.
+  Title: 2-Faktor Setup U2F / WebAuthN hinzufügen
+  Description: Füge deinen 2-Faktor hinzu, indem du einen Namen (z.B. MyPhone, MacBook, etc.) eingibst und den '2-Faktor registrieren' Button drückst.
   TokenNameLabel: Name des Multifaktors / Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Multifaktor registrieren
+  RegisterTokenButtonText: 2-Faktor registrieren
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
 
 InitMFADone:
-  Title: Multifaktor Verifizierung erstellt
-  Description: Multifikator Verifizierung erfolgreich abgeschlossen. Der Multifaktor muss bei jeder Anmeldung eingegeben werden.
+  Title: 2-Faktor Verifizierung erstellt
+  Description: 2-Faktor Verifizierung erfolgreich abgeschlossen. Der Zweitfaktor muss bei jeder Anmeldung eingegeben werden.
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
 MFAProvider:
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
+  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
+  Provider1: Geräte abhängig (e.g FaceID, Windows Hello, Fingerprint)
   ChooseOther: oder wähle eine andere Option aus
 
 VerifyMFAOTP:
-  Title: Multifaktor verifizieren
-  Description: Verifiziere deinen Multifaktor
+  Title: 2-Faktor verifizieren
+  Description: Verifiziere deinen Zweitfaktor
   CodeLabel: Code
   NextButtonText: next
 
 VerifyMFAU2F:
-  Title: Multifaktor Verifizierung
+  Title: 2-Faktor Verifizierung
   Description: Verifiziere deinen Multifaktor U2F / WebAuthN Token
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
-  ValidateTokenButtonText: Passwortlos anmelden
+  ValidateTokenButtonText: 2-Faktor verifizieren
 
 Passwordless:
   Title: Passwortlos einloggen
@@ -181,7 +181,7 @@ EmailVerification:
   Description: Du hast ein E-Mail zur Verifizierung deiner E-Mail Adresse bekommen. Gib den Code im untenstehenden Formular ein. Mit erneut versenden, wird dir ein neues E-Mail zugestellt.
   CodeLabel: Code
   NextButtonText: weiter
-  ResendButtonText: erneut senden
+  ResendButtonText: Code erneut senden
 
 EmailVerificationDone:
   Title: E-Mail Verifizierung

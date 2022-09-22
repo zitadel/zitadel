@@ -53,7 +53,7 @@ InitPassword:
   CodeLabel: Codice
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma la password
-  ResendButtonText: rispedisci
+  ResendButtonText: codice di reinvio
   NextButtonText: Avanti
 
 InitPasswordDone:
@@ -78,16 +78,16 @@ InitUserDone:
   CancelButtonText: annulla
 
 InitMFAPrompt:
-  Title: Configurazione a più fattori
-  Description: Vuoi impostare l'autenticazione a più fattori?
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (2° fattore universale)
+  Title: Impostazione a 2 fattori
+  Description: Volete impostare l'autenticazione di secondo fattore?
+  Provider0: App Autenticatore (ad esempio Google/Microsoft Authenticator, Authy)
+  Provider1: Dipende dal dispositivo (ad es. FaceID, Windows Hello, impronta digitale)
   NextButtonText: Avanti
   SkipButtonText: salta
 
 InitMFAOTP:
-  Title: Verifica a più fattori
-  Description: Verifica il tuo multifattore.
+  Title: Verifica a 2 fattori
+  Description: Verificare il secondo fattore.
   OTPDescription: Scannerizza il codice con la tua app di autenticazione (ad esempio Google Authenticator) o copia la chiave segreta e inserisci il codice generato nel campo sottostante.
   SecretLabel: Chiave
   CodeLabel: Codice
@@ -95,36 +95,36 @@ InitMFAOTP:
   CancelButtonText: annulla
 
 InitMFAU2F:
-  Title: Configurazione a più fattori U2F / WebAuthN
-  Description: Aggiungete il vostro multifattore fornendo un nome (ad es. MyPhone, MacBook) e cliccando sul pulsante "Registra multifattore".
-  TokenNameLabel: Nome del multifattore/dispositivo
+  Title: Impostazione di U2F a 2 fattori / WebAuthN
+  Description: Aggiungete il vostro fattore 2 fornendo un nome (ad es. MyPhone, MacBook) e facendo clic sul pulsante "Registra fattore 2" qui sotto.
+  TokenNameLabel: Nome del dispositivo a 2 fattori
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Registro multifattoriale
+  RegisterTokenButtonText: Registrazione a 2 fattori
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
 
 InitMFADone:
-  Title: Verificazione a più fattori effettuata
-  Description: La verificazione del multifattore eseguita con successo. Il multifattore è richiesto ad ogni login.
+  Title: Verifica a 2 fattori effettuata
+  Description: La verifica a 2 fattori è stata eseguita con successo. Il secondo fattore deve essere inserito a ogni accesso.
   NextButtonText: Avanti
   CancelButtonText: annulla
 
 MFAProvider:
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (2° fattore universale)
+  Provider0: App Autenticatore (ad esempio Google/Microsoft Authenticator, Authy)
+  Provider1: Dipende dal dispositivo (ad es. FaceID, Windows Hello, impronta digitale)
   ChooseOther: o scegli un'altra opzione
 
 VerifyMFAOTP:
-  Title: Verificazione del Multificator
-  Description: Verifica il tuo multifattore
+  Title: Verifica a 2 fattori
+  Description: Verificare il secondo fattore
   CodeLabel: Codice
   NextButtonText: Avanti
 
 VerifyMFAU2F:
-  Title: Verificazione a più fattori
-  Description: Verifica il tuo token U2F / WebAuthN
+  Title: Verifica a 2 fattori
+  Description: Verificare il fattore 2 con il dispositivo registrato (ad es. FaceID, Windows Hello, impronta digitale).
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati di avere l'ultima versione installata o usane una diversa (per esempio Chrome, Safari, Firefox).
   ErrorRetry: Prova di nuovo, crea una nuova richiesta o scegli un metodo diverso.
-  ValidateTokenButtonText: Accedi senza password
+  ValidateTokenButtonText: Verifica a 2 fattori
 
 Passwordless:
   Title: Accesso senza password
@@ -172,7 +172,7 @@ PasswordChangeDone:
   NextButtonText: Avanti
 
 PasswordResetDone:
-  Title: Link per il cambiamento inviato
+  Title: Invio del link per la reimpostazione della password
   Description: Controlla la tua email per reimpostare la tua password.
   NextButtonText: Avanti
 
@@ -181,7 +181,7 @@ EmailVerification:
   Description: Ti abbiamo inviato un'e-mail per verificare il tuo indirizzo. Inserisci il codice nel campo sottostante.
   CodeLabel: Codice
   NextButtonText: Avanti
-  ResendButtonText: rispedisci
+  ResendButtonText: codice di reinvio
 
 EmailVerificationDone:
   Title: Verificazione email effettuata

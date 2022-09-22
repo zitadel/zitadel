@@ -53,7 +53,7 @@ InitPassword:
   CodeLabel: Code
   NewPasswordLabel: New Password
   NewPasswordConfirmLabel: Confirm Password
-  ResendButtonText: resend
+  ResendButtonText: resend code
   NextButtonText: next
 
 InitPasswordDone:
@@ -78,53 +78,53 @@ InitUserDone:
   CancelButtonText: cancel
 
 InitMFAPrompt:
-  Title: Multifactor Setup
-  Description: Would you like to setup multifactor authentication?
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
+  Title: 2-Factor Setup
+  Description: Would you like to setup second factor authentication?
+  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
+  Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
   NextButtonText: next
   SkipButtonText: skip
 
 InitMFAOTP:
-  Title: Multifactor Verification
-  Description: Verify your multifactor.
-  OTPDescription: Scan the code with your authenticator app (e.g Google Authenticator) or copy the secret and insert the generated code below.
+  Title: 2-Factor Verification
+  Description: Verify your second factor.
+  OTPDescription: Scan the code with your authenticator app (e.g Google/Microsoft Authenticator, Authy) or copy the secret and insert the generated code below.
   SecretLabel: Secret
   CodeLabel: Code
   NextButtonText: next
   CancelButtonText: cancel
 
 InitMFAU2F:
-  Title: Multifactor Setup U2F / WebAuthN
-  Description: Add your multifactor by providing a name (e.g MyPhone, MacBook) and then clicking on the 'Register multifactor' button below.
-  TokenNameLabel: Name of the multifactor / device
+  Title: Setup 2-Factor
+  Description: Add your device dependent 2-factor like FaceID, Windows Hello or Fingerprint by providing a name (e.g MyPhone, MacBook) and then clicking on the 'Register 2-factor' button below.
+  TokenNameLabel: Name of the 2-factor / device
   NotSupported: WebAuthN is not supported by your browser. Please ensure it is up to date or use a different one (e.g. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Register multifactor
+  RegisterTokenButtonText: Register 2-factor
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 InitMFADone:
-  Title: Multifactor Verification done
-  Description: Multifactor verification successfully done. The multifactor has to be entered on each login.
+  Title: 2-Factor Verification done
+  Description: 2-factor verification successfully done. The secondfactor has to be entered on each login.
   NextButtonText: next
   CancelButtonText: cancel
 
 MFAProvider:
-  Provider0: OTP (One Time Password)
-  Provider1: U2F (Universal 2nd Factor)
+  Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
+  Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
   ChooseOther: or choose an other option
 
 VerifyMFAOTP:
-  Title: Verify Multifactor
-  Description: Verify your multifactor
+  Title: Verify 2-Factor
+  Description: Verify your second factor
   CodeLabel: Code
   NextButtonText: next
 
 VerifyMFAU2F:
   Title: Multifactor Verification
-  Description: Verify your multifactor U2F / WebAuthN token
+  Description: Verify your 2-Factor with the registered device (e.g FaceID, Windows Hello, Fingerprint)
   NotSupported: WebAuthN is not supported by your browser. Make sure you are using the newest version or change your browser to a supported one (Chrome, Safari, Firefox)
   ErrorRetry: Retry, create a new request or choose a other method.
-  ValidateTokenButtonText: Login with passwordless
+  ValidateTokenButtonText: Verify 2-Factor
 
 Passwordless:
   Title: Login passwordless
@@ -172,7 +172,7 @@ PasswordChangeDone:
   NextButtonText: next
 
 PasswordResetDone:
-  Title: Reset link set
+  Title: Password reset link sent
   Description: Check your email to reset your password.
   NextButtonText: next
 
@@ -181,7 +181,7 @@ EmailVerification:
   Description: We have sent you an email to verify your address. Please enter the code in the form below.
   CodeLabel: Code
   NextButtonText: next
-  ResendButtonText: resend
+  ResendButtonText: resend code
 
 EmailVerificationDone:
   Title: E-Mail Verification

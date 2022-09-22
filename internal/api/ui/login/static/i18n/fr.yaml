@@ -53,7 +53,7 @@ InitPassword:
   CodeLabel: Code
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirmLabel: Confirmer le mot de passe
-  ResendButtonText: envoyer à nouveau
+  ResendButtonText: code de réexpédition
   NextButtonText: suivant
 
 InitPasswordDone:
@@ -78,16 +78,16 @@ InitUserDone:
   CancelButtonText: annuler
 
 InitMFAPrompt:
-  Title: Configuration multifactorielle
-  Description: Voulez-vous configurer l'authentification multifactorielle ?
-  Provider0: OTP (mot de passe à usage unique)
-  Provider1: U2F (2e facteur universel)
+  Title: Configuration à 2 facteurs
+  Description: Voulez-vous configurer l'authentification par second facteur ?
+  Provider0: Application d'authentification (par exemple, Google/Microsoft Authenticator, Authy)
+  Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
   NextButtonText: Suivant
   SkipButtonText: Passer
 
 InitMFAOTP:
-  Title: Vérification multifactorielle
-  Description: Vérifier votre multifacteur.
+  Title: Vérification à deux facteurs
+  Description: Vérifiez votre deuxième facteur.
   OTPDescription: Scannez le code avec votre application d'authentification (par exemple Google Authenticator) ou copiez le secret et insérez le code généré ci-dessous.
   SecretLabel: Secret
   CodeLabel: Code
@@ -95,36 +95,36 @@ InitMFAOTP:
   CancelButtonText: Annuler
 
 InitMFAU2F:
-  Title: Configuration multifactorielle U2F / WebAuthN
-  Description: Ajoutez votre multifacteur en lui donnant un nom (par exemple MyPhone, MacBook), puis cliquez sur le bouton "Enregistrer le multifacteur" ci-dessous.
-  TokenNameLabel: Nom du multifacteur / dispositif
+  Title: Configuration de 2-Factor U2F / WebAuthN
+  Description: Ajoutez votre facteur 2 en fournissant un nom (par exemple MyPhone, MacBook) et cliquez ensuite sur le bouton "Enregistrer le facteur 2" ci-dessous.
+  TokenNameLabel: Nom du dispositif à 2 facteurs
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
-  RegisterTokenButtonText: Registre multifactoriel
+  RegisterTokenButtonText: Enregistrez 2-facteurs
   ErrorRetry: Réessayez, créez un nouveau défi ou choisissez une autre méthode.
 
 InitMFADone:
-  Title: Vérification multifactorielle effectuée
-  Description: La vérification multifactorielle a été effectuée avec succès. Le multifacteur doit être saisi à chaque connexion.
+  Title: Vérification à 2 facteurs effectuée
+  Description: La vérification du second facteur a été effectuée avec succès. Le second facteur doit être saisi à chaque connexion.
   NextButtonText: Suivant
   CancelButtonText: Annuler
 
 MFAProvider:
-  Provider0: OTP (Mot de passe à usage unique)
-  Provider1: U2F (2ne facteur universel)
+  Provider0: Application d'authentification (par exemple, Google/Microsoft Authenticator, Authy)
+  Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
   ChooseOther: ou choisissez une autre option
 
 VerifyMFAOTP:
-  Title: Vérifier le multifacteur
-  Description: Vérifier votre multifacteur
+  Title: Vérifier 2-Facteurs
+  Description: Vérifiez votre second facteur
   CodeLabel: Code
   NextButtonText: Suivant
 
 VerifyMFAU2F:
-  Title: Vérification multifactorielle
-  Description: Vérifiez votre jeton multifactoriel U2F / WebAuthN.
+  Title: Vérifier 2-Facteurs
+  Description: Vérifiez votre facteur 2 avec l'appareil enregistré (par exemple FaceID, Windows Hello, empreinte digitale).
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Assurez-vous que vous utilisez la dernière version ou changez votre navigateur pour un navigateur pris en charge (Chrome, Safari, Firefox).
   ErrorRetry: Réessayer, créer une nouvelle demande ou choisir une autre méthode.
-  ValidateTokenButtonText: Connexion sans mot de passe
+  ValidateTokenButtonText: Vérifier 2-Facteurs
 
 Passwordless:
   Title: Connexion sans mot de passe
@@ -172,7 +172,7 @@ PasswordChangeDone:
   NextButtonText: suivant
 
 PasswordResetDone:
-  Title: Réinitialisation du jeu de liens
+  Title: Lien de réinitialisation du mot de passe envoyé
   Description: Vérifiez votre e-mail pour réinitialiser votre mot de passe.
   NextButtonText: suivant
 
@@ -181,7 +181,7 @@ EmailVerification:
   Description: Nous vous avons envoyé un e-mail pour vérifier votre adresse. Veuillez saisir le code dans le formulaire ci-dessous.
   CodeLabel: Code
   NextButtonText: suivant
-  ResendButtonText: envoyer à nouveau
+  ResendButtonText: code de réexpédition
 
 EmailVerificationDone:
   Title: E-Mail Verification
