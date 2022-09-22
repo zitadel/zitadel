@@ -14,6 +14,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/zitadel/zitadel/internal/actions"
+	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -300,7 +301,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 							logging.WithError(err).Info("unable to get md in action")
 							panic(err)
 						}
-						return c.Runtime.ToValue(actions.UserMetadataListFromQuery(c, metadata))
+						return object.UserMetadataListFromQuery(c, metadata)
 					}
 				}),
 			),
@@ -446,7 +447,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 							logging.WithError(err).Info("unable to get md in action")
 							panic(err)
 						}
-						return c.Runtime.ToValue(actions.UserMetadataListFromQuery(c, metadata))
+						return object.UserMetadataListFromQuery(c, metadata)
 					}
 				}),
 			),

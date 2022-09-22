@@ -1,4 +1,4 @@
-package actions
+package object
 
 import (
 	"encoding/json"
@@ -6,10 +6,12 @@ import (
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func UserMetadataListFromQuery(c *FieldConfig, metadata *query.UserMetadataList) *userMetadataList {
+func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetadataList) goja.Value {
 	result := &userMetadataList{
 		Count:     metadata.Count,
 		Sequence:  metadata.Sequence,
@@ -34,7 +36,7 @@ func UserMetadataListFromQuery(c *FieldConfig, metadata *query.UserMetadataList)
 		}
 	}
 
-	return result
+	return c.Runtime.ToValue(result)
 }
 
 type userMetadataList struct {
