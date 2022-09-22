@@ -132,18 +132,11 @@ func (l *Login) customExternalUserToLoginUserMapping(ctx context.Context, user *
 	}
 
 	ctxOpts := actions.SetContextFields(
-	// actions.SetFields("accessToken", tokens.AccessToken),
-	// actions.SetFields("idToken", tokens.IDToken),
-	// actions.SetFields("getClaim", func(claim string) interface{} {
-	// 	return tokens.IDTokenClaims.GetClaim(claim)
-	// }),
-	// actions.SetFields("claimsJSON", func() (string, error) {
-	// 	c, err := json.Marshal(tokens.IDTokenClaims)
-	// 	if err != nil {
-	// 		return "", err
-	// 	}
-	// 	return string(c), nil
-	// }),
+		actions.SetFields("v1",
+			actions.SetFields("user", func(c *actions.FieldConfig) interface{} {
+				return object.UserFromHuman(c, user)
+			}),
+		),
 	)
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {

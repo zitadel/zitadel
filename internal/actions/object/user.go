@@ -28,7 +28,7 @@ func UserFromExternalUser(c *actions.FieldConfig, user *domain.ExternalUser) goj
 	})
 }
 
-func UserFromHuman(c *actions.FieldConfig, user domain.Human) goja.Value {
+func UserFromHuman(c *actions.FieldConfig, user *domain.Human) goja.Value {
 	u := &humanUser{
 		Id:                 user.AggregateID,
 		CreationDate:       user.CreationDate,
