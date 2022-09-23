@@ -1,14 +1,15 @@
 import {apiCallProperties} from './apiauth';
 import {ensureSomethingIsSet} from './ensure';
 
-export function ensureOIDCSettingsSet(api: apiCallProperties, accessTokenLifetime, idTokenLifetime, refreshTokenIdleExpiration, refreshTokenExpiration: number): Cypress.Chainable<number> {
+export function ensureOIDCSettingsSet(api: apiCallProperties, accessTokenLifetime, idTokenLifetime, refreshTokenExpiration, refreshTokenIdleExpiration: number): Cypress.Chainable<number> {
     return ensureSomethingIsSet(api, `${api.adminBaseURL}settings/oidc`,
         (settings: any) => {
             let entity = null;
-            if (settings.settings?.accessTokenLifetime === durationString(accessTokenLifetime) &&
-                settings.settings?.idTokenLifetime === durationString(idTokenLifetime) &&
-                settings.settings?.refreshTokenIdleExpiration === durationString(refreshTokenIdleExpiration) &&
-                settings.settings?.refreshTokenExpiration === durationString(refreshTokenExpiration)) {
+            if (settings.settings?.accessTokenLifetime === hoursToDuration(accessTokenLifetime) &&
+                settings.settings?.idTokenLifetime === hoursToDuration(idTokenLifetime) &&
+                settings.settings?.refreshTokenExpiration === daysToDuration(refreshTokenExpiration) &&
+                settings.settings?.refreshTokenIdleExpiration === daysToDuration(refreshTokenIdleExpiration)
+            ) {
                 entity = settings.settings
             }
             return {
@@ -18,13 +19,16 @@ export function ensureOIDCSettingsSet(api: apiCallProperties, accessTokenLifetim
         },
         `${api.adminBaseURL}settings/oidc`,
         {
-            accessTokenLifetime: durationString(accessTokenLifetime),
-            idTokenLifetime: durationString(idTokenLifetime),
-            refreshTokenIdleExpiration: durationString(refreshTokenIdleExpiration),
-            refreshTokenExpiration: durationString(refreshTokenExpiration),
+            accessTokenLifetime: hoursToDuration(accessTokenLifetime),
+            idTokenLifetime: hoursToDuration(idTokenLifetime),
+            refreshTokenExpiration: daysToDuration(refreshTokenExpiration),
+            refreshTokenIdleExpiration: daysToDuration(refreshTokenIdleExpiration),
         });
 }
 
-function durationString(durationInSeconds: number): string {
-    return durationInSeconds.toString() + "s"
+function hoursToDuration(hours: number): string {
+    return (hours*3600).toString() + "s"
+}
+function daysToDuration(days: number): string {
+    return hoursToDuration(24*days)
 }
