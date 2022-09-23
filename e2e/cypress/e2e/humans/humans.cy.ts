@@ -21,7 +21,7 @@ describe('humans', () => {
       cy.url().should('contain', 'users/create');
       cy.get('[formcontrolname="email"]').type(loginname('e2ehuman', Cypress.env('ORGANIZATION')));
       //force needed due to the prefilled username prefix
-      cy.get('[formcontrolname="userName"]').type(loginname(testHumanUserNameAdd, Cypress.env("ORGANIZATION")));
+      cy.get('[formcontrolname="userName"]').type(loginname(testHumanUserNameAdd, Cypress.env('ORGANIZATION')));
       cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
       cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
       cy.get('[formcontrolname="phone"]').type('+41 123456789');
@@ -35,7 +35,7 @@ describe('humans', () => {
   describe('remove', () => {
     before('ensure it exists', () => {
       apiAuth().then((api) => {
-        ensureHumanUserExists(api, loginname(testHumanUserNameRemove, Cypress.env("ORGANIZATION"))).then(() => {
+        ensureHumanUserExists(api, loginname(testHumanUserNameRemove, Cypress.env('ORGANIZATION'))).then(() => {
           cy.visit(humansPath);
         });
       });
