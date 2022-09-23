@@ -6,18 +6,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { CardComponent } from './card.component';
 
-
-
 @NgModule({
   declarations: [CardComponent],
-  imports: [
-    CommonModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-  ],
-  exports: [
-    CardComponent,
-  ],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule],
+  exports: [CardComponent],
 })
-export class CardModule { }
+export class CardModule {}

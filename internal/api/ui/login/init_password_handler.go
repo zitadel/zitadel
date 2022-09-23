@@ -29,14 +29,13 @@ type initPasswordFormData struct {
 type initPasswordData struct {
 	baseData
 	profileData
-	Code                      string
-	UserID                    string
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
+	Code         string
+	UserID       string
+	MinLength    uint64
+	HasUppercase string
+	HasLowercase string
+	HasNumber    string
+	HasSymbol    string
 }
 
 func InitPasswordLink(origin, userID, code, orgID string) string {
@@ -85,7 +84,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
 	}
-	l.renderInitPasswordDone(w, r, authReq)
+	l.renderInitPasswordDone(w, r, authReq, userOrg)
 }
 
 func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
@@ -130,9 +129,8 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 		UserID:      userID,
 		Code:        code,
 	}
-	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, authReq, userID)
+	policy := l.getPasswordComplexityPolicyByUserID(r, userID)
 	if policy != nil {
-		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
 		if policy.HasUppercase {
 			data.HasUppercase = UpperCaseRegex
@@ -157,7 +155,11 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitPassword], data, nil)
 }
 
-func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	data := l.getUserData(r, authReq, "Password Init Done", "", "")
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplInitPasswordDone], data, nil)
+	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		l.customTexts(r.Context(), translator, orgID)
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitPasswordDone], data, nil)
 }

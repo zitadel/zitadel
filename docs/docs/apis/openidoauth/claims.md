@@ -31,7 +31,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | preferred_username (username when Introspect)     | When requested | When requested | Yes                                         | No                                   |
 | sub                                               | Yes            | Yes            | Yes                                         | When JWT                             |
 | urn:zitadel:iam:org:domain:primary:{domainname}   | When requested | When requested | When requested                              | When JWT and requested               |
-| urn:zitadel:iam:org:project:roles:{rolename}      | When requested | When requested | When requested or configured                | When JWT and requested or configured |
+| urn:zitadel:iam:org:project:roles                 | When requested | When requested | When requested or configured                | When JWT and requested or configured |
 | urn:zitadel:iam:user:metadata                     | When requested | When requested | When requested                              | When JWT and requested               |
 | urn:zitadel:iam:user:resourceowner:id             | When requested | When requested | When requested                              | When JWT and requested               |
 | urn:zitadel:iam:user:resourceowner:name           | When requested | When requested | When requested                              | When JWT and requested               |
@@ -71,12 +71,12 @@ Please check below the matrix for an overview where which scope is asserted.
 
 ## Reserved Claims
 
-ZITADEL reserves some claims to assert certain data.
+ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes). 
 
 | Claims                                            | Example                                                                                              | Description                                                                                                                                                                        |
 |:--------------------------------------------------|:-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | urn:zitadel:iam:org:domain:primary:{domainname}   | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                  | This claim represents the primary domain of the organization the user belongs to.                                                                                                  |
-| urn:zitadel:iam:org:project:roles:{rolename}      | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role. |
+| urn:zitadel:iam:org:project:roles                 | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role. |
 | urn:zitadel:iam:roles:{rolename}                  | TBA                                                                                                  | TBA                                                                                                                                                                                |
 | urn:zitadel:iam:user:metadata                     | `{"urn:zitadel:iam:user:metadata": [ {"key": "VmFsdWU=" } ] }`                                       | The metadata claim will include all metadata of a user. The values are base64 encoded.                                                                                             |
 | urn:zitadel:iam:user:resourceowner:id             | `{"urn:zitadel:iam:user:resourceowner:id": "orgid"}`                                                 | This claim represents the id of the resource owner organisation of the user.                                                                                                       |

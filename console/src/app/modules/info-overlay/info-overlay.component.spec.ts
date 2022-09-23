@@ -8,9 +8,8 @@ describe('InfoOverlayComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ InfoOverlayComponent ]
-    })
-    .compileComponents();
+      declarations: [InfoOverlayComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

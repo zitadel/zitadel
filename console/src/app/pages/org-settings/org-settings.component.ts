@@ -6,15 +6,15 @@ import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 
 import {
-    BRANDING,
-    COMPLEXITY,
-    DOMAIN,
-    IDP,
-    LOCKOUT,
-    LOGIN,
-    LOGINTEXTS,
-    MESSAGETEXTS,
-    PRIVACYPOLICY,
+  BRANDING,
+  COMPLEXITY,
+  DOMAIN,
+  IDP,
+  LOCKOUT,
+  LOGIN,
+  LOGINTEXTS,
+  MESSAGETEXTS,
+  PRIVACYPOLICY,
 } from '../../modules/settings-list/settings';
 
 @Component({

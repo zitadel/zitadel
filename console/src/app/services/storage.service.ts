@@ -10,7 +10,7 @@ export class StorageService implements OAuthStorage {
   private sessionStorage: Storage = window.sessionStorage;
   private localStorage: Storage = window.localStorage;
 
-  constructor() { }
+  constructor() {}
 
   public setItem<TValue = string>(key: string, value: TValue, location: StorageLocation = StorageLocation.session): void {
     this.getStorage(location).setItem(this.getPrefixedKey(key), JSON.stringify(value));
@@ -33,9 +33,7 @@ export class StorageService implements OAuthStorage {
   }
 
   private getStorage(location: StorageLocation): Storage {
-    return location === StorageLocation.session
-      ? this.sessionStorage
-      : this.localStorage;
+    return location === StorageLocation.session ? this.sessionStorage : this.localStorage;
   }
 }
 
