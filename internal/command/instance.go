@@ -327,8 +327,8 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	validations = append(validations, addGeneratedDomain...)
 	if setup.CustomDomain != "" {
 		validations = append(validations,
-			c.addInstanceDomain(instanceAgg, setup.CustomDomain, false),
-			setPrimaryInstanceDomain(instanceAgg, setup.CustomDomain),
+			c.prepareAddInstanceDomain(instanceAgg, setup.CustomDomain, false),
+			prepareSetPrimaryInstanceDomain(instanceAgg, setup.CustomDomain),
 		)
 	}
 
@@ -444,7 +444,7 @@ func prepareAddInstance(a *instance.Aggregate, instanceName string, defaultLangu
 	}
 }
 
-//SetIAMProject defines the command to set the id of the IAM project onto the instance
+// SetIAMProject defines the command to set the id of the IAM project onto the instance
 func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -455,7 +455,7 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 	}
 }
 
-//SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+// SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
 func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

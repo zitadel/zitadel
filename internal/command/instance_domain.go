@@ -21,56 +21,17 @@ var (
 
 func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.addInstanceDomain(instanceAgg, instanceDomain, false)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+	return c.processWithFirst(ctx, c.prepareAddInstanceDomain(instanceAgg, instanceDomain, false))
 }
 
 func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := setPrimaryInstanceDomain(instanceAgg, instanceDomain)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+	return c.processWithLast(ctx, prepareSetPrimaryInstanceDomain(instanceAgg, instanceDomain))
 }
 
 func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := removeInstanceDomain(instanceAgg, instanceDomain)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+	return c.processWithLast(ctx, prepareRemoveInstanceDomain(instanceAgg, instanceDomain))
 }
 
 func (c *Commands) addGeneratedInstanceDomain(ctx context.Context, a *instance.Aggregate, instanceName string) ([]preparation.Validation, error) {
@@ -79,12 +40,12 @@ func (c *Commands) addGeneratedInstanceDomain(ctx context.Context, a *instance.A
 		return nil, err
 	}
 	return []preparation.Validation{
-		c.addInstanceDomain(a, domain, true),
-		setPrimaryInstanceDomain(a, domain),
+		c.prepareAddInstanceDomain(a, domain, true),
+		prepareSetPrimaryInstanceDomain(a, domain),
 	}, nil
 }
 
-func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
+func (c *Commands) prepareAddInstanceDomain(a *instance.Aggregate, instanceDomain string, generated bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
@@ -154,8 +115,8 @@ func (c *Commands) updateConsoleRedirectURIs(ctx context.Context, filter prepara
 	)
 }
 
-//checkUpdateConsoleRedirectURIs validates if the required console uri is present in the redirect_uris and post_logout_redirect_uris
-//it will return true only if present in both list, otherwise false
+// checkUpdateConsoleRedirectURIs validates if the required console uri is present in the redirect_uris and post_logout_redirect_uris
+// it will return true only if present in both list, otherwise false
 func (c *Commands) checkUpdateConsoleRedirectURIs(instanceDomain string, redirectURIs, postLogoutRedirectURIs []string) bool {
 	redirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + consoleRedirectPath
 	if !containsURI(redirectURIs, redirectURI) {
@@ -165,7 +126,7 @@ func (c *Commands) checkUpdateConsoleRedirectURIs(instanceDomain string, redirec
 	return containsURI(postLogoutRedirectURIs, postLogoutRedirectURI)
 }
 
-func setPrimaryInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
+func prepareSetPrimaryInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-9mWjf", "Errors.Invalid.Argument")
@@ -183,7 +144,7 @@ func setPrimaryInstanceDomain(a *instance.Aggregate, instanceDomain string) prep
 	}
 }
 
-func removeInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
+func prepareRemoveInstanceDomain(a *instance.Aggregate, instanceDomain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if instanceDomain = strings.TrimSpace(instanceDomain); instanceDomain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-39nls", "Errors.Invalid.Argument")

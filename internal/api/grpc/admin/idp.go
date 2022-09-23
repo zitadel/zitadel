@@ -34,30 +34,30 @@ func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*
 }
 
 func (s *Server) AddOIDCIDP(ctx context.Context, req *admin_pb.AddOIDCIDPRequest) (*admin_pb.AddOIDCIDPResponse, error) {
-	config, err := s.command.AddDefaultIDPConfig(ctx, addOIDCIDPRequestToDomain(req))
+	id, config, err := s.command.AddDefaultIDPConfig(ctx, addOIDCIDPRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddOIDCIDPResponse{
-		IdpId: config.IDPConfigID,
+		IdpId: id,
 		Details: object_pb.AddToDetailsPb(
 			config.Sequence,
-			config.ChangeDate,
+			config.EventDate,
 			config.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) AddJWTIDP(ctx context.Context, req *admin_pb.AddJWTIDPRequest) (*admin_pb.AddJWTIDPResponse, error) {
-	config, err := s.command.AddDefaultIDPConfig(ctx, addJWTIDPRequestToDomain(req))
+	id, config, err := s.command.AddDefaultIDPConfig(ctx, addJWTIDPRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddJWTIDPResponse{
-		IdpId: config.IDPConfigID,
+		IdpId: id,
 		Details: object_pb.AddToDetailsPb(
 			config.Sequence,
-			config.ChangeDate,
+			config.EventDate,
 			config.ResourceOwner,
 		),
 	}, nil
@@ -71,7 +71,7 @@ func (s *Server) UpdateIDP(ctx context.Context, req *admin_pb.UpdateIDPRequest) 
 	return &admin_pb.UpdateIDPResponse{
 		Details: object_pb.ChangeToDetailsPb(
 			config.Sequence,
-			config.ChangeDate,
+			config.EventDate,
 			config.ResourceOwner,
 		),
 	}, nil

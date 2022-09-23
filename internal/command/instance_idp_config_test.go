@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -13,7 +14,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
@@ -31,7 +31,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 		config *domain.IDPConfig
 	}
 	type res struct {
-		want *domain.IDPConfig
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -60,6 +60,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
@@ -119,7 +120,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.IDPConfig{
+				/*want: &domain.IDPConfig{
 					ObjectRoot: models.ObjectRoot{
 						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
@@ -130,7 +131,8 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 					StylingType:  domain.IDPConfigStylingTypeGoogle,
 					State:        domain.IDPConfigStateActive,
 					AutoRegister: true,
-				},
+				},*/
+				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
 			},
 		},
 		{
@@ -138,6 +140,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusherWithInstanceID(
@@ -182,7 +185,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.IDPConfig{
+				/*want: &domain.IDPConfig{
 					ObjectRoot: models.ObjectRoot{
 						InstanceID:    "INSTANCE",
 						AggregateID:   "INSTANCE",
@@ -192,7 +195,8 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 					Name:        "name1",
 					StylingType: domain.IDPConfigStylingTypeGoogle,
 					State:       domain.IDPConfigStateActive,
-				},
+				},*/
+				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
 			},
 		},
 	}
@@ -203,7 +207,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			got, err := r.AddDefaultIDPConfig(tt.args.ctx, tt.args.config)
+			_, got, err := r.AddDefaultIDPConfig(tt.args.ctx, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -226,7 +230,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 		config *domain.IDPConfig
 	}
 	type res struct {
-		want *domain.IDPConfig
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -274,7 +278,8 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewIDPConfigAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
@@ -284,7 +289,8 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 								true,
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
 							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								"clientid1",
@@ -306,17 +312,18 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 					),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
 								newDefaultIDPConfigChangedEvent(context.Background(), "config1", "name1", "name2", domain.IDPConfigStylingTypeUnspecified, false),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name2", "INSTANCE")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", idpconfig.NewAddIDPConfigNameUniqueConstraint("name2", "INSTANCE")),
 					),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				config: &domain.IDPConfig{
 					IDPConfigID:  "config1",
 					Name:         "name2",
@@ -325,17 +332,20 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.IDPConfig{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
+				/*
+					want: &domain.IDPConfig{
+						ObjectRoot: models.ObjectRoot{
+							AggregateID:   "INSTANCE",
+							ResourceOwner: "INSTANCE",
+						},
+						IDPConfigID:  "config1",
+						Name:         "name2",
+						StylingType:  domain.IDPConfigStylingTypeUnspecified,
+						State:        domain.IDPConfigStateActive,
+						AutoRegister: false,
 					},
-					IDPConfigID:  "config1",
-					Name:         "name2",
-					StylingType:  domain.IDPConfigStylingTypeUnspecified,
-					State:        domain.IDPConfigStateActive,
-					AutoRegister: false,
-				},
+				*/
+				want: &domain.ObjectDetails{Sequence: 0x0, EventDate: time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC), ResourceOwner: "INSTANCE"},
 			},
 		},
 	}

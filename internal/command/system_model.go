@@ -144,7 +144,7 @@ func (wm *SystemConfigWriteModel) NewChangedEvents(commands *Commands) map[strin
 		return cmds
 	}
 	//otherwise the add instance domain will take care of the uris
-	cmds[instanceOfCustomDomain].Validations = append(cmds[instanceOfCustomDomain].Validations, commands.addInstanceDomain(instance.NewAggregate(instanceOfCustomDomain), wm.newExternalDomain, false))
+	cmds[instanceOfCustomDomain].Validations = append(cmds[instanceOfCustomDomain].Validations, commands.prepareAddInstanceDomain(instance.NewAggregate(instanceOfCustomDomain), wm.newExternalDomain, false))
 	return cmds
 }
 
@@ -172,7 +172,7 @@ func (wm *SystemConfigWriteModel) changeConfig(validation *SystemConfigChangesVa
 		return newCustomDomainExists, isInstanceOfCustomDomain
 	}
 	//otherwise the add instance domain will take care of the uris
-	validation.Validations = append(validation.Validations, commands.addInstanceDomain(instance.NewAggregate(validation.InstanceID), newGeneratedDomain, true))
+	validation.Validations = append(validation.Validations, commands.prepareAddInstanceDomain(instance.NewAggregate(validation.InstanceID), newGeneratedDomain, true))
 	return newCustomDomainExists, isInstanceOfCustomDomain
 }
 

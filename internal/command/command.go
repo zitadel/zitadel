@@ -1,11 +1,13 @@
 package command
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -131,4 +133,52 @@ func AppendAndReduce(object interface {
 }, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
 	return object.Reduce()
+}
+
+func (c *Commands) processWithLast(ctx context.Context, validation preparation.Validation) (*domain.ObjectDetails, error) {
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
+	}, nil
+}
+
+func (c *Commands) processWithFirst(ctx context.Context, validation preparation.Validation) (*domain.ObjectDetails, error) {
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[0].Sequence(),
+		EventDate:     events[0].CreationDate(),
+		ResourceOwner: events[0].Aggregate().ResourceOwner,
+	}, nil
+}
+
+func (c *Commands) processWithID(ctx context.Context, validation preparation.Validation) (string, *domain.ObjectDetails, error) {
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return "", nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return events[len(events)-1].Aggregate().ID, &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
+	}, nil
 }
