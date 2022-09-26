@@ -64,7 +64,7 @@ InitPasswordDone:
 
 InitUser:
   Title: Attivare l'utente
-  Description: Verificate la vostra e-mail con il codice sottostante e impostate la vostra password.
+  Description: Verifica la tua e-mail con il codice sottostante e imposta la tua nuova password.
   CodeLabel: Codice
   NewPasswordLabel: Nuova password
   NewPasswordConfirm: Conferma la password
