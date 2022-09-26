@@ -223,7 +223,17 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
-          "apis/actions"
+        {
+          type: "category",
+          label: "Actions",
+          collapsed: true,
+          items: [
+            "apis/actions/introduction",
+            "apis/actions/modules",
+            "apis/actions/login_flow",
+            "apis/actions/register_flow",
+          ]
+        }
       ],
     },
     {
