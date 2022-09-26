@@ -79,7 +79,7 @@ InitUserDone:
 
 InitMFAPrompt:
   Title: 2-Factor Setup
-  Description: Would you like to setup second factor authentication?
+  Description: 2-factor authentication gives you an additional security for your user account. This ensures that only you have access to your account.
   Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
   Provider1: Device dependent (e.g FaceID, Windows Hello, Fingerprint)
   NextButtonText: next
@@ -120,7 +120,7 @@ VerifyMFAOTP:
   NextButtonText: next
 
 VerifyMFAU2F:
-  Title: Multifactor Verification
+  Title: 2-Factor Verification
   Description: Verify your 2-Factor with the registered device (e.g FaceID, Windows Hello, Fingerprint)
   NotSupported: WebAuthN is not supported by your browser. Make sure you are using the newest version or change your browser to a supported one (Chrome, Safari, Firefox)
   ErrorRetry: Retry, create a new request or choose a other method.

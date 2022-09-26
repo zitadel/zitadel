@@ -79,7 +79,7 @@ InitUserDone:
 
 InitMFAPrompt:
   Title: Configuration à 2 facteurs
-  Description: Voulez-vous configurer l'authentification par second facteur ?
+  Description: L'authentification à deux facteurs vous offre une sécurité supplémentaire pour votre compte d'utilisateur. Vous êtes ainsi assuré d'être le seul à avoir accès à votre compte.
   Provider0: Application d'authentification (par exemple, Google/Microsoft Authenticator, Authy)
   Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
   NextButtonText: Suivant
@@ -96,7 +96,7 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: Configuration de 2-Factor U2F / WebAuthN
-  Description: Ajoutez votre facteur 2 en fournissant un nom (par exemple MyPhone, MacBook) et cliquez ensuite sur le bouton "Enregistrer le facteur 2" ci-dessous.
+  Description: Ajoutez votre appareil dépendant de 2-facteurs comme FaceID, Windows Hello ou Fingerprint en fournissant un nom (par exemple MyPhone, MacBook) et en cliquant sur le bouton "Enregistrer 2-facteurs" ci-dessous.
   TokenNameLabel: Nom du dispositif à 2 facteurs
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
   RegisterTokenButtonText: Enregistrez 2-facteurs

@@ -79,7 +79,7 @@ InitUserDone:
 
 InitMFAPrompt:
   Title: 2-Factor设置
-  Description: 你想设置第二因素认证吗？
+  Description: 双因素认证为您的用户账户提供了额外的安全保障。这确保只有你能访问你的账户。
   Provider0: 认证器应用(如 Google/Migrosoft Authenticator, Authy)
   Provider1: 取决于设备（如FaceID、Windows Hello、指纹）。
   NextButtonText: 继续
@@ -96,7 +96,7 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: 设置2-Factor U2F / WebAuthN
-  Description: 通过提供一个名称（如MyPhone，MacBook），然后点击下面的 "注册双因素 "按钮，添加你的双因素。
+  Description: 通过提供一个名称（如MyPhone，MacBook），然后点击下面的 "注册2-factor "按钮，添加你的设备依赖的2-factor，如FaceID，Windows Hello或指纹。
   TokenNameLabel: 双因素/设备的名称
   NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
   RegisterTokenButtonText: 注册双因素

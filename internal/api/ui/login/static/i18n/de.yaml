@@ -79,7 +79,7 @@ InitUserDone:
 
 InitMFAPrompt:
   Title: 2-Faktor hinzufügen
-  Description: Möchtest du einen 2-Faktor hinzufügen?
+  Description: 2-Faktor-Authentifizierung gibt dir eine zusätzliche Sicherheit für dein Benutzerkonto. Damit stellst du sicher, dass nur du Zugriff auf deinen Account hast.
   Provider0: Authenticator App (e.g Google/Microsoft Authenticator, Authy)
   Provider1: Geräte abhängig (e.g FaceID, Windows Hello, Fingerprint)
   NextButtonText: weiter
@@ -96,7 +96,7 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: 2-Faktor Setup U2F / WebAuthN hinzufügen
-  Description: Füge deinen 2-Faktor hinzu, indem du einen Namen (z.B. MyPhone, MacBook, etc.) eingibst und den '2-Faktor registrieren' Button drückst.
+  Description: Füge deinen Geräte abhängigen 2-Faktor wie FaceID, Windows Hello oder Fingerprint hinzu, indem du einen Namen (z.B. MyPhone, MacBook, etc.) eingibst und den '2-Faktor registrieren' Button drückst.
   TokenNameLabel: Name des Multifaktors / Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze einen anderen (z.B. Chrome, Safari, Firefox)
   RegisterTokenButtonText: 2-Faktor registrieren
