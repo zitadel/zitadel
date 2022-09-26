@@ -173,7 +173,7 @@ PasswordChangeDone:
 
 PasswordResetDone:
   Title: Invio del link per la reimpostazione della password
-  Description: Controlla la tua email per reimpostare la tua password.
+  Description: Controlla la tua email per continuare e reimpostare la tua password.
   NextButtonText: Avanti
 
 EmailVerification:
