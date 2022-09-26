@@ -114,7 +114,7 @@ MFAProvider:
   ChooseOther: o scegli un'altra opzione
 
 VerifyMFAOTP:
-  Title: Verifica a 2 fattori
+  Title: Verificazione fattore
   Description: Verificare il secondo fattore
   CodeLabel: Codice
   NextButtonText: Avanti
