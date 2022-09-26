@@ -121,7 +121,7 @@ VerifyMFAOTP:
 
 VerifyMFAU2F:
   Title: Verificazione fattore
-  Description: Verificare il fattore 2 con il dispositivo registrato (ad es. FaceID, Windows Hello, impronta digitale).
+  Description: Verifica il tuo fattore con il dispositivo registrato (ad es. FaceID, Windows Hello, impronta digitale).
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati di avere l'ultima versione installata o usane una diversa (per esempio Chrome, Safari, Firefox).
   ErrorRetry: Prova di nuovo, crea una nuova richiesta o scegli un metodo diverso.
   ValidateTokenButtonText: Verifica a 2 fattori
