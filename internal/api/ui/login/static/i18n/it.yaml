@@ -115,7 +115,7 @@ MFAProvider:
 
 VerifyMFAOTP:
   Title: Verificazione fattore
-  Description: Verificare il secondo fattore
+  Description: Verifica il tuo secondo fattore con la tua app
   CodeLabel: Codice
   NextButtonText: Avanti
 
