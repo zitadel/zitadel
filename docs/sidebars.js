@@ -94,7 +94,9 @@ module.exports = {
             "guides/manage/console/projects",
             "guides/manage/console/roles",
             "guides/manage/console/applications",
+            "guides/manage/console/users",
             "guides/manage/console/managers",
+            "guides/manage/console/actions",
           ],
         },
         {

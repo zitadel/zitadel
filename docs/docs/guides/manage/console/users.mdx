@@ -2,9 +2,36 @@
 title: Users
 ---
 
-Now, you can add roles to your own user, or you can create a new user. To create a new user, go to Users and click “New”. Enter the required contact details and save by clicking “Create”.
+Users within ZITADEL are your human application users, but can also be for service purpose.
 
-![Create new user](/img/console_users_create_new_user.gif)
+<img src="/img/guides/console/usersmenu.png" width="420px" alt="User types" />
+
+A human user has an email address and a password, and can additionally save information about phone, nickname, gender, language.
+A service user only has a name and a description aside his username.
+
+A service user can be authenticated with JWT profile or Personal Access Tokens. Both methods can specify an expiry.
+A human user can authenticate itself with his password, add multiple factors for additional security, and enable passwordless authentication.
+
+Service users are primarily used to gain access for a backend service or iot device. The fact that service users can also be ZITADEL managers is used to restrict access to specific projects or organizations.
+To get an understanding on how service users are used, take a look at our NextJS B2B Demo application.
+
+To create a new user, go to Users and click “New”. Enter the required contact details and save by clicking “Create”.
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<Tabs>
+  <TabItem value="human" label="Human User" default>
+    <img src="/img/guides/console/addhuman.png" width="750px" alt="Add Human" />
+  </TabItem>
+  <TabItem value="service" label="Service User">
+    <img
+      src="/img/guides/console/addmachine.png"
+      width="580px"
+      alt="Add Service User"
+    />
+  </TabItem>
+</Tabs>
 
 To grant users certain roles, you need to create authorizations. Go back to the project, and jump to the section AUTHORIZATIONS.
 
