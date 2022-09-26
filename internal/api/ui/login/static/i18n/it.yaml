@@ -132,7 +132,7 @@ Passwordless:
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
   LoginWithPwButtonText: Accedi con password
-  ValidateTokenButtonText: Accedi senza password
+  ValidateTokenButtonText: Accedi
 
 PasswordlessPrompt:
   Title: Autenticazione passwordless
