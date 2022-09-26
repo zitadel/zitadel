@@ -67,7 +67,7 @@ InitUser:
   Description: Du hast einen Code erhalten, welcher im untenstehenden Formular eingegeben werden muss um deine E-Mail zu verifizieren und ein neues Passwort zu setzen.
   CodeLabel: Code
   NewPasswordLabel: Neues Passwort
-  NewPasswordConfirmLabel: Passwort bestätigen
+  NewPasswordConfirm: Passwort bestätigen
   NextButtonText: weiter
   ResendButtonText: erneut senden
 
@@ -239,6 +239,7 @@ ExternalRegistrationUserOverview:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
@@ -282,7 +283,7 @@ LinkingUsersDone:
   CancelButtonText: abbrechen
   NextButtonText: weiter
 
-ExternalNotFoundOption:
+ExternalNotFound:
   Title: Externer Benutzer
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
   LinkButtonText: Verlinken
@@ -296,6 +297,7 @@ ExternalNotFoundOption:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
 
 Footer:
   PoweredBy: Powered By

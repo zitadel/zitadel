@@ -1,17 +1,20 @@
 package system
 
 import (
+	"strings"
+
 	"golang.org/x/text/language"
 
 	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
-func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup) *command.InstanceSetup {
+func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {
 	if req.InstanceName != "" {
 		defaultInstance.InstanceName = req.InstanceName
 		defaultInstance.Org.Name = req.InstanceName
@@ -39,6 +42,11 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 				defaultInstance.Org.Human.PreferredLanguage = lang
 			}
 		}
+	}
+	// check if default username is email style or else append @<orgname>.<custom-domain>
+	// this way we have the same value as before changing `UserLoginMustBeDomain` to false
+	if !defaultInstance.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(defaultInstance.Org.Human.Username, "@") {
+		defaultInstance.Org.Human.Username = defaultInstance.Org.Human.Username + "@" + domain.NewIAMDomainName(defaultInstance.Org.Name, externalDomain)
 	}
 	if req.OwnerUserName != "" {
 		defaultInstance.Org.Human.Username = req.OwnerUserName

@@ -313,6 +313,9 @@ DefaultInstance:
   Org:
     Name:
     Human:
+      # in case that UserLoginMustBeDomain is false (default) and if you don't overwrite the username with an email,
+      # it will be suffixed by the org domain (org-name + domain from config).
+      # for example: zitadel-admin in org `My Org` on domain.tld -> zitadel-admin@my-org.domain.tld
       UserName: zitadel-admin
       FirstName: ZITADEL
       LastName: Admin
@@ -386,7 +389,7 @@ DefaultInstance:
     ExpireWarnDays: 0
     MaxAgeDays: 0
   DomainPolicy:
-    UserLoginMustBeDomain: true
+    UserLoginMustBeDomain: false
     ValidateOrgDomains: true
     SMTPSenderAddressMatchesInstanceDomain: false
   LoginPolicy:
