@@ -136,7 +136,7 @@ Passwordless:
 
 PasswordlessPrompt:
   Title: Autenticazione passwordless
-  Description: Vuoi impostare il login senza password? Metodi di autenticazione del dispositivo, come FaceID, Windows Hello o impronte digitali.
+  Description: Vuoi impostare il login senza password? Scegli tra metodi di autenticazione di un dispositivo (ad es. FaceID, Windows Hello o impronte digitali).
   DescriptionInit: Devi impostare il login senza password. Usa il link che ti è stato inviato per registrare il tuo dispositivo.
   PasswordlessButtonText: Continua
   NextButtonText: Avanti
