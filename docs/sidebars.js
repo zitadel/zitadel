@@ -92,6 +92,7 @@ module.exports = {
             "guides/manage/console/instance-settings",
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
+            "guides/manage/console/roles",
             "guides/manage/console/applications",
             "guides/manage/console/managers",
           ],

@@ -23,36 +23,6 @@ To create a project, navigate to your organization, then projects or directly vi
 
 then enter your project name and continue.
 
-Let’s make this more interesting and add some basic roles and authorizations to your project and then confirm the scope of the roles and authorizations.
-
-Jump to the section ROLES and create two new roles with the following values
-
-- Key: reader
-- Display Name: Reader
-- Group: user
-
-and
-
-- Key: editor
-- Display Name: Editor
-- Group: user
-
-![Add New Roles](/img/console_projects_add_new_roles.gif)
-
-Now, you can add roles to your own user, or you can create a new user. To create a new user, go to Users and click “New”. Enter the required contact details and save by clicking “Create”.
-
-![Create new user](/img/console_users_create_new_user.gif)
-
-To grant users certain roles, you need to create authorizations. Go back to the project, and jump to the section AUTHORIZATIONS.
-
-![Verify your authorization](/img/console_projects_create_authorization.gif)
-
-You can verify the role grant on the user. Select Users from the navigation menu and click on the user Coyote. Scroll down to the section AUTHORIZATION, there you should be able to verify that the user has the role ‘reader’ for your project ‘My first project’.
-
-![Organization grant](/img/console_projects_authorization_created.png)
-
-Now create another project (eg. “My second project”) and verify that there are no roles or authorizations on your second project.
-
 ## What is a granted project?
 
 Now imagine you could use the POS platform from the example not only for yourself but sell it to other business partners too.
@@ -65,6 +35,7 @@ Now, enter the domain of the partner organization (if you can't remember it, nav
 
 Now select the roles you want this organization to use and save.
 This enables you to lock a certain organization out of a feature if you don't want their users to use it.
+You can learn more about roles [here](./roles).
 
 Organizations can then create authorizations for their users on their own. The project is shown them seperated from their own projects.
 
@@ -76,11 +47,28 @@ Organizations can then create authorizations for their users on their own. The p
 
 ## Grant a project
 
-1. Visit the project that you have created before, then in the section GRANTED ORGANIZATIONS click New.
-2. Enter the domain ‘acme.caos.ch’, search the organization and continue to the next step.
-3. Select some roles you would like to grant to the organization ACME and confirm.
-4. You should now see ACME-CAOS in the section GRANTED ORGANIZATIONS
+1. Visit the project `POS` that you have created before, then in the section **Grants** click **New**.
 
-![Grant a project](/img/projects_create_org_grant.gif)
+<img src="/img/guides/console/grantsmenu.png" alt="Grants" width="170px" />
 
-<!-- //TODO Add whats next again -->
+2. Enter the domain of the organization you want to grant (go to the organization detail page if you can't remember it), hit the search button and continue.
+3. Select some roles you would like to grant to the organization and confirm.
+4. You should now see the granted organization in the section **grants**.
+
+## Branding
+
+If you have different designs for your organizations or probably and use project grants, you can define the login behaviour on the project detail page.
+
+<img
+  src="/img/guides/console/projectbranding.png"
+  alt="Project branding"
+  width="400px"
+/>
+
+You can choose from
+
+- **Unspecified**: As soon as the user is identified, the branding of the organization of the identified user will be shown, before the system default is shown.
+- **Use project setting**: The branding of the organization which owns the project will be shown
+- **Use organization setting**: The branding of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown.
+
+In a B2B use case, you would typically use the organization setting. If you want to omit organization detection, you can preselect an organization with the primary domain [scope](/docs/apis/openidoauth/scopes#reserved-scopes) (ex. `urn:zitadel:iam:org:domain:primary:{domainname}`).
