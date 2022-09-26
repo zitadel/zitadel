@@ -128,7 +128,7 @@ VerifyMFAU2F:
 
 Passwordless:
   Title: Accesso senza password
-  Description: Accedere con i metodi di autenticazione forniti dal dispositivo, come FaceID, Windows Hello o impronta digitale.
+  Description: Accedi con il metodo di autenticazione del tuo dispositivo registrato (ad es. FaceID, Windows Hello o impronta digitale).
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
   LoginWithPwButtonText: Accedi con password
