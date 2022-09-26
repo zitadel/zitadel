@@ -87,7 +87,7 @@ InitMFAPrompt:
 
 InitMFAOTP:
   Title: Vérification à deux facteurs
-  Description: Vérifiez votre deuxième facteur.
+  Description: Créez votre 2-facteurs. Téléchargez une application d'authentification si vous n'en avez pas déjà une.
   OTPDescription: Scannez le code avec votre application d'authentification (par exemple Google Authenticator) ou copiez le secret et insérez le code généré ci-dessous.
   SecretLabel: Secret
   CodeLabel: Code

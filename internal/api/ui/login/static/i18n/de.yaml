@@ -87,7 +87,7 @@ InitMFAPrompt:
 
 InitMFAOTP:
   Title: 2-Faktor Verifizierung
-  Description: Verifiziere deinen 2-Faktor
+  Description: Erstelle deinen 2-Faktor. Lade eine Authenticator-App herunter, wenn du noch keines hast.
   OTPDescription: Scanne den Code mit einem Authentifizierungs-App (z.B Google/Mircorsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
   SecretLabel: Secret
   CodeLabel: Code

@@ -87,7 +87,7 @@ InitMFAPrompt:
 
 InitMFAOTP:
   Title: 双因素验证
-  Description: 核实你的第二个因素。
+  Description: 创建你的双因素。如果你还没有，请下载一个认证器应用程序。
   OTPDescription: 使用您的身份验证器应用程序（例如 Google Authenticator）扫描代码或复制密码并在下方插入生成的代码。
   SecretLabel: 秘钥
   CodeLabel: 验证码
