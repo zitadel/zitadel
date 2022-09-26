@@ -99,7 +99,7 @@ InitMFAU2F:
   Description: Aggiungi il tuo dispositivo da 2 fattori come FaceID, Windows Hello o Impronte digitali, fornendo un nome (ad es. MyPhone, MacBook) e facendo clic sul pulsante "Registra" qui sotto.
   TokenNameLabel: Nome del dispositivo a due fattori
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Registrazione a 2 fattori
+  RegisterTokenButtonText: Registra
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
 
 InitMFADone:
