@@ -422,7 +422,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 	if err != nil {
 		return nil, err
 	}
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner)
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
