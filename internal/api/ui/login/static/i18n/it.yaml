@@ -172,7 +172,7 @@ PasswordChangeDone:
   NextButtonText: Avanti
 
 PasswordResetDone:
-  Title: Invio del link per la reimpostazione della password
+  Title: Link per la reimpostazione della password è stato inviato
   Description: Controlla la tua email per continuare e reimpostare la tua password.
   NextButtonText: Avanti
 
