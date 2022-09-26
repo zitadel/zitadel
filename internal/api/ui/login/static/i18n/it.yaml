@@ -69,7 +69,7 @@ InitUser:
   NewPasswordLabel: Nuova password
   NewPasswordConfirm: Conferma la password
   NextButtonText: Avanti
-  ResendButtonText: reinvio del codice
+  ResendButtonText: Reinvia codice
 
 InitUserDone:
   Title: Utente attivato
