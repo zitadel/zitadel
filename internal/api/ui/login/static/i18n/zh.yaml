@@ -67,7 +67,7 @@ InitUser:
   Description: 用下面的代码验证您的电子邮件，并设置您的密码。
   CodeLabel: 验证码
   NewPasswordLabel: 新密码
-  NewPasswordConfirmLabel: 确认密码
+  NewPasswordConfirm: 确认密码
   NextButtonText: 继续
   ResendButtonText: 重发代码
 
@@ -283,7 +283,7 @@ LinkingUsersDone:
   CancelButtonText: 取消
   NextButtonText: 继续
 
-ExternalNotFoundOption:
+ExternalNotFound:
   Title: 外部用户
   Description: 未找到外部用户。你想绑定你已存在的用户还是自动注册一个新用户。
   LinkButtonText: 绑定
@@ -293,10 +293,10 @@ ExternalNotFoundOption:
   TosLinkText: 服务条款
   TosConfirmAnd: 和
   PrivacyLinkText: 隐私政策
-  German: 德语
-  English: 英语
-  Italian: 意大利语
-  French: 法语
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
 
 Footer:

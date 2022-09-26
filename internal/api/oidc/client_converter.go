@@ -103,6 +103,9 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 		return true
 	}
+	if strings.HasPrefix(scope, domain.OrgIDScope) {
+		return true
+	}
 	if strings.HasPrefix(scope, domain.ProjectIDScope) {
 		return true
 	}

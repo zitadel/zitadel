@@ -67,7 +67,7 @@ InitUser:
   Description: Vérifiez votre e-mail avec le code ci-dessous et définissez votre mot de passe.
   CodeLabel: Code
   NewPasswordLabel: Nouveau mot de passe
-  NewPasswordConfirmLabel: Confirmer le mot de passe
+  NewPasswordConfirm: Confirmer le mot de passe
   NextButtonText: Suivant
   ResendButtonText: code de réexpédition
 
@@ -239,6 +239,7 @@ ExternalRegistrationUserOverview:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -282,7 +283,7 @@ LinkingUsersDone:
   CancelButtonText: annuler
   NextButtonText: suivant
 
-ExternalNotFoundOption:
+ExternalNotFound:
   Title: Utilisateur externe
   Description: Utilisateur externe non trouvé. Voulez-vous lier votre utilisateur ou enregistrer automatiquement un nouvel utilisateur.
   LinkButtonText: Lier
@@ -296,6 +297,7 @@ ExternalNotFoundOption:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
 
 Footer:
   PoweredBy: Promulgué par

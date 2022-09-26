@@ -1,11 +1,11 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    <h1>{{t "InitUser.Title" }}</h1>
+    <h1>{{t "InitUser.Title"}}</h1>
 
     {{ template "user-profile" . }}
 
-    <p>{{t "InitUser.Description" }}</p>
+    <p>{{t "InitUser.Description"}}</p>
 </div>
 
 <form action="{{ initUserUrl }}" method="POST">
@@ -33,7 +33,7 @@
                 autocomplete="new-password" autofocus required>
         </div>
         <div class="field">
-            <label class="lgn-label" for="passwordconfirm">{{t "InitUser.NewPasswordConfirmLabel"}}</label>
+            <label class="lgn-label" for="passwordconfirm">{{t "InitUser.NewPasswordConfirm"}}</label>
             <input class="lgn-input" type="password" id="passwordconfirm" name="passwordconfirm"
                 autocomplete="new-password" autofocus required>
             {{ template "password-complexity-policy-description" . }}
@@ -54,7 +54,7 @@
 
         <span class="fill-space"></span>
 
-        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "InitUser.ResendButtonText" }}</button>
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "InitUser.ResendButtonText"}}</button>
     </div>
 </form>
 

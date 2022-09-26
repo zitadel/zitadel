@@ -67,7 +67,7 @@ InitUser:
   Description: Verificate la vostra e-mail con il codice sottostante e impostate la vostra password.
   CodeLabel: Codice
   NewPasswordLabel: Nuova password
-  NewPasswordConfirmLabel: Conferma la password
+  NewPasswordConfirm: Conferma la password
   NextButtonText: Avanti
   ResendButtonText: reinvio del codice
 
@@ -209,9 +209,9 @@ RegistrationUser:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
   GenderLabel: Genere
   Female: Femminile
-  Chinese: 简体中文
   Male: Maschile
   Diverse: diverso / X
   PasswordLabel: Password
@@ -239,6 +239,7 @@ ExternalRegistrationUserOverview:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -282,7 +283,7 @@ LinkingUsersDone:
   CancelButtonText: annulla
   NextButtonText: Avanti
 
-ExternalNotFoundOption:
+ExternalNotFound:
   Title: Utente esterno
   Description: Utente esterno non trovato. Vuoi collegare il tuo utente o registrarne uno nuovo automaticamente.
   LinkButtonText: Link
@@ -296,6 +297,7 @@ ExternalNotFoundOption:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
 
 Footer:
   PoweredBy: Alimentato da
