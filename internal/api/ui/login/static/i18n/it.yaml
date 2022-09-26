@@ -144,7 +144,7 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: Registrazione dell'autenticazione passwordless
-  Description: Add your authentication by providing a name (e.g MyMobilePhone, MacBook, etc) and then clicking on the 'Register passwordless' button below.
+  Description: Aggiungi il tuo metodo fornendo un nome (ad es. Cellulare, MacBook, etc) e poi cliccando sul pulsante 'Registra'.
   TokenNameLabel: Nome del dispositivo
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
   RegisterTokenButtonText: Registra
