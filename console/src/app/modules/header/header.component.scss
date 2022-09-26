@@ -17,11 +17,6 @@
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
 
-  .show-all {
-    color: mat.get-color-from-palette($primary, 300) !important;
-    border-top: 1px solid map-get($foreground, divider);
-  }
-
   .filter-form {
     margin: 0 0.5rem;
     color: mat.get-color-from-palette($foreground, text) !important;

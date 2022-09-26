@@ -14,28 +14,22 @@ import { AvatarModule } from '../avatar/avatar.module';
 
 import { ChangesComponent } from './changes.component';
 
-
 @NgModule({
-    declarations: [
-        ChangesComponent,
-    ],
-    imports: [
-        CommonModule,
-        ScrollableModule,
-        MatProgressSpinnerModule,
-        TranslateModule,
-        MatIconModule,
-        MatButtonModule,
-        HasRolePipeModule,
-        ScrollingModule,
-        LocalizedDatePipeModule,
-        TimestampToDatePipeModule,
-        MatTooltipModule,
-        AvatarModule,
-    ],
-    exports: [
-        ChangesComponent,
-        ScrollableModule,
-    ],
+  declarations: [ChangesComponent],
+  imports: [
+    CommonModule,
+    ScrollableModule,
+    MatProgressSpinnerModule,
+    TranslateModule,
+    MatIconModule,
+    MatButtonModule,
+    HasRolePipeModule,
+    ScrollingModule,
+    LocalizedDatePipeModule,
+    TimestampToDatePipeModule,
+    MatTooltipModule,
+    AvatarModule,
+  ],
+  exports: [ChangesComponent, ScrollableModule],
 })
-export class ChangesModule { }
+export class ChangesModule {}

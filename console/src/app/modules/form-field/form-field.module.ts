@@ -8,20 +8,8 @@ import { CnslErrorDirective } from './error.directive';
 import { CnslFormFieldComponent } from './form-field.component';
 
 @NgModule({
-  declarations: [
-    CnslFormFieldComponent,
-    CnslErrorDirective,
-  ],
-  imports: [
-    CommonModule,
-    MatRippleModule,
-    LabelModule,
-  ],
-  exports: [
-    CnslFormFieldComponent,
-    LabelComponent,
-    CnslErrorDirective,
-  ],
+  declarations: [CnslFormFieldComponent, CnslErrorDirective],
+  imports: [CommonModule, MatRippleModule, LabelModule],
+  exports: [CnslFormFieldComponent, LabelComponent, CnslErrorDirective],
 })
-export class FormFieldModule { }
-
+export class FormFieldModule {}

@@ -20,21 +20,22 @@ export class OrgMembersDataSource extends DataSource<Member.AsObject> {
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);
-    from(this.service.listOrgMembers(pageSize, offset)).pipe(
-      map(resp => {
-        this.totalResult = resp.details?.totalResult || 0;
-        if (resp.details?.viewTimestamp) {
-          this.viewTimestamp = resp.details.viewTimestamp;
-        }
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(members => {
-      this.membersSubject.next(members);
-    });
+    from(this.service.listOrgMembers(pageSize, offset))
+      .pipe(
+        map((resp) => {
+          this.totalResult = resp.details?.totalResult || 0;
+          if (resp.details?.viewTimestamp) {
+            this.viewTimestamp = resp.details.viewTimestamp;
+          }
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((members) => {
+        this.membersSubject.next(members);
+      });
   }
-
 
   /**
    * Connect this data source to the table. The table will only update when

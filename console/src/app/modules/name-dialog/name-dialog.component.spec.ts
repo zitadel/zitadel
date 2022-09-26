@@ -6,13 +6,11 @@ describe('NameDialogComponent', () => {
   let component: NameDialogComponent;
   let fixture: ComponentFixture<NameDialogComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [NameDialogComponent],
-      }).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [NameDialogComponent],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(NameDialogComponent);

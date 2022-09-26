@@ -10,12 +10,8 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 
 import { InfoRowComponent } from './info-row.component';
 
-
-
 @NgModule({
-  declarations: [
-    InfoRowComponent,
-  ],
+  declarations: [InfoRowComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -26,8 +22,6 @@ import { InfoRowComponent } from './info-row.component';
     LocalizedDatePipeModule,
     TimestampToDatePipeModule,
   ],
-  exports: [
-    InfoRowComponent,
-  ],
+  exports: [InfoRowComponent],
 })
-export class InfoRowModule { }
+export class InfoRowModule {}

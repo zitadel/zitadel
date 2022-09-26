@@ -9,14 +9,12 @@ describe('OrgMembersComponent', () => {
   let component: OrgMembersComponent;
   let fixture: ComponentFixture<OrgMembersComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [OrgMembersComponent],
-        imports: [NoopAnimationsModule, MatSortModule, MatTableModule],
-      }).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [OrgMembersComponent],
+      imports: [NoopAnimationsModule, MatSortModule, MatTableModule],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(OrgMembersComponent);

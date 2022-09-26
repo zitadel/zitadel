@@ -26,9 +26,7 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { NameDialogModule } from '../../../modules/name-dialog/name-dialog.module';
-import {
-  ProjectPrivateLabelingDialogModule,
-} from '../../../modules/project-private-labeling-dialog/project-private-labeling-dialog.module';
+import { ProjectPrivateLabelingDialogModule } from '../../../modules/project-private-labeling-dialog/project-private-labeling-dialog.module';
 import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
 
 @NgModule({

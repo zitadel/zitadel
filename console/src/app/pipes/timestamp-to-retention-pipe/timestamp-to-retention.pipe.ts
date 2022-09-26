@@ -5,7 +5,6 @@ import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
   name: 'timestampToRetention',
 })
 export class TimestampToRetentionPipe implements PipeTransform {
-
   transform(value?: Duration.AsObject, ...args: unknown[]): unknown {
     if (value) {
       return this.retentionFromTimestamp(value);
@@ -16,10 +15,9 @@ export class TimestampToRetentionPipe implements PipeTransform {
 
   private retentionFromTimestamp(date: Duration.AsObject): any {
     if (date?.seconds !== undefined && date?.nanos !== undefined) {
-      const ms = (date.seconds * 1000 + date.nanos / 1000 / 1000);
+      const ms = date.seconds * 1000 + date.nanos / 1000 / 1000;
       const mins = ms / 1000 / 60;
       return +(mins / 60 / 24).toFixed(2);
     }
   }
 }
-

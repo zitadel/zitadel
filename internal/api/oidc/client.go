@@ -95,6 +95,13 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 				scopes = scopes[:len(scopes)-1]
 			}
 		}
+		if strings.HasPrefix(scope, domain.OrgIDScope) {
+			if strings.TrimPrefix(scope, domain.OrgIDScope) != user.ResourceOwner {
+				scopes[i] = scopes[len(scopes)-1]
+				scopes[len(scopes)-1] = ""
+				scopes = scopes[:len(scopes)-1]
+			}
+		}
 	}
 	return scopes, nil
 }
@@ -119,7 +126,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.UserInfoSetter, tokenID, subject, origin string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
+	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
@@ -154,7 +161,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 }
 
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
+	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
@@ -251,6 +258,16 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 				userInfo.AppendClaims(domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 			}
+			if strings.HasPrefix(scope, domain.OrgIDScope) {
+				userInfo.AppendClaims(domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
+				resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+				if err != nil {
+					return err
+				}
+				for claim, value := range resourceOwnerClaims {
+					userInfo.AppendClaims(claim, value)
+				}
+			}
 		}
 	}
 	if len(roles) == 0 || applicationID == "" {
@@ -289,8 +306,19 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
-		} else if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+		}
+		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 			claims = appendClaim(claims, domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
+		}
+		if strings.HasPrefix(scope, domain.OrgIDScope) {
+			claims = appendClaim(claims, domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
+			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			for claim, value := range resourceOwnerClaims {
+				claims = appendClaim(claims, claim, value)
+			}
 		}
 	}
 	if len(roles) == 0 || clientID == "" {
