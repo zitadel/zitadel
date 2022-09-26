@@ -147,7 +147,7 @@ PasswordlessRegistration:
   Description: Add your authentication by providing a name (e.g MyMobilePhone, MacBook, etc) and then clicking on the 'Register passwordless' button below.
   TokenNameLabel: Nome del dispositivo
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Registrazione senza password
+  RegisterTokenButtonText: Registra
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
 
 PasswordlessRegistrationDone:
