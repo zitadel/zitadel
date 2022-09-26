@@ -104,7 +104,7 @@ InitMFAU2F:
 
 InitMFADone:
   Title: Verificazione a due fattori effettuata
-  Description: La verifica a 2 fattori è stata eseguita con successo. Il secondo fattore deve essere inserito a ogni accesso.
+  Description: La verificazione a due fattori è stata eseguita con successo. Il secondo fattore deve essere inserito a ogni accesso.
   NextButtonText: Avanti
   CancelButtonText: annulla
 
