@@ -6,7 +6,9 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/api/saml"
 
+	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -45,6 +47,7 @@ type Config struct {
 	Admin             admin_es.Config
 	UserAgentCookie   *middleware.UserAgentCookieConfig
 	OIDC              oidc.Config
+	SAML              saml.Config
 	Login             login.Config
 	Console           console.Config
 	AssetStorage      static_config.AssetStorageConfig
@@ -56,6 +59,7 @@ type Config struct {
 	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
 	CustomerPortal    string
 	Machine           *id.Config
+	Actions           *actions.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -68,6 +72,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
+			actions.HTTPConfigDecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")
@@ -82,6 +87,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 	logging.OnError(err).Fatal("unable to set meter")
 
 	id.Configure(config.Machine)
+	actions.SetHTTPConfig(&config.Actions.HTTP)
 
 	return config
 }
@@ -90,6 +96,7 @@ type encryptionKeyConfig struct {
 	DomainVerification   *crypto.KeyConfig
 	IDPConfig            *crypto.KeyConfig
 	OIDC                 *crypto.KeyConfig
+	SAML                 *crypto.KeyConfig
 	OTP                  *crypto.KeyConfig
 	SMS                  *crypto.KeyConfig
 	SMTP                 *crypto.KeyConfig

@@ -1,14 +1,24 @@
 <cnsl-create-layout
-  title="{{ 'APP.PAGES.CREATE_OIDC' | translate }}"
-  [createSteps]="createSteps"
+  title="{{ 'APP.PAGES.CREATE' | translate }}"
+  [createSteps]="
+    appType?.value?.createType === AppCreateType.OIDC
+      ? appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE
+        ? 4
+        : 3
+      : appType?.value?.createType === AppCreateType.API
+      ? 3
+      : appType?.value?.createType === AppCreateType.SAML
+      ? 3
+      : 0
+  "
   [currentCreateStep]="currentCreateStep"
   (closed)="close()"
 >
-  <h1>{{ 'APP.PAGES.CREATE_OIDC_DESC_TITLE' | translate }}</h1>
+  <h1>{{ 'APP.PAGES.CREATE_DESC_TITLE' | translate }}</h1>
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
   <mat-checkbox class="proswitch" color="primary" [(ngModel)]="devmode">
-    {{ 'APP.OIDC.PROSWITCH' | translate }}
+    {{ 'APP.PROSWITCH' | translate }}
   </mat-checkbox>
 
   <mat-horizontal-stepper
@@ -21,16 +31,16 @@
   >
     <mat-step [stepControl]="firstFormGroup" [editable]="true">
       <form [formGroup]="firstFormGroup">
-        <ng-template matStepLabel>{{ 'APP.OIDC.NAMEANDTYPESECTION' | translate }}</ng-template>
+        <ng-template matStepLabel>{{ 'APP.NAMEANDTYPESECTION' | translate }}</ng-template>
 
-        <p class="step-title">{{ 'APP.OIDC.TITLEFIRST' | translate }}</p>
+        <p class="step-title">{{ 'APP.TITLEFIRST' | translate }}</p>
         <cnsl-form-field class="name-formfield">
           <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
           <input cnslInput cdkFocusInitial formControlName="name" />
           <span cnslError *ngIf="name?.errors?.required">{{ 'PROJECT.APP.NAMEREQUIRED' | translate }}</span>
         </cnsl-form-field>
 
-        <p class="step-title">{{ 'APP.OIDC.TYPETITLE' | translate }}</p>
+        <p class="step-title">{{ 'APP.TYPETITLE' | translate }}</p>
 
         <cnsl-type-radio [types]="appTypes" (selectedType)="appType?.setValue($event)" [selected]="appType?.value">
         </cnsl-type-radio>
@@ -48,9 +58,13 @@
       </form>
     </mat-step>
 
-    <!-- skip for native applications -->
+    <!-- skip for native OIDC and SAML applications -->
     <mat-step
-      *ngIf="oidcAppRequest.appType !== OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      *ngIf="
+        (appType?.value?.createType === AppCreateType.OIDC &&
+          appType?.value.oidcAppType !== OIDCAppType.OIDC_APP_TYPE_NATIVE) ||
+        appType?.value?.createType === AppCreateType.API
+      "
       [stepControl]="secondFormGroup"
       [editable]="true"
     >
@@ -85,33 +99,39 @@
       <ng-template matStepLabel>{{ 'APP.OIDC.REDIRECTSECTION' | translate }}</ng-template>
 
       <p class="step-title">{{ 'APP.OIDC.REDIRECTTITLE' | translate }}</p>
-      <p class="step-description cnsl-secondary-text" *ngIf="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      >
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
       </p>
-      <p class="step-description cnsl-secondary-text" *ngIf="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_WEB">
+      <p class="step-description cnsl-secondary-text" *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB">
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
       </p>
 
       <cnsl-redirect-uris
         class="redirect-section"
         [canWrite]="true"
-        [isNative]="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
-        (changedUris)="oidcAppRequest.redirectUrisList = $any($event)"
-        [urisList]="oidcAppRequest.redirectUrisList"
+        [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        (changedUris)="oidcAppRequest.setRedirectUrisList($any($event))"
+        [urisList]="oidcAppRequest.toObject().redirectUrisList"
         [getValues]="requestRedirectValuesSubject$"
         title="{{ 'APP.OIDC.REDIRECT' | translate }}"
       >
       </cnsl-redirect-uris>
 
       <p class="step-title">{{ 'APP.OIDC.POSTREDIRECTTITLE' | translate }}</p>
-      <p class="step-description cnsl-secondary-text" *ngIf="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      >
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
       </p>
       <p
         class="step-description cnsl-secondary-text"
         *ngIf="
-          oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_WEB ||
-          oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT
+          appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB ||
+          appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT
         "
       >
         {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
@@ -120,11 +140,11 @@
       <cnsl-redirect-uris
         class="redirect-section"
         [canWrite]="true"
-        (changedUris)="oidcAppRequest.postLogoutRedirectUrisList = $any($event)"
-        [urisList]="oidcAppRequest.postLogoutRedirectUrisList"
+        (changedUris)="oidcAppRequest.setPostLogoutRedirectUrisList($any($event))"
+        [urisList]="oidcAppRequest.toObject().postLogoutRedirectUrisList"
         title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
         [getValues]="requestRedirectValuesSubject$"
-        [isNative]="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
       >
       </cnsl-redirect-uris>
 
@@ -136,97 +156,173 @@
       </div>
     </mat-step>
 
+    <mat-step *ngIf="appType?.value?.createType === AppCreateType.SAML" [editable]="true">
+      <ng-template matStepLabel>{{ 'APP.SAML.CONFIGSECTION' | translate }}</ng-template>
+
+      <form [formGroup]="samlConfigForm">
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
+          <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+        </cnsl-form-field>
+      </form>
+
+      <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+
+      <input
+        #xmlFileInput
+        style="display: none"
+        class="file-input"
+        type="file"
+        accept="text/xml,application/xml"
+        (change)="onDropXML($any($event.target).files)"
+      />
+      <button type="button" mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
+        {{ 'APP.SAML.XML' | translate }}
+      </button>
+
+      <div
+        class="saml-xml"
+        [ngClass]="{ disabled: !!metadataUrl?.value }"
+        *ngIf="decodedBase64 && samlAppRequest.toObject().metadataXml && !samlAppRequest.toObject().metadataUrl"
+      >
+        <!-- <p class="preview-text cnsl-secondary-text">PREVIEW</p> -->
+        <ngx-codemirror
+          [(ngModel)]="decodedBase64"
+          [options]="{
+            lineNumbers: true,
+            theme: 'material',
+            mode: 'application/xml'
+          }"
+        ></ngx-codemirror>
+      </div>
+
+      <div class="app-create-actions">
+        <button mat-stroked-button class="bck-button" matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>
+        <button mat-raised-button color="primary" matStepperNext [attr.data-e2e]="'continue-button-redirecturis'">
+          {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+      </div>
+    </mat-step>
+
     <mat-step>
       <ng-template matStepLabel>{{ 'APP.OIDC.OVERVIEWSECTION' | translate }}</ng-template>
       <p class="step-title">{{ 'APP.OIDC.OVERVIEWTITLE' | translate }}</p>
-      <div class="row cnsl-secondary-text">
-        <span class="left">
+      <div class="row">
+        <span class="left cnsl-secondary-text">
           {{ 'APP.NAME' | translate }}
         </span>
         <span class="right">
-          {{ oidcAppRequest.name }}
+          {{ name?.value }}
         </span>
       </div>
 
       <ng-container *ngIf="appType?.value?.createType === AppCreateType.OIDC">
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.TYPE' | translate }}
           </span>
           <span class="right">
-            {{ 'APP.OIDC.APPTYPE.' + oidcAppRequest.appType | translate }}
+            {{ 'APP.OIDC.APPTYPE.' + oidcAppRequest.toObject().appType | translate }}
           </span>
         </div>
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.GRANT' | translate }}
           </span>
-          <span class="right" *ngIf="oidcAppRequest.grantTypesList && oidcAppRequest.grantTypesList.length > 0">
-            [<span *ngFor="let element of oidcAppRequest.grantTypesList; index as i">
+          <span
+            class="right"
+            *ngIf="oidcAppRequest.toObject().grantTypesList && oidcAppRequest.toObject().grantTypesList.length > 0"
+          >
+            [<span *ngFor="let element of oidcAppRequest.toObject().grantTypesList; index as i">
               {{ 'APP.OIDC.GRANT.' + element | translate }}
-              {{ i < oidcAppRequest.grantTypesList.length - 1 ? ', ' : '' }} </span
+              {{ i < oidcAppRequest.toObject().grantTypesList.length - 1 ? ', ' : '' }} </span
             >]
           </span>
         </div>
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.OIDC.RESPONSETYPE' | translate }}
           </span>
-          <span class="right" *ngIf="oidcAppRequest.responseTypesList && oidcAppRequest.responseTypesList.length > 0">
-            [<span *ngFor="let element of oidcAppRequest.responseTypesList; index as i">
+          <span
+            class="right"
+            *ngIf="oidcAppRequest.toObject().responseTypesList && oidcAppRequest.toObject().responseTypesList.length > 0"
+          >
+            [<span *ngFor="let element of oidcAppRequest.toObject().responseTypesList; index as i">
               {{ 'APP.OIDC.RESPONSE.' + element | translate }}
-              {{ i < oidcAppRequest.responseTypesList.length - 1 ? ', ' : '' }} </span
+              {{ i < oidcAppRequest.toObject().responseTypesList.length - 1 ? ', ' : '' }} </span
             >]
           </span>
         </div>
 
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.AUTHMETHOD' | translate }}
           </span>
           <span class="right">
             <span>
-              {{ 'APP.OIDC.AUTHMETHOD.' + oidcAppRequest.authMethodType | translate }}
+              {{ 'APP.OIDC.AUTHMETHOD.' + oidcAppRequest.toObject().authMethodType | translate }}
             </span>
           </span>
         </div>
 
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.OIDC.REDIRECT' | translate }}
           </span>
-          <span class="right" *ngIf="oidcAppRequest.redirectUrisList && oidcAppRequest.redirectUrisList.length > 0">
-            [<span *ngFor="let redirect of oidcAppRequest.redirectUrisList; index as i">
+          <span
+            class="right"
+            *ngIf="oidcAppRequest.toObject().redirectUrisList && oidcAppRequest.toObject().redirectUrisList.length > 0"
+          >
+            [<span *ngFor="let redirect of oidcAppRequest.toObject().redirectUrisList; index as i">
               {{ redirect }}
-              {{ i < oidcAppRequest.redirectUrisList.length - 1 ? ', ' : '' }} </span
+              {{ i < oidcAppRequest.toObject().redirectUrisList.length - 1 ? ', ' : '' }} </span
             >]
           </span>
         </div>
 
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
           </span>
           <span
             class="right"
-            *ngIf="oidcAppRequest.postLogoutRedirectUrisList && oidcAppRequest.postLogoutRedirectUrisList.length > 0"
+            *ngIf="
+              oidcAppRequest.toObject().postLogoutRedirectUrisList &&
+              oidcAppRequest.toObject().postLogoutRedirectUrisList.length > 0
+            "
           >
-            [<span *ngFor="let redirect of oidcAppRequest.postLogoutRedirectUrisList; index as i">
+            [<span *ngFor="let redirect of oidcAppRequest.toObject().postLogoutRedirectUrisList; index as i">
               {{ redirect }}
-              {{ i < oidcAppRequest.postLogoutRedirectUrisList.length - 1 ? ', ' : '' }} </span
+              {{ i < oidcAppRequest.toObject().postLogoutRedirectUrisList.length - 1 ? ', ' : '' }} </span
             >]
           </span>
         </div>
       </ng-container>
 
       <ng-container *ngIf="appType?.value?.createType === AppCreateType.API">
-        <div class="row cnsl-secondary-text">
-          <span class="left">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
             {{ 'APP.AUTHMETHOD' | translate }}
           </span>
           <span class="right">
             <span>
-              {{ 'APP.API.AUTHMETHOD.' + apiAppRequest.authMethodType | translate }}
+              {{ 'APP.API.AUTHMETHOD.' + authMethodType?.value | translate }}
+            </span>
+          </span>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="appType?.value?.createType === AppCreateType.SAML">
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.SAML.METADATA' | translate }}
+          </span>
+          <span class="right">
+            <span *ngIf="metadataUrl?.value">
+              {{ metadataUrl?.value }}
+            </span>
+            <span *ngIf="samlAppRequest.toObject().metadataXml">
+              {{ 'APP.SAML.METADATAFROMFILE' | translate }}
             </span>
           </span>
         </div>
@@ -278,15 +374,56 @@
           </cnsl-form-field>
         </ng-container>
 
-        <cnsl-form-field class="formfield">
-          <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
-          <mat-select formControlName="authMethodType">
-            <mat-option *ngFor="let type of authMethodTypes" [value]="type.type">
-              <span *ngIf="type.oidc">{{ 'APP.OIDC.AUTHMETHOD.' + type.type | translate }}</span>
-              <span *ngIf="type.api">{{ 'APP.API.AUTHMETHOD.' + type.type | translate }}</span>
-            </mat-option>
-          </mat-select>
-        </cnsl-form-field>
+        <ng-container *ngIf="formappType?.value?.createType !== AppCreateType.SAML">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'APP.AUTHMETHOD' | translate }}</cnsl-label>
+            <mat-select formControlName="authMethodType">
+              <mat-option *ngFor="let type of authMethodTypes" [value]="type.type">
+                <span *ngIf="type.oidc">{{ 'APP.OIDC.AUTHMETHOD.' + type.type | translate }}</span>
+                <span *ngIf="type.api">{{ 'APP.API.AUTHMETHOD.' + type.type | translate }}</span>
+              </mat-option>
+            </mat-select>
+          </cnsl-form-field>
+        </ng-container>
+      </div>
+
+      <div class="content">
+        <ng-container *ngIf="formappType?.value?.createType === AppCreateType.SAML">
+          <div class="saml">
+            <cnsl-form-field class="formfield">
+              <cnsl-label>{{ 'APP.SAML.URL' | translate }}</cnsl-label>
+              <input cnslInput formControlName="metadataUrl" placeholder="https://" />
+            </cnsl-form-field>
+
+            <span class="cnsl-app-or cnsl-secondary-text">{{ 'APP.SAML.OR' | translate }}</span>
+
+            <input
+              #xmlFileInput
+              style="display: none"
+              class="file-input"
+              type="file"
+              (change)="onDropXML($any($event.target).files)"
+            />
+            <button type="button" mat-stroked-button (click)="$event.preventDefault(); xmlFileInput.click()">
+              {{ 'APP.SAML.XML' | translate }}
+            </button>
+
+            <div
+              class="saml-xml"
+              [ngClass]="{ disabled: !!formMetadataUrl?.value }"
+              *ngIf="decodedBase64 && samlAppRequest.toObject().metadataXml && !samlAppRequest.toObject().metadataUrl"
+            >
+              <ngx-codemirror
+                [(ngModel)]="decodedBase64"
+                [options]="{
+                  lineNumbers: true,
+                  theme: 'material',
+                  mode: 'application/xml'
+                }"
+              ></ngx-codemirror>
+            </div>
+          </div>
+        </ng-container>
       </div>
 
       <div class="content" *ngIf="formappType?.value?.createType === AppCreateType.OIDC">
@@ -294,22 +431,22 @@
           <cnsl-redirect-uris
             class="redirect-section"
             [canWrite]="true"
-            (changedUris)="oidcAppRequest.redirectUrisList = $any($event)"
-            [urisList]="oidcAppRequest.redirectUrisList"
+            (changedUris)="oidcAppRequest.setRedirectUrisList($any($event))"
+            [urisList]="oidcAppRequest.toObject().redirectUrisList"
             title="{{ 'APP.OIDC.REDIRECT' | translate }}"
             [getValues]="requestRedirectValuesSubject$"
-            [isNative]="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+            [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
           >
           </cnsl-redirect-uris>
 
           <cnsl-redirect-uris
             class="redirect-section"
             [canWrite]="true"
-            (changedUris)="oidcAppRequest.postLogoutRedirectUrisList = $any($event)"
-            [urisList]="oidcAppRequest.postLogoutRedirectUrisList"
+            (changedUris)="oidcAppRequest.setPostLogoutRedirectUrisList($any($event))"
+            [urisList]="oidcAppRequest.toObject().postLogoutRedirectUrisList"
             title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
             [getValues]="requestRedirectValuesSubject$"
-            [isNative]="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+            [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
           >
           </cnsl-redirect-uris>
         </div>

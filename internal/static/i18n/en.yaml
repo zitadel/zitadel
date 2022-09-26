@@ -249,8 +249,13 @@ Errors:
       NotInactive: Application is not inactive
       OIDCConfigInvalid: OIDC configuration is invalid
       APIConfigInvalid: API configuration is invalid
-      IsNotOIDC: Application is not type oidc
+      SAMLConfigInvalid: SAML configuration is invalid
+      IsNotOIDC: Application is not type OIDC
       IsNotAPI: Application is not type API
+      IsNotSAML: Application is not type SAML
+      SAMLMetadataMissing: SAML metadata is missing
+      SAMLMetadataFormat: SAML Metadata format error
+      SAMLEntityIDAlreadyExisting: SAML EntityID already existing
       OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
       APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
       AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
@@ -751,6 +756,9 @@ EventTypes:
           added: Application key added
           removed: Application key removed
       config:
+        saml:
+          added: SAML Configuration added
+          changed: SAML Configuration changed
         oidc:
           added: OIDC Configuration added
           changed: OIDC Configuration changed

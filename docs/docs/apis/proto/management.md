@@ -1254,6 +1254,19 @@ Returns a new generated secret if needed (Depending on the configuration)
     POST: /projects/{project_id}/apps/oidc
 
 
+### AddSAMLApp
+
+> **rpc** AddSAMLApp([AddSAMLAppRequest](#addsamlapprequest))
+[AddSAMLAppResponse](#addsamlappresponse)
+
+Adds a new saml service provider
+Returns a entityID
+
+
+
+    POST: /projects/{project_id}/apps/saml
+
+
 ### AddAPIApp
 
 > **rpc** AddAPIApp([AddAPIAppRequest](#addapiapprequest))
@@ -1290,6 +1303,18 @@ Changes the configuration of the oidc client
 
 
     PUT: /projects/{project_id}/apps/{app_id}/oidc_config
+
+
+### UpdateSAMLAppConfig
+
+> **rpc** UpdateSAMLAppConfig([UpdateSAMLAppConfigRequest](#updatesamlappconfigrequest))
+[UpdateSAMLAppConfigResponse](#updatesamlappconfigresponse)
+
+Changes the configuration of the saml application
+
+
+
+    PUT: /projects/{project_id}/apps/{app_id}/saml_config
 
 
 ### UpdateAPIAppConfig
@@ -3018,7 +3043,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | primary_color |  string | - | string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this [scope in](../openidoauth/scopes) |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes |  |
 | warn_color |  string | - | string.max_len: 50<br />  |
 | background_color |  string | - | string.max_len: 50<br />  |
 | font_color |  string | - | string.max_len: 50<br />  |
@@ -3689,6 +3714,32 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddSAMLAppRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - | bytes.max_len: 500000<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### AddSAMLAppResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
@@ -8362,6 +8413,31 @@ This is an empty request
 
 
 ### UpdateProjectRoleResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSAMLAppConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - | bytes.max_len: 500000<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### UpdateSAMLAppConfigResponse
 
 
 

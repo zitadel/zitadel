@@ -2,7 +2,6 @@ package login
 
 import (
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -14,13 +13,6 @@ const (
 	UpperCaseRegex = `[A-Z]`
 	NumberRegex    = `[0-9]`
 	SymbolRegex    = `[^A-Za-z0-9]`
-)
-
-var (
-	hasStringLowerCase = regexp.MustCompile(LowerCaseRegex).MatchString
-	hasStringUpperCase = regexp.MustCompile(UpperCaseRegex).MatchString
-	hasNumber          = regexp.MustCompile(NumberRegex).MatchString
-	hasSymbol          = regexp.MustCompile(SymbolRegex).MatchString
 )
 
 func (l *Login) getPasswordComplexityPolicy(r *http.Request, authReq *domain.AuthRequest, orgID string) (*iam_model.PasswordComplexityPolicyView, string, error) {
