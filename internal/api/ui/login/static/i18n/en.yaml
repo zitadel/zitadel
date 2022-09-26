@@ -103,8 +103,8 @@ InitMFAU2F:
   ErrorRetry: Retry, create a new challenge or choose a different method.
 
 InitMFADone:
-  Title: 2-Factor Verification done
-  Description: 2-factor verification successfully done. The secondfactor has to be entered on each login.
+  Title: 2-Factor Setup done
+  Description: Awesome! You just successfully set up your 2-factor and made your account way more secure. The multifactor has to be entered on each login.
   NextButtonText: next
   CancelButtonText: cancel
 

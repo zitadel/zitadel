@@ -103,8 +103,8 @@ InitMFAU2F:
   ErrorRetry: Réessayez, créez un nouveau défi ou choisissez une autre méthode.
 
 InitMFADone:
-  Title: Vérification à 2 facteurs effectuée
-  Description: La vérification du second facteur a été effectuée avec succès. Le second facteur doit être saisi à chaque connexion.
+  Title: Configuration de 2 facteurs faite
+  Description: Génial! Vous venez de configurer avec succès votre facteur 2 et de rendre votre compte beaucoup plus sûr. Le second facteur doit être saisi à chaque connexion.
   NextButtonText: Suivant
   CancelButtonText: Annuler
 

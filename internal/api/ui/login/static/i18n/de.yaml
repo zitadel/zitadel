@@ -103,8 +103,8 @@ InitMFAU2F:
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
 
 InitMFADone:
-  Title: 2-Faktor Verifizierung erstellt
-  Description: 2-Faktor Verifizierung erfolgreich abgeschlossen. Der Zweitfaktor muss bei jeder Anmeldung eingegeben werden.
+  Title: 2-Faktor eingerichtet
+  Description: Großartig! Du hast gerade erfolgreich deinen 2-Faktor eingerichtet und dein Konto viel sicherer gemacht. Der 2-Faktor muss bei jeder Anmeldung eingegeben werden.
   NextButtonText: weiter
   CancelButtonText: abbrechen
 

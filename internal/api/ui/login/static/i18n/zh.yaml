@@ -64,7 +64,7 @@ InitPasswordDone:
 
 InitUser:
   Title: 激活用户
-  Description: 用下面的代码验证您的电子邮件，并设置您的密码。
+  Description: 请在下面输入您收到的验证码，以验证您的电子邮件并设置您的密码。
   CodeLabel: 验证码
   NewPasswordLabel: 新密码
   NewPasswordConfirm: 确认密码
@@ -78,10 +78,10 @@ InitUserDone:
   CancelButtonText: 取消
 
 InitMFAPrompt:
-  Title: 2-Factor设置
-  Description: 双因素认证为您的用户账户提供了额外的安全保障。这确保只有你能访问你的账户。
-  Provider0: 认证器应用(如 Google/Migrosoft Authenticator, Authy)
-  Provider1: 取决于设备（如FaceID、Windows Hello、指纹）。
+  Title: 两步验证设置
+  Description: 两步验证为您的账户提供了额外的安全保障。这确保只有你能访问你的账户。
+  Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
+  Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
   NextButtonText: 继续
   SkipButtonText: 跳过
 
@@ -96,21 +96,21 @@ InitMFAOTP:
 
 InitMFAU2F:
   Title: 设置2-Factor U2F / WebAuthN
-  Description: 通过提供一个名称（如MyPhone，MacBook），然后点击下面的 "注册2-factor "按钮，添加你的设备依赖的2-factor，如FaceID，Windows Hello或指纹。
+  Description: 通过提供一个名称（如MyPhone，MacBook），然后点击下面的 "注册2-Factor" 按钮，添加支持 2-Factor （如FaceID，Windows Hello或指纹）的设备。
   TokenNameLabel: 双因素/设备的名称
   NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
   RegisterTokenButtonText: 注册双因素
   ErrorRetry: 重试、创建新挑战码或选择不同的方法。
 
 InitMFADone:
-  Title: 完成双因素验证
-  Description: 双因素验证已成功完成。每次登录时都必须输入第二要素。
+  Title: 2-Factor设置完成
+  Description: 真棒！你刚刚成功地设置了你的双因素，使你的账户更加安全。你刚刚成功地设置了你的双因素，使你的账户更加安全。第二次因素必须在每次登录时输入。
   NextButtonText: 继续
   CancelButtonText: 取消
 
 MFAProvider:
-  Provider0: 认证器应用(如 Google/Migrosoft Authenticator, Authy)
-  Provider1: 取决于设备（如FaceID、Windows Hello、指纹）。
+  Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
+  Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
   ChooseOther: 或选择其他选项
 
 VerifyMFAOTP:
@@ -144,7 +144,7 @@ PasswordlessPrompt:
 
 PasswordlessRegistration:
   Title: 无密码设置
-  Description: 通过提供一个名称（如MyMobilePhone、MacBook等），然后点击下面的 "注册无密码 "按钮，添加你的认证。
+  Description: 通过提供一个名称（如 MyMobilePhone、MacBook等），然后点击下面的 "注册无密码" 按钮，添加你的认证。
   TokenNameLabel: 设备的名称
   NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
   RegisterTokenButtonText: 注册无密码
