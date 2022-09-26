@@ -152,7 +152,7 @@ PasswordlessRegistration:
 
 PasswordlessRegistrationDone:
   Title: Configurazione dell'autenticazione senza password
-  Description: Dispositivo per passwordless aggiunto con successo.
+  Description: Dispositivo per l'autenticazione passwordless aggiunto con successo.
   DescriptionClose: Ora puoi chiudere questa finestra.
   NextButtonText: Avanti
   CancelButtonText: annulla
