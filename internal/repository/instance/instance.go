@@ -66,7 +66,7 @@ func (e *InstanceChangedEvent) UniqueConstraints() []*eventstore.EventUniqueCons
 	return nil
 }
 
-func NewInstanceChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, oldName, newName string) *InstanceChangedEvent {
+func NewInstanceChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, newName string) *InstanceChangedEvent {
 	return &InstanceChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,

@@ -51,6 +51,17 @@ func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequ
 	}, nil
 }
 
+func (s *Server) UpdateInstance(ctx context.Context, req *system_pb.UpdateInstanceRequest) (*system_pb.UpdateInstanceResponse, error) {
+	ctx = authz.WithInstanceID(ctx, req.InstanceId)
+	details, err := s.command.UpdateInstance(ctx, req.InstanceName)
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.UpdateInstanceResponse{
+		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
 func (s *Server) ExistsDomain(ctx context.Context, req *system_pb.ExistsDomainRequest) (*system_pb.ExistsDomainResponse, error) {
 	domainQuery, err := query.NewInstanceDomainDomainSearchQuery(query.TextEqualsIgnoreCase, req.Domain)
 	if err != nil {

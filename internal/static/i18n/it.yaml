@@ -142,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token non è valido
       NotFound: Refresh Token non trovato
+  Instance:
+    NotFound: Istanza non trovata
+    AlreadyExists: L'istanza esiste già
+    NotChanged: Istanza non modificata
   Org:
     AlreadyExists: Nome dell'organizzazione già preso
     Invalid: L'organizzazione non è valida
