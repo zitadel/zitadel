@@ -1,0 +1,8 @@
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml
+FirstInstance:
+  Org:
+    Name: 'My Org'
+    Human:
+      # use the loginname root@my-org.my.domain
+      Username: 'root'
+      Password: 'RootPassword1!'

@@ -2,24 +2,24 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/id"
-	id_mock "github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id"
+	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		idGenerator     id.Generator
-		secretGenerator crypto.Generator
-		keySize         int
+		eventstore  *eventstore.Eventstore
+		idGenerator id.Generator
+		keySize     int
 	}
 	type args struct {
 		ctx           context.Context
@@ -126,8 +126,7 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "key1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "key1"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -173,9 +172,8 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 						),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "key1"),
-				secretGenerator: GetMockSecretGenerator(t),
-				keySize:         10,
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "key1"),
+				keySize:     10,
 			},
 			args: args{
 				ctx: context.Background(),
@@ -195,10 +193,9 @@ func TestCommandSide_AddAPIApplicationKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                 tt.fields.eventstore,
-				idGenerator:                tt.fields.idGenerator,
-				applicationSecretGenerator: tt.fields.secretGenerator,
-				applicationKeySize:         tt.fields.keySize,
+				eventstore:         tt.fields.eventstore,
+				idGenerator:        tt.fields.idGenerator,
+				applicationKeySize: tt.fields.keySize,
 			}
 			got, err := r.AddApplicationKey(tt.args.ctx, tt.args.key, tt.args.resourceOwner)
 			if tt.res.err == nil {

@@ -3,12 +3,12 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -46,7 +46,7 @@ func NewHumanPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 	}
 }
 
-func HumanPhoneChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPhoneChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	phoneChangedEvent := &HumanPhoneChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -80,8 +80,8 @@ func NewHumanPhoneRemovedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 	}
 }
 
-func HumanPhoneRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanPhoneChangedEvent{
+func HumanPhoneRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	return &HumanPhoneRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
@@ -110,7 +110,7 @@ func NewHumanPhoneVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func HumanPhoneVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPhoneVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanPhoneVerifiedEvent{
 		BaseEvent:       *eventstore.BaseEventFromRepo(event),
 		IsPhoneVerified: true,
@@ -139,7 +139,7 @@ func NewHumanPhoneVerificationFailedEvent(ctx context.Context, aggregate *events
 	}
 }
 
-func HumanPhoneVerificationFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPhoneVerificationFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanPhoneVerificationFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -177,7 +177,7 @@ func NewHumanPhoneCodeAddedEvent(
 	}
 }
 
-func HumanPhoneCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPhoneCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	codeAdded := &HumanPhoneCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -211,7 +211,7 @@ func NewHumanPhoneCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func HumanPhoneCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPhoneCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanPhoneCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

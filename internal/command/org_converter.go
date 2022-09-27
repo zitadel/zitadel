@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func orgWriteModelToOrg(wm *OrgWriteModel) *domain.Org {
@@ -13,10 +13,12 @@ func orgWriteModelToOrg(wm *OrgWriteModel) *domain.Org {
 	}
 }
 
-func orgWriteModelToOrgIAMPolicy(wm *ORGOrgIAMPolicyWriteModel) *domain.OrgIAMPolicy {
-	return &domain.OrgIAMPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.PolicyOrgIAMWriteModel.WriteModel),
-		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
+func orgWriteModelToDomainPolicy(wm *OrgDomainPolicyWriteModel) *domain.DomainPolicy {
+	return &domain.DomainPolicy{
+		ObjectRoot:                             writeModelToObjectRoot(wm.PolicyDomainWriteModel.WriteModel),
+		UserLoginMustBeDomain:                  wm.UserLoginMustBeDomain,
+		ValidateOrgDomains:                     wm.ValidateOrgDomains,
+		SMTPSenderAddressMatchesInstanceDomain: wm.SMTPSenderAddressMatchesInstanceDomain,
 	}
 }
 

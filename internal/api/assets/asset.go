@@ -3,22 +3,25 @@ package assets
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
-	"github.com/caos/logging"
-	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/gorilla/mux"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/management/repository"
-	"github.com/caos/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/static"
+)
+
+const (
+	HandlerPrefix = "/assets/v1"
 )
 
 type Handler struct {
@@ -27,7 +30,7 @@ type Handler struct {
 	commands        *command.Commands
 	authInterceptor *http_mw.AuthInterceptor
 	idGenerator     id.Generator
-	orgRepo         repository.OrgRepository
+	query           *query.Queries
 }
 
 func (h *Handler) AuthInterceptor() *http_mw.AuthInterceptor {
@@ -46,49 +49,55 @@ func (h *Handler) Storage() static.Storage {
 	return h.storage
 }
 
+func AssetAPI(externalSecure bool) func(context.Context) string {
+	return func(ctx context.Context) string {
+		return http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix
+	}
+}
+
+func AssetAPIFromDomain(externalSecure bool, externalPort uint16) func(context.Context) string {
+	return func(ctx context.Context) string {
+		return http_util.BuildHTTP(authz.GetInstance(ctx).RequestedDomain(), externalPort, externalSecure) + HandlerPrefix
+	}
+}
+
 type Uploader interface {
-	Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error
+	UploadAsset(ctx context.Context, info string, asset *command.AssetUpload, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
-	BucketName(data authz.CtxData) string
+	ResourceOwner(instance authz.Instance, data authz.CtxData) string
 	ContentTypeAllowed(contentType string) bool
 	MaxFileSize() int64
+	ObjectType() static.ObjectType
 }
 
 type Downloader interface {
 	ObjectName(ctx context.Context, path string) (string, error)
-	BucketName(ctx context.Context, id string) string
+	ResourceOwner(ctx context.Context, ownerPath string) string
 }
 
 type ErrorHandler func(http.ResponseWriter, *http.Request, error, int)
 
 func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, code int) {
-	logging.Log("ASSET-g5ef1").WithError(err).WithField("uri", r.RequestURI).Error("error occurred on asset api")
+	logging.WithFields("uri", r.RequestURI).WithError(err).Warn("error occurred on asset api")
 	http.Error(w, err.Error(), code)
 }
 
-func NewHandler(
-	commands *command.Commands,
-	verifier *authz.TokenVerifier,
-	authConfig authz.Config,
-	idGenerator id.Generator,
-	storage static.Storage,
-	orgRepo repository.OrgRepository,
-) http.Handler {
+func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, instanceInterceptor, assetCacheInterceptor func(handler http.Handler) http.Handler) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler,
 		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
 		idGenerator:     idGenerator,
 		storage:         storage,
-		orgRepo:         orgRepo,
+		query:           queries,
 	}
 
-	verifier.RegisterServer("Management-API", "assets", AssetsService_AuthMethods) //TODO: separate api?
+	verifier.RegisterServer("Assets-API", "assets", AssetsService_AuthMethods)
 	router := mux.NewRouter()
-	router.Use(sentryhttp.New(sentryhttp.Options{}).Handle)
+	router.Use(instanceInterceptor, assetCacheInterceptor)
 	RegisterRoutes(router, h)
-	router.PathPrefix("/{id}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
-	return router
+	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
+	return http_util.CopyHeadersToContext(http_mw.CORSInterceptor(router))
 }
 
 func (h *Handler) GetFile() Downloader {
@@ -101,8 +110,8 @@ func (l *publicFileDownloader) ObjectName(_ context.Context, path string) (strin
 	return path, nil
 }
 
-func (l *publicFileDownloader) BucketName(_ context.Context, id string) string {
-	return id
+func (l *publicFileDownloader) ResourceOwner(_ context.Context, ownerPath string) string {
+	return ownerPath
 }
 
 const maxMemory = 2 << 20
@@ -113,6 +122,10 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		ctx := r.Context()
 		ctxData := authz.GetCtxData(ctx)
 		err := r.ParseMultipartForm(maxMemory)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		file, handler, err := r.FormFile(paramFile)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -120,7 +133,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		}
 		defer func() {
 			err = file.Close()
-			logging.Log("UPLOAD-GDg34").OnError(err).Warn("could not close file")
+			logging.OnError(err).Warn("could not close file")
 		}()
 		contentType := handler.Header.Get("content-type")
 		size := handler.Size
@@ -133,18 +146,21 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			return
 		}
 
-		bucketName := uploader.BucketName(ctxData)
+		resourceOwner := uploader.ResourceOwner(authz.GetInstance(ctx), ctxData)
 		objectName, err := uploader.ObjectName(ctxData)
 		if err != nil {
 			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
 		}
-		info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, contentType, file, size)
-		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
-			return
+		uploadInfo := &command.AssetUpload{
+			ResourceOwner: resourceOwner,
+			ObjectName:    objectName,
+			ContentType:   contentType,
+			ObjectType:    uploader.ObjectType(),
+			File:          file,
+			Size:          size,
 		}
-		err = uploader.Callback(ctx, info, ctxData.OrgID, s.Commands())
+		err = uploader.UploadAsset(ctx, ctxData.OrgID, uploadInfo, s.Commands())
 		if err != nil {
 			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
@@ -158,11 +174,11 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			return
 		}
 		ctx := r.Context()
-		id := mux.Vars(r)["id"]
-		bucketName := downloader.BucketName(ctx, id)
+		ownerPath := mux.Vars(r)["owner"]
+		resourceOwner := downloader.ResourceOwner(ctx, ownerPath)
 		path := ""
-		if id != "" {
-			path = strings.Split(r.RequestURI, id+"/")[1]
+		if ownerPath != "" {
+			path = strings.Split(r.RequestURI, ownerPath+"/")[1]
 		}
 		objectName, err := downloader.ObjectName(ctx, path)
 		if err != nil {
@@ -170,27 +186,39 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 			return
 		}
 		if objectName == "" {
-			s.ErrorHandler()(w, r, fmt.Errorf("file not found: %v", objectName), http.StatusNotFound)
+			s.ErrorHandler()(w, r, fmt.Errorf("file not found: %v", path), http.StatusNotFound)
 			return
 		}
-		reader, getInfo, err := s.Storage().GetObject(ctx, bucketName, objectName)
-		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
-			return
+		if err = GetAsset(w, r, resourceOwner, objectName, s.Storage()); err != nil {
+			s.ErrorHandler()(w, r, err, http.StatusInternalServerError)
 		}
-		data, err := ioutil.ReadAll(reader)
-		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
-			return
-		}
-		info, err := getInfo()
-		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("download failed: %v", err), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("content-length", strconv.FormatInt(info.Size, 10))
-		w.Header().Set("content-type", info.ContentType)
-		w.Header().Set("ETag", info.ETag)
-		w.Write(data)
 	}
+}
+
+func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName string, storage static.Storage) error {
+	split := strings.Split(objectName, "?v=")
+	if len(split) == 2 {
+		objectName = split[0]
+	}
+	data, getInfo, err := storage.GetObject(r.Context(), authz.GetInstance(r.Context()).InstanceID(), resourceOwner, objectName)
+	if err != nil {
+		return fmt.Errorf("download failed: %v", err)
+	}
+	info, err := getInfo()
+	if err != nil {
+		return fmt.Errorf("download failed: %v", err)
+	}
+	if info.Hash == strings.Trim(r.Header.Get(http_util.IfNoneMatch), "\"") {
+		w.Header().Set(http_util.LastModified, info.LastModified.Format(time.RFC1123))
+		w.Header().Set(http_util.Etag, "\""+info.Hash+"\"")
+		w.WriteHeader(304)
+		return nil
+	}
+	w.Header().Set(http_util.ContentLength, strconv.FormatInt(info.Size, 10))
+	w.Header().Set(http_util.ContentType, info.ContentType)
+	w.Header().Set(http_util.LastModified, info.LastModified.Format(time.RFC1123))
+	w.Header().Set(http_util.Etag, "\""+info.Hash+"\"")
+	_, err = w.Write(data)
+	logging.New().OnError(err).Error("error writing response for asset")
+	return nil
 }

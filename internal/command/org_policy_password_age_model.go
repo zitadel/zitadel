@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
 type OrgPasswordAgePolicyWriteModel struct {
@@ -24,7 +24,7 @@ func NewOrgPasswordAgePolicyWriteModel(orgID string) *OrgPasswordAgePolicyWriteM
 	}
 }
 
-func (wm *OrgPasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgPasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.PasswordAgePolicyAddedEvent:

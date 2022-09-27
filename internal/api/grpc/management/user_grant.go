@@ -3,37 +3,43 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/api/grpc/user"
-
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrantByIDRequest) (*mgmt_pb.GetUserGrantByIDResponse, error) {
-	grant, err := s.usergrant.UserGrantByID(ctx, req.GrantId)
+	idQuery, err := query.NewUserGrantGrantIDSearchQuery(req.GrantId)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewUserGrantResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	grant, err := s.query.UserGrant(ctx, true, idQuery, ownerQuery)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetUserGrantByIDResponse{
-		UserGrant: user.UserGrantToPb(grant),
+		UserGrant: user.UserGrantToPb(s.assetAPIPrefix(ctx), grant),
 	}, nil
 }
 
 func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*mgmt_pb.ListUserGrantResponse, error) {
-	r := ListUserGrantsRequestToModel(ctx, req)
-	r.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
-	res, err := s.usergrant.SearchUserGrants(ctx, r)
+	queries, err := ListUserGrantsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.UserGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserGrantResponse{
-		Result: user.UserGrantsToPb(res.Result),
-		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  user.UserGrantsToPb(s.assetAPIPrefix(ctx), res.UserGrants),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 

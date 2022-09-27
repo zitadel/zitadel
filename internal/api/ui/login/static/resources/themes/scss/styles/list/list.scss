@@ -1,0 +1,5 @@
+@import 'list_base';
+
+.lgn-list, ul {
+  @include lgn-list-base;
+}

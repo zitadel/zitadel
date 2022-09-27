@@ -1,0 +1,63 @@
+#### redirect_uri
+
+Native clients might have to register multiple redirect_uris as operating system have different requirements.
+Typically, you register a redirect_uri starting with a custom protocol, e.g. `ch.zitadel.app://callback`.
+You're also allowed to use http://localhost, http://127.0.0.1 and http:[::1] without specifying a port: `http://locahost/callback`.
+
+#### post creation actions
+
+After the application creation, you might want to set additional options like `refresh_token` and `additional origins`.
+
+If you want to request refresh_tokens and use them to renew the user's access_tokens without their interaction,
+enable them in the OIDC Configuration section by ticking the checkbox.
+
+When calling the userinfo_endpoint or any ZITADEL API, we will check if an origin header is sent. This is automatically done
+by the user agent. If one is sent we will check if the origin is allowed for your application. By default, all computed
+origins of the redirect_uri list are allowed.
+So if your native app is built with a JavaScript base framework like ReactNative and you only specified redirect_uris
+with a custom protocol, you will need to add the origin where the app is served from, e.g. `http://localhost:8100`.
+
+### Additional parameters and customization
+
+There are additional parameters and values you can provide to satisfy your use case and to customize the user's authentication flow.
+Please check the [authorization_endpoint reference](/docs/apis/openidoauth/endpoints#authorization_endpoint) in the OAuth / OIDC documentation.
+
+## Callback
+
+Regardless of a successful or error response from the authorization_endpoint, the authorization server will call your
+callback endpoint you provided by the `redirect_uri`.
+
+:::note
+If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client,
+the error will be display directly to the user on the auth server.
+:::
+
+Upon successful authentication you'll be given a `code` and if provided the unmodified `state` parameter.
+You will need this `code` in the token request.
+
+If a parameter was missing, malformed or any other error occurred, your answer will contain an `error` stating the error type,
+possibly an `error_description` providing some information about the error and its reason and the `state` parameter.
+Check the [error response section](/docs/apis/openidoauth/endpoints#error-response) in the authorization_endpoint reference.
+
+## Token request
+
+Next you will have to exchange the given `code` for the tokens. For this HTTP POST request (form-urlencoded) you will need to provide the following:
+
+- code: the code that was issued from the authorization request
+- grant_type: must be `authorization_code`
+- redirect_uri: callback uri where the code was sent to. Must match exactly the redirect_uri of the authorization request
+
+Depending on your authentication method you'll need additional headers and parameters:
+
+Send your `client_id` and the previously generated string as `code_verifier` for us to recompute the `code_challenge` of the authorization request:
+
+```curl
+curl --request POST \
+--url {your-domain}/oauth/v2/token \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data grant_type=authorization_code \
+--data code=${code} \
+--data redirect_uri=${redirect_uri} \
+--data client_id=${client_id} \
+--data code_verifier=${code_verifier}
+```

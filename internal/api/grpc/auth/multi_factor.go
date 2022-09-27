@@ -3,20 +3,35 @@ package auth
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
-	user_pb "github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
+	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFactorsRequest) (*auth_pb.ListMyAuthFactorsResponse, error) {
-	mfas, err := s.repo.MyUserMFAs(ctx)
+	query := new(query.UserAuthMethodSearchQueries)
+	err := query.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendStateQuery(domain.MFAStateReady)
+	if err != nil {
+		return nil, err
+	}
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyAuthFactorsResponse{
-		Result: user_grpc.AuthFactorsToPb(mfas),
+		Result: user_grpc.AuthMethodsToPb(authMethods),
 	}, nil
 }
 

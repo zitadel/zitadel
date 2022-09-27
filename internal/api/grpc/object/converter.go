@@ -5,25 +5,31 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/query"
-	object_pb "github.com/caos/zitadel/pkg/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
 )
 
 func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      objectDetail.Sequence,
-		ChangeDate:    timestamppb.New(objectDetail.EventDate),
 		ResourceOwner: objectDetail.ResourceOwner,
 	}
+	if !objectDetail.EventDate.IsZero() {
+		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
+	}
+	return details
 }
 
 func DomainToAddDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      objectDetail.Sequence,
-		CreationDate:  timestamppb.New(objectDetail.EventDate),
 		ResourceOwner: objectDetail.ResourceOwner,
 	}
+	if !objectDetail.EventDate.IsZero() {
+		details.CreationDate = timestamppb.New(objectDetail.EventDate)
+	}
+	return details
 }
 
 func ToViewDetailsPb(
@@ -32,12 +38,17 @@ func ToViewDetailsPb(
 	changeDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      sequence,
-		CreationDate:  timestamppb.New(creationDate),
-		ChangeDate:    timestamppb.New(changeDate),
 		ResourceOwner: resourceOwner,
 	}
+	if !creationDate.IsZero() {
+		details.CreationDate = timestamppb.New(creationDate)
+	}
+	if !changeDate.IsZero() {
+		details.ChangeDate = timestamppb.New(changeDate)
+	}
+	return details
 }
 
 func ChangeToDetailsPb(
@@ -45,11 +56,14 @@ func ChangeToDetailsPb(
 	changeDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      sequence,
-		ChangeDate:    timestamppb.New(changeDate),
 		ResourceOwner: resourceOwner,
 	}
+	if !changeDate.IsZero() {
+		details.ChangeDate = timestamppb.New(changeDate)
+	}
+	return details
 }
 
 func AddToDetailsPb(
@@ -57,11 +71,14 @@ func AddToDetailsPb(
 	creationDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
-	return &object_pb.ObjectDetails{
+	details := &object_pb.ObjectDetails{
 		Sequence:      sequence,
-		CreationDate:  timestamppb.New(creationDate),
 		ResourceOwner: resourceOwner,
 	}
+	if !creationDate.IsZero() {
+		details.CreationDate = timestamppb.New(creationDate)
+	}
+	return details
 }
 
 func ToListDetails(
@@ -69,11 +86,15 @@ func ToListDetails(
 	processedSequence uint64,
 	viewTimestamp time.Time,
 ) *object_pb.ListDetails {
-	return &object_pb.ListDetails{
+	details := &object_pb.ListDetails{
 		TotalResult:       totalResult,
 		ProcessedSequence: processedSequence,
-		ViewTimestamp:     timestamppb.New(viewTimestamp),
 	}
+	if !viewTimestamp.IsZero() {
+		details.ViewTimestamp = timestamppb.New(viewTimestamp)
+	}
+
+	return details
 }
 
 func TextMethodToModel(method object_pb.TextQueryMethod) domain.SearchMethod {
@@ -124,7 +145,7 @@ func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
 
 func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc bool) {
 	if query == nil {
-		return
+		return 0, 0, false
 	}
 	return query.Offset, uint64(query.Limit), query.Asc
 }

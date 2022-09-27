@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/repository/idpconfig"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type IDPJWTConfigWriteModel struct {
@@ -25,7 +25,7 @@ func NewOrgIDPJWTConfigWriteModel(idpConfigID, orgID string) *IDPJWTConfigWriteM
 	}
 }
 
-func (wm *IDPJWTConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IDPJWTConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.IDPJWTConfigAddedEvent:

@@ -3,8 +3,8 @@ package admin
 import (
 	"testing"
 
-	"github.com/caos/zitadel/internal/test"
-	"github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/internal/test"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func TestAddIAMMemberToDomain(t *testing.T) {

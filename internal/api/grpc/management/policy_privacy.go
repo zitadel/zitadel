@@ -3,14 +3,14 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetPrivacyPolicyRequest) (*mgmt_pb.GetPrivacyPolicyResponse, error) {
-	policy, err := s.org.GetPrivacyPolicy(ctx)
+	policy, err := s.query.PrivacyPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetPrivacyPoli
 }
 
 func (s *Server) GetDefaultPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetDefaultPrivacyPolicyRequest) (*mgmt_pb.GetDefaultPrivacyPolicyResponse, error) {
-	policy, err := s.org.GetDefaultPrivacyPolicy(ctx)
+	policy, err := s.query.DefaultPrivacyPolicy(ctx, true)
 	if err != nil {
 		return nil, err
 	}

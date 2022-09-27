@@ -6,15 +6,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/id"
-	id_mock "github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id"
+	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommandSide_AddMachine(t *testing.T) {
@@ -77,41 +77,16 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			},
 		},
 		{
-			name: "org policy global, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								false,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
-					Username: "username",
-					Name:     "name",
-				},
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
 			name: "add machine, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),

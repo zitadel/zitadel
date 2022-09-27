@@ -3,8 +3,8 @@ package sdk
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type filterFunc func(context.Context, *es_models.SearchQuery) ([]*es_models.Event, error)

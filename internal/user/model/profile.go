@@ -3,7 +3,7 @@ package model
 import (
 	"golang.org/x/text/language"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type Profile struct {
@@ -17,7 +17,7 @@ type Profile struct {
 	Gender             Gender
 	PreferredLoginName string
 	LoginNames         []string
-	AvatarURL          string
+	AvatarKey          string
 }
 
 func (p *Profile) IsValid() bool {

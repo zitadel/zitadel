@@ -1,8 +1,9 @@
 package model
 
 import (
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"testing"
+
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func TestFormatPhoneNumber(t *testing.T) {

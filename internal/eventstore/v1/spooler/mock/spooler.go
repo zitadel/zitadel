@@ -5,44 +5,45 @@
 package mock
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 	time "time"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockLocker is a mock of Locker interface
+// MockLocker is a mock of Locker interface.
 type MockLocker struct {
 	ctrl     *gomock.Controller
 	recorder *MockLockerMockRecorder
 }
 
-// MockLockerMockRecorder is the mock recorder for MockLocker
+// MockLockerMockRecorder is the mock recorder for MockLocker.
 type MockLockerMockRecorder struct {
 	mock *MockLocker
 }
 
-// NewMockLocker creates a new mock instance
+// NewMockLocker creates a new mock instance.
 func NewMockLocker(ctrl *gomock.Controller) *MockLocker {
 	mock := &MockLocker{ctrl: ctrl}
 	mock.recorder = &MockLockerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockLocker) EXPECT() *MockLockerMockRecorder {
 	return m.recorder
 }
 
-// Renew mocks base method
-func (m *MockLocker) Renew(lockerID, viewModel string, waitTime time.Duration) error {
+// Renew mocks base method.
+func (m *MockLocker) Renew(lockerID, viewModel, instanceID string, waitTime time.Duration) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Renew", lockerID, viewModel, waitTime)
+	ret := m.ctrl.Call(m, "Renew", lockerID, viewModel, instanceID, waitTime)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Renew indicates an expected call of Renew
-func (mr *MockLockerMockRecorder) Renew(lockerID, viewModel, waitTime interface{}) *gomock.Call {
+// Renew indicates an expected call of Renew.
+func (mr *MockLockerMockRecorder) Renew(lockerID, viewModel, instanceID, waitTime interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Renew", reflect.TypeOf((*MockLocker)(nil).Renew), lockerID, viewModel, waitTime)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Renew", reflect.TypeOf((*MockLocker)(nil).Renew), lockerID, viewModel, instanceID, waitTime)
 }

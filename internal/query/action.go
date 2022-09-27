@@ -8,9 +8,11 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/api/authz"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 var (
@@ -31,6 +33,10 @@ var (
 	}
 	ActionColumnResourceOwner = Column{
 		name:  projection.ActionResourceOwnerCol,
+		table: actionTable,
+	}
+	ActionColumnInstanceID = Column{
+		name:  projection.ActionInstanceIDCol,
 		table: actionTable,
 	}
 	ActionColumnSequence = Column{
@@ -83,17 +89,21 @@ type ActionSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *ActionSearchQueries) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *ActionSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }
 
 func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries) (actions *Actions, err error) {
 	query, scan := prepareActionsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		}).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SDgwg", "Errors.Query.InvalidRequest")
 	}
@@ -114,10 +124,9 @@ func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (*
 	stmt, scan := prepareActionQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			ActionColumnID.identifier(): id,
-		},
-		sq.Eq{
+			ActionColumnID.identifier():            id,
 			ActionColumnResourceOwner.identifier(): orgID,
+			ActionColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
@@ -137,6 +146,10 @@ func NewActionNameSearchQuery(method TextComparison, value string) (SearchQuery,
 
 func NewActionStateSearchQuery(value domain.ActionState) (SearchQuery, error) {
 	return NewNumberQuery(ActionColumnState, int(value), NumberEquals)
+}
+
+func NewActionIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(ActionColumnID, id, TextEquals)
 }
 
 func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, error)) {

@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	_ "github.com/caos/zitadel/internal/statik"
+	_ "github.com/zitadel/zitadel/internal/statik"
 )
 
 func NoCacheInterceptor() grpc.UnaryServerInterceptor {

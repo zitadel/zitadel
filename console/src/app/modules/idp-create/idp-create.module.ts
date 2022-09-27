@@ -11,27 +11,32 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 
+import { CardModule } from '../card/card.module';
+import { CreateLayoutModule } from '../create-layout/create-layout.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { IdpCreateRoutingModule } from './idp-create-routing.module';
 import { IdpCreateComponent } from './idp-create.component';
+import { IdpTypeRadioComponent } from './idp-type-radio/idp-type-radio.component';
 
 @NgModule({
-  declarations: [IdpCreateComponent],
+  declarations: [IdpCreateComponent, IdpTypeRadioComponent],
   imports: [
     IdpCreateRoutingModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    CreateLayoutModule,
     InfoSectionModule,
     InputModule,
     MatButtonModule,
     MatSelectModule,
     MatIconModule,
     MatChipsModule,
+    CardModule,
     MatCheckboxModule,
     MatTooltipModule,
     TranslateModule,
     MatProgressBarModule,
   ],
 })
-export class IdpCreateModule { }
+export class IdpCreateModule {}

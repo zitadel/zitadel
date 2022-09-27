@@ -3,7 +3,7 @@ package repository
 import (
 	"regexp"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 var versionRegexp = regexp.MustCompile(`^v[0-9]+(\.[0-9]+){0,2}$`)

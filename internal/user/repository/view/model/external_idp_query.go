@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type ExternalIDPSearchRequest usr_model.ExternalIDPSearchRequest
@@ -59,6 +59,8 @@ func (key ExternalIDPSearchKey) ToColumnName() string {
 		return ExternalIDPKeyIDPConfigID
 	case usr_model.ExternalIDPSearchKeyResourceOwner:
 		return ExternalIDPKeyResourceOwner
+	case usr_model.ExternalIDPSearchKeyInstanceID:
+		return ExternalIDPKeyInstanceID
 	default:
 		return ""
 	}

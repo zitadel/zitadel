@@ -2,15 +2,17 @@ package model
 
 import (
 	"encoding/json"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
 
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/iam/model"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 const (
@@ -33,24 +35,9 @@ type PasswordComplexityPolicyView struct {
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func PasswordComplexityViewFromModel(policy *model.PasswordComplexityPolicyView) *PasswordComplexityPolicyView {
-	return &PasswordComplexityPolicyView{
-		AggregateID:  policy.AggregateID,
-		Sequence:     policy.Sequence,
-		CreationDate: policy.CreationDate,
-		ChangeDate:   policy.ChangeDate,
-		MinLength:    policy.MinLength,
-		HasLowercase: policy.HasLowercase,
-		HasUppercase: policy.HasUppercase,
-		HasSymbol:    policy.HasSymbol,
-		HasNumber:    policy.HasNumber,
-		Default:      policy.Default,
-	}
-}
-
-func PasswordComplexityViewToModel(policy *PasswordComplexityPolicyView) *model.PasswordComplexityPolicyView {
+func PasswordComplexityViewToModel(policy *query.PasswordComplexityPolicy) *model.PasswordComplexityPolicyView {
 	return &model.PasswordComplexityPolicyView{
-		AggregateID:  policy.AggregateID,
+		AggregateID:  policy.ID,
 		Sequence:     policy.Sequence,
 		CreationDate: policy.CreationDate,
 		ChangeDate:   policy.ChangeDate,
@@ -59,19 +46,21 @@ func PasswordComplexityViewToModel(policy *PasswordComplexityPolicyView) *model.
 		HasUppercase: policy.HasUppercase,
 		HasSymbol:    policy.HasSymbol,
 		HasNumber:    policy.HasNumber,
-		Default:      policy.Default,
+		Default:      policy.IsDefault,
 	}
 }
 
 func (i *PasswordComplexityPolicyView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.PasswordComplexityPolicyAdded, org_es_model.PasswordComplexityPolicyAdded:
+	switch eventstore.EventType(event.Type) {
+	case instance.PasswordComplexityPolicyAddedEventType,
+		org.PasswordComplexityPolicyAddedEventType:
 		i.setRootData(event)
 		i.CreationDate = event.CreationDate
 		err = i.SetData(event)
-	case es_model.PasswordComplexityPolicyChanged, org_es_model.PasswordComplexityPolicyChanged:
+	case instance.PasswordComplexityPolicyChangedEventType,
+		org.PasswordComplexityPolicyChangedEventType:
 		err = i.SetData(event)
 	}
 	return err

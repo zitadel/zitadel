@@ -1,9 +1,10 @@
 package keypair
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(AddedEventType, AddedEventMapper)
+	es.RegisterFilterEventMapper(AddedCertificateEventType, AddedCertificateEventMapper)
 }

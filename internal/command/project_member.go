@@ -4,13 +4,11 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/caos/zitadel/internal/eventstore"
-
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
@@ -21,7 +19,7 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, 
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +31,12 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, 
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
+func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (eventstore.Command, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-3m9ds", "Errors.Project.Member.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-3m9ds", "Errors.Project.Member.Invalid")
 	}
 
 	err := c.checkUserExists(ctx, addedMember.UserID, "")
@@ -56,13 +54,13 @@ func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.
 	return project.NewProjectMemberAddedEvent(ctx, projectAgg, member.UserID, member.Roles...), nil
 }
 
-//ChangeProjectMember updates an existing member
+// ChangeProjectMember updates an existing member
 func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
 	if !member.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-LiaZi", "Errors.Project.Member.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-LiaZi", "Errors.Project.Member.Invalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-3m9d", "Errors.Project.Member.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-3m9d", "Errors.Project.Member.Invalid")
 	}
 
 	existingMember, err := c.projectMemberWriteModelByID(ctx, member.AggregateID, member.UserID, resourceOwner)
@@ -71,10 +69,10 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Membe
 	}
 
 	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.RolesNotChanged")
+		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.RolesNotChanged")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +87,7 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Membe
 
 func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-66mHd", "Errors.Project.Member.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-66mHd", "Errors.Project.Member.Invalid")
 	}
 	m, err := c.projectMemberWriteModelByID(ctx, projectID, userID, resourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
@@ -101,7 +99,7 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
 	removeEvent := c.removeProjectMember(ctx, projectAgg, userID, false)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +110,7 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
-func (c *Commands) removeProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.EventPusher {
+func (c *Commands) removeProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {
 	if cascade {
 		return project.NewProjectMemberCascadeRemovedEvent(
 			ctx,

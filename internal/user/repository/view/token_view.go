@@ -2,18 +2,21 @@ package view
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/user/model"
-	usr_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/user/model"
+	usr_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
-func TokenByID(db *gorm.DB, table, tokenID string) (*usr_model.TokenView, error) {
+func TokenByIDs(db *gorm.DB, table, tokenID, userID, instanceID string) (*usr_model.TokenView, error) {
 	token := new(usr_model.TokenView)
-	query := repository.PrepareGetByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyTokenID), tokenID)
+	query := repository.PrepareGetByQuery(table,
+		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyTokenID, Method: domain.SearchMethodEquals, Value: tokenID},
+		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyUserID, Method: domain.SearchMethodEquals, Value: userID},
+		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID},
+	)
 	err := query(db, token)
 	if errors.IsNotFound(err) {
 		return nil, errors.ThrowNotFound(nil, "VIEW-6ub3p", "Errors.Token.NotFound")
@@ -21,15 +24,20 @@ func TokenByID(db *gorm.DB, table, tokenID string) (*usr_model.TokenView, error)
 	return token, err
 }
 
-func TokensByUserID(db *gorm.DB, table, userID string) ([]*usr_model.TokenView, error) {
+func TokensByUserID(db *gorm.DB, table, userID, instanceID string) ([]*usr_model.TokenView, error) {
 	tokens := make([]*usr_model.TokenView, 0)
 	userIDQuery := &model.TokenSearchQuery{
 		Key:    model.TokenSearchKeyUserID,
 		Method: domain.SearchMethodEquals,
 		Value:  userID,
 	}
+	instanceIDQuery := &model.TokenSearchQuery{
+		Key:    model.TokenSearchKeyInstanceID,
+		Method: domain.SearchMethodEquals,
+		Value:  instanceID,
+	}
 	query := repository.PrepareSearchQuery(table, usr_model.TokenSearchRequest{
-		Queries: []*model.TokenSearchQuery{userIDQuery},
+		Queries: []*model.TokenSearchQuery{userIDQuery, instanceIDQuery},
 	})
 	_, err := query(db, &tokens)
 	return tokens, err
@@ -49,25 +57,43 @@ func PutTokens(db *gorm.DB, table string, tokens ...*usr_model.TokenView) error 
 	return save(db, t...)
 }
 
-func DeleteToken(db *gorm.DB, table, tokenID string) error {
-	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyTokenID), tokenID)
-	return delete(db)
-}
-
-func DeleteSessionTokens(db *gorm.DB, table, agentID, userID string) error {
+func DeleteToken(db *gorm.DB, table, tokenID, instanceID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyUserAgentID), Value: agentID},
-		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyUserID), Value: userID},
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyTokenID), tokenID},
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
 	)
 	return delete(db)
 }
 
-func DeleteUserTokens(db *gorm.DB, table, userID string) error {
-	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyUserID), userID)
+func DeleteSessionTokens(db *gorm.DB, table, agentID, userID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyUserAgentID), Value: agentID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyUserID), Value: userID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), Value: instanceID},
+	)
 	return delete(db)
 }
 
-func DeleteApplicationTokens(db *gorm.DB, table string, appIDs []string) error {
-	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyApplicationID), pq.StringArray(appIDs))
+func DeleteUserTokens(db *gorm.DB, table, userID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyUserID), userID},
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+	)
+	return delete(db)
+}
+
+func DeleteTokensFromRefreshToken(db *gorm.DB, table, refreshTokenID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyRefreshTokenID), refreshTokenID},
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+	)
+	return delete(db)
+}
+
+func DeleteApplicationTokens(db *gorm.DB, table, instanceID string, appIDs []string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyApplicationID), appIDs},
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+	)
 	return delete(db)
 }

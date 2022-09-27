@@ -7,4 +7,5 @@ const (
 	Operation_Greater
 	Operation_Less
 	Operation_In
+	Operation_NotIn
 )

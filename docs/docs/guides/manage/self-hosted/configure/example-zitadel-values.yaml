@@ -1,0 +1,17 @@
+# All possible options and their defaults: https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml
+zitadel:
+  configmapConfig:
+    Log:
+      Level: 'info'
+
+    # Make ZITADEL accessible over HTTP, not HTTPS
+    ExternalSecure: false
+    ExternalDomain: localhost
+
+    # the configmap is also passed to the zitadel binary via the --steps flag
+    FirstInstance:
+      Org:
+        Human:
+          # use the loginname root@zitadel.localhost
+          Username: 'root'
+          Password: 'RootPassword1!'

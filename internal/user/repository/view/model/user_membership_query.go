@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type UserMembershipSearchRequest usr_model.UserMembershipSearchRequest
@@ -61,6 +61,9 @@ func (key UserMembershipSearchKey) ToColumnName() string {
 		return UserMembershipKeyAggregateID
 	case usr_model.UserMembershipSearchKeyObjectID:
 		return UserMembershipKeyObjectID
+	case usr_model.UserMembershipSearchKeyInstanceID:
+		return UserMembershipKeyInstanceID
+
 	default:
 		return ""
 	}

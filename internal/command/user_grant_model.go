@@ -1,11 +1,11 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
 
 type UserGrantWriteModel struct {
@@ -89,17 +89,19 @@ type UserGrantPreConditionReadModel struct {
 	UserID             string
 	ProjectID          string
 	ProjectGrantID     string
+	ResourceOwner      string
 	UserExists         bool
 	ProjectExists      bool
 	ProjectGrantExists bool
 	ExistingRoleKeys   []string
 }
 
-func NewUserGrantPreConditionReadModel(userID, projectID, projectGrantID string) *UserGrantPreConditionReadModel {
+func NewUserGrantPreConditionReadModel(userID, projectID, projectGrantID, resourceOwner string) *UserGrantPreConditionReadModel {
 	return &UserGrantPreConditionReadModel{
 		UserID:         userID,
 		ProjectID:      projectID,
 		ProjectGrantID: projectGrantID,
+		ResourceOwner:  resourceOwner,
 	}
 }
 
@@ -115,17 +117,18 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		case *user.UserRemovedEvent:
 			wm.UserExists = false
 		case *project.ProjectAddedEvent:
-			wm.ProjectExists = true
+			if wm.ProjectGrantID == "" && wm.ResourceOwner == e.Aggregate().ResourceOwner {
+				wm.ProjectExists = true
+			}
 		case *project.ProjectRemovedEvent:
 			wm.ProjectExists = false
 		case *project.GrantAddedEvent:
-			if wm.ProjectGrantID == e.GrantID {
+			if wm.ProjectGrantID == e.GrantID && wm.ResourceOwner == e.GrantedOrgID {
 				wm.ProjectGrantExists = true
 				wm.ExistingRoleKeys = e.RoleKeys
 			}
 		case *project.GrantChangedEvent:
 			if wm.ProjectGrantID == e.GrantID {
-				wm.ProjectGrantExists = true
 				wm.ExistingRoleKeys = e.RoleKeys
 			}
 		case *project.GrantRemovedEvent:

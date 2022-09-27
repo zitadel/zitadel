@@ -9,7 +9,8 @@ import (
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 	api_trace "go.opentelemetry.io/otel/trace"
 
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	otel_resource "github.com/zitadel/zitadel/internal/telemetry/otel"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Tracer struct {
@@ -17,19 +18,24 @@ type Tracer struct {
 	sampler  sdk_trace.Sampler
 }
 
-func NewTracer(name string, sampler sdk_trace.Sampler, exporter sdk_trace.SpanExporter) *Tracer {
+func NewTracer(sampler sdk_trace.Sampler, exporter sdk_trace.SpanExporter) (*Tracer, error) {
+	resource, err := otel_resource.ResourceWithService()
+	if err != nil {
+		return nil, err
+	}
 	spanProcessor := sdk_trace.NewBatchSpanProcessor(exporter)
 	tp := sdk_trace.NewTracerProvider(
 		sdk_trace.WithSampler(sampler),
 		sdk_trace.WithBatcher(exporter),
 		sdk_trace.WithSpanProcessor(spanProcessor),
+		sdk_trace.WithResource(resource),
 	)
 
 	otel.SetTracerProvider(tp)
 	tc := propagation.TraceContext{}
 	otel.SetTextMapPropagator(tc)
 
-	return &Tracer{Exporter: tp.Tracer(name), sampler: sampler}
+	return &Tracer{Exporter: tp.Tracer(""), sampler: sampler}, nil
 }
 
 func (t *Tracer) Sampler() sdk_trace.Sampler {

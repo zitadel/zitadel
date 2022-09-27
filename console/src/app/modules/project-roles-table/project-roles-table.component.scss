@@ -1,0 +1,48 @@
+.icon-button {
+  margin-right: 0.5rem;
+}
+
+.action {
+  width: 40px;
+}
+
+.margin-neg {
+  margin-left: -1rem;
+}
+
+.role {
+  display: inline-block;
+  margin: 0.25rem;
+  cursor: pointer;
+
+  &.no-selection {
+    cursor: default;
+  }
+}
+
+.role-table-actions {
+  width: 50px;
+}
+
+.role-key {
+  display: flex;
+}
+
+.pointer {
+  outline: none;
+  cursor: pointer;
+}
+
+tr {
+  outline: none;
+
+  button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    button {
+      visibility: visible;
+    }
+  }
+}

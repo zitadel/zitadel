@@ -1,0 +1,62 @@
+<div
+  *ngIf="type !== ActionKeysType.ORGSWITCHER && (isHandset$ | async) === false"
+  class="action-keys-wrapper"
+  [ngSwitch]="type"
+  [ngClass]="{ 'without-margin': withoutMargin, 'no-contrast-mode': doNotUseContrast }"
+>
+  <div *ngSwitchCase="ActionKeysType.CLEAR" class="action-keys-row">
+    <div class="action-key esc">
+      <div class="key-overlay"></div>
+      <span>ESC</span>
+    </div>
+  </div>
+  <div *ngSwitchCase="ActionKeysType.ADD" class="action-keys-row" data-e2e="action-key-add">
+    <div class="action-key">
+      <div class="key-overlay"></div>
+      <span>N</span>
+    </div>
+  </div>
+  <div *ngSwitchCase="ActionKeysType.DELETE" class="action-keys-row">
+    <div class="action-key">
+      <div class="key-overlay"></div>
+      <span *ngIf="isMacLike || isIOS; else otherOS">⌘</span>
+    </div>
+    +
+    <div class="action-key">
+      <div class="key-overlay"></div>
+      <span>BS</span>
+    </div>
+  </div>
+  <div *ngSwitchCase="ActionKeysType.DEACTIVATE" class="action-keys-row">
+    <div class="action-key">
+      <div class="key-overlay"></div>
+      <span *ngIf="isMacLike || isIOS; else otherOS">⌘</span>
+    </div>
+    +
+    <div class="action-key">
+      <div class="key-overlay"></div>
+      <span>↓</span>
+    </div>
+  </div>
+  <div *ngSwitchCase="ActionKeysType.REACTIVATE" class="action-keys-row">
+    <div class="action-key">
+      <div class="key-overlay"></div>
+      <span *ngIf="isMacLike || isIOS; else otherOS">⌘</span>
+    </div>
+    +
+    <div class="action-key">
+      <div class="key-overlay"></div>
+      <span>↑</span>
+    </div>
+  </div>
+  <div *ngSwitchCase="ActionKeysType.FILTER" class="action-keys-row">
+    <div class="action-key">
+      <div class="key-overlay"></div>
+      <span>F</span>
+    </div>
+  </div>
+</div>
+
+<ng-template #otherOS>
+  <span>crtl</span>
+</ng-template>

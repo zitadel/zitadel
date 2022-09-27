@@ -7,19 +7,21 @@ import (
 	"io"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/gamut"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	iam_model "github.com/zitadel/zitadel/internal/iam/repository/view/model"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/static"
 )
 
 const (
@@ -30,21 +32,13 @@ type Styling struct {
 	handler
 	static       static.Storage
 	subscription *v1.Subscription
-	devMode      bool
-	resourceUrl  string
 }
 
-func newStyling(handler handler, static static.Storage, localDevMode bool) *Styling {
+func newStyling(handler handler, static static.Storage) *Styling {
 	h := &Styling{
 		handler: handler,
 		static:  static,
 	}
-	prefix := ""
-	if localDevMode {
-		prefix = "/login"
-	}
-	h.resourceUrl = prefix + "/resources/dynamic" //TODO: ?
-
 	h.subscribe()
 
 	return h
@@ -67,61 +61,87 @@ func (m *Styling) Subscription() *v1.Subscription {
 	return m.subscription
 }
 
-func (_ *Styling) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{model.OrgAggregate, iam_es_model.IAMAggregate}
+func (_ *Styling) AggregateTypes() []models.AggregateType {
+	return []models.AggregateType{org.AggregateType, instance.AggregateType}
 }
 
-func (m *Styling) CurrentSequence() (uint64, error) {
-	sequence, err := m.view.GetLatestStylingSequence()
+func (m *Styling) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := m.view.GetLatestStylingSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (m *Styling) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := m.view.GetLatestStylingSequence()
+func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
+	sequences, err := m.view.GetLatestStylingSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(m.AggregateTypes()...).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+	searchQuery := models.NewSearchQuery()
+	for _, sequence := range sequences {
+		var seq uint64
+		for _, instanceID := range instanceIDs {
+			if sequence.InstanceID == instanceID {
+				seq = sequence.CurrentSequence
+				break
+			}
+		}
+		searchQuery.AddQuery().
+			AggregateTypeFilter(m.AggregateTypes()...).
+			LatestSequenceFilter(seq).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return searchQuery, nil
 }
 
-func (m *Styling) Reduce(event *es_models.Event) (err error) {
+func (m *Styling) Reduce(event *models.Event) (err error) {
 	switch event.AggregateType {
-	case model.OrgAggregate, iam_es_model.IAMAggregate:
+	case org.AggregateType, instance.AggregateType:
 		err = m.processLabelPolicy(event)
 	}
 	return err
 }
 
-func (m *Styling) processLabelPolicy(event *es_models.Event) (err error) {
+func (m *Styling) processLabelPolicy(event *models.Event) (err error) {
 	policy := new(iam_model.LabelPolicyView)
-	switch event.Type {
-	case iam_es_model.LabelPolicyAdded, model.LabelPolicyAdded:
+	switch eventstore.EventType(event.Type) {
+	case instance.LabelPolicyAddedEventType,
+		org.LabelPolicyAddedEventType:
 		err = policy.AppendEvent(event)
-	case iam_es_model.LabelPolicyChanged, model.LabelPolicyChanged,
-		iam_es_model.LabelPolicyLogoAdded, model.LabelPolicyLogoAdded,
-		iam_es_model.LabelPolicyLogoRemoved, model.LabelPolicyLogoRemoved,
-		iam_es_model.LabelPolicyIconAdded, model.LabelPolicyIconAdded,
-		iam_es_model.LabelPolicyIconRemoved, model.LabelPolicyIconRemoved,
-		iam_es_model.LabelPolicyLogoDarkAdded, model.LabelPolicyLogoDarkAdded,
-		iam_es_model.LabelPolicyLogoDarkRemoved, model.LabelPolicyLogoDarkRemoved,
-		iam_es_model.LabelPolicyIconDarkAdded, model.LabelPolicyIconDarkAdded,
-		iam_es_model.LabelPolicyIconDarkRemoved, model.LabelPolicyIconDarkRemoved,
-		iam_es_model.LabelPolicyFontAdded, model.LabelPolicyFontAdded,
-		iam_es_model.LabelPolicyFontRemoved, model.LabelPolicyFontRemoved,
-		iam_es_model.LabelPolicyAssetsRemoved, model.LabelPolicyAssetsRemoved:
-		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
+	case instance.LabelPolicyChangedEventType,
+		org.LabelPolicyChangedEventType,
+		instance.LabelPolicyLogoAddedEventType,
+		org.LabelPolicyLogoAddedEventType,
+		instance.LabelPolicyLogoRemovedEventType,
+		org.LabelPolicyLogoRemovedEventType,
+		instance.LabelPolicyIconAddedEventType,
+		org.LabelPolicyIconAddedEventType,
+		instance.LabelPolicyIconRemovedEventType,
+		org.LabelPolicyIconRemovedEventType,
+		instance.LabelPolicyLogoDarkAddedEventType,
+		org.LabelPolicyLogoDarkAddedEventType,
+		instance.LabelPolicyLogoDarkRemovedEventType,
+		org.LabelPolicyLogoDarkRemovedEventType,
+		instance.LabelPolicyIconDarkAddedEventType,
+		org.LabelPolicyIconDarkAddedEventType,
+		instance.LabelPolicyIconDarkRemovedEventType,
+		org.LabelPolicyIconDarkRemovedEventType,
+		instance.LabelPolicyFontAddedEventType,
+		org.LabelPolicyFontAddedEventType,
+		instance.LabelPolicyFontRemovedEventType,
+		org.LabelPolicyFontRemovedEventType,
+		instance.LabelPolicyAssetsRemovedEventType,
+		org.LabelPolicyAssetsRemovedEventType:
+		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, event.InstanceID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
 		}
 		err = policy.AppendEvent(event)
 
-	case iam_es_model.LabelPolicyActivated, model.LabelPolicyActivated:
-		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, int32(domain.LabelPolicyStatePreview))
+	case instance.LabelPolicyActivatedEventType,
+		org.LabelPolicyActivatedEventType:
+		policy, err = m.view.StylingByAggregateIDAndState(event.AggregateID, event.InstanceID, int32(domain.LabelPolicyStatePreview))
 		if err != nil {
 			return err
 		}
@@ -139,13 +159,13 @@ func (m *Styling) processLabelPolicy(event *es_models.Event) (err error) {
 	return m.view.PutStyling(policy, event)
 }
 
-func (m *Styling) OnError(event *es_models.Event, err error) error {
+func (m *Styling) OnError(event *models.Event, err error) error {
 	logging.LogWithFields("SPOOL-2m9fs", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
-	return spooler.HandleError(event, err, m.view.GetLatestLabelPolicyFailedEvent, m.view.ProcessedLabelPolicyFailedEvent, m.view.ProcessedLabelPolicySequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, m.view.GetLatestStylingFailedEvent, m.view.ProcessedStylingFailedEvent, m.view.ProcessedStylingSequence, m.errorCountUntilSkip)
 }
 
 func (m *Styling) OnSuccess() error {
-	return spooler.HandleSuccess(m.view.UpdateLabelPolicySpoolerRunTimestamp)
+	return spooler.HandleSuccess(m.view.UpdateStylingSpoolerRunTimestamp)
 }
 
 func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
@@ -153,12 +173,12 @@ func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
 	if err != nil {
 		return err
 	}
-	return m.uploadFilesToBucket(policy.AggregateID, "text/css", reader, size)
+	return m.uploadFilesToStorage(policy.InstanceID, policy.AggregateID, "text/css", reader, size)
 }
 
 func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64, error) {
 	cssContent := ""
-	cssContent += fmt.Sprint(":root {")
+	cssContent += ":root {"
 	if policy.PrimaryColor != "" {
 		palette := m.generateColorPaletteRGBA255(policy.PrimaryColor)
 		for i, color := range palette {
@@ -190,11 +210,11 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 		fontname = split[len(split)-1]
 		cssContent += fmt.Sprintf("--zitadel-font-family: %s;", fontname)
 	}
-	cssContent += fmt.Sprint("}")
+	cssContent += "}"
 	if policy.FontURL != "" {
-		cssContent += fmt.Sprintf(fontFaceTemplate, fontname, m.resourceUrl, policy.AggregateID, policy.FontURL)
+		cssContent += fmt.Sprintf(fontFaceTemplate, fontname, login.HandlerPrefix+login.EndpointDynamicResources, policy.AggregateID, policy.FontURL)
 	}
-	cssContent += fmt.Sprint(".lgn-dark-theme {")
+	cssContent += ".lgn-dark-theme {"
 	if policy.PrimaryColorDark != "" {
 		palette := m.generateColorPaletteRGBA255(policy.PrimaryColorDark)
 		for i, color := range palette {
@@ -219,7 +239,7 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 			cssContent += fmt.Sprintf("--zitadel-color-text-%v: %s;", i, color)
 		}
 	}
-	cssContent += fmt.Sprint("}")
+	cssContent += "}"
 
 	data := []byte(cssContent)
 	buffer := bytes.NewBuffer(data)
@@ -235,9 +255,10 @@ const fontFaceTemplate = `
 }
 `
 
-func (m *Styling) uploadFilesToBucket(aggregateID, contentType string, reader io.Reader, size int64) error {
+func (m *Styling) uploadFilesToStorage(instanceID, aggregateID, contentType string, reader io.Reader, size int64) error {
 	fileName := domain.CssPath + "/" + domain.CssVariablesFileName
-	_, err := m.static.PutObject(context.Background(), aggregateID, fileName, contentType, reader, size, true)
+	//TODO: handle location as soon as possible
+	_, err := m.static.PutObject(context.Background(), instanceID, "", aggregateID, fileName, contentType, static.ObjectTypeStyling, reader, size)
 	return err
 }
 
@@ -245,27 +266,27 @@ func (m *Styling) generateColorPaletteRGBA255(hex string) map[string]string {
 	palette := make(map[string]string)
 	defaultColor := gamut.Hex(hex)
 
-	color50, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 1.0))
+	color50, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.52))
 	if ok {
 		palette["50"] = cssRGB(color50.RGB255())
 	}
 
-	color100, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.8))
+	color100, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.37))
 	if ok {
 		palette["100"] = cssRGB(color100.RGB255())
 	}
 
-	color200, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.6))
+	color200, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.26))
 	if ok {
 		palette["200"] = cssRGB(color200.RGB255())
 	}
 
-	color300, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.4))
+	color300, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.12))
 	if ok {
 		palette["300"] = cssRGB(color300.RGB255())
 	}
 
-	color400, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.1))
+	color400, ok := colorful.MakeColor(gamut.Lighter(defaultColor, 0.06))
 	if ok {
 		palette["400"] = cssRGB(color400.RGB255())
 	}
@@ -275,22 +296,22 @@ func (m *Styling) generateColorPaletteRGBA255(hex string) map[string]string {
 		palette["500"] = cssRGB(color500.RGB255())
 	}
 
-	color600, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.1))
+	color600, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.06))
 	if ok {
 		palette["600"] = cssRGB(color600.RGB255())
 	}
 
-	color700, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.2))
+	color700, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.12))
 	if ok {
 		palette["700"] = cssRGB(color700.RGB255())
 	}
 
-	color800, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.3))
+	color800, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.18))
 	if ok {
 		palette["800"] = cssRGB(color800.RGB255())
 	}
 
-	color900, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.4))
+	color900, ok := colorful.MakeColor(gamut.Darker(defaultColor, 0.24))
 	if ok {
 		palette["900"] = cssRGB(color900.RGB255())
 	}

@@ -16,7 +16,6 @@ title: zitadel/app.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | client_id |  string | - |  |
-| client_secret |  string | - |  |
 | auth_method_type |  APIAuthMethodType | - |  |
 
 
@@ -34,6 +33,7 @@ title: zitadel/app.proto
 | name |  string | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oidc_config |  OIDCConfig | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.api_config |  APIConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.saml_config |  SAMLConfig | - |  |
 
 
 
@@ -72,7 +72,6 @@ title: zitadel/app.proto
 | grant_types | repeated OIDCGrantType | - |  |
 | app_type |  OIDCAppType | - |  |
 | client_id |  string | - |  |
-| client_secret |  string | - |  |
 | auth_method_type |  OIDCAuthMethodType | - |  |
 | post_logout_redirect_uris | repeated string | - |  |
 | version |  OIDCVersion | - |  |
@@ -86,6 +85,18 @@ title: zitadel/app.proto
 | clock_skew |  google.protobuf.Duration | - |  |
 | additional_origins | repeated string | - |  |
 | allowed_origins | repeated string | - |  |
+
+
+
+
+### SAMLConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - |  |
 
 
 

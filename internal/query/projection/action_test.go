@@ -4,22 +4,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/handler"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/action"
 )
 
 func TestActionProjection_reduces(t *testing.T) {
 	type args struct {
-		event func(t *testing.T) eventstore.EventReader
+		event func(t *testing.T) eventstore.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		reduce func(event eventstore.EventReader) (*handler.Statement, error)
+		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
 	}{
 		{
@@ -31,7 +31,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "name", "script":"name(){}","timeout": 3000000000, "allowedToFail": true}`),
 				), action.AddedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionAdded,
+			reduce: (&actionProjection{}).reduceActionAdded,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -40,12 +40,13 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.actions (id, creation_date, change_date, resource_owner, sequence, name, script, timeout, allowed_to_fail, action_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.actions2 (id, creation_date, change_date, resource_owner, instance_id, sequence, name, script, timeout, allowed_to_fail, action_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								uint64(15),
 								"name",
 								"name(){}",
@@ -67,7 +68,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "name2", "script":"name2(){}"}`),
 				), action.ChangedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionChanged,
+			reduce: (&actionProjection{}).reduceActionChanged,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -76,7 +77,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.actions2 SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -98,7 +99,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), action.DeactivatedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionDeactivated,
+			reduce: (&actionProjection{}).reduceActionDeactivated,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -107,7 +108,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions2 SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -128,7 +129,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), action.ReactivatedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionReactivated,
+			reduce: (&actionProjection{}).reduceActionReactivated,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -137,7 +138,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions2 SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -158,7 +159,7 @@ func TestActionProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), action.RemovedEventMapper),
 			},
-			reduce: (&ActionProjection{}).reduceActionRemoved,
+			reduce: (&actionProjection{}).reduceActionRemoved,
 			want: wantReduce{
 				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
@@ -167,7 +168,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.actions WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.actions2 WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type PrivacyPolicyView struct {

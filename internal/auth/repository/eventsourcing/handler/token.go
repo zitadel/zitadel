@@ -4,19 +4,22 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	proj_model "github.com/caos/zitadel/internal/project/model"
-	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	proj_view "github.com/caos/zitadel/internal/project/repository/view"
-	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/zitadel/zitadel/internal/eventstore/v1/sdk"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	proj_model "github.com/zitadel/zitadel/internal/project/model"
+	project_es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
+	proj_view "github.com/zitadel/zitadel/internal/project/repository/view"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 const (
@@ -58,41 +61,40 @@ func (t *Token) Subscription() *v1.Subscription {
 }
 
 func (_ *Token) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{user_es_model.UserAggregate, project_es_model.ProjectAggregate}
+	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
 }
 
-func (p *Token) CurrentSequence() (uint64, error) {
-	sequence, err := p.view.GetLatestTokenSequence()
+func (p *Token) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := p.view.GetLatestTokenSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (t *Token) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := t.view.GetLatestTokenSequence()
+func (t *Token) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
+	sequences, err := t.view.GetLatestTokenSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(user_es_model.UserAggregate, project_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+	return newSearchQuery(sequences, t.AggregateTypes(), instanceIDs), nil
 }
 
 func (t *Token) Reduce(event *es_models.Event) (err error) {
-	switch event.Type {
-	case user_es_model.UserTokenAdded:
+	switch eventstore.EventType(event.Type) {
+	case user.UserTokenAddedType,
+		user_repo.PersonalAccessTokenAddedType:
 		token := new(view_model.TokenView)
 		err := token.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		return t.view.PutToken(token, event)
-	case user_es_model.UserProfileChanged,
-		user_es_model.HumanProfileChanged:
+	case user.UserV1ProfileChangedType,
+		user.HumanProfileChangedType:
 		user := new(view_model.UserView)
 		user.AppendEvent(event)
-		tokens, err := t.view.TokensByUserID(event.AggregateID)
+		tokens, err := t.view.TokensByUserID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -100,27 +102,40 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 			token.PreferredLanguage = user.PreferredLanguage
 		}
 		return t.view.PutTokens(tokens, event)
-	case user_es_model.SignedOut,
-		user_es_model.HumanSignedOut:
+	case user.UserV1SignedOutType,
+		user.HumanSignedOutType:
 		id, err := agentIDFromSession(event)
 		if err != nil {
 			return err
 		}
-		return t.view.DeleteSessionTokens(id, event.AggregateID, event)
-	case user_es_model.UserLocked,
-		user_es_model.UserDeactivated,
-		user_es_model.UserRemoved:
-		return t.view.DeleteUserTokens(event.AggregateID, event)
-	case project_es_model.ApplicationDeactivated,
-		project_es_model.ApplicationRemoved:
+		return t.view.DeleteSessionTokens(id, event.AggregateID, event.InstanceID, event)
+	case user.UserLockedType,
+		user.UserDeactivatedType,
+		user.UserRemovedType:
+		return t.view.DeleteUserTokens(event.AggregateID, event.InstanceID, event)
+	case user_repo.UserTokenRemovedType,
+		user_repo.PersonalAccessTokenRemovedType:
+		id, err := tokenIDFromRemovedEvent(event)
+		if err != nil {
+			return err
+		}
+		return t.view.DeleteToken(id, event.InstanceID, event)
+	case user_repo.HumanRefreshTokenRemovedType:
+		id, err := refreshTokenIDFromRemovedEvent(event)
+		if err != nil {
+			return err
+		}
+		return t.view.DeleteTokensFromRefreshToken(id, event.InstanceID, event)
+	case project.ApplicationDeactivatedType,
+		project.ApplicationRemovedType:
 		application, err := applicationFromSession(event)
 		if err != nil {
 			return err
 		}
 		return t.view.DeleteApplicationTokens(event, application.AppID)
-	case project_es_model.ProjectDeactivated,
-		project_es_model.ProjectRemoved:
-		project, err := t.getProjectByID(context.Background(), event.AggregateID)
+	case project.ProjectDeactivatedType,
+		project.ProjectRemovedType:
+		project, err := t.getProjectByID(context.Background(), event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -157,12 +172,30 @@ func applicationFromSession(event *es_models.Event) (*project_es_model.Applicati
 	return application, nil
 }
 
+func tokenIDFromRemovedEvent(event *es_models.Event) (string, error) {
+	removed := make(map[string]interface{})
+	if err := json.Unmarshal(event.Data, &removed); err != nil {
+		logging.Log("EVEN-Sdff3").WithError(err).Error("could not unmarshal event data")
+		return "", caos_errs.ThrowInternal(nil, "MODEL-Sff32", "could not unmarshal data")
+	}
+	return removed["tokenId"].(string), nil
+}
+
+func refreshTokenIDFromRemovedEvent(event *es_models.Event) (string, error) {
+	removed := make(map[string]interface{})
+	if err := json.Unmarshal(event.Data, &removed); err != nil {
+		logging.Log("EVEN-Ff23g").WithError(err).Error("could not unmarshal event data")
+		return "", caos_errs.ThrowInternal(nil, "MODEL-Dfb3w", "could not unmarshal data")
+	}
+	return removed["tokenId"].(string), nil
+}
+
 func (t *Token) OnSuccess() error {
 	return spooler.HandleSuccess(t.view.UpdateTokenSpoolerRunTimestamp)
 }
 
-func (t *Token) getProjectByID(ctx context.Context, projID string) (*proj_model.Project, error) {
-	query, err := proj_view.ProjectByIDQuery(projID, 0)
+func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (*proj_model.Project, error) {
+	query, err := proj_view.ProjectByIDQuery(projID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}

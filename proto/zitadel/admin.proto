@@ -1,14 +1,17 @@
 syntax = "proto3";
 
 import "zitadel/idp.proto";
+import "zitadel/instance.proto";
 import "zitadel/user.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
 import "zitadel/policy.proto";
+import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
-import "zitadel/features.proto";
+import "zitadel/management.proto";
+import "zitadel/v1.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -20,21 +23,21 @@ import "validate/validate.proto";
 
 package zitadel.admin.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/admin";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/admin";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Administration API aka Admin";
         version: "1.0";
-        description: "This API is intended to configure and manage the IAM itself.";
+        description: "This API is intended to configure and manage the IAM instance itself.";
         contact:{
             name: "CAOS developers of ZITADEL"
-            url: "https://zitadel.ch"
-            email: "hi@zitadel.ch"
+            url: "https://zitadel.com"
+            email: "hi@zitadel.com"
         }
         license: {
             name: "Apache 2.0",
-            url: "https://github.com/caos/zitadel/blob/main/LICENSE";
+            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
         };
     };
 
@@ -47,8 +50,16 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     produces: "application/json";
     produces: "application/grpc";
 
-    host: "api.zitadel.io";
+    consumes: "application/grpc-web+proto";
+    produces: "application/grpc-web+proto";
+
+    host: "api.zitadel.ch";
     base_path: "/admin/v1";
+
+    external_docs: {
+        description: "Detailed information about ZITADEL",
+        url: "https://docs.zitadel.com"
+    }
 
     security_definitions: {
 		security: {
@@ -153,6 +164,290 @@ service AdminService {
         };
     }
 
+    // Set the default language
+    rpc SetDefaultLanguage(SetDefaultLanguageRequest) returns (SetDefaultLanguageResponse) {
+        option (google.api.http) = {
+            put: "/languages/default/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Set the default language
+    rpc GetDefaultLanguage(GetDefaultLanguageRequest) returns (GetDefaultLanguageResponse) {
+        option (google.api.http) = {
+            get: "/languages/default";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Returns the details of the instance
+    rpc GetMyInstance(GetMyInstanceRequest) returns (GetMyInstanceResponse) {
+        option (google.api.http) = {
+            get: "/instances/me";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Returns the domains of the instance
+    rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
+        option (google.api.http) = {
+            post: "/domains/_search";
+        };
+    }
+
+    // Set the default language
+    rpc ListSecretGenerators(ListSecretGeneratorsRequest) returns (ListSecretGeneratorsResponse) {
+        option (google.api.http) = {
+            post: "/secretgenerators/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Get Secret Generator by type (e.g PasswordResetCode)
+    rpc GetSecretGenerator(GetSecretGeneratorRequest) returns (GetSecretGeneratorResponse) {
+        option (google.api.http) = {
+            get: "/secretgenerators/{generator_type}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Update secret generator configuration
+    rpc UpdateSecretGenerator(UpdateSecretGeneratorRequest) returns (UpdateSecretGeneratorResponse) {
+        option (google.api.http) = {
+            put: "/secretgenerators/{generator_type}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Get system smtp configuration
+    rpc GetSMTPConfig(GetSMTPConfigRequest) returns (GetSMTPConfigResponse) {
+        option (google.api.http) = {
+            get: "/smtp";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Add system smtp configuration
+    rpc AddSMTPConfig(AddSMTPConfigRequest) returns (AddSMTPConfigResponse) {
+        option (google.api.http) = {
+            post: "/smtp";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update system smtp configuration
+    rpc UpdateSMTPConfig(UpdateSMTPConfigRequest) returns (UpdateSMTPConfigResponse) {
+        option (google.api.http) = {
+            put: "/smtp";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update system smtp configuration password for host
+    rpc UpdateSMTPConfigPassword(UpdateSMTPConfigPasswordRequest) returns (UpdateSMTPConfigPasswordResponse) {
+        option (google.api.http) = {
+            put: "/smtp/password";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Remove system smtp configuration
+    rpc RemoveSMTPConfig(RemoveSMTPConfigRequest) returns (RemoveSMTPConfigResponse) {
+        option (google.api.http) = {
+            delete: "/smtp";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // list sms provider configurations
+    rpc ListSMSProviders(ListSMSProvidersRequest) returns (ListSMSProvidersResponse) {
+        option (google.api.http) = {
+            post: "/sms/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Get sms provider
+    rpc GetSMSProvider(GetSMSProviderRequest) returns (GetSMSProviderResponse) {
+        option (google.api.http) = {
+            get: "/sms/{id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Add twilio sms provider
+    rpc AddSMSProviderTwilio(AddSMSProviderTwilioRequest) returns (AddSMSProviderTwilioResponse) {
+        option (google.api.http) = {
+            post: "/sms/twilio";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update twilio sms provider
+    rpc UpdateSMSProviderTwilio(UpdateSMSProviderTwilioRequest) returns (UpdateSMSProviderTwilioResponse) {
+        option (google.api.http) = {
+            put: "/sms/twilio/{id}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update twilio sms provider token
+    rpc UpdateSMSProviderTwilioToken(UpdateSMSProviderTwilioTokenRequest) returns (UpdateSMSProviderTwilioTokenResponse) {
+        option (google.api.http) = {
+            put: "/sms/twilio/{id}/token";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Activate sms provider
+    rpc ActivateSMSProvider(ActivateSMSProviderRequest) returns (ActivateSMSProviderResponse) {
+        option (google.api.http) = {
+            post: "/sms/{id}/_activate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Deactivate sms provider
+    rpc DeactivateSMSProvider(DeactivateSMSProviderRequest) returns (DeactivateSMSProviderResponse) {
+        option (google.api.http) = {
+            post: "/sms/{id}/_deactivate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Remove sms provider token
+    rpc RemoveSMSProvider(RemoveSMSProviderRequest) returns (RemoveSMSProviderResponse) {
+        option (google.api.http) = {
+            delete: "/sms/{id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Get OIDC settings (e.g token lifetimes, etc.)
+    rpc GetOIDCSettings(GetOIDCSettingsRequest) returns (GetOIDCSettingsResponse) {
+        option (google.api.http) = {
+            get: "/settings/oidc";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Add oidc settings (e.g token lifetimes, etc)
+    rpc AddOIDCSettings(AddOIDCSettingsRequest) returns (AddOIDCSettingsResponse) {
+        option (google.api.http) = {
+            post: "/settings/oidc";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update oidc settings (e.g token lifetimes, etc)
+    rpc UpdateOIDCSettings(UpdateOIDCSettingsRequest) returns (UpdateOIDCSettingsResponse) {
+        option (google.api.http) = {
+            put: "/settings/oidc";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Get file system notification provider
+    rpc GetFileSystemNotificationProvider(GetFileSystemNotificationProviderRequest) returns (GetFileSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            get: "/notification/provider/file";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Get log notification provider
+    rpc GetLogNotificationProvider(GetLogNotificationProviderRequest) returns (GetLogNotificationProviderResponse) {
+        option (google.api.http) = {
+            get: "/notification/provider/log";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
@@ -167,7 +462,7 @@ service AdminService {
             tags: "orgs";
             tags: "global";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Organizations";
+                url: "https://docs.zitadel.com/administrate#Organizations";
                 description: "detailed information about organizations";
             };
             responses: {
@@ -179,7 +474,7 @@ service AdminService {
         };
     }
 
-    //Checks whether an organisation exists by the given parameters 
+    //Checks whether an organisation exists by the given parameters
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
             get: "/orgs/_is_unique";
@@ -193,7 +488,7 @@ service AdminService {
             tags: "orgs";
             tags: "global";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Organizations";
+                url: "https://docs.zitadel.com/administrate#Organizations";
                 description: "detailed information about organizations";
             };
             responses: {
@@ -208,6 +503,28 @@ service AdminService {
                     description: "ZITADEL NOT started yet";
                 };
             };
+        };
+    }
+
+    // Set the default org
+    rpc SetDefaultOrg(SetDefaultOrgRequest) returns (SetDefaultOrgResponse) {
+        option (google.api.http) = {
+            put: "/orgs/default/{org_id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Set the default org
+    rpc GetDefaultOrg(GetDefaultOrgRequest) returns (GetDefaultOrgResponse) {
+        option (google.api.http) = {
+            get: "/orgs/default";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
         };
     }
 
@@ -227,7 +544,7 @@ service AdminService {
             tags: "orgs";
             tags: "global";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Organizations";
+                url: "https://docs.zitadel.com/administrate#Organizations";
                 description: "detailed information about organizations";
             };
             responses: {
@@ -250,7 +567,7 @@ service AdminService {
         };
     }
 
-    //Creates a new org and user 
+    //Creates a new org and user
     // and adds the user to the orgs members as ORG_OWNER
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
@@ -266,7 +583,7 @@ service AdminService {
             tags: "orgs";
             tags: "global";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Organizations";
+                url: "https://docs.zitadel.com/administrate#Organizations";
                 description: "detailed information about organizations";
             };
             responses: {
@@ -289,7 +606,7 @@ service AdminService {
         };
     }
 
-    // Returns a identity provider configuration of the IAM
+    // Returns a identity provider configuration of the IAM instance
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
             get: "/idps/{id}";
@@ -302,7 +619,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -325,7 +642,7 @@ service AdminService {
         };
     }
 
-    // Returns all identity provider configurations of the IAM
+    // Returns all identity provider configurations of the IAM instance
     rpc ListIDPs(ListIDPsRequest) returns (ListIDPsResponse) {
         option (google.api.http) = {
             post: "/idps/_search";
@@ -339,7 +656,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -362,7 +679,7 @@ service AdminService {
         };
     }
 
-    // Adds a new oidc identity provider configuration the IAM
+    // Adds a new oidc identity provider configuration the IAM instance
     rpc AddOIDCIDP(AddOIDCIDPRequest) returns (AddOIDCIDPResponse) {
         option (google.api.http) = {
             post: "/idps/oidc";
@@ -378,7 +695,7 @@ service AdminService {
             tags: "oidc";
 
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
+                url: "https://docs.zitadel.com/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
             };
             responses: {
@@ -401,7 +718,7 @@ service AdminService {
         };
     }
 
-    // Adds a new jwt identity provider configuration the IAM
+    // Adds a new jwt identity provider configuration the IAM instance
     rpc AddJWTIDP(AddJWTIDPRequest) returns (AddJWTIDPResponse) {
         option (google.api.http) = {
             post: "/idps/jwt";
@@ -451,7 +768,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -488,7 +805,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -525,7 +842,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -561,7 +878,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#What_are_Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -600,7 +917,7 @@ service AdminService {
             tags: "identity provider";
             tags: "oidc";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
+                url: "https://docs.zitadel.com/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
                 description: "detailed descriptions about oidc configuration";
             };
             responses: {
@@ -680,59 +997,8 @@ service AdminService {
         };
     }
 
-    rpc GetDefaultFeatures(GetDefaultFeaturesRequest) returns (GetDefaultFeaturesResponse) {
-        option(google.api.http) = {
-            get: "/features"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.read"
-        };
-    }
-
-    rpc SetDefaultFeatures(SetDefaultFeaturesRequest) returns (SetDefaultFeaturesResponse) {
-        option(google.api.http) = {
-            put: "/features"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.write"
-        };
-    }
-
-    rpc GetOrgFeatures(GetOrgFeaturesRequest) returns (GetOrgFeaturesResponse) {
-        option(google.api.http) = {
-            get: "/orgs/{org_id}/features"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.read"
-        };
-    }
-
-    rpc SetOrgFeatures(SetOrgFeaturesRequest) returns (SetOrgFeaturesResponse) {
-        option(google.api.http) = {
-            put: "/orgs/{org_id}/features"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.write"
-        };
-    }
-
-    rpc ResetOrgFeatures(ResetOrgFeaturesRequest) returns (ResetOrgFeaturesResponse) {
-        option(google.api.http) = {
-            delete: "/orgs/{org_id}/features"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.features.write"
-        };
-    }
-
-    //Returns the IAM policy defined by the administrators of ZITADEL
+    //deprecated: please use DomainPolicy instead
+    //Returns the Org IAM policy defined by the administrators of ZITADEL
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/orgiam";
@@ -743,22 +1009,23 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "default org iam policy";
+                    description: "default domain policy";
                 };
             };
         };
     }
 
-    //Updates the default IAM policy.
+    //deprecated: please use DomainPolicy instead
+    //Updates the default OrgIAM policy.
     // it impacts all organisations without a customised policy
     rpc UpdateOrgIAMPolicy(UpdateOrgIAMPolicyRequest) returns (UpdateOrgIAMPolicyResponse) {
         option (google.api.http) = {
@@ -771,21 +1038,22 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "default org iam policy updated";
+                    description: "default domain policy updated";
                 };
             };
         };
     }
 
+    //deprecated: please use DomainPolicy instead
     //Returns the customised policy or the default if not customised
     rpc GetCustomOrgIAMPolicy(GetCustomOrgIAMPolicyRequest) returns (GetCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
@@ -797,22 +1065,23 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "org iam policy of the org or the default policy if not customized";
+                    description: "domain policy of the org or the default policy if not customized";
                 };
             };
         };
     }
 
-    //Defines a custom ORGIAM policy as specified
+    //deprecated: please use DomainPolicy instead
+    //Defines a custom OrgIAM policy as specified
     rpc AddCustomOrgIAMPolicy(AddCustomOrgIAMPolicyRequest) returns (AddCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/{org_id}/policies/orgiam";
@@ -824,22 +1093,23 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "org iam policy created";
+                    description: "domain policy created";
                 };
             };
         };
     }
 
-    //Updates a custom ORGIAM policy as specified
+    //deprecated: please use DomainPolicy instead
+    //Updates a custom OrgIAM policy as specified
     rpc UpdateCustomOrgIAMPolicy(UpdateCustomOrgIAMPolicyRequest) returns (UpdateCustomOrgIAMPolicyResponse) {
         option (google.api.http) = {
             put: "/orgs/{org_id}/policies/orgiam";
@@ -851,21 +1121,22 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "domain policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "org iam policy updated";
+                    description: "domain policy updated";
                 };
             };
         };
     }
 
+    //deprecated: please use DomainPolicy instead
     //Resets the org iam policy of the organisation to default
     // ZITADEL will fallback to the default policy defined by the ZITADEL administrators
     rpc ResetCustomOrgIAMPolicyToDefault(ResetCustomOrgIAMPolicyToDefaultRequest) returns (ResetCustomOrgIAMPolicyToDefaultResponse) {
@@ -878,16 +1149,177 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "org iam policy";
+            tags: "orgiam";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#IAM_Access_Preference";
-                description: "detailed information about the org iam policy";
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the orgiam";
             };
             responses: {
                 key: "200";
                 value: {
-                    description: "resets the custom org iam policy to the default policy";
+                    description: "resets the custom orgiam to the default policy";
+                };
+            };
+        };
+    }
+
+    //Returns the Domain policy defined by the administrators of ZITADEL
+    rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/domain";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "default domain policy";
+                };
+            };
+        };
+    }
+
+    //Updates the default Domain policy.
+    // it impacts all organisations without a customised policy
+    rpc UpdateDomainPolicy(UpdateDomainPolicyRequest) returns (UpdateDomainPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/domain";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "default domain policy updated";
+                };
+            };
+        };
+    }
+
+    //Returns the customised policy or the default if not customised
+    rpc GetCustomDomainPolicy(GetCustomDomainPolicyRequest) returns (GetCustomDomainPolicyResponse) {
+        option (google.api.http) = {
+            get: "/orgs/{org_id}/policies/domain";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "domain policy of the org or the default policy if not customized";
+                };
+            };
+        };
+    }
+
+    //Defines a custom Domain policy as specified
+    rpc AddCustomDomainPolicy(AddCustomDomainPolicyRequest) returns (AddCustomDomainPolicyResponse) {
+        option (google.api.http) = {
+            post: "/orgs/{org_id}/policies/domain";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "domain policy created";
+                };
+            };
+        };
+    }
+
+    //Updates a custom Domain policy as specified
+    rpc UpdateCustomDomainPolicy(UpdateCustomDomainPolicyRequest) returns (UpdateCustomDomainPolicyResponse) {
+        option (google.api.http) = {
+            put: "/orgs/{org_id}/policies/domain";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domain policy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domain policy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "domain policy updated";
+                };
+            };
+        };
+    }
+
+    //Resets the org iam policy of the organisation to default
+    // ZITADEL will fallback to the default policy defined by the ZITADEL administrators
+    rpc ResetCustomDomainPolicyToDefault(ResetCustomDomainPolicyToDefaultRequest) returns (ResetCustomDomainPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{org_id}/policies/domain";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "domainpolicy";
+            tags: "policy";
+            external_docs: {
+                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
+                description: "detailed information about the domainpolicy";
+            };
+            responses: {
+                key: "200";
+                value: {
+                    description: "resets the custom domainpolicy to the default policy";
                 };
             };
         };
@@ -1042,7 +1474,7 @@ service AdminService {
             tags: "login policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Login_Options";
+                url: "https://docs.zitadel.com/administrate#Login_Options";
                 description: "detailed information about the login policy";
             };
             responses: {
@@ -1053,7 +1485,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default login policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLoginPolicy(UpdateLoginPolicyRequest) returns (UpdateLoginPolicyResponse) {
@@ -1070,7 +1502,7 @@ service AdminService {
             tags: "login policy";
             tags: "policy";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Login_Options";
+                url: "https://docs.zitadel.com/administrate#Login_Options";
                 description: "detailed information about the login policy";
             };
             responses: {
@@ -1099,7 +1531,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1118,7 +1550,7 @@ service AdminService {
             post: "/policies/login/idps";
             body: "*";
         };
-        
+
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
@@ -1128,7 +1560,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1156,7 +1588,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1183,7 +1615,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1212,7 +1644,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1251,7 +1683,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1289,7 +1721,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1318,7 +1750,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1357,7 +1789,7 @@ service AdminService {
             tags: "policy";
             tags: "identity provider";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Identity_Providers";
+                url: "https://docs.zitadel.com/administrate#Identity_Providers";
                 description: "detailed information about identity providers";
             };
             responses: {
@@ -1395,7 +1827,7 @@ service AdminService {
             tags: "password policy";
             tags: "password complexity";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Password_complexity";
+                url: "https://docs.zitadel.com/administrate#Password_complexity";
                 description: "detailed information about the password complexity policy";
             };
             responses: {
@@ -1424,7 +1856,7 @@ service AdminService {
             tags: "password policy";
             tags: "password complexity";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#Password_complexity";
+                url: "https://docs.zitadel.com/administrate#Password_complexity";
                 description: "detailed information about the password complexity policy";
             };
             responses: {
@@ -1469,7 +1901,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default password age policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdatePasswordAgePolicy(UpdatePasswordAgePolicyRequest) returns (UpdatePasswordAgePolicyResponse) {
@@ -1527,7 +1959,7 @@ service AdminService {
             };
         };
     }
-    
+
     //Updates the default lockout policy of ZITADEL
     // it impacts all organisations without a customised policy
     rpc UpdateLockoutPolicy(UpdateLockoutPolicyRequest) returns (UpdateLockoutPolicyResponse) {
@@ -1566,6 +1998,7 @@ service AdminService {
 
     //Updates the default privacy policy of ZITADEL
     // it impacts all organisations without a customised policy
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdatePrivacyPolicy(UpdatePrivacyPolicyRequest) returns (UpdatePrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy";
@@ -1637,6 +2070,18 @@ service AdminService {
         };
     }
 
+    // Removes the custom init message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomInitMessageTextToDefault(ResetCustomInitMessageTextToDefaultRequest) returns (ResetCustomInitMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/init/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
     //Returns the default text for password reset message (translation file)
     rpc GetDefaultPasswordResetMessageText(GetDefaultPasswordResetMessageTextRequest) returns (GetDefaultPasswordResetMessageTextResponse) {
         option (google.api.http) = {
@@ -1675,6 +2120,18 @@ service AdminService {
 
     }
 
+    // Removes the custom password reset message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomPasswordResetMessageTextToDefault(ResetCustomPasswordResetMessageTextToDefaultRequest) returns (ResetCustomPasswordResetMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifyemail/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
     //Returns the default text for verify email message (translation files)
     rpc GetDefaultVerifyEmailMessageText(GetDefaultVerifyEmailMessageTextRequest) returns (GetDefaultVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
@@ -1709,6 +2166,18 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+        };
+    }
+
+    // Removes the custom verify email message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomVerifyEmailMessageTextToDefault(ResetCustomVerifyEmailMessageTextToDefaultRequest) returns (ResetCustomVerifyEmailMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifyemail/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
         };
     }
 
@@ -1749,6 +2218,18 @@ service AdminService {
         };
     }
 
+    // Removes the custom verify phone text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomVerifyPhoneMessageTextToDefault(ResetCustomVerifyPhoneMessageTextToDefaultRequest) returns (ResetCustomVerifyPhoneMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifyphone/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
     //Returns the default text for domain claimed message (translation file)
     rpc GetDefaultDomainClaimedMessageText(GetDefaultDomainClaimedMessageTextRequest) returns (GetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
@@ -1786,6 +2267,18 @@ service AdminService {
         };
     }
 
+    // Removes the custom domain claimed message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomDomainClaimedMessageTextToDefault(ResetCustomDomainClaimedMessageTextToDefaultRequest) returns (ResetCustomDomainClaimedMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/domainclaimed/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
     //Returns the default text for passwordless registration message (translation file)
     rpc GetDefaultPasswordlessRegistrationMessageText(GetDefaultPasswordlessRegistrationMessageTextRequest) returns (GetDefaultPasswordlessRegistrationMessageTextResponse) {
         option (google.api.http) = {
@@ -1820,6 +2313,18 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+        };
+    }
+
+    // Removes the custom passwordless link message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomPasswordlessRegistrationMessageTextToDefault(ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest) returns (ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/passwordless_registration/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
         };
     }
 
@@ -1871,7 +2376,7 @@ service AdminService {
         };
     }
 
-    //Returns the IAM roles visible for the requested user 
+    //Returns the IAM roles visible for the requested user
     rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
         option (google.api.http) = {
             post: "/members/roles/_search";
@@ -1886,7 +2391,7 @@ service AdminService {
             tags: "member";
             tags: "roles";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -1915,7 +2420,7 @@ service AdminService {
             tags: "member";
             tags: "iam member";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -1944,7 +2449,7 @@ service AdminService {
             tags: "member";
             tags: "iam member";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -1984,7 +2489,7 @@ service AdminService {
             tags: "member";
             tags: "iam member";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -2022,7 +2527,7 @@ service AdminService {
             tags: "member";
             tags: "iam member";
             external_docs: {
-                url: "https://docs.zitadel.ch/administrate#ZITADEL_s_management_roles";
+                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
                 description: "detailed information about the IAM member roles";
             };
             responses: {
@@ -2060,7 +2565,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -2072,36 +2577,8 @@ service AdminService {
         };
     }
 
-    //Truncates the delta of the change stream
-    // be carefull with this function because ZITADEL has to 
-    // recompute the deltas after they got cleared. 
-    // Search requests will return wrong results until all deltas are recomputed
-    rpc ClearView(ClearViewRequest) returns (ClearViewResponse) {
-        option (google.api.http) = {
-            post: "/views/{database}/{view_name}";
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.write";
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "views";
-            external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
-                description: "details of ZITADEL's event driven software concepts";
-            };
-            responses: {
-                key: "200";
-                value: {
-                    description: "View cleared";
-                };
-            };
-        };
-    }
-
     //Returns event descriptions which cannot be processed.
-    // It's possible that some events need some retries. 
+    // It's possible that some events need some retries.
     // For example if the SMTP-API wasn't able to send an email at the first time
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
@@ -2115,7 +2592,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -2129,7 +2606,7 @@ service AdminService {
 
     //Deletes the event from failed events view.
     // the event is not removed from the change stream
-    // This call is usefull if the system was able to process the event later. 
+    // This call is usefull if the system was able to process the event later.
     // e.g. if the second try of sending an email was successful. the first try produced a
     // failed event. You can find out if it worked on the `failure_count`
     rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
@@ -2144,7 +2621,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
             external_docs: {
-                url: "https://docs.zitadel.ch/concepts#Software_Architecture";
+                url: "https://docs.zitadel.com/concepts#Software_Architecture";
                 description: "details of ZITADEL's event driven software concepts";
             };
             responses: {
@@ -2166,6 +2643,29 @@ service AdminService {
             };
         };
     }
+
+    // Imports data into instance and creates different objects
+    rpc ImportData(ImportDataRequest) returns (ImportDataResponse) {
+        option (google.api.http) = {
+            post: "/import";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+    // Exports data from instance
+    rpc ExportData(ExportDataRequest) returns (ExportDataResponse) {
+        option (google.api.http) = {
+            post: "/export";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
 }
 
 
@@ -2182,7 +2682,255 @@ message GetSupportedLanguagesResponse {
     repeated string languages = 1;
 }
 
+message SetDefaultLanguageRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 10}];
+}
+
+message SetDefaultLanguageResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetDefaultLanguageRequest {}
+
+message GetDefaultLanguageResponse {
+    string language = 1;
+}
+
+message SetDefaultOrgRequest {
+    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message SetDefaultOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetDefaultOrgRequest {}
+
+message GetDefaultOrgResponse {
+    zitadel.org.v1.Org org = 1;
+}
+
+//This is an empty request
+message GetMyInstanceRequest {}
+
+message GetMyInstanceResponse {
+    zitadel.instance.v1.InstanceDetail instance = 1;
+}
+
+message ListInstanceDomainsRequest {
+    zitadel.v1.ListQuery query = 1;
+    // the field the result is sorted
+    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    //criterias the client is looking for
+    repeated zitadel.instance.v1.DomainSearchQuery queries = 3;
+}
+
+message ListInstanceDomainsResponse {
+    zitadel.v1.ListDetails details = 1;
+    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    repeated zitadel.instance.v1.Domain result = 3;
+}
+
+message ListSecretGeneratorsRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
+    repeated zitadel.settings.v1.SecretGeneratorQuery queries = 2;
+}
+
+message ListSecretGeneratorsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.settings.v1.SecretGenerator result = 3;
+}
+
+message GetSecretGeneratorRequest {
+    zitadel.settings.v1.SecretGeneratorType generator_type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message GetSecretGeneratorResponse {
+    zitadel.settings.v1.SecretGenerator secret_generator = 1;
+}
+
+message UpdateSecretGeneratorRequest {
+    zitadel.settings.v1.SecretGeneratorType generator_type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    uint32 length = 2;
+    google.protobuf.Duration  expiry   = 3;
+    bool include_lower_letters = 4;
+    bool include_upper_letters = 5;
+    bool include_digits = 6;
+    bool include_symbols = 7;
+}
+
+message UpdateSecretGeneratorResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetSMTPConfigRequest {}
+
+message GetSMTPConfigResponse {
+    zitadel.settings.v1.SMTPConfig smtp_config = 1;
+}
+
+message AddSMTPConfigRequest {
+    string sender_address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool tls = 3;
+    string host = 4 [(validate.rules).string = {min_len: 1, max_len: 500}];
+    string user = 5;
+    string password = 6;
+}
+
+message AddSMTPConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSMTPConfigRequest {
+    string sender_address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool tls = 3;
+    string host = 4 [(validate.rules).string = {min_len: 1, max_len: 500}];
+    string user = 5;
+}
+
+message UpdateSMTPConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSMTPConfigPasswordRequest {
+    string password = 1;
+}
+
+message UpdateSMTPConfigPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//this is en empty request
+message RemoveSMTPConfigRequest {}
+
+message RemoveSMTPConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListSMSProvidersRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListSMSProvidersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.settings.v1.SMSProvider result = 3;
+}
+
+message GetSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message GetSMSProviderResponse {
+    zitadel.settings.v1.SMSProvider config = 1;
+}
+
+message AddSMSProviderTwilioRequest {
+    string sid = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_number = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddSMSProviderTwilioResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSMSProviderTwilioRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sid = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_number = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateSMSProviderTwilioResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSMSProviderTwilioTokenRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ActivateSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ActivateSMSProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeactivateSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateSMSProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveSMSProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetFileSystemNotificationProviderRequest {}
+
+message GetFileSystemNotificationProviderResponse {
+    zitadel.settings.v1.DebugNotificationProvider provider = 1;
+}
+
+//This is an empty request
+message GetLogNotificationProviderRequest {}
+
+message GetLogNotificationProviderResponse {
+    zitadel.settings.v1.DebugNotificationProvider provider = 1;
+}
+
+// This is an empty request
+message GetOIDCSettingsRequest {}
+
+message GetOIDCSettingsResponse {
+    zitadel.settings.v1.OIDCSettings settings = 1;
+}
+
+message AddOIDCSettingsRequest {
+    google.protobuf.Duration  access_token_lifetime   = 1;
+    google.protobuf.Duration  id_token_lifetime   = 2;
+    google.protobuf.Duration  refresh_token_idle_expiration   = 3;
+    google.protobuf.Duration  refresh_token_expiration   = 4;
+}
+
+message AddOIDCSettingsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateOIDCSettingsRequest {
+    google.protobuf.Duration  access_token_lifetime   = 1;
+    google.protobuf.Duration  id_token_lifetime   = 2;
+    google.protobuf.Duration  refresh_token_idle_expiration   = 3;
+    google.protobuf.Duration  refresh_token_expiration   = 4;
+}
+
+message UpdateOIDCSettingsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 // if name or domain is already in use, org is not unique
+// at least one argument has to be provided
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
@@ -2192,18 +2940,16 @@ message IsOrgUniqueRequest {
 	};
 
     string name = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"CAOS AG\"";
-            min_length: 1;
             max_length: 200;
         }
     ];
     string domain = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"caos.ch\"";
-            min_length: 1;
             max_length: 200;
         }
     ];
@@ -2351,7 +3097,7 @@ message SetUpOrgRequest {
                     min_length: 1;
                     example: "\"gigi@caos.ch\"";
                 }
-            ];  //TODO: check if no value is allowed
+            ];
             bool is_email_verified = 2;
         }
         message Phone {
@@ -2372,7 +3118,7 @@ message SetUpOrgRequest {
             ];
             bool is_phone_verified = 2;
         }
-    
+
         string user_name = 1 [
             (validate.rules).string = {min_len: 1, max_len: 200},
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2381,7 +3127,7 @@ message SetUpOrgRequest {
                 example: "\"mr_long_neck\"";
             }
         ];
-        
+
         Profile profile = 2 [(validate.rules).message.required = true];
         Email email = 3 [(validate.rules).message.required = true];
         Phone phone = 4;
@@ -2401,6 +3147,8 @@ message SetUpOrgRequest {
         // oneof field for the user managing the organisation
         Human human = 2;
     }
+    // specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty)
+    repeated string roles = 3;
 }
 
 message SetUpOrgResponse {
@@ -2785,88 +3533,6 @@ message UpdateIDPJWTConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetDefaultFeaturesRequest {}
-
-message GetDefaultFeaturesResponse {
-    zitadel.features.v1.Features features = 1;
-}
-
-message SetDefaultFeaturesRequest {
-    string tier_name = 1 [(validate.rules).string = {max_len: 200}];
-    string description = 2 [(validate.rules).string = {max_len: 200}];
-
-    google.protobuf.Duration audit_log_retention = 5 [(validate.rules).duration = {gte: {seconds: 0}}];
-    bool login_policy_username_login = 6;
-    bool login_policy_registration = 7;
-    bool login_policy_idp = 8;
-    bool login_policy_factors = 9;
-    bool login_policy_passwordless = 10;
-    bool password_complexity_policy = 11;
-    bool label_policy = 12;
-    bool custom_domain = 13;
-    bool login_policy_password_reset = 14;
-    bool label_policy_private_label = 15;
-    bool label_policy_watermark = 16;
-    bool custom_text = 17;
-    bool privacy_policy = 18;
-    bool metadata_user = 19;
-    bool custom_text_message = 20;
-    bool custom_text_login = 21;
-    bool lockout_policy = 22;
-    bool actions = 23;
-}
-
-message SetDefaultFeaturesResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message GetOrgFeaturesRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message GetOrgFeaturesResponse {
-    zitadel.features.v1.Features features = 1;
-}
-
-message SetOrgFeaturesRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string tier_name = 2 [(validate.rules).string = {max_len: 200}];
-    string description = 3 [(validate.rules).string = {max_len: 200}];
-    zitadel.features.v1.FeaturesState state = 4;
-    string state_description = 5 [(validate.rules).string = {max_len: 200}];
-
-    google.protobuf.Duration audit_log_retention = 6 [(validate.rules).duration = {gte: {seconds: 0}}];
-    bool login_policy_username_login = 7;
-    bool login_policy_registration = 8;
-    bool login_policy_idp = 9;
-    bool login_policy_factors = 10;
-    bool login_policy_passwordless = 11;
-    bool password_complexity_policy = 12;
-    bool label_policy = 13;
-    bool custom_domain = 14;
-    bool login_policy_password_reset = 15;
-    bool label_policy_private_label = 16;
-    bool label_policy_watermark = 17;
-    bool custom_text = 18;
-    bool privacy_policy = 19;
-    bool metadata_user = 20;
-    bool custom_text_message = 21;
-    bool custom_text_login = 22;
-    bool lockout_policy = 23;
-    bool actions = 24;
-}
-
-message SetOrgFeaturesResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message ResetOrgFeaturesRequest {
-    string org_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-message ResetOrgFeaturesResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
 message GetOrgIAMPolicyRequest {}
 
 message GetOrgIAMPolicyResponse {
@@ -2883,10 +3549,10 @@ message UpdateOrgIAMPolicyResponse {
 
 message GetCustomOrgIAMPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2899,16 +3565,17 @@ message GetCustomOrgIAMPolicyRequest {
 
 message GetCustomOrgIAMPolicyResponse {
     zitadel.policy.v1.OrgIAMPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.OrgIAMPolicy
     bool is_default = 2;
 }
 
 message AddCustomOrgIAMPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
-    
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
+
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -2930,10 +3597,10 @@ message AddCustomOrgIAMPolicyResponse {
 
 message UpdateCustomOrgIAMPolicyRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["org_id"]
-		};
-	};
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
 
     string org_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -2956,6 +3623,137 @@ message UpdateCustomOrgIAMPolicyResponse {
 
 message ResetCustomOrgIAMPolicyToDefaultRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message ResetCustomOrgIAMPolicyToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetDomainPolicyRequest {}
+
+message GetDomainPolicyResponse {
+    zitadel.policy.v1.DomainPolicy policy = 1;
+}
+
+message UpdateDomainPolicyRequest {
+    bool user_login_must_be_domain = 1;
+    bool validate_org_domains = 2;
+    bool smtp_sender_address_matches_instance_domain = 3;
+}
+
+message UpdateDomainPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetCustomDomainPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"#69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message GetCustomDomainPolicyResponse {
+    zitadel.policy.v1.DomainPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.DomainPolicy
+    bool is_default = 2;
+}
+
+message AddCustomDomainPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"#69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ]; // the username has to end with the domain of it's organisation (uniqueness is organisation based)
+    bool validate_org_domains = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if organisation domains should be validated org count as validated automatically"
+        }
+    ];
+    bool smtp_sender_address_matches_instance_domain = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the smtp sender address domain should match an existing domain on the instance"
+        }
+    ];
+}
+
+message AddCustomDomainPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateCustomDomainPolicyRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["org_id"]
+		};
+	};
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ];
+    bool validate_org_domains = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if organisation domains should be validated org count as validated automatically"
+        }
+    ];
+    bool smtp_sender_address_matches_instance_domain = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the smtp sender address domain should match an existing domain on the instance"
+        }
+    ];
+}
+
+message UpdateCustomDomainPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomDomainPolicyToDefaultRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
 		json_schema: {
 			required: ["org_id"]
 		};
@@ -2971,7 +3769,7 @@ message ResetCustomOrgIAMPolicyToDefaultRequest {
     ];
 }
 
-message ResetCustomOrgIAMPolicyToDefaultResponse {
+message ResetCustomDomainPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3000,7 +3798,7 @@ message UpdateLabelPolicyRequest {
     ];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];
@@ -3097,6 +3895,21 @@ message UpdateLoginPolicyRequest {
             description: "defines if password reset link should be shown in the login screen"
         }
     ];
+    bool ignore_unknown_usernames = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
 }
 
 message UpdateLoginPolicyResponse {
@@ -3140,7 +3953,7 @@ message RemoveIDPFromLoginPolicyRequest {
 			required: ["idp_id"]
 		};
 	};
-    
+
     string idp_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3169,7 +3982,7 @@ message AddSecondFactorToLoginPolicyRequest {
 			required: ["type"]
 		};
 	};
-    
+
     zitadel.policy.v1.SecondFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -3219,7 +4032,7 @@ message RemoveMultiFactorFromLoginPolicyRequest {
 			required: ["type"]
 		};
 	};
-    
+
     zitadel.policy.v1.MultiFactorType type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
@@ -3322,6 +4135,7 @@ message GetPrivacyPolicyResponse {
 message UpdatePrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message UpdatePrivacyPolicyResponse {
@@ -3364,6 +4178,14 @@ message SetDefaultInitMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ResetCustomInitMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomInitMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultPasswordResetMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3397,6 +4219,14 @@ message SetDefaultPasswordResetMessageTextRequest {
 }
 
 message SetDefaultPasswordResetMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomPasswordResetMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomPasswordResetMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3436,6 +4266,14 @@ message SetDefaultVerifyEmailMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ResetCustomVerifyEmailMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomVerifyEmailMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultVerifyPhoneMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3469,6 +4307,14 @@ message SetDefaultVerifyPhoneMessageTextRequest {
 }
 
 message SetDefaultVerifyPhoneMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomVerifyPhoneMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomVerifyPhoneMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3508,6 +4354,14 @@ message SetDefaultDomainClaimedMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ResetCustomDomainClaimedMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomDomainClaimedMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultPasswordlessRegistrationMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3541,6 +4395,14 @@ message SetDefaultPasswordlessRegistrationMessageTextRequest {
 }
 
 message SetDefaultPasswordlessRegistrationMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3710,34 +4572,6 @@ message ListViewsResponse {
     repeated View result = 1;
 }
 
-message ClearViewRequest {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["database", "view_name"]
-		};
-	};
-
-    string database = 1 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"adminapi\"";
-            min_length: 1;
-            max_length: 200;
-        }
-    ];
-    string view_name = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"iam_members\"";
-            min_length: 1;
-            max_length: 200;
-        }
-    ];
-}
-
-//This is an empty response
-message ClearViewResponse {}
-
 //This is an empty request
 message ListFailedEventsRequest {}
 
@@ -3834,4 +4668,188 @@ message FailedEvent {
             example: "\"ID=EXAMP-ID3ER Message=Example message\"";
         }
     ];
+}
+
+message ImportDataRequest {
+    message LocalInput{
+        string path = 1;
+    }
+    message S3Input{
+        string path = 1;
+        string endpoint = 2;
+        string access_key_id =3;
+        string secret_access_key = 4;
+        bool ssl = 5;
+        string bucket = 6;
+    }
+    message GCSInput{
+        string bucket = 1;
+        string serviceaccount_json = 2;
+        string path = 3;
+    }
+
+    oneof data {
+        ImportDataOrg data_orgs = 1;
+        zitadel.v1.v1.ImportDataOrg data_orgsv1 = 2;
+        LocalInput data_orgs_local = 3;
+        LocalInput data_orgsv1_local = 4;
+        S3Input data_orgs_s3 = 5;
+        S3Input data_orgsv1_s3 = 6;
+        GCSInput data_orgs_gcs = 7;
+        GCSInput data_orgsv1_gcs = 8;
+    }
+    string timeout = 9;
+}
+
+message ImportDataOrg {
+    repeated DataOrg orgs = 1;
+}
+
+message DataOrg {
+    string org_id = 1;
+    zitadel.management.v1.AddOrgRequest org = 3;
+    AddCustomDomainPolicyRequest domain_policy = 4;
+    zitadel.management.v1.AddCustomLabelPolicyRequest label_policy = 5;
+    zitadel.management.v1.AddCustomLockoutPolicyRequest lockout_policy = 6;
+    zitadel.management.v1.AddCustomLoginPolicyRequest login_policy = 7;
+    zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest password_complexity_policy = 8;
+    zitadel.management.v1.AddCustomPrivacyPolicyRequest privacy_policy = 9;
+
+    repeated zitadel.v1.v1.DataProject projects = 10;
+    repeated zitadel.management.v1.AddProjectRoleRequest project_roles = 11;
+    repeated zitadel.v1.v1.DataAPIApplication api_apps = 12;
+    repeated zitadel.v1.v1.DataOIDCApplication oidc_apps = 13;
+    repeated zitadel.v1.v1.DataHumanUser human_users = 14;
+    repeated zitadel.v1.v1.DataMachineUser machine_users = 15;
+    repeated zitadel.management.v1.SetTriggerActionsRequest trigger_actions = 16;
+    repeated zitadel.v1.v1.DataAction actions = 17;
+
+    repeated zitadel.v1.v1.DataProjectGrant project_grants = 18;
+    repeated zitadel.management.v1.AddUserGrantRequest user_grants = 19;
+
+    repeated zitadel.management.v1.AddOrgMemberRequest org_members = 20;
+    repeated zitadel.management.v1.AddProjectMemberRequest project_members = 21;
+    repeated zitadel.management.v1.AddProjectGrantMemberRequest project_grant_members = 22;
+
+    repeated zitadel.management.v1.SetUserMetadataRequest user_metadata = 23;
+
+    repeated zitadel.management.v1.SetCustomLoginTextsRequest login_texts = 24;
+
+    repeated zitadel.management.v1.SetCustomInitMessageTextRequest init_messages = 25;
+    repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest password_reset_messages = 26;
+    repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest verify_email_messages = 27;
+    repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest verify_phone_messages = 28;
+    repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest domain_claimed_messages = 29;
+    repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest passwordless_registration_messages = 30;
+
+    repeated zitadel.v1.v1.DataOIDCIDP oidc_idps = 31;
+    repeated zitadel.v1.v1.DataJWTIDP jwt_idps = 32;
+
+    repeated zitadel.idp.v1.IDPUserLink user_links = 33;
+    repeated zitadel.org.v1.Domain domains = 34;
+}
+
+message ImportDataResponse{
+    repeated ImportDataError errors = 1;
+    ImportDataSuccess success = 2;
+}
+
+message ImportDataError{
+    string type = 1;
+    string id = 2;
+    string message = 3;
+}
+
+message ImportDataSuccess {
+    repeated ImportDataSuccessOrg orgs = 1;
+}
+
+message ImportDataSuccessOrg{
+    string org_id = 1;
+    repeated string project_ids = 2;
+    repeated string project_roles = 3;
+    repeated string oidc_app_ids = 4;
+    repeated string api_app_ids = 5;
+    repeated string human_user_ids = 6;
+    repeated string machine_user_ids = 7;
+    repeated string action_ids = 8;
+    repeated zitadel.management.v1.SetTriggerActionsRequest trigger_actions = 9;
+    repeated ImportDataSuccessProjectGrant project_grants = 10;
+    repeated ImportDataSuccessUserGrant user_grants = 11;
+    repeated string org_members = 12;
+    repeated ImportDataSuccessProjectMember project_members = 13;
+    repeated ImportDataSuccessProjectGrantMember project_grant_members = 14;
+    repeated string oidc_ipds = 15;
+    repeated string jwt_idps = 16;
+    repeated string idp_links = 17;
+    repeated ImportDataSuccessUserLinks user_links = 18;
+    repeated ImportDataSuccessUserMetadata user_metadata = 19;
+    repeated string domains = 20;
+}
+
+message ImportDataSuccessProjectGrant{
+    string grant_id = 1;
+    string project_id = 2;
+    string org_id = 3;
+}
+
+message ImportDataSuccessUserGrant{
+    string project_id = 1;
+    string user_id = 2;
+}
+
+message ImportDataSuccessProjectMember{
+    string project_id = 1;
+    string user_id = 2;
+}
+
+message ImportDataSuccessProjectGrantMember{
+    string project_id = 1;
+    string grant_id = 2;
+    string user_id = 3;
+}
+
+message ImportDataSuccessUserLinks {
+    string user_id = 1;
+    string external_user_id = 2;
+    string display_name = 3;
+    string idp_id = 4;
+}
+
+message ImportDataSuccessUserMetadata {
+    string user_id = 1;
+    string key = 2;
+}
+
+message ExportDataRequest {
+    message LocalOutput{
+        string path = 1;
+    }
+    message S3Output{
+        string path = 1;
+        string endpoint = 2;
+        string access_key_id =3;
+        string secret_access_key = 4;
+        bool ssl = 5;
+        string bucket = 6;
+    }
+    message GCSOutput{
+        string bucket = 1;
+        string serviceaccount_json = 2;
+        string path = 3;
+    }
+
+    repeated string org_ids = 1;
+    repeated string excluded_org_ids = 2;
+    bool with_passwords = 3;
+    bool with_otp = 4;
+    bool response_output = 5;
+    LocalOutput local_output = 6;
+    S3Output s3_output = 7;
+    GCSOutput gcs_output = 8;
+    string timeout = 9;
+}
+
+message ExportDataResponse {
+    repeated DataOrg orgs = 1;
 }

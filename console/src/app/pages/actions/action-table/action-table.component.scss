@@ -1,0 +1,35 @@
+.margin-right {
+  margin-right: 0.5rem;
+}
+
+td,
+th {
+  padding: 0 1rem;
+
+  &:first-child {
+    padding-left: 0;
+    padding-right: 1rem;
+  }
+
+  &:last-child {
+    padding-right: 0;
+  }
+}
+
+.action-select-cell {
+  width: 50px;
+}
+
+tr {
+  outline: none;
+
+  button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    button {
+      visibility: visible;
+    }
+  }
+}

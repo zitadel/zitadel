@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/caos/zitadel/internal/api/grpc/server/middleware"
+import "github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 
 func (c *ListMyUserChangesResponse) Localizers() []middleware.Localizer {
 	if c == nil {

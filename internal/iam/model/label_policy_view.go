@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type LabelPolicyView struct {
@@ -48,6 +48,7 @@ const (
 	LabelPolicySearchKeyUnspecified LabelPolicySearchKey = iota
 	LabelPolicySearchKeyAggregateID
 	LabelPolicySearchKeyState
+	LabelPolicySearchKeyInstanceID
 )
 
 type LabelPolicySearchQuery struct {

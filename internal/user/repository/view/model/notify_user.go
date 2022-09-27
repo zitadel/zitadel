@@ -4,92 +4,45 @@ import (
 	"encoding/json"
 	"time"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/logging"
-	"github.com/lib/pq"
-
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	"github.com/caos/zitadel/internal/user/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/database"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	org_model "github.com/zitadel/zitadel/internal/org/model"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 const (
 	NotifyUserKeyUserID        = "id"
 	NotifyUserKeyResourceOwner = "resource_owner"
+	NotifyUserKeyInstanceID    = "instance_id"
 )
 
 type NotifyUser struct {
-	ID                 string         `json:"-" gorm:"column:id;primary_key"`
-	CreationDate       time.Time      `json:"-" gorm:"column:creation_date"`
-	ChangeDate         time.Time      `json:"-" gorm:"column:change_date"`
-	ResourceOwner      string         `json:"-" gorm:"column:resource_owner"`
-	UserName           string         `json:"userName" gorm:"column:user_name"`
-	LoginNames         pq.StringArray `json:"-" gorm:"column:login_names"`
-	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
-	FirstName          string         `json:"firstName" gorm:"column:first_name"`
-	LastName           string         `json:"lastName" gorm:"column:last_name"`
-	NickName           string         `json:"nickName" gorm:"column:nick_name"`
-	DisplayName        string         `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage  string         `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender             int32          `json:"gender" gorm:"column:gender"`
-	LastEmail          string         `json:"email" gorm:"column:last_email"`
-	VerifiedEmail      string         `json:"-" gorm:"column:verified_email"`
-	LastPhone          string         `json:"phone" gorm:"column:last_phone"`
-	VerifiedPhone      string         `json:"-" gorm:"column:verified_phone"`
-	PasswordSet        bool           `json:"-" gorm:"column:password_set"`
-	Sequence           uint64         `json:"-" gorm:"column:sequence"`
-	State              int32          `json:"-" gorm:"-"`
-}
-
-func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
-	return &NotifyUser{
-		ID:                 user.ID,
-		ChangeDate:         user.ChangeDate,
-		CreationDate:       user.CreationDate,
-		ResourceOwner:      user.ResourceOwner,
-		UserName:           user.UserName,
-		LoginNames:         user.LoginNames,
-		PreferredLoginName: user.PreferredLoginName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		NickName:           user.NickName,
-		DisplayName:        user.DisplayName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             int32(user.Gender),
-		LastEmail:          user.LastEmail,
-		VerifiedEmail:      user.VerifiedEmail,
-		LastPhone:          user.LastPhone,
-		VerifiedPhone:      user.VerifiedPhone,
-		PasswordSet:        user.PasswordSet,
-		Sequence:           user.Sequence,
-	}
-}
-
-func NotifyUserToModel(user *NotifyUser) *model.NotifyUser {
-	return &model.NotifyUser{
-		ID:                 user.ID,
-		ChangeDate:         user.ChangeDate,
-		CreationDate:       user.CreationDate,
-		ResourceOwner:      user.ResourceOwner,
-		UserName:           user.UserName,
-		LoginNames:         user.LoginNames,
-		PreferredLoginName: user.PreferredLoginName,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		NickName:           user.NickName,
-		DisplayName:        user.DisplayName,
-		PreferredLanguage:  user.PreferredLanguage,
-		Gender:             model.Gender(user.Gender),
-		LastEmail:          user.LastEmail,
-		VerifiedEmail:      user.VerifiedEmail,
-		LastPhone:          user.LastPhone,
-		VerifiedPhone:      user.VerifiedPhone,
-		PasswordSet:        user.PasswordSet,
-		Sequence:           user.Sequence,
-	}
+	ID                 string               `json:"-" gorm:"column:id;primary_key"`
+	CreationDate       time.Time            `json:"-" gorm:"column:creation_date"`
+	ChangeDate         time.Time            `json:"-" gorm:"column:change_date"`
+	ResourceOwner      string               `json:"-" gorm:"column:resource_owner"`
+	UserName           string               `json:"userName" gorm:"column:user_name"`
+	LoginNames         database.StringArray `json:"-" gorm:"column:login_names"`
+	PreferredLoginName string               `json:"-" gorm:"column:preferred_login_name"`
+	FirstName          string               `json:"firstName" gorm:"column:first_name"`
+	LastName           string               `json:"lastName" gorm:"column:last_name"`
+	NickName           string               `json:"nickName" gorm:"column:nick_name"`
+	DisplayName        string               `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage  string               `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender             int32                `json:"gender" gorm:"column:gender"`
+	LastEmail          string               `json:"email" gorm:"column:last_email"`
+	VerifiedEmail      string               `json:"-" gorm:"column:verified_email"`
+	LastPhone          string               `json:"phone" gorm:"column:last_phone"`
+	VerifiedPhone      string               `json:"-" gorm:"column:verified_phone"`
+	PasswordSet        bool                 `json:"-" gorm:"column:password_set"`
+	Sequence           uint64               `json:"-" gorm:"column:sequence"`
+	State              int32                `json:"-" gorm:"-"`
+	InstanceID         string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string {
@@ -99,14 +52,14 @@ func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string 
 	return u.UserName + "@" + domain
 }
 
-func (u *NotifyUser) SetLoginNames(policy *iam_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
+func (u *NotifyUser) SetLoginNames(userLoginMustBeDomain bool, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {
 			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
 		}
 	}
-	if !policy.UserLoginMustBeDomain {
+	if !userLoginMustBeDomain {
 		loginNames = append(loginNames, u.UserName)
 	}
 	u.LoginNames = loginNames
@@ -115,12 +68,12 @@ func (u *NotifyUser) SetLoginNames(policy *iam_model.OrgIAMPolicy, domains []*or
 func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 	u.ChangeDate = event.CreationDate
 	u.Sequence = event.Sequence
-	switch event.Type {
-	case es_model.UserAdded,
-		es_model.UserRegistered,
-		es_model.HumanRegistered,
-		es_model.HumanAdded,
-		es_model.MachineAdded:
+	switch eventstore.EventType(event.Type) {
+	case user.UserV1AddedType,
+		user.UserV1RegisteredType,
+		user.HumanRegisteredType,
+		user.HumanAddedType,
+		user.MachineAddedEventType:
 		u.CreationDate = event.CreationDate
 		u.setRootData(event)
 		err = u.setData(event)
@@ -128,28 +81,28 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 			return err
 		}
 		err = u.setPasswordData(event)
-	case es_model.UserProfileChanged,
-		es_model.UserEmailChanged,
-		es_model.UserPhoneChanged,
-		es_model.HumanProfileChanged,
-		es_model.HumanEmailChanged,
-		es_model.HumanPhoneChanged,
-		es_model.UserUserNameChanged:
+	case user.UserV1ProfileChangedType,
+		user.UserV1EmailChangedType,
+		user.UserV1PhoneChangedType,
+		user.HumanProfileChangedType,
+		user.HumanEmailChangedType,
+		user.HumanPhoneChangedType,
+		user.UserUserNameChangedType:
 		err = u.setData(event)
-	case es_model.UserEmailVerified,
-		es_model.HumanEmailVerified:
+	case user.UserV1EmailVerifiedType,
+		user.HumanEmailVerifiedType:
 		u.VerifiedEmail = u.LastEmail
-	case es_model.UserPhoneRemoved,
-		es_model.HumanPhoneRemoved:
+	case user.UserV1PhoneRemovedType,
+		user.HumanPhoneRemovedType:
 		u.VerifiedPhone = ""
 		u.LastPhone = ""
-	case es_model.UserPhoneVerified,
-		es_model.HumanPhoneVerified:
+	case user.UserV1PhoneVerifiedType,
+		user.HumanPhoneVerifiedType:
 		u.VerifiedPhone = u.LastPhone
-	case es_model.UserPasswordChanged,
-		es_model.HumanPasswordChanged:
+	case user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType:
 		err = u.setPasswordData(event)
-	case es_model.UserRemoved:
+	case user.UserRemovedType:
 		u.State = int32(UserStateDeleted)
 	}
 	return err
@@ -158,6 +111,7 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 func (u *NotifyUser) setRootData(event *models.Event) {
 	u.ID = event.AggregateID
 	u.ResourceOwner = event.ResourceOwner
+	u.InstanceID = event.InstanceID
 }
 
 func (u *NotifyUser) setData(event *models.Event) error {

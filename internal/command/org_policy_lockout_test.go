@@ -6,13 +6,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
 func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
@@ -60,7 +60,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								true,
 							),
@@ -90,7 +90,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLockoutPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									10,
 									true,
 								),
@@ -203,7 +203,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								true,
 							),
@@ -231,7 +231,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								true,
 							),
@@ -341,7 +341,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLockoutPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								10,
 								true,
 							),
@@ -351,7 +351,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLockoutPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -386,7 +386,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 
 func newPasswordLockoutPolicyChangedEvent(ctx context.Context, orgID string, maxAttempts uint64, showLockoutFailure bool) *org.LockoutPolicyChangedEvent {
 	event, _ := org.NewLockoutPolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.LockoutPolicyChanges{
 			policy.ChangeMaxAttempts(maxAttempts),
 			policy.ChangeShowLockOutFailures(showLockoutFailure),

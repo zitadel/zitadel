@@ -4,9 +4,9 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, resourceOwner string) (*domain.ObjectDetails, error) {
@@ -21,7 +21,7 @@ func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, reso
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DgGh3", "Errors.Flow.Empty")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewFlowClearedEvent(ctx, orgAgg, flowType))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewFlowClearedEvent(ctx, orgAgg, flowType))
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowTy
 		}
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewTriggerActionsSetEvent(ctx, orgAgg, flowType, triggerType, actionIDs))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewTriggerActionsSetEvent(ctx, orgAgg, flowType, triggerType, actionIDs))
 	if err != nil {
 		return nil, err
 	}

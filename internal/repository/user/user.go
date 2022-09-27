@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -21,6 +21,7 @@ const (
 	UserReactivatedType       = userEventTypePrefix + "reactivated"
 	UserRemovedType           = userEventTypePrefix + "removed"
 	UserTokenAddedType        = userEventTypePrefix + "token.added"
+	UserTokenRemovedType      = userEventTypePrefix + "token.removed"
 	UserDomainClaimedType     = userEventTypePrefix + "domain.claimed"
 	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
@@ -69,7 +70,7 @@ func NewUserLockedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *U
 	}
 }
 
-func UserLockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserLockedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserLockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -97,7 +98,7 @@ func NewUserUnlockedEvent(ctx context.Context, aggregate *eventstore.Aggregate) 
 	}
 }
 
-func UserUnlockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserUnlockedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserUnlockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -125,7 +126,7 @@ func NewUserDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregat
 	}
 }
 
-func UserDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -153,7 +154,7 @@ func NewUserReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregat
 	}
 }
 
-func UserReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -163,7 +164,7 @@ type UserRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	userName          string
-	externalIDPs      []*domain.ExternalIDP
+	externalIDPs      []*domain.UserIDPLink
 	loginMustBeDomain bool
 }
 
@@ -177,7 +178,7 @@ func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.loginMustBeDomain))
 	}
 	for _, idp := range e.externalIDPs {
-		events = append(events, NewRemoveExternalIDPUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
+		events = append(events, NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
 	}
 	return events
 }
@@ -186,7 +187,7 @@ func NewUserRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userName string,
-	externalIDPs []*domain.ExternalIDP,
+	externalIDPs []*domain.UserIDPLink,
 	userLoginMustBeDomain bool,
 ) *UserRemovedEvent {
 	return &UserRemovedEvent{
@@ -201,7 +202,7 @@ func NewUserRemovedEvent(
 	}
 }
 
-func UserRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -213,6 +214,7 @@ type UserTokenAddedEvent struct {
 	TokenID           string    `json:"tokenId"`
 	ApplicationID     string    `json:"applicationId"`
 	UserAgentID       string    `json:"userAgentId"`
+	RefreshTokenID    string    `json:"refreshTokenID,omitempty"`
 	Audience          []string  `json:"audience"`
 	Scopes            []string  `json:"scopes"`
 	Expiration        time.Time `json:"expiration"`
@@ -233,7 +235,8 @@ func NewUserTokenAddedEvent(
 	tokenID,
 	applicationID,
 	userAgentID,
-	preferredLanguage string,
+	preferredLanguage,
+	refreshTokenID string,
 	audience,
 	scopes []string,
 	expiration time.Time,
@@ -247,6 +250,7 @@ func NewUserTokenAddedEvent(
 		TokenID:           tokenID,
 		ApplicationID:     applicationID,
 		UserAgentID:       userAgentID,
+		RefreshTokenID:    refreshTokenID,
 		Audience:          audience,
 		Scopes:            scopes,
 		Expiration:        expiration,
@@ -254,7 +258,7 @@ func NewUserTokenAddedEvent(
 	}
 }
 
-func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	tokenAdded := &UserTokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -264,6 +268,47 @@ func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 	}
 
 	return tokenAdded, nil
+}
+
+type UserTokenRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	TokenID string `json:"tokenId"`
+}
+
+func (e *UserTokenRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *UserTokenRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewUserTokenRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	tokenID string,
+) *UserTokenRemovedEvent {
+	return &UserTokenRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserTokenRemovedType,
+		),
+		TokenID: tokenID,
+	}
+}
+
+func UserTokenRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	tokenRemoved := &UserTokenRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, tokenRemoved)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
+	}
+
+	return tokenRemoved, nil
 }
 
 type DomainClaimedEvent struct {
@@ -304,7 +349,7 @@ func NewDomainClaimedEvent(
 	}
 }
 
-func DomainClaimedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainClaimedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	domainClaimed := &DomainClaimedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -341,7 +386,7 @@ func NewDomainClaimedSentEvent(
 	}
 }
 
-func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -385,7 +430,7 @@ func NewUsernameChangedEvent(
 	}
 }
 
-func UsernameChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UsernameChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	domainClaimed := &UsernameChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

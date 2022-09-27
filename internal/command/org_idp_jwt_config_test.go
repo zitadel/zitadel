@@ -7,14 +7,14 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/idpconfig"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
@@ -99,7 +99,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeJWT,
@@ -109,7 +109,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"jwt-endpoint",
 								"issuer",
@@ -119,7 +119,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPConfigRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name",
 							),
@@ -146,7 +146,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeJWT,
@@ -156,7 +156,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"jwt-endpoint",
 								"issuer",
@@ -191,7 +191,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeJWT,
@@ -201,7 +201,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPJWTConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"jwt-endpoint",
 								"issuer",
@@ -256,8 +256,8 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idpConfigSecretCrypto: tt.fields.secretCrypto,
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := r.ChangeIDPJWTConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -275,7 +275,7 @@ func TestCommandSide_ChangeIDPJWTConfig(t *testing.T) {
 
 func newIDPJWTConfigChangedEvent(ctx context.Context, orgID, configID, jwtEndpoint, issuer, keysEndpoint, headerName string) *org.IDPJWTConfigChangedEvent {
 	event, _ := org.NewIDPJWTConfigChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		configID,
 		[]idpconfig.JWTConfigChanges{
 			idpconfig.ChangeJWTEndpoint(jwtEndpoint),

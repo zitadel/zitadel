@@ -1,1 +1,0 @@
-GRANT UPDATE ON TABLE eventstore.events TO eventstore;

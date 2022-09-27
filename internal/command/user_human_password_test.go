@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommandSide_SetOneTimePassword(t *testing.T) {
@@ -239,15 +239,15 @@ func TestCommandSide_SetPassword(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		userPasswordAlg crypto.HashAlgorithm
-		secretGenerator crypto.Generator
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		code          string
-		resourceOwner string
-		password      string
-		agentID       string
+		ctx             context.Context
+		userID          string
+		code            string
+		resourceOwner   string
+		password        string
+		agentID         string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -377,14 +377,14 @@ func TestCommandSide_SetPassword(t *testing.T) {
 						),
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				code:          "test",
-				resourceOwner: "org1",
-				password:      "password",
+				ctx:             context.Background(),
+				userID:          "user1",
+				code:            "test",
+				resourceOwner:   "org1",
+				password:        "password",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -459,15 +459,15 @@ func TestCommandSide_SetPassword(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
-				password:      "password",
-				code:          "a",
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				password:        "password",
+				code:            "a",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -479,11 +479,10 @@ func TestCommandSide_SetPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:               tt.fields.eventstore,
-				userPasswordAlg:          tt.fields.userPasswordAlg,
-				passwordVerificationCode: tt.fields.secretGenerator,
+				eventstore:      tt.fields.eventstore,
+				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID)
+			err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -778,14 +777,14 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 
 func TestCommandSide_RequestSetPassword(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		secretGenerator crypto.Generator
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		resourceOwner string
-		notifyType    domain.NotificationType
+		ctx             context.Context
+		userID          string
+		resourceOwner   string
+		notifyType      domain.NotificationType
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -925,12 +924,12 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -942,10 +941,9 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:               tt.fields.eventstore,
-				passwordVerificationCode: tt.fields.secretGenerator,
+				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RequestSetPassword(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.notifyType)
+			got, err := r.RequestSetPassword(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.notifyType, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1126,10 +1124,86 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 		},
 		{
+			name: "login policy not found, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "login policy login password not allowed, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "user not existing, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
 					expectFilter(),
 				),
 			},
@@ -1148,6 +1222,26 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1182,6 +1276,26 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1250,6 +1364,26 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1325,6 +1459,26 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),

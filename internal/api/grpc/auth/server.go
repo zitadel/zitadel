@@ -1,16 +1,21 @@
 package auth
 
 import (
+	"context"
+	"time"
+
 	"google.golang.org/grpc"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server"
-	"github.com/caos/zitadel/internal/auth/repository"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/internal/api/assets"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server"
+	"github.com/zitadel/zitadel/internal/auth/repository"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 var _ auth.AuthServiceServer = (*Server)(nil)
@@ -21,22 +26,37 @@ const (
 
 type Server struct {
 	auth.UnimplementedAuthServiceServer
-	command  *command.Commands
-	query    *query.Queries
-	repo     repository.Repository
-	defaults systemdefaults.SystemDefaults
+	command           *command.Commands
+	query             *query.Queries
+	repo              repository.Repository
+	defaults          systemdefaults.SystemDefaults
+	assetsAPIDomain   func(context.Context) string
+	userCodeAlg       crypto.EncryptionAlgorithm
+	externalSecure    bool
+	auditLogRetention time.Duration
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, authRepo repository.Repository, defaults systemdefaults.SystemDefaults) *Server {
+func CreateServer(command *command.Commands,
+	query *query.Queries,
+	authRepo repository.Repository,
+	defaults systemdefaults.SystemDefaults,
+	userCodeAlg crypto.EncryptionAlgorithm,
+	externalSecure bool,
+	auditLogRetention time.Duration,
+) *Server {
 	return &Server{
-		command:  command,
-		query:    query,
-		repo:     authRepo,
-		defaults: defaults,
+		command:           command,
+		query:             query,
+		repo:              authRepo,
+		defaults:          defaults,
+		assetsAPIDomain:   assets.AssetAPI(externalSecure),
+		userCodeAlg:       userCodeAlg,
+		externalSecure:    externalSecure,
+		auditLogRetention: auditLogRetention,
 	}
 }
 

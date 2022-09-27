@@ -1,0 +1,18 @@
+h1 {
+  margin-top: 0;
+}
+
+.view-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+
+  .icon-button {
+    display: block;
+    border-radius: 0.5rem;
+  }
+}
+
+.projects-table-wrapper {
+  padding-top: 0.5rem;
+}

@@ -2,12 +2,13 @@ package command
 
 import (
 	"context"
+	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
 type OrgLoginPolicyWriteModel struct {
@@ -25,7 +26,7 @@ func NewOrgLoginPolicyWriteModel(orgID string) *OrgLoginPolicyWriteModel {
 	}
 }
 
-func (wm *OrgLoginPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgLoginPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LoginPolicyAddedEvent:
@@ -66,8 +67,15 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	allowRegister,
 	allowExternalIDP,
 	forceMFA,
-	hidePasswordReset bool,
+	hidePasswordReset,
+	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
+	defaultRedirectURI string,
+	passwordCheckLifetime,
+	externalLoginCheckLifetime,
+	mfaInitSkipLifetime,
+	secondFactorCheckLifetime,
+	multiFactorCheckLifetime time.Duration,
 ) (*org.LoginPolicyChangedEvent, bool) {
 
 	changes := make([]policy.LoginPolicyChanges, 0)
@@ -86,8 +94,29 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	if wm.HidePasswordReset != hidePasswordReset {
 		changes = append(changes, policy.ChangeHidePasswordReset(hidePasswordReset))
 	}
+	if wm.IgnoreUnknownUsernames != ignoreUnknownUsernames {
+		changes = append(changes, policy.ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames))
+	}
+	if wm.PasswordCheckLifetime != passwordCheckLifetime {
+		changes = append(changes, policy.ChangePasswordCheckLifetime(passwordCheckLifetime))
+	}
+	if wm.ExternalLoginCheckLifetime != externalLoginCheckLifetime {
+		changes = append(changes, policy.ChangeExternalLoginCheckLifetime(externalLoginCheckLifetime))
+	}
+	if wm.MFAInitSkipLifetime != mfaInitSkipLifetime {
+		changes = append(changes, policy.ChangeMFAInitSkipLifetime(mfaInitSkipLifetime))
+	}
+	if wm.SecondFactorCheckLifetime != secondFactorCheckLifetime {
+		changes = append(changes, policy.ChangeSecondFactorCheckLifetime(secondFactorCheckLifetime))
+	}
+	if wm.MultiFactorCheckLifetime != multiFactorCheckLifetime {
+		changes = append(changes, policy.ChangeMultiFactorCheckLifetime(multiFactorCheckLifetime))
+	}
 	if passwordlessType.Valid() && wm.PasswordlessType != passwordlessType {
 		changes = append(changes, policy.ChangePasswordlessType(passwordlessType))
+	}
+	if wm.DefaultRedirectURI != defaultRedirectURI {
+		changes = append(changes, policy.ChangeDefaultRedirectURI(defaultRedirectURI))
 	}
 	if len(changes) == 0 {
 		return nil, false

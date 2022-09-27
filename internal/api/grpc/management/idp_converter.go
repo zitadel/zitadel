@@ -1,16 +1,20 @@
 package management
 
 import (
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"context"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func addOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {
+func AddOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
 		Name:         req.Name,
 		OIDCConfig:   addOIDCIDPRequestToDomainOIDCIDPConfig(req),
@@ -31,7 +35,7 @@ func addOIDCIDPRequestToDomainOIDCIDPConfig(req *mgmt_pb.AddOrgOIDCIDPRequest) *
 	}
 }
 
-func addJWTIDPRequestToDomain(req *mgmt_pb.AddOrgJWTIDPRequest) *domain.IDPConfig {
+func AddJWTIDPRequestToDomain(req *mgmt_pb.AddOrgJWTIDPRequest) *domain.IDPConfig {
 	return &domain.IDPConfig{
 		Name:         req.Name,
 		JWTConfig:    addJWTIDPRequestToDomainJWTIDPConfig(req),
@@ -81,36 +85,50 @@ func updateJWTConfigToDomain(req *mgmt_pb.UpdateOrgIDPJWTConfigRequest) *domain.
 	}
 }
 
-func listIDPsToModel(req *mgmt_pb.ListOrgIDPsRequest) *iam_model.IDPConfigSearchRequest {
+func listIDPsToModel(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &iam_model.IDPConfigSearchRequest{
-		Offset:        offset,
-		Limit:         limit,
-		Asc:           asc,
-		SortingColumn: idp_grpc.FieldNameToModel(req.SortingColumn),
-		Queries:       idpQueriesToModel(req.Queries),
+	q, err := idpQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
 	}
+	resourceOwnerQuery, err := query.NewIDPResourceOwnerListSearchQuery(authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	q = append(q, resourceOwnerQuery)
+	return &query.IDPSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: idp_grpc.FieldNameToModel(req.SortingColumn),
+		},
+		Queries: q,
+	}, nil
 }
 
-func idpQueriesToModel(queries []*mgmt_pb.IDPQuery) []*iam_model.IDPConfigSearchQuery {
-	q := make([]*iam_model.IDPConfigSearchQuery, len(queries))
+func idpQueriesToModel(queries []*mgmt_pb.IDPQuery) (q []query.SearchQuery, err error) {
+	q = make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i] = idpQueryToModel(query)
+		q[i], err = idpQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return q
+	return q, nil
 }
 
-func idpQueryToModel(query *mgmt_pb.IDPQuery) *iam_model.IDPConfigSearchQuery {
-	switch q := query.Query.(type) {
+func idpQueryToModel(idpQuery *mgmt_pb.IDPQuery) (query.SearchQuery, error) {
+	switch q := idpQuery.Query.(type) {
 	case *mgmt_pb.IDPQuery_IdpNameQuery:
-		return idp_grpc.IDPNameQueryToModel(q.IdpNameQuery)
+		return query.NewIDPNameSearchQuery(object.TextMethodToQuery(q.IdpNameQuery.Method), q.IdpNameQuery.Name)
 	case *mgmt_pb.IDPQuery_IdpIdQuery:
-		return idp_grpc.IDPIDQueryToModel(q.IdpIdQuery)
+		return query.NewIDPIDSearchQuery(q.IdpIdQuery.Id)
 	case *mgmt_pb.IDPQuery_OwnerTypeQuery:
-		return idp_grpc.IDPOwnerTypeQueryToModel(q.OwnerTypeQuery)
+		return query.NewIDPOwnerTypeSearchQuery(idp_grpc.IDPProviderTypeFromPb(q.OwnerTypeQuery.OwnerType))
 	default:
-		return nil
+		return nil, errors.ThrowInvalidArgument(nil, "MANAG-WtLPV", "List.Query.Invalid")
 	}
 }
 
@@ -137,18 +155,18 @@ func idpConfigTypeToDomain(idpType iam_model.IDPProviderType) domain.IdentityPro
 	}
 }
 
-func externalIDPViewsToDomain(idps []*user_model.ExternalIDPView) []*domain.ExternalIDP {
-	externalIDPs := make([]*domain.ExternalIDP, len(idps))
+func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
+	links := make([]*domain.UserIDPLink, len(idps))
 	for i, idp := range idps {
-		externalIDPs[i] = &domain.ExternalIDP{
+		links[i] = &domain.UserIDPLink{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID:   idp.UserID,
 				ResourceOwner: idp.ResourceOwner,
 			},
-			IDPConfigID:    idp.IDPConfigID,
-			ExternalUserID: idp.ExternalUserID,
-			DisplayName:    idp.UserDisplayName,
+			IDPConfigID:    idp.IDPID,
+			ExternalUserID: idp.ProvidedUserID,
+			DisplayName:    idp.ProvidedUsername,
 		}
 	}
-	return externalIDPs
+	return links
 }

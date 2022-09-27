@@ -3,8 +3,8 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	caos_errors "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 )
 
 func checkExplicitProjectPermission(ctx context.Context, grantID, projectID string) error {

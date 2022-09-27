@@ -1,0 +1,59 @@
+<div class="sidenav-container">
+  <div class="sidenav-settings-list" [ngClass]="{ indented: indented }">
+    <div class="sidenav-sticky-rel">
+      <h1 *ngIf="title">{{ title }}</h1>
+      <p *ngIf="description" class="cnsl-secondary-text">{{ description }}</p>
+
+      <button
+        *ngIf="currentSetting !== undefined"
+        (click)="value = undefined"
+        class="sidenav-setting-list-element mob-only"
+        [ngClass]="{ active: true }"
+      >
+        <i class="las la-angle-left"></i>
+        <span>{{ 'USER.SETTINGS.TITLE' | translate }}</span>
+      </button>
+
+      <ng-container *ngFor="let setting of settingsList; index as i">
+        <ng-container>
+          <span
+            class="sidenav-setting-group hide-on-mobile"
+            [ngClass]="{ show: currentSetting === undefined }"
+            *ngIf="
+              (setting.groupI18nKey && i > 0 && setting.groupI18nKey !== settingsList[i - 1].groupI18nKey) ||
+              (i === 0 && setting.groupI18nKey)
+            "
+            >{{ setting.groupI18nKey | translate }}</span
+          >
+
+          <button
+            (click)="value = setting.id"
+            *ngIf="
+              !setting.requiredRoles ||
+              (setting.requiredRoles.mgmt && (setting.requiredRoles.mgmt | hasRole: true | async)) ||
+              (setting.requiredRoles.admin && (setting.requiredRoles.admin | hasRole: true | async))
+            "
+            class="sidenav-setting-list-element hide-on-mobile"
+            [ngClass]="{ active: currentSetting === setting.id, show: currentSetting === undefined }"
+          >
+            <span>{{ setting.i18nKey | translate }}</span>
+            <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>
+          </button>
+        </ng-container>
+        <ng-template #btn>
+          <button
+            (click)="value = setting.id"
+            class="sidenav-setting-list-element hide-on-mobile"
+            [ngClass]="{ active: currentSetting === setting.id, show: currentSetting === undefined }"
+          >
+            <span>{{ setting.i18nKey | translate }}</span>
+          </button>
+        </ng-template>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="sidenav-content">
+    <ng-content></ng-content>
+  </div>
+</div>

@@ -1,12 +1,13 @@
 package text
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	text_pb "github.com/caos/zitadel/pkg/grpc/text"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	text_pb "github.com/zitadel/zitadel/pkg/grpc/text"
 )
 
-func DomainCustomMsgTextToPb(msg *domain.CustomMessageText) *text_pb.MessageCustomText {
+func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomText {
 	return &text_pb.MessageCustomText{
 		Title:      msg.Title,
 		PreHeader:  msg.PreHeader,
@@ -14,13 +15,14 @@ func DomainCustomMsgTextToPb(msg *domain.CustomMessageText) *text_pb.MessageCust
 		Greeting:   msg.Greeting,
 		Text:       msg.Text,
 		ButtonText: msg.ButtonText,
-		FooterText: msg.FooterText,
+		FooterText: msg.Footer,
 		Details: object.ToViewDetailsPb(
 			msg.Sequence,
 			msg.CreationDate,
 			msg.ChangeDate,
-			"", //TODO: resourceowner
+			msg.AggregateID,
 		),
+		IsDefault: msg.IsDefault,
 	}
 }
 
@@ -32,6 +34,7 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 			text.ChangeDate,
 			text.AggregateID,
 		),
+		IsDefault:                            text.IsDefault,
 		SelectAccountText:                    SelectAccountScreenToPb(text.SelectAccount),
 		LoginText:                            LoginScreenTextToPb(text.Login),
 		PasswordText:                         PasswordScreenTextToPb(text.Password),
@@ -302,6 +305,7 @@ func PasswordlessRegistrationDoneScreenTextToPb(text domain.PasswordlessRegistra
 	return &text_pb.PasswordlessRegistrationDoneScreenText{
 		Title:            text.Title,
 		Description:      text.Description,
+		DescriptionClose: text.DescriptionClose,
 		NextButtonText:   text.NextButtonText,
 		CancelButtonText: text.CancelButtonText,
 	}
@@ -453,7 +457,6 @@ func FooterTextToPb(text domain.FooterText) *text_pb.FooterText {
 		Tos:           text.TOS,
 		PrivacyPolicy: text.PrivacyPolicy,
 		Help:          text.Help,
-		HelpLink:      text.HelpLink,
 	}
 }
 
@@ -754,9 +757,10 @@ func PasswordlessRegistrationDoneScreenTextPbToDomain(text *text_pb.Passwordless
 		return domain.PasswordlessRegistrationDoneScreenText{}
 	}
 	return domain.PasswordlessRegistrationDoneScreenText{
-		Title:          text.Title,
-		Description:    text.Description,
-		NextButtonText: text.NextButtonText,
+		Title:            text.Title,
+		Description:      text.Description,
+		DescriptionClose: text.DescriptionClose,
+		NextButtonText:   text.NextButtonText,
 	}
 }
 
@@ -942,6 +946,5 @@ func FooterTextPbToDomain(text *text_pb.FooterText) domain.FooterText {
 		TOS:           text.Tos,
 		PrivacyPolicy: text.PrivacyPolicy,
 		Help:          text.Help,
-		HelpLink:      text.HelpLink,
 	}
 }

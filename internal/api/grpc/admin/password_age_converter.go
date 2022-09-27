@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/internal/domain"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func UpdatePasswordAgePolicyToDomain(policy *admin_pb.UpdatePasswordAgePolicyRequest) *domain.PasswordAgePolicy {

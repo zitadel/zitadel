@@ -6,19 +6,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/oidc/pkg/op"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v2/pkg/op"
 	"golang.org/x/text/language"
 
-	http_utils "github.com/caos/zitadel/internal/api/http"
-	model2 "github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/user/model"
 )
 
 const (
+	// DEPRECATED: use `amrPWD` instead
 	amrPassword     = "password"
+	amrPWD          = "pwd"
 	amrMFA          = "mfa"
 	amrOTP          = "otp"
 	amrUserPresence = "user"
@@ -40,7 +42,7 @@ func (a *AuthRequest) GetACR() string {
 func (a *AuthRequest) GetAMR() []string {
 	amr := make([]string, 0)
 	if a.PasswordVerified {
-		amr = append(amr, amrPassword)
+		amr = append(amr, amrPassword, amrPWD)
 	}
 	if len(a.MFAsVerified) > 0 {
 		amr = append(amr, amrMFA)
@@ -79,6 +81,10 @@ func (a *AuthRequest) GetRedirectURI() string {
 
 func (a *AuthRequest) GetResponseType() oidc.ResponseType {
 	return ResponseTypeToOIDC(a.oidc().ResponseType)
+}
+
+func (a *AuthRequest) GetResponseMode() oidc.ResponseMode {
+	return ""
 }
 
 func (a *AuthRequest) GetScopes() []string {
@@ -128,6 +134,7 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		SelectedIDPConfigID: GetSelectedIDPIDFromScopes(authReq.Scopes),
 		MaxAuthAge:          MaxAgeToBusiness(authReq.MaxAge),
 		UserID:              userID,
+		InstanceID:          authz.GetInstance(ctx).InstanceID(),
 		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
 			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),
@@ -201,8 +208,8 @@ func UILocalesToBusiness(tags []language.Tag) []string {
 
 func GetSelectedIDPIDFromScopes(scopes oidc.SpaceDelimitedArray) string {
 	for _, scope := range scopes {
-		if strings.HasPrefix(scope, model2.SelectIDPScope) {
-			return strings.TrimPrefix(scope, model2.SelectIDPScope)
+		if strings.HasPrefix(scope, domain.SelectIDPScope) {
+			return strings.TrimPrefix(scope, domain.SelectIDPScope)
 		}
 	}
 	return ""

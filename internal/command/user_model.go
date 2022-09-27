@@ -3,19 +3,20 @@ package command
 import (
 	"strings"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errors "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type UserWriteModel struct {
 	eventstore.WriteModel
 
-	UserName     string
-	ExternalIDPs []*domain.ExternalIDP
-	UserState    domain.UserState
+	UserName  string
+	IDPLinks  []*domain.UserIDPLink
+	UserState domain.UserState
+	UserType  domain.UserType
 }
 
 func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
@@ -24,7 +25,7 @@ func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
-		ExternalIDPs: make([]*domain.ExternalIDP, 0),
+		IDPLinks: make([]*domain.UserIDPLink, 0),
 	}
 }
 
@@ -34,34 +35,37 @@ func (wm *UserWriteModel) Reduce() error {
 		case *user.HumanAddedEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
+			wm.UserType = domain.UserTypeHuman
 		case *user.HumanRegisteredEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
+			wm.UserType = domain.UserTypeHuman
 		case *user.HumanInitialCodeAddedEvent:
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive
-		case *user.HumanExternalIDPAddedEvent:
-			wm.ExternalIDPs = append(wm.ExternalIDPs, &domain.ExternalIDP{IDPConfigID: e.IDPConfigID, ExternalUserID: e.ExternalUserID})
-		case *user.HumanExternalIDPRemovedEvent:
-			idx, _ := wm.ExternalIDPByID(e.IDPConfigID, e.ExternalUserID)
+		case *user.UserIDPLinkAddedEvent:
+			wm.IDPLinks = append(wm.IDPLinks, &domain.UserIDPLink{IDPConfigID: e.IDPConfigID, ExternalUserID: e.ExternalUserID})
+		case *user.UserIDPLinkRemovedEvent:
+			idx, _ := wm.IDPLinkByID(e.IDPConfigID, e.ExternalUserID)
 			if idx < 0 {
 				continue
 			}
-			copy(wm.ExternalIDPs[idx:], wm.ExternalIDPs[idx+1:])
-			wm.ExternalIDPs[len(wm.ExternalIDPs)-1] = nil
-			wm.ExternalIDPs = wm.ExternalIDPs[:len(wm.ExternalIDPs)-1]
-		case *user.HumanExternalIDPCascadeRemovedEvent:
-			idx, _ := wm.ExternalIDPByID(e.IDPConfigID, e.ExternalUserID)
+			copy(wm.IDPLinks[idx:], wm.IDPLinks[idx+1:])
+			wm.IDPLinks[len(wm.IDPLinks)-1] = nil
+			wm.IDPLinks = wm.IDPLinks[:len(wm.IDPLinks)-1]
+		case *user.UserIDPLinkCascadeRemovedEvent:
+			idx, _ := wm.IDPLinkByID(e.IDPConfigID, e.ExternalUserID)
 			if idx < 0 {
 				continue
 			}
-			copy(wm.ExternalIDPs[idx:], wm.ExternalIDPs[idx+1:])
-			wm.ExternalIDPs[len(wm.ExternalIDPs)-1] = nil
-			wm.ExternalIDPs = wm.ExternalIDPs[:len(wm.ExternalIDPs)-1]
+			copy(wm.IDPLinks[idx:], wm.IDPLinks[idx+1:])
+			wm.IDPLinks[len(wm.IDPLinks)-1] = nil
+			wm.IDPLinks = wm.IDPLinks[:len(wm.IDPLinks)-1]
 		case *user.MachineAddedEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
+			wm.UserType = domain.UserTypeMachine
 		case *user.UsernameChangedEvent:
 			wm.UserName = e.UserName
 		case *user.UserLockedEvent:
@@ -96,9 +100,9 @@ func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanAddedType,
 			user.HumanRegisteredType,
 			user.HumanInitializedCheckSucceededType,
-			user.HumanExternalIDPAddedType,
-			user.HumanExternalIDPRemovedType,
-			user.HumanExternalIDPCascadeRemovedType,
+			user.UserIDPLinkAddedType,
+			user.UserIDPLinkRemovedType,
+			user.UserIDPLinkCascadeRemovedType,
 			user.MachineAddedEventType,
 			user.UserUserNameChangedType,
 			user.MachineChangedEventType,
@@ -122,12 +126,12 @@ func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregat
 	return eventstore.AggregateFromWriteModel(wm, user.AggregateType, user.AggregateVersion)
 }
 
-func CheckOrgIAMPolicyForUserName(userName string, policy *domain.OrgIAMPolicy) error {
+func CheckDomainPolicyForUserName(userName string, policy *domain.DomainPolicy) error {
 	if policy == nil {
-		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-3Mb9s", "Errors.Users.OrgIamPolicyNil")
+		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-3Mb9s", "Errors.Users.DomainPolicyNil")
 	}
 	if policy.UserLoginMustBeDomain && strings.Contains(userName, "@") {
-		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-4M9vs", "Errors.User.EmailAsUsernameNotAllowed")
+		return caos_errors.ThrowPreconditionFailed(nil, "COMMAND-2k9fD", "Errors.User.EmailAsUsernameNotAllowed")
 	}
 	return nil
 }
@@ -140,6 +144,10 @@ func isUserStateInactive(state domain.UserState) bool {
 	return hasUserState(state, domain.UserStateInactive)
 }
 
+func isUserStateInitial(state domain.UserState) bool {
+	return hasUserState(state, domain.UserStateInitial)
+}
+
 func hasUserState(check domain.UserState, states ...domain.UserState) bool {
 	for _, state := range states {
 		if check == state {
@@ -149,8 +157,8 @@ func hasUserState(check domain.UserState, states ...domain.UserState) bool {
 	return false
 }
 
-func (wm *UserWriteModel) ExternalIDPByID(idpID, externalUserID string) (idx int, idp *domain.ExternalIDP) {
-	for idx, idp = range wm.ExternalIDPs {
+func (wm *UserWriteModel) IDPLinkByID(idpID, externalUserID string) (idx int, idp *domain.UserIDPLink) {
+	for idx, idp = range wm.IDPLinks {
 		if idp.IDPConfigID == idpID && idp.ExternalUserID == externalUserID {
 			return idx, idp
 		}

@@ -3,8 +3,8 @@ package domain
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/crypto"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type IDPConfig struct {
@@ -78,6 +78,7 @@ const (
 
 	//count is for validation
 	idpConfigTypeCount
+	IDPConfigTypeUnspecified IDPConfigType = -1
 )
 
 func (f IDPConfigType) Valid() bool {

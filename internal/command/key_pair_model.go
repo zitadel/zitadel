@@ -1,19 +1,19 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	keypair "github.com/caos/zitadel/internal/repository/keypair"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
 
 type KeyPairWriteModel struct {
 	eventstore.WriteModel
 
-	Usage      domain.KeyUsage
-	Algorithm  string
-	PrivateKey *domain.Key
-	PublicKey  *domain.Key
+	Usage       domain.KeyUsage
+	Algorithm   string
+	PrivateKey  *domain.Key
+	PublicKey   *domain.Key
+	Certificate *domain.Key
 }
 
 func NewKeyPairWriteModel(aggregateID, resourceOwner string) *KeyPairWriteModel {
@@ -25,7 +25,7 @@ func NewKeyPairWriteModel(aggregateID, resourceOwner string) *KeyPairWriteModel 
 	}
 }
 
-func (wm *KeyPairWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *KeyPairWriteModel) AppendEvents(events ...eventstore.Event) {
 	wm.WriteModel.AppendEvents(events...)
 }
 
@@ -43,6 +43,11 @@ func (wm *KeyPairWriteModel) Reduce() error {
 				Key:    e.PublicKey.Key,
 				Expiry: e.PublicKey.Expiry,
 			}
+		case *keypair.AddedCertificateEvent:
+			wm.Certificate = &domain.Key{
+				Key:    e.Certificate.Key,
+				Expiry: e.Certificate.Expiry,
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -52,13 +57,12 @@ func (wm *KeyPairWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(project.AggregateType).
+		AggregateTypes(keypair.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(keypair.AddedEventType).
+		EventTypes(keypair.AddedEventType, keypair.AddedCertificateEventType).
 		Builder()
 }
 
 func KeyPairAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, keypair.AggregateType, keypair.AggregateVersion)
-
 }

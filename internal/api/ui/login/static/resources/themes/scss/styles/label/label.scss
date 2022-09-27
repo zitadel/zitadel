@@ -1,0 +1,9 @@
+@import "label_base";
+
+.lgn-label {
+  @include lgn-label-base;
+
+  * {
+    font-size: 12px;
+  }
+}

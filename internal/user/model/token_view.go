@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	caos_errors "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 
 	"time"
 )
@@ -20,6 +20,8 @@ type TokenView struct {
 	Scopes            []string
 	Sequence          uint64
 	PreferredLanguage string
+	RefreshTokenID    string
+	IsPAT             bool
 }
 
 type TokenSearchRequest struct {
@@ -36,10 +38,12 @@ const (
 	TokenSearchKeyUnspecified TokenSearchKey = iota
 	TokenSearchKeyTokenID
 	TokenSearchKeyUserID
+	TokenSearchKeyRefreshTokenID
 	TokenSearchKeyApplicationID
 	TokenSearchKeyUserAgentID
 	TokenSearchKeyExpiration
 	TokenSearchKeyResourceOwner
+	TokenSearchKeyInstanceID
 )
 
 type TokenSearchQuery struct {

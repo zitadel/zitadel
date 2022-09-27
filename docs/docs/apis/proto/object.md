@@ -66,6 +66,16 @@ on manipulation: the |  |
 ## Enums
 
 
+### ListQueryMethod {#listquerymethod}
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| LIST_QUERY_METHOD_IN | 0 | - |
+
+
+
+
 ### TextQueryMethod {#textquerymethod}
 
 

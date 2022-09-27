@@ -6,9 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/lib/pq"
+	"github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 func Test_numberPlaceholder(t *testing.T) {
@@ -80,6 +79,7 @@ func Test_getField(t *testing.T) {
 			es_models.Field_AggregateID:    "aggregate_id",
 			es_models.Field_LatestSequence: "event_sequence",
 			es_models.Field_ResourceOwner:  "resource_owner",
+			es_models.Field_InstanceID:     "instance_id",
 			es_models.Field_EditorService:  "editor_service",
 			es_models.Field_EditorUser:     "editor_user",
 			es_models.Field_EventType:      "event_type",
@@ -234,8 +234,8 @@ func Test_prepareColumns(t *testing.T) {
 				dest:    new(es_models.Event),
 			},
 			res: res{
-				query:    "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
-				dbRow:    []interface{}{time.Time{}, es_models.EventType(""), uint64(5), Sequence(0), Data(nil), "", "", "", es_models.AggregateType("user"), "hodor", es_models.Version("")},
+				query:    "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				dbRow:    []interface{}{time.Time{}, es_models.EventType(""), uint64(5), Sequence(0), Data(nil), "", "", "", "", es_models.AggregateType("user"), "hodor", es_models.Version("")},
 				expected: es_models.Event{AggregateID: "hodor", AggregateType: "user", Sequence: 5, Data: make(Data, 0)},
 			},
 		},
@@ -246,7 +246,7 @@ func Test_prepareColumns(t *testing.T) {
 				dest:    new(uint64),
 			},
 			res: res{
-				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				dbErr: errors.IsErrorInvalidArgument,
 			},
 		},
@@ -258,7 +258,7 @@ func Test_prepareColumns(t *testing.T) {
 				dbErr:   sql.ErrConnDone,
 			},
 			res: res{
-				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+				query: "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
 				dbErr: errors.IsInternal,
 			},
 		},
@@ -307,7 +307,7 @@ func prepareTestScan(err error, res []interface{}) scan {
 
 func Test_prepareCondition(t *testing.T) {
 	type args struct {
-		filters []*es_models.Filter
+		filters [][]*es_models.Filter
 	}
 	type res struct {
 		clause string
@@ -331,7 +331,7 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "empty filters",
 			args: args{
-				filters: []*es_models.Filter{},
+				filters: [][]*es_models.Filter{},
 			},
 			res: res{
 				clause: "",
@@ -341,8 +341,10 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "invalid condition",
 			args: args{
-				filters: []*es_models.Filter{
-					es_models.NewFilter(es_models.Field_AggregateID, "wrong", es_models.Operation(-1)),
+				filters: [][]*es_models.Filter{
+					{
+						es_models.NewFilter(es_models.Field_AggregateID, "wrong", es_models.Operation(-1)),
+					},
 				},
 			},
 			res: res{
@@ -353,27 +355,31 @@ func Test_prepareCondition(t *testing.T) {
 		{
 			name: "array as condition value",
 			args: args{
-				filters: []*es_models.Filter{
-					es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"user", "org"}, es_models.Operation_In),
+				filters: [][]*es_models.Filter{
+					{
+						es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"user", "org"}, es_models.Operation_In),
+					},
 				},
 			},
 			res: res{
-				clause: " WHERE aggregate_type = ANY(?)",
-				values: []interface{}{pq.Array([]es_models.AggregateType{"user", "org"})},
+				clause: " WHERE ( aggregate_type = ANY(?) )",
+				values: []interface{}{[]es_models.AggregateType{"user", "org"}},
 			},
 		},
 		{
 			name: "multiple filters",
 			args: args{
-				filters: []*es_models.Filter{
-					es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"user", "org"}, es_models.Operation_In),
-					es_models.NewFilter(es_models.Field_AggregateID, "1234", es_models.Operation_Equals),
-					es_models.NewFilter(es_models.Field_EventType, []es_models.EventType{"user.created", "org.created"}, es_models.Operation_In),
+				filters: [][]*es_models.Filter{
+					{
+						es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"user", "org"}, es_models.Operation_In),
+						es_models.NewFilter(es_models.Field_AggregateID, "1234", es_models.Operation_Equals),
+						es_models.NewFilter(es_models.Field_EventType, []es_models.EventType{"user.created", "org.created"}, es_models.Operation_In),
+					},
 				},
 			},
 			res: res{
-				clause: " WHERE aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?)",
-				values: []interface{}{pq.Array([]es_models.AggregateType{"user", "org"}), "1234", pq.Array([]es_models.EventType{"user.created", "org.created"})},
+				clause: " WHERE ( aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) )",
+				values: []interface{}{[]es_models.AggregateType{"user", "org"}, "1234", []es_models.EventType{"user.created", "org.created"}},
 			},
 		},
 	}
@@ -426,10 +432,10 @@ func Test_buildQuery(t *testing.T) {
 		{
 			name: "with order by desc",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").OrderDesc(),
+				queryFactory: es_models.NewSearchQueryFactory().OrderDesc().AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE ( aggregate_type = $1 ) ORDER BY event_sequence DESC",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user")},
 			},
@@ -437,10 +443,10 @@ func Test_buildQuery(t *testing.T) {
 		{
 			name: "with limit",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5),
+				queryFactory: es_models.NewSearchQueryFactory().Limit(5).AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence LIMIT $2",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE ( aggregate_type = $1 ) ORDER BY event_sequence LIMIT $2",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user"), uint64(5)},
 				limit:      5,
@@ -449,10 +455,10 @@ func Test_buildQuery(t *testing.T) {
 		{
 			name: "with limit and order by desc",
 			args: args{
-				queryFactory: es_models.NewSearchQueryFactory("user").Limit(5).OrderDesc(),
+				queryFactory: es_models.NewSearchQueryFactory().Limit(5).OrderDesc().AddQuery().AggregateTypes("user").Factory(),
 			},
 			res: res{
-				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE aggregate_type = $1 ORDER BY event_sequence DESC LIMIT $2",
+				query:      "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE ( aggregate_type = $1 ) ORDER BY event_sequence DESC LIMIT $2",
 				rowScanner: true,
 				values:     []interface{}{es_models.AggregateType("user"), uint64(5)},
 				limit:      5,

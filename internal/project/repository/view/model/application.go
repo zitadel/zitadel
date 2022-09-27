@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/logging"
-	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/project/model"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
@@ -36,67 +37,34 @@ type ApplicationView struct {
 	HasProjectCheck        bool                          `json:"hasProjectCheck" gorm:"column:has_project_check"`
 	PrivateLabelingSetting domain.PrivateLabelingSetting `json:"privateLabelingSetting" gorm:"column:private_labeling_setting"`
 
-	IsOIDC                     bool           `json:"-" gorm:"column:is_oidc"`
-	OIDCVersion                int32          `json:"oidcVersion" gorm:"column:oidc_version"`
-	OIDCClientID               string         `json:"clientId" gorm:"column:oidc_client_id"`
-	OIDCRedirectUris           pq.StringArray `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
-	OIDCResponseTypes          pq.Int64Array  `json:"responseTypes" gorm:"column:oidc_response_types"`
-	OIDCGrantTypes             pq.Int64Array  `json:"grantTypes" gorm:"column:oidc_grant_types"`
-	OIDCApplicationType        int32          `json:"applicationType" gorm:"column:oidc_application_type"`
-	OIDCAuthMethodType         int32          `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
-	OIDCPostLogoutRedirectUris pq.StringArray `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
-	NoneCompliant              bool           `json:"-" gorm:"column:none_compliant"`
-	ComplianceProblems         pq.StringArray `json:"-" gorm:"column:compliance_problems"`
-	DevMode                    bool           `json:"devMode" gorm:"column:dev_mode"`
-	OriginAllowList            pq.StringArray `json:"-" gorm:"column:origin_allow_list"`
-	AdditionalOrigins          pq.StringArray `json:"additionalOrigins" gorm:"column:additional_origins"`
-	AccessTokenType            int32          `json:"accessTokenType" gorm:"column:access_token_type"`
-	AccessTokenRoleAssertion   bool           `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
-	IDTokenRoleAssertion       bool           `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
-	IDTokenUserinfoAssertion   bool           `json:"idTokenUserinfoAssertion" gorm:"column:id_token_userinfo_assertion"`
-	ClockSkew                  time.Duration  `json:"clockSkew" gorm:"column:clock_skew"`
+	IsOIDC                     bool                                        `json:"-" gorm:"column:is_oidc"`
+	OIDCVersion                int32                                       `json:"oidcVersion" gorm:"column:oidc_version"`
+	OIDCClientID               string                                      `json:"clientId" gorm:"column:oidc_client_id"`
+	OIDCRedirectUris           database.StringArray                        `json:"redirectUris" gorm:"column:oidc_redirect_uris"`
+	OIDCResponseTypes          database.EnumArray[domain.OIDCResponseType] `json:"responseTypes" gorm:"column:oidc_response_types"`
+	OIDCGrantTypes             database.EnumArray[domain.OIDCGrantType]    `json:"grantTypes" gorm:"column:oidc_grant_types"`
+	OIDCApplicationType        int32                                       `json:"applicationType" gorm:"column:oidc_application_type"`
+	OIDCAuthMethodType         int32                                       `json:"authMethodType" gorm:"column:oidc_auth_method_type"`
+	OIDCPostLogoutRedirectUris database.StringArray                        `json:"postLogoutRedirectUris" gorm:"column:oidc_post_logout_redirect_uris"`
+	NoneCompliant              bool                                        `json:"-" gorm:"column:none_compliant"`
+	ComplianceProblems         database.StringArray                        `json:"-" gorm:"column:compliance_problems"`
+	DevMode                    bool                                        `json:"devMode" gorm:"column:dev_mode"`
+	OriginAllowList            database.StringArray                        `json:"-" gorm:"column:origin_allow_list"`
+	AdditionalOrigins          database.StringArray                        `json:"additionalOrigins" gorm:"column:additional_origins"`
+	AccessTokenType            int32                                       `json:"accessTokenType" gorm:"column:access_token_type"`
+	AccessTokenRoleAssertion   bool                                        `json:"accessTokenRoleAssertion" gorm:"column:access_token_role_assertion"`
+	IDTokenRoleAssertion       bool                                        `json:"idTokenRoleAssertion" gorm:"column:id_token_role_assertion"`
+	IDTokenUserinfoAssertion   bool                                        `json:"idTokenUserinfoAssertion" gorm:"column:id_token_userinfo_assertion"`
+	ClockSkew                  time.Duration                               `json:"clockSkew" gorm:"column:clock_skew"`
+
+	IsSAML      bool   `json:"-" gorm:"column:is_saml"`
+	Metadata    []byte `json:"metadata" gorm:"column:metadata"`
+	MetadataURL string `json:"metadata_url" gorm:"column:metadata_url"`
 
 	Sequence uint64 `json:"-" gorm:"sequence"`
 }
 
-func ApplicationViewToModel(app *ApplicationView) *model.ApplicationView {
-	return &model.ApplicationView{
-		ID:                     app.ID,
-		ProjectID:              app.ProjectID,
-		Name:                   app.Name,
-		State:                  model.AppState(app.State),
-		Sequence:               app.Sequence,
-		CreationDate:           app.CreationDate,
-		ChangeDate:             app.ChangeDate,
-		ResourceOwner:          app.ResourceOwner,
-		ProjectRoleAssertion:   app.ProjectRoleAssertion,
-		ProjectRoleCheck:       app.ProjectRoleCheck,
-		HasProjectCheck:        app.HasProjectCheck,
-		PrivateLabelingSetting: app.PrivateLabelingSetting,
-
-		IsOIDC:                     app.IsOIDC,
-		OIDCVersion:                model.OIDCVersion(app.OIDCVersion),
-		OIDCClientID:               app.OIDCClientID,
-		OIDCRedirectUris:           app.OIDCRedirectUris,
-		OIDCResponseTypes:          OIDCResponseTypesToModel(app.OIDCResponseTypes),
-		OIDCGrantTypes:             OIDCGrantTypesToModel(app.OIDCGrantTypes),
-		OIDCApplicationType:        model.OIDCApplicationType(app.OIDCApplicationType),
-		OIDCAuthMethodType:         model.OIDCAuthMethodType(app.OIDCAuthMethodType),
-		OIDCPostLogoutRedirectUris: app.OIDCPostLogoutRedirectUris,
-		NoneCompliant:              app.NoneCompliant,
-		ComplianceProblems:         app.ComplianceProblems,
-		DevMode:                    app.DevMode,
-		OriginAllowList:            app.OriginAllowList,
-		AdditionalOrigins:          app.AdditionalOrigins,
-		AccessTokenType:            model.OIDCTokenType(app.AccessTokenType),
-		AccessTokenRoleAssertion:   app.AccessTokenRoleAssertion,
-		IDTokenRoleAssertion:       app.IDTokenRoleAssertion,
-		IDTokenUserinfoAssertion:   app.IDTokenUserinfoAssertion,
-		ClockSkew:                  app.ClockSkew,
-	}
-}
-
-func OIDCResponseTypesToModel(oidctypes []int64) []model.OIDCResponseType {
+func OIDCResponseTypesToModel(oidctypes []domain.OIDCResponseType) []model.OIDCResponseType {
 	result := make([]model.OIDCResponseType, len(oidctypes))
 	for i, t := range oidctypes {
 		result[i] = model.OIDCResponseType(t)
@@ -104,7 +72,7 @@ func OIDCResponseTypesToModel(oidctypes []int64) []model.OIDCResponseType {
 	return result
 }
 
-func OIDCGrantTypesToModel(granttypes []int64) []model.OIDCGrantType {
+func OIDCGrantTypesToModel(granttypes []domain.OIDCGrantType) []model.OIDCGrantType {
 	result := make([]model.OIDCGrantType, len(granttypes))
 	for i, t := range granttypes {
 		result[i] = model.OIDCGrantType(t)
@@ -112,41 +80,35 @@ func OIDCGrantTypesToModel(granttypes []int64) []model.OIDCGrantType {
 	return result
 }
 
-func ApplicationViewsToModel(roles []*ApplicationView) []*model.ApplicationView {
-	result := make([]*model.ApplicationView, len(roles))
-	for i, r := range roles {
-		result[i] = ApplicationViewToModel(r)
-	}
-	return result
-}
-
 func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 	view := new(ApplicationView)
-	switch event.Type {
-	case es_model.ApplicationAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.ApplicationAddedType:
 		err = view.SetData(event)
 		if err != nil {
 			return err
 		}
-	case es_model.ApplicationChanged,
-		es_model.OIDCConfigAdded,
-		es_model.OIDCConfigChanged,
-		es_model.APIConfigAdded,
-		es_model.APIConfigChanged,
-		es_model.ApplicationDeactivated,
-		es_model.ApplicationReactivated:
+	case project.ApplicationChangedType,
+		project.OIDCConfigAddedType,
+		project.OIDCConfigChangedType,
+		project.APIConfigAddedType,
+		project.APIConfigChangedType,
+		project.ApplicationDeactivatedType,
+		project.ApplicationReactivatedType,
+		project.SAMLConfigAddedType,
+		project.SAMLConfigChangedType:
 		err = view.SetData(event)
 		if err != nil {
 			return err
 		}
-	case es_model.ApplicationRemoved:
+	case project.ApplicationRemovedType:
 		err = view.SetData(event)
 		if err != nil {
 			return err
 		}
-	case es_model.ProjectChanged:
+	case project.ProjectChangedType:
 		return a.AppendEvent(event)
-	case es_model.ProjectRemoved:
+	case project.ProjectRemovedType:
 		return a.AppendEvent(event)
 	default:
 		return nil
@@ -160,13 +122,13 @@ func (a *ApplicationView) AppendEventIfMyApp(event *models.Event) (err error) {
 func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 	a.Sequence = event.Sequence
 	a.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.ApplicationAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.ApplicationAddedType:
 		a.setRootData(event)
 		a.CreationDate = event.CreationDate
 		a.ResourceOwner = event.ResourceOwner
 		err = a.SetData(event)
-	case es_model.OIDCConfigAdded:
+	case project.OIDCConfigAddedType:
 		a.IsOIDC = true
 		err = a.SetData(event)
 		if err != nil {
@@ -174,27 +136,32 @@ func (a *ApplicationView) AppendEvent(event *models.Event) (err error) {
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
-	case es_model.APIConfigAdded:
+	case project.SAMLConfigAddedType:
+		a.IsSAML = true
+		return a.SetData(event)
+	case project.APIConfigAddedType:
 		a.IsOIDC = false
 		return a.SetData(event)
-	case es_model.ApplicationChanged:
+	case project.ApplicationChangedType:
 		return a.SetData(event)
-	case es_model.OIDCConfigChanged:
+	case project.OIDCConfigChangedType:
 		err = a.SetData(event)
 		if err != nil {
 			return err
 		}
 		a.setCompliance()
 		return a.setOriginAllowList()
-	case es_model.APIConfigChanged:
+	case project.SAMLConfigChangedType:
 		return a.SetData(event)
-	case es_model.ProjectChanged:
+	case project.APIConfigChangedType:
+		return a.SetData(event)
+	case project.ProjectChangedType:
 		return a.setProjectChanges(event)
-	case es_model.ApplicationDeactivated:
+	case project.ApplicationDeactivatedType:
 		a.State = int32(model.AppStateInactive)
-	case es_model.ApplicationReactivated:
+	case project.ApplicationReactivatedType:
 		a.State = int32(model.AppStateActive)
-	case es_model.ApplicationRemoved, es_model.ProjectRemoved:
+	case project.ApplicationRemovedType, project.ProjectRemovedType:
 		a.State = int32(model.AppStateRemoved)
 	}
 	return err
@@ -213,7 +180,7 @@ func (a *ApplicationView) SetData(event *models.Event) error {
 }
 
 func (a *ApplicationView) setOriginAllowList() error {
-	allowList := make([]string, 0)
+	allowList := make(database.StringArray, 0)
 	for _, redirect := range a.OIDCRedirectUris {
 		origin, err := http_util.GetOriginFromURLString(redirect)
 		if err != nil {

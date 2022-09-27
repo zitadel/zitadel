@@ -1,62 +1,56 @@
 package types
 
 import (
+	"context"
 	"html"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/providers"
-	"github.com/caos/zitadel/internal/notification/providers/chat"
-	"github.com/caos/zitadel/internal/notification/providers/email"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
-func generateEmail(user *view_model.NotifyUser, subject, content string, config systemdefaults.Notifications, lastEmail bool) error {
-	provider, err := email.InitEmailProvider(config.Providers.Email)
-	if err != nil {
-		return err
-	}
+func generateEmail(ctx context.Context, user *query.NotifyUser, subject, content string, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastEmail bool) error {
 	content = html.UnescapeString(content)
-	message := &email.EmailMessage{
-		SenderEmail: config.Providers.Email.From,
-		Recipients:  []string{user.VerifiedEmail},
-		Subject:     subject,
-		Content:     content,
+	message := &messages.Email{
+		Recipients: []string{user.VerifiedEmail},
+		Subject:    subject,
+		Content:    content,
 	}
 	if lastEmail {
 		message.Recipients = []string{user.LastEmail}
 	}
-	if provider.CanHandleMessage(message) {
-		if config.DebugMode {
-			return sendDebugEmail(message, config)
-		}
-		return provider.HandleMessage(message)
-	}
-	return caos_errs.ThrowInternalf(nil, "NOTIF-s8ipw", "Could not send init message: userid: %v", user.ID)
-}
 
-func sendDebugEmail(message providers.Message, config systemdefaults.Notifications) error {
-	provider, err := chat.InitChatProvider(config.Providers.Chat)
+	channelChain, err := senders.EmailChannels(ctx, smtpConfig, getFileSystemProvider, getLogProvider)
 	if err != nil {
 		return err
 	}
-	return provider.HandleMessage(message)
+
+	if channelChain.Len() == 0 {
+		return caos_errors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
+	}
+	return channelChain.HandleMessage(message)
 }
 
-func mapNotifyUserToArgs(user *view_model.NotifyUser) map[string]interface{} {
-	return map[string]interface{}{
-		"UserName":           user.UserName,
-		"FirstName":          user.FirstName,
-		"LastName":           user.LastName,
-		"NickName":           user.NickName,
-		"DisplayName":        user.DisplayName,
-		"LastEmail":          user.LastEmail,
-		"VerifiedEmail":      user.VerifiedEmail,
-		"LastPhone":          user.LastPhone,
-		"VerifiedPhone":      user.VerifiedPhone,
-		"PreferredLoginName": user.PreferredLoginName,
-		"LoginNames":         user.LoginNames,
-		"ChangeDate":         user.ChangeDate,
-		"CreationDate":       user.CreationDate,
+func mapNotifyUserToArgs(user *query.NotifyUser, args map[string]interface{}) map[string]interface{} {
+	if args == nil {
+		args = make(map[string]interface{})
 	}
+	args["UserName"] = user.Username
+	args["FirstName"] = user.FirstName
+	args["LastName"] = user.LastName
+	args["NickName"] = user.NickName
+	args["DisplayName"] = user.DisplayName
+	args["LastEmail"] = user.LastEmail
+	args["VerifiedEmail"] = user.VerifiedEmail
+	args["LastPhone"] = user.LastPhone
+	args["VerifiedPhone"] = user.VerifiedPhone
+	args["PreferredLoginName"] = user.PreferredLoginName
+	args["LoginNames"] = user.LoginNames
+	args["ChangeDate"] = user.ChangeDate
+	args["CreationDate"] = user.CreationDate
+	return args
 }

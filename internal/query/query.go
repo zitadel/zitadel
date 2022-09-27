@@ -3,48 +3,84 @@ package query
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"net/http"
+	"sync"
 
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/eventstore"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/caos/zitadel/internal/repository/action"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/project"
-	usr_repo "github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
+
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/domain"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/action"
+	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
 
 type Queries struct {
-	iamID      string
 	eventstore *eventstore.Eventstore
 	client     *sql.DB
+
+	idpConfigEncryption crypto.EncryptionAlgorithm
+
+	DefaultLanguage                     language.Tag
+	LoginDir                            http.FileSystem
+	NotificationDir                     http.FileSystem
+	mutex                               sync.Mutex
+	LoginTranslationFileContents        map[string][]byte
+	NotificationTranslationFileContents map[string][]byte
+	supportedLangs                      []language.Tag
+	zitadelRoles                        []authz.RoleMapping
+	multifactors                        domain.MultifactorConfigs
 }
 
-type Config struct {
-	Eventstore types.SQLUser
-}
-
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults) (repo *Queries, err error) {
-	sqlClient, err := projections.CRDB.Start()
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to start login statik dir")
+	}
+
+	statikNotificationFS, err := fs.NewWithNamespace("notification")
+	if err != nil {
+		return nil, fmt.Errorf("unable to start notification statik dir")
 	}
 
 	repo = &Queries{
-		iamID:      defaults.IamID,
-		eventstore: es,
-		client:     sqlClient,
+		eventstore:                          es,
+		client:                              sqlClient,
+		DefaultLanguage:                     language.Und,
+		LoginDir:                            statikLoginFS,
+		NotificationDir:                     statikNotificationFS,
+		LoginTranslationFileContents:        make(map[string][]byte),
+		NotificationTranslationFileContents: make(map[string][]byte),
+		zitadelRoles:                        zitadelRoles,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
 	project.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
+	keypair.RegisterEventMappers(repo.eventstore)
+	usergrant.RegisterEventMappers(repo.eventstore)
 
-	err = projection.Start(ctx, sqlClient, es, projections)
+	repo.idpConfigEncryption = idpConfigEncryption
+	repo.multifactors = domain.MultifactorConfigs{
+		OTP: domain.OTPConfig{
+			CryptoMFA: otpEncryption,
+			Issuer:    defaults.Multifactors.OTP.Issuer,
+		},
+	}
+
+	err = projection.Start(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -52,24 +88,6 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	return repo, nil
 }
 
-func (r *Queries) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, err error) {
-	readModel, err := r.iamByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return readModelToIAM(readModel), nil
-}
-
-func (r *Queries) iamByID(ctx context.Context, id string) (_ *ReadModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	readModel := NewReadModel(id)
-	err = r.eventstore.FilterToQueryReducer(ctx, readModel)
-	if err != nil {
-		return nil, err
-	}
-
-	return readModel, nil
+func (q *Queries) Health(ctx context.Context) error {
+	return q.client.Ping()
 }

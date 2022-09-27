@@ -4,22 +4,6 @@
   }
 }
 
-.add-row {
-  display: flex;
-  margin: -.5rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-
-  .button {
-    margin: .5rem;
-    margin-top: 1rem;
-
-    .icon {
-      margin-right: .5rem;
-    }
-  }
-}
-
 .centered {
   display: flex;
   align-items: center;
@@ -32,16 +16,4 @@
 
 .table {
   width: 100%;
-
-  td,
-  th {
-    &:first-child {
-      padding-left: 0;
-      padding-right: 1rem;
-    }
-
-    &:last-child {
-      padding-right: 0;
-    }
-  }
 }

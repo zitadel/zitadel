@@ -5,9 +5,9 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
 type CustomLoginTextsReadModel struct {
@@ -22,7 +22,7 @@ func (wm *CustomLoginTextsReadModel) Reduce() error {
 			wm.CustomLoginTexts[e.Template+e.Language.String()] = &CustomText{Language: e.Language, Template: e.Template}
 		case *policy.CustomTextTemplateRemovedEvent:
 			if _, ok := wm.CustomLoginTexts[e.Template+e.Language.String()]; ok {
-				delete(wm.CustomLoginTexts, e.Template)
+				delete(wm.CustomLoginTexts, e.Template+e.Language.String())
 			}
 		}
 	}
@@ -182,6 +182,7 @@ type CustomLoginTextReadModel struct {
 
 	PasswordlessRegistrationDoneTitle            string
 	PasswordlessRegistrationDoneDescription      string
+	PasswordlessRegistrationDoneDescriptionClose string
 	PasswordlessRegistrationDoneNextButtonText   string
 	PasswordlessRegistrationDoneCancelButtonText string
 
@@ -1703,6 +1704,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenSetE
 		wm.PasswordlessRegistrationDoneDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose {
+		wm.PasswordlessRegistrationDoneDescriptionClose = e.Text
+		return
+	}
 	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
 		wm.PasswordlessRegistrationDoneNextButtonText = e.Text
 		return
@@ -1720,6 +1725,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenRemo
 	}
 	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
 		wm.PasswordlessRegistrationDoneDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose {
+		wm.PasswordlessRegistrationDoneDescriptionClose = ""
 		return
 	}
 	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
@@ -2499,10 +2508,6 @@ func (wm *CustomLoginTextReadModel) handleFooterTextSetEvent(e *policy.CustomTex
 		wm.FooterHelp = e.Text
 		return
 	}
-	if e.Key == domain.LoginKeyFooterHelpLink {
-		wm.FooterHelpLink = e.Text
-		return
-	}
 }
 
 func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -2516,10 +2521,6 @@ func (wm *CustomLoginTextReadModel) handleFooterTextRemoveEvent(e *policy.Custom
 	}
 	if e.Key == domain.LoginKeyFooterHelp {
 		wm.FooterHelp = ""
-		return
-	}
-	if e.Key == domain.LoginKeyFooterHelpLink {
-		wm.FooterHelpLink = ""
 		return
 	}
 }

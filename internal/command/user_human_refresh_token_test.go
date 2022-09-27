@@ -6,27 +6,25 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/oidc/pkg/oidc"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/text/language"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/id"
-	id_mock "github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id"
+	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
-		iamDomain    string
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -56,15 +54,13 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "error access token, error",
+			name: "missing ID, error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(),
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -73,8 +69,15 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "refreshTokenID1"),
 			},
-			args: args{},
+			args: args{
+				ctx:      context.Background(),
+				orgID:    "orgID",
+				agentID:  "agentID",
+				userID:   "userID",
+				clientID: "clientID",
+			},
 			res: res{
 				err: caos_errs.IsNotFound,
 			},
@@ -82,39 +85,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 		{
 			name: "renew refresh token, invalid token, error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "orgID").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.German,
-							domain.GenderUnspecified,
-							"email",
-							true,
-						)),
-					),
-					expectFilter(
-						eventFromEventPusher(user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "orgID").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.German,
-							domain.GenderUnspecified,
-							"email",
-							true,
-						)),
-					),
-				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "accessTokenID1"),
+				eventstore:   eventstoreExpect(t),
 				keyAlgorithm: refreshTokenEncryptionAlgorithm(gomock.NewController(t)),
 			},
 			args: args{
@@ -128,39 +99,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 		{
 			name: "renew refresh token, invalid token (invalid userID), error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "orgID").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.German,
-							domain.GenderUnspecified,
-							"email",
-							true,
-						)),
-					),
-					expectFilter(
-						eventFromEventPusher(user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "orgID").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.German,
-							domain.GenderUnspecified,
-							"email",
-							true,
-						)),
-					),
-				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "accessTokenID1"),
+				eventstore:   eventstoreExpect(t),
 				keyAlgorithm: refreshTokenEncryptionAlgorithm(gomock.NewController(t)),
 			},
 			args: args{
@@ -177,36 +116,6 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 			name: "renew refresh token, token inactive, error",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "orgID").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.German,
-							domain.GenderUnspecified,
-							"email",
-							true,
-						)),
-					),
-					expectFilter(
-						eventFromEventPusher(user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "orgID").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.German,
-							domain.GenderUnspecified,
-							"email",
-							true,
-						)),
-					),
 					expectFilter(
 						eventFromEventPusher(user.NewHumanRefreshTokenAddedEvent(
 							context.Background(),
@@ -229,7 +138,6 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 						)),
 					),
 				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "accessTokenID1"),
 				keyAlgorithm: refreshTokenEncryptionAlgorithm(gomock.NewController(t)),
 			},
 			args: args{
@@ -247,36 +155,6 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "orgID").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.German,
-							domain.GenderUnspecified,
-							"email",
-							true,
-						)),
-					),
-					expectFilter(
-						eventFromEventPusher(user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("userID", "orgID").Aggregate,
-							"username",
-							"firstname",
-							"lastname",
-							"nickname",
-							"displayname",
-							language.German,
-							domain.GenderUnspecified,
-							"email",
-							true,
-						)),
-					),
-					expectFilter(
 						eventFromEventPusher(user.NewHumanRefreshTokenAddedEvent(
 							context.Background(),
 							&user.NewAggregate("userID", "orgID").Aggregate,
@@ -293,7 +171,6 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 						)),
 					),
 				),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "accessTokenID1"),
 				keyAlgorithm: refreshTokenEncryptionAlgorithm(gomock.NewController(t)),
 			},
 			args: args{
@@ -407,7 +284,6 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 			c := &Commands{
 				eventstore:   tt.fields.eventstore,
 				idGenerator:  tt.fields.idGenerator,
-				iamDomain:    tt.fields.iamDomain,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
 			got, gotRefresh, err := c.AddAccessAndRefreshToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.refreshToken,
@@ -809,7 +685,6 @@ func TestCommands_addRefreshToken(t *testing.T) {
 	authTime := time.Now().Add(-1 * time.Hour)
 	type fields struct {
 		eventstore   *eventstore.Eventstore
-		idGenerator  id.Generator
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -836,7 +711,6 @@ func TestCommands_addRefreshToken(t *testing.T) {
 			name: "add refresh Token",
 			fields: fields{
 				eventstore:   eventstoreExpect(t),
-				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "refreshTokenID"),
 				keyAlgorithm: refreshTokenEncryptionAlgorithm(gomock.NewController(t)),
 			},
 			args: args{
@@ -849,6 +723,7 @@ func TestCommands_addRefreshToken(t *testing.T) {
 					TokenID:           "accessTokenID1",
 					ApplicationID:     "clientID",
 					UserAgentID:       "agentID",
+					RefreshTokenID:    "refreshTokenID",
 					Audience:          []string{"clientID1"},
 					Expiration:        time.Now().Add(5 * time.Minute),
 					Scopes:            []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess},
@@ -882,7 +757,6 @@ func TestCommands_addRefreshToken(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:   tt.fields.eventstore,
-				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
 			gotEvent, gotRefreshToken, err := c.addRefreshToken(tt.args.ctx, tt.args.accessToken, tt.args.authMethodsReferences, tt.args.authTime, tt.args.idleExpiration, tt.args.expiration)
@@ -915,6 +789,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 	}
 	type res struct {
 		event           *user.HumanRefreshTokenRenewedEvent
+		refreshTokenID  string
 		newRefreshToken string
 		err             func(error) bool
 	}
@@ -1076,6 +951,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 					"refreshToken1",
 					1*time.Hour,
 				),
+				refreshTokenID:  "tokenID",
 				newRefreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:refreshToken1")),
 			},
 		},
@@ -1087,7 +963,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			gotEvent, gotNewRefreshToken, err := c.renewRefreshToken(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.refreshToken, tt.args.idleExpiration)
+			gotEvent, gotRefreshTokenID, gotNewRefreshToken, err := c.renewRefreshToken(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.refreshToken, tt.args.idleExpiration)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1096,6 +972,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.event, gotEvent)
+				assert.Equal(t, tt.res.refreshTokenID, gotRefreshTokenID)
 				assert.Equal(t, tt.res.newRefreshToken, gotNewRefreshToken)
 			}
 		})

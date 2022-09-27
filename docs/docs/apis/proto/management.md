@@ -233,7 +233,7 @@ Changes the username
 
 
 
-    GET: /users/{user_id}/username
+    PUT: /users/{user_id}/username
 
 
 ### SetUserMetadata
@@ -529,6 +529,20 @@ Returns all configured passwordless authenticators
     POST: /users/{user_id}/passwordless/_search
 
 
+### AddPasswordlessRegistration
+
+> **rpc** AddPasswordlessRegistration([AddPasswordlessRegistrationRequest](#addpasswordlessregistrationrequest))
+[AddPasswordlessRegistrationResponse](#addpasswordlessregistrationresponse)
+
+Adds a new passwordless authenticator link to the user and returns it directly
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/{user_id}/passwordless/_link
+
+
 ### SendPasswordlessRegistration
 
 > **rpc** SendPasswordlessRegistration([SendPasswordlessRegistrationRequest](#sendpasswordlessregistrationrequest))
@@ -609,11 +623,60 @@ Generates a new machine key, details should be stored after return
 > **rpc** RemoveMachineKey([RemoveMachineKeyRequest](#removemachinekeyrequest))
 [RemoveMachineKeyResponse](#removemachinekeyresponse)
 
-Removed a machine key
+Removes a machine key
 
 
 
     DELETE: /users/{user_id}/keys/{key_id}
+
+
+### GetPersonalAccessTokenByIDs
+
+> **rpc** GetPersonalAccessTokenByIDs([GetPersonalAccessTokenByIDsRequest](#getpersonalaccesstokenbyidsrequest))
+[GetPersonalAccessTokenByIDsResponse](#getpersonalaccesstokenbyidsresponse)
+
+Returns a personal access token of a (machine) user
+
+
+
+    GET: /users/{user_id}/pats/{token_id}
+
+
+### ListPersonalAccessTokens
+
+> **rpc** ListPersonalAccessTokens([ListPersonalAccessTokensRequest](#listpersonalaccesstokensrequest))
+[ListPersonalAccessTokensResponse](#listpersonalaccesstokensresponse)
+
+Returns all personal access tokens of a (machine) user which match the query
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /users/{user_id}/pats/_search
+
+
+### AddPersonalAccessToken
+
+> **rpc** AddPersonalAccessToken([AddPersonalAccessTokenRequest](#addpersonalaccesstokenrequest))
+[AddPersonalAccessTokenResponse](#addpersonalaccesstokenresponse)
+
+Generates a new personal access token for a machine user, details should be stored after return
+
+
+
+    POST: /users/{user_id}/pats
+
+
+### RemovePersonalAccessToken
+
+> **rpc** RemovePersonalAccessToken([RemovePersonalAccessTokenRequest](#removepersonalaccesstokenrequest))
+[RemovePersonalAccessTokenResponse](#removepersonalaccesstokenresponse)
+
+Removes a personal access token
+
+
+
+    DELETE: /users/{user_id}/pats/{token_id}
 
 
 ### ListHumanLinkedIDPs
@@ -739,6 +802,78 @@ Sets the state of my organisation to active
 
 
     POST: /orgs/me/_reactivate
+
+
+### SetOrgMetadata
+
+> **rpc** SetOrgMetadata([SetOrgMetadataRequest](#setorgmetadatarequest))
+[SetOrgMetadataResponse](#setorgmetadataresponse)
+
+Sets a org metadata by key
+
+
+
+    POST: /metadata/{key}
+
+
+### BulkSetOrgMetadata
+
+> **rpc** BulkSetOrgMetadata([BulkSetOrgMetadataRequest](#bulksetorgmetadatarequest))
+[BulkSetOrgMetadataResponse](#bulksetorgmetadataresponse)
+
+Set a list of org metadata
+
+
+
+    POST: /metadata/_bulk
+
+
+### ListOrgMetadata
+
+> **rpc** ListOrgMetadata([ListOrgMetadataRequest](#listorgmetadatarequest))
+[ListOrgMetadataResponse](#listorgmetadataresponse)
+
+Returns the org metadata
+
+
+
+    POST: /metadata/_search
+
+
+### GetOrgMetadata
+
+> **rpc** GetOrgMetadata([GetOrgMetadataRequest](#getorgmetadatarequest))
+[GetOrgMetadataResponse](#getorgmetadataresponse)
+
+Returns the org metadata by key
+
+
+
+    GET: /metadata/{key}
+
+
+### RemoveOrgMetadata
+
+> **rpc** RemoveOrgMetadata([RemoveOrgMetadataRequest](#removeorgmetadatarequest))
+[RemoveOrgMetadataResponse](#removeorgmetadataresponse)
+
+Removes a org metadata by key
+
+
+
+    DELETE: /metadata/{key}
+
+
+### BulkRemoveOrgMetadata
+
+> **rpc** BulkRemoveOrgMetadata([BulkRemoveOrgMetadataRequest](#bulkremoveorgmetadatarequest))
+[BulkRemoveOrgMetadataResponse](#bulkremoveorgmetadataresponse)
+
+Set a list of org metadata
+
+
+
+    DELETE: /metadata/_bulk
 
 
 ### ListOrgDomains
@@ -1191,6 +1326,19 @@ Returns a new generated secret if needed (Depending on the configuration)
     POST: /projects/{project_id}/apps/oidc
 
 
+### AddSAMLApp
+
+> **rpc** AddSAMLApp([AddSAMLAppRequest](#addsamlapprequest))
+[AddSAMLAppResponse](#addsamlappresponse)
+
+Adds a new saml service provider
+Returns a entityID
+
+
+
+    POST: /projects/{project_id}/apps/saml
+
+
 ### AddAPIApp
 
 > **rpc** AddAPIApp([AddAPIAppRequest](#addapiapprequest))
@@ -1227,6 +1375,18 @@ Changes the configuration of the oidc client
 
 
     PUT: /projects/{project_id}/apps/{app_id}/oidc_config
+
+
+### UpdateSAMLAppConfig
+
+> **rpc** UpdateSAMLAppConfig([UpdateSAMLAppConfigRequest](#updatesamlappconfigrequest))
+[UpdateSAMLAppConfigResponse](#updatesamlappconfigresponse)
+
+Changes the configuration of the saml application
+
+
+
+    PUT: /projects/{project_id}/apps/{app_id}/saml_config
 
 
 ### UpdateAPIAppConfig
@@ -1354,6 +1514,19 @@ Removes an app key
     DELETE: /projects/{project_id}/apps/{app_id}/keys/{key_id}
 
 
+### ListProjectGrantChanges
+
+> **rpc** ListProjectGrantChanges([ListProjectGrantChangesRequest](#listprojectgrantchangesrequest))
+[ListProjectGrantChangesResponse](#listprojectgrantchangesresponse)
+
+Returns the history of the project grant (each event)
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /projects/{project_id}/grants/{grant_id}/changes/_search
+
+
 ### GetProjectGrantByID
 
 > **rpc** GetProjectGrantByID([GetProjectGrantByIDRequest](#getprojectgrantbyidrequest))
@@ -1377,6 +1550,19 @@ Limit should always be set, there is a default limit set by the service
 
 
     POST: /projects/{project_id}/grants/_search
+
+
+### ListAllProjectGrants
+
+> **rpc** ListAllProjectGrants([ListAllProjectGrantsRequest](#listallprojectgrantsrequest))
+[ListAllProjectGrantsResponse](#listallprojectgrantsresponse)
+
+Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /projectgrants/_search
 
 
 ### AddProjectGrant
@@ -1604,28 +1790,29 @@ remove a list of user grants in one request
     DELETE: /user_grants/_bulk
 
 
-### GetFeatures
-
-> **rpc** GetFeatures([GetFeaturesRequest](#getfeaturesrequest))
-[GetFeaturesResponse](#getfeaturesresponse)
-
-
-
-
-
-    GET: /features
-
-
 ### GetOrgIAMPolicy
 
 > **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
 [GetOrgIAMPolicyResponse](#getorgiampolicyresponse)
 
-Returns the org iam policy (this policy is managed by the iam administrator)
+deprecated: please use DomainPolicy instead
+Returns the domain policy (this policy is managed by the iam administrator)
 
 
 
     GET: /policies/orgiam
+
+
+### GetDomainPolicy
+
+> **rpc** GetDomainPolicy([GetDomainPolicyRequest](#getdomainpolicyrequest))
+[GetDomainPolicyResponse](#getdomainpolicyresponse)
+
+Returns the domain policy (this policy is managed by the iam administrator)
+
+
+
+    GET: /policies/domain
 
 
 ### GetLoginPolicy
@@ -2019,6 +2206,7 @@ With this policy the privacy relevant things can be configured (e.g tos link)
 
 Add a custom privacy policy for the organisation
 With this policy privacy relevant things can be configured (e.g. tos link)
+Variable {{.Lang}} can be set to have different links based on the language
 
 
 
@@ -2032,6 +2220,7 @@ With this policy privacy relevant things can be configured (e.g. tos link)
 
 Update the privacy complexity policy for the organisation
 With this policy privacy relevant things can be configured (e.g. tos link)
+Variable {{.Lang}} can be set to have different links based on the language
 
 
 
@@ -2731,6 +2920,30 @@ Change JWT identity provider configuration of the organisation
     PUT: /actions/{id}
 
 
+### DeactivateAction
+
+> **rpc** DeactivateAction([DeactivateActionRequest](#deactivateactionrequest))
+[DeactivateActionResponse](#deactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_deactivate
+
+
+### ReactivateAction
+
+> **rpc** ReactivateAction([ReactivateActionRequest](#reactivateactionrequest))
+[ReactivateActionResponse](#reactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_reactivate
+
+
 ### DeleteAction
 
 > **rpc** DeleteAction([DeleteActionRequest](#deleteactionrequest))
@@ -2878,7 +3091,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | primary_color |  string | - | string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes |  |
 | warn_color |  string | - | string.max_len: 50<br />  |
 | background_color |  string | - | string.max_len: 50<br />  |
 | font_color |  string | - | string.max_len: 50<br />  |
@@ -2936,6 +3149,28 @@ This is an empty request
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
+| password_check_lifetime |  google.protobuf.Duration | - |  |
+| external_login_check_lifetime |  google.protobuf.Duration | - |  |
+| mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
+| second_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| second_factors | repeated zitadel.policy.v1.SecondFactorType | - |  |
+| multi_factors | repeated zitadel.policy.v1.MultiFactorType | - |  |
+| idps | repeated AddCustomLoginPolicyRequest.IDP | - |  |
+
+
+
+
+### AddCustomLoginPolicyRequest.IDP
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| ownerType |  zitadel.idp.v1.IDPOwnerType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 
@@ -3008,6 +3243,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | tos_link |  string | - |  |
 | privacy_link |  string | - |  |
+| help_link |  string | - |  |
 
 
 
@@ -3044,7 +3280,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| email |  string | - | string.email: true<br />  |
 | is_email_verified |  bool | - |  |
 
 
@@ -3356,6 +3592,55 @@ This is an empty request
 
 
 
+### AddPasswordlessRegistrationRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddPasswordlessRegistrationResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| link |  string | - |  |
+| expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### AddPersonalAccessTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+
+
+
+
+### AddPersonalAccessTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token_id |  string | - |  |
+| token |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddProjectGrantMemberRequest
 
 
@@ -3482,6 +3767,32 @@ This is an empty request
 
 
 
+### AddSAMLAppRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - | bytes.max_len: 500000<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### AddSAMLAppResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -3566,6 +3877,28 @@ This is an empty request
 
 
 
+### BulkRemoveOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### BulkRemoveUserGrantRequest
 
 
@@ -3596,6 +3929,40 @@ This is an empty request
 
 
 ### BulkRemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata | repeated BulkSetOrgMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetOrgMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetOrgMetadataResponse
 
 
 
@@ -4383,19 +4750,19 @@ This is an empty request
 
 
 
-### GetFeaturesRequest
+### GetDomainPolicyRequest
 
 
 
 
 
-### GetFeaturesResponse
+### GetDomainPolicyResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| features |  zitadel.features.v1.Features | - |  |
+| policy |  zitadel.policy.v1.DomainPolicy | - |  |
 
 
 
@@ -4526,8 +4893,9 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| global_org_id |  string | - |  |
+| global_org_id |  string | deprecated: use default_org_id instead |  |
 | iam_project_id |  string | - |  |
+| default_org_id |  string | - |  |
 
 
 
@@ -4545,7 +4913,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy |  |
 
 
 
@@ -4563,7 +4931,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LockoutPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LockoutPolicy |  |
 
 
 
@@ -4581,7 +4949,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LoginPolicy |  |
 
 
 
@@ -4705,6 +5073,28 @@ This is an empty request
 
 
 
+### GetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
 ### GetPasswordAgePolicyRequest
 This is an empty request
 
@@ -4718,7 +5108,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordAgePolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.PasswordAgePolicy |  |
 
 
 
@@ -4736,7 +5126,30 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.PasswordComplexityPolicy |  |
+
+
+
+
+### GetPersonalAccessTokenByIDsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetPersonalAccessTokenByIDsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token |  zitadel.user.v1.PersonalAccessToken | - |  |
 
 
 
@@ -4754,7 +5167,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy |  |
 
 
 
@@ -4964,8 +5377,10 @@ This is an empty response
 | email |  ImportHumanUserRequest.Email | - | message.required: true<br />  |
 | phone |  ImportHumanUserRequest.Phone | - |  |
 | password |  string | - |  |
+| hashed_password |  ImportHumanUserRequest.HashedPassword | - |  |
 | password_change_required |  bool | - |  |
 | request_passwordless_registration |  bool | - |  |
+| otp_code |  string | - |  |
 
 
 
@@ -4976,8 +5391,20 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| email |  string | - | string.email: true<br />  |
 | is_email_verified |  bool | - |  |
+
+
+
+
+### ImportHumanUserRequest.HashedPassword
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| value |  string | - |  |
+| algorithm |  string | - |  |
 
 
 
@@ -5030,7 +5457,8 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | link |  string | - |  |
-| lifetime |  google.protobuf.Duration | - |  |
+| lifetime |  google.protobuf.Duration | deprecated: use expiration instead |  |
+| expiration |  google.protobuf.Duration | - |  |
 
 
 
@@ -5084,6 +5512,30 @@ This is an empty response
 
 
 
+### ListAllProjectGrantsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.project.v1.AllProjectGrantQuery | criterias the client is looking for |  |
+
+
+
+
+### ListAllProjectGrantsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.project.v1.GrantedProject | - |  |
+
+
+
+
 ### ListAppChangesRequest
 
 
@@ -5103,8 +5555,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5377,8 +5828,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5474,6 +5924,54 @@ This is an empty request
 
 
 
+### ListOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
+### ListPersonalAccessTokensRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListPersonalAccessTokensResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.PersonalAccessToken | - |  |
+
+
+
+
 ### ListProjectChangesRequest
 
 
@@ -5492,8 +5990,31 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
+
+
+
+
+### ListProjectGrantChangesRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.change.v1.ChangeQuery | list limitations and ordering |  |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| grant_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ListProjectGrantChangesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5683,8 +6204,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -6429,6 +6949,51 @@ This is an empty response
 
 
 
+### RemoveOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemovePersonalAccessTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemovePersonalAccessTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveProjectGrantMemberRequest
 
 
@@ -6663,7 +7228,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| email |  string | - | string.email: true<br />  |
+| email |  string | - | string.email: true<br /> string.ignore_empty: true<br />  |
 
 
 
@@ -7279,6 +7844,29 @@ This is an empty request
 
 
 
+### SetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetPrimaryOrgDomainRequest
 
 
@@ -7511,6 +8099,13 @@ This is an empty request
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
+| password_check_lifetime |  google.protobuf.Duration | - |  |
+| external_login_check_lifetime |  google.protobuf.Duration | - |  |
+| mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
+| second_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 
 
 
@@ -7583,6 +8178,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | tos_link |  string | - |  |
 | privacy_link |  string | - |  |
+| help_link |  string | - |  |
 
 
 
@@ -7973,6 +8569,31 @@ This is an empty request
 
 
 ### UpdateProjectRoleResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSAMLAppConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - | bytes.max_len: 500000<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### UpdateSAMLAppConfigResponse
 
 
 

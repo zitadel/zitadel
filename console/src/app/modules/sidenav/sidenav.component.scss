@@ -1,0 +1,148 @@
+@use '@angular/material' as mat;
+
+@mixin sidenav-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .sidenav-container {
+    display: grid;
+    position: relative;
+    grid-template-columns: 1fr;
+
+    .sidenav-settings-list {
+      position: relative;
+
+      &.indented {
+        margin-right: 2rem;
+
+        .sidenav-sticky-rel {
+          margin-left: -2rem;
+          padding-left: 2rem;
+          background: map-get($background, footer);
+        }
+      }
+
+      .sidenav-sticky-rel {
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 36px;
+        padding: 20px 2rem 20px 0;
+
+        .sidenav-setting-group {
+          font-size: 11px;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: if($is-dark-theme, #ffffff60, #00000060);
+          margin-top: 1rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          padding-top: 1rem;
+          border-top: 1px solid if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+
+          &:nth-child(2) {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 0;
+          }
+
+          &.hide-on-mobile {
+            @media only screen and (max-width: 500px) {
+              display: none;
+            }
+          }
+
+          &.show {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
+          }
+        }
+
+        .sidenav-setting-list-element {
+          border: none;
+          background: none;
+          text-align: left;
+          padding: 0.75rem 0;
+          font-size: 15px;
+          cursor: pointer;
+          color: map-get($foreground, text);
+          display: flex;
+          align-items: center;
+
+          span {
+            opacity: 0.6;
+          }
+
+          i {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            line-height: 1.2rem;
+          }
+
+          .warn-icon {
+            color: map-get($background, alert);
+            margin-left: 0.5rem;
+            font-size: 1.2rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            flex-shrink: 0;
+          }
+
+          &:hover {
+            span {
+              opacity: 1;
+            }
+          }
+
+          &.mob-only {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
+          }
+
+          &.hide-on-mobile {
+            @media only screen and (max-width: 500px) {
+              display: none;
+            }
+          }
+
+          &.show {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
+          }
+
+          &.active {
+            font-weight: 600;
+
+            span {
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+
+    .sidenav-content {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    @media only screen and (min-width: 824px) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+
+      .sidenav-content {
+        grid-column-start: 2;
+        grid-column-end: 5;
+      }
+    }
+  }
+}

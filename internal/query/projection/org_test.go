@@ -3,22 +3,22 @@ package projection
 import (
 	"testing"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/handler"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func TestOrgProjection_reduces(t *testing.T) {
 	type args struct {
-		event func(t *testing.T) eventstore.EventReader
+		event func(t *testing.T) eventstore.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		reduce func(event eventstore.EventReader) (*handler.Statement, error)
+		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
 	}{
 		{
@@ -30,7 +30,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{"domain": "domain.new"}`),
 				), org.DomainPrimarySetEventMapper),
 			},
-			reduce: (&OrgProjection{}).reducePrimaryDomainSet,
+			reduce: (&orgProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -39,7 +39,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, primary_domain) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -60,7 +60,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					nil,
 				), org.OrgReactivatedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgReactivated,
+			reduce: (&orgProjection{}).reduceOrgReactivated,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -69,7 +69,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -90,7 +90,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					nil,
 				), org.OrgDeactivatedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgDeactivated,
+			reduce: (&orgProjection{}).reduceOrgDeactivated,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -99,7 +99,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, org_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -120,7 +120,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "new name"}`),
 				), org.OrgChangedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgChanged,
+			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -129,7 +129,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.orgs SET (change_date, sequence, name) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.orgs SET (change_date, sequence, name) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -150,7 +150,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), org.OrgChangedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgChanged,
+			reduce: (&orgProjection{}).reduceOrgChanged,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -168,7 +168,7 @@ func TestOrgProjection_reduces(t *testing.T) {
 					[]byte(`{"name": "name"}`),
 				), org.OrgAddedEventMapper),
 			},
-			reduce: (&OrgProjection{}).reduceOrgAdded,
+			reduce: (&orgProjection{}).reduceOrgAdded,
 			want: wantReduce{
 				projection:       OrgProjectionTable,
 				aggregateType:    eventstore.AggregateType("org"),
@@ -177,12 +177,13 @@ func TestOrgProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.orgs (id, creation_date, change_date, resource_owner, sequence, name, org_state) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.orgs (id, creation_date, change_date, resource_owner, instance_id, sequence, name, org_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								uint64(15),
 								"name",
 								domain.OrgStateActive,

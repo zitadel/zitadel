@@ -1,20 +1,23 @@
 package projection
 
-import "github.com/caos/zitadel/internal/config/types"
+import (
+	"time"
+)
 
 type Config struct {
-	RequeueEvery     types.Duration
-	RetryFailedAfter types.Duration
-	MaxFailureCount  uint
-	BulkLimit        uint64
-	CRDB             types.SQL
-	Customizations   map[string]CustomConfig
-	MaxIterators     int
+	RequeueEvery        time.Duration
+	RetryFailedAfter    time.Duration
+	MaxFailureCount     uint
+	ConcurrentInstances uint
+	BulkLimit           uint64
+	Customizations      map[string]CustomConfig
+	MaxIterators        int
 }
 
 type CustomConfig struct {
-	RequeueEvery     *types.Duration
-	RetryFailedAfter *types.Duration
-	MaxFailureCount  *uint
-	BulkLimit        *uint64
+	RequeueEvery        *time.Duration
+	RetryFailedAfter    *time.Duration
+	MaxFailureCount     *uint
+	ConcurrentInstances *uint
+	BulkLimit           *uint64
 }

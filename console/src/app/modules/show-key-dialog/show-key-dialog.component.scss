@@ -3,21 +3,20 @@
   margin-top: 0;
 }
 
-.desc {
-  color: rgb(201, 51, 71);
-  font-size: .9rem;
-}
-
 .form-field {
   width: 100%;
 }
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+
+  .fill-space {
+    flex: 1;
+  }
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
 
@@ -33,10 +32,9 @@
   }
 
   .left {
-    color: var(--grey);
     margin-right: 1rem;
     margin-top: 0;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
   }
 
   .right {

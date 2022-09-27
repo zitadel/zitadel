@@ -3,9 +3,9 @@ package domain
 import (
 	"strings"
 
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type OrgDomain struct {
@@ -32,7 +32,7 @@ func (domain *OrgDomain) GenerateVerificationCode(codeGenerator crypto.Generator
 }
 
 func NewIAMDomainName(orgName, iamDomain string) string {
-	return strings.ToLower(strings.ReplaceAll(orgName, " ", "-") + "." + iamDomain)
+	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(orgName), " ", "-") + "." + iamDomain)
 }
 
 type OrgDomainValidationType int32

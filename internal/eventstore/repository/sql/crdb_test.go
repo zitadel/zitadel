@@ -2,11 +2,12 @@ package sql
 
 import (
 	"context"
+	"database/sql"
 	"sync"
 	"testing"
 
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/lib/pq"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 func TestCRDB_placeholder(t *testing.T) {
@@ -265,18 +266,19 @@ func TestCRDB_columnName(t *testing.T) {
 
 func TestCRDB_Push_OneAggregate(t *testing.T) {
 	type args struct {
-		ctx               context.Context
-		events            []*repository.Event
-		uniqueConstraints *repository.UniqueConstraint
-		uniqueDataType    string
-		uniqueDataField   string
+		ctx                  context.Context
+		events               []*repository.Event
+		uniqueConstraints    *repository.UniqueConstraint
+		uniqueDataType       string
+		uniqueDataField      string
+		uniqueDataInstanceID string
 	}
 	type eventsRes struct {
 		pushedEventsCount int
 		uniqueCount       int
 		assetCount        int
 		aggType           repository.AggregateType
-		aggID             []string
+		aggID             database.StringArray
 	}
 	type res struct {
 		wantErr   bool
@@ -417,7 +419,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				client: testCRDBClient,
 			}
 			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
-				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField)
+				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField, tt.args.uniqueDataInstanceID)
 				if err != nil {
 					t.Error("unable to prefill insert unique data: ", err)
 					return
@@ -427,7 +429,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
-			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, pq.Array(tt.res.eventsRes.aggID))
+			countEventRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = $1 AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
 			var eventCount int
 			err := countEventRow.Scan(&eventCount)
 			if err != nil {
@@ -438,7 +440,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, eventCount)
 			}
 			if tt.args.uniqueConstraints != nil {
-				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField)
+				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2 AND instance_id = $3", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField, tt.args.uniqueConstraints.InstanceID)
 				var uniqueCount int
 				err := countUniqueRow.Scan(&uniqueCount)
 				if err != nil {
@@ -459,8 +461,8 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	}
 	type eventsRes struct {
 		pushedEventsCount int
-		aggType           []repository.AggregateType
-		aggID             []string
+		aggType           database.StringArray
+		aggID             database.StringArray
 	}
 	type res struct {
 		wantErr   bool
@@ -484,7 +486,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 2,
 					aggID:             []string{"100", "101"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -503,7 +505,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 4,
 					aggID:             []string{"102", "103"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -530,7 +532,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				eventsRes: eventsRes{
 					pushedEventsCount: 12,
 					aggID:             []string{"106", "107", "108"},
-					aggType:           []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggType:           database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -544,7 +546,7 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
 
-			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", pq.Array(tt.res.eventsRes.aggType), pq.Array(tt.res.eventsRes.aggID))
+			countRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2)", tt.res.eventsRes.aggType, tt.res.eventsRes.aggID)
 			var count int
 			err := countRow.Scan(&count)
 			if err != nil {
@@ -558,14 +560,92 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	}
 }
 
+func TestCRDB_CreateInstance(t *testing.T) {
+	type args struct {
+		instanceID string
+	}
+	type res struct {
+		wantErr bool
+		exists  bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			name: "no number",
+			args: args{
+				instanceID: "asdf;use defaultdb;DROP DATABASE zitadel;--",
+			},
+			res: res{
+				wantErr: true,
+				exists:  false,
+			},
+		},
+		{
+			name: "no instance id",
+			args: args{
+				instanceID: "",
+			},
+			res: res{
+				wantErr: true,
+				exists:  false,
+			},
+		},
+		{
+			name: "correct number",
+			args: args{
+				instanceID: "1235",
+			},
+			res: res{
+				wantErr: false,
+				exists:  true,
+			},
+		},
+		{
+			name: "correct text",
+			args: args{
+				instanceID: "system",
+			},
+			res: res{
+				wantErr: false,
+				exists:  true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := &CRDB{
+				client: testCRDBClient,
+			}
+
+			if err := db.CreateInstance(context.Background(), tt.args.instanceID); (err != nil) != tt.res.wantErr {
+				t.Errorf("CRDB.CreateInstance() error = %v, wantErr %v", err, tt.res.wantErr)
+			}
+
+			sequenceRow := testCRDBClient.QueryRow("SELECT EXISTS(SELECT 1 FROM [SHOW SEQUENCES FROM eventstore] WHERE sequence_name like $1)", "i_"+tt.args.instanceID+"%")
+			var exists bool
+			err := sequenceRow.Scan(&exists)
+			if err != nil {
+				t.Error("unable to query inserted rows: ", err)
+				return
+			}
+			if exists != tt.res.exists {
+				t.Errorf("expected exists %v got %v", tt.res.exists, exists)
+			}
+		})
+	}
+}
+
 func TestCRDB_Push_Parallel(t *testing.T) {
 	type args struct {
 		events [][]*repository.Event
 	}
 	type eventsRes struct {
 		pushedEventsCount int
-		aggTypes          []repository.AggregateType
-		aggIDs            []string
+		aggTypes          database.StringArray
+		aggIDs            database.StringArray
 	}
 	type res struct {
 		errCount  int
@@ -600,7 +680,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"200", "201", "202", "203"},
 					pushedEventsCount: 9,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -637,7 +717,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"204", "205", "206"},
 					pushedEventsCount: 14,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -667,7 +747,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				eventsRes: eventsRes{
 					aggIDs:            []string{"207", "208"},
 					pushedEventsCount: 11,
-					aggTypes:          []repository.AggregateType{repository.AggregateType(t.Name())},
+					aggTypes:          database.StringArray{t.Name()},
 				},
 			},
 		},
@@ -700,7 +780,7 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 				t.Errorf("CRDB.Push() error count = %d, wanted err count %d, errs: %v", len(errs), tt.res.errCount, errs)
 			}
 
-			rows, err := testCRDBClient.Query("SELECT event_data FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2) order by event_sequence", pq.Array(tt.res.eventsRes.aggTypes), pq.Array(tt.res.eventsRes.aggIDs))
+			rows, err := testCRDBClient.Query("SELECT event_data FROM eventstore.events where aggregate_type = ANY($1) AND aggregate_id = ANY($2) order by event_sequence", tt.res.eventsRes.aggTypes, tt.res.eventsRes.aggIDs)
 			if err != nil {
 				t.Error("unable to query inserted rows: ", err)
 				return
@@ -912,10 +992,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 		events []*repository.Event
 	}
 	type res struct {
-		resourceOwners []string
+		resourceOwners database.StringArray
 	}
 	type fields struct {
-		aggregateIDs  []string
+		aggregateIDs  database.StringArray
 		aggregateType string
 	}
 	tests := []struct {
@@ -928,8 +1008,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of same aggregate same resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -944,8 +1024,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of different aggregate same resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "501", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "502", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "501", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "502", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -960,8 +1040,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of different aggregate different resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "503", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "504", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
+					generateEvent(t, "503", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "504", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -976,10 +1056,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of different aggregate different resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
-					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
+					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
+					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -994,10 +1074,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of different aggregate different resource owner per event",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
-					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
+					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1012,10 +1092,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of one aggregate different resource owner per event",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1042,12 +1122,12 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			}
 
 			for i, event := range tt.args.events {
-				if event.ResourceOwner != tt.res.resourceOwners[i] {
-					t.Errorf("resource owner not expected want: %q got: %q", tt.res.resourceOwners[i], event.ResourceOwner)
+				if event.ResourceOwner.String != tt.res.resourceOwners[i] {
+					t.Errorf("resource owner not expected want: %q got: %q", tt.res.resourceOwners[i], event.ResourceOwner.String)
 				}
 			}
 
-			rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY event_sequence", tt.fields.aggregateType, pq.Array(tt.fields.aggregateIDs))
+			rows, err := testCRDBClient.Query("SELECT resource_owner FROM eventstore.events WHERE aggregate_type = $1 AND aggregate_id = ANY($2) ORDER BY event_sequence", tt.fields.aggregateType, tt.fields.aggregateIDs)
 			if err != nil {
 				t.Error("unable to query inserted rows: ", err)
 				return
@@ -1087,7 +1167,7 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 		AggregateType: repository.AggregateType(t.Name()),
 		EditorService: "svc",
 		EditorUser:    "user",
-		ResourceOwner: "ro",
+		ResourceOwner: sql.NullString{String: "ro", Valid: true},
 		Type:          "test.created",
 		Version:       "v1",
 	}
@@ -1115,6 +1195,7 @@ func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *re
 	e := &repository.UniqueConstraint{
 		UniqueType:  table,
 		UniqueField: uniqueField,
+		InstanceID:  "",
 		Action:      repository.UniqueConstraintRemoved,
 	}
 

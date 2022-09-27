@@ -1,9 +1,9 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
 type PrivacyPolicyWriteModel struct {
@@ -11,6 +11,7 @@ type PrivacyPolicyWriteModel struct {
 
 	TOSLink     string
 	PrivacyLink string
+	HelpLink    string
 	State       domain.PolicyState
 }
 
@@ -20,6 +21,7 @@ func (wm *PrivacyPolicyWriteModel) Reduce() error {
 		case *policy.PrivacyPolicyAddedEvent:
 			wm.TOSLink = e.TOSLink
 			wm.PrivacyLink = e.PrivacyLink
+			wm.HelpLink = e.HelpLink
 			wm.State = domain.PolicyStateActive
 		case *policy.PrivacyPolicyChangedEvent:
 			if e.PrivacyLink != nil {
@@ -27,6 +29,9 @@ func (wm *PrivacyPolicyWriteModel) Reduce() error {
 			}
 			if e.TOSLink != nil {
 				wm.TOSLink = *e.TOSLink
+			}
+			if e.HelpLink != nil {
+				wm.HelpLink = *e.HelpLink
 			}
 		case *policy.PrivacyPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved

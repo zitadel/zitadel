@@ -1,0 +1,30 @@
+<h1 mat-dialog-title class="title">
+  <span>{{ 'PROJECT.ROLE.EDITTITLE' | translate }}</span>
+</h1>
+<p class="desc cnsl-secondary-text">{{ 'PROJECT.ROLE.EDITDESCRIPTION' | translate }}</p>
+<div mat-dialog-content>
+  <form *ngIf="formGroup" class="role-detail-full-width" [formGroup]="formGroup" (ngSubmit)="submitForm()">
+    <cnsl-form-field>
+      <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
+      <input cnslInput formControlName="key" />
+    </cnsl-form-field>
+    <cnsl-form-field>
+      <cnsl-label>{{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }}</cnsl-label>
+      <input cnslInput formControlName="displayName" />
+    </cnsl-form-field>
+    <cnsl-form-field>
+      <cnsl-label>{{ 'PROJECT.ROLE.GROUP' | translate }}</cnsl-label>
+      <input cnslInput formControlName="group" />
+    </cnsl-form-field>
+  </form>
+</div>
+
+<div mat-dialog-actions class="action">
+  <button mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CANCEL' | translate }}
+  </button>
+
+  <button [disabled]="formGroup.invalid" color="primary" mat-raised-button class="ok-button" (click)="submitForm()">
+    {{ 'ACTIONS.SAVE' | translate }}
+  </button>
+</div>

@@ -1,0 +1,18 @@
+.spinner-wr {
+  margin: 0.5rem 0;
+}
+
+.oidc-form-field {
+  max-width: 400px;
+  display: block;
+}
+
+.oidc-btn-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+
+  .save-button {
+    display: block;
+  }
+}

@@ -4,40 +4,63 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	proj_grpc "github.com/caos/zitadel/internal/api/grpc/project"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
+	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	proj_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetProjectGrantByID(ctx context.Context, req *mgmt_pb.GetProjectGrantByIDRequest) (*mgmt_pb.GetProjectGrantByIDResponse, error) {
-	grant, err := s.project.ProjectGrantByID(ctx, req.GrantId)
+	grant, err := s.query.ProjectGrantByID(ctx, true, req.GrantId)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetProjectGrantByIDResponse{
-		ProjectGrant: proj_grpc.GrantedProjectToPb(grant),
+		ProjectGrant: proj_grpc.GrantedProjectViewToPb(grant),
 	}, nil
 }
 
 func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProjectGrantsRequest) (*mgmt_pb.ListProjectGrantsResponse, error) {
-	queries, err := ListProjectGrantsRequestToModel(req)
+	queries, err := listProjectGrantsRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
-	domains, err := s.project.SearchProjectGrants(ctx, queries)
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	grants, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantsResponse{
-		Result: proj_grpc.GrantedProjectsToPb(domains.Result),
-		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
-		),
+		Result:  proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
+		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.Timestamp),
+	}, nil
+}
+
+func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllProjectGrantsRequest) (*mgmt_pb.ListAllProjectGrantsResponse, error) {
+	queries, err := listAllProjectGrantsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	if err != nil {
+		return nil, err
+	}
+	grants, err := s.query.SearchProjectGrants(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListAllProjectGrantsResponse{
+		Result:  proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
+		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.Timestamp),
 	}, nil
 }
 
@@ -57,11 +80,21 @@ func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGra
 }
 
 func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProjectGrantRequest) (*mgmt_pb.UpdateProjectGrantResponse, error) {
-	userGrants, err := s.usergrant.UserGrantsByProjectAndGrantID(ctx, req.ProjectId, req.GrantId)
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.ProjectId)
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(userGrants)...)
+	grantQuery, err := query.NewUserGrantGrantIDSearchQuery(req.GrantId)
+	if err != nil {
+		return nil, err
+	}
+	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery, grantQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +128,21 @@ func (s *Server) ReactivateProjectGrant(ctx context.Context, req *mgmt_pb.Reacti
 }
 
 func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProjectGrantRequest) (*mgmt_pb.RemoveProjectGrantResponse, error) {
-	details, err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	grantQuery, err := query.NewUserGrantGrantIDSearchQuery(req.GrantId)
+	if err != nil {
+		return nil, err
+	}
+	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery, grantQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(userGrants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +152,7 @@ func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProj
 }
 
 func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.ListProjectGrantMemberRolesRequest) (*mgmt_pb.ListProjectGrantMemberRolesResponse, error) {
-	roles := s.project.GetProjectGrantMemberRoles()
+	roles := s.query.GetProjectGrantMemberRoles()
 	return &mgmt_pb.ListProjectGrantMemberRolesResponse{
 		Result:  roles,
 		Details: object_grpc.ToListDetails(uint64(len(roles)), 0, time.Now()),
@@ -113,17 +160,17 @@ func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.L
 }
 
 func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*mgmt_pb.ListProjectGrantMembersResponse, error) {
-	response, err := s.project.SearchProjectGrantMembers(ctx, ListProjectGrantMembersRequestToModel(req))
+	queries, err := ListProjectGrantMembersRequestToModel(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	response, err := s.query.ProjectGrantMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantMembersResponse{
-		Result: member_grpc.ProjectGrantMembersToPb(response.Result),
-		Details: object_grpc.ToListDetails(
-			response.TotalResult,
-			response.Sequence,
-			response.Timestamp,
-		),
+		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), response.Members),
+		Details: object_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
 	}, nil
 }
 

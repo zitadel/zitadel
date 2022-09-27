@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type HandlerConfig struct {
@@ -10,13 +10,13 @@ type HandlerConfig struct {
 type Handler struct {
 	Eventstore *eventstore.Eventstore
 	Sub        *eventstore.Subscription
-	EventQueue chan eventstore.EventReader
+	EventQueue chan eventstore.Event
 }
 
 func NewHandler(config HandlerConfig) Handler {
 	return Handler{
 		Eventstore: config.Eventstore,
-		EventQueue: make(chan eventstore.EventReader, 100),
+		EventQueue: make(chan eventstore.Event, 100),
 	}
 }
 
@@ -26,4 +26,11 @@ func (h *Handler) Subscribe(aggregates ...eventstore.AggregateType) {
 
 func (h *Handler) SubscribeEvents(types map[eventstore.AggregateType][]eventstore.EventType) {
 	h.Sub = eventstore.SubscribeEventTypes(h.EventQueue, types)
+}
+
+func (h *Handler) Unsubscribe() {
+	if h.Sub == nil {
+		return
+	}
+	h.Sub.Unsubscribe()
 }

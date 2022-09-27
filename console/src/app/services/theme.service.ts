@@ -1,37 +1,45 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+import { GrpcAuthService } from './grpc-auth.service';
 
 declare const tinycolor: any;
 
 export interface Color {
   name: string;
   hex: string;
-  darkContrast: boolean;
+  rgb: string;
+  contrastColor: string;
 }
 
 @Injectable()
 export class ThemeService {
-  private _darkTheme: Subject<boolean> = new Subject<boolean>();
+  private _darkTheme: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   public isDarkTheme: Observable<boolean> = this._darkTheme.asObservable();
 
   private primaryColorPalette: Color[] = [];
   private warnColorPalette: Color[] = [];
   private backgroundColorPalette: Color[] = [];
 
+  constructor(private authService: GrpcAuthService) {
+    const theme = localStorage.getItem('theme');
+    if (theme) {
+      if (theme === 'light-theme') {
+        this.setDarkTheme(false);
+      } else {
+        this.setDarkTheme(true);
+      }
+    }
+  }
+
   setDarkTheme(isDarkTheme: boolean): void {
     this._darkTheme.next(isDarkTheme);
   }
 
   public updateTheme(colors: Color[], type: string, theme: string): void {
-    colors.forEach(color => {
-      document.documentElement.style.setProperty(
-        `--theme-${theme}-${type}-${color.name}`,
-        color.hex,
-      );
-      document.documentElement.style.setProperty(
-        `--theme-${theme}-${type}-contrast-${color.name}`,
-        color.darkContrast ? 'hsla(0, 0%, 0%, 0.87)' : '#ffffff',
-      );
+    colors.forEach((color) => {
+      document.documentElement.style.setProperty(`--theme-${theme}-${type}-${color.name}`, color.hex);
+      document.documentElement.style.setProperty(`--theme-${theme}-${type}-contrast-${color.name}`, color.contrastColor);
     });
   }
 
@@ -48,6 +56,13 @@ export class ThemeService {
   public saveBackgroundColor(color: string, isDark: boolean): void {
     this.backgroundColorPalette = this.computeColors(color);
     this.updateTheme(this.backgroundColorPalette, 'background', isDark ? 'dark' : 'light');
+  }
+
+  public saveTextColor(colorHex: string, isDark: boolean): void {
+    const theme = isDark ? 'dark' : 'light';
+    document.documentElement.style.setProperty(`--theme-${theme}-${'text'}`, colorHex);
+    const secondaryTextHex = tinycolor(colorHex).setAlpha(0.78).toHex8String();
+    document.documentElement.style.setProperty(`--theme-${theme}-${'secondary-text'}`, secondaryTextHex);
   }
 
   private computeColors(hex: string): Color[] {
@@ -74,7 +89,123 @@ export class ThemeService {
     return {
       name: name,
       hex: c.toHexString(),
-      darkContrast: c.isLight(),
+      rgb: c.toRgbString(),
+      contrastColor: this.getContrast(c.toHexString()),
     };
+  }
+
+  public isLight(hex: string): boolean {
+    const color = tinycolor(hex);
+    return color.isLight();
+  }
+
+  public isDark(hex: string): boolean {
+    const color = tinycolor(hex);
+    return color.isDark();
+  }
+
+  public getContrast(color: string): string {
+    const onBlack = tinycolor.readability('#000', color);
+    const onWhite = tinycolor.readability('#fff', color);
+    if (onBlack > onWhite) {
+      return 'hsla(0, 0%, 0%, 0.87)';
+    } else {
+      return '#ffffff';
+    }
+  }
+
+  public setDefaultColors = () => {
+    const darkPrimary = '#bbbafa';
+    const lightPrimary = '#5469d4';
+
+    const darkWarn = '#ff3b5b';
+    const lightWarn = '#cd3d56';
+
+    const darkBackground = '#111827';
+    const lightBackground = '#fafafa';
+
+    const darkText = '#ffffff';
+    const lightText = '#000000';
+
+    this.savePrimaryColor(darkPrimary, true);
+    this.savePrimaryColor(lightPrimary, false);
+
+    this.saveWarnColor(darkWarn, true);
+    this.saveWarnColor(lightWarn, false);
+
+    this.saveBackgroundColor(darkBackground, true);
+    this.saveBackgroundColor(lightBackground, false);
+
+    this.saveTextColor(darkText, true);
+    this.saveTextColor(lightText, false);
+  };
+
+  public loadPrivateLabelling(forceDefault: boolean = false): void {
+    if (forceDefault) {
+      this.setDefaultColors();
+    } else {
+      const isDark = (color: string) => this.isDark(color);
+      const isLight = (color: string) => this.isLight(color);
+
+      this.authService
+        .getMyLabelPolicy()
+        .then((lpresp) => {
+          const labelpolicy = lpresp.policy;
+
+          const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
+          const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
+
+          const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
+          const lightWarn = labelpolicy?.warnColor || '#cd3d56';
+
+          let darkBackground = labelpolicy?.backgroundColorDark;
+          let lightBackground = labelpolicy?.backgroundColor;
+
+          let darkText = labelpolicy?.fontColorDark ?? '#ffffff';
+          let lightText = labelpolicy?.fontColor ?? '#000000';
+
+          this.savePrimaryColor(darkPrimary, true);
+          this.savePrimaryColor(lightPrimary, false);
+
+          this.saveWarnColor(darkWarn, true);
+          this.saveWarnColor(lightWarn, false);
+
+          if (darkBackground && !isDark(darkBackground)) {
+            console.info(
+              `Background (${darkBackground}) is not dark enough for a dark theme. Falling back to zitadel background`,
+            );
+            darkBackground = '#111827';
+          }
+          this.saveBackgroundColor(darkBackground || '#111827', true);
+
+          if (lightBackground && !isLight(lightBackground)) {
+            console.info(
+              `Background (${lightBackground}) is not light enough for a light theme. Falling back to zitadel background`,
+            );
+            lightBackground = '#fafafa';
+          }
+          this.saveBackgroundColor(lightBackground || '#fafafa', false);
+
+          if (darkText && !isLight(darkText)) {
+            console.info(
+              `Text color (${darkText}) is not light enough for a dark theme. Falling back to zitadel's text color`,
+            );
+            darkText = '#ffffff';
+          }
+          this.saveTextColor(darkText || '#ffffff', true);
+
+          if (lightText && !isDark(lightText)) {
+            console.info(
+              `Text color (${lightText}) is not dark enough for a light theme. Falling back to zitadel's text color`,
+            );
+            lightText = '#000000';
+          }
+          this.saveTextColor(lightText || '#000000', false);
+        })
+        .catch((error) => {
+          console.error('could not load private labelling policy!', error);
+          this.setDefaultColors();
+        });
+    }
   }
 }

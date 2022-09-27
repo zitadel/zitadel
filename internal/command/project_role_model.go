@@ -3,9 +3,9 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 type ProjectRoleWriteModel struct {
@@ -36,7 +36,7 @@ func NewProjectRoleWriteModel(projectID, resourceOwner string) *ProjectRoleWrite
 	}
 }
 
-func (wm *ProjectRoleWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ProjectRoleWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.RoleAddedEvent:

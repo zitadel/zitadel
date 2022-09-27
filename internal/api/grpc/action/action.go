@@ -1,11 +1,12 @@
 package action
 
 import (
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/query"
-	action_pb "github.com/caos/zitadel/pkg/grpc/action"
 	"google.golang.org/protobuf/types/known/durationpb"
+
+	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 )
 
 func FlowTypeToDomain(flowType action_pb.FlowType) domain.FlowType {
@@ -110,8 +111,12 @@ func ActionStateToPb(state domain.ActionState) action_pb.ActionState {
 func ActionNameQuery(q *action_pb.ActionNameQuery) (query.SearchQuery, error) {
 	return query.NewActionNameSearchQuery(object_grpc.TextMethodToQuery(q.Method), q.Name)
 }
+
 func ActionStateQuery(q *action_pb.ActionStateQuery) (query.SearchQuery, error) {
 	return query.NewActionStateSearchQuery(ActionStateToDomain(q.State))
+}
+func ActionIDQuery(q *action_pb.ActionIDQuery) (query.SearchQuery, error) {
+	return query.NewActionIDSearchQuery(q.Id)
 }
 
 func ActionStateToDomain(state action_pb.ActionState) domain.ActionState {

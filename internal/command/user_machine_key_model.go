@@ -3,10 +3,10 @@ package command
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type MachineKeyWriteModel struct {
@@ -29,7 +29,7 @@ func NewMachineKeyWriteModel(userID, keyID, resourceOwner string) *MachineKeyWri
 	}
 }
 
-func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.MachineKeyAddedEvent:

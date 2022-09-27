@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 func TestFilter(t *testing.T) {

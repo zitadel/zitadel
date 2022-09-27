@@ -8,16 +8,19 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/repository/member"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/repository/member"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
+
+	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommandSide_UsernameChange(t *testing.T) {
@@ -94,6 +97,23 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 			},
 		},
 		{
+			name: "username only spaces, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:      context.Background(),
+				orgID:    "org1",
+				userID:   "user1",
+				username: "  ",
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "user removed, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -139,6 +159,39 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				orgID:    "org1",
 				userID:   "user1",
 				username: "username",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "username not changed (spaces), precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:      context.Background(),
+				orgID:    "org1",
+				userID:   "user1",
+				username: "username ",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -201,8 +254,10 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -243,8 +298,10 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -270,6 +327,66 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				orgID:    "org1",
 				userID:   "user1",
 				username: "username1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change username (remove spaces), ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewUsernameChangedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"username1",
+									true,
+								),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username1", "org1", true)),
+					),
+				),
+			},
+			args: args{
+				ctx:      context.Background(),
+				orgID:    "org1",
+				userID:   "user1",
+				username: "username1 ",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -918,9 +1035,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 	type (
 		args struct {
 			ctx                    context.Context
+			instanceID             string
 			orgID                  string
 			userID                 string
-			cascadeUserMemberships []*domain.UserMembership
+			cascadeUserMemberships []*CascadingMembership
 			cascadeUserGrants      []string
 		}
 	)
@@ -1025,8 +1143,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1078,7 +1198,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"idpConfigID",
 								"displayName",
@@ -1089,8 +1209,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1107,7 +1229,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
-						uniqueConstraintsFromEventConstraint(user.NewRemoveExternalIDPUniqueConstraint("idpConfigID", "externalUserID")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("idpConfigID", "externalUserID")),
 					),
 				),
 			},
@@ -1146,8 +1268,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1163,14 +1287,14 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 								),
 							),
 							eventFromEventPusher(
-								iam.NewMemberCascadeRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate,
+								instance.NewMemberCascadeRemovedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"user1",
 								),
 							),
 							eventFromEventPusher(
 								org.NewMemberCascadeRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"user1",
 								),
 							),
@@ -1189,7 +1313,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
-						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint(domain.IAMID, "user1")),
+						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("INSTANCE", "user1")),
 						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("org1", "user1")),
 						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("project1", "user1")),
 						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantMemberUniqueConstraint("project1", "user1", "grant1")),
@@ -1200,31 +1324,36 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				cascadeUserMemberships: []*domain.UserMembership{
+				cascadeUserMemberships: []*CascadingMembership{
 					{
-						MemberType:    domain.MemberTypeIam,
+						IAM: &CascadingIAMMembership{
+							IAMID: "INSTANCE",
+						},
 						UserID:        "user1",
-						AggregateID:   "IAM",
 						ResourceOwner: "org1",
 					},
 					{
-						MemberType:    domain.MemberTypeOrganisation,
+						Org: &CascadingOrgMembership{
+							OrgID: "org1",
+						},
 						UserID:        "user1",
 						ResourceOwner: "org1",
-						AggregateID:   "org1",
 					},
 					{
-						MemberType:    domain.MemberTypeProject,
+
+						Project: &CascadingProjectMembership{
+							ProjectID: "project1",
+						},
 						UserID:        "user1",
 						ResourceOwner: "org1",
-						AggregateID:   "project1",
 					},
 					{
-						MemberType:    domain.MemberTypeProjectGrant,
+						ProjectGrant: &CascadingProjectGrantMembership{
+							ProjectID: "project1",
+							GrantID:   "grant1",
+						},
 						UserID:        "user1",
 						ResourceOwner: "org1",
-						AggregateID:   "project1",
-						ObjectID:      "grant1",
 					},
 				},
 			},
@@ -1322,6 +1451,136 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := r.AddUserToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.audience, tt.args.scopes, tt.args.lifetime)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommands_RevokeAccessToken(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx     context.Context
+		userID  string
+		orgID   string
+		tokenID string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"id missing error",
+			fields{
+				eventstoreExpect(t),
+			},
+			args{
+				context.Background(),
+				"userID",
+				"orgID",
+				"",
+			},
+			res{
+				nil,
+				caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"not active error",
+			fields{
+				eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserTokenAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								"tokenID",
+								"clientID",
+								"agentID",
+								"de",
+								"refreshTokenID",
+								[]string{"clientID"},
+								[]string{"openid"},
+								time.Now(),
+							),
+						),
+					),
+				),
+			},
+			args{
+				context.Background(),
+				"userID",
+				"orgID",
+				"tokenID",
+			},
+			res{
+				nil,
+				caos_errs.IsNotFound,
+			},
+		},
+		{
+			"active ok",
+			fields{
+				eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserTokenAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								"tokenID",
+								"clientID",
+								"agentID",
+								"de",
+								"refreshTokenID",
+								[]string{"clientID"},
+								[]string{"openid"},
+								time.Now().Add(5*time.Hour),
+							),
+						),
+					),
+					expectPush(
+						eventPusherToEvents(
+							user.NewUserTokenRemovedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								"tokenID",
+							),
+						),
+					),
+				),
+			},
+			args{
+				context.Background(),
+				"userID",
+				"orgID",
+				"tokenID",
+			},
+			res{
+				&domain.ObjectDetails{
+					ResourceOwner: "orgID",
+				},
+				nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := c.RevokeAccessToken(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.tokenID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1436,6 +1695,158 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestExistsUser(t *testing.T) {
+	type args struct {
+		filter        preparation.FilterToQueryReducer
+		id            string
+		resourceOwner string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantExists bool
+		wantErr    bool
+	}{
+		{
+			name: "no events",
+			args: args{
+				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{}, nil
+				},
+				id:            "id",
+				resourceOwner: "ro",
+			},
+			wantExists: false,
+			wantErr:    false,
+		},
+		{
+			name: "human registered",
+			args: args{
+				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						user.NewHumanRegisteredEvent(
+							context.Background(),
+							&user.NewAggregate("id", "ro").Aggregate,
+							"userName",
+							"firstName",
+							"lastName",
+							"nickName",
+							"displayName",
+							language.German,
+							domain.GenderFemale,
+							"support@zitadel.com",
+							true,
+						),
+					}, nil
+				},
+				id:            "id",
+				resourceOwner: "ro",
+			},
+			wantExists: true,
+			wantErr:    false,
+		},
+		{
+			name: "human added",
+			args: args{
+				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("id", "ro").Aggregate,
+							"userName",
+							"firstName",
+							"lastName",
+							"nickName",
+							"displayName",
+							language.German,
+							domain.GenderFemale,
+							"support@zitadel.com",
+							true,
+						),
+					}, nil
+				},
+				id:            "id",
+				resourceOwner: "ro",
+			},
+			wantExists: true,
+			wantErr:    false,
+		},
+		{
+			name: "machine added",
+			args: args{
+				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						user.NewMachineAddedEvent(
+							context.Background(),
+							&user.NewAggregate("id", "ro").Aggregate,
+							"userName",
+							"name",
+							"description",
+							true,
+						),
+					}, nil
+				},
+				id:            "id",
+				resourceOwner: "ro",
+			},
+			wantExists: true,
+			wantErr:    false,
+		},
+		{
+			name: "user removed",
+			args: args{
+				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return []eventstore.Event{
+						user.NewMachineAddedEvent(
+							context.Background(),
+							&user.NewAggregate("removed", "ro").Aggregate,
+							"userName",
+							"name",
+							"description",
+							true,
+						),
+						user.NewUserRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("removed", "ro").Aggregate,
+							"userName",
+							nil,
+							true,
+						),
+					}, nil
+				},
+				id:            "id",
+				resourceOwner: "ro",
+			},
+			wantExists: false,
+			wantErr:    false,
+		},
+		{
+			name: "error durring filter",
+			args: args{
+				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+					return nil, errors.ThrowInternal(nil, "USER-Drebn", "Errors.Internal")
+				},
+				id:            "id",
+				resourceOwner: "ro",
+			},
+			wantExists: false,
+			wantErr:    true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotExists, err := ExistsUser(context.Background(), tt.args.filter, tt.args.id, tt.args.resourceOwner)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExistsUser() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotExists != tt.wantExists {
+				t.Errorf("ExistsUser() = %v, want %v", gotExists, tt.wantExists)
 			}
 		})
 	}

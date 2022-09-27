@@ -1,8 +1,9 @@
-h3 {
+.app-grid-h2 {
   font-weight: 400;
   font-size: 16px;
   text-transform: uppercase;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
+  margin: 2rem 0 1rem 0;
 }
 
 .app-grid-header {
@@ -15,9 +16,9 @@ h3 {
 }
 
 .app-container {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0 -1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 120px);
+  grid-auto-rows: auto;
   padding-bottom: 2rem;
 
   .sp-container {
@@ -33,7 +34,6 @@ h3 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 150px;
 
     .grid-card {
       cursor: pointer;
@@ -46,22 +46,37 @@ h3 {
       width: 80px;
       margin: 1rem;
       text-transform: uppercase;
-      border-radius: .5rem;
+      border-radius: 0.5rem;
       font-weight: 800;
       box-sizing: border-box;
 
-      &.add {
-        border: 2px solid var(--grey);
+      i {
+        font-size: 1.2rem;
+      }
+
+      .samlspan {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        line-height: 1.2rem;
       }
     }
 
     .name {
       font-size: 14px;
+      text-align: center;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
     }
 
     .type {
       font-size: 12px;
       color: #8a868a;
+      text-align: center;
+      width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 }

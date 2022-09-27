@@ -1,0 +1,18 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+    <h1>{{t "LogoutDone.Title"}}</h1>
+    <p> {{t "LogoutDone.Description"}}</p>
+</div>
+<form action="{{ loginUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <div class="lgn-actions">
+        <span class="fill-space"></span>
+        <button class="lgn-raised-button lgn-primary right" type="submit">{{t "LogoutDone.LoginButtonText"}}</button>
+    </div>
+</form>
+
+
+{{template "main-bottom" .}}

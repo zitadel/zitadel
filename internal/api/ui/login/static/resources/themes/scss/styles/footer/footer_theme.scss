@@ -1,0 +1,31 @@
+@import "footer";
+
+@mixin lgn-footer-theme() {
+  // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
+
+  @include lgn-footer-color();
+  // }
+}
+
+@mixin lgn-footer-color() {
+  footer {
+    background-color: var(--zitadel-color-footer-background);
+    border-top: 1px solid var(--zitadel-color-footer-line);
+    backdrop-filter: blur(10px);
+
+    @-moz-document url-prefix() {
+      background-color: var(--zitadel-color-footer-background-mozilla);
+      backdrop-filter: none;
+    }
+
+    a {
+      color: var(--zitadel-color-text-500);
+    }
+
+    .lgn-logo-watermark {
+      background: var(--zitadel-logo-powered-by) no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+  }
+}

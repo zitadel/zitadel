@@ -16,7 +16,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.auth.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/auth";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/auth";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
@@ -24,13 +24,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         version: "1.0";
         description: "The authentication API is used for all operations on the currently logged in user.";
         contact:{
-            name: "CAOS developers of ZITADEL"
-            url: "https://zitadel.ch"
-            email: "hi@zitadel.ch"
+            name: "ZITADEL"
+            url: "https://zitadel.com"
+            email: "hi@zitadel.com"
         }
         license: {
             name: "Apache License 2.0",
-            url: "https://github.com/caos/zitadel/blob/main/LICENSE"
+            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE"
         };
     };
 
@@ -38,9 +38,19 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     consumes: "application/json";
     consumes: "application/grpc";
+    consumes: "application/grpc-web+proto";
 
     produces: "application/json";
     produces: "application/grpc";
+    produces: "application/grpc-web+proto";
+
+    host: "api.zitadel.ch";
+    base_path: "/auth/v1";
+
+    external_docs: {
+        description: "Detailed information about ZITADEL",
+        url: "https://docs.zitadel.com"
+    }
 };
 
 
@@ -70,6 +80,17 @@ service AuthService {
 
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
+        };
+    }
+
+    // Changes the user state to deleted
+    rpc RemoveMyUser(RemoveMyUserRequest) returns (RemoveMyUserResponse) {
+        option (google.api.http) = {
+            delete: "/users/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.self.delete"
         };
     }
 
@@ -530,17 +551,6 @@ service AuthService {
         };
     }
 
-    // Returns a list of features, which are allowed on these organisation based on the subscription of the organisation
-    rpc ListMyZitadelFeatures(ListMyZitadelFeaturesRequest) returns (ListMyZitadelFeaturesResponse) {
-        option (google.api.http) = {
-            post: "/features/zitadel/me/_search"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
-        };
-    }
-
     // Returns the permissions the authorized user has in ZITADEL based on his manager roles (e.g ORG_OWNER)
     rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
         option (google.api.http) = {
@@ -569,6 +579,28 @@ service AuthService {
         option (google.api.http) = {
             post: "/memberships/me/_search"
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the label policy of the current organisation
+    rpc GetMyLabelPolicy(GetMyLabelPolicyRequest) returns (GetMyLabelPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the privacy policy of the current organisation
+    rpc GetMyPrivacyPolicy(GetMyPrivacyPolicyRequest) returns (GetMyPrivacyPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/privacy"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -604,12 +636,22 @@ message GetMyUserResponse {
     ];
 }
 
+//This is an empty request
+// the request parameters are read from the token-header
+message RemoveMyUserRequest {}
+
+message RemoveMyUserResponse{
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message ListMyUserChangesRequest {
     zitadel.change.v1.ChangeQuery query = 1;
 }
 
 message ListMyUserChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -751,7 +793,7 @@ message GetMyEmailResponse {
 }
 
 message SetMyEmailRequest {
-    string email = 1 [(validate.rules).string.email = true]; //TODO: check if no value is allowed
+    string email = 1 [(validate.rules).string.email = true];
 }
 
 message SetMyEmailResponse {
@@ -973,13 +1015,6 @@ message ListMyProjectOrgsResponse {
 }
 
 //This is an empty request
-message ListMyZitadelFeaturesRequest {}
-
-message ListMyZitadelFeaturesResponse {
-    repeated string result = 1;
-}
-
-//This is an empty request
 message ListMyZitadelPermissionsRequest {}
 
 message ListMyZitadelPermissionsResponse {
@@ -1003,4 +1038,18 @@ message ListMyMembershipsRequest {
 message ListMyMembershipsResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.user.v1.Membership result = 2;
+}
+
+//This is an empty request
+message GetMyLabelPolicyRequest {}
+
+message GetMyLabelPolicyResponse {
+    zitadel.policy.v1.LabelPolicy policy = 1;
+}
+
+//This is an empty request
+message GetMyPrivacyPolicyRequest {}
+
+message GetMyPrivacyPolicyResponse {
+    zitadel.policy.v1.PrivacyPolicy policy = 1;
 }

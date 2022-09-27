@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	caos_errors "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 
 	"time"
 )
@@ -35,6 +35,7 @@ const (
 	ExternalIDPSearchKeyUserID
 	ExternalIDPSearchKeyIdpConfigID
 	ExternalIDPSearchKeyResourceOwner
+	ExternalIDPSearchKeyInstanceID
 )
 
 type ExternalIDPSearchQuery struct {

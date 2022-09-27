@@ -4,19 +4,19 @@
 }
 
 .desc {
-  color: var(--grey);
-  font-size: .9rem;
+  font-size: 14px;
 }
 
-.form-field {
+.add-key-form-field {
   width: 100%;
+  position: relative;
 }
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }

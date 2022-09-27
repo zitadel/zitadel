@@ -4,7 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 const (
@@ -123,4 +123,12 @@ func CompareHash(value *CryptoValue, comparer []byte, alg HashAlgorithm) error {
 		return errors.ThrowInvalidArgument(nil, "CRYPT-HF32f", "value was hashed with a different algorithm")
 	}
 	return alg.CompareHash(value.Crypted, comparer)
+}
+
+func FillHash(value []byte, alg HashAlgorithm) *CryptoValue {
+	return &CryptoValue{
+		CryptoType: TypeHash,
+		Algorithm:  alg.Algorithm(),
+		Crypted:    value,
+	}
 }

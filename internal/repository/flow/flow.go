@@ -3,10 +3,10 @@ package flow
 import (
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -47,7 +47,7 @@ func NewTriggerActionsSetEvent(
 	}
 }
 
-func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &TriggerActionsSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -88,7 +88,7 @@ func NewTriggerActionsCascadeRemovedEvent(
 	}
 }
 
-func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &TriggerActionsCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -125,7 +125,7 @@ func NewFlowClearedEvent(
 	}
 }
 
-func FlowClearedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func FlowClearedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &FlowClearedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

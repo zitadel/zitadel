@@ -3,16 +3,18 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	authn_grpc "github.com/caos/zitadel/internal/api/grpc/authn"
-	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	project_grpc "github.com/caos/zitadel/internal/api/grpc/project"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
+	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
+	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	project_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest) (*mgmt_pb.GetAppByIDResponse, error) {
-	app, err := s.project.ApplicationByID(ctx, req.ProjectId, req.AppId)
+	app, err := s.query.AppByProjectAndAppID(ctx, true, req.ProjectId, req.AppId)
 	if err != nil {
 		return nil, err
 	}
@@ -26,37 +28,33 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchApplications(ctx, queries)
+	apps, err := s.query.SearchApps(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAppsResponse{
-		Result: project_grpc.AppsToPb(domains.Result),
-		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
-		),
+		Result:  project_grpc.AppsToPb(apps.Apps),
+		Details: object_grpc.ToListDetails(apps.Count, apps.Sequence, apps.Timestamp),
 	}, nil
 }
 
 func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChangesRequest) (*mgmt_pb.ListAppChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	res, err := s.project.ApplicationChanges(ctx, req.ProjectId, req.AppId, sequence, limit, asc, features.AuditLogRetention)
+	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	res, err := s.query.ApplicationChanges(ctx, req.ProjectId, req.AppId, sequence, limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAppChangesResponse{
-		Result: change_grpc.AppChangesToPb(res.Changes),
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
 func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest) (*mgmt_pb.AddOIDCAppResponse, error) {
-	app, err := s.command.AddOIDCApplication(ctx, AddOIDCAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	app, err := s.command.AddOIDCApplication(ctx, AddOIDCAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +67,23 @@ func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest)
 		ComplianceProblems: project_grpc.ComplianceProblemsToLocalizedMessages(app.Compliance.Problems),
 	}, nil
 }
+func (s *Server) AddSAMLApp(ctx context.Context, req *mgmt_pb.AddSAMLAppRequest) (*mgmt_pb.AddSAMLAppResponse, error) {
+	app, err := s.command.AddSAMLApplication(ctx, AddSAMLAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddSAMLAppResponse{
+		AppId:   app.AppID,
+		Details: object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
+	}, nil
+}
 
 func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (*mgmt_pb.AddAPIAppResponse, error) {
-	app, err := s.command.AddAPIApplication(ctx, AddAPIAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	app, err := s.command.AddAPIApplication(ctx, AddAPIAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +111,20 @@ func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOID
 		return nil, err
 	}
 	return &mgmt_pb.UpdateOIDCAppConfigResponse{
+		Details: object_grpc.ChangeToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAMLAppConfigRequest) (*mgmt_pb.UpdateSAMLAppConfigResponse, error) {
+	config, err := s.command.ChangeSAMLApplication(ctx, UpdateSAMLAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateSAMLAppConfigResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
@@ -152,7 +178,11 @@ func (s *Server) RemoveApp(ctx context.Context, req *mgmt_pb.RemoveAppRequest) (
 }
 
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, req *mgmt_pb.RegenerateOIDCClientSecretRequest) (*mgmt_pb.RegenerateOIDCClientSecretResponse, error) {
-	config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +197,11 @@ func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, req *mgmt_pb.Re
 }
 
 func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.RegenerateAPIClientSecretRequest) (*mgmt_pb.RegenerateAPIClientSecretResponse, error) {
-	config, err := s.command.ChangeAPIApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	config, err := s.command.ChangeAPIApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +216,19 @@ func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.Reg
 }
 
 func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (*mgmt_pb.GetAppKeyResponse, error) {
-	key, err := s.project.GetClientKey(ctx, req.ProjectId, req.AppId, req.KeyId)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	objectID, err := query.NewAuthNKeyObjectIDQuery(req.AppId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, resourceOwner, aggregateID, objectID)
 	if err != nil {
 		return nil, err
 	}
@@ -192,21 +238,17 @@ func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (
 }
 
 func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*mgmt_pb.ListAppKeysResponse, error) {
-	queries, err := ListAPIClientKeysRequestToModel(req)
+	queries, err := ListAPIClientKeysRequestToQuery(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchClientKeys(ctx, queries)
+	keys, err := s.query.SearchAuthNKeys(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAppKeysResponse{
-		Result: authn_grpc.KeyViewsToPb(domains.Result),
-		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
-		),
+		Result:  authn_grpc.KeysToPb(keys.AuthNKeys),
+		Details: object_grpc.ToListDetails(keys.Count, keys.Sequence, keys.Timestamp),
 	}, nil
 }
 

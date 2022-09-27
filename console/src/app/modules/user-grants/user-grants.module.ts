@@ -16,37 +16,46 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { InputModule } from '../../modules/input/input.module';
+import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { AvatarModule } from '../avatar/avatar.module';
+import { FilterUserGrantsModule } from '../filter-user-grants/filter-user-grants.module';
 import { PaginatorModule } from '../paginator/paginator.module';
+import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
+import { TableActionsModule } from '../table-actions/table-actions.module';
+import { UserGrantRoleDialogModule } from '../user-grant-role-dialog/user-grant-role-dialog.module';
+import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
 import { UserGrantsComponent } from './user-grants.component';
 
-
 @NgModule({
-    declarations: [UserGrantsComponent],
-    imports: [
-        CommonModule,
-        FormsModule,
-        AvatarModule,
-        MatButtonModule,
-        HasRoleModule,
-        MatTableModule,
-        PaginatorModule,
-        MatIconModule,
-        RouterModule,
-        MatProgressSpinnerModule,
-        MatCheckboxModule,
-        MatTooltipModule,
-        MatSelectModule,
-        TranslateModule,
-        HasRolePipeModule,
-        TimestampToDatePipeModule,
-        RefreshTableModule,
-        LocalizedDatePipeModule,
-        InputModule,
-    ],
-    exports: [
-        UserGrantsComponent,
-    ],
+  declarations: [UserGrantsComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AvatarModule,
+    MatButtonModule,
+    HasRoleModule,
+    MatTableModule,
+    PaginatorModule,
+    MatIconModule,
+    RouterModule,
+    ProjectRoleChipModule,
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    MatTooltipModule,
+    TableActionsModule,
+    UserGrantRoleDialogModule,
+    MatSelectModule,
+    TranslateModule,
+    ActionKeysModule,
+    FilterUserGrantsModule,
+    HasRolePipeModule,
+    TimestampToDatePipeModule,
+    RefreshTableModule,
+    LocalizedDatePipeModule,
+    InputModule,
+    WarnDialogModule,
+  ],
+  exports: [UserGrantsComponent],
 })
-export class UserGrantsModule { }
+export class UserGrantsModule {}

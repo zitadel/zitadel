@@ -1,11 +1,11 @@
 package domain
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
+	"github.com/zitadel/zitadel/internal/crypto"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type OTP struct {
@@ -37,7 +37,7 @@ func VerifyMFAOTP(code string, secret *crypto.CryptoValue, cryptoAlg crypto.Encr
 
 	valid := totp.Validate(code, decrypt)
 	if !valid {
-		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.Provider0.InvalidCode")
+		return caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode")
 	}
 	return nil
 }

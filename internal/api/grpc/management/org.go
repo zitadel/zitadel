@@ -3,21 +3,22 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
+	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
+	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
+	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*mgmt_pb.GetMyOrgResponse, error) {
-	org, err := s.query.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
+	org, err := s.query.OrgByID(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -34,22 +35,18 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 }
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	response, err := s.org.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, features.AuditLogRetention)
+	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	response, err := s.query.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgChangesResponse{
-		Result: change_grpc.OrgChangesToPb(response.Changes),
+		Result: change_grpc.ChangesToPb(response.Changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
 func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_pb.AddOrgResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Name, s.systemDefaults.Domain))
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Name, authz.GetInstance(ctx).RequestedDomain()), "")
 	if err != nil {
 		return nil, err
 	}
@@ -103,13 +100,23 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 	}, err
 }
 
-func (s *Server) GetOrgIAMPolicy(ctx context.Context, req *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
-	policy, err := s.org.GetMyOrgIamPolicy(ctx)
+func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPolicyRequest) (*mgmt_pb.GetDomainPolicyResponse, error) {
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetDomainPolicyResponse{
+		Policy: policy_grpc.DomainPolicyToPb(policy),
+	}, nil
+}
+
+func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetOrgIAMPolicyResponse{
-		Policy: policy_grpc.OrgIAMPolicyToPb(policy),
+		Policy: policy_grpc.DomainPolicyToOrgIAMPb(policy),
 	}, nil
 }
 
@@ -118,31 +125,34 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.org.SearchMyOrgDomains(ctx, queries)
+	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries.Queries = append(queries.Queries, orgIDQuery)
+
+	domains, err := s.query.SearchOrgDomains(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
-		Result: org_grpc.DomainsToPb(domains.Result),
-		Details: object.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
-		),
+		Result:  org_grpc.DomainsToPb(domains.Domains),
+		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.Timestamp),
 	}, nil
 }
 
 func (s *Server) AddOrgDomain(ctx context.Context, req *mgmt_pb.AddOrgDomainRequest) (*mgmt_pb.AddOrgDomainResponse, error) {
-	domain, err := s.command.AddOrgDomain(ctx, AddOrgDomainRequestToDomain(ctx, req), nil)
+	orgID := authz.GetCtxData(ctx).OrgID
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, req.Domain, orgID)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.AddOrgDomain(ctx, orgID, req.Domain, userIDs)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddOrgDomainResponse{
-		Details: object.AddToDetailsPb(
-			domain.Sequence,
-			domain.ChangeDate,
-			domain.ResourceOwner,
-		),
+		Details: object.DomainToAddDetailsPb(details),
 	}, nil
 }
 
@@ -178,7 +188,7 @@ func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *mgmt_p
 }
 
 func (s *Server) ValidateOrgDomain(ctx context.Context, req *mgmt_pb.ValidateOrgDomainRequest) (*mgmt_pb.ValidateOrgDomainResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, req.Domain)
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, req.Domain, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -201,46 +211,34 @@ func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimar
 	}, nil
 }
 
-func (s *Server) ListOrgMemberRoles(ctx context.Context, req *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
-	roles := s.org.GetOrgMemberRoles()
+func (s *Server) ListOrgMemberRoles(ctx context.Context, _ *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
+	instance, err := s.query.Instance(ctx, false)
+	if err != nil {
+		return nil, err
+	}
+	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == instance.DefaultOrgID)
 	return &mgmt_pb.ListOrgMemberRolesResponse{
 		Result: roles,
 	}, nil
 }
 
 func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*mgmt_pb.ListOrgMembersResponse, error) {
-	queries, err := ListOrgMembersRequestToModel(req)
+	queries, err := ListOrgMembersRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.org.SearchMyOrgMembers(ctx, queries)
+	members, err := s.query.OrgMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
-		Result: member_grpc.OrgMembersToPb(members.Result),
-		Details: object.ToListDetails(
-			members.TotalResult,
-			members.Sequence,
-			members.Timestamp,
-		),
-	}, nil
-}
-
-func ListOrgMembersRequestToModel(req *mgmt_pb.ListOrgMembersRequest) (*org_model.OrgMemberSearchRequest, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := member_grpc.MemberQueriesToOrgMember(req.Queries)
-	return &org_model.OrgMemberSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
-		Queries: queries,
+		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
+		Details: object.ToListDetails(members.Count, members.Sequence, members.Timestamp),
 	}, nil
 }
 
 func (s *Server) AddOrgMember(ctx context.Context, req *mgmt_pb.AddOrgMemberRequest) (*mgmt_pb.AddOrgMemberResponse, error) {
-	addedMember, err := s.command.AddOrgMember(ctx, AddOrgMemberRequestToDomain(ctx, req))
+	addedMember, err := s.command.AddOrgMember(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.Roles...)
 	if err != nil {
 		return nil, err
 	}
@@ -277,27 +275,96 @@ func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemb
 	}, nil
 }
 
-func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain string) ([]string, error) {
-	users, err := s.user.SearchUsers(ctx, &usr_model.UserSearchRequest{
-		Queries: []*usr_model.UserSearchQuery{
-			{
-				Key:    usr_model.UserSearchKeyPreferredLoginName,
-				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  orgDomain,
-			},
-			{
-				Key:    usr_model.UserSearchKeyResourceOwner,
-				Method: domain.SearchMethodNotEquals,
-				Value:  authz.GetCtxData(ctx).OrgID,
-			},
-		},
-	}, false)
+func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, orgID string) ([]string, error) {
+	queries := make([]query.SearchQuery, 0, 2)
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, len(users.Result))
-	for i, user := range users.Result {
+	queries = append(queries, loginName)
+	if orgID != "" {
+		owner, err := query.NewUserResourceOwnerSearchQuery(orgID, query.TextNotEquals)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, owner)
+	}
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries})
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Users))
+	for i, user := range users.Users {
 		userIDs[i] = user.ID
 	}
 	return userIDs, nil
+}
+
+func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetadataRequest) (*mgmt_pb.ListOrgMetadataResponse, error) {
+	metadataQueries, err := ListOrgMetadataToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchOrgMetadata(ctx, true, authz.GetCtxData(ctx).OrgID, metadataQueries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListOrgMetadataResponse{
+		Result:  metadata.OrgMetadataListToPb(res.Metadata),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+	}, nil
+}
+
+func (s *Server) GetOrgMetadata(ctx context.Context, req *mgmt_pb.GetOrgMetadataRequest) (*mgmt_pb.GetOrgMetadataResponse, error) {
+	data, err := s.query.GetOrgMetadataByKey(ctx, true, authz.GetCtxData(ctx).OrgID, req.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetOrgMetadataResponse{
+		Metadata: metadata.OrgMetadataToPb(data),
+	}, nil
+}
+
+func (s *Server) SetOrgMetadata(ctx context.Context, req *mgmt_pb.SetOrgMetadataRequest) (*mgmt_pb.SetOrgMetadataResponse, error) {
+	result, err := s.command.SetOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, &domain.Metadata{Key: req.Key, Value: req.Value})
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetOrgMetadataResponse{
+		Details: obj_grpc.AddToDetailsPb(
+			result.Sequence,
+			result.ChangeDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) BulkSetOrgMetadata(ctx context.Context, req *mgmt_pb.BulkSetOrgMetadataRequest) (*mgmt_pb.BulkSetOrgMetadataResponse, error) {
+	result, err := s.command.BulkSetOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, BulkSetOrgMetadataToDomain(req)...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkSetOrgMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) RemoveOrgMetadata(ctx context.Context, req *mgmt_pb.RemoveOrgMetadataRequest) (*mgmt_pb.RemoveOrgMetadataResponse, error) {
+	result, err := s.command.RemoveOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, req.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveOrgMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) BulkRemoveOrgMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveOrgMetadataRequest) (*mgmt_pb.BulkRemoveOrgMetadataResponse, error) {
+	result, err := s.command.BulkRemoveOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, req.Keys...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkRemoveOrgMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }

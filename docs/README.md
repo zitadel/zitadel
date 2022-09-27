@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b82a23f7-d8c7-4025-af18-a46586e89ed0/deploy-status)](https://app.netlify.com/sites/zitadel-docs/deploys)
+
 # Website
 
 This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.

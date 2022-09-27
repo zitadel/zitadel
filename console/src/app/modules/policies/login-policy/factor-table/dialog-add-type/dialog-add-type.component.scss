@@ -1,0 +1,21 @@
+.title {
+  font-size: 1.3rem;
+}
+
+.desc {
+  font-size: 14px;
+  margin-top: 0;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.action {
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    border-radius: 0.5rem;
+  }
+}

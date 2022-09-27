@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func projectWriteModelToProject(writeModel *ProjectWriteModel) *domain.Project {
@@ -54,6 +54,18 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		IDTokenUserinfoAssertion: writeModel.IDTokenUserinfoAssertion,
 		ClockSkew:                writeModel.ClockSkew,
 		AdditionalOrigins:        writeModel.AdditionalOrigins,
+	}
+}
+
+func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.SAMLApp {
+	return &domain.SAMLApp{
+		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:       writeModel.AppID,
+		AppName:     writeModel.AppName,
+		State:       writeModel.State,
+		Metadata:    writeModel.Metadata,
+		MetadataURL: writeModel.MetadataURL,
+		EntityID:    writeModel.EntityID,
 	}
 }
 

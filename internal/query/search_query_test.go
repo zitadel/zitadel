@@ -6,8 +6,7 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/lib/pq"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 var (
@@ -18,6 +17,11 @@ var (
 	testCol = Column{
 		name:  "test_col",
 		table: testTable,
+	}
+	testLowerCol = Column{
+		name:           "test_lower_col",
+		table:          testTable,
+		isOrderByLower: true,
 	}
 	testNoCol = Column{
 		name:  "",
@@ -34,7 +38,6 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 	}
 	type want struct {
 		stmtAddition string
-		args         []interface{}
 	}
 	tests := []struct {
 		name   string
@@ -46,7 +49,6 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			fields: fields{},
 			want: want{
 				stmtAddition: "",
-				args:         nil,
 			},
 		},
 		{
@@ -56,7 +58,6 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			},
 			want: want{
 				stmtAddition: "OFFSET 5",
-				args:         nil,
 			},
 		},
 		{
@@ -66,7 +67,6 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			},
 			want: want{
 				stmtAddition: "LIMIT 5",
-				args:         nil,
 			},
 		},
 		{
@@ -76,8 +76,7 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				Asc:           true,
 			},
 			want: want{
-				stmtAddition: "ORDER BY LOWER(?)",
-				args:         []interface{}{"test_table.test_col"},
+				stmtAddition: "ORDER BY test_table.test_col",
 			},
 		},
 		{
@@ -86,8 +85,17 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				SortingColumn: testCol,
 			},
 			want: want{
-				stmtAddition: "ORDER BY LOWER(?) DESC",
-				args:         []interface{}{"test_table.test_col"},
+				stmtAddition: "ORDER BY test_table.test_col DESC",
+			},
+		},
+		{
+			name: "sort lower asc",
+			fields: fields{
+				SortingColumn: testLowerCol,
+				Asc:           true,
+			},
+			want: want{
+				stmtAddition: "ORDER BY LOWER(test_table.test_lower_col)",
 			},
 		},
 		{
@@ -99,8 +107,7 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 				Asc:           true,
 			},
 			want: want{
-				stmtAddition: "ORDER BY LOWER(?) LIMIT 10 OFFSET 5",
-				args:         []interface{}{"test_table.test_col"},
+				stmtAddition: "ORDER BY test_table.test_col LIMIT 10 OFFSET 5",
 			},
 		},
 	}
@@ -116,16 +123,12 @@ func TestSearchRequest_ToQuery(t *testing.T) {
 			query := sq.Select((testCol).identifier()).From(testTable.identifier())
 			expectedQuery, _, _ := query.ToSql()
 
-			stmt, args, err := req.toQuery(query).ToSql()
+			stmt, _, err := req.toQuery(query).ToSql()
 			if len(tt.want.stmtAddition) > 0 {
 				expectedQuery += " " + tt.want.stmtAddition
 			}
 			if expectedQuery != stmt {
 				t.Errorf("stmt = %q, want %q", stmt, expectedQuery)
-			}
-
-			if !reflect.DeepEqual(args, tt.want.args) {
-				t.Errorf("args = %v, want %v", args, tt.want.stmtAddition)
 			}
 
 			if err != nil {
@@ -230,7 +233,6 @@ func TestTextQuery_comp(t *testing.T) {
 	}
 	type want struct {
 		query interface{}
-		args  []interface{}
 		isNil bool
 	}
 	tests := []struct {
@@ -247,7 +249,6 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Eq{"test_table.test_col": "Hurst"},
-				args:  nil,
 			},
 		},
 		{
@@ -259,7 +260,6 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.ILike{"test_table.test_col": "Hurst"},
-				args:  nil,
 			},
 		},
 		{
@@ -271,7 +271,6 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Like{"test_table.test_col": "Hurst%"},
-				args:  nil,
 			},
 		},
 		{
@@ -283,7 +282,6 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.ILike{"test_table.test_col": "Hurst%"},
-				args:  nil,
 			},
 		},
 		{
@@ -295,7 +293,6 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Like{"test_table.test_col": "%Hurst"},
-				args:  nil,
 			},
 		},
 		{
@@ -307,7 +304,6 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.ILike{"test_table.test_col": "%Hurst"},
-				args:  nil,
 			},
 		},
 		{
@@ -319,7 +315,6 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Like{"test_table.test_col": "%Hurst%"},
-				args:  nil,
 			},
 		},
 		{
@@ -331,7 +326,6 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.ILike{"test_table.test_col": "%Hurst%"},
-				args:  nil,
 			},
 		},
 		{
@@ -342,8 +336,10 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextListContains,
 			},
 			want: want{
-				query: "test_table.test_col @> ? ",
-				args:  []interface{}{pq.StringArray{"Hurst"}},
+				query: &listContains{
+					col:  testCol,
+					args: []interface{}{"Hurst"},
+				},
 			},
 		},
 		{
@@ -376,7 +372,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Text:    tt.fields.Text,
 				Compare: tt.fields.Compare,
 			}
-			query, args := s.comp()
+			query := s.comp()
 			if query == nil && tt.want.isNil {
 				return
 			} else if tt.want.isNil && query != nil {
@@ -385,10 +381,6 @@ func TestTextQuery_comp(t *testing.T) {
 
 			if !reflect.DeepEqual(query, tt.want.query) {
 				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
-			}
-
-			if !reflect.DeepEqual(args, tt.want.args) {
-				t.Errorf("wrong args: want: %v, (%T), got: %v (%T)", tt.want.args, tt.want.args, args, args)
 			}
 		})
 	}
@@ -589,7 +581,6 @@ func TestNumberQuery_comp(t *testing.T) {
 	}
 	type want struct {
 		query interface{}
-		args  []interface{}
 		isNil bool
 	}
 	tests := []struct {
@@ -606,7 +597,6 @@ func TestNumberQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Eq{"test_table.test_col": 42},
-				args:  nil,
 			},
 		},
 		{
@@ -618,7 +608,6 @@ func TestNumberQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.NotEq{"test_table.test_col": 42},
-				args:  nil,
 			},
 		},
 		{
@@ -630,7 +619,6 @@ func TestNumberQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Lt{"test_table.test_col": 42},
-				args:  nil,
 			},
 		},
 		{
@@ -642,7 +630,6 @@ func TestNumberQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Gt{"test_table.test_col": 42},
-				args:  nil,
 			},
 		},
 		{
@@ -653,8 +640,10 @@ func TestNumberQuery_comp(t *testing.T) {
 				Compare: NumberListContains,
 			},
 			want: want{
-				query: "test_table.test_col @> ? ",
-				args:  []interface{}{pq.Array(42)},
+				query: &listContains{
+					col:  testCol,
+					args: []interface{}{42},
+				},
 			},
 		},
 		{
@@ -687,7 +676,7 @@ func TestNumberQuery_comp(t *testing.T) {
 				Number:  tt.fields.Number,
 				Compare: tt.fields.Compare,
 			}
-			query, args := s.comp()
+			query := s.comp()
 			if query == nil && tt.want.isNil {
 				return
 			} else if tt.want.isNil && query != nil {
@@ -696,10 +685,6 @@ func TestNumberQuery_comp(t *testing.T) {
 
 			if !reflect.DeepEqual(query, tt.want.query) {
 				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
-			}
-
-			if !reflect.DeepEqual(args, tt.want.args) {
-				t.Errorf("wrong args: want: %v, (%T), got: %v (%T)", tt.want.args, tt.want.args, args, args)
 			}
 		})
 	}

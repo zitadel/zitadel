@@ -6,16 +6,17 @@ import "time"
 // It implements a basic reducer
 // it's purpose is to reduce events to create new ones
 type WriteModel struct {
-	AggregateID       string        `json:"-"`
-	ProcessedSequence uint64        `json:"-"`
-	Events            []EventReader `json:"-"`
-	ResourceOwner     string        `json:"-"`
-	ChangeDate        time.Time     `json:"-"`
+	AggregateID       string    `json:"-"`
+	ProcessedSequence uint64    `json:"-"`
+	Events            []Event   `json:"-"`
+	ResourceOwner     string    `json:"-"`
+	InstanceID        string    `json:"-"`
+	ChangeDate        time.Time `json:"-"`
 }
 
 //AppendEvents adds all the events to the read model.
 // The function doesn't compute the new state of the read model
-func (rm *WriteModel) AppendEvents(events ...EventReader) {
+func (rm *WriteModel) AppendEvents(events ...Event) {
 	rm.Events = append(rm.Events, events...)
 }
 
@@ -32,12 +33,15 @@ func (wm *WriteModel) Reduce() error {
 	if wm.ResourceOwner == "" {
 		wm.ResourceOwner = wm.Events[0].Aggregate().ResourceOwner
 	}
+	if wm.InstanceID == "" {
+		wm.InstanceID = wm.Events[0].Aggregate().InstanceID
+	}
 
 	wm.ProcessedSequence = wm.Events[len(wm.Events)-1].Sequence()
 	wm.ChangeDate = wm.Events[len(wm.Events)-1].CreationDate()
 
 	// all events processed and not needed anymore
 	wm.Events = nil
-	wm.Events = []EventReader{}
+	wm.Events = []Event{}
 	return nil
 }

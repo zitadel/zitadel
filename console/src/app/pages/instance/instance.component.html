@@ -1,0 +1,35 @@
+<cnsl-top-view
+  [hasBackButton]="false"
+  title="{{ 'IAM.TITLE' | translate }}"
+  sub="{{ 'IAM.DESCRIPTION' | translate }}"
+  [isActive]="instance?.state === State.STATE_RUNNING"
+  [isInactive]="instance?.state === State.STATE_STOPPED || instance?.state === State.STATE_STOPPING"
+  [hasContributors]="true"
+  stateTooltip="{{ 'INSTANCE.STATE.' + instance?.state | translate }}"
+>
+  <cnsl-contributors
+    topContributors
+    [totalResult]="totalMemberResult"
+    [loading]="loading$ | async"
+    [membersSubject]="membersSubject"
+    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+    (addClicked)="openAddMember()"
+    (showDetailClicked)="showDetail()"
+    (refreshClicked)="loadMembers()"
+    [disabled]="(['iam.member.write'] | hasRole | async) === false"
+  >
+  </cnsl-contributors>
+
+  <cnsl-info-row topContent *ngIf="instance" [instance]="instance"></cnsl-info-row>
+</cnsl-top-view>
+
+<div class="max-width-container">
+  <h2 class="instance-table-title">{{ 'ORG.LIST.TITLE' | translate }}</h2>
+
+  <p class="instance-table-desc cnsl-secondary-text">{{ 'ORG.LIST.DESCRIPTION' | translate }}</p>
+
+  <cnsl-org-table></cnsl-org-table>
+
+  <cnsl-settings-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-settings-grid>
+</div>

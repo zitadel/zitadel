@@ -3,10 +3,10 @@ package org
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/idpconfig"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
 const (
@@ -44,7 +44,7 @@ func NewIDPJWTConfigAddedEvent(
 	}
 }
 
-func IDPJWTConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPJWTConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := idpconfig.JWTConfigAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func NewIDPJWTConfigChangedEvent(
 	return &IDPJWTConfigChangedEvent{JWTConfigChangedEvent: *changeEvent}, nil
 }
 
-func IDPJWTConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPJWTConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := idpconfig.JWTConfigChangedEventMapper(event)
 	if err != nil {
 		return nil, err

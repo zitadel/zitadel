@@ -1,7 +1,13 @@
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 
+@import '~codemirror/lib/codemirror';
 @import './component-themes';
-@import '~@angular/material/theming';
+@import './styles/lato-font.scss';
+@import '@angular/material/theming';
+
+$material-design-icons-font-directory-path: '~material-design-icons-iconfont/dist/fonts/';
+
+@import '~material-design-icons-iconfont/src/material-design-icons';
 
 // Plus imports for other components in your app.
 
@@ -12,7 +18,7 @@
 @font-face {
   font-family: ailerons;
   font-display: auto;
-  src: url(assets/ailerons.otf) format('opentype');
+  src: url(./assets/ailerons.otf) format('opentype');
 }
 
 :root {
@@ -23,22 +29,21 @@
 }
 
 $caos-dark-primary: (
-  50 : var(--theme-dark-primary-50),
-  100 : var(--theme-dark-primary-100),
-  200 : var(--theme-dark-primary-200),
-  300 : var(--theme-dark-primary-300),
-  400 : var(--theme-dark-primary-400),
-  500 : var(--theme-dark-primary-500),
-  600 : var(--theme-dark-primary-600),
-  700 : var(--theme-dark-primary-700),
-  800 : var(--theme-dark-primary-800),
-  900 : var(--theme-dark-primary-900),
-  A100 : var(--theme-dark-primary-A100),
-  A200 : var(--theme-dark-primary-A200),
-  A400 : var(--theme-dark-primary-A400),
-  A700 : var(--theme-dark-primary-A700),
-  contrast:
-  (
+  50: var(--theme-dark-primary-50),
+  100: var(--theme-dark-primary-100),
+  200: var(--theme-dark-primary-200),
+  300: var(--theme-dark-primary-300),
+  400: var(--theme-dark-primary-400),
+  500: var(--theme-dark-primary-500),
+  600: var(--theme-dark-primary-600),
+  700: var(--theme-dark-primary-700),
+  800: var(--theme-dark-primary-800),
+  900: var(--theme-dark-primary-900),
+  A100: var(--theme-dark-primary-A100),
+  A200: var(--theme-dark-primary-A200),
+  A400: var(--theme-dark-primary-A400),
+  A700: var(--theme-dark-primary-A700),
+  contrast: (
     50: var(--theme-dark-primary-contrast-50),
     100: var(--theme-dark-primary-contrast-100),
     200: var(--theme-dark-primary-contrast-200),
@@ -52,27 +57,26 @@ $caos-dark-primary: (
     A100: var(--theme-dark-primary-contrast-A100),
     A200: var(--theme-dark-primary-contrast-A200),
     A400: var(--theme-dark-primary-contrast-A400),
-    A700: var(--theme-dark-primary-contrast-A700)
-  )
+    A700: var(--theme-dark-primary-contrast-A700),
+  ),
 );
 
 $caos-light-primary: (
-  50 : var(--theme-light-primary-50),
-  100 : var(--theme-light-primary-100),
-  200 : var(--theme-light-primary-200),
-  300 : var(--theme-light-primary-300),
-  400 : var(--theme-light-primary-400),
-  500 : var(--theme-light-primary-500),
-  600 : var(--theme-light-primary-600),
-  700 : var(--theme-light-primary-700),
-  800 : var(--theme-light-primary-800),
-  900 : var(--theme-light-primary-900),
-  A100 : var(--theme-light-primary-A100),
-  A200 : var(--theme-light-primary-A200),
-  A400 : var(--theme-light-primary-A400),
-  A700 : var(--theme-light-primary-A700),
-  contrast:
-  (
+  50: var(--theme-light-primary-50),
+  100: var(--theme-light-primary-100),
+  200: var(--theme-light-primary-200),
+  300: var(--theme-light-primary-300),
+  400: var(--theme-light-primary-400),
+  500: var(--theme-light-primary-500),
+  600: var(--theme-light-primary-600),
+  700: var(--theme-light-primary-700),
+  800: var(--theme-light-primary-800),
+  900: var(--theme-light-primary-900),
+  A100: var(--theme-light-primary-A100),
+  A200: var(--theme-light-primary-A200),
+  A400: var(--theme-light-primary-A400),
+  A700: var(--theme-light-primary-A700),
+  contrast: (
     50: var(--theme-light-primary-contrast-50),
     100: var(--theme-light-primary-contrast-100),
     200: var(--theme-light-primary-contrast-200),
@@ -86,27 +90,26 @@ $caos-light-primary: (
     A100: var(--theme-light-primary-contrast-A100),
     A200: var(--theme-light-primary-contrast-A200),
     A400: var(--theme-light-primary-contrast-A400),
-    A700: var(--theme-light-primary-contrast-A700)
-  )
+    A700: var(--theme-light-primary-contrast-A700),
+  ),
 );
 
 $caos-dark-background: (
-  50 : var(--theme-dark-background-50),
-  100 : var(--theme-dark-background-100),
-  200 : var(--theme-dark-background-200),
-  300 : var(--theme-dark-background-300),
-  400 : var(--theme-dark-background-400),
-  500 : var(--theme-dark-background-500),
-  600 : var(--theme-dark-background-600),
-  700 : var(--theme-dark-background-700),
-  800 : var(--theme-dark-background-800),
-  900 : var(--theme-dark-background-900),
-  A100 : var(--theme-dark-background-A100),
-  A200 : var(--theme-dark-background-A200),
-  A400 : var(--theme-dark-background-A400),
-  A700 : var(--theme-dark-background-A700),
-  contrast:
-  (
+  50: var(--theme-dark-background-50),
+  100: var(--theme-dark-background-100),
+  200: var(--theme-dark-background-200),
+  300: var(--theme-dark-background-300),
+  400: var(--theme-dark-background-400),
+  500: var(--theme-dark-background-500),
+  600: var(--theme-dark-background-600),
+  700: var(--theme-dark-background-700),
+  800: var(--theme-dark-background-800),
+  900: var(--theme-dark-background-900),
+  A100: var(--theme-dark-background-A100),
+  A200: var(--theme-dark-background-A200),
+  A400: var(--theme-dark-background-A400),
+  A700: var(--theme-dark-background-A700),
+  contrast: (
     50: var(--theme-dark-background-contrast-50),
     100: var(--theme-dark-background-contrast-100),
     200: var(--theme-dark-background-contrast-200),
@@ -120,27 +123,26 @@ $caos-dark-background: (
     A100: var(--theme-dark-background-contrast-A100),
     A200: var(--theme-dark-background-contrast-A200),
     A400: var(--theme-dark-background-contrast-A400),
-    A700: var(--theme-dark-background-contrast-A700)
-  )
+    A700: var(--theme-dark-background-contrast-A700),
+  ),
 );
 
 $caos-light-background: (
-  50 : var(--theme-light-background-50),
-  100 : var(--theme-light-background-100),
-  200 : var(--theme-light-background-200),
-  300 : var(--theme-light-background-300),
-  400 : var(--theme-light-background-400),
-  500 : var(--theme-light-background-500),
-  600 : var(--theme-light-background-600),
-  700 : var(--theme-light-background-700),
-  800 : var(--theme-light-background-800),
-  900 : var(--theme-light-background-900),
-  A100 : var(--theme-light-background-A100),
-  A200 : var(--theme-light-background-A200),
-  A400 : var(--theme-light-background-A400),
-  A700 : var(--theme-light-background-A700),
-  contrast:
-  (
+  50: var(--theme-light-background-50),
+  100: var(--theme-light-background-100),
+  200: var(--theme-light-background-200),
+  300: var(--theme-light-background-300),
+  400: var(--theme-light-background-400),
+  500: var(--theme-light-background-500),
+  600: var(--theme-light-background-600),
+  700: var(--theme-light-background-700),
+  800: var(--theme-light-background-800),
+  900: var(--theme-light-background-900),
+  A100: var(--theme-light-background-A100),
+  A200: var(--theme-light-background-A200),
+  A400: var(--theme-light-background-A400),
+  A700: var(--theme-light-background-A700),
+  contrast: (
     50: var(--theme-light-background-contrast-50),
     100: var(--theme-light-background-contrast-100),
     200: var(--theme-light-background-contrast-200),
@@ -154,27 +156,26 @@ $caos-light-background: (
     A100: var(--theme-light-background-contrast-A100),
     A200: var(--theme-light-background-contrast-A200),
     A400: var(--theme-light-background-contrast-A400),
-    A700: var(--theme-light-background-contrast-A700)
-  )
+    A700: var(--theme-light-background-contrast-A700),
+  ),
 );
 
 $caos-dark-warn: (
-  50 : var(--theme-dark-warn-50),
-  100 : var(--theme-dark-warn-100),
-  200 : var(--theme-dark-warn-200),
-  300 : var(--theme-dark-warn-300),
-  400 : var(--theme-dark-warn-400),
-  500 : var(--theme-dark-warn-500),
-  600 : var(--theme-dark-warn-600),
-  700 : var(--theme-dark-warn-700),
-  800 : var(--theme-dark-warn-800),
-  900 : var(--theme-dark-warn-900),
-  A100 : var(--theme-dark-warn-A100),
-  A200 : var(--theme-dark-warn-A200),
-  A400 : var(--theme-dark-warn-A400),
-  A700 : var(--theme-dark-warn-A700),
-  contrast:
-  (
+  50: var(--theme-dark-warn-50),
+  100: var(--theme-dark-warn-100),
+  200: var(--theme-dark-warn-200),
+  300: var(--theme-dark-warn-300),
+  400: var(--theme-dark-warn-400),
+  500: var(--theme-dark-warn-500),
+  600: var(--theme-dark-warn-600),
+  700: var(--theme-dark-warn-700),
+  800: var(--theme-dark-warn-800),
+  900: var(--theme-dark-warn-900),
+  A100: var(--theme-dark-warn-A100),
+  A200: var(--theme-dark-warn-A200),
+  A400: var(--theme-dark-warn-A400),
+  A700: var(--theme-dark-warn-A700),
+  contrast: (
     50: var(--theme-dark-warn-contrast-50),
     100: var(--theme-dark-warn-contrast-100),
     200: var(--theme-dark-warn-contrast-200),
@@ -188,27 +189,26 @@ $caos-dark-warn: (
     A100: var(--theme-dark-warn-contrast-A100),
     A200: var(--theme-dark-warn-contrast-A200),
     A400: var(--theme-dark-warn-contrast-A400),
-    A700: var(--theme-dark-warn-contrast-A700)
-  )
+    A700: var(--theme-dark-warn-contrast-A700),
+  ),
 );
 
 $caos-light-warn: (
-  50 : var(--theme-light-warn-50),
-  100 : var(--theme-light-warn-100),
-  200 : var(--theme-light-warn-200),
-  300 : var(--theme-light-warn-300),
-  400 : var(--theme-light-warn-400),
-  500 : var(--theme-light-warn-500),
-  600 : var(--theme-light-warn-600),
-  700 : var(--theme-light-warn-700),
-  800 : var(--theme-light-warn-800),
-  900 : var(--theme-light-warn-900),
-  A100 : var(--theme-light-warn-A100),
-  A200 : var(--theme-light-warn-A200),
-  A400 : var(--theme-light-warn-A400),
-  A700 : var(--theme-light-warn-A700),
-  contrast:
-  (
+  50: var(--theme-light-warn-50),
+  100: var(--theme-light-warn-100),
+  200: var(--theme-light-warn-200),
+  300: var(--theme-light-warn-300),
+  400: var(--theme-light-warn-400),
+  500: var(--theme-light-warn-500),
+  600: var(--theme-light-warn-600),
+  700: var(--theme-light-warn-700),
+  800: var(--theme-light-warn-800),
+  900: var(--theme-light-warn-900),
+  A100: var(--theme-light-warn-A100),
+  A200: var(--theme-light-warn-A200),
+  A400: var(--theme-light-warn-A400),
+  A700: var(--theme-light-warn-A700),
+  contrast: (
     50: var(--theme-light-warn-contrast-50),
     100: var(--theme-light-warn-contrast-100),
     200: var(--theme-light-warn-contrast-200),
@@ -222,18 +222,30 @@ $caos-light-warn: (
     A100: var(--theme-light-warn-contrast-A100),
     A200: var(--theme-light-warn-contrast-A200),
     A400: var(--theme-light-warn-contrast-A400),
-    A700: var(--theme-light-warn-contrast-A700)
-  )
+    A700: var(--theme-light-warn-contrast-A700),
+  ),
 );
+
+$caos-dark-theme-text: var(--theme-dark-text);
+$caos-light-theme-text: var(--theme-light-text);
+
+$caos-dark-theme-secondary-text: var(--theme-dark-secondary-text);
+$caos-light-theme-secondary-text: var(--theme-light-secondary-text);
 
 $caos-dark-theme-background: (
   status-bar: map_get($caos-dark-background, 300),
   app-bar: map_get($caos-dark-background, 500),
   background: map_get($caos-dark-background, 500),
-  hover: rgba(black, .04),
-  card: map_get($caos-dark-background, 400),
+  hover: rgba(black, 0.04),
+  card: #222,
+  // set fixed color due to https://github.com/angular/components/pull/14253
+  // change where a scss mix function can't use a css var
+  cards: map_get($caos-dark-background, 400),
+  cardhovered: map_get($caos-dark-background, 300),
+  contributor: map_get($caos-dark-background, 400),
+  contributor-avatar: map_get($caos-dark-background, 300),
   dialog: map_get($caos-dark-background, 500),
-  disabled-button: rgba(black, .12),
+  disabled-button: rgba(black, 0.12),
   raised-button: white,
   focused-button: $dark-focused,
   selected-button: map_get($caos-dark-background, 300),
@@ -243,18 +255,33 @@ $caos-dark-theme-background: (
   disabled-list-option: map_get($caos-dark-background, 200),
   tooltip: map_get($mat-gray, 700),
   infosection: map_get($caos-dark-background, 300),
-  warninfosection: #4f566b,
-  successinfosection: #4f566b
+  warninfosection: #741f2c4a,
+  alertinfosection: #92400e50,
+  successinfosection: map_get($caos-dark-background, 300),
+  state: map_get($caos-dark-background, 300),
+  state-active: #68cf8340,
+  state-inactive: #af455359,
+  toolbar: rgba(map_get($caos-dark-background, 500), 0.9),
+  moz-toolbar: map_get($caos-dark-background, 500),
+  footer: #00000020,
+  metadata-section: #00000020,
+  alert: #fbbf24,
 );
 
 $caos-light-theme-background: (
   status-bar: map_get($caos-light-background, 300),
   app-bar: map_get($caos-light-background, 100),
   background: map_get($caos-light-background, 500),
-  hover: rgba(black, .04),
-  card: map_get($caos-light-background, 400),
+  hover: rgba(black, 0.04),
+  contributor: #00000010,
+  contributor-avatar: map_get($caos-light-primary, 300),
+  card: #fff,
+  // set fixed color due to https://github.com/angular/components/pull/14253
+  // change where a scss mix function can't use a css var
+  cards: map_get($caos-light-background, 400),
+  cardhovered: map_get($caos-light-background, 300),
   dialog: map_get($caos-light-background, 500),
-  disabled-button: rgba(black, .12),
+  disabled-button: rgba(black, 0.12),
   raised-button: white,
   focused-button: $light-focused,
   selected-button: map_get($caos-light-background, 300),
@@ -263,9 +290,15 @@ $caos-light-theme-background: (
   unselected-chip: map_get($caos-light-background, 300),
   disabled-list-option: map_get($caos-light-background, 200),
   tooltip: map_get($mat-gray, 700),
-  infosection: #e4e4e4,
+  infosection: map_get($caos-light-background, 600),
   warninfosection: #ffc1c1,
-  successinfosection: #cbf4c9
+  alertinfosection: rgb(251, 191, 36),
+  successinfosection: #cbf4c9,
+  toolbar: rgba(map_get($caos-light-background, 500), 0.9),
+  moz-toolbar: map_get($caos-light-background, 500),
+  footer: #00000008,
+  metadata-section: #605f5f08,
+  alert: rgb(251, 191, 36),
 );
 
 $caos-dark-theme-foreground: (
@@ -273,20 +306,24 @@ $caos-dark-theme-foreground: (
   divider: $light-dividers,
   dividers: $light-dividers,
   disabled: $light-disabled-text,
-  disabled-button: rgba(white, .26),
+  disabled-button: rgba(white, 0.26),
   disabled-text: $light-disabled-text,
   elevation: black,
   hint-text: $light-disabled-text,
-  secondary-text: $light-secondary-text,
-  icon: rgba(white, .54),
-  icons: rgba(white, .54),
-  text: rgba(white, .87),
-  slider-min: rgba(white, .87),
-  slider-off: rgba(white, .26),
-  slider-off-active: rgba(white, .38),
+  secondary-text: $caos-dark-theme-secondary-text,
+  placeholder-text: rgba(white, 0.4),
+  icon: rgba(white, 0.54),
+  icons: rgba(white, 0.54),
+  text: $caos-dark-theme-text,
+  slider-min: rgba(white, 0.87),
+  slider-off: rgba(white, 0.26),
+  slider-off-active: rgba(white, 0.38),
   infosection: #f0f0f0,
   warninfosection: #ffc1c1,
-  successinfosection: #cbf4c9
+  alertinfosection: rgb(251, 191, 36),
+  successinfosection: #cbf4c9,
+  toolbar-items: map-get(map-get($caos-dark-primary, contrast), 500),
+  slash: #ffffff6e,
 );
 
 $caos-light-theme-foreground: (
@@ -294,20 +331,24 @@ $caos-light-theme-foreground: (
   divider: $dark-dividers,
   dividers: $dark-dividers,
   disabled: $dark-disabled-text,
-  disabled-button: rgba(black, .26),
+  disabled-button: rgba(black, 0.26),
   disabled-text: $dark-disabled-text,
   elevation: black,
   hint-text: $dark-disabled-text,
-  secondary-text: $dark-secondary-text,
-  icon: rgba(black, .54),
-  icons: rgba(black, .54),
-  text: rgba(black, .87),
-  slider-min: rgba(black, .87),
-  slider-off: rgba(black, .26),
-  slider-off-active: rgba(black, .38),
-  infosection: #4a4a4a,
+  secondary-text: $caos-light-theme-secondary-text,
+  placeholder-text: rgba(black, 0.3),
+  icon: rgba(black, 0.54),
+  icons: rgba(black, 0.54),
+  text: $caos-light-theme-text,
+  slider-min: rgba(black, 0.87),
+  slider-off: rgba(black, 0.26),
+  slider-off-active: rgba(black, 0.38),
+  infosection: map-get(map-get($caos-light-background, contrast), 600),
   warninfosection: #620e0e,
-  successinfosection: #0e6245
+  alertinfosection: rgb(146, 64, 14),
+  successinfosection: #0e6245,
+  toolbar-items: map-get(map-get($caos-light-primary, contrast), 500),
+  slash: #0000006e,
 );
 
 $caos-dark-app-theme: (
@@ -316,7 +357,7 @@ $caos-dark-app-theme: (
   warn: mat-palette($caos-dark-warn),
   is-dark: true,
   foreground: $caos-dark-theme-foreground,
-  background: $caos-dark-theme-background
+  background: $caos-dark-theme-background,
 );
 
 $caos-light-app-theme: (
@@ -325,14 +366,14 @@ $caos-light-app-theme: (
   warn: mat-palette($caos-light-warn),
   is-dark: false,
   foreground: $caos-light-theme-foreground,
-  background: $caos-light-theme-background
+  background: $caos-light-theme-background,
 );
 
-$custom-typography: mat.define-typography-config($font-family: 'Lato');
+$custom-typography: mat.define-typography-config(
+  $font-family: 'Lato',
+);
 
 @include mat.core($custom-typography);
-@include component-themes($caos-dark-app-theme);
-@include mat.all-component-themes($caos-dark-app-theme);
 
 .mat-dialog-container,
 .mat-raised-button,
@@ -345,26 +386,88 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   height: 35px !important;
 }
 
+.cnsl-action-button {
+  display: flex;
+  align-items: center;
+
+  &.mat-raised-button,
+  &.mat-stroked-button {
+    padding-left: 0.5rem;
+    height: 36px;
+
+    .mat-button-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    i:not(.no-margin) {
+      margin-right: 0.25rem;
+      font-size: 1.3rem;
+    }
+
+    .mat-icon {
+      margin-right: 0.25rem;
+    }
+  }
+}
+
+.mat-calendar-table {
+  height: 280px;
+}
+
+@include component-themes($caos-dark-app-theme);
+@include mat.all-component-themes($caos-dark-app-theme);
+
 .light-theme {
   @include component-themes($caos-light-app-theme);
   @include mat.all-component-themes($caos-light-app-theme);
 
+  $background: map-get($caos-light-app-theme, background);
+  $foreground: map-get($caos-light-app-theme, foreground);
+
   --color-main: var(--theme-light-primary-500);
   --warn: #cd3d56;
   --success: #10b981;
+  $border-color: map-get($foreground, divider);
 
-  $background: map-get($caos-light-app-theme, background);
+  .mat-menu-panel {
+    background-color: map-get($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border-radius: 6px;
+  }
 
-  .sidenav,
+  .mat-option {
+    background-color: map-get($background, cards);
+
+    &:hover {
+      background-color: map-get($background, cardhovered);
+    }
+  }
+
+  .mat-button-toggle-group-appearance-standard {
+    border-color: map-get($foreground, divider);
+  }
+
+  .mat-button-toggle {
+    background-color: mat.get-color-from-palette($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    &.mat-button-toggle-checked {
+      background-color: #00000010;
+    }
+  }
+
   .main-container,
-  .mat-dialog-container {
+  .mat-dialog-container,
+  .mat-calendar {
     background-color: map-get($background, background);
-    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
     background-color: map-get($background, background);
     border-radius: 8px;
   }
@@ -387,48 +490,79 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
 }
 
 .dark-theme {
-  @include component-themes($caos-dark-app-theme);
-  @include mat.all-component-themes($caos-dark-app-theme);
+  $background: map-get($caos-dark-app-theme, background);
+  $foreground: map-get($caos-dark-app-theme, foreground);
 
   --color-main: var(--theme-dark-primary-500);
   --warn: #ff3b5b;
   --success: #10b981;
-  $background: map-get($caos-dark-app-theme, background);
+  $border-color: map-get($foreground, divider);
 
-  .sidenav,
+  .main-container {
+    color: map-get($foreground, text);
+  }
+
+  .mat-menu-panel {
+    background-color: map-get($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border-radius: 6px;
+  }
+
+  .mat-option {
+    background-color: map-get($background, cards);
+
+    &:hover {
+      background-color: map-get($background, cardhovered);
+    }
+  }
+
+  .mat-button-toggle-group-appearance-standard {
+    border-color: map-get($foreground, divider);
+  }
+
+  .mat-button-toggle {
+    background-color: mat.get-color-from-palette($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+    &.mat-button-toggle-checked {
+      background-color: mat.get-color-from-palette($background, background);
+    }
+  }
+
   .main-container,
-  .mat-dialog-container {
+  .mat-dialog-container,
+  .mat-calendar {
     background-color: map-get($background, background);
-    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     background-color: map-get($background, background);
     border-radius: 8px;
-    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
     background-color: map-get($background, background);
-    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
   }
 
   ::-webkit-scrollbar-thumb {
     background-color: #737c8870;
     border-radius: 8px;
     cursor: pointer;
-    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
   }
 
   .root-header {
     box-shadow: inset 0 -1px map-get($caos-dark-theme-foreground, divider);
   }
 }
-// @include mat.checkbox-theme($candy-app-theme);
 
 /* You can add global styles to this file, and also import other style files */
 
@@ -439,19 +573,8 @@ body {
 
 body {
   margin: 0;
-  font-family:
-    'Lato',
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Roboto",
-    "Oxygen",
-    "Ubuntu",
-    "Cantarell",
-    "Fira Sans",
-    "Droid Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 h1 {
@@ -463,40 +586,26 @@ h2 {
   font-weight: 400;
 }
 
+.transparent-backdrop {
+  background: transparent !important;
+  opacity: 0;
+}
+
 .mat-paginator .mat-select {
   border: none;
 }
 
 .max-width-container {
-  max-width: 1350px;
-  padding: 0 2rem;
-  padding-top: 2rem;
-  padding-left: 2rem;
+  max-width: 80rem;
+  margin: 0 auto;
+}
 
-  @media only screen and (min-width: 1024px) {
-    max-width: 1120px;
-  }
-
-  @media only screen and (min-width: 899px) {
-    max-width: 899px;
-  }
-
-  @media only screen and (max-width: 500px) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+.max-width-description {
+  max-width: 50rem;
 }
 
 .enlarged-container {
-  padding: 0 1.5rem;
-  padding-top: 2rem;
-  padding-left: 2rem;
-  max-width: 1690px;
-
-  @media only screen and (max-width: 500px) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+  padding: 2rem 0 0 0;
 }
 
 i {
@@ -504,5 +613,17 @@ i {
 }
 
 .mat-checkbox-inner-container.mat-checkbox-inner-container-no-side-margin {
-  margin-right: .5rem !important;
+  margin-right: 0.5rem !important;
+}
+
+.mat-button-toggle-button {
+  display: flex;
+  height: 36px;
+  line-height: 36px !important;
+  align-items: center;
+  font-size: 14px !important;
+}
+
+.mat-button-toggle-label-content {
+  line-height: 36px;
 }

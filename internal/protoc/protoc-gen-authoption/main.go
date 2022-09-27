@@ -1,8 +1,8 @@
 package main
 
 import (
-	base "github.com/caos/zitadel/internal/protoc/protoc-base"
-	"github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption"
+	base "github.com/zitadel/zitadel/internal/protoc/protoc-base"
+	"github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/authoption"
 )
 
 const (

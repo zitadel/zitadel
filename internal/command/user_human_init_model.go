@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type HumanInitCodeWriteModel struct {
@@ -47,9 +47,6 @@ func (wm *HumanInitCodeWriteModel) Reduce() error {
 			wm.IsEmailVerified = false
 		case *user.HumanEmailVerifiedEvent:
 			wm.IsEmailVerified = true
-			if wm.UserState == domain.UserStateInitial {
-				wm.UserState = domain.UserStateActive
-			}
 		case *user.HumanInitialCodeAddedEvent:
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
@@ -70,7 +67,8 @@ func (wm *HumanInitCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.UserV1AddedType,
+		EventTypes(
+			user.UserV1AddedType,
 			user.HumanAddedType,
 			user.UserV1RegisteredType,
 			user.HumanRegisteredType,

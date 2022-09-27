@@ -2,23 +2,24 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	org_model "github.com/caos/zitadel/internal/org/model"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-	"github.com/caos/zitadel/internal/org/repository/view"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/zitadel/zitadel/internal/eventstore/v1/sdk"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	org_model "github.com/zitadel/zitadel/internal/org/model"
+	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/org/repository/view"
+	query2 "github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 const (
@@ -27,17 +28,17 @@ const (
 
 type User struct {
 	handler
-	iamID        string
 	subscription *v1.Subscription
+	queries      *query2.Queries
 }
 
 func newUser(
 	handler handler,
-	iamID string,
+	queries *query2.Queries,
 ) *User {
 	h := &User{
 		handler: handler,
-		iamID:   iamID,
+		queries: queries,
 	}
 
 	h.subscribe()
@@ -62,32 +63,30 @@ func (u *User) Subscription() *v1.Subscription {
 	return u.subscription
 }
 func (_ *User) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{es_model.UserAggregate, org_es_model.OrgAggregate}
+	return []es_models.AggregateType{user_repo.AggregateType, org.AggregateType}
 }
 
-func (u *User) CurrentSequence() (uint64, error) {
-	sequence, err := u.view.GetLatestUserSequence()
+func (u *User) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := u.view.GetLatestUserSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (u *User) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := u.view.GetLatestUserSequence()
+func (u *User) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
+	sequences, err := u.view.GetLatestUserSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(u.AggregateTypes()...).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+	return newSearchQuery(sequences, u.AggregateTypes(), instanceIDs), nil
 }
 
 func (u *User) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
-	case es_model.UserAggregate:
+	case user_repo.AggregateType:
 		return u.ProcessUser(event)
-	case org_es_model.OrgAggregate:
+	case org.AggregateType:
 		return u.ProcessOrg(event)
 	default:
 		return nil
@@ -96,74 +95,106 @@ func (u *User) Reduce(event *es_models.Event) (err error) {
 
 func (u *User) ProcessUser(event *es_models.Event) (err error) {
 	user := new(view_model.UserView)
-	switch event.Type {
-	case es_model.UserAdded,
-		es_model.MachineAdded,
-		es_model.HumanAdded,
-		es_model.UserRegistered,
-		es_model.HumanRegistered:
+	switch eventstore.EventType(event.Type) {
+	case user_repo.UserV1AddedType,
+		user_repo.MachineAddedEventType,
+		user_repo.HumanAddedType,
+		user_repo.UserV1RegisteredType,
+		user_repo.HumanRegisteredType:
 		err = user.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = u.fillLoginNames(user)
-	case es_model.UserProfileChanged,
-		es_model.UserEmailChanged,
-		es_model.UserEmailVerified,
-		es_model.UserPhoneChanged,
-		es_model.UserPhoneVerified,
-		es_model.UserPhoneRemoved,
-		es_model.UserAddressChanged,
-		es_model.UserDeactivated,
-		es_model.UserReactivated,
-		es_model.UserLocked,
-		es_model.UserUnlocked,
-		es_model.MFAOTPAdded,
-		es_model.MFAOTPVerified,
-		es_model.MFAOTPRemoved,
-		es_model.MFAInitSkipped,
-		es_model.UserPasswordChanged,
-		es_model.HumanProfileChanged,
-		es_model.HumanEmailChanged,
-		es_model.HumanEmailVerified,
-		es_model.HumanAvatarAdded,
-		es_model.HumanAvatarRemoved,
-		es_model.HumanPhoneChanged,
-		es_model.HumanPhoneVerified,
-		es_model.HumanPhoneRemoved,
-		es_model.HumanAddressChanged,
-		es_model.HumanMFAOTPAdded,
-		es_model.HumanMFAOTPVerified,
-		es_model.HumanMFAOTPRemoved,
-		es_model.HumanMFAU2FTokenAdded,
-		es_model.HumanMFAU2FTokenVerified,
-		es_model.HumanMFAU2FTokenRemoved,
-		es_model.HumanPasswordlessTokenAdded,
-		es_model.HumanPasswordlessTokenVerified,
-		es_model.HumanPasswordlessTokenRemoved,
-		es_model.HumanMFAInitSkipped,
-		es_model.MachineChanged,
-		es_model.HumanPasswordChanged,
-		es_models.EventType(user_repo.HumanPasswordlessInitCodeAddedType),
-		es_models.EventType(user_repo.HumanPasswordlessInitCodeRequestedType):
-		user, err = u.view.UserByID(event.AggregateID)
+	case user_repo.UserV1ProfileChangedType,
+		user_repo.UserV1EmailChangedType,
+		user_repo.UserV1EmailVerifiedType,
+		user_repo.UserV1PhoneChangedType,
+		user_repo.UserV1PhoneVerifiedType,
+		user_repo.UserV1PhoneRemovedType,
+		user_repo.UserV1AddressChangedType,
+		user_repo.UserDeactivatedType,
+		user_repo.UserReactivatedType,
+		user_repo.UserLockedType,
+		user_repo.UserUnlockedType,
+		user_repo.UserV1MFAOTPAddedType,
+		user_repo.UserV1MFAOTPVerifiedType,
+		user_repo.UserV1MFAOTPRemovedType,
+		user_repo.UserV1MFAInitSkippedType,
+		user_repo.UserV1PasswordChangedType,
+		user_repo.HumanProfileChangedType,
+		user_repo.HumanEmailChangedType,
+		user_repo.HumanEmailVerifiedType,
+		user_repo.HumanAvatarAddedType,
+		user_repo.HumanAvatarRemovedType,
+		user_repo.HumanPhoneChangedType,
+		user_repo.HumanPhoneVerifiedType,
+		user_repo.HumanPhoneRemovedType,
+		user_repo.HumanAddressChangedType,
+		user_repo.HumanMFAOTPAddedType,
+		user_repo.HumanMFAOTPVerifiedType,
+		user_repo.HumanMFAOTPRemovedType,
+		user_repo.HumanU2FTokenAddedType,
+		user_repo.HumanU2FTokenVerifiedType,
+		user_repo.HumanU2FTokenRemovedType,
+		user_repo.HumanPasswordlessTokenAddedType,
+		user_repo.HumanPasswordlessTokenVerifiedType,
+		user_repo.HumanPasswordlessTokenRemovedType,
+		user_repo.HumanMFAInitSkippedType,
+		user_repo.MachineChangedEventType,
+		user_repo.HumanPasswordChangedType,
+		user_repo.HumanPasswordlessInitCodeAddedType,
+		user_repo.HumanPasswordlessInitCodeRequestedType:
+		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
 		if err != nil {
-			return err
+			if !errors.IsNotFound(err) {
+				return err
+			}
+			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			if err != nil {
+				return err
+			}
+			events, err := u.es.FilterEvents(context.Background(), query)
+			if err != nil {
+				return err
+			}
+			user = &view_model.UserView{}
+			for _, e := range events {
+				if err = user.AppendEvent(e); err != nil {
+					return err
+				}
+			}
 		}
 		err = user.AppendEvent(event)
-	case es_model.DomainClaimed,
-		es_model.UserUserNameChanged:
-		user, err = u.view.UserByID(event.AggregateID)
+	case user_repo.UserDomainClaimedType,
+		user_repo.UserUserNameChangedType:
+		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
 		if err != nil {
-			return err
+			if !errors.IsNotFound(err) {
+				return err
+			}
+			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			if err != nil {
+				return err
+			}
+			events, err := u.es.FilterEvents(context.Background(), query)
+			if err != nil {
+				return err
+			}
+			user = &view_model.UserView{}
+			for _, e := range events {
+				if err = user.AppendEvent(e); err != nil {
+					return err
+				}
+			}
 		}
 		err = user.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		err = u.fillLoginNames(user)
-	case es_model.UserRemoved:
-		return u.view.DeleteUser(event.AggregateID, event)
+	case user_repo.UserRemovedType:
+		return u.view.DeleteUser(event.AggregateID, event.InstanceID, event)
 	default:
 		return u.view.ProcessedUserSequence(event)
 	}
@@ -174,31 +205,24 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
-	org, err := u.getOrgByID(context.Background(), user.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner, user.InstanceID)
 	if err != nil {
 		return err
 	}
-	policy := org.OrgIamPolicy
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
-	}
-	user.SetLoginNames(policy, org.Domains)
-	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	user.SetLoginNames(userLoginMustBeDomain, domains)
+	user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 	return nil
 }
 
 func (u *User) ProcessOrg(event *es_models.Event) (err error) {
-	switch event.Type {
-	case org_es_model.OrgDomainVerified,
-		org_es_model.OrgDomainRemoved,
-		org_es_model.OrgIAMPolicyAdded,
-		org_es_model.OrgIAMPolicyChanged,
-		org_es_model.OrgIAMPolicyRemoved:
+	switch eventstore.EventType(event.Type) {
+	case org.OrgDomainVerifiedEventType,
+		org.OrgDomainRemovedEventType,
+		org.DomainPolicyAddedEventType,
+		org.DomainPolicyChangedEventType,
+		org.DomainPolicyRemovedEventType:
 		return u.fillLoginNamesOnOrgUsers(event)
-	case org_es_model.OrgDomainPrimarySet:
+	case org.OrgDomainPrimarySetEventType:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
 	default:
 		return u.view.ProcessedUserSequence(event)
@@ -206,48 +230,34 @@ func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 }
 
 func (u *User) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.ResourceOwner, event.InstanceID)
 	if err != nil {
 		return err
 	}
-	policy := org.OrgIamPolicy
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
-	}
-	users, err := u.view.UsersByOrgID(event.AggregateID)
+	users, err := u.view.UsersByOrgID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
 	for _, user := range users {
-		user.SetLoginNames(policy, org.Domains)
+		user.SetLoginNames(userLoginMustBeDomain, domains)
 	}
 	return u.view.PutUsers(users, event)
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner, event.InstanceID)
 	if err != nil {
 		return err
 	}
-	policy := org.OrgIamPolicy
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
-	}
-	if !policy.UserLoginMustBeDomain {
+	if !userLoginMustBeDomain {
 		return nil
 	}
-	users, err := u.view.UsersByOrgID(event.AggregateID)
+	users, err := u.view.UsersByOrgID(event.AggregateID, event.InstanceID)
 	if err != nil {
 		return err
 	}
 	for _, user := range users {
-		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+		user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 	}
 	return u.view.PutUsers(users, event)
 }
@@ -261,8 +271,8 @@ func (u *User) OnSuccess() error {
 	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp)
 }
 
-func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, error) {
-	query, err := view.OrgByIDQuery(orgID, 0)
+func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
+	query, err := view.OrgByIDQuery(orgID, instanceID, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -283,30 +293,17 @@ func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, er
 	return org_es_model.OrgToModel(esOrg), nil
 }
 
-func (u *User) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
-	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
+func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceID string) (userLoginMustBeDomain bool, primaryDomain string, domains []*org_model.OrgDomain, err error) {
+	org, err := u.getOrgByID(ctx, orgID, instanceID)
 	if err != nil {
-		return nil, err
+		return false, "", nil, err
 	}
-	iam := &model.IAM{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID: domain.IAMID,
-		},
+	if org.DomainPolicy == nil {
+		policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
+		if err != nil {
+			return false, "", nil, err
+		}
+		userLoginMustBeDomain = policy.UserLoginMustBeDomain
 	}
-	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
-	if err != nil && errors.IsNotFound(err) && iam.Sequence == 0 {
-		return nil, err
-	}
-	return model.IAMToModel(iam), nil
-}
-
-func (u *User) getDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicy, error) {
-	existingIAM, err := u.getIAMByID(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if existingIAM.DefaultOrgIAMPolicy == nil {
-		return nil, errors.ThrowNotFound(nil, "EVENT-3m9fs", "Errors.IAM.OrgIAMPolicy.NotExisting")
-	}
-	return existingIAM.DefaultOrgIAMPolicy, nil
+	return userLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 }

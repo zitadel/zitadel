@@ -1,21 +1,21 @@
-.wrap {
+.signed-out-wrap {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  .header {
+  .signed-out-header {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 50px;
 
     h1 {
       font-size: 3rem;
     }
 
     p {
-      color: var(--grey);
       text-align: center;
       font-size: 14px;
       margin: 0;
@@ -25,16 +25,6 @@
     img {
       height: 100px;
       max-width: 170px;
-      margin-bottom: 2rem;
-    }
-
-    button {
-      display: block;
-      padding: .5rem 4rem;
-
-      i {
-        margin-left: .5rem;
-      }
     }
   }
 }

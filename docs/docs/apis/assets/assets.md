@@ -12,7 +12,7 @@ title: zitadel/assets
 
 > UploadDefaultLabelPolicyFont()
 
-POST: /iam/policy/label/font
+POST: /instance/policy/label/font
 
  	
 
@@ -20,7 +20,7 @@ POST: /iam/policy/label/font
 
 > GetDefaultLabelPolicyFont()
 
-GET: /iam/policy/label/font
+GET: /instance/policy/label/font
 
  	
 
@@ -28,7 +28,7 @@ GET: /iam/policy/label/font
 
 > GetPreviewDefaultLabelPolicyFont()
 
-GET: /iam/policy/label/font/_preview
+GET: /instance/policy/label/font/_preview
 
  	
 	
@@ -38,13 +38,13 @@ GET: /iam/policy/label/font/_preview
 
 > UploadDefaultLabelPolicyIcon()
 
-POST: /iam/policy/label/icon
+POST: /instance/policy/label/icon
 
 ### UploadDefaultLabelPolicyIcon()
 
 > UploadDefaultLabelPolicyIconDark()
 
-POST: /iam/policy/label/icon/dark
+POST: /instance/policy/label/icon/dark
  	
  	
 
@@ -52,13 +52,13 @@ POST: /iam/policy/label/icon/dark
 
 > GetDefaultLabelPolicyIcon()
 
-GET: /iam/policy/label/icon
+GET: /instance/policy/label/icon
 
 ### GetDefaultLabelPolicyIcon()
 
 > GetDefaultLabelPolicyIconDark()
 
-GET: /iam/policy/label/icon/dark
+GET: /instance/policy/label/icon/dark
  	
  	
 
@@ -66,13 +66,13 @@ GET: /iam/policy/label/icon/dark
 
 > GetPreviewDefaultLabelPolicyIcon()
 
-GET: /iam/policy/label/icon/_preview
+GET: /instance/policy/label/icon/_preview
 
 ### GetPreviewDefaultLabelPolicyIcon()
 
 > GetPreviewDefaultLabelPolicyIconDark()
 
-GET: /iam/policy/label/icon/dark/_preview
+GET: /instance/policy/label/icon/dark/_preview
  	
  	
 	
@@ -82,13 +82,13 @@ GET: /iam/policy/label/icon/dark/_preview
 
 > UploadDefaultLabelPolicyLogo()
 
-POST: /iam/policy/label/logo
+POST: /instance/policy/label/logo
 
 ### UploadDefaultLabelPolicyLogo()
 
 > UploadDefaultLabelPolicyLogoDark()
 
-POST: /iam/policy/label/logo/dark
+POST: /instance/policy/label/logo/dark
  	
  	
 
@@ -96,13 +96,13 @@ POST: /iam/policy/label/logo/dark
 
 > GetDefaultLabelPolicyLogo()
 
-GET: /iam/policy/label/logo
+GET: /instance/policy/label/logo
 
 ### GetDefaultLabelPolicyLogo()
 
 > GetDefaultLabelPolicyLogoDark()
 
-GET: /iam/policy/label/logo/dark
+GET: /instance/policy/label/logo/dark
  	
  	
 
@@ -110,13 +110,13 @@ GET: /iam/policy/label/logo/dark
 
 > GetPreviewDefaultLabelPolicyLogo()
 
-GET: /iam/policy/label/logo/_preview
+GET: /instance/policy/label/logo/_preview
 
 ### GetPreviewDefaultLabelPolicyLogo()
 
 > GetPreviewDefaultLabelPolicyLogoDark()
 
-GET: /iam/policy/label/logo/dark/_preview
+GET: /instance/policy/label/logo/dark/_preview
  	
  	
 	

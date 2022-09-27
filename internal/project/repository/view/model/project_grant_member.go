@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/logging"
-	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/project/model"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/database"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
@@ -25,61 +24,33 @@ const (
 )
 
 type ProjectGrantMemberView struct {
-	UserID             string         `json:"userId" gorm:"column:user_id;primary_key"`
-	GrantID            string         `json:"grantId" gorm:"column:grant_id;primary_key"`
-	ProjectID          string         `json:"-" gorm:"column:project_id"`
-	UserName           string         `json:"-" gorm:"column:user_name"`
-	Email              string         `json:"-" gorm:"column:email_address"`
-	FirstName          string         `json:"-" gorm:"column:first_name"`
-	LastName           string         `json:"-" gorm:"column:last_name"`
-	DisplayName        string         `json:"-" gorm:"column:display_name"`
-	Roles              pq.StringArray `json:"roles" gorm:"column:roles"`
-	Sequence           uint64         `json:"-" gorm:"column:sequence"`
-	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
-	AvatarKey          string         `json:"-" gorm:"column:avatar_key"`
-	UserResourceOwner  string         `json:"-" gorm:"column:user_resource_owner"`
+	UserID             string               `json:"userId" gorm:"column:user_id;primary_key"`
+	GrantID            string               `json:"grantId" gorm:"column:grant_id;primary_key"`
+	ProjectID          string               `json:"-" gorm:"column:project_id"`
+	UserName           string               `json:"-" gorm:"column:user_name"`
+	Email              string               `json:"-" gorm:"column:email_address"`
+	FirstName          string               `json:"-" gorm:"column:first_name"`
+	LastName           string               `json:"-" gorm:"column:last_name"`
+	DisplayName        string               `json:"-" gorm:"column:display_name"`
+	Roles              database.StringArray `json:"roles" gorm:"column:roles"`
+	Sequence           uint64               `json:"-" gorm:"column:sequence"`
+	PreferredLoginName string               `json:"-" gorm:"column:preferred_login_name"`
+	AvatarKey          string               `json:"-" gorm:"column:avatar_key"`
+	UserResourceOwner  string               `json:"-" gorm:"column:user_resource_owner"`
 
 	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
 	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
 }
 
-func ProjectGrantMemberToModel(member *ProjectGrantMemberView, prefixAvatarURL string) *model.ProjectGrantMemberView {
-	return &model.ProjectGrantMemberView{
-		UserID:             member.UserID,
-		GrantID:            member.GrantID,
-		ProjectID:          member.ProjectID,
-		UserName:           member.UserName,
-		Email:              member.Email,
-		FirstName:          member.FirstName,
-		LastName:           member.LastName,
-		DisplayName:        member.DisplayName,
-		PreferredLoginName: member.PreferredLoginName,
-		AvatarURL:          domain.AvatarURL(prefixAvatarURL, member.UserResourceOwner, member.AvatarKey),
-		UserResourceOwner:  member.UserResourceOwner,
-		Roles:              member.Roles,
-		Sequence:           member.Sequence,
-		CreationDate:       member.CreationDate,
-		ChangeDate:         member.ChangeDate,
-	}
-}
-
-func ProjectGrantMembersToModel(roles []*ProjectGrantMemberView, prefixAvatarURL string) []*model.ProjectGrantMemberView {
-	result := make([]*model.ProjectGrantMemberView, len(roles))
-	for i, r := range roles {
-		result[i] = ProjectGrantMemberToModel(r, prefixAvatarURL)
-	}
-	return result
-}
-
 func (r *ProjectGrantMemberView) AppendEvent(event *models.Event) (err error) {
 	r.Sequence = event.Sequence
 	r.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.ProjectGrantMemberAdded:
+	switch eventstore.EventType(event.Type) {
+	case project.GrantMemberAddedType:
 		r.setRootData(event)
 		r.CreationDate = event.CreationDate
 		err = r.SetData(event)
-	case es_model.ProjectGrantMemberChanged:
+	case project.GrantMemberChangedType:
 		err = r.SetData(event)
 	}
 	return err

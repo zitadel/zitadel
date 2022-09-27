@@ -8,9 +8,10 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 var (
@@ -31,6 +32,10 @@ var (
 	}
 	OrgColumnResourceOwner = Column{
 		name:  projection.OrgColumnResourceOwner,
+		table: orgsTable,
+	}
+	OrgColumnInstanceID = Column{
+		name:  projection.OrgColumnInstanceID,
 		table: orgsTable,
 	}
 	OrgColumnState = Column{
@@ -76,15 +81,20 @@ type OrgSearchQueries struct {
 func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (*Org, error) {
+	if shouldTriggerBulk {
+		projection.OrgProjection.Trigger(ctx)
+	}
+
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.identifier(): id,
+		OrgColumnID.identifier():         id,
+		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
@@ -97,7 +107,8 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnDomain.identifier(): domain,
+		OrgColumnDomain.identifier():     domain,
+		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
@@ -108,14 +119,22 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 }
 
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
+	if name == "" && domain == "" {
+		return false, errors.ThrowInvalidArgument(nil, "QUERY-DGqfd", "Errors.Query.InvalidRequest")
+	}
 	query, scan := prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				OrgColumnDomain.identifier(): domain,
+				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
-			sq.Eq{
-				OrgColumnName.identifier(): name,
+			sq.Or{
+				sq.Eq{
+					OrgColumnDomain.identifier(): domain,
+				},
+				sq.Eq{
+					OrgColumnName.identifier(): name,
+				},
 			},
 		}).ToSql()
 	if err != nil {
@@ -127,13 +146,15 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 }
 
 func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
-	_, err = q.OrgByID(ctx, id)
+	_, err = q.OrgByID(ctx, true, id)
 	return err
 }
-
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
 	query, scan := prepareOrgsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.Query.InvalidRequest")
 	}
@@ -156,6 +177,14 @@ func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, 
 
 func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(OrgColumnName, value, method)
+}
+
+func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(OrgColumnID, list, ListIn)
 }
 
 func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {

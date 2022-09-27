@@ -10,25 +10,27 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
+import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { MemberCreateDialogModule } from '../add-member-dialog/member-create-dialog.module';
 import { ProjectMembersRoutingModule } from './project-members-routing.module';
 import { ProjectMembersComponent } from './project-members.component';
 
 @NgModule({
-    declarations: [ProjectMembersComponent],
-    imports: [
-        ProjectMembersRoutingModule,
-        CommonModule,
-        HasRoleModule,
-        MatButtonModule,
-        MatIconModule,
-        MatTooltipModule,
-        TranslateModule,
-        DetailLayoutModule,
-        MatDialogModule,
-        MembersTableModule,
-        HasRolePipeModule,
-        MemberCreateDialogModule,
-    ],
+  declarations: [ProjectMembersComponent],
+  imports: [
+    ProjectMembersRoutingModule,
+    CommonModule,
+    HasRoleModule,
+    MatButtonModule,
+    MatIconModule,
+    ActionKeysModule,
+    MatTooltipModule,
+    TranslateModule,
+    DetailLayoutModule,
+    MatDialogModule,
+    MembersTableModule,
+    HasRolePipeModule,
+    MemberCreateDialogModule,
+  ],
 })
-export class ProjectMembersModule { }
+export class ProjectMembersModule {}

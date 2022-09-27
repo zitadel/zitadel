@@ -1,0 +1,28 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+  <h1>{{t "InitUserDone.Title"}}</h1>
+
+  {{ template "user-profile" . }}
+
+  <p>{{t "InitUserDone.Description"}}</p>
+</div>
+
+<form action="{{ loginUrl }}" method="POST">
+  {{ .CSRF }}
+
+  <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+  <input type="hidden" name="orgID" value="{{ .OrgID }}" />
+
+  <div class="lgn-actions lgn-reverse-order">
+    <button class="lgn-raised-button lgn-primary" type="submit">
+      {{t "InitUserDone.NextButtonText"}}
+    </button>
+    <span class="fill-space"></span>
+    <a class="lgn-stroked-button" href="{{ loginUrl }}">
+      {{t "InitUserDone.CancelButtonText"}}
+    </a>
+  </div>
+</form>
+
+{{template "main-bottom" .}}

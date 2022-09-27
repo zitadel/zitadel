@@ -1,6 +1,10 @@
 package repository
 
-import "github.com/caos/zitadel/internal/errors"
+import (
+	"database/sql"
+
+	"github.com/zitadel/zitadel/internal/errors"
+)
 
 //SearchQuery defines the which and how data are queried
 type SearchQuery struct {
@@ -8,6 +12,7 @@ type SearchQuery struct {
 	Limit   uint64
 	Desc    bool
 	Filters [][]*Filter
+	Tx      *sql.Tx
 }
 
 //Columns defines which fields of the event are needed for the query
@@ -18,6 +23,8 @@ const (
 	ColumnsEvent = iota + 1
 	//ColumnsMaxSequence represents the latest sequence of the filtered events
 	ColumnsMaxSequence
+	// ColumnsInstanceIDs represents the instance ids of the filtered events
+	ColumnsInstanceIDs
 
 	columnsCount
 )
@@ -50,6 +57,8 @@ const (
 	OperationIn
 	//OperationJSONContains checks if a stored value matches the given json
 	OperationJSONContains
+	//OperationNotIn checks if a stored value does not match one of the passed value list
+	OperationNotIn
 
 	operationCount
 )
@@ -66,6 +75,8 @@ const (
 	FieldSequence
 	//FieldResourceOwner represents the resource owner field
 	FieldResourceOwner
+	//FieldInstanceID represents the instance id field
+	FieldInstanceID
 	//FieldEditorService represents the editor service field
 	FieldEditorService
 	//FieldEditorUser represents the editor user field
@@ -74,6 +85,8 @@ const (
 	FieldEventType
 	//FieldEventData represents the event data field
 	FieldEventData
+	//FieldCreationDate represents the creation date field
+	FieldCreationDate
 
 	fieldCount
 )

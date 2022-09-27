@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
 
 import { PolicyComponentServiceType } from '../modules/policies/policy-component-types.enum';
 import { Theme } from '../modules/policies/private-labeling-policy/private-labeling-policy.component';
@@ -17,23 +18,23 @@ export enum AssetType {
 }
 
 export enum AssetEndpoint {
-  IAMFONT = 'iam/policy/label/font',
+  IAMFONT = 'instance/policy/label/font',
   MGMTFONT = 'org/policy/label/font',
 
-  IAMDARKLOGO = 'iam/policy/label/logo/dark',
-  IAMLOGO = 'iam/policy/label/logo',
-  IAMDARKICON = 'iam/policy/label/icon/dark',
-  IAMICON = 'iam/policy/label/icon',
+  IAMDARKLOGO = 'instance/policy/label/logo/dark',
+  IAMLOGO = 'instance/policy/label/logo',
+  IAMDARKICON = 'instance/policy/label/icon/dark',
+  IAMICON = 'instance/policy/label/icon',
 
   MGMTDARKLOGO = 'org/policy/label/logo/dark',
   MGMTLOGO = 'org/policy/label/logo',
   MGMTDARKICON = 'org/policy/label/icon/dark',
   MGMTICON = 'org/policy/label/icon',
 
-  IAMDARKLOGOPREVIEW = 'iam/policy/label/logo/dark/_preview',
-  IAMLOGOPREVIEW = 'iam/policy/label/logo/_preview',
-  IAMDARKICONPREVIEW = 'iam/policy/label/icon/dark/_preview',
-  IAMICONPREVIEW = 'iam/policy/label/icon/_preview',
+  IAMDARKLOGOPREVIEW = 'instance/policy/label/logo/dark/_preview',
+  IAMLOGOPREVIEW = 'instance/policy/label/logo/_preview',
+  IAMDARKICONPREVIEW = 'instance/policy/label/icon/dark/_preview',
+  IAMICONPREVIEW = 'instance/policy/label/icon/_preview',
 
   MGMTDARKLOGOPREVIEW = 'org/policy/label/logo/dark/_preview',
   MGMTLOGOPREVIEW = 'org/policy/label/logo/_preview',
@@ -80,13 +81,13 @@ export class AssetService {
   }
 
   private async getServiceUrl(): Promise<string> {
-    const url = await this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
-        if (data && data.assetServiceUrl) {
-          console.log(data.assetServiceUrl);
-          return data.assetServiceUrl;
+    const url = await lastValueFrom(this.http.get('./assets/environment.json'))
+      .then((data: any) => {
+        if (data && data.api) {
+          return data.api;
         }
-      }).catch(error => {
+      })
+      .catch((error) => {
         console.error(error);
       });
 
@@ -103,29 +104,11 @@ export class AssetService {
     }
 
     return this.serviceUrl.then((url) =>
-      this.http.post(`${url}/assets/v1/${endpoint}`,
-        body,
-        {
+      this.http
+        .post(`${url}/assets/v1/${endpoint}`, body, {
           headers: headers,
-        }).toPromise(),
-    );
-  }
-
-  public load(endpoint: string, orgId?: string): Promise<any> {
-    const headers: any = {
-      [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
-    };
-
-    if (orgId) {
-      headers[orgKey] = `${orgId}`;
-    }
-
-    return this.serviceUrl.then((url) =>
-      this.http.get(`${url}/assets/v1/${endpoint}`,
-        {
-          responseType: 'blob',
-          headers: headers,
-        }).toPromise(),
+        })
+        .toPromise(),
     );
   }
 }

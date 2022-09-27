@@ -1,0 +1,247 @@
+@mixin project-grid-theme($theme) {
+  $foreground: map-get($theme, foreground);
+
+  .view-toggle {
+    border-bottom: 1px solid map-get($foreground, divider);
+  }
+}
+
+.view-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 0.5rem;
+
+  .anim-list {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  button {
+    &.left-button {
+      margin-right: 1rem;
+    }
+  }
+}
+
+.grid-main-container {
+  position: relative;
+
+  .loading-sp-wrapper {
+    display: block;
+    margin: 1rem 0.5rem 0 0.5rem;
+  }
+
+  .owned-project-grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -1rem;
+    box-sizing: border-box;
+
+    h2 {
+      padding: 0 1rem;
+      flex-basis: 100%;
+    }
+
+    .item {
+      position: relative;
+      z-index: 100;
+      margin: 1rem;
+      flex-basis: 270px;
+      display: flex;
+      text-decoration: none;
+      cursor: pointer;
+      padding-top: 0;
+      padding-right: 0;
+      padding-bottom: 0;
+      padding-left: 1rem;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      min-height: 166px;
+      transition: box-shadow 0.1s ease-in;
+
+      img {
+        height: 50px;
+        width: 50px;
+        margin: 1rem;
+      }
+
+      .text-part {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 70px;
+        padding: 0.5rem 1rem 0 0;
+
+        .top {
+          font-size: 0.8rem;
+          margin-bottom: 0;
+          margin-top: 0.5rem;
+        }
+
+        .name-row {
+          display: flex;
+          align-items: center;
+          margin: 1rem 0 0.5rem 0;
+
+          .name {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+          }
+
+          .state-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+
+            &.active {
+              background-color: var(--success);
+            }
+
+            &.inactive {
+              background-color: var(--warn);
+            }
+          }
+        }
+
+        .description {
+          font-size: 0.8rem;
+        }
+
+        .owning-org {
+          font-size: 0.8rem;
+        }
+
+        .created {
+          font-size: 0.8rem;
+        }
+
+        .organization {
+          display: flex;
+          align-items: center;
+          margin-top: 1rem;
+
+          .org_avatar {
+            height: 25px;
+            width: 25px;
+            border-radius: 50%;
+            margin: 0;
+            margin-right: 1rem;
+          }
+        }
+
+        .fill-space {
+          flex: 1;
+        }
+
+        span {
+          margin: 2px 0;
+        }
+      }
+
+      .delete-button {
+        opacity: 0;
+        user-select: none;
+        position: absolute;
+        bottom: 0;
+        right: 30px;
+        margin: 0;
+        margin-bottom: 0.25rem;
+
+        &:not(:hover) {
+          color: #8795a1;
+        }
+      }
+
+      .edit-button {
+        opacity: 0;
+        user-select: none;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        margin: 0;
+        margin-bottom: 0.25rem;
+
+        &:not(:hover) {
+          color: var(--grey);
+        }
+
+        &.selected {
+          opacity: 1;
+        }
+      }
+
+      &:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+
+        .delete-button,
+        .edit-button {
+          opacity: 1;
+        }
+      }
+
+      &.selected {
+        .delete-button,
+        .edit-button {
+          opacity: 1;
+        }
+
+        .icon {
+          opacity: 1;
+        }
+      }
+
+      @media only screen and (max-width: 450px) {
+        flex-basis: 100%;
+      }
+    }
+
+    .add-project-button {
+      z-index: 100;
+      flex-basis: 270px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 166px;
+      border-radius: 0.5rem;
+      margin: 1rem;
+      box-sizing: border-box;
+      transition: box-shadow 0.1s ease-in;
+
+      .icon {
+        display: flex;
+        justify-content: center;
+        align-self: center;
+        margin-bottom: 1rem;
+        height: 2.5rem;
+        line-height: 2.5rem;
+        font-size: 2.5rem;
+      }
+
+      &:hover {
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+
+        .icon,
+        span {
+          &.disabled {
+            color: gray;
+          }
+        }
+      }
+
+      @media only screen and (max-width: 450px) {
+        flex-basis: 100%;
+      }
+    }
+  }
+}
+
+.n-items {
+  padding: 0 1rem;
+  font-size: 0.8rem;
+  flex-basis: 100%;
+}

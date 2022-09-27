@@ -32,6 +32,306 @@ Returns the default languages
     GET: /languages
 
 
+### SetDefaultLanguage
+
+> **rpc** SetDefaultLanguage([SetDefaultLanguageRequest](#setdefaultlanguagerequest))
+[SetDefaultLanguageResponse](#setdefaultlanguageresponse)
+
+Set the default language
+
+
+
+    PUT: /languages/default/{language}
+
+
+### GetDefaultLanguage
+
+> **rpc** GetDefaultLanguage([GetDefaultLanguageRequest](#getdefaultlanguagerequest))
+[GetDefaultLanguageResponse](#getdefaultlanguageresponse)
+
+Set the default language
+
+
+
+    GET: /languages/default
+
+
+### GetMyInstance
+
+> **rpc** GetMyInstance([GetMyInstanceRequest](#getmyinstancerequest))
+[GetMyInstanceResponse](#getmyinstanceresponse)
+
+Returns the details of the instance
+
+
+
+    GET: /instances/me
+
+
+### ListInstanceDomains
+
+> **rpc** ListInstanceDomains([ListInstanceDomainsRequest](#listinstancedomainsrequest))
+[ListInstanceDomainsResponse](#listinstancedomainsresponse)
+
+Returns the domains of the instance
+
+
+
+    POST: /domains/_search
+
+
+### ListSecretGenerators
+
+> **rpc** ListSecretGenerators([ListSecretGeneratorsRequest](#listsecretgeneratorsrequest))
+[ListSecretGeneratorsResponse](#listsecretgeneratorsresponse)
+
+Set the default language
+
+
+
+    POST: /secretgenerators/_search
+
+
+### GetSecretGenerator
+
+> **rpc** GetSecretGenerator([GetSecretGeneratorRequest](#getsecretgeneratorrequest))
+[GetSecretGeneratorResponse](#getsecretgeneratorresponse)
+
+Get Secret Generator by type (e.g PasswordResetCode)
+
+
+
+    GET: /secretgenerators/{generator_type}
+
+
+### UpdateSecretGenerator
+
+> **rpc** UpdateSecretGenerator([UpdateSecretGeneratorRequest](#updatesecretgeneratorrequest))
+[UpdateSecretGeneratorResponse](#updatesecretgeneratorresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /secretgenerators/{generator_type}
+
+
+### GetSMTPConfig
+
+> **rpc** GetSMTPConfig([GetSMTPConfigRequest](#getsmtpconfigrequest))
+[GetSMTPConfigResponse](#getsmtpconfigresponse)
+
+Get system smtp configuration
+
+
+
+    GET: /smtp
+
+
+### AddSMTPConfig
+
+> **rpc** AddSMTPConfig([AddSMTPConfigRequest](#addsmtpconfigrequest))
+[AddSMTPConfigResponse](#addsmtpconfigresponse)
+
+Add system smtp configuration
+
+
+
+    POST: /smtp
+
+
+### UpdateSMTPConfig
+
+> **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
+[UpdateSMTPConfigResponse](#updatesmtpconfigresponse)
+
+Update system smtp configuration
+
+
+
+    PUT: /smtp
+
+
+### UpdateSMTPConfigPassword
+
+> **rpc** UpdateSMTPConfigPassword([UpdateSMTPConfigPasswordRequest](#updatesmtpconfigpasswordrequest))
+[UpdateSMTPConfigPasswordResponse](#updatesmtpconfigpasswordresponse)
+
+Update system smtp configuration password for host
+
+
+
+    PUT: /smtp/password
+
+
+### RemoveSMTPConfig
+
+> **rpc** RemoveSMTPConfig([RemoveSMTPConfigRequest](#removesmtpconfigrequest))
+[RemoveSMTPConfigResponse](#removesmtpconfigresponse)
+
+Remove system smtp configuration
+
+
+
+    DELETE: /smtp
+
+
+### ListSMSProviders
+
+> **rpc** ListSMSProviders([ListSMSProvidersRequest](#listsmsprovidersrequest))
+[ListSMSProvidersResponse](#listsmsprovidersresponse)
+
+list sms provider configurations
+
+
+
+    POST: /sms/_search
+
+
+### GetSMSProvider
+
+> **rpc** GetSMSProvider([GetSMSProviderRequest](#getsmsproviderrequest))
+[GetSMSProviderResponse](#getsmsproviderresponse)
+
+Get sms provider
+
+
+
+    GET: /sms/{id}
+
+
+### AddSMSProviderTwilio
+
+> **rpc** AddSMSProviderTwilio([AddSMSProviderTwilioRequest](#addsmsprovidertwiliorequest))
+[AddSMSProviderTwilioResponse](#addsmsprovidertwilioresponse)
+
+Add twilio sms provider
+
+
+
+    POST: /sms/twilio
+
+
+### UpdateSMSProviderTwilio
+
+> **rpc** UpdateSMSProviderTwilio([UpdateSMSProviderTwilioRequest](#updatesmsprovidertwiliorequest))
+[UpdateSMSProviderTwilioResponse](#updatesmsprovidertwilioresponse)
+
+Update twilio sms provider
+
+
+
+    PUT: /sms/twilio/{id}
+
+
+### UpdateSMSProviderTwilioToken
+
+> **rpc** UpdateSMSProviderTwilioToken([UpdateSMSProviderTwilioTokenRequest](#updatesmsprovidertwiliotokenrequest))
+[UpdateSMSProviderTwilioTokenResponse](#updatesmsprovidertwiliotokenresponse)
+
+Update twilio sms provider token
+
+
+
+    PUT: /sms/twilio/{id}/token
+
+
+### ActivateSMSProvider
+
+> **rpc** ActivateSMSProvider([ActivateSMSProviderRequest](#activatesmsproviderrequest))
+[ActivateSMSProviderResponse](#activatesmsproviderresponse)
+
+Activate sms provider
+
+
+
+    POST: /sms/{id}/_activate
+
+
+### DeactivateSMSProvider
+
+> **rpc** DeactivateSMSProvider([DeactivateSMSProviderRequest](#deactivatesmsproviderrequest))
+[DeactivateSMSProviderResponse](#deactivatesmsproviderresponse)
+
+Deactivate sms provider
+
+
+
+    POST: /sms/{id}/_deactivate
+
+
+### RemoveSMSProvider
+
+> **rpc** RemoveSMSProvider([RemoveSMSProviderRequest](#removesmsproviderrequest))
+[RemoveSMSProviderResponse](#removesmsproviderresponse)
+
+Remove sms provider token
+
+
+
+    DELETE: /sms/{id}
+
+
+### GetOIDCSettings
+
+> **rpc** GetOIDCSettings([GetOIDCSettingsRequest](#getoidcsettingsrequest))
+[GetOIDCSettingsResponse](#getoidcsettingsresponse)
+
+Get OIDC settings (e.g token lifetimes, etc.)
+
+
+
+    GET: /settings/oidc
+
+
+### AddOIDCSettings
+
+> **rpc** AddOIDCSettings([AddOIDCSettingsRequest](#addoidcsettingsrequest))
+[AddOIDCSettingsResponse](#addoidcsettingsresponse)
+
+Add oidc settings (e.g token lifetimes, etc)
+
+
+
+    POST: /settings/oidc
+
+
+### UpdateOIDCSettings
+
+> **rpc** UpdateOIDCSettings([UpdateOIDCSettingsRequest](#updateoidcsettingsrequest))
+[UpdateOIDCSettingsResponse](#updateoidcsettingsresponse)
+
+Update oidc settings (e.g token lifetimes, etc)
+
+
+
+    PUT: /settings/oidc
+
+
+### GetFileSystemNotificationProvider
+
+> **rpc** GetFileSystemNotificationProvider([GetFileSystemNotificationProviderRequest](#getfilesystemnotificationproviderrequest))
+[GetFileSystemNotificationProviderResponse](#getfilesystemnotificationproviderresponse)
+
+Get file system notification provider
+
+
+
+    GET: /notification/provider/file
+
+
+### GetLogNotificationProvider
+
+> **rpc** GetLogNotificationProvider([GetLogNotificationProviderRequest](#getlognotificationproviderrequest))
+[GetLogNotificationProviderResponse](#getlognotificationproviderresponse)
+
+Get log notification provider
+
+
+
+    GET: /notification/provider/log
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -56,6 +356,30 @@ Checks whether an organisation exists by the given parameters
     GET: /orgs/_is_unique
 
 
+### SetDefaultOrg
+
+> **rpc** SetDefaultOrg([SetDefaultOrgRequest](#setdefaultorgrequest))
+[SetDefaultOrgResponse](#setdefaultorgresponse)
+
+Set the default org
+
+
+
+    PUT: /orgs/default/{org_id}
+
+
+### GetDefaultOrg
+
+> **rpc** GetDefaultOrg([GetDefaultOrgRequest](#getdefaultorgrequest))
+[GetDefaultOrgResponse](#getdefaultorgresponse)
+
+Set the default org
+
+
+
+    GET: /orgs/default
+
+
 ### ListOrgs
 
 > **rpc** ListOrgs([ListOrgsRequest](#listorgsrequest))
@@ -74,7 +398,7 @@ all queries need to match (AND)
 > **rpc** SetUpOrg([SetUpOrgRequest](#setuporgrequest))
 [SetUpOrgResponse](#setuporgresponse)
 
-Creates a new org and user 
+Creates a new org and user
 and adds the user to the orgs members as ORG_OWNER
 
 
@@ -87,7 +411,7 @@ and adds the user to the orgs members as ORG_OWNER
 > **rpc** GetIDPByID([GetIDPByIDRequest](#getidpbyidrequest))
 [GetIDPByIDResponse](#getidpbyidresponse)
 
-Returns a identity provider configuration of the IAM
+Returns a identity provider configuration of the IAM instance
 
 
 
@@ -99,7 +423,7 @@ Returns a identity provider configuration of the IAM
 > **rpc** ListIDPs([ListIDPsRequest](#listidpsrequest))
 [ListIDPsResponse](#listidpsresponse)
 
-Returns all identity provider configurations of the IAM
+Returns all identity provider configurations of the IAM instance
 
 
 
@@ -111,7 +435,7 @@ Returns all identity provider configurations of the IAM
 > **rpc** AddOIDCIDP([AddOIDCIDPRequest](#addoidcidprequest))
 [AddOIDCIDPResponse](#addoidcidpresponse)
 
-Adds a new oidc identity provider configuration the IAM
+Adds a new oidc identity provider configuration the IAM instance
 
 
 
@@ -123,7 +447,7 @@ Adds a new oidc identity provider configuration the IAM
 > **rpc** AddJWTIDP([AddJWTIDPRequest](#addjwtidprequest))
 [AddJWTIDPResponse](#addjwtidpresponse)
 
-Adds a new jwt identity provider configuration the IAM
+Adds a new jwt identity provider configuration the IAM instance
 
 
 
@@ -207,72 +531,13 @@ all fields are updated. If no value is provided the field will be empty afterwar
     PUT: /idps/{idp_id}/jwt_config
 
 
-### GetDefaultFeatures
-
-> **rpc** GetDefaultFeatures([GetDefaultFeaturesRequest](#getdefaultfeaturesrequest))
-[GetDefaultFeaturesResponse](#getdefaultfeaturesresponse)
-
-
-
-
-
-    GET: /features
-
-
-### SetDefaultFeatures
-
-> **rpc** SetDefaultFeatures([SetDefaultFeaturesRequest](#setdefaultfeaturesrequest))
-[SetDefaultFeaturesResponse](#setdefaultfeaturesresponse)
-
-
-
-
-
-    PUT: /features
-
-
-### GetOrgFeatures
-
-> **rpc** GetOrgFeatures([GetOrgFeaturesRequest](#getorgfeaturesrequest))
-[GetOrgFeaturesResponse](#getorgfeaturesresponse)
-
-
-
-
-
-    GET: /orgs/{org_id}/features
-
-
-### SetOrgFeatures
-
-> **rpc** SetOrgFeatures([SetOrgFeaturesRequest](#setorgfeaturesrequest))
-[SetOrgFeaturesResponse](#setorgfeaturesresponse)
-
-
-
-
-
-    PUT: /orgs/{org_id}/features
-
-
-### ResetOrgFeatures
-
-> **rpc** ResetOrgFeatures([ResetOrgFeaturesRequest](#resetorgfeaturesrequest))
-[ResetOrgFeaturesResponse](#resetorgfeaturesresponse)
-
-
-
-
-
-    DELETE: /orgs/{org_id}/features
-
-
 ### GetOrgIAMPolicy
 
 > **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
 [GetOrgIAMPolicyResponse](#getorgiampolicyresponse)
 
-Returns the IAM policy defined by the administrators of ZITADEL
+deprecated: please use DomainPolicy instead
+Returns the Org IAM policy defined by the administrators of ZITADEL
 
 
 
@@ -284,7 +549,8 @@ Returns the IAM policy defined by the administrators of ZITADEL
 > **rpc** UpdateOrgIAMPolicy([UpdateOrgIAMPolicyRequest](#updateorgiampolicyrequest))
 [UpdateOrgIAMPolicyResponse](#updateorgiampolicyresponse)
 
-Updates the default IAM policy.
+deprecated: please use DomainPolicy instead
+Updates the default OrgIAM policy.
 it impacts all organisations without a customised policy
 
 
@@ -297,6 +563,7 @@ it impacts all organisations without a customised policy
 > **rpc** GetCustomOrgIAMPolicy([GetCustomOrgIAMPolicyRequest](#getcustomorgiampolicyrequest))
 [GetCustomOrgIAMPolicyResponse](#getcustomorgiampolicyresponse)
 
+deprecated: please use DomainPolicy instead
 Returns the customised policy or the default if not customised
 
 
@@ -309,7 +576,8 @@ Returns the customised policy or the default if not customised
 > **rpc** AddCustomOrgIAMPolicy([AddCustomOrgIAMPolicyRequest](#addcustomorgiampolicyrequest))
 [AddCustomOrgIAMPolicyResponse](#addcustomorgiampolicyresponse)
 
-Defines a custom ORGIAM policy as specified
+deprecated: please use DomainPolicy instead
+Defines a custom OrgIAM policy as specified
 
 
 
@@ -321,7 +589,8 @@ Defines a custom ORGIAM policy as specified
 > **rpc** UpdateCustomOrgIAMPolicy([UpdateCustomOrgIAMPolicyRequest](#updatecustomorgiampolicyrequest))
 [UpdateCustomOrgIAMPolicyResponse](#updatecustomorgiampolicyresponse)
 
-Updates a custom ORGIAM policy as specified
+deprecated: please use DomainPolicy instead
+Updates a custom OrgIAM policy as specified
 
 
 
@@ -333,12 +602,87 @@ Updates a custom ORGIAM policy as specified
 > **rpc** ResetCustomOrgIAMPolicyToDefault([ResetCustomOrgIAMPolicyToDefaultRequest](#resetcustomorgiampolicytodefaultrequest))
 [ResetCustomOrgIAMPolicyToDefaultResponse](#resetcustomorgiampolicytodefaultresponse)
 
+deprecated: please use DomainPolicy instead
 Resets the org iam policy of the organisation to default
 ZITADEL will fallback to the default policy defined by the ZITADEL administrators
 
 
 
     DELETE: /orgs/{org_id}/policies/orgiam
+
+
+### GetDomainPolicy
+
+> **rpc** GetDomainPolicy([GetDomainPolicyRequest](#getdomainpolicyrequest))
+[GetDomainPolicyResponse](#getdomainpolicyresponse)
+
+Returns the Domain policy defined by the administrators of ZITADEL
+
+
+
+    GET: /policies/domain
+
+
+### UpdateDomainPolicy
+
+> **rpc** UpdateDomainPolicy([UpdateDomainPolicyRequest](#updatedomainpolicyrequest))
+[UpdateDomainPolicyResponse](#updatedomainpolicyresponse)
+
+Updates the default Domain policy.
+it impacts all organisations without a customised policy
+
+
+
+    PUT: /policies/domain
+
+
+### GetCustomDomainPolicy
+
+> **rpc** GetCustomDomainPolicy([GetCustomDomainPolicyRequest](#getcustomdomainpolicyrequest))
+[GetCustomDomainPolicyResponse](#getcustomdomainpolicyresponse)
+
+Returns the customised policy or the default if not customised
+
+
+
+    GET: /orgs/{org_id}/policies/domain
+
+
+### AddCustomDomainPolicy
+
+> **rpc** AddCustomDomainPolicy([AddCustomDomainPolicyRequest](#addcustomdomainpolicyrequest))
+[AddCustomDomainPolicyResponse](#addcustomdomainpolicyresponse)
+
+Defines a custom Domain policy as specified
+
+
+
+    POST: /orgs/{org_id}/policies/domain
+
+
+### UpdateCustomDomainPolicy
+
+> **rpc** UpdateCustomDomainPolicy([UpdateCustomDomainPolicyRequest](#updatecustomdomainpolicyrequest))
+[UpdateCustomDomainPolicyResponse](#updatecustomdomainpolicyresponse)
+
+Updates a custom Domain policy as specified
+
+
+
+    PUT: /orgs/{org_id}/policies/domain
+
+
+### ResetCustomDomainPolicyToDefault
+
+> **rpc** ResetCustomDomainPolicyToDefault([ResetCustomDomainPolicyToDefaultRequest](#resetcustomdomainpolicytodefaultrequest))
+[ResetCustomDomainPolicyToDefaultResponse](#resetcustomdomainpolicytodefaultresponse)
+
+Resets the org iam policy of the organisation to default
+ZITADEL will fallback to the default policy defined by the ZITADEL administrators
+
+
+
+    DELETE: /orgs/{org_id}/policies/domain
 
 
 ### GetLabelPolicy
@@ -684,6 +1028,7 @@ Returns the privacy policy defined by the administrators of ZITADEL
 
 Updates the default privacy policy of ZITADEL
 it impacts all organisations without a customised policy
+Variable {{.Lang}} can be set to have different links based on the language
 
 
 
@@ -729,6 +1074,19 @@ The Following Variables can be used:
     PUT: /text/message/init/{language}
 
 
+### ResetCustomInitMessageTextToDefault
+
+> **rpc** ResetCustomInitMessageTextToDefault([ResetCustomInitMessageTextToDefaultRequest](#resetcustominitmessagetexttodefaultrequest))
+[ResetCustomInitMessageTextToDefaultResponse](#resetcustominitmessagetexttodefaultresponse)
+
+Removes the custom init message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/init/{language}
+
+
 ### GetDefaultPasswordResetMessageText
 
 > **rpc** GetDefaultPasswordResetMessageText([GetDefaultPasswordResetMessageTextRequest](#getdefaultpasswordresetmessagetextrequest))
@@ -766,6 +1124,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/passwordreset/{language}
+
+
+### ResetCustomPasswordResetMessageTextToDefault
+
+> **rpc** ResetCustomPasswordResetMessageTextToDefault([ResetCustomPasswordResetMessageTextToDefaultRequest](#resetcustompasswordresetmessagetexttodefaultrequest))
+[ResetCustomPasswordResetMessageTextToDefaultResponse](#resetcustompasswordresetmessagetexttodefaultresponse)
+
+Removes the custom password reset message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyemail/{language}
 
 
 ### GetDefaultVerifyEmailMessageText
@@ -807,6 +1178,19 @@ The Following Variables can be used:
     PUT: /text/message/verifyemail/{language}
 
 
+### ResetCustomVerifyEmailMessageTextToDefault
+
+> **rpc** ResetCustomVerifyEmailMessageTextToDefault([ResetCustomVerifyEmailMessageTextToDefaultRequest](#resetcustomverifyemailmessagetexttodefaultrequest))
+[ResetCustomVerifyEmailMessageTextToDefaultResponse](#resetcustomverifyemailmessagetexttodefaultresponse)
+
+Removes the custom verify email message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyemail/{language}
+
+
 ### GetDefaultVerifyPhoneMessageText
 
 > **rpc** GetDefaultVerifyPhoneMessageText([GetDefaultVerifyPhoneMessageTextRequest](#getdefaultverifyphonemessagetextrequest))
@@ -844,6 +1228,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/verifyphone/{language}
+
+
+### ResetCustomVerifyPhoneMessageTextToDefault
+
+> **rpc** ResetCustomVerifyPhoneMessageTextToDefault([ResetCustomVerifyPhoneMessageTextToDefaultRequest](#resetcustomverifyphonemessagetexttodefaultrequest))
+[ResetCustomVerifyPhoneMessageTextToDefaultResponse](#resetcustomverifyphonemessagetexttodefaultresponse)
+
+Removes the custom verify phone text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyphone/{language}
 
 
 ### GetDefaultDomainClaimedMessageText
@@ -885,6 +1282,19 @@ The Following Variables can be used:
     PUT: /text/message/domainclaimed/{language}
 
 
+### ResetCustomDomainClaimedMessageTextToDefault
+
+> **rpc** ResetCustomDomainClaimedMessageTextToDefault([ResetCustomDomainClaimedMessageTextToDefaultRequest](#resetcustomdomainclaimedmessagetexttodefaultrequest))
+[ResetCustomDomainClaimedMessageTextToDefaultResponse](#resetcustomdomainclaimedmessagetexttodefaultresponse)
+
+Removes the custom domain claimed message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/domainclaimed/{language}
+
+
 ### GetDefaultPasswordlessRegistrationMessageText
 
 > **rpc** GetDefaultPasswordlessRegistrationMessageText([GetDefaultPasswordlessRegistrationMessageTextRequest](#getdefaultpasswordlessregistrationmessagetextrequest))
@@ -922,6 +1332,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/passwordless_registration/{language}
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefault
+
+> **rpc** ResetCustomPasswordlessRegistrationMessageTextToDefault([ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest](#resetcustompasswordlessregistrationmessagetexttodefaultrequest))
+[ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse](#resetcustompasswordlessregistrationmessagetexttodefaultresponse)
+
+Removes the custom passwordless link message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/passwordless_registration/{language}
 
 
 ### GetDefaultLoginTexts
@@ -1052,28 +1475,13 @@ they represent the delta of the event happend on the objects
     POST: /views/_search
 
 
-### ClearView
-
-> **rpc** ClearView([ClearViewRequest](#clearviewrequest))
-[ClearViewResponse](#clearviewresponse)
-
-Truncates the delta of the change stream
-be carefull with this function because ZITADEL has to 
-recompute the deltas after they got cleared. 
-Search requests will return wrong results until all deltas are recomputed
-
-
-
-    POST: /views/{database}/{view_name}
-
-
 ### ListFailedEvents
 
 > **rpc** ListFailedEvents([ListFailedEventsRequest](#listfailedeventsrequest))
 [ListFailedEventsResponse](#listfailedeventsresponse)
 
 Returns event descriptions which cannot be processed.
-It's possible that some events need some retries. 
+It's possible that some events need some retries.
 For example if the SMTP-API wasn't able to send an email at the first time
 
 
@@ -1088,13 +1496,37 @@ For example if the SMTP-API wasn't able to send an email at the first time
 
 Deletes the event from failed events view.
 the event is not removed from the change stream
-This call is usefull if the system was able to process the event later. 
+This call is usefull if the system was able to process the event later.
 e.g. if the second try of sending an email was successful. the first try produced a
 failed event. You can find out if it worked on the `failure_count`
 
 
 
     DELETE: /failedevents/{database}/{view_name}/{failed_sequence}
+
+
+### ImportData
+
+> **rpc** ImportData([ImportDataRequest](#importdatarequest))
+[ImportDataResponse](#importdataresponse)
+
+Imports data into instance and creates different objects
+
+
+
+    POST: /import
+
+
+### ExportData
+
+> **rpc** ExportData([ExportDataRequest](#exportdatarequest))
+[ExportDataResponse](#exportdataresponse)
+
+Exports data from instance
+
+
+
+    POST: /export
 
 
 
@@ -1112,6 +1544,53 @@ This is an empty request
 
 
 ### ActivateLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ActivateSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ActivateSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddCustomDomainPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_login_must_be_domain |  bool | the username has to end with the domain of it's organisation (uniqueness is organisation based) |  |
+| validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
+
+
+
+
+### AddCustomDomainPolicyResponse
 
 
 
@@ -1272,6 +1751,83 @@ This is an empty request
 
 
 
+### AddOIDCSettingsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| access_token_lifetime |  google.protobuf.Duration | - |  |
+| id_token_lifetime |  google.protobuf.Duration | - |  |
+| refresh_token_idle_expiration |  google.protobuf.Duration | - |  |
+| refresh_token_expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### AddOIDCSettingsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### AddSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
+| password |  string | - |  |
+
+
+
+
+### AddSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -1294,20 +1850,45 @@ This is an empty request
 
 
 
-### ClearViewRequest
+### DataOrg
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| database |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| view_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### ClearViewResponse
-This is an empty response
+| org_id |  string | - |  |
+| org |  zitadel.management.v1.AddOrgRequest | - |  |
+| domain_policy |  AddCustomDomainPolicyRequest | - |  |
+| label_policy |  zitadel.management.v1.AddCustomLabelPolicyRequest | - |  |
+| lockout_policy |  zitadel.management.v1.AddCustomLockoutPolicyRequest | - |  |
+| login_policy |  zitadel.management.v1.AddCustomLoginPolicyRequest | - |  |
+| password_complexity_policy |  zitadel.management.v1.AddCustomPasswordComplexityPolicyRequest | - |  |
+| privacy_policy |  zitadel.management.v1.AddCustomPrivacyPolicyRequest | - |  |
+| projects | repeated zitadel.v1.v1.DataProject | - |  |
+| project_roles | repeated zitadel.management.v1.AddProjectRoleRequest | - |  |
+| api_apps | repeated zitadel.v1.v1.DataAPIApplication | - |  |
+| oidc_apps | repeated zitadel.v1.v1.DataOIDCApplication | - |  |
+| human_users | repeated zitadel.v1.v1.DataHumanUser | - |  |
+| machine_users | repeated zitadel.v1.v1.DataMachineUser | - |  |
+| trigger_actions | repeated zitadel.management.v1.SetTriggerActionsRequest | - |  |
+| actions | repeated zitadel.v1.v1.DataAction | - |  |
+| project_grants | repeated zitadel.v1.v1.DataProjectGrant | - |  |
+| user_grants | repeated zitadel.management.v1.AddUserGrantRequest | - |  |
+| org_members | repeated zitadel.management.v1.AddOrgMemberRequest | - |  |
+| project_members | repeated zitadel.management.v1.AddProjectMemberRequest | - |  |
+| project_grant_members | repeated zitadel.management.v1.AddProjectGrantMemberRequest | - |  |
+| user_metadata | repeated zitadel.management.v1.SetUserMetadataRequest | - |  |
+| login_texts | repeated zitadel.management.v1.SetCustomLoginTextsRequest | - |  |
+| init_messages | repeated zitadel.management.v1.SetCustomInitMessageTextRequest | - |  |
+| password_reset_messages | repeated zitadel.management.v1.SetCustomPasswordResetMessageTextRequest | - |  |
+| verify_email_messages | repeated zitadel.management.v1.SetCustomVerifyEmailMessageTextRequest | - |  |
+| verify_phone_messages | repeated zitadel.management.v1.SetCustomVerifyPhoneMessageTextRequest | - |  |
+| domain_claimed_messages | repeated zitadel.management.v1.SetCustomDomainClaimedMessageTextRequest | - |  |
+| passwordless_registration_messages | repeated zitadel.management.v1.SetCustomPasswordlessRegistrationMessageTextRequest | - |  |
+| oidc_idps | repeated zitadel.v1.v1.DataOIDCIDP | - |  |
+| jwt_idps | repeated zitadel.v1.v1.DataJWTIDP | - |  |
+| user_links | repeated zitadel.idp.v1.IDPUserLink | - |  |
+| domains | repeated zitadel.org.v1.Domain | - |  |
 
 
 
@@ -1330,6 +1911,98 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### DeactivateSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### DeactivateSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ExportDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_ids | repeated string | - |  |
+| excluded_org_ids | repeated string | - |  |
+| with_passwords |  bool | - |  |
+| with_otp |  bool | - |  |
+| response_output |  bool | - |  |
+| local_output |  ExportDataRequest.LocalOutput | - |  |
+| s3_output |  ExportDataRequest.S3Output | - |  |
+| gcs_output |  ExportDataRequest.GCSOutput | - |  |
+| timeout |  string | - |  |
+
+
+
+
+### ExportDataRequest.GCSOutput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| bucket |  string | - |  |
+| serviceaccount_json |  string | - |  |
+| path |  string | - |  |
+
+
+
+
+### ExportDataRequest.LocalOutput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+
+
+
+
+### ExportDataRequest.S3Output
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+| endpoint |  string | - |  |
+| access_key_id |  string | - |  |
+| secret_access_key |  string | - |  |
+| ssl |  bool | - |  |
+| bucket |  string | - |  |
+
+
+
+
+### ExportDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated DataOrg | - |  |
 
 
 
@@ -1367,6 +2040,29 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetCustomDomainPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomDomainPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.DomainPolicy | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.DomainPolicy |  |
 
 
 
@@ -1433,7 +2129,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.OrgIAMPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.OrgIAMPolicy |  |
 
 
 
@@ -1548,23 +2244,6 @@ This is an empty response
 
 
 
-### GetDefaultFeaturesRequest
-
-
-
-
-
-### GetDefaultFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| features |  zitadel.features.v1.Features | - |  |
-
-
-
-
 ### GetDefaultInitMessageTextRequest
 
 
@@ -1587,6 +2266,23 @@ This is an empty response
 
 
 
+### GetDefaultLanguageRequest
+This is an empty request
+
+
+
+
+### GetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - |  |
+
+
+
+
 ### GetDefaultLoginTextsRequest
 
 
@@ -1605,6 +2301,23 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | custom_text |  zitadel.text.v1.LoginCustomText | - |  |
+
+
+
+
+### GetDefaultOrgRequest
+This is an empty request
+
+
+
+
+### GetDefaultOrgResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org |  zitadel.org.v1.Org | - |  |
 
 
 
@@ -1697,6 +2410,40 @@ This is an empty response
 
 
 
+### GetDomainPolicyRequest
+
+
+
+
+
+### GetDomainPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.DomainPolicy | - |  |
+
+
+
+
+### GetFileSystemNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetFileSystemNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+
+
+
+
 ### GetIDPByIDRequest
 
 
@@ -1753,6 +2500,23 @@ This is an empty request
 
 
 
+### GetLogNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetLogNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+
+
+
+
 ### GetLoginPolicyRequest
 This is an empty request
 
@@ -1766,6 +2530,40 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
+
+
+
+
+### GetMyInstanceRequest
+This is an empty request
+
+
+
+
+### GetMyInstanceResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance |  zitadel.instance.v1.InstanceDetail | - |  |
+
+
+
+
+### GetOIDCSettingsRequest
+This is an empty request
+
+
+
+
+### GetOIDCSettingsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| settings |  zitadel.settings.v1.OIDCSettings | - |  |
 
 
 
@@ -1788,28 +2586,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org |  zitadel.org.v1.Org | - |  |
-
-
-
-
-### GetOrgFeaturesRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetOrgFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| features |  zitadel.features.v1.Features | - |  |
 
 
 
@@ -1899,6 +2675,67 @@ This is an empty request
 
 
 
+### GetSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+
+
+
+
+### GetSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config |  zitadel.settings.v1.SMSProvider | - |  |
+
+
+
+
+### GetSMTPConfigRequest
+This is an empty request
+
+
+
+
+### GetSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| smtp_config |  zitadel.settings.v1.SMTPConfig | - |  |
+
+
+
+
+### GetSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+
+
+
+
+### GetSecretGeneratorResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| secret_generator |  zitadel.settings.v1.SecretGenerator | - |  |
+
+
+
+
 ### GetSupportedLanguagesRequest
 This is an empty request
 
@@ -1940,14 +2777,227 @@ This is an empty response
 
 
 
-### IsOrgUniqueRequest
-if name or domain is already in use, org is not unique
+### ImportDataError
+
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| domain |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| type |  string | - |  |
+| id |  string | - |  |
+| message |  string | - |  |
+
+
+
+
+### ImportDataOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated DataOrg | - |  |
+
+
+
+
+### ImportDataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs |  ImportDataOrg | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1 |  zitadel.v1.v1.ImportDataOrg | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_local |  ImportDataRequest.LocalInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_local |  ImportDataRequest.LocalInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_s3 |  ImportDataRequest.S3Input | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_s3 |  ImportDataRequest.S3Input | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgs_gcs |  ImportDataRequest.GCSInput | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) data.data_orgsv1_gcs |  ImportDataRequest.GCSInput | - |  |
+| timeout |  string | - |  |
+
+
+
+
+### ImportDataRequest.GCSInput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| bucket |  string | - |  |
+| serviceaccount_json |  string | - |  |
+| path |  string | - |  |
+
+
+
+
+### ImportDataRequest.LocalInput
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+
+
+
+
+### ImportDataRequest.S3Input
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| path |  string | - |  |
+| endpoint |  string | - |  |
+| access_key_id |  string | - |  |
+| secret_access_key |  string | - |  |
+| ssl |  bool | - |  |
+| bucket |  string | - |  |
+
+
+
+
+### ImportDataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| errors | repeated ImportDataError | - |  |
+| success |  ImportDataSuccess | - |  |
+
+
+
+
+### ImportDataSuccess
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| orgs | repeated ImportDataSuccessOrg | - |  |
+
+
+
+
+### ImportDataSuccessOrg
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - |  |
+| project_ids | repeated string | - |  |
+| project_roles | repeated string | - |  |
+| oidc_app_ids | repeated string | - |  |
+| api_app_ids | repeated string | - |  |
+| human_user_ids | repeated string | - |  |
+| machine_user_ids | repeated string | - |  |
+| action_ids | repeated string | - |  |
+| trigger_actions | repeated zitadel.management.v1.SetTriggerActionsRequest | - |  |
+| project_grants | repeated ImportDataSuccessProjectGrant | - |  |
+| user_grants | repeated ImportDataSuccessUserGrant | - |  |
+| org_members | repeated string | - |  |
+| project_members | repeated ImportDataSuccessProjectMember | - |  |
+| project_grant_members | repeated ImportDataSuccessProjectGrantMember | - |  |
+| oidc_ipds | repeated string | - |  |
+| jwt_idps | repeated string | - |  |
+| idp_links | repeated string | - |  |
+| user_links | repeated ImportDataSuccessUserLinks | - |  |
+| user_metadata | repeated ImportDataSuccessUserMetadata | - |  |
+| domains | repeated string | - |  |
+
+
+
+
+### ImportDataSuccessProjectGrant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| grant_id |  string | - |  |
+| project_id |  string | - |  |
+| org_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessProjectGrantMember
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| grant_id |  string | - |  |
+| user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessProjectMember
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserGrant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - |  |
+| user_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserLinks
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| external_user_id |  string | - |  |
+| display_name |  string | - |  |
+| idp_id |  string | - |  |
+
+
+
+
+### ImportDataSuccessUserMetadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| key |  string | - |  |
+
+
+
+
+### IsOrgUniqueRequest
+if name or domain is already in use, org is not unique
+at least one argument has to be provided
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.max_len: 200<br />  |
+| domain |  string | - | string.max_len: 200<br />  |
 
 
 
@@ -2048,6 +3098,32 @@ This is an empty request
 
 
 
+### ListInstanceDomainsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| sorting_column |  zitadel.instance.v1.DomainFieldName | the field the result is sorted |  |
+| queries | repeated zitadel.instance.v1.DomainSearchQuery | criterias the client is looking for |  |
+
+
+
+
+### ListInstanceDomainsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| sorting_column |  zitadel.instance.v1.DomainFieldName | - |  |
+| result | repeated zitadel.instance.v1.Domain | - |  |
+
+
+
+
 ### ListLoginPolicyIDPsRequest
 
 
@@ -2129,6 +3205,53 @@ This is an empty request
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.org.v1.OrgFieldName | - |  |
 | result | repeated zitadel.org.v1.Org | - |  |
+
+
+
+
+### ListSMSProvidersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListSMSProvidersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SMSProvider | - |  |
+
+
+
+
+### ListSecretGeneratorsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.settings.v1.SecretGeneratorQuery | criterias the client is looking for |  |
+
+
+
+
+### ListSecretGeneratorsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SecretGenerator | - |  |
 
 
 
@@ -2364,6 +3487,45 @@ This is an empty request
 
 
 
+### RemoveSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveSMTPConfigRequest
+this is en empty request
+
+
+
+
+### RemoveSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveSecondFactorFromLoginPolicyRequest
 
 
@@ -2376,6 +3538,72 @@ This is an empty request
 
 
 ### RemoveSecondFactorFromLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomDomainClaimedMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomDomainClaimedMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomDomainPolicyToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomDomainPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomInitMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomInitMessageTextToDefaultResponse
 
 
 
@@ -2430,18 +3658,84 @@ This is an empty request
 
 
 
-### ResetOrgFeaturesRequest
+### ResetCustomPasswordResetMessageTextToDefaultRequest
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
 
-### ResetOrgFeaturesResponse
+### ResetCustomPasswordResetMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomVerifyEmailMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomVerifyEmailMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomVerifyPhoneMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomVerifyPhoneMessageTextToDefaultResponse
 
 
 
@@ -2537,48 +3831,6 @@ This is an empty request
 
 
 
-### SetDefaultFeaturesRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| tier_name |  string | - | string.max_len: 200<br />  |
-| description |  string | - | string.max_len: 200<br />  |
-| audit_log_retention |  google.protobuf.Duration | - | duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
-| login_policy_username_login |  bool | - |  |
-| login_policy_registration |  bool | - |  |
-| login_policy_idp |  bool | - |  |
-| login_policy_factors |  bool | - |  |
-| login_policy_passwordless |  bool | - |  |
-| password_complexity_policy |  bool | - |  |
-| label_policy |  bool | - |  |
-| custom_domain |  bool | - |  |
-| login_policy_password_reset |  bool | - |  |
-| label_policy_private_label |  bool | - |  |
-| label_policy_watermark |  bool | - |  |
-| custom_text |  bool | - |  |
-| privacy_policy |  bool | - |  |
-| metadata_user |  bool | - |  |
-| custom_text_message |  bool | - |  |
-| custom_text_login |  bool | - |  |
-| lockout_policy |  bool | - |  |
-| actions |  bool | - |  |
-
-
-
-
-### SetDefaultFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### SetDefaultInitMessageTextRequest
 
 
@@ -2598,6 +3850,50 @@ This is an empty request
 
 
 ### SetDefaultInitMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultLanguageRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 10<br />  |
+
+
+
+
+### SetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultOrgRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### SetDefaultOrgResponse
 
 
 
@@ -2724,51 +4020,6 @@ This is an empty request
 
 
 
-### SetOrgFeaturesRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| tier_name |  string | - | string.max_len: 200<br />  |
-| description |  string | - | string.max_len: 200<br />  |
-| state |  zitadel.features.v1.FeaturesState | - |  |
-| state_description |  string | - | string.max_len: 200<br />  |
-| audit_log_retention |  google.protobuf.Duration | - | duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
-| login_policy_username_login |  bool | - |  |
-| login_policy_registration |  bool | - |  |
-| login_policy_idp |  bool | - |  |
-| login_policy_factors |  bool | - |  |
-| login_policy_passwordless |  bool | - |  |
-| password_complexity_policy |  bool | - |  |
-| label_policy |  bool | - |  |
-| custom_domain |  bool | - |  |
-| login_policy_password_reset |  bool | - |  |
-| label_policy_private_label |  bool | - |  |
-| label_policy_watermark |  bool | - |  |
-| custom_text |  bool | - |  |
-| privacy_policy |  bool | - |  |
-| metadata_user |  bool | - |  |
-| custom_text_message |  bool | - |  |
-| custom_text_login |  bool | - |  |
-| lockout_policy |  bool | - |  |
-| actions |  bool | - |  |
-
-
-
-
-### SetOrgFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### SetUpOrgRequest
 
 
@@ -2777,6 +4028,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | org |  SetUpOrgRequest.Org | - | message.required: true<br />  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) user.human |  SetUpOrgRequest.Human | oneof field for the user managing the organisation |  |
+| roles | repeated string | specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty) |  |
 
 
 
@@ -2802,7 +4054,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| email |  string | - | string.email: true<br />  |
 | is_email_verified |  bool | - |  |
 
 
@@ -2861,6 +4113,31 @@ This is an empty request
 
 
 
+### UpdateCustomDomainPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_login_must_be_domain |  bool | - |  |
+| validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
+
+
+
+
+### UpdateCustomDomainPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateCustomOrgIAMPolicyRequest
 
 
@@ -2874,6 +4151,30 @@ This is an empty request
 
 
 ### UpdateCustomOrgIAMPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateDomainPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_login_must_be_domain |  bool | - |  |
+| validate_org_domains |  bool | - |  |
+| smtp_sender_address_matches_instance_domain |  bool | - |  |
+
+
+
+
+### UpdateDomainPolicyResponse
 
 
 
@@ -3051,11 +4352,43 @@ This is an empty request
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
+| ignore_unknown_usernames |  bool | - |  |
+| default_redirect_uri |  string | - |  |
+| password_check_lifetime |  google.protobuf.Duration | - |  |
+| external_login_check_lifetime |  google.protobuf.Duration | - |  |
+| mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
+| second_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 
 
 
 
 ### UpdateLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateOIDCSettingsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| access_token_lifetime |  google.protobuf.Duration | - |  |
+| id_token_lifetime |  google.protobuf.Duration | - |  |
+| refresh_token_idle_expiration |  google.protobuf.Duration | - |  |
+| refresh_token_expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### UpdateOIDCSettingsResponse
 
 
 
@@ -3145,11 +4478,135 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | tos_link |  string | - |  |
 | privacy_link |  string | - |  |
+| help_link |  string | - |  |
 
 
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| length |  uint32 | - |  |
+| expiry |  google.protobuf.Duration | - |  |
+| include_lower_letters |  bool | - |  |
+| include_upper_letters |  bool | - |  |
+| include_digits |  bool | - |  |
+| include_symbols |  bool | - |  |
+
+
+
+
+### UpdateSecretGeneratorResponse
 
 
 

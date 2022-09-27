@@ -1,23 +1,18 @@
 package server
 
 import (
-	"context"
-	grpc_api "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"crypto/tls"
 
-	"github.com/caos/logging"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"golang.org/x/text/language"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
-	"github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-)
-
-const (
-	defaultGrpcPort = "80"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 type Server interface {
@@ -28,42 +23,25 @@ type Server interface {
 	AuthMethods() authz.MethodMapping
 }
 
-func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang language.Tag) *grpc.Server {
+func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, queries *query.Queries, hostHeaderName string, tlsConfig *tls.Config) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
-	return grpc.NewServer(
+	serverOptions := []grpc.ServerOption{
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.DefaultTracingServer(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
-				middleware.SentryHandler(),
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
+				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_MethodPrefix),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
-				middleware.TranslationHandler(lang),
+				middleware.TranslationHandler(),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 			),
 		),
-	)
-}
-
-func Serve(ctx context.Context, server *grpc.Server, port string) {
-	go func() {
-		<-ctx.Done()
-		server.GracefulStop()
-	}()
-
-	go func() {
-		listener := http.CreateListener(port)
-		err := server.Serve(listener)
-		logging.Log("SERVE-Ga3e94").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("grpc server serve failed")
-	}()
-	logging.LogWithFields("SERVE-bZ44QM", "port", port).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Info("grpc server is listening")
-}
-
-func grpcPort(port string) string {
-	if port == "" {
-		return defaultGrpcPort
 	}
-	return port
+	if tlsConfig != nil {
+		serverOptions = append(serverOptions, grpc.Creds(credentials.NewTLS(tlsConfig)))
+	}
+	return grpc.NewServer(serverOptions...)
 }

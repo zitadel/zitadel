@@ -3,12 +3,13 @@ package auth
 import (
 	"context"
 
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
-	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
+	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *auth_pb.GetMyPasswordComplexityPolicyRequest) (*auth_pb.GetMyPasswordComplexityPolicyResponse, error) {
-	policy, err := s.repo.GetMyPasswordComplexityPolicy(ctx)
+	policy, err := s.query.PasswordComplexityPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

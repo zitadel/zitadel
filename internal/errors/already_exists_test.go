@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func TestAlreadyExistsError(t *testing.T) {

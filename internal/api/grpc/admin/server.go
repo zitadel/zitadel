@@ -1,15 +1,19 @@
 package admin
 
 import (
+	"context"
 	"google.golang.org/grpc"
 
-	"github.com/caos/zitadel/internal/admin/repository"
-	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/internal/admin/repository"
+	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/api/assets"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 const (
@@ -20,32 +24,36 @@ var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
 	admin.UnimplementedAdminServiceServer
-	command       *command.Commands
-	query         *query.Queries
-	org           repository.OrgRepository
-	iam           repository.IAMRepository
-	administrator repository.AdministratorRepository
-	repo          repository.Repository
-	features      repository.FeaturesRepository
-	users         repository.UserRepository
-	iamDomain     string
+	database        string
+	command         *command.Commands
+	query           *query.Queries
+	administrator   repository.AdministratorRepository
+	assetsAPIDomain func(context.Context) string
+	userCodeAlg     crypto.EncryptionAlgorithm
+	passwordHashAlg crypto.HashAlgorithm
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, iamDomain string) *Server {
+func CreateServer(
+	database string,
+	command *command.Commands,
+	query *query.Queries,
+	sd systemdefaults.SystemDefaults,
+	repo repository.Repository,
+	externalSecure bool,
+	userCodeAlg crypto.EncryptionAlgorithm,
+) *Server {
 	return &Server{
-		command:       command,
-		query:         query,
-		org:           repo,
-		iam:           repo,
-		administrator: repo,
-		repo:          repo,
-		features:      repo,
-		users:         repo,
-		iamDomain:     iamDomain,
+		database:        database,
+		command:         command,
+		query:           query,
+		administrator:   repo,
+		assetsAPIDomain: assets.AssetAPI(externalSecure),
+		userCodeAlg:     userCodeAlg,
+		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 	}
 }
 

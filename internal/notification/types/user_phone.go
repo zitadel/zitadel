@@ -1,37 +1,39 @@
 package types
 
 import (
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/providers"
-	"github.com/caos/zitadel/internal/notification/providers/chat"
-	"github.com/caos/zitadel/internal/notification/providers/twilio"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	"context"
+
+	"github.com/zitadel/logging"
+
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
-func generateSms(user *view_model.NotifyUser, content string, config systemdefaults.Notifications, lastPhone bool) error {
-	provider := twilio.InitTwilioProvider(config.Providers.Twilio)
-	message := &twilio.TwilioMessage{
-		SenderPhoneNumber:    config.Providers.Twilio.From,
+func generateSms(ctx context.Context, user *query.NotifyUser, content string, getTwilioProvider func(ctx context.Context) (*twilio.TwilioConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), lastPhone bool) error {
+	number := ""
+	twilioConfig, err := getTwilioProvider(ctx)
+	if err == nil {
+		number = twilioConfig.SenderNumber
+	}
+	message := &messages.SMS{
+		SenderPhoneNumber:    number,
 		RecipientPhoneNumber: user.VerifiedPhone,
 		Content:              content,
 	}
 	if lastPhone {
 		message.RecipientPhoneNumber = user.LastPhone
 	}
-	if provider.CanHandleMessage(message) {
-		if config.DebugMode {
-			return sendDebugPhone(message, config)
-		}
-		return provider.HandleMessage(message)
-	}
-	return caos_errs.ThrowInternalf(nil, "NOTIF-s8ipw", "Could not send init message: userid: %v", user.ID)
-}
 
-func sendDebugPhone(message providers.Message, config systemdefaults.Notifications) error {
-	provider, err := chat.InitChatProvider(config.Providers.Chat)
-	if err != nil {
-		return err
+	channelChain, err := senders.SMSChannels(ctx, twilioConfig, getFileSystemProvider, getLogProvider)
+	logging.OnError(err).Error("could not create sms channel")
+
+	if channelChain.Len() == 0 {
+		return caos_errors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
 	}
-	return provider.HandleMessage(message)
+	return channelChain.HandleMessage(message)
 }

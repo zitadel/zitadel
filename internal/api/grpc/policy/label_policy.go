@@ -1,35 +1,36 @@
 package policy
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/iam/model"
-	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
 )
 
-func ModelLabelPolicyToPb(policy *model.LabelPolicyView) *policy_pb.LabelPolicy {
+func ModelLabelPolicyToPb(policy *query.LabelPolicy, assetPrefix string) *policy_pb.LabelPolicy {
 	return &policy_pb.LabelPolicy{
-		IsDefault:           policy.Default,
-		PrimaryColor:        policy.PrimaryColor,
-		BackgroundColor:     policy.BackgroundColor,
-		FontColor:           policy.FontColor,
-		WarnColor:           policy.WarnColor,
-		PrimaryColorDark:    policy.PrimaryColorDark,
-		BackgroundColorDark: policy.BackgroundColorDark,
-		WarnColorDark:       policy.WarnColorDark,
-		FontColorDark:       policy.FontColorDark,
-		FontUrl:             policy.FontURL,
-		LogoUrl:             policy.LogoURL,
-		LogoUrlDark:         policy.LogoDarkURL,
-		IconUrl:             policy.IconURL,
-		IconUrlDark:         policy.IconDarkURL,
+		IsDefault:           policy.IsDefault,
+		PrimaryColor:        policy.Light.PrimaryColor,
+		BackgroundColor:     policy.Light.BackgroundColor,
+		FontColor:           policy.Light.FontColor,
+		WarnColor:           policy.Light.WarnColor,
+		PrimaryColorDark:    policy.Dark.PrimaryColor,
+		BackgroundColorDark: policy.Dark.BackgroundColor,
+		WarnColorDark:       policy.Dark.WarnColor,
+		FontColorDark:       policy.Dark.FontColor,
+		FontUrl:             domain.AssetURL(assetPrefix, policy.ResourceOwner, policy.FontURL),
+		LogoUrl:             domain.AssetURL(assetPrefix, policy.ResourceOwner, policy.Light.LogoURL),
+		LogoUrlDark:         domain.AssetURL(assetPrefix, policy.ResourceOwner, policy.Dark.LogoURL),
+		IconUrl:             domain.AssetURL(assetPrefix, policy.ResourceOwner, policy.Light.IconURL),
+		IconUrlDark:         domain.AssetURL(assetPrefix, policy.ResourceOwner, policy.Dark.IconURL),
 
-		DisableWatermark:    policy.DisableWatermark,
+		DisableWatermark:    policy.WatermarkDisabled,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
-			"", //TODO: resourceowner
+			policy.ResourceOwner,
 		),
 	}
 }

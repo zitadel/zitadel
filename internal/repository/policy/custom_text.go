@@ -5,9 +5,9 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -50,7 +50,7 @@ func NewCustomTextSetEvent(
 	}
 }
 
-func CustomTextSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CustomTextSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &CustomTextSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -88,7 +88,7 @@ func NewCustomTextRemovedEvent(base *eventstore.BaseEvent, template, key string,
 	}
 }
 
-func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &CustomTextRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -124,7 +124,7 @@ func NewCustomTextTemplateRemovedEvent(base *eventstore.BaseEvent, template stri
 	}
 }
 
-func CustomTextTemplateRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CustomTextTemplateRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &CustomTextTemplateRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

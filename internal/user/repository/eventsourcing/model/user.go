@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/user/model"
 )
 
 const (
@@ -37,28 +40,28 @@ func (u *User) AppendEvents(events ...*es_models.Event) error {
 func (u *User) AppendEvent(event *es_models.Event) error {
 	u.ObjectRoot.AppendEvent(event)
 
-	switch event.Type {
-	case UserAdded,
-		HumanAdded,
-		MachineAdded,
-		UserRegistered,
-		HumanRegistered,
-		UserProfileChanged,
-		DomainClaimed,
-		UserUserNameChanged:
+	switch eventstore.EventType(event.Type) {
+	case user.UserV1AddedType,
+		user.HumanAddedType,
+		user.MachineAddedEventType,
+		user.UserV1RegisteredType,
+		user.HumanRegisteredType,
+		user.UserV1ProfileChangedType,
+		user.UserDomainClaimedType,
+		user.UserUserNameChangedType:
 		err := u.setData(event)
 		if err != nil {
 			return err
 		}
-	case UserDeactivated:
+	case user.UserDeactivatedType:
 		u.appendDeactivatedEvent()
-	case UserReactivated:
+	case user.UserReactivatedType:
 		u.appendReactivatedEvent()
-	case UserLocked:
+	case user.UserLockedType:
 		u.appendLockedEvent()
-	case UserUnlocked:
+	case user.UserUnlockedType:
 		u.appendUnlockedEvent()
-	case UserRemoved:
+	case user.UserRemovedType:
 		u.appendRemovedEvent()
 	}
 

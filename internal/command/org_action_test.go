@@ -4,16 +4,17 @@ import (
 	"context"
 	"testing"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/action"
-	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func TestCommands_AddAction(t *testing.T) {
@@ -95,29 +96,29 @@ func TestCommands_AddAction(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								action.NewAddedEvent(context.Background(),
-									&action.NewAggregate("id1", "org1").Aggregate,
-									"name",
-									"name() {};",
+									&action.NewAggregate("id2", "org1").Aggregate,
+									"name2",
+									"name2() {};",
 									0,
 									false,
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(action.NewAddActionNameUniqueConstraint("name", "org1")),
+						uniqueConstraintsFromEventConstraint(action.NewAddActionNameUniqueConstraint("name2", "org1")),
 					),
 				),
-				idGenerator: mock.ExpectID(t, "id1"),
+				idGenerator: mock.ExpectID(t, "id2"),
 			},
 			args{
 				ctx: context.Background(),
 				addAction: &domain.Action{
-					Name:   "name",
-					Script: "name() {};",
+					Name:   "name2",
+					Script: "name2() {};",
 				},
 				resourceOwner: "org1",
 			},
 			res{
-				id: "id1",
+				id: "id2",
 				details: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
@@ -746,7 +747,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewTriggerActionsCascadeRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									domain.FlowTypeExternalAuthentication,
 									"id1",
 								),

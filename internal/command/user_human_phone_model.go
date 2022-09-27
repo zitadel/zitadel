@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type HumanPhoneWriteModel struct {
@@ -67,8 +67,12 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 			wm.CodeExpiry = e.Expiry
 		case *user.HumanPhoneRemovedEvent:
 			wm.State = domain.PhoneStateRemoved
+			wm.IsPhoneVerified = false
+			wm.Phone = ""
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
+			wm.IsPhoneVerified = false
+			wm.Phone = ""
 		}
 	}
 	return wm.WriteModel.Reduce()

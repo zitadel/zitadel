@@ -4,12 +4,12 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/repository/idpconfig"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type IDPOIDCConfigWriteModel struct {
@@ -28,7 +28,7 @@ func NewOrgIDPOIDCConfigWriteModel(idpConfigID, orgID string) *IDPOIDCConfigWrit
 	}
 }
 
-func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.IDPOIDCConfigAddedEvent:

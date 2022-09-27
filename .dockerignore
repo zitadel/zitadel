@@ -17,3 +17,5 @@ README.md
 SECURITY.md
 pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
+.goreleaser.yaml
+.artifacts/

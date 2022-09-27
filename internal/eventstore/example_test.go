@@ -3,14 +3,13 @@ package eventstore_test
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/repository/sql"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 )
 
 // ------------------------------------------------------------
@@ -18,7 +17,7 @@ import (
 // ------------------------------------------------------------
 func NewUserAggregate(id string) *eventstore.Aggregate {
 	return eventstore.NewAggregate(
-		authz.NewMockContext("caos", "adlerhurst"),
+		authz.NewMockContext("zitadel", "caos", "adlerhurst"),
 		id,
 		"test.user",
 		"v1",
@@ -45,8 +44,8 @@ func NewUserAddedEvent(id string, firstName string) *UserAddedEvent {
 	}
 }
 
-func UserAddedEventMapper() (eventstore.EventType, func(*repository.Event) (eventstore.EventReader, error)) {
-	return "user.added", func(event *repository.Event) (eventstore.EventReader, error) {
+func UserAddedEventMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user.added", func(event *repository.Event) (eventstore.Event, error) {
 		e := &UserAddedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
@@ -90,8 +89,8 @@ func NewUserFirstNameChangedEvent(id, firstName string) *UserFirstNameChangedEve
 	}
 }
 
-func UserFirstNameChangedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.EventReader, error)) {
-	return "user.firstName.changed", func(event *repository.Event) (eventstore.EventReader, error) {
+func UserFirstNameChangedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user.firstName.changed", func(event *repository.Event) (eventstore.Event, error) {
 		e := &UserFirstNameChangedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
@@ -132,8 +131,8 @@ func NewUserPasswordCheckedEvent(id string) *UserPasswordCheckedEvent {
 	}
 }
 
-func UserPasswordCheckedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.EventReader, error)) {
-	return "user.password.checked", func(event *repository.Event) (eventstore.EventReader, error) {
+func UserPasswordCheckedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user.password.checked", func(event *repository.Event) (eventstore.Event, error) {
 		return &UserPasswordCheckedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
@@ -169,8 +168,8 @@ func NewUserDeletedEvent(id string) *UserDeletedEvent {
 	}
 }
 
-func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.EventReader, error)) {
-	return "user.deleted", func(event *repository.Event) (eventstore.EventReader, error) {
+func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user.deleted", func(event *repository.Event) (eventstore.Event, error) {
 		return &UserDeletedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
@@ -199,7 +198,7 @@ type UsersReadModel struct {
 	Users []*UserReadModel
 }
 
-func (rm *UsersReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *UsersReadModel) AppendEvents(events ...eventstore.Event) {
 	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
 		switch e := event.(type) {
@@ -294,7 +293,7 @@ func TestUserReadModel(t *testing.T) {
 		RegisterFilterEventMapper(UserPasswordCheckedMapper()).
 		RegisterFilterEventMapper(UserDeletedMapper())
 
-	events, err := es.PushEvents(context.Background(),
+	events, err := es.Push(context.Background(),
 		NewUserAddedEvent("1", "hodor"),
 		NewUserAddedEvent("2", "hodor"),
 		NewUserPasswordCheckedEvent("2"),
@@ -308,7 +307,7 @@ func TestUserReadModel(t *testing.T) {
 
 	events = append(events, nil)
 
-	fmt.Printf("%+v\n", events)
+	t.Logf("%+v\n", events)
 
 	users := UsersReadModel{}
 
@@ -316,5 +315,5 @@ func TestUserReadModel(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpected error on filter to reducer: %v", err)
 	}
-	fmt.Printf("%+v", users)
+	t.Logf("%+v", users)
 }

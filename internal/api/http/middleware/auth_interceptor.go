@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type AuthInterceptor struct {
@@ -62,7 +62,7 @@ func authorize(r *http.Request, verifier *authz.TokenVerifier, authConfig authz.
 		return nil, errors.New("auth header missing")
 	}
 
-	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), verifier, authConfig, authOpt, r.RequestURI) //TODO: permission
+	ctxSetter, err := authz.CheckUserAuthorization(authCtx, &httpReq{}, authToken, http_util.GetOrgID(r), verifier, authConfig, authOpt, r.RequestURI)
 	if err != nil {
 		return nil, err
 	}

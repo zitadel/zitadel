@@ -2,101 +2,120 @@ package api
 
 import (
 	"context"
+	"crypto/tls"
 	"net/http"
+	"strings"
 
-	"github.com/caos/logging"
-	sentryhttp "github.com/getsentry/sentry-go/http"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
+	"github.com/gorilla/mux"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
-	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/api/authz"
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
-	"github.com/caos/zitadel/internal/api/grpc/server"
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/api/oidc"
-	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	authz_es "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	view_model "github.com/caos/zitadel/internal/view/model"
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-type Config struct {
-	GRPC grpc_util.Config
-	OIDC oidc.OPHandlerConfig
-}
-
 type API struct {
+	port           uint16
 	grpcServer     *grpc.Server
-	gatewayHandler *server.GatewayHandler
-	verifier       *authz.TokenVerifier
-	serverPort     string
+	verifier       *internal_authz.TokenVerifier
 	health         health
-	auth           auth
-	admin          admin
+	router         *mux.Router
+	externalSecure bool
+	http1HostName  string
 }
 
 type health interface {
 	Health(ctx context.Context) error
-	IamByID(ctx context.Context) (*iam_model.IAM, error)
-	VerifierClientID(ctx context.Context, appName string) (string, error)
+	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
-type auth interface {
-	ActiveUserSessionCount() int64
-}
-
-type admin interface {
-	GetViews() ([]*view_model.View, error)
-	GetSpoolerDiv(database, viewName string) int64
-}
-
-func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+func New(port uint16, router *mux.Router, queries *query.Queries, verifier *internal_authz.TokenVerifier, authZ internal_authz.Config, externalSecure bool, tlsConfig *tls.Config, http2HostName, http1HostName string) *API {
 	api := &API{
-		serverPort: config.GRPC.ServerPort,
+		port:           port,
+		verifier:       verifier,
+		health:         queries,
+		router:         router,
+		externalSecure: externalSecure,
+		http1HostName:  http1HostName,
 	}
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig)
+	api.routeGRPC()
 
-	repo := struct {
-		authz_es.EsRepository
-		query.Queries
-	}{
-		*authZRepo,
-		*q,
-	}
-
-	api.verifier = authz.Start(&repo)
-	api.health = authZRepo
-	api.auth = authRepo
-	api.admin = adminRepo
-	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
-	api.gatewayHandler = server.CreateGatewayHandler(config.GRPC)
-	api.RegisterHandler("", api.healthHandler())
+	api.RegisterHandler("/debug", api.healthHandler())
 
 	return api
 }
 
-func (a *API) RegisterServer(ctx context.Context, server server.Server) {
-	server.RegisterServer(a.grpcServer)
-	a.gatewayHandler.RegisterGateway(ctx, server)
-	a.verifier.RegisterServer(server.AppName(), server.MethodPrefix(), server.AuthMethods())
+func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) error {
+	grpcServer.RegisterServer(a.grpcServer)
+	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port, a.http1HostName)
+	if err != nil {
+		return err
+	}
+	a.RegisterHandler(prefix, handler)
+	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
+	return nil
 }
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
-	sentryHandler := sentryhttp.New(sentryhttp.Options{})
-	a.gatewayHandler.RegisterHandler(prefix, sentryHandler.Handle(handler))
+	prefix = strings.TrimSuffix(prefix, "/")
+	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
+	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))
 }
 
-func (a *API) Start(ctx context.Context) {
-	server.Serve(ctx, a.grpcServer, a.serverPort)
-	a.gatewayHandler.Serve(ctx)
+func (a *API) routeGRPC() {
+	http2Route := a.router.
+		MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
+			return r.ProtoMajor == 2
+		}).
+		Subrouter()
+	http2Route.
+		Methods(http.MethodPost).
+		Headers("Content-Type", "application/grpc").
+		Handler(a.grpcServer)
+
+	if !a.externalSecure {
+		a.routeGRPCWeb(a.router)
+		return
+	}
+	a.routeGRPCWeb(http2Route)
+}
+
+func (a *API) routeGRPCWeb(router *mux.Router) {
+	router.NewRoute().
+		Methods(http.MethodPost, http.MethodOptions).
+		MatcherFunc(
+			func(r *http.Request, _ *mux.RouteMatch) bool {
+				if strings.Contains(strings.ToLower(r.Header.Get("content-type")), "application/grpc-web+") {
+					return true
+				}
+				return strings.Contains(strings.ToLower(r.Header.Get("access-control-request-headers")), "x-grpc-web")
+			}).
+		Handler(
+			grpcweb.WrapServer(a.grpcServer,
+				grpcweb.WithAllowedRequestHeaders(
+					[]string{
+						http_util.Origin,
+						http_util.ContentType,
+						http_util.Accept,
+						http_util.AcceptLanguage,
+						http_util.Authorization,
+						http_util.ZitadelOrgID,
+						http_util.XUserAgent,
+						http_util.XGrpcWeb,
+					},
+				),
+				grpcweb.WithOriginFunc(func(_ string) bool {
+					return true
+				}),
+			),
+		)
 }
 
 func (a *API) healthHandler() http.Handler {
@@ -107,117 +126,60 @@ func (a *API) healthHandler() http.Handler {
 			}
 			return nil
 		},
-		func(ctx context.Context) error {
-			iam, err := a.health.IamByID(ctx)
-			if err != nil && !errors.IsNotFound(err) {
-				return errors.ThrowPreconditionFailed(err, "API-dsgT2", "IAM SETUP CHECK FAILED")
-			}
-			if iam == nil || iam.SetUpStarted < domain.StepCount-1 {
-				return errors.ThrowPreconditionFailed(nil, "API-HBfs3", "IAM NOT SET UP")
-			}
-			if iam.SetUpDone < domain.StepCount-1 {
-				return errors.ThrowPreconditionFailed(nil, "API-DASs2", "IAM SETUP RUNNING")
-			}
-			return nil
-		},
 	}
 	handler := http.NewServeMux()
 	handler.HandleFunc("/healthz", handleHealth)
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/validate", handleValidate(checks))
-	handler.HandleFunc("/clientID", a.handleClientID)
-	handler.Handle("/metrics", a.handleMetrics())
+	handler.Handle("/metrics", metricsExporter())
 
 	return handler
 }
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte("ok"))
-	logging.Log("API-Hfss2").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(r.Context())).Error("error writing ok for health")
+	logging.WithFields("traceID", tracing.TraceIDFromCtx(r.Context())).OnError(err).Error("error writing ok for health")
 }
 
 func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		errors := validate(r.Context(), checks)
-		if len(errors) == 0 {
+		errs := validate(r.Context(), checks)
+		if len(errs) == 0 {
 			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
-		http_util.MarshalJSON(w, nil, errors[0], http.StatusPreconditionFailed)
+		http_util.MarshalJSON(w, nil, errs[0], http.StatusPreconditionFailed)
 	}
 }
 
 func handleValidate(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		errors := validate(r.Context(), checks)
-		if len(errors) == 0 {
+		errs := validate(r.Context(), checks)
+		if len(errs) == 0 {
 			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
-		http_util.MarshalJSON(w, errors, nil, http.StatusOK)
+		http_util.MarshalJSON(w, errs, nil, http.StatusOK)
 	}
-}
-
-func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
-	id, err := a.health.VerifierClientID(r.Context(), "Zitadel Console")
-	if err != nil {
-		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
-		return
-	}
-	http_util.MarshalJSON(w, id, nil, http.StatusOK)
-}
-
-func (a *API) handleMetrics() http.Handler {
-	a.registerActiveSessionCounters()
-	a.registerSpoolerDivCounters()
-	return metrics.GetExporter()
-}
-
-func (a *API) registerActiveSessionCounters() {
-	metrics.RegisterValueObserver(
-		metrics.ActiveSessionCounter,
-		metrics.ActiveSessionCounterDescription,
-		func(ctx context.Context, result metric.Int64ObserverResult) {
-			result.Observe(
-				a.auth.ActiveUserSessionCount(),
-			)
-		},
-	)
-}
-
-func (a *API) registerSpoolerDivCounters() {
-	views, err := a.admin.GetViews()
-	if err != nil {
-		logging.Log("API-3M8sd").WithError(err).Error("could not read views for metrics")
-		return
-	}
-	metrics.RegisterValueObserver(
-		metrics.SpoolerDivCounter,
-		metrics.SpoolerDivCounterDescription,
-		func(ctx context.Context, result metric.Int64ObserverResult) {
-			for _, view := range views {
-				labels := map[string]attribute.Value{
-					metrics.Database: attribute.StringValue(view.Database),
-					metrics.ViewName: attribute.StringValue(view.ViewName),
-				}
-				result.Observe(
-					a.admin.GetSpoolerDiv(view.Database, view.ViewName),
-					otel.MapToKeyValue(labels)...,
-				)
-			}
-		},
-	)
 }
 
 type ValidationFunction func(ctx context.Context) error
 
 func validate(ctx context.Context, validations []ValidationFunction) []error {
-	errors := make([]error, 0)
+	errs := make([]error, 0)
 	for _, validation := range validations {
 		if err := validation(ctx); err != nil {
-			logging.Log("API-vf823").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Error("validation failed")
-			errors = append(errors, err)
+			logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Error("validation failed")
+			errs = append(errs, err)
 		}
 	}
-	return errors
+	return errs
+}
+
+func metricsExporter() http.Handler {
+	exporter := metrics.GetExporter()
+	if exporter == nil {
+		return http.NotFoundHandler()
+	}
+	return exporter
 }

@@ -1,18 +1,14 @@
 package authz
 
 import (
-	"context"
+	"database/sql"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/authz/repository/eventsourcing"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/authz/repository"
+	"github.com/zitadel/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
-type Config struct {
-	Repository eventsourcing.Config
-}
-
-func Start(ctx context.Context, config Config, authZ authz.Config, systemDefaults sd.SystemDefaults, queries *query.Queries) (*eventsourcing.EsRepository, error) {
-	return eventsourcing.Start(config.Repository, authZ, systemDefaults, queries)
+func Start(queries *query.Queries, dbClient *sql.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, externalSecure bool) (repository.Repository, error) {
+	return eventsourcing.Start(queries, dbClient, keyEncryptionAlgorithm, externalSecure)
 }

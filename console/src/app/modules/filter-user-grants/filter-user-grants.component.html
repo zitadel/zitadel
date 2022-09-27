@@ -1,0 +1,105 @@
+<cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()" [queryCount]="searchQueries.length">
+  <div class="filter-row" id="filtercomp">
+    <div class="name-query">
+      <mat-checkbox
+        id="displayname"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.DISPLAYNAME)"
+        (change)="changeCheckbox(SubQuery.DISPLAYNAME, $event)"
+        >{{ 'FILTER.DISPLAYNAME' | translate }}
+      </mat-checkbox>
+      <div class="subquery" *ngIf="getSubFilter(SubQuery.DISPLAYNAME) as dnq">
+        <cnsl-form-field class="filter-select-method">
+          <mat-select [value]="dnq.getMethod()" (selectionChange)="setMethod(dnq, $event)">
+            <mat-option *ngFor="let method of methods" [value]="method">
+              {{ 'FILTER.METHODS.' + method | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+
+        <cnsl-form-field class="filter-input-value">
+          <input
+            cnslInput
+            name="value"
+            [value]="dnq.getDisplayName()"
+            (change)="setValue(SubQuery.DISPLAYNAME, dnq, $event)"
+          />
+        </cnsl-form-field>
+      </div>
+    </div>
+
+    <div class="usernane-query">
+      <mat-checkbox
+        id="username"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.USERNAME)"
+        (change)="changeCheckbox(SubQuery.USERNAME, $event)"
+        >{{ 'FILTER.USERNAME' | translate }}
+      </mat-checkbox>
+      <div class="subquery" *ngIf="getSubFilter(SubQuery.USERNAME) as unq">
+        <cnsl-form-field class="filter-select-method">
+          <mat-select [value]="unq.getMethod()" (selectionChange)="setMethod(unq, $event)">
+            <mat-option *ngFor="let method of methods" [value]="method">
+              {{ 'FILTER.METHODS.' + method | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+
+        <cnsl-form-field class="filter-input-value">
+          <input cnslInput name="value" [value]="unq.getUserName()" (change)="setValue(SubQuery.USERNAME, unq, $event)" />
+        </cnsl-form-field>
+      </div>
+    </div>
+
+    <div class="email-query">
+      <mat-checkbox
+        id="email"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.ORGNAME)"
+        (change)="changeCheckbox(SubQuery.ORGNAME, $event)"
+        >{{ 'FILTER.ORGNAME' | translate }}
+      </mat-checkbox>
+      <div class="subquery" *ngIf="getSubFilter(SubQuery.ORGNAME) as onq">
+        <cnsl-form-field class="filter-select-method">
+          <mat-select [value]="onq.getMethod()" (selectionChange)="setMethod(onq, $event)">
+            <mat-option *ngFor="let method of methods" [value]="method">
+              {{ 'FILTER.METHODS.' + method | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+
+        <cnsl-form-field class="filter-input-value">
+          <input cnslInput name="value" [value]="onq.getOrgName()" (change)="setValue(SubQuery.ORGNAME, onq, $event)" />
+        </cnsl-form-field>
+      </div>
+    </div>
+
+    <div class="email-query">
+      <mat-checkbox
+        id="projectname"
+        class="cb"
+        [checked]="getSubFilter(SubQuery.PROJECTNAME)"
+        (change)="changeCheckbox(SubQuery.PROJECTNAME, $event)"
+        >{{ 'FILTER.PROJECTNAME' | translate }}
+      </mat-checkbox>
+      <div class="subquery" *ngIf="getSubFilter(SubQuery.PROJECTNAME) as pnq">
+        <cnsl-form-field class="filter-select-method">
+          <mat-select [value]="pnq.getMethod()" (selectionChange)="setMethod(pnq, $event)">
+            <mat-option *ngFor="let method of methods" [value]="method">
+              {{ 'FILTER.METHODS.' + method | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+
+        <cnsl-form-field class="filter-input-value">
+          <input
+            cnslInput
+            name="value"
+            [value]="pnq.getProjectName()"
+            (change)="setValue(SubQuery.PROJECTNAME, pnq, $event)"
+          />
+        </cnsl-form-field>
+      </div>
+    </div>
+  </div>
+</cnsl-filter>

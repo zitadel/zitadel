@@ -3,16 +3,9 @@ import { NgModule } from '@angular/core';
 
 import { TimestampToDatePipe } from './timestamp-to-date.pipe';
 
-
 @NgModule({
-    declarations: [
-        TimestampToDatePipe,
-    ],
-    imports: [
-        CommonModule,
-    ],
-    exports: [
-        TimestampToDatePipe,
-    ],
+  declarations: [TimestampToDatePipe],
+  imports: [CommonModule],
+  exports: [TimestampToDatePipe],
 })
-export class TimestampToDatePipeModule { }
+export class TimestampToDatePipeModule {}

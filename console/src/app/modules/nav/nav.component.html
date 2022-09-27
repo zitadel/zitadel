@@ -1,0 +1,210 @@
+<ng-container *ngIf="['iam.read$', 'iam.write$'] | hasRole as iamuser$">
+  <div class="nav-col" [ngClass]="{ 'is-admin': (iamuser$ | async) }">
+    <ng-container
+      *ngIf="breadcrumbService.breadcrumbsExtended$ && (breadcrumbService.breadcrumbsExtended$ | async) as breadc"
+    >
+      <ng-container
+        *ngIf="
+          breadc[breadc.length - 1] &&
+          !breadc[breadc.length - 1].hideNav &&
+          breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER
+        "
+        [ngSwitch]="breadc[0].type"
+      >
+        <div class="nav-row" @navrow>
+          <ng-container *ngSwitchCase="BreadcrumbType.INSTANCE">
+            <div class="nav-row-abs" @navroworg>
+              <ng-template cnslHasRole [hasRole]="['iam.read']">
+                <a
+                  class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/instance']"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.INSTANCEOVERVIEW' | translate }} </span>
+                  </div>
+                </a>
+
+                <a
+                  class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/orgs']"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.ORGS' | translate }} </span>
+                  </div>
+                </a>
+
+                <a
+                  class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/views']"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.VIEWS' | translate }} </span>
+                  </div>
+                </a>
+
+                <a
+                  class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/failed-events']"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.FAILEDEVENTS' | translate }} </span>
+                  </div>
+                </a>
+
+                <a
+                  class="nav-item"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="['/settings']"
+                  *ngIf="['iam.read', 'iam.policy.read'] | hasRole: true | async"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.SETTINGS' | translate }} </span>
+                  </div>
+                </a>
+
+                <a
+                  *ngIf="customerPortalLink"
+                  class="nav-item external-link"
+                  [href]="customerPortalLink"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div class="c_label">
+                    <span> {{ 'MENU.CUSTOMERPORTAL' | translate }} </span>
+                  </div>
+                  <i class="las la-external-link-alt"></i>
+                </a>
+              </ng-template>
+
+              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
+            </div>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="BreadcrumbType.ORG">
+            <div class="nav-row-abs" @navrowproject>
+              <a
+                class="nav-item"
+                [routerLinkActive]="['active']"
+                [routerLinkActiveOptions]="{ exact: true }"
+                [routerLink]="['/']"
+              >
+                <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
+              </a>
+
+              <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
+                <ng-template cnslHasRole [hasRole]="['org.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                    [routerLink]="['/org']"
+                  >
+                    <span class="label">{{ 'MENU.ORGANIZATION' | translate }}</span>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                    [routerLink]="['/projects']"
+                  >
+                    <div class="c_label">
+                      <span> {{ 'MENU.PROJECT' | translate }} </span>
+                      <small
+                        *ngIf="(mgmtService?.ownedProjectsCount | async) && (mgmtService?.grantedProjectsCount | async)"
+                        class="count"
+                        >({{
+                          ((mgmtService.ownedProjectsCount | async) ?? 0) +
+                            ((mgmtService.grantedProjectsCount | async) ?? 0)
+                        }})</small
+                      >
+                    </div>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLink]="['/users']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                  >
+                    <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLink]="['/grants']"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['org.action.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLink]="['/actions']"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['org.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLink]="['/domains']"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                  >
+                    <span class="label">{{ 'MENU.DOMAINS' | translate }}</span>
+                  </a>
+                </ng-template>
+
+                <ng-template cnslHasRole [hasRole]="['org.read']">
+                  <a
+                    class="nav-item"
+                    [routerLinkActive]="['active']"
+                    [routerLinkActiveOptions]="{ exact: false }"
+                    [routerLink]="['/org-settings']"
+                    *ngIf="['policy.read'] | hasRole | async"
+                  >
+                    <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
+                  </a>
+                </ng-template>
+              </ng-container>
+
+              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</ng-container>
+
+<ng-template #shortcutKeyRef>
+  <ng-container *ngIf="(isHandset$ | async) === false">
+    <span class="fill-space"></span>
+    <div (click)="openHelp()" class="nav-shortcut-action-key" matTooltip="{{ 'MENU.OPENSHORTCUTSTOOLTIP' | translate }}">
+      <div class="nav-key-overlay"></div>
+      <span>?</span>
+    </div>
+  </ng-container>
+</ng-template>

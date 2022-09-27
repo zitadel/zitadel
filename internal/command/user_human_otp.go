@@ -2,13 +2,41 @@ package command
 
 import (
 	"context"
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+
+	"github.com/zitadel/zitadel/internal/crypto"
+
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
+
+func (c *Commands) ImportHumanOTP(ctx context.Context, userID, userAgentID, resourceowner string, key string) error {
+	encryptedSecret, err := crypto.Encrypt([]byte(key), c.multifactors.OTP.CryptoMFA)
+	if err != nil {
+		return err
+	}
+	if err = c.checkUserExists(ctx, userID, resourceowner); err != nil {
+		return err
+	}
+
+	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceowner)
+	if err != nil {
+		return err
+	}
+	if otpWriteModel.State == domain.MFAStateReady {
+		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
+	}
+	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
+
+	_, err = c.eventstore.Push(ctx,
+		user.NewHumanOTPAddedEvent(ctx, userAgg, encryptedSecret),
+		user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID),
+	)
+	return err
+}
 
 func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string) (*domain.OTP, error) {
 	if userID == "" {
@@ -24,19 +52,21 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 		logging.Log("COMMAND-Cm0ds").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-55M9f", "Errors.Org.NotFound")
 	}
-	orgPolicy, err := c.getOrgIAMPolicy(ctx, org.AggregateID)
+	orgPolicy, err := c.getOrgDomainPolicy(ctx, org.AggregateID)
 	if err != nil {
 		logging.Log("COMMAND-y5zv9").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org policy for loginname")
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.OrgIAM.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound")
 	}
+
 	otpWriteModel, err := c.otpWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return nil, err
 	}
 	if otpWriteModel.State == domain.MFAStateReady {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.Provider0.AlreadyReady")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
+
 	accountName := domain.GenerateLoginName(human.GetUsername(), org.PrimaryDomain, orgPolicy.UserLoginMustBeDomain)
 	if accountName == "" {
 		accountName = human.EmailAddress
@@ -45,8 +75,8 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.PushEvents(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
 
+	_, err = c.eventstore.Push(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
 	if err != nil {
 		return nil, err
 	}
@@ -69,17 +99,17 @@ func (c *Commands) HumanCheckMFAOTPSetup(ctx context.Context, userID, code, user
 		return nil, err
 	}
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.Provider0.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting")
 	}
 	if existingOTP.State == domain.MFAStateReady {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.Provider0.AlreadyReady")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady")
 	}
 	if err := domain.VerifyMFAOTP(code, existingOTP.Secret, c.multifactors.OTP.CryptoMFA); err != nil {
 		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID))
 	if err != nil {
 		return nil, err
 	}
@@ -99,15 +129,15 @@ func (c *Commands) HumanCheckMFAOTP(ctx context.Context, userID, code, resourceo
 		return err
 	}
 	if existingOTP.State != domain.MFAStateReady {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.Provider0.NotReady")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	err = domain.VerifyMFAOTP(code, existingOTP.Secret, c.multifactors.OTP.CryptoMFA)
 	if err == nil {
-		_, err = c.eventstore.PushEvents(ctx, user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		_, err = c.eventstore.Push(ctx, user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
 	}
-	_, pushErr := c.eventstore.PushEvents(ctx, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	_, pushErr := c.eventstore.Push(ctx, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	logging.Log("COMMAND-9fj7s").OnError(pushErr).Error("error create password check failed event")
 	return err
 }
@@ -122,10 +152,10 @@ func (c *Commands) HumanRemoveOTP(ctx context.Context, userID, resourceOwner str
 		return nil, err
 	}
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.Provider0.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
 	if err != nil {
 		return nil, err
 	}

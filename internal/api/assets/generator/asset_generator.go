@@ -6,31 +6,31 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	"github.com/caos/zitadel/internal/config"
+	"github.com/zitadel/zitadel/internal/config"
 )
 
 var (
-	directory = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
-	assets    = flag.String("assets", "../../../../docs/docs/apis/assets/assets.md", "path where the assets.md will be generated")
+	directory   = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
+	assetsDocs  = flag.String("assets", "../../../../docs/docs/apis/assets/assets.md", "path where the assets.md will be generated")
+	assetPrefix = flag.String("handler-prefix", "/assets/v1", "prefix of the handler paths")
 )
 
 func main() {
 	flag.Parse()
 	configFile := *directory + "asset.yaml"
 	authz, err := os.OpenFile(*directory+"../authz.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-Gn31f").OnError(err).Fatal("cannot open authz file")
+	logging.OnError(err).Fatal("cannot open authz file")
 	router, err := os.OpenFile(*directory+"../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-ABen3").OnError(err).Fatal("cannot open router file")
-	docs, err := os.OpenFile(*assets, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-Dfvsd").OnError(err).Fatal("cannot open docs file")
-	GenerateAssetHandler(configFile, authz, router, docs)
+	logging.OnError(err).Fatal("cannot open router file")
+	docs, err := os.OpenFile(*assetsDocs, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
+	logging.OnError(err).Fatal("cannot open docs file")
+	GenerateAssetHandler(configFile, *assetPrefix, authz, router, docs)
 }
 
 type Method struct {
 	Path        string
-	Feature     string
 	HasDarkMode bool
 	Handlers    []Handler
 }
@@ -97,7 +97,7 @@ type Service struct {
 	Methods map[string]Method
 }
 
-func GenerateAssetHandler(configFilePath string, authz, router, docs io.Writer) {
+func GenerateAssetHandler(configFilePath, handlerPrefix string, authz, router, docs io.Writer) {
 	conf := new(struct {
 		Services Services
 	})
@@ -117,7 +117,7 @@ func GenerateAssetHandler(configFilePath string, authz, router, docs io.Writer) 
 	}{
 		GoPkgName: "assets",
 		Name:      "AssetsService",
-		Prefix:    "/assets/v1",
+		Prefix:    handlerPrefix,
 		Services:  conf.Services,
 	}
 	err = tmplAuthz.Execute(authz, data)
@@ -131,7 +131,7 @@ func GenerateAssetHandler(configFilePath string, authz, router, docs io.Writer) 
 const authzTmpl = `package {{.GoPkgName}}
 
 import (
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 /**
@@ -143,15 +143,13 @@ var {{.Name}}_AuthMethods = authz.MethodMapping {
     {{ range $service := .Services}}
 	{{ range $method := .Methods}}
 	{{ range $handler := .Handlers}}
-    {{ if (or $method.Feature $handler.Permission) }}
+    {{ if $handler.Permission }}
     	"{{$handler.Method}}:{{$prefix}}{{$service.Prefix}}{{$method.Path}}{{$handler.PathSuffix}}": authz.Option{
                Permission: "{{$handler.Permission}}",
-               Feature:    "{{$method.Feature}}",
         },
 	{{ if $method.HasDarkMode }}
 		"{{$handler.Method}}:{{$prefix}}{{$service.Prefix}}{{$method.Path}}/dark{{$handler.PathSuffix}}": authz.Option{
                Permission: "{{$handler.Permission}}",
-               Feature:    "{{$method.Feature}}",
         },
 	{{end}}
 	{{end}}
@@ -166,9 +164,9 @@ const routerTmpl = `package {{.GoPkgName}}
 import (
 	"github.com/gorilla/mux"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/static"
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/static"
 )
 
 type {{.Name}} interface {

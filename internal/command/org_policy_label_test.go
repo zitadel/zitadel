@@ -1,28 +1,27 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/policy"
-	"github.com/caos/zitadel/internal/static"
-	"github.com/caos/zitadel/internal/static/mock"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/static/mock"
 )
 
 func TestCommandSide_AddLabelPolicy(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier orgFeatureChecker
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -65,7 +64,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -104,82 +103,16 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "add policy, permission denied",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
-							),
-						),
-					),
-				),
-				tokenVerifier: GetMockVerifier(t),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.LabelPolicy{
-					PrimaryColor:        "#ffffff",
-					BackgroundColor:     "#ffffff",
-					WarnColor:           "#ffffff",
-					FontColor:           "#ffffff",
-					PrimaryColorDark:    "#ffffff",
-					BackgroundColorDark: "#ffffff",
-					WarnColorDark:       "#ffffff",
-					FontColorDark:       "#ffffff",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
-			},
-		},
-		{
 			name: "add policy,ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"#ffffff",
 									"#ffffff",
 									"#ffffff",
@@ -196,7 +129,6 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 						},
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -239,8 +171,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
-				tokenVerifier: tt.fields.tokenVerifier,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -258,8 +189,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 
 func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier orgFeatureChecker
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -316,71 +246,6 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "permission denied error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
-							),
-						),
-					),
-				),
-				tokenVerifier: GetMockVerifier(t),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.LabelPolicy{
-					PrimaryColor:        "#000000",
-					BackgroundColor:     "#000000",
-					WarnColor:           "#000000",
-					FontColor:           "#000000",
-					PrimaryColorDark:    "#000000",
-					BackgroundColorDark: "#000000",
-					WarnColorDark:       "#000000",
-					FontColorDark:       "#000000",
-					HideLoginNameSuffix: true,
-					ErrorMsgPopup:       true,
-					DisableWatermark:    true,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
-			},
-		},
-		{
 			name: "no changes, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -388,7 +253,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -400,29 +265,10 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
 							),
 						),
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -453,7 +299,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -465,24 +311,6 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLabelPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								"#ffffff",
-								true,
-								true,
-								false,
 							),
 						),
 					),
@@ -507,7 +335,6 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 						},
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLabelPolicyPrivateLabel, domain.FeatureLabelPolicyWatermark),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -550,8 +377,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
-				tokenVerifier: tt.fields.tokenVerifier,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -622,7 +448,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -641,7 +467,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyActivatedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -726,7 +552,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -745,7 +571,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -782,9 +608,9 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		orgID      string
-		storageKey string
+		ctx    context.Context
+		orgID  string
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -804,23 +630,16 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
 				ctx:   context.Background(),
-				orgID: "org1",
+				orgID: "",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "logo",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -835,12 +654,61 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "logo",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "logo",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -851,7 +719,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -870,18 +738,26 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyLogoAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
-									"key",
+									&org.NewAggregate("org1").Aggregate,
+									"logo",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "logo",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -896,7 +772,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 				static:     tt.fields.storage,
 			}
-			got, err := r.AddLogoLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			got, err := r.AddLogoLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -971,7 +847,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -987,7 +863,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyLogoAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -996,7 +872,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyLogoRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -1039,11 +915,12 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		orgID      string
-		storageKey string
+		ctx    context.Context
+		orgID  string
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1063,23 +940,16 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
 				ctx:   context.Background(),
-				orgID: "org1",
+				orgID: "",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "icon",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1094,12 +964,61 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "icon",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "icon",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -1110,7 +1029,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1129,18 +1048,26 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyIconAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
-									"key",
+									&org.NewAggregate("org1").Aggregate,
+									"icon",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "icon",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1153,8 +1080,9 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.AddIconLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			got, err := r.AddIconLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1227,7 +1155,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1243,7 +1171,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyIconAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -1252,7 +1180,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyIconRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -1294,11 +1222,12 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		orgID      string
-		storageKey string
+		ctx    context.Context
+		orgID  string
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1319,22 +1248,15 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:   context.Background(),
-				orgID: "org1",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
+				orgID: "",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "logo",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1349,12 +1271,61 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "logo",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "logo",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -1365,7 +1336,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1384,18 +1355,26 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
-									"key",
+									&org.NewAggregate("org1").Aggregate,
+									"logo",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "logo",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1408,8 +1387,9 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.AddLogoDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			got, err := r.AddLogoDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1484,7 +1464,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1500,7 +1480,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -1509,7 +1489,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyLogoDarkRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -1555,9 +1535,9 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		orgID      string
-		storageKey string
+		ctx    context.Context
+		orgID  string
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1577,23 +1557,16 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
 				ctx:   context.Background(),
-				orgID: "org1",
+				orgID: "",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "icon",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1608,12 +1581,61 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "icon",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "icon",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -1624,7 +1646,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1643,18 +1665,26 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
-									"key",
+									&org.NewAggregate("org1").Aggregate,
+									"icon",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "icon",
+					ContentType:   "image",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1667,8 +1697,9 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.AddIconDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			got, err := r.AddIconDarkLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1739,7 +1770,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1755,7 +1786,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -1764,7 +1795,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyIconDarkRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -1806,11 +1837,12 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		orgID      string
-		storageKey string
+		ctx    context.Context
+		orgID  string
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1830,23 +1862,16 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
 				ctx:   context.Background(),
-				orgID: "org1",
+				orgID: "",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "font",
+					ContentType:   "ttf",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1861,12 +1886,53 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLabelPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "font",
+					ContentType:   "ttf",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -1877,7 +1943,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -1896,18 +1962,26 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyFontAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
-									"key",
+									&org.NewAggregate("org1").Aggregate,
+									"font",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
-				ctx:        context.Background(),
-				orgID:      "org1",
-				storageKey: "key",
+				ctx:   context.Background(),
+				orgID: "org1",
+				upload: &AssetUpload{
+					ResourceOwner: "org1",
+					ObjectName:    "font",
+					ContentType:   "ttf",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1920,8 +1994,9 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
-			got, err := r.AddFontLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.storageKey)
+			got, err := r.AddFontLabelPolicy(tt.args.ctx, tt.args.orgID, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1992,7 +2067,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLabelPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"#ffffff",
 								"#ffffff",
 								"#ffffff",
@@ -2008,7 +2083,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewLabelPolicyFontAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"key",
 							),
 						),
@@ -2017,7 +2092,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLabelPolicyFontRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"key",
 								),
 							),
@@ -2058,7 +2133,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 
 func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool) *org.LabelPolicyChangedEvent {
 	event, _ := org.NewLabelPolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		[]policy.LabelPolicyChanges{
 			policy.ChangePrimaryColor(primaryColor),
 			policy.ChangeBackgroundColor(backgroundColor),

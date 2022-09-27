@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"io"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 var _ EncryptionAlgorithm = (*AESCrypto)(nil)
@@ -18,8 +18,8 @@ type AESCrypto struct {
 	keyIDs          []string
 }
 
-func NewAESCrypto(config *KeyConfig) (*AESCrypto, error) {
-	keys, ids, err := LoadKeys(config)
+func NewAESCrypto(config *KeyConfig, keyStorage KeyStorage) (*AESCrypto, error) {
+	keys, ids, err := LoadKeys(config, keyStorage)
 	if err != nil {
 		return nil, err
 	}

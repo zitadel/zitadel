@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/logging"
-	"github.com/lib/pq"
+	"github.com/zitadel/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
-	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/database"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	usr_model "github.com/zitadel/zitadel/internal/user/model"
 )
 
 const (
@@ -21,24 +21,26 @@ const (
 	RefreshTokenKeyUserAgentID   = "user_agent_id"
 	RefreshTokenKeyExpiration    = "expiration"
 	RefreshTokenKeyResourceOwner = "resource_owner"
+	RefreshTokenKeyInstanceID    = "instance_id"
 )
 
 type RefreshTokenView struct {
-	ID                    string         `json:"tokenId" gorm:"column:id;primary_key"`
-	CreationDate          time.Time      `json:"-" gorm:"column:creation_date"`
-	ChangeDate            time.Time      `json:"-" gorm:"column:change_date"`
-	ResourceOwner         string         `json:"-" gorm:"column:resource_owner"`
-	Token                 string         `json:"-" gorm:"column:token"`
-	UserID                string         `json:"-" gorm:"column:user_id"`
-	ClientID              string         `json:"clientID" gorm:"column:client_id"`
-	UserAgentID           string         `json:"userAgentId" gorm:"column:user_agent_id"`
-	Audience              pq.StringArray `json:"audience" gorm:"column:audience"`
-	Scopes                pq.StringArray `json:"scopes" gorm:"column:scopes"`
-	AuthMethodsReferences pq.StringArray `json:"authMethodsReference" gorm:"column:amr"`
-	AuthTime              time.Time      `json:"authTime" gorm:"column:auth_time"`
-	IdleExpiration        time.Time      `json:"-" gorm:"column:idle_expiration"`
-	Expiration            time.Time      `json:"-" gorm:"column:expiration"`
-	Sequence              uint64         `json:"-" gorm:"column:sequence"`
+	ID                    string               `json:"tokenId" gorm:"column:id;primary_key"`
+	CreationDate          time.Time            `json:"-" gorm:"column:creation_date"`
+	ChangeDate            time.Time            `json:"-" gorm:"column:change_date"`
+	ResourceOwner         string               `json:"-" gorm:"column:resource_owner"`
+	Token                 string               `json:"-" gorm:"column:token"`
+	UserID                string               `json:"-" gorm:"column:user_id"`
+	ClientID              string               `json:"clientID" gorm:"column:client_id"`
+	UserAgentID           string               `json:"userAgentId" gorm:"column:user_agent_id"`
+	Audience              database.StringArray `json:"audience" gorm:"column:audience"`
+	Scopes                database.StringArray `json:"scopes" gorm:"column:scopes"`
+	AuthMethodsReferences database.StringArray `json:"authMethodsReference" gorm:"column:amr"`
+	AuthTime              time.Time            `json:"authTime" gorm:"column:auth_time"`
+	IdleExpiration        time.Time            `json:"-" gorm:"column:idle_expiration"`
+	Expiration            time.Time            `json:"-" gorm:"column:expiration"`
+	Sequence              uint64               `json:"-" gorm:"column:sequence"`
+	InstanceID            string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func RefreshTokenViewsToModel(tokens []*RefreshTokenView) []*usr_model.RefreshTokenView {
@@ -115,6 +117,7 @@ func (t *RefreshTokenView) AppendEvent(event *es_models.Event) error {
 func (t *RefreshTokenView) setRootData(event *es_models.Event) {
 	t.UserID = event.AggregateID
 	t.ResourceOwner = event.ResourceOwner
+	t.InstanceID = event.InstanceID
 }
 
 func (t *RefreshTokenView) appendAddedEvent(event *es_models.Event) error {

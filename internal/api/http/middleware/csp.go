@@ -34,7 +34,7 @@ var (
 	}
 )
 
-func (csp *CSP) Value(nonce string) string {
+func (csp *CSP) Value(nonce string, host string) string {
 	valuesMap := csp.asMap()
 
 	values := make([]string, 0, len(valuesMap))
@@ -43,7 +43,7 @@ func (csp *CSP) Value(nonce string) string {
 			continue
 		}
 
-		values = append(values, fmt.Sprintf("%v %v", k, v.String(nonce)))
+		values = append(values, fmt.Sprintf("%v %v", k, v.String(nonce, host)))
 	}
 
 	return strings.Join(values, ";")
@@ -99,24 +99,33 @@ func (srcOpts CSPSourceOptions) AddHost(h ...string) CSPSourceOptions {
 	return append(srcOpts, h...)
 }
 
+func (srcOpts CSPSourceOptions) AddOwnHost() CSPSourceOptions {
+	return append(srcOpts, placeHolderHost)
+}
+
 func (srcOpts CSPSourceOptions) AddScheme(s ...string) CSPSourceOptions {
 	return srcOpts.add(s, "%v:")
 }
 
 func (srcOpts CSPSourceOptions) AddNonce() CSPSourceOptions {
-	return append(srcOpts, "'nonce-%v'")
+	return append(srcOpts, fmt.Sprintf("'nonce-%s'", placeHolderNonce))
 }
+
+const (
+	placeHolderNonce = "{{nonce}}"
+	placeHolderHost  = "{{host}}"
+)
 
 func (srcOpts CSPSourceOptions) AddHash(alg, b64v string) CSPSourceOptions {
 	return append(srcOpts, fmt.Sprintf("'%v-%v'", alg, b64v))
 }
 
-func (srcOpts CSPSourceOptions) String(nonce string) string {
+func (srcOpts CSPSourceOptions) String(nonce, host string) string {
 	value := strings.Join(srcOpts, " ")
-	if !strings.Contains(value, "%v") {
+	if !strings.Contains(value, placeHolderNonce) && !strings.Contains(value, placeHolderHost) {
 		return value
 	}
-	return fmt.Sprintf(value, nonce)
+	return strings.ReplaceAll(strings.ReplaceAll(value, placeHolderHost, host), placeHolderNonce, nonce)
 }
 
 func (srcOpts CSPSourceOptions) add(values []string, format string) CSPSourceOptions {

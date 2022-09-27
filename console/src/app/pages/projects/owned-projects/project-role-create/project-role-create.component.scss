@@ -1,0 +1,39 @@
+.add-line-btn {
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+}
+
+.newrole-content {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ffffff20;
+  margin-bottom: 1rem;
+  display: flex;
+
+  .newrole {
+    display: grid;
+    grid-template-columns: 1fr;
+    flex: 1;
+
+    @media only screen and (min-width: 1000px) {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-gap: 1rem;
+    }
+  }
+
+  button {
+    align-self: flex-end;
+    margin-bottom: 1rem;
+  }
+}
+
+.continue-button {
+  margin-top: 3rem;
+  display: block;
+  padding: 0.5rem 4rem;
+
+  @media only screen and (max-width: 450px) {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+  }
+}

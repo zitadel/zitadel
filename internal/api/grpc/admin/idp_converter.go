@@ -1,13 +1,13 @@
 package admin
 
 import (
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func addOIDCIDPRequestToDomain(req *admin_pb.AddOIDCIDPRequest) *domain.IDPConfig {
@@ -81,71 +81,76 @@ func updateJWTConfigToDomain(req *admin_pb.UpdateIDPJWTConfigRequest) *domain.JW
 	}
 }
 
-func listIDPsToModel(req *admin_pb.ListIDPsRequest) *iam_model.IDPConfigSearchRequest {
+func listIDPsToModel(instanceID string, req *admin_pb.ListIDPsRequest) (*query.IDPSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &iam_model.IDPConfigSearchRequest{
-		Offset:        offset,
-		Limit:         limit,
-		Asc:           asc,
-		SortingColumn: idp_grpc.FieldNameToModel(req.SortingColumn),
-		Queries:       idpQueriesToModel(req.Queries),
+	queries, err := idpQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
 	}
+	iamQuery, err := query.NewIDPResourceOwnerSearchQuery(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, iamQuery)
+	return &query.IDPSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: idp_grpc.FieldNameToModel(req.SortingColumn),
+		},
+		Queries: queries,
+	}, nil
 }
 
-func idpQueriesToModel(queries []*admin_pb.IDPQuery) []*iam_model.IDPConfigSearchQuery {
-	q := make([]*iam_model.IDPConfigSearchQuery, len(queries))
+func idpQueriesToModel(queries []*admin_pb.IDPQuery) (q []query.SearchQuery, err error) {
+	q = make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i] = idpQueryToModel(query)
+		q[i], err = idpQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return q
+	return q, nil
 }
 
-func idpQueryToModel(query *admin_pb.IDPQuery) *iam_model.IDPConfigSearchQuery {
-	switch q := query.Query.(type) {
+func idpQueryToModel(idpQuery *admin_pb.IDPQuery) (query.SearchQuery, error) {
+	switch q := idpQuery.Query.(type) {
 	case *admin_pb.IDPQuery_IdpNameQuery:
-		return idp_grpc.IDPNameQueryToModel(q.IdpNameQuery)
+		return query.NewIDPNameSearchQuery(object.TextMethodToQuery(q.IdpNameQuery.Method), q.IdpNameQuery.Name)
 	case *admin_pb.IDPQuery_IdpIdQuery:
-		return idp_grpc.IDPIDQueryToModel(q.IdpIdQuery)
+		return query.NewIDPIDSearchQuery(q.IdpIdQuery.Id)
 	default:
-		return nil
+		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-VmqQu", "List.Query.Invalid")
 	}
 }
 
-func idpProviderViewsToDomain(idps []*iam_model.IDPProviderView) []*domain.IDPProvider {
+func idpsToDomain(idps []*query.IDP) []*domain.IDPProvider {
 	idpProvider := make([]*domain.IDPProvider, len(idps))
 	for i, idp := range idps {
 		idpProvider[i] = &domain.IDPProvider{
 			ObjectRoot: models.ObjectRoot{
-				AggregateID: idp.AggregateID,
+				AggregateID: idp.ResourceOwner,
 			},
-			IDPConfigID: idp.IDPConfigID,
-			Type:        idpConfigTypeToDomain(idp.IDPProviderType),
+			IDPConfigID: idp.ID,
+			Type:        idp.OwnerType,
 		}
 	}
 	return idpProvider
 }
 
-func idpConfigTypeToDomain(idpType iam_model.IDPProviderType) domain.IdentityProviderType {
-	switch idpType {
-	case iam_model.IDPProviderTypeOrg:
-		return domain.IdentityProviderTypeOrg
-	default:
-		return domain.IdentityProviderTypeSystem
-	}
-}
-
-func externalIDPViewsToDomain(idps []*user_model.ExternalIDPView) []*domain.ExternalIDP {
-	externalIDPs := make([]*domain.ExternalIDP, len(idps))
+func idpUserLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
+	externalIDPs := make([]*domain.UserIDPLink, len(idps))
 	for i, idp := range idps {
-		externalIDPs[i] = &domain.ExternalIDP{
+		externalIDPs[i] = &domain.UserIDPLink{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID:   idp.UserID,
 				ResourceOwner: idp.ResourceOwner,
 			},
-			IDPConfigID:    idp.IDPConfigID,
-			ExternalUserID: idp.ExternalUserID,
-			DisplayName:    idp.UserDisplayName,
+			IDPConfigID:    idp.IDPID,
+			ExternalUserID: idp.ProvidedUserID,
+			DisplayName:    idp.ProvidedUsername,
 		}
 	}
 	return externalIDPs

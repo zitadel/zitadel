@@ -1,0 +1,16 @@
+<div class="max-width-container">
+  <div class="settings-top-view">
+    <div>
+      <div class="settings-title-row">
+        <h1>{{ 'SETTINGS.INSTANCE.TITLE' | translate }}</h1>
+      </div>
+      <p class="desc cnsl-secondary-text">{{ 'SETTINGS.INSTANCE.DESCRIPTION' | translate }}</p>
+    </div>
+    <span class="fill-space"></span>
+  </div>
+  <cnsl-settings-list
+    [selectedId]="id"
+    [serviceType]="PolicyComponentServiceType.ADMIN"
+    [settingsList]="settingsList"
+  ></cnsl-settings-list>
+</div>

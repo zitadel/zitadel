@@ -3,18 +3,17 @@ package handler
 import (
 	"encoding/json"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
-	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
 
 const (
@@ -56,43 +55,41 @@ func (t *RefreshToken) Subscription() *v1.Subscription {
 }
 
 func (t *RefreshToken) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{user_es_model.UserAggregate, project_es_model.ProjectAggregate}
+	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
 }
 
-func (t *RefreshToken) CurrentSequence() (uint64, error) {
-	sequence, err := t.view.GetLatestRefreshTokenSequence()
+func (t *RefreshToken) CurrentSequence(instanceID string) (uint64, error) {
+	sequence, err := t.view.GetLatestRefreshTokenSequence(instanceID)
 	if err != nil {
 		return 0, err
 	}
 	return sequence.CurrentSequence, nil
 }
 
-func (t *RefreshToken) EventQuery() (*es_models.SearchQuery, error) {
-	sequence, err := t.view.GetLatestRefreshTokenSequence()
+func (t *RefreshToken) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
+	sequences, err := t.view.GetLatestRefreshTokenSequences(instanceIDs...)
 	if err != nil {
 		return nil, err
 	}
-	return es_models.NewSearchQuery().
-		AggregateTypeFilter(user_es_model.UserAggregate, project_es_model.ProjectAggregate).
-		LatestSequenceFilter(sequence.CurrentSequence), nil
+	return newSearchQuery(sequences, t.AggregateTypes(), instanceIDs), nil
 }
 
 func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 	switch eventstore.EventType(event.Type) {
-	case user_repo.HumanRefreshTokenAddedType:
+	case user.HumanRefreshTokenAddedType:
 		token := new(view_model.RefreshTokenView)
 		err := token.AppendEvent(event)
 		if err != nil {
 			return err
 		}
 		return t.view.PutRefreshToken(token, event)
-	case user_repo.HumanRefreshTokenRenewedType:
-		e := new(user_repo.HumanRefreshTokenRenewedEvent)
+	case user.HumanRefreshTokenRenewedType:
+		e := new(user.HumanRefreshTokenRenewedEvent)
 		if err := json.Unmarshal(event.Data, e); err != nil {
 			logging.Log("EVEN-DBbn4").WithError(err).Error("could not unmarshal event data")
 			return caos_errs.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
 		}
-		token, err := t.view.RefreshTokenByID(e.TokenID)
+		token, err := t.view.RefreshTokenByID(e.TokenID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -101,17 +98,17 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 			return err
 		}
 		return t.view.PutRefreshToken(token, event)
-	case user_repo.HumanRefreshTokenRemovedType:
-		e := new(user_repo.HumanRefreshTokenRemovedEvent)
+	case user.HumanRefreshTokenRemovedType:
+		e := new(user.HumanRefreshTokenRemovedEvent)
 		if err := json.Unmarshal(event.Data, e); err != nil {
 			logging.Log("EVEN-BDbh3").WithError(err).Error("could not unmarshal event data")
 			return caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
 		}
-		return t.view.DeleteRefreshToken(e.TokenID, event)
-	case user_repo.UserLockedType,
-		user_repo.UserDeactivatedType,
-		user_repo.UserRemovedType:
-		return t.view.DeleteUserRefreshTokens(event.AggregateID, event)
+		return t.view.DeleteRefreshToken(e.TokenID, event.InstanceID, event)
+	case user.UserLockedType,
+		user.UserDeactivatedType,
+		user.UserRemovedType:
+		return t.view.DeleteUserRefreshTokens(event.AggregateID, event.InstanceID, event)
 	default:
 		return t.view.ProcessedRefreshTokenSequence(event)
 	}

@@ -1,87 +1,90 @@
-.preview {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-  margin-bottom: 2rem;
+@use '@angular/material' as mat;
 
-  * {
+@import '../../../../../styles/input.scss';
+@import '../../../label/label.component.scss';
+
+@mixin preview-theme($show-dark) {
+  $theme: if($show-dark, $caos-dark-app-theme, $caos-light-app-theme);
+
+  @include input-theme($theme);
+  @include cnsl-label-theme($theme);
+  //   @include mat.all-component-themes($theme);
+
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+
+  .preview {
     pointer-events: none;
-  }
+    border-radius: 0.5rem;
+    transform: scale(0.9);
+    color: map-get($foreground, text);
 
-  .label {
-    color: var(--grey);
-    font-size: 12px;
-    position: absolute;
-    right: 1rem;
-    top: 1rem;
-  }
+    * {
+      pointer-events: none;
+    }
 
-  .dashed {
-    border: 2px dashed rgba(#697386, .5);
-    border-radius: .5rem;
-    padding: 100px 20px;
+    .label {
+      font-size: 12px;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
 
-    .login-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 360px;
-      margin: auto;
+    .dashed {
+      padding: 100px 20px;
 
-      @media only screen and (min-width: 1000px) {
-        width: 360px;
-      }
-
-      img {
-        max-width: 160px;
-        max-height: 150px;
-        margin-bottom: 1rem;
-      }
-
-      h1 {
-        font-size: 20px;
-      }
-
-      .formfield {
-        width: 100%;
-      }
-
-      .btn-wrapper {
+      .login-wrapper {
         display: flex;
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .error-msg {
-        align-self: flex-start;
-        display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        outline: none;
-        justify-content: flex-start;
+        width: 100%;
+        max-width: 360px;
+        margin: auto;
 
-        i {
-          margin-right: .5rem;
+        @media only screen and (min-width: 1000px) {
+          width: 360px;
         }
 
-        span {
-          font-size: 14px;
-          margin: 1rem 0;
+        img {
+          max-width: 160px;
+          max-height: 150px;
+          margin-bottom: 1rem;
         }
-      }
-    }
 
-    &.light {
-      .login-wrapper *:not(.cnsl-label):not(.mat-button-wrapper) {
-        color: #000;
-      }
-    }
+        h1 {
+          font-size: 20px;
+        }
 
-    &.dark {
-      .login-wrapper *:not(.cnsl-label):not(.mat-button-wrapper) {
-        color: #fff;
+        .formfield {
+          width: 100%;
+        }
+
+        .btn-wrapper {
+          display: flex;
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .error-msg {
+          align-self: flex-start;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          outline: none;
+          justify-content: flex-start;
+
+          i {
+            margin-right: 0.5rem;
+          }
+
+          span {
+            font-size: 14px;
+            margin: 1rem 0;
+          }
+        }
       }
     }
   }

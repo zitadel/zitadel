@@ -2,65 +2,92 @@ package auth
 
 import (
 	"context"
-	"time"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/change"
-	"github.com/caos/zitadel/internal/api/grpc/metadata"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/api/grpc/org"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/change"
+	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
+	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/api/grpc/org"
+	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
+	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*auth_pb.GetMyUserResponse, error) {
-	user, err := s.repo.MyUser(ctx)
+	user, err := s.query.GetUserByID(ctx, true, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user)}, nil
+	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user, s.assetsAPIDomain(ctx))}, nil
+}
+
+func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserRequest) (*auth_pb.RemoveMyUserResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	userGrantUserID, err := query.NewUserGrantUserIDSearchQuery(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID}}
+	grants, err := s.query.UserGrants(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+
+	userQuery, err := query.NewMembershipUserIDQuery(authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants)...)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.RemoveMyUserResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(details),
+	}, nil
 }
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
-	sequence, limit, asc := change.ChangeQueryToModel(req.Query)
-	features, err := s.repo.GetOrgFeatures(ctx, authz.GetCtxData(ctx).ResourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	changes, err := s.repo.MyUserChanges(ctx, sequence, limit, asc, features.AuditLogRetention)
+	sequence, limit, asc := change.ChangeQueryToQuery(req.Query)
+	changes, err := s.query.UserChanges(ctx, authz.GetCtxData(ctx).UserID, sequence, limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyUserChangesResponse{
-		Result: change.UserChangesToPb(changes.Changes),
+		Result: change.ChangesToPb(changes.Changes, s.assetsAPIDomain(ctx)),
 	}, nil
 }
 
 func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadataRequest) (*auth_pb.ListMyMetadataResponse, error) {
-	res, err := s.repo.SearchMyMetadata(ctx, ListUserMetadataToDomain(req))
+	queries, err := ListUserMetadataToQuery(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchUserMetadata(ctx, true, authz.GetCtxData(ctx).UserID, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyMetadataResponse{
-		Result: metadata.MetadataListToPb(res.Result),
-		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  metadata.UserMetadataListToPb(res.Metadata),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
 func (s *Server) GetMyMetadata(ctx context.Context, req *auth_pb.GetMyMetadataRequest) (*auth_pb.GetMyMetadataResponse, error) {
-	data, err := s.repo.GetMyMetadataByKey(ctx, req.Key)
+	data, err := s.query.GetUserMetadataByKey(ctx, true, authz.GetCtxData(ctx).UserID, req.Key)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.GetMyMetadataResponse{
-		Metadata: metadata.DomainMetadataToPb(data),
+		Metadata: metadata.UserMetadataToPb(data),
 	}, nil
 }
 
@@ -70,7 +97,7 @@ func (s *Server) ListMyUserSessions(ctx context.Context, req *auth_pb.ListMyUser
 		return nil, err
 	}
 	return &auth_pb.ListMyUserSessionsResponse{
-		Result: user_grpc.UserSessionsToPb(userSessions),
+		Result: user_grpc.UserSessionsToPb(userSessions, s.assetsAPIDomain(ctx)),
 	}, nil
 }
 
@@ -81,7 +108,7 @@ func (s *Server) UpdateMyUserName(ctx context.Context, req *auth_pb.UpdateMyUser
 		return nil, err
 	}
 	return &auth_pb.UpdateMyUserNameResponse{
-		Details: object.DomainToChangeDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -94,46 +121,211 @@ func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {
 }
 
 func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGrantsRequest) (*auth_pb.ListMyUserGrantsResponse, error) {
-	res, err := s.repo.SearchMyUserGrants(ctx, ListMyUserGrantsRequestToModel(req))
+	queries, err := ListMyUserGrantsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.UserGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
-		Result: UserGrantsToPb(res.Result),
-		Details: object.ToListDetails(
-			res.TotalResult,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  UserGrantsToPb(res.UserGrants),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
 func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProjectOrgsRequest) (*auth_pb.ListMyProjectOrgsResponse, error) {
-	r, err := ListMyProjectOrgsRequestToModel(req)
+	queries, err := ListMyProjectOrgsRequestToQuery(req)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.repo.SearchMyProjectOrgs(ctx, r)
+
+	ctxData := authz.GetCtxData(ctx)
+
+	//client of user is not in project of ZITADEL
+	if ctxData.ProjectID != authz.GetInstance(ctx).ProjectID() {
+		userGrantProjectID, err := query.NewUserGrantProjectIDSearchQuery(ctxData.ProjectID)
+		if err != nil {
+			return nil, err
+		}
+		userGrantUserID, err := query.NewUserGrantUserIDSearchQuery(ctxData.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}})
+		if err != nil {
+			return nil, err
+		}
+
+		ids := make([]string, 0, len(grants.UserGrants))
+		for _, grant := range grants.UserGrants {
+			ids = appendIfNotExists(ids, grant.ResourceOwner)
+		}
+
+		idsQuery, err := query.NewOrgIDsSearchQuery(ids...)
+		if err != nil {
+			return nil, err
+		}
+		queries.Queries = append(queries.Queries, idsQuery)
+	} else {
+		memberships, err := s.myOrgsQuery(ctx, ctxData)
+		if err != nil {
+			return nil, err
+		}
+
+		if !isIAMAdmin(memberships.Memberships) {
+			ids := make([]string, 0, len(memberships.Memberships))
+			for _, membership := range memberships.Memberships {
+				orgID := membership.ResourceOwner
+				if membership.ProjectGrant != nil && membership.ProjectGrant.GrantedOrgID != "" {
+					orgID = membership.ProjectGrant.GrantedOrgID
+				}
+				ids = appendIfNotExists(ids, orgID)
+			}
+
+			idsQuery, err := query.NewOrgIDsSearchQuery(ids...)
+			if err != nil {
+				return nil, err
+			}
+			queries.Queries = append(queries.Queries, idsQuery)
+		}
+	}
+
+	orgs, err := s.query.SearchOrgs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyProjectOrgsResponse{
-		//TODO: not all details
-		Details: object.ToListDetails(res.TotalResult, 0, time.Time{}),
-		Result:  org.OrgsToPb(res.Result),
+		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
+		Result:  org.OrgsToPb(orgs.Orgs),
 	}, nil
 }
 
-func ListMyProjectOrgsRequestToModel(req *auth_pb.ListMyProjectOrgsRequest) (*grant_model.UserGrantSearchRequest, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := org.OrgQueriesToUserGrantModel(req.Queries)
+func (s *Server) myOrgsQuery(ctx context.Context, ctxData authz.CtxData) (*query.Memberships, error) {
+	userQuery, err := query.NewMembershipUserIDQuery(ctxData.UserID)
 	if err != nil {
 		return nil, err
 	}
-	return &grant_model.UserGrantSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
+	return s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery},
+	})
+}
+
+func isIAMAdmin(memberships []*query.Membership) bool {
+	for _, m := range memberships {
+		if m.IAM != nil {
+			return true
+		}
+	}
+	return false
+}
+
+func appendIfNotExists(array []string, value string) []string {
+	for _, a := range array {
+		if a == value {
+			return array
+		}
+	}
+	return append(array, value)
+}
+
+func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*query.OrgSearchQueries, error) {
+	offset, limit, asc := obj_grpc.ListQueryToModel(req.Query)
+	queries, err := org.OrgQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.OrgSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
+}
+
+func membershipToDomain(memberships []*query.Membership) []*domain.UserMembership {
+	result := make([]*domain.UserMembership, len(memberships))
+	for i, membership := range memberships {
+		typ, displayName, aggID, objID := MemberTypeToDomain(membership)
+		result[i] = &domain.UserMembership{
+			UserID:        membership.UserID,
+			MemberType:    typ,
+			AggregateID:   aggID,
+			ObjectID:      objID,
+			Roles:         membership.Roles,
+			DisplayName:   displayName,
+			CreationDate:  membership.CreationDate,
+			ChangeDate:    membership.ChangeDate,
+			ResourceOwner: membership.ResourceOwner,
+			//TODO: implement
+			// ResourceOwnerName: membership.ResourceOwnerName,
+			Sequence: membership.Sequence,
+		}
+	}
+	return result
+}
+
+func MemberTypeToDomain(m *query.Membership) (_ domain.MemberType, displayName, aggID, objID string) {
+	if m.Org != nil {
+		return domain.MemberTypeOrganisation, m.Org.Name, m.Org.OrgID, ""
+	} else if m.IAM != nil {
+		return domain.MemberTypeIam, m.IAM.Name, m.IAM.IAMID, ""
+	} else if m.Project != nil {
+		return domain.MemberTypeProject, m.Project.Name, m.Project.ProjectID, ""
+	} else if m.ProjectGrant != nil {
+		return domain.MemberTypeProjectGrant, m.ProjectGrant.ProjectName, m.ProjectGrant.ProjectID, m.ProjectGrant.GrantID
+	}
+	return domain.MemberTypeUnspecified, "", "", ""
+}
+
+func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {
+	cascades := make([]*command.CascadingMembership, len(memberships))
+	for i, membership := range memberships {
+		cascades[i] = &command.CascadingMembership{
+			UserID:        membership.UserID,
+			ResourceOwner: membership.ResourceOwner,
+			IAM:           cascadingIAMMembership(membership.IAM),
+			Org:           cascadingOrgMembership(membership.Org),
+			Project:       cascadingProjectMembership(membership.Project),
+			ProjectGrant:  cascadingProjectGrantMembership(membership.ProjectGrant),
+		}
+	}
+	return cascades
+}
+
+func cascadingIAMMembership(membership *query.IAMMembership) *command.CascadingIAMMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingIAMMembership{IAMID: membership.IAMID}
+}
+func cascadingOrgMembership(membership *query.OrgMembership) *command.CascadingOrgMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingOrgMembership{OrgID: membership.OrgID}
+}
+func cascadingProjectMembership(membership *query.ProjectMembership) *command.CascadingProjectMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectMembership{ProjectID: membership.ProjectID}
+}
+func cascadingProjectGrantMembership(membership *query.ProjectGrantMembership) *command.CascadingProjectGrantMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectGrantMembership{ProjectID: membership.ProjectID, GrantID: membership.GrantID}
+}
+
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
+	converted := make([]string, len(userGrants))
+	for i, grant := range userGrants {
+		converted[i] = grant.ID
+	}
+	return converted
 }

@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+
+import { InfoSectionType } from '../info-section/info-section.component';
 
 @Component({
   selector: 'cnsl-edit-text',
@@ -10,32 +12,34 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class EditTextComponent implements OnInit, OnDestroy {
   @Input() label: string = '';
-  @Input() current$!: Observable<{ [key: string]: any | string; }>;
-  @Input() default$!: Observable<{ [key: string]: any | string; }>;
+  @Input() current$!: Observable<{ [key: string]: string | boolean }>;
+  @Input() default$!: Observable<{ [key: string]: string | boolean }>;
   @Input() currentlyDragged: string = '';
-  @Output() changedValues: EventEmitter<{ [key: string]: string; }> = new EventEmitter();
-  public currentMap: { [key: string]: string; } = {};
+  @Output() changedValues: EventEmitter<{ [key: string]: string }> = new EventEmitter();
+  public currentMap: { [key: string]: string | boolean } = {}; // boolean because of isDefault
   private destroy$: Subject<void> = new Subject();
-  public form!: FormGroup;
-  public warnText: { [key: string]: string | undefined; } = {};
+  public form!: UntypedFormGroup;
+  public warnText: { [key: string]: string | boolean | undefined } = {};
 
   @Input() public chips: any[] = [];
   @Input() public disabled: boolean = true;
 
   public copied: string = '';
+  public InfoSectionType: any = InfoSectionType;
 
   public ngOnInit(): void {
-    this.current$.pipe(takeUntil(this.destroy$)).subscribe(value => {
+    this.current$.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       this.currentMap = value;
-      this.form = new FormGroup({});
-      Object.keys(value).map(key => {
-        const control = new FormControl({ value: value[key], disabled: this.disabled });
-        this.form.addControl(key, control);
+      this.form = new UntypedFormGroup({});
+      Object.keys(value).map((key) => {
+        if (key !== 'isDefault') {
+          const control = new UntypedFormControl({ value: value[key], disabled: this.disabled });
+          this.form.addControl(key, control);
+        }
       });
 
-      this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(values => this.changedValues.emit(values));
+      this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((values) => this.changedValues.emit(values));
     });
-
   }
 
   public ngOnDestroy(): void {
@@ -43,7 +47,7 @@ export class EditTextComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  public setWarnText(key: string, text: string | undefined): void {
+  public setWarnText(key: string, text: string | boolean | undefined): void {
     this.warnText[key] = text;
   }
 

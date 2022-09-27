@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig, resourceOwner string) (*domain.OIDCIDPConfig, error) {
@@ -33,7 +34,7 @@ func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCI
 		config.AuthorizationEndpoint,
 		config.TokenEndpoint,
 		config.ClientSecretString,
-		c.idpConfigSecretCrypto,
+		c.idpConfigEncryption,
 		config.IDPDisplayNameMapping,
 		config.UsernameMapping,
 		config.Scopes...)
@@ -41,10 +42,10 @@ func (c *Commands) ChangeIDPOIDCConfig(ctx context.Context, config *domain.OIDCI
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-10ods", "Errors.Org.IDPConfig.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

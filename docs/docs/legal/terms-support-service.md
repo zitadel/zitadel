@@ -38,6 +38,8 @@ We provide the Services under the conditions stated on our websites and the PO a
 
 We are entitled to offer new services, to withdraw existing services (**Termination**) or to modify the specifications and prices of existing services (**Modification**) at any time. If the modification or termination affects a service that you are using at that time, we will inform you via email that said service will be automatically modified and/or is no longer available after a period of 30 days.
 
+If such modification would have a disadvantageous impact on the Customer use of service, CAOS and Customer must discuss the change with the Customer first and, to the best of its ability, find a solution that is acceptable to both Parties. If such a solution cannot be found, CAOS may implement the modification and Customer may submit notice of termination of the relevant Service (email is sufficient) before the modification becomes effective without being obliged to pay contractual penalties or termination fees. CAOS may modify the prices for a service after the minimum term of the agreement.
+
 ### Modification of services booked by you
 
 You may change or terminate Services booked by you at any time. Modifications will take effect in the next billing period, or as agreed otherwise between the Parties. Changing services booked by you requires a new PO, stating the new conditions of the services after Modification, to be accepted by the Parties.
@@ -102,7 +104,6 @@ You will take appropriate measures to prevent any misuse of the services you boo
 
 ### Disaster recovery
 
-
 Any liability for damages, indirect or direct, in case of data loss is explicitly rejected.
 
 ### Reporting obligations
@@ -145,7 +146,7 @@ Recertification of a unit, to be covered under Support Services, is required for
 * units that run a release that is older than 180 days from the products most recent stable release
 * requests for support on products and services purchased or supported from non-authorized resellers
 
-Recertification of a unit requires payment of a Recertification Fee which results in a [checkup](/docs/guides/installation/checkup) of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
+Recertification of a unit requires payment of a Recertification Fee which results in a checkup of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
 
 Please contact us for current fees.
 
@@ -180,7 +181,7 @@ In the event of the termination of the contract, we reserve the right to irrevoc
 
 ## Data protection
 
-Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](privacy-policy) and [Data Processing Agreement](data-processing-agreement), or our [Trust Site](https://zitadel.ch/trust/) for more information about how we process and protect your data.
+Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](privacy-policy) and [Data Processing Agreement](data-processing-agreement), or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
 
 ## Liability
 
@@ -212,9 +213,9 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 ### Entry into force
 
-These TOS shall enter into force as of August 23, 2021.
+These TOS shall enter into force as of 15.07.2022.
 
-Last revised: August 23, 2021
+Last revised: June 14, 2022
 
 ### Amendments
 

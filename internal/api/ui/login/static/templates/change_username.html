@@ -1,0 +1,39 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+    <h1>{{t "UsernameChange.Title"}}</h1>
+
+    {{ template "user-profile" . }}
+
+    <p>{{t "UsernameChange.Description"}}</p>
+</div>
+
+<form action="{{ changeUsernameUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+
+    <div class="field">
+        <label class="lgn-label" for="username">{{t "UsernameChange.UsernameLabel"}}</label>
+        <input class="lgn-input" type="text" id="username" name="username" autocomplete="username" autofocus required>
+    </div>
+
+    {{ template "error-message" .}}
+
+    <div class="lgn-actions">
+        <a class="lgn-stroked-button" href="{{ loginUrl }}">
+            {{t "UsernameChange.CancelButtonText"}}
+        </a>
+        <span class="fill-space"></span>
+        <button type="submit" id="submit-button" value="false"
+            class="lgn-raised-button lgn-primary">{{t "UsernameChange.NextButtonText"}}</button>
+
+    </div>
+</form>
+
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+
+
+{{template "main-bottom" .}}

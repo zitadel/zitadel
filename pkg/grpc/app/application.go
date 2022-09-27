@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 )
 
 func (a *App) Localizers() []middleware.Localizer {

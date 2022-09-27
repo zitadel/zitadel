@@ -6,17 +6,19 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/id"
-	id_mock "github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/idpconfig"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id"
+	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommandSide_AddIDPConfig(t *testing.T) {
@@ -92,7 +94,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewIDPConfigAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"config1",
 									"name1",
 									domain.IDPConfigTypeOIDC,
@@ -102,7 +104,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewIDPOIDCConfigAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"clientid1",
 									"config1",
 									"issuer",
@@ -168,7 +170,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewIDPConfigAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"config1",
 									"name1",
 									domain.IDPConfigTypeOIDC,
@@ -178,7 +180,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewIDPJWTConfigAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"config1",
 									"jwt-endpoint",
 									"issuer",
@@ -223,9 +225,9 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idGenerator:           tt.fields.idGenerator,
-				idpConfigSecretCrypto: tt.fields.secretCrypto,
+				eventstore:          tt.fields.eventstore,
+				idGenerator:         tt.fields.idGenerator,
+				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := r.AddIDPConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -319,7 +321,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -329,7 +331,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -404,7 +406,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 
 func newIDPConfigChangedEvent(ctx context.Context, orgID, configID, oldName, newName string, stylingType domain.IDPConfigStylingType) *org.IDPConfigChangedEvent {
 	event, _ := org.NewIDPConfigChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
+		&org.NewAggregate(orgID).Aggregate,
 		configID,
 		oldName,
 		[]idpconfig.IDPConfigChanges{
@@ -413,4 +415,191 @@ func newIDPConfigChangedEvent(ctx context.Context, orgID, configID, oldName, new
 		},
 	)
 	return event
+}
+
+func TestCommands_RemoveIDPConfig(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx                   context.Context
+		idpID                 string
+		orgID                 string
+		cascadeRemoveProvider bool
+		cascadeExternalIDPs   []*domain.UserIDPLink
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"not existing, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args{
+				context.Background(),
+				"idp1",
+				"org1",
+				false,
+				nil,
+			},
+			res{
+				nil,
+				caos_errs.IsNotFound,
+			},
+		},
+		{
+			"no cascade, ok",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idp1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								false,
+							),
+						),
+					),
+					expectPush(
+						eventPusherToEvents(
+							org.NewIDPConfigRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idp1",
+								"name1",
+							),
+						),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "org1")),
+					),
+				),
+			},
+			args{
+				context.Background(),
+				"idp1",
+				"org1",
+				false,
+				nil,
+			},
+			res{
+				&domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				nil,
+			},
+		},
+		{
+			"cascade, ok",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idp1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayName",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.com",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"idp1",
+								"name",
+								"id1",
+							),
+						),
+					),
+					expectPush(
+						eventPusherToEvents(
+							org.NewIDPConfigRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idp1",
+								"name1",
+							),
+							org.NewIdentityProviderCascadeRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idp1",
+							),
+							user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"idp1",
+								"id1",
+							),
+						),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "org1")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("idp1", "id1")),
+					),
+				),
+			},
+			args{
+				context.Background(),
+				"idp1",
+				"org1",
+				true,
+				[]*domain.UserIDPLink{
+					{
+						ObjectRoot: models.ObjectRoot{
+							AggregateID: "user1",
+						},
+						IDPConfigID:    "idp1",
+						ExternalUserID: "id1",
+						DisplayName:    "name",
+					},
+				},
+			},
+			res{
+				&domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := c.RemoveIDPConfig(tt.args.ctx, tt.args.idpID, tt.args.orgID, tt.args.cascadeRemoveProvider, tt.args.cascadeExternalIDPs...)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
 }

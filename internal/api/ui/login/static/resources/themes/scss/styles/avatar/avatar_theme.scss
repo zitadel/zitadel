@@ -1,0 +1,53 @@
+@import "avatar";
+@import "../elevation/elevation";
+
+@mixin lgn-avatar-theme() {
+  @include lgn-avatar-color();
+}
+
+@mixin lgn-avatar-color() {
+  .lgn-avatar:not(.transparent) {
+    @include _lgn-avatar-theme-property("background-color", false);
+    // @include lgn-avatar-elevation(2);
+  }
+
+  //   .lgn-avatar .initials {
+  //     @include _lgn-avatar-theme-property("color", true);
+  //   }
+}
+
+@mixin _lgn-avatar-theme-property($property, $contrast) {
+  $color: if(
+    $contrast,
+    var(--zitadel-color-primary-contrast),
+    var(--zitadel-color-primary)
+  );
+
+  &.lgn-primary {
+    #{$property}: $color;
+  }
+  &.lgn-accent {
+    #{$property}: $color;
+  }
+  &.lgn-warn {
+    #{$property}: $color;
+  }
+
+  &.lgn-primary,
+  &.lgn-accent,
+  &.lgn-warn,
+  &[disabled] {
+    &[disabled] {
+      $btn-color: if(
+        $property == "color",
+        var(--zitadel-color-button-disabled),
+        var(--itadel-color-button-disabled-background)
+      );
+      #{$property}: $btn-color;
+    }
+  }
+}
+
+@mixin lgn-avatar-elevation($zValue, $opacity: $lgn-elevation-opacity) {
+  @include lgn-elevation($zValue, rgb(0, 0, 0), $opacity);
+}

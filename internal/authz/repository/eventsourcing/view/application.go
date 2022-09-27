@@ -3,70 +3,42 @@ package view
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/project/repository/view"
-	"github.com/caos/zitadel/internal/project/repository/view/model"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-const (
-	applicationTable = "authz.applications"
-)
-
-func (v *View) ApplicationByID(projectID, appID string) (*model.ApplicationView, error) {
-	return view.ApplicationByID(v.Db, applicationTable, projectID, appID)
+func (v *View) ApplicationByOIDCClientID(ctx context.Context, clientID string) (*query.App, error) {
+	return v.Query.AppByOIDCClientID(ctx, clientID)
 }
 
-func (v *View) ApplicationByOIDCClientID(clientID string) (*model.ApplicationView, error) {
-	return view.ApplicationByOIDCClientID(v.Db, applicationTable, clientID)
-}
-
-func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, appName string) (_ *model.ApplicationView, err error) {
+func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, appName string) (_ *query.App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	return view.ApplicationByProjectIDAndAppName(v.Db, applicationTable, projectID, appName)
-}
-
-func (v *View) SearchApplications(request *proj_model.ApplicationSearchRequest) ([]*model.ApplicationView, uint64, error) {
-	return view.SearchApplications(v.Db, applicationTable, request)
-}
-
-func (v *View) PutApplication(project *model.ApplicationView, event *models.Event) error {
-	err := view.PutApplication(v.Db, applicationTable, project)
+	nameQuery, err := query.NewAppNameSearchQuery(query.TextEquals, appName)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return v.ProcessedApplicationSequence(event)
-}
-
-func (v *View) DeleteApplication(appID string, event *models.Event) error {
-	err := view.DeleteApplication(v.Db, applicationTable, appID)
-	if err != nil && !errors.IsNotFound(err) {
-		return err
+	projectQuery, err := query.NewAppProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
 	}
-	return v.ProcessedApplicationSequence(event)
-}
 
-func (v *View) GetLatestApplicationSequence() (*repository.CurrentSequence, error) {
-	return v.latestSequence(applicationTable)
-}
+	queries := &query.AppSearchQueries{
+		Queries: []query.SearchQuery{
+			nameQuery,
+			projectQuery,
+		},
+	}
 
-func (v *View) ProcessedApplicationSequence(event *models.Event) error {
-	return v.saveCurrentSequence(applicationTable, event)
-}
+	apps, err := v.Query.SearchApps(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	if len(apps.Apps) != 1 {
+		return nil, errors.ThrowNotFound(nil, "VIEW-svLQq", "app not found")
+	}
 
-func (v *View) UpdateApplicationSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(applicationTable)
-}
-
-func (v *View) GetLatestApplicationFailedEvent(sequence uint64) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(applicationTable, sequence)
-}
-
-func (v *View) ProcessedApplicationFailedEvent(failedEvent *repository.FailedEvent) error {
-	return v.saveFailedEvent(failedEvent)
+	return apps.Apps[0], nil
 }

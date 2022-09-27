@@ -1,28 +1,37 @@
 package eventstore
 
 import (
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"database/sql"
+	"time"
+
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
-//SearchQueryBuilder represents the builder for your filter
+// SearchQueryBuilder represents the builder for your filter
 // if invalid data are set the filter will fail
 type SearchQueryBuilder struct {
 	columns       repository.Columns
 	limit         uint64
 	desc          bool
 	resourceOwner string
+	instanceID    string
 	queries       []*SearchQuery
+	tx            *sql.Tx
 }
 
 type SearchQuery struct {
 	builder              *SearchQueryBuilder
 	aggregateTypes       []AggregateType
 	aggregateIDs         []string
+	instanceID           string
+	excludedInstanceIDs  []string
 	eventSequenceGreater uint64
 	eventSequenceLess    uint64
 	eventTypes           []EventType
 	eventData            map[string]interface{}
+	creationDateAfter    time.Time
 }
 
 // Columns defines which fields of the event are needed for the query
@@ -33,6 +42,8 @@ const (
 	ColumnsEvent Columns = repository.ColumnsEvent
 	// ColumnsMaxSequence represents the latest sequence of the filtered events
 	ColumnsMaxSequence Columns = repository.ColumnsMaxSequence
+	// ColumnsInstanceIDs represents the instance ids of the filtered events
+	ColumnsInstanceIDs Columns = repository.ColumnsInstanceIDs
 )
 
 // AggregateType is the object name
@@ -49,101 +60,176 @@ func NewSearchQueryBuilder(columns Columns) *SearchQueryBuilder {
 	}
 }
 
-//Columns defines which fields are set
-func (factory *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder {
-	factory.columns = repository.Columns(columns)
-	return factory
-}
-
-//Limit defines how many events are returned maximally.
-func (factory *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
-	factory.limit = limit
-	return factory
-}
-
-//ResourceOwner defines the resource owner (org) of the events
-func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
-	factory.resourceOwner = resourceOwner
-	return factory
-}
-
-//OrderDesc changes the sorting order of the returned events to descending
-func (factory *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
-	factory.desc = true
-	return factory
-}
-
-//OrderAsc changes the sorting order of the returned events to ascending
-func (factory *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
-	factory.desc = false
-	return factory
-}
-
-//AddQuery creates a new sub query.
-//All fields in the sub query are AND-connected in the storage request.
-//Multiple sub queries are OR-connected in the storage request.
-func (factory *SearchQueryBuilder) AddQuery() *SearchQuery {
-	query := &SearchQuery{
-		builder: factory,
+func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) (matches bool) {
+	if builder.limit > 0 && uint64(existingLen) >= builder.limit {
+		return false
 	}
-	factory.queries = append(factory.queries, query)
+	if builder.resourceOwner != "" && event.Aggregate().ResourceOwner != builder.resourceOwner {
+		return false
+	}
+	if event.Aggregate().InstanceID != "" && builder.instanceID != "" && event.Aggregate().InstanceID != builder.instanceID {
+		return false
+	}
+
+	if len(builder.queries) == 0 {
+		return true
+	}
+	for _, query := range builder.queries {
+		if query.matches(event) {
+			return true
+		}
+	}
+	return false
+}
+
+// Columns defines which fields are set
+func (builder *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder {
+	builder.columns = repository.Columns(columns)
+	return builder
+}
+
+// Limit defines how many events are returned maximally.
+func (builder *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
+	builder.limit = limit
+	return builder
+}
+
+// ResourceOwner defines the resource owner (org) of the events
+func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
+	builder.resourceOwner = resourceOwner
+	return builder
+}
+
+// InstanceID defines the instanceID (system) of the events
+func (builder *SearchQueryBuilder) InstanceID(instanceID string) *SearchQueryBuilder {
+	builder.instanceID = instanceID
+	return builder
+}
+
+// OrderDesc changes the sorting order of the returned events to descending
+func (builder *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
+	builder.desc = true
+	return builder
+}
+
+// OrderAsc changes the sorting order of the returned events to ascending
+func (builder *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
+	builder.desc = false
+	return builder
+}
+
+// SetTx ensures that the eventstore library uses the existing transaction
+func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
+	builder.tx = tx
+	return builder
+}
+
+// AddQuery creates a new sub query.
+// All fields in the sub query are AND-connected in the storage request.
+// Multiple sub queries are OR-connected in the storage request.
+func (builder *SearchQueryBuilder) AddQuery() *SearchQuery {
+	query := &SearchQuery{
+		builder: builder,
+	}
+	builder.queries = append(builder.queries, query)
 
 	return query
 }
 
-//Or creates a new sub query on the search query builder
+// Or creates a new sub query on the search query builder
 func (query SearchQuery) Or() *SearchQuery {
 	return query.builder.AddQuery()
 }
 
-//AggregateTypes filters for events with the given aggregate types
+// AggregateTypes filters for events with the given aggregate types
 func (query *SearchQuery) AggregateTypes(types ...AggregateType) *SearchQuery {
 	query.aggregateTypes = types
 	return query
 }
 
-//SequenceGreater filters for events with sequence greater the requested sequence
+// SequenceGreater filters for events with sequence greater the requested sequence
 func (query *SearchQuery) SequenceGreater(sequence uint64) *SearchQuery {
 	query.eventSequenceGreater = sequence
 	return query
 }
 
-//SequenceLess filters for events with sequence less the requested sequence
+// SequenceLess filters for events with sequence less the requested sequence
 func (query *SearchQuery) SequenceLess(sequence uint64) *SearchQuery {
 	query.eventSequenceLess = sequence
 	return query
 }
 
-//AggregateIDs filters for events with the given aggregate id's
+// AggregateIDs filters for events with the given aggregate id's
 func (query *SearchQuery) AggregateIDs(ids ...string) *SearchQuery {
 	query.aggregateIDs = ids
 	return query
 }
 
-//EventTypes filters for events with the given event types
+// InstanceID filters for events with the given instanceID
+func (query *SearchQuery) InstanceID(instanceID string) *SearchQuery {
+	query.instanceID = instanceID
+	return query
+}
+
+// ExcludedInstanceID filters for events not having the given instanceIDs
+func (query *SearchQuery) ExcludedInstanceID(instanceIDs ...string) *SearchQuery {
+	query.excludedInstanceIDs = instanceIDs
+	return query
+}
+
+// CreationDateNewer filters for events which happened after the specified time
+func (query *SearchQuery) CreationDateAfter(time time.Time) *SearchQuery {
+	query.creationDateAfter = time
+	return query
+}
+
+// EventTypes filters for events with the given event types
 func (query *SearchQuery) EventTypes(types ...EventType) *SearchQuery {
 	query.eventTypes = types
 	return query
 }
 
-//EventData filters for events with the given event data.
-//Use this call with care as it will be slower than the other filters.
+// EventData filters for events with the given event data.
+// Use this call with care as it will be slower than the other filters.
 func (query *SearchQuery) EventData(data map[string]interface{}) *SearchQuery {
 	query.eventData = data
 	return query
 }
 
-//Builder returns the SearchQueryBuilder of the sub query
+// Builder returns the SearchQueryBuilder of the sub query
 func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
 }
 
-func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
+func (query *SearchQuery) matches(event Event) bool {
+	if query.eventSequenceLess > 0 && event.Sequence() >= query.eventSequenceLess {
+		return false
+	}
+	if query.eventSequenceGreater > 0 && event.Sequence() <= query.eventSequenceGreater {
+		return false
+	}
+	if ok := isAggreagteTypes(event.Aggregate(), query.aggregateTypes...); len(query.aggregateTypes) > 0 && !ok {
+		return false
+	}
+	if ok := isAggregateIDs(event.Aggregate(), query.aggregateIDs...); len(query.aggregateIDs) > 0 && !ok {
+		return false
+	}
+	if event.Aggregate().InstanceID != "" && query.instanceID != "" && event.Aggregate().InstanceID != query.instanceID {
+		return false
+	}
+	if ok := isEventTypes(event, query.eventTypes...); len(query.eventTypes) > 0 && !ok {
+		return false
+	}
+	return true
+}
+
+func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQuery, error) {
 	if builder == nil ||
 		len(builder.queries) < 1 ||
 		builder.columns.Validate() != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
+	builder.instanceID = instanceID
 	filters := make([][]*repository.Filter, len(builder.queries))
 
 	for i, query := range builder.queries {
@@ -154,7 +240,11 @@ func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 			query.eventDataFilter,
 			query.eventSequenceGreaterFilter,
 			query.eventSequenceLessFilter,
+			query.instanceIDFilter,
+			query.excludedInstanceIDFilter,
+			query.creationDateAfterFilter,
 			query.builder.resourceOwnerFilter,
+			query.builder.instanceIDFilter,
 		} {
 			if filter := f(); filter != nil {
 				if err := filter.Validate(); err != nil {
@@ -171,6 +261,7 @@ func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 		Limit:   builder.limit,
 		Desc:    builder.desc,
 		Filters: filters,
+		Tx:      builder.tx,
 	}, nil
 }
 
@@ -181,7 +272,7 @@ func (query *SearchQuery) aggregateIDFilter() *repository.Filter {
 	if len(query.aggregateIDs) == 1 {
 		return repository.NewFilter(repository.FieldAggregateID, query.aggregateIDs[0], repository.OperationEquals)
 	}
-	return repository.NewFilter(repository.FieldAggregateID, query.aggregateIDs, repository.OperationIn)
+	return repository.NewFilter(repository.FieldAggregateID, database.StringArray(query.aggregateIDs), repository.OperationIn)
 }
 
 func (query *SearchQuery) eventTypeFilter() *repository.Filter {
@@ -191,20 +282,23 @@ func (query *SearchQuery) eventTypeFilter() *repository.Filter {
 	if len(query.eventTypes) == 1 {
 		return repository.NewFilter(repository.FieldEventType, repository.EventType(query.eventTypes[0]), repository.OperationEquals)
 	}
-	eventTypes := make([]repository.EventType, len(query.eventTypes))
+	eventTypes := make(database.StringArray, len(query.eventTypes))
 	for i, eventType := range query.eventTypes {
-		eventTypes[i] = repository.EventType(eventType)
+		eventTypes[i] = string(eventType)
 	}
 	return repository.NewFilter(repository.FieldEventType, eventTypes, repository.OperationIn)
 }
 
 func (query *SearchQuery) aggregateTypeFilter() *repository.Filter {
+	if len(query.aggregateTypes) < 1 {
+		return nil
+	}
 	if len(query.aggregateTypes) == 1 {
 		return repository.NewFilter(repository.FieldAggregateType, repository.AggregateType(query.aggregateTypes[0]), repository.OperationEquals)
 	}
-	aggregateTypes := make([]repository.AggregateType, len(query.aggregateTypes))
+	aggregateTypes := make(database.StringArray, len(query.aggregateTypes))
 	for i, aggregateType := range query.aggregateTypes {
-		aggregateTypes[i] = repository.AggregateType(aggregateType)
+		aggregateTypes[i] = string(aggregateType)
 	}
 	return repository.NewFilter(repository.FieldAggregateType, aggregateTypes, repository.OperationIn)
 }
@@ -231,11 +325,39 @@ func (query *SearchQuery) eventSequenceLessFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldSequence, query.eventSequenceLess, sortOrder)
 }
 
+func (query *SearchQuery) instanceIDFilter() *repository.Filter {
+	if query.instanceID == "" {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldInstanceID, query.instanceID, repository.OperationEquals)
+}
+
+func (query *SearchQuery) excludedInstanceIDFilter() *repository.Filter {
+	if len(query.excludedInstanceIDs) == 0 {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldInstanceID, database.StringArray(query.excludedInstanceIDs), repository.OperationNotIn)
+}
+
 func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {
 	if builder.resourceOwner == "" {
 		return nil
 	}
 	return repository.NewFilter(repository.FieldResourceOwner, builder.resourceOwner, repository.OperationEquals)
+}
+
+func (builder *SearchQueryBuilder) instanceIDFilter() *repository.Filter {
+	if builder.instanceID == "" {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldInstanceID, builder.instanceID, repository.OperationEquals)
+}
+
+func (query *SearchQuery) creationDateAfterFilter() *repository.Filter {
+	if query.creationDateAfter.IsZero() {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldCreationDate, query.creationDateAfter, repository.OperationGreater)
 }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {

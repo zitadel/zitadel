@@ -2,76 +2,98 @@ package management
 
 import (
 	"context"
+	"time"
 
+	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/authn"
-	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	"github.com/caos/zitadel/internal/api/grpc/metadata"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/api/grpc/user"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/domain"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/authn"
+	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
+	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
+	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
+	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/api/http"
+	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
-	user, err := s.user.UserByIDAndResourceOwner(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	user, err := s.query.GetUserByID(ctx, true, req.Id, owner)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetUserByIDResponse{
-		User: user_grpc.UserToPb(user),
+		User: user_grpc.UserToPb(user, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
 func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetUserByLoginNameGlobalRequest) (*mgmt_pb.GetUserByLoginNameGlobalResponse, error) {
-	user, err := s.user.GetUserByLoginNameGlobal(ctx, req.LoginName)
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery(req.LoginName, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	user, err := s.query.GetUser(ctx, true, loginName)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetUserByLoginNameGlobalResponse{
-		User: user_grpc.UserToPb(user),
+		User: user_grpc.UserToPb(user, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (*mgmt_pb.ListUsersResponse, error) {
-	r := ListUsersRequestToModel(ctx, req)
-	res, err := s.user.SearchUsers(ctx, r, true)
+	queries, err := ListUsersRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchUsers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUsersResponse{
-		Result: user_grpc.UsersToPb(res.Result),
-		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  user_grpc.UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	res, err := s.user.UserChanges(ctx, req.UserId, sequence, limit, asc, features.AuditLogRetention)
+	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	res, err := s.query.UserChanges(ctx, req.UserId, sequence, limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserChangesResponse{
-		Result: change_grpc.UserChangesToPb(res.Changes),
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequest) (*mgmt_pb.IsUserUniqueResponse, error) {
-	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email)
+	orgID := authz.GetCtxData(ctx).OrgID
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if !policy.UserLoginMustBeDomain {
+		orgID = ""
+	}
+	unique, err := s.query.IsUserUnique(ctx, req.UserName, req.Email, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -81,27 +103,35 @@ func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequ
 }
 
 func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMetadataRequest) (*mgmt_pb.ListUserMetadataResponse, error) {
-	res, err := s.user.SearchMetadata(ctx, req.Id, authz.GetCtxData(ctx).OrgID, ListUserMetadataToDomain(req))
+	metadataQueries, err := ListUserMetadataToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	err = metadataQueries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMetadataResponse{
-		Result: metadata.MetadataListToPb(res.Result),
-		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  metadata.UserMetadataListToPb(res.Metadata),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
 func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetadataRequest) (*mgmt_pb.GetUserMetadataResponse, error) {
-	data, err := s.user.GetMetadataByKey(ctx, req.Id, authz.GetCtxData(ctx).OrgID, req.Key)
+	owner, err := query.NewUserMetadataResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	data, err := s.query.GetUserMetadataByKey(ctx, true, req.Id, req.Key, owner)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetUserMetadataResponse{
-		Metadata: metadata.DomainMetadataToPb(data),
+		Metadata: metadata.UserMetadataToPb(data),
 	}, nil
 }
 
@@ -122,7 +152,7 @@ func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetada
 
 func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUserMetadataRequest) (*mgmt_pb.BulkSetUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, BulkSetMetadataToDomain(req)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, BulkSetUserMetadataToDomain(req)...)
 	if err != nil {
 		return nil, err
 	}
@@ -154,23 +184,66 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 }
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
-	human, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req))
+	details, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToAddHuman(req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddHumanUserResponse{
-		UserId: human.AggregateID,
+		UserId: details.ID,
 		Details: obj_grpc.AddToDetailsPb(
-			human.Sequence,
-			human.ChangeDate,
-			human.ResourceOwner,
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner,
 		),
 	}, nil
 }
 
+func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.AddHuman {
+	lang, err := language.Parse(req.Profile.PreferredLanguage)
+	logging.OnError(err).Debug("unable to parse language")
+
+	human := &command.AddHuman{
+		Username:    req.UserName,
+		FirstName:   req.Profile.FirstName,
+		LastName:    req.Profile.LastName,
+		NickName:    req.Profile.NickName,
+		DisplayName: req.Profile.DisplayName,
+		Email: command.Email{
+			Address:  req.Email.Email,
+			Verified: req.Email.IsEmailVerified,
+		},
+		PreferredLanguage:      lang,
+		Gender:                 user_grpc.GenderToDomain(req.Profile.Gender),
+		Password:               req.InitialPassword,
+		PasswordChangeRequired: true,
+		Passwordless:           false,
+		Register:               false,
+		ExternalIDP:            false,
+	}
+	if req.Phone != nil {
+		human.Phone = command.Phone{
+			Number:   req.Phone.Phone,
+			Verified: req.Phone.IsPhoneVerified,
+		}
+	}
+	return human
+}
+
 func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUserRequest) (*mgmt_pb.ImportHumanUserResponse, error) {
 	human, passwordless := ImportHumanUserRequestToDomain(req)
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless)
+	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -183,9 +256,11 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 		),
 	}
 	if code != nil {
+		origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
 		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
-			Link:     code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
-			Lifetime: durationpb.New(code.Expiration),
+			Link:       code.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
+			Lifetime:   durationpb.New(code.Expiration),
+			Expiration: durationpb.New(code.Expiration),
 		}
 	}
 	return resp, nil
@@ -247,29 +322,33 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 }
 
 func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest) (*mgmt_pb.RemoveUserResponse, error) {
-	grants, err := s.usergrant.UserGrantsByUserID(ctx, req.Id)
+	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	membersShips, err := s.user.UserMembershipsByUserID(ctx, req.Id)
+	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{userGrantUserQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, UserMembershipViewsToDomain(membersShips), userGrantsToIDs(grants)...)
+	membershipsUserQuery, err := query.NewMembershipUserIDQuery(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{membershipsUserQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
-}
-
-func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {
-	converted := make([]string, len(userGrants))
-	for i, grant := range userGrants {
-		converted[i] = grant.ID
-	}
-	return converted
 }
 
 func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserNameRequest) (*mgmt_pb.UpdateUserNameResponse, error) {
@@ -283,12 +362,16 @@ func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserName
 }
 
 func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfileRequest) (*mgmt_pb.GetHumanProfileResponse, error) {
-	profile, err := s.user.ProfileByID(ctx, req.UserId)
+	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	profile, err := s.query.GetHumanProfile(ctx, req.UserId, owner)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetHumanProfileResponse{
-		Profile: user_grpc.ProfileToPb(profile),
+		Profile: user_grpc.ProfileToPb(profile, s.assetAPIPrefix(ctx)),
 		Details: obj_grpc.ToViewDetailsPb(
 			profile.Sequence,
 			profile.CreationDate,
@@ -313,7 +396,11 @@ func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHuma
 }
 
 func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRequest) (*mgmt_pb.GetHumanEmailResponse, error) {
-	email, err := s.user.EmailByID(ctx, req.UserId)
+	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	email, err := s.query.GetHumanEmail(ctx, req.UserId, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -329,7 +416,11 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 }
 
 func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanEmailRequest) (*mgmt_pb.UpdateHumanEmailResponse, error) {
-	email, err := s.command.ChangeHumanEmail(ctx, UpdateHumanEmailRequestToDomain(ctx, req))
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	email, err := s.command.ChangeHumanEmail(ctx, UpdateHumanEmailRequestToDomain(ctx, req), emailCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -343,7 +434,11 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 }
 
 func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.ResendHumanInitializationRequest) (*mgmt_pb.ResendHumanInitializationResponse, error) {
-	details, err := s.command.ResendInitialMail(ctx, req.UserId, req.Email, authz.GetCtxData(ctx).OrgID)
+	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.ResendInitialMail(ctx, req.UserId, req.Email, authz.GetCtxData(ctx).OrgID, initCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -353,7 +448,11 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 }
 
 func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.ResendHumanEmailVerificationRequest) (*mgmt_pb.ResendHumanEmailVerificationResponse, error) {
-	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, emailCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -363,7 +462,11 @@ func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.
 }
 
 func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRequest) (*mgmt_pb.GetHumanPhoneResponse, error) {
-	phone, err := s.user.PhoneByID(ctx, req.UserId)
+	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	phone, err := s.query.GetHumanPhone(ctx, req.UserId, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -379,7 +482,11 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 }
 
 func (s *Server) UpdateHumanPhone(ctx context.Context, req *mgmt_pb.UpdateHumanPhoneRequest) (*mgmt_pb.UpdateHumanPhoneResponse, error) {
-	phone, err := s.command.ChangeHumanPhone(ctx, UpdateHumanPhoneRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	phone, err := s.command.ChangeHumanPhone(ctx, UpdateHumanPhoneRequestToDomain(req), authz.GetCtxData(ctx).OrgID, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -403,7 +510,11 @@ func (s *Server) RemoveHumanPhone(ctx context.Context, req *mgmt_pb.RemoveHumanP
 }
 
 func (s *Server) ResendHumanPhoneVerification(ctx context.Context, req *mgmt_pb.ResendHumanPhoneVerificationRequest) (*mgmt_pb.ResendHumanPhoneVerificationResponse, error) {
-	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -419,7 +530,7 @@ func (s *Server) RemoveHumanAvatar(ctx context.Context, req *mgmt_pb.RemoveHuman
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanAvatarResponse{
-		Details: object.DomainToChangeDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -444,7 +555,11 @@ func (s *Server) SetHumanPassword(ctx context.Context, req *mgmt_pb.SetHumanPass
 }
 
 func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mgmt_pb.SendHumanResetPasswordNotificationRequest) (*mgmt_pb.SendHumanResetPasswordNotificationResponse, error) {
-	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type))
+	passwordCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordResetCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type), passwordCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -454,12 +569,25 @@ func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mg
 }
 
 func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHumanAuthFactorsRequest) (*mgmt_pb.ListHumanAuthFactorsResponse, error) {
-	mfas, err := s.user.UserMFAs(ctx, req.UserId)
+	query := new(query.UserAuthMethodSearchQueries)
+	err := query.AppendUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendStateQuery(domain.MFAStateReady)
+	if err != nil {
+		return nil, err
+	}
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanAuthFactorsResponse{
-		Result: user_grpc.AuthFactorsToPb(mfas),
+		Result: user_grpc.AuthMethodsToPb(authMethods),
 	}, nil
 }
 
@@ -484,23 +612,58 @@ func (s *Server) RemoveHumanAuthFactorU2F(ctx context.Context, req *mgmt_pb.Remo
 }
 
 func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHumanPasswordlessRequest) (*mgmt_pb.ListHumanPasswordlessResponse, error) {
-	tokens, err := s.user.GetPasswordless(ctx, req.UserId)
+	query := new(query.UserAuthMethodSearchQueries)
+	err := query.AppendUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendStateQuery(domain.MFAStateReady)
+	if err != nil {
+		return nil, err
+	}
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanPasswordlessResponse{
-		Result: user.WebAuthNTokensViewToPb(tokens),
+		Result: user_grpc.UserAuthMethodsToWebAuthNTokenPb(authMethods),
+	}, nil
+}
+
+func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.AddPasswordlessRegistrationRequest) (*mgmt_pb.AddPasswordlessRegistrationResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID, passwordlessInitCode)
+	if err != nil {
+		return nil, err
+	}
+	origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
+	return &mgmt_pb.AddPasswordlessRegistrationResponse{
+		Details:    obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
+		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }
 
 func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.SendPasswordlessRegistrationRequest) (*mgmt_pb.SendPasswordlessRegistrationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.SendPasswordlessRegistrationResponse{
-		Details: object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Details: obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 	}, nil
 }
 
@@ -529,7 +692,15 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 }
 
 func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachineKeyByIDsRequest) (*mgmt_pb.GetMachineKeyByIDsResponse, error) {
-	key, err := s.user.GetMachineKey(ctx, req.UserId, req.KeyId)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -539,17 +710,17 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	result, err := s.user.SearchMachineKeys(ctx, ListMachineKeysRequestToModel(req))
+	query, err := ListMachineKeysRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.query.SearchAuthNKeys(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
-		Result: authn.KeyViewsToPb(result.Result),
-		Details: obj_grpc.ToListDetails(
-			result.TotalResult,
-			result.Sequence,
-			result.Timestamp,
-		),
+		Result:  authn.KeysToPb(result.AuthNKeys),
+		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.Timestamp),
 	}, nil
 }
 
@@ -565,7 +736,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      key.KeyID,
 		KeyDetails: keyDetails,
-		Details: object.AddToDetailsPb(
+		Details: obj_grpc.AddToDetailsPb(
 			key.Sequence,
 			key.ChangeDate,
 			key.ResourceOwner,
@@ -583,22 +754,86 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 	}, nil
 }
 
+func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.GetPersonalAccessTokenByIDsRequest) (*mgmt_pb.GetPersonalAccessTokenByIDsResponse, error) {
+	resourceOwner, err := query.NewPersonalAccessTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewPersonalAccessTokenUserIDSearchQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, resourceOwner, aggregateID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetPersonalAccessTokenByIDsResponse{
+		Token: user_grpc.PersonalAccessTokenToPb(token),
+	}, nil
+}
+
+func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*mgmt_pb.ListPersonalAccessTokensResponse, error) {
+	queries, err := ListPersonalAccessTokensRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.query.SearchPersonalAccessTokens(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListPersonalAccessTokensResponse{
+		Result:  user_grpc.PersonalAccessTokensToPb(result.PersonalAccessTokens),
+		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+	}, nil
+}
+
+func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPersonalAccessTokenRequest) (*mgmt_pb.AddPersonalAccessTokenResponse, error) {
+	expDate := time.Time{}
+	if req.ExpirationDate != nil {
+		expDate = req.ExpirationDate.AsTime()
+	}
+	scopes := []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
+	pat, token, err := s.command.AddPersonalAccessToken(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, expDate, scopes, domain.UserTypeMachine)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddPersonalAccessTokenResponse{
+		TokenId: pat.TokenID,
+		Token:   token,
+		Details: obj_grpc.AddToDetailsPb(
+			pat.Sequence,
+			pat.ChangeDate,
+			pat.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *mgmt_pb.RemovePersonalAccessTokenRequest) (*mgmt_pb.RemovePersonalAccessTokenResponse, error) {
+	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemovePersonalAccessTokenResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
 func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*mgmt_pb.ListHumanLinkedIDPsResponse, error) {
-	res, err := s.user.SearchExternalIDPs(ctx, ListHumanLinkedIDPsRequestToModel(req))
+	queries, err := ListHumanLinkedIDPsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IDPUserLinks(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanLinkedIDPsResponse{
-		Result: idp_grpc.IDPsToUserLinkPb(res.Result),
-		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
-			res.Sequence,
-			res.Timestamp,
-		),
+		Result:  idp_grpc.IDPUserLinksToPb(res.Links),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
-	objectDetails, err := s.command.RemoveHumanExternalIDP(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
+	objectDetails, err := s.command.RemoveUserIDPLink(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}
@@ -608,20 +843,64 @@ func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHu
 }
 
 func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*mgmt_pb.ListUserMembershipsResponse, error) {
-	request, err := ListUserMembershipsRequestToModel(req)
+	request, err := ListUserMembershipsRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.user.SearchUserMemberships(ctx, request)
+	response, err := s.query.Memberships(ctx, request)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMembershipsResponse{
-		Result: user_grpc.MembershipsToMembershipsPb(response.Result),
-		Details: obj_grpc.ToListDetails(
-			response.TotalResult,
-			response.Sequence,
-			response.Timestamp,
-		),
+		Result:  user_grpc.MembershipsToMembershipsPb(response.Memberships),
+		Details: obj_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
 	}, nil
+}
+
+func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {
+	cascades := make([]*command.CascadingMembership, len(memberships))
+	for i, membership := range memberships {
+		cascades[i] = &command.CascadingMembership{
+			UserID:        membership.UserID,
+			ResourceOwner: membership.ResourceOwner,
+			IAM:           cascadingIAMMembership(membership.IAM),
+			Org:           cascadingOrgMembership(membership.Org),
+			Project:       cascadingProjectMembership(membership.Project),
+			ProjectGrant:  cascadingProjectGrantMembership(membership.ProjectGrant),
+		}
+	}
+	return cascades
+}
+
+func cascadingIAMMembership(membership *query.IAMMembership) *command.CascadingIAMMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingIAMMembership{IAMID: membership.IAMID}
+}
+func cascadingOrgMembership(membership *query.OrgMembership) *command.CascadingOrgMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingOrgMembership{OrgID: membership.OrgID}
+}
+func cascadingProjectMembership(membership *query.ProjectMembership) *command.CascadingProjectMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectMembership{ProjectID: membership.ProjectID}
+}
+func cascadingProjectGrantMembership(membership *query.ProjectGrantMembership) *command.CascadingProjectGrantMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectGrantMembership{ProjectID: membership.ProjectID, GrantID: membership.GrantID}
+}
+
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
+	converted := make([]string, len(userGrants))
+	for i, grant := range userGrants {
+		converted[i] = grant.ID
+	}
+	return converted
 }

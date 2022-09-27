@@ -1,284 +1,359 @@
 module.exports = {
-    quickstarts: [
-        'quickstarts/introduction',
+  examples: [
+    "examples/introduction",
+    {
+      type: "category",
+      label: "Integrate ZITADEL Login in your App",
+      items: [
+        "examples/login/angular",
+        "examples/login/react",
+        "examples/login/flutter",
+        "examples/login/nextjs",
+      ],
+      collapsed: false,
+    },
+    {
+      type: "category",
+      label: "Secure your API",
+      items: [
+        "examples/secure-api/go",
+        "examples/secure-api/dot-net"],
+      collapsed: false,
+    },
+    {
+      type: "category",
+      label: "Call the ZITADEL API",
+      items: [
+        "examples/call-zitadel-api/go",
+        "examples/call-zitadel-api/dot-net",
+      ],
+      collapsed: false,
+    },
+    {
+      type: "category",
+      label: "Identity Aware Proxy",
+      items: ["examples/identity-proxy/oauth2-proxy"],
+      collapsed: false,
+    },
+  ],
+  guides: [
+    "guides/overview",
+    {
+      type: "category",
+      label: "Get started",
+      collapsed: false,
+      items: [
+        "guides/start/quickstart",
+      ],
+    },
+    {
+      type: "category",
+      label: "Deploy",
+      collapsed: false,
+      items: [
+        "guides/deploy/overview",
+        "guides/deploy/linux",
+        "guides/deploy/macos",
+        "guides/deploy/compose",
+        "guides/deploy/knative",
+        "guides/deploy/kubernetes",
+        "guides/deploy/loadbalancing-example/loadbalancing-example",
+      ],
+    },
+    {
+      type: "category",
+      label: "Manage",
+      collapsed: false,
+      items: [
         {
-            type: 'category',
-            label: 'Integrate ZITADEL Login in your App',
-            items: ['quickstarts/login/angular', 'quickstarts/login/react', 'quickstarts/login/flutter', 'quickstarts/login/nextjs'],
-            collapsed: false,
+          type: 'category',
+          label: 'Cloud',
+          items: [
+            "guides/manage/cloud/overview",
+            "guides/manage/cloud/start",
+            "guides/manage/cloud/instances",
+            "guides/manage/cloud/billing",
+            "guides/manage/cloud/users",
+            "guides/manage/cloud/support",
+          ]
         },
         {
-            type: 'category',
-            label: 'Secure your API',
-            items: ['quickstarts/secure-api/go', 'quickstarts/secure-api/dot-net'],
-            collapsed: false,
+          type: 'category',
+          label: 'Self-Hosted',
+          items: [
+            "guides/manage/self-hosted/configure/configure",
+            "guides/manage/self-hosted/proxy/proxy",
+            "guides/manage/self-hosted/custom-domain",
+            "guides/manage/self-hosted/http2",
+            "guides/manage/self-hosted/tls_modes",
+            "guides/manage/self-hosted/database/database",
+          ]
         },
         {
-            type: 'category',
-            label: 'Call the ZITADEL API',
-            items: ['quickstarts/call-zitadel-api/go', 'quickstarts/call-zitadel-api/dot-net'],
-            collapsed: false,
+          type: 'category',
+          label: 'Console',
+          items: [
+            "guides/manage/console/organizations",
+            "guides/manage/console/projects",
+            "guides/manage/console/applications",
+          ]
         },
-        'quickstarts/libs',
         {
-            type: 'category',
-            label: 'Identity Aware Proxy',
-            items: ['quickstarts/identity-proxy/oauth2-proxy'],
-            collapsed: false,
+          type: 'category',
+          label: 'Customize',
+          items: [
+            "guides/manage/customize/branding",
+            "guides/manage/customize/texts",
+            "guides/manage/customize/behavior",
+            "guides/manage/customize/user-metadata",
+          ]
+        },
+        {
+          type: 'category',
+          label: 'Terraform',
+          items: [
+            "guides/manage/terraform/basics",
+          ]
         }
-    ],
-    guides: [
-        'guides/introduction',
+      ],
+    },
+    {
+      type: "category",
+      label: "Integrate",
+      collapsed: false,
+      items: [
+        "guides/integrate/login-users",
+        "guides/integrate/identity-brokering",
         {
-            type: 'category',
-            label: 'Get to know ZITADEL',
-            collapsed: false,
-            items: [
-                'guides/basics/get-started',
-                'guides/basics/organizations',
-                'guides/basics/projects',
-            ],
+          type: "category",
+          label: "Access ZITADEL APIs",
+          collapsed: false,
+          items: [
+            "guides/integrate/serviceusers",
+            "guides/integrate/access-zitadel-apis",
+            "guides/integrate/access-zitadel-system-api",
+            "guides/integrate/export-and-import",
+          ],
         },
         {
-            type: 'category',
-            label: 'Authentication',
-            collapsed: false,
-            items: [
-                'guides/authentication/login-users',
-                'guides/authentication/identity-brokering',
-                'guides/authentication/serviceusers',
-            ],
+          type: "category",
+          label: "OpenID Connect 1.0 Clients",
+          collapsed: false,
+          items: [
+            "guides/integrate/oauth-recommended-flows",
+            "guides/integrate/auth0-oidc",
+            "guides/integrate/azuread-oidc",
+            "guides/integrate/authenticated-mongodb-charts",
+            "guides/integrate/gitlab-self-hosted",
+          ],
         },
         {
-            type: 'category',
-            label: 'Authorization',
-            collapsed: false,
-            items: [
-                'guides/authorization/oauth-recommended-flows',
-            ],
+          type: "category",
+          label: "SAML 2.0 Clients",
+          collapsed: false,
+          items: [
+            "guides/integrate/auth0-saml",
+            "guides/integrate/aws-saml",
+            "guides/integrate/pingidentity-saml",
+            "guides/integrate/atlassian-saml",
+            "guides/integrate/gitlab-saml",
+          ],
+        },
+      ],
+    },
+    {
+      type: "category",
+      label: "Solution Scenarios",
+      collapsed: false,
+      items: [
+        "guides/solution-scenarios/introduction",
+        "guides/solution-scenarios/b2c",
+        "guides/solution-scenarios/b2b",
+      ],
+    },
+    {
+      type: "category",
+      label: "Trainings",
+      collapsed: true,
+      items: [
+        "guides/trainings/introduction",
+        "guides/trainings/application",
+        "guides/trainings/recurring",
+        "guides/trainings/project",
+      ],
+    },
+  ],
+  apis: [
+    "apis/introduction",
+    {
+      type: "category",
+      label: "API Definition",
+      collapsed: false,
+      items: [
+        "apis/statuscodes",
+        {
+          type: "category",
+          label: "Proto",
+          collapsed: true,
+          items: [
+            "apis/proto/auth",
+            "apis/proto/management",
+            "apis/proto/admin",
+            "apis/proto/system",
+            "apis/proto/instance",
+            "apis/proto/org",
+            "apis/proto/user",
+            "apis/proto/app",
+            "apis/proto/policy",
+            "apis/proto/auth_n_key",
+            "apis/proto/change",
+            "apis/proto/idp",
+            "apis/proto/member",
+            "apis/proto/metadata",
+            "apis/proto/message",
+            "apis/proto/text",
+            "apis/proto/action",
+            "apis/proto/object",
+            "apis/proto/options",
+          ],
         },
         {
-            type: 'category',
-            label: 'API',
-            collapsed: false,
-            items: [
-                'guides/api/access-zitadel-apis'
-            ],
+          type: "category",
+          label: "Assets API",
+          collapsed: true,
+          items: ["apis/assets/assets"],
         },
-        {
-            type: 'category',
-            label: 'Customization',
-            collapsed: false,
-            items: [
-                'guides/customization/branding',
-                'guides/customization/texts',
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Installation',
-            collapsed: false,
-            items: [
-                {
-                    type: 'category',
-                    label: 'CAOS Managed',
-                    collapsed: true,
-                    items: [
-                        'guides/installation/shared-cloud',
-                        'guides/installation/managed-dedicated-instance'
-                    ],
-                },
-                {
-                    type: 'category',
-                    label: 'CAOS Service Packages',
-                    collapsed: true,
-                    items: [
-                        'guides/installation/setup',
-                        'guides/installation/setup-orbos',
-                        'guides/installation/checkup'
-                    ],
-                },
-                {
-                    type: 'category',
-                    label: 'Self Managed',
-                    collapsed: true,
-                    items: [
-                        'guides/installation/crd',
-                        'guides/installation/gitops',
-                        'guides/installation/orbos'
-                    ],
-                },
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Trainings',
-            collapsed: false,
-            items: [
-                'guides/trainings/introduction',
-                {
-                    type: 'category',
-                    label: 'Support Service',
-                    collapsed: true,
-                    items: [
-                        'guides/trainings/supportservice/operations',
-                        'guides/trainings/supportservice/application',
-                        'guides/trainings/supportservice/recurring',
-                    ],
-                },
-            ],
-        }
-    ],
-    apis: [
-        'apis/introduction',
-        'apis/domains',
-        {
-            type: 'category',
-            label: 'Rate Limits',
-            collapsed: true,
-            items: [
-                'legal/rate-limit-policy',
-                'apis/ratelimits/accounts',
-                'apis/ratelimits/api',
-            ],
-        },
-        'apis/apis',
-        {
-            type: 'category',
-            label: 'Proto API Definition',
-            collapsed: true,
-            items: [
-                'apis/proto/auth',
-                'apis/proto/management',
-                'apis/proto/admin',
-                'apis/proto/org',
-                'apis/proto/user',
-                'apis/proto/app',
-                'apis/proto/policy',
-                'apis/proto/auth_n_key',
-                'apis/proto/change',
-                'apis/proto/idp',
-                'apis/proto/member',
-                'apis/proto/metadata',
-                'apis/proto/message',
-                'apis/proto/text',
-                'apis/proto/object',
-                'apis/proto/options',
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Assets API Definition',
-            collapsed: false,
-            items: [
-                'apis/assets/assets',
-            ],
-        },
-        {
-            type: 'category',
-            label: 'OpenID Connect & OAuth',
-            collapsed: true,
-            items: [
-                'apis/openidoauth/endpoints',
-                'apis/openidoauth/scopes',
-                'apis/openidoauth/claims',
-                'apis/openidoauth/authn-methods',
-                'apis/openidoauth/grant-types'
-            ],
-        },
-    ],
-    concepts: [
-        'concepts/introduction',
-        {
-            type: 'category',
-            label: 'ZITADEL',
-            collapsed: true,
-            items: [
-                'concepts/zitadel/architecture',
-                {
-                    type: 'category',
-                    label: "Object Overview",
-                    collapsed: false,
-                    items: [
-                        'concepts/zitadel/objects/overview',
-                        'concepts/zitadel/objects/organizations',
-                        'concepts/zitadel/objects/policies',
-                        'concepts/zitadel/objects/projects',
-                        'concepts/zitadel/objects/applications',
-                        'concepts/zitadel/objects/granted_projects',
-                        'concepts/zitadel/objects/users',
-                        'concepts/zitadel/objects/managers',
-                        'concepts/zitadel/objects/jwt_idp',
-                    ],
-                },
-            ],
-        }, {
-            type: 'category',
-            label: 'General',
-            collapsed: true,
-            items: [
-                'concepts/general/principles',
-                'concepts/general/eventstore',
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Use Cases',
-            collapsed: true,
-            items: [
-                'concepts/usecases/saas'
-            ],
-        },
-
-    ],
-    manuals: [
-        'manuals/introduction',
-        {
-            type: 'category',
-            label: 'User',
-            items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login',],
-            collapsed: false,
-        },
-    ],
-    legal: [
-        'legal/introduction',
-        'legal/terms-of-service',
-        'legal/data-processing-agreement',
-        {
-            type: 'category',
-            label: 'Service Descriptions',
-            collapsed: false,
-            items: [
-                'legal/service-level-description',
-                'legal/support-services',
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Dedicated Instance',
-            collapsed: false,
-            items: [
-                'legal/terms-of-service-dedicated',
-                'legal/dedicated-instance-annex',
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Support Program',
-            collapsed: false,
-            items: [
-                'legal/terms-support-service'
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Policies',
-            collapsed: false,
-            items: [
-                'legal/privacy-policy',
-                'legal/acceptable-use-policy',
-                'legal/rate-limit-policy'
-            ],
-        }
-    ],
+          "apis/actions"
+      ],
+    },
+    {
+      type: "category",
+      label: "OpenID Connect & OAuth",
+      collapsed: false,
+      items: [
+        "apis/openidoauth/endpoints",
+        "apis/openidoauth/scopes",
+        "apis/openidoauth/claims",
+        "apis/openidoauth/authn-methods",
+        "apis/openidoauth/grant-types",
+      ],
+    },
+    {
+      type: "category",
+      label: "SAML",
+      collapsed: false,
+      items: [
+        "apis/saml/endpoints",
+      ],
+    },
+    {
+      type: "category",
+      label: "Observability",
+      collapsed: false,
+      items: [
+        "apis/observability/metrics",
+        "apis/observability/health",
+      ],
+    },
+    {
+      type: "category",
+      label: "Rate Limits",
+      collapsed: false,
+      items: [
+        "apis/ratelimits/ratelimits",
+        "legal/rate-limit-policy",
+      ],
+    },
+  ],
+  concepts: [
+    "concepts/introduction",
+    "concepts/principles",
+    {
+      type: "category",
+      label: "Eventstore",
+      collapsed: false,
+      items: [
+        "concepts/eventstore/overview",
+        "concepts/eventstore/implementation",
+      ],
+    },
+    {
+      type: "category",
+      label: "Architecture",
+      collapsed: false,
+      items: [
+        "concepts/architecture/software",
+        "concepts/architecture/solution",
+        "concepts/architecture/secrets",
+      ],
+    },
+    {
+      type: "category",
+      label: "Structure",
+      collapsed: false,
+      items: [
+        "concepts/structure/overview",
+        "concepts/structure/instance",
+        "concepts/structure/organizations",
+        "concepts/structure/policies",
+        "concepts/structure/projects",
+        "concepts/structure/applications",
+        "concepts/structure/granted_projects",
+        "concepts/structure/users",
+        "concepts/structure/managers",
+        "concepts/zitadel/objects/jwt_idp",
+      ],
+    },
+    {
+      type: "category",
+      label: "Use Cases",
+      collapsed: false,
+      items: ["concepts/usecases/saas"],
+    },
+    {
+      type: "category",
+      label: "Features",
+      collapsed: false,
+      items: [
+        "concepts/features/actions",
+        "concepts/features/selfservice"
+      ],
+    },
+  ],
+  manuals: [
+    "manuals/introduction",
+    "manuals/user-profile",
+    "manuals/user-login",
+    "manuals/troubleshooting",
+  ],
+  legal: [
+    "legal/introduction",
+    "legal/terms-of-service",
+    "legal/data-processing-agreement",
+    {
+      type: "category",
+      label: "Service Description",
+      collapsed: false,
+      items: ["legal/cloud-service-description", "legal/service-level-description", "legal/support-services"],
+    },
+    {
+      type: "category",
+      label: "Additional terms",
+      collapsed: true,
+      items: [
+        "legal/terms-support-service",
+        "legal/terms-of-service-dedicated",
+      ],
+    },
+    {
+      type: "category",
+      label: "Policies",
+      collapsed: false,
+      items: [
+        "legal/privacy-policy",
+        "legal/acceptable-use-policy",
+        "legal/rate-limit-policy",
+      ],
+    },
+  ],
 };

@@ -32,3 +32,15 @@ func IsUnauthenticated(err error) bool {
 	_, ok := err.(Unauthenticated)
 	return ok
 }
+
+func (err *UnauthenticatedError) Is(target error) bool {
+	t, ok := target.(*UnauthenticatedError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}
+
+func (err *UnauthenticatedError) Unwrap() error {
+	return err.CaosError
+}

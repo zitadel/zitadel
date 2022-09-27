@@ -1,18 +1,16 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	caos_errors "github.com/caos/zitadel/internal/errors"
-
 	"time"
 
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 )
 
 type UserSessionView struct {
 	CreationDate                 time.Time
 	ChangeDate                   time.Time
-	State                        req_model.UserSessionState
+	State                        domain.UserSessionState
 	ResourceOwner                string
 	UserAgentID                  string
 	UserID                       string
@@ -20,15 +18,14 @@ type UserSessionView struct {
 	LoginName                    string
 	DisplayName                  string
 	AvatarKey                    string
-	AvatarURL                    string
 	SelectedIDPConfigID          string
 	PasswordVerification         time.Time
 	PasswordlessVerification     time.Time
 	ExternalLoginVerification    time.Time
 	SecondFactorVerification     time.Time
-	SecondFactorVerificationType req_model.MFAType
+	SecondFactorVerificationType domain.MFAType
 	MultiFactorVerification      time.Time
-	MultiFactorVerificationType  req_model.MFAType
+	MultiFactorVerificationType  domain.MFAType
 	Sequence                     uint64
 }
 
@@ -48,6 +45,7 @@ const (
 	UserSessionSearchKeyUserID
 	UserSessionSearchKeyState
 	UserSessionSearchKeyResourceOwner
+	UserSessionSearchKeyInstanceID
 )
 
 type UserSessionSearchQuery struct {

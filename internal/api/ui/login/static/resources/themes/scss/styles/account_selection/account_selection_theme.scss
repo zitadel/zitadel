@@ -1,0 +1,50 @@
+@import "account_selection";
+
+@mixin lgn-account-selection-theme() {
+  @include lgn-account-selection-color();
+}
+
+@mixin lgn-account-selection-color() {
+  .lgn-account-selection {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .lgn-account {
+      color: inherit;
+      background: transparent;
+      box-shadow: inset 0 -1px var(--zitadel-color-footer-line);
+
+      &:hover {
+        background-color: var(--zitadel-color-account-selector-hover);
+      }
+
+      &:focus {
+        background-color: var(--zitadel-color-account-selector-active);
+      }
+
+      &:active {
+        background-color: var(--zitadel-color-account-selector-active);
+      }
+
+      .lgn-loginname {
+        font-size: 14px;
+        color: var(--zitadel-color-label);
+      }
+
+      .lgn-session-state {
+        color: var(--zitadel-color-label);
+
+        &.i0 {
+          color: var(--zitadel-color-state-success-font);
+          background: var(--zitadel-color-state-success-background);
+        }
+
+        &.i1 {
+          color: var(--zitadel-color-state-warn-font);
+          background: var(--zitadel-color-state-warn-background);
+        }
+      }
+    }
+  }
+}

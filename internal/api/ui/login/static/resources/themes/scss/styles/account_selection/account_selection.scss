@@ -1,0 +1,72 @@
+$lgn-container-max-width: 380px;
+$lgn-container-padding: 20px;
+$lgn-container-margin: 0px auto 50px auto;
+
+.lgn-account-selection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .lgn-account {
+    display: flex;
+    align-items: center;
+    border: none;
+    outline: none;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    .left {
+      padding: 0.5rem 1rem;
+    }
+
+    .lgn-names {
+      display: block;
+      margin: 0.5rem;
+      text-align: start;
+      overflow: hidden;
+
+      .lgn-displayname {
+        font-size: 16px;
+        margin: 0.5rem 0;
+        margin-bottom: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .lgn-loginname {
+        font-size: 14px;
+        margin: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .lgn-session-state {
+        margin: 0.25rem 0;
+        border-radius: 50vw;
+        padding: 2px 0.5rem;
+        letter-spacing: 0.05em;
+        font-size: 12px;
+        white-space: nowrap;
+        box-shadow: 0 0 3px #0000001a;
+        width: fit-content;
+        line-height: 1rem;
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    i {
+      font-size: 1.2rem;
+
+      &.account-add {
+        font-size: 1.4rem;
+        margin-left: 3px;
+      }
+    }
+  }
+}

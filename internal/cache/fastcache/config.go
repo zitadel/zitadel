@@ -1,6 +1,6 @@
 package fastcache
 
-import "github.com/caos/zitadel/internal/cache"
+import "github.com/zitadel/zitadel/internal/cache"
 
 type Config struct {
 	MaxCacheSizeInByte int

@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	req_model "github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
-	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/user/model"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 )
 
 const (
@@ -19,6 +20,7 @@ const (
 	UserSessionKeyUserID        = "user_id"
 	UserSessionKeyState         = "state"
 	UserSessionKeyResourceOwner = "resource_owner"
+	UserSessionKeyInstanceID    = "instance_id"
 )
 
 type UserSessionView struct {
@@ -41,6 +43,7 @@ type UserSessionView struct {
 	MultiFactorVerification      time.Time `json:"-" gorm:"column:multi_factor_verification"`
 	MultiFactorVerificationType  int32     `json:"-" gorm:"column:multi_factor_verification_type"`
 	Sequence                     uint64    `json:"-" gorm:"column:sequence"`
+	InstanceID                   string    `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
@@ -52,35 +55,34 @@ func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {
 	return v, nil
 }
 
-func UserSessionToModel(userSession *UserSessionView, prefixAvatarURL string) *model.UserSessionView {
+func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 	return &model.UserSessionView{
 		ChangeDate:                   userSession.ChangeDate,
 		CreationDate:                 userSession.CreationDate,
 		ResourceOwner:                userSession.ResourceOwner,
-		State:                        req_model.UserSessionState(userSession.State),
+		State:                        domain.UserSessionState(userSession.State),
 		UserAgentID:                  userSession.UserAgentID,
 		UserID:                       userSession.UserID,
 		UserName:                     userSession.UserName,
 		LoginName:                    userSession.LoginName,
 		DisplayName:                  userSession.DisplayName,
 		AvatarKey:                    userSession.AvatarKey,
-		AvatarURL:                    domain.AvatarURL(prefixAvatarURL, userSession.ResourceOwner, userSession.AvatarKey),
 		SelectedIDPConfigID:          userSession.SelectedIDPConfigID,
 		PasswordVerification:         userSession.PasswordVerification,
 		PasswordlessVerification:     userSession.PasswordlessVerification,
 		ExternalLoginVerification:    userSession.ExternalLoginVerification,
 		SecondFactorVerification:     userSession.SecondFactorVerification,
-		SecondFactorVerificationType: req_model.MFAType(userSession.SecondFactorVerificationType),
+		SecondFactorVerificationType: domain.MFAType(userSession.SecondFactorVerificationType),
 		MultiFactorVerification:      userSession.MultiFactorVerification,
-		MultiFactorVerificationType:  req_model.MFAType(userSession.MultiFactorVerificationType),
+		MultiFactorVerificationType:  domain.MFAType(userSession.MultiFactorVerificationType),
 		Sequence:                     userSession.Sequence,
 	}
 }
 
-func UserSessionsToModel(userSessions []*UserSessionView, prefixAvatarURL string) []*model.UserSessionView {
+func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionView {
 	result := make([]*model.UserSessionView, len(userSessions))
 	for i, s := range userSessions {
-		result[i] = UserSessionToModel(s, prefixAvatarURL)
+		result[i] = UserSessionToModel(s)
 	}
 	return result
 }
@@ -88,12 +90,12 @@ func UserSessionsToModel(userSessions []*UserSessionView, prefixAvatarURL string
 func (v *UserSessionView) AppendEvent(event *models.Event) error {
 	v.Sequence = event.Sequence
 	v.ChangeDate = event.CreationDate
-	switch event.Type {
-	case es_model.UserPasswordCheckSucceeded,
-		es_model.HumanPasswordCheckSucceeded:
+	switch eventstore.EventType(event.Type) {
+	case user.UserV1PasswordCheckSucceededType,
+		user.HumanPasswordCheckSucceededType:
 		v.PasswordVerification = event.CreationDate
-		v.State = int32(req_model.UserSessionStateActive)
-	case es_model.HumanExternalLoginCheckSucceeded:
+		v.State = int32(domain.UserSessionStateActive)
+	case user.UserIDPLoginCheckSucceededType:
 		data := new(es_model.AuthRequest)
 		err := data.SetData(event)
 		if err != nil {
@@ -101,21 +103,21 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		}
 		v.ExternalLoginVerification = event.CreationDate
 		v.SelectedIDPConfigID = data.SelectedIDPConfigID
-		v.State = int32(req_model.UserSessionStateActive)
-	case es_model.HumanPasswordlessTokenCheckSucceeded:
+		v.State = int32(domain.UserSessionStateActive)
+	case user.HumanPasswordlessTokenCheckSucceededType:
 		v.PasswordlessVerification = event.CreationDate
 		v.MultiFactorVerification = event.CreationDate
-		v.MultiFactorVerificationType = int32(req_model.MFATypeU2FUserVerification)
-		v.State = int32(req_model.UserSessionStateActive)
-	case es_model.HumanPasswordlessTokenCheckFailed,
-		es_model.HumanPasswordlessTokenRemoved:
+		v.MultiFactorVerificationType = int32(domain.MFATypeU2FUserVerification)
+		v.State = int32(domain.UserSessionStateActive)
+	case user.HumanPasswordlessTokenCheckFailedType,
+		user.HumanPasswordlessTokenRemovedType:
 		v.PasswordlessVerification = time.Time{}
 		v.MultiFactorVerification = time.Time{}
-	case es_model.UserPasswordCheckFailed,
-		es_model.HumanPasswordCheckFailed:
+	case user.UserV1PasswordCheckFailedType,
+		user.HumanPasswordCheckFailedType:
 		v.PasswordVerification = time.Time{}
-	case es_model.UserPasswordChanged,
-		es_model.HumanPasswordChanged:
+	case user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType:
 		data := new(es_model.PasswordChange)
 		err := data.SetData(event)
 		if err != nil {
@@ -124,57 +126,74 @@ func (v *UserSessionView) AppendEvent(event *models.Event) error {
 		if v.UserAgentID != data.UserAgentID {
 			v.PasswordVerification = time.Time{}
 		}
-	case es_model.HumanMFAOTPVerified:
+	case user.HumanMFAOTPVerifiedType:
 		data := new(es_model.OTPVerified)
 		err := data.SetData(event)
 		if err != nil {
 			return err
 		}
 		if v.UserAgentID == data.UserAgentID {
-			v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeOTP)
+			v.setSecondFactorVerification(event.CreationDate, domain.MFATypeOTP)
 		}
-	case es_model.MFAOTPCheckSucceeded,
-		es_model.HumanMFAOTPCheckSucceeded:
-		v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeOTP)
-	case es_model.MFAOTPCheckFailed,
-		es_model.MFAOTPRemoved,
-		es_model.HumanMFAOTPCheckFailed,
-		es_model.HumanMFAOTPRemoved,
-		es_model.HumanMFAU2FTokenCheckFailed,
-		es_model.HumanMFAU2FTokenRemoved:
+	case user.UserV1MFAOTPCheckSucceededType,
+		user.HumanMFAOTPCheckSucceededType:
+		v.setSecondFactorVerification(event.CreationDate, domain.MFATypeOTP)
+	case user.UserV1MFAOTPCheckFailedType,
+		user.UserV1MFAOTPRemovedType,
+		user.HumanMFAOTPCheckFailedType,
+		user.HumanMFAOTPRemovedType,
+		user.HumanU2FTokenCheckFailedType,
+		user.HumanU2FTokenRemovedType:
 		v.SecondFactorVerification = time.Time{}
-	case es_model.HumanMFAU2FTokenVerified:
+	case user.HumanU2FTokenVerifiedType:
 		data := new(es_model.WebAuthNVerify)
 		err := data.SetData(event)
 		if err != nil {
 			return err
 		}
 		if v.UserAgentID == data.UserAgentID {
-			v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeU2F)
+			v.setSecondFactorVerification(event.CreationDate, domain.MFATypeU2F)
 		}
-	case es_model.HumanMFAU2FTokenCheckSucceeded:
-		v.setSecondFactorVerification(event.CreationDate, req_model.MFATypeU2F)
-	case es_model.SignedOut,
-		es_model.HumanSignedOut,
-		es_model.UserLocked,
-		es_model.UserDeactivated:
+	case user.HumanU2FTokenCheckSucceededType:
+		v.setSecondFactorVerification(event.CreationDate, domain.MFATypeU2F)
+	case user.UserV1SignedOutType,
+		user.HumanSignedOutType,
+		user.UserLockedType,
+		user.UserDeactivatedType:
 		v.PasswordlessVerification = time.Time{}
 		v.PasswordVerification = time.Time{}
 		v.SecondFactorVerification = time.Time{}
-		v.SecondFactorVerificationType = int32(req_model.MFALevelNotSetUp)
+		v.SecondFactorVerificationType = int32(domain.MFALevelNotSetUp)
 		v.MultiFactorVerification = time.Time{}
-		v.MultiFactorVerificationType = int32(req_model.MFALevelNotSetUp)
+		v.MultiFactorVerificationType = int32(domain.MFALevelNotSetUp)
 		v.ExternalLoginVerification = time.Time{}
-		v.State = int32(req_model.UserSessionStateTerminated)
-	case es_model.HumanExternalIDPRemoved, es_model.HumanExternalIDPCascadeRemoved:
+		v.State = int32(domain.UserSessionStateTerminated)
+	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		v.ExternalLoginVerification = time.Time{}
 		v.SelectedIDPConfigID = ""
+	case user.HumanAvatarAddedType:
+		key, err := avatarKeyFromEvent(event)
+		if err != nil {
+			return err
+		}
+		v.AvatarKey = key
+	case user.HumanAvatarRemovedType:
+		v.AvatarKey = ""
 	}
 	return nil
 }
 
-func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time, mfaType req_model.MFAType) {
+func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time, mfaType domain.MFAType) {
 	v.SecondFactorVerification = verificationTime
 	v.SecondFactorVerificationType = int32(mfaType)
-	v.State = int32(req_model.UserSessionStateActive)
+	v.State = int32(domain.UserSessionStateActive)
+}
+
+func avatarKeyFromEvent(event *models.Event) (string, error) {
+	data := make(map[string]string)
+	if err := json.Unmarshal(event.Data, &data); err != nil {
+		logging.Log("EVEN-Sfew2").WithError(err).Error("could not unmarshal event data")
+		return "", caos_errs.ThrowInternal(err, "MODEL-SFw2q", "could not unmarshal event")
+	}
+	return data["storeKey"], nil
 }

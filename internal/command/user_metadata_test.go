@@ -7,15 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func TestCommandSide_SetMetadata(t *testing.T) {
+func TestCommandSide_SetUserMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -168,7 +168,7 @@ func TestCommandSide_SetMetadata(t *testing.T) {
 	}
 }
 
-func TestCommandSide_BulkSetMetadata(t *testing.T) {
+func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -504,7 +504,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 	}
 }
 
-func TestCommandSide_BulkRemoveMetadata(t *testing.T) {
+func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}

@@ -6,8 +6,8 @@ package {{.File.GoPkg.Name}}
 import (
     "google.golang.org/grpc"
     
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 )
 
 {{ range $s := .File.Services }}
@@ -21,11 +21,10 @@ const {{$s.Name}}_MethodPrefix = "{{$.File.Package}}.{{$s.Name}}"
 var {{$s.Name}}_AuthMethods = authz.MethodMapping {
     {{ range $m := $s.Method}}
         {{ $mAuthOpt := option $m.Options "zitadel.v1.auth_option" }}
-        {{ if and $mAuthOpt (or $mAuthOpt.Permission $mAuthOpt.Feature) }}
+        {{ if and $mAuthOpt $mAuthOpt.Permission }}
             "/{{$.File.Package}}.{{$s.Name}}/{{.Name}}": authz.Option{
                 Permission: "{{$mAuthOpt.Permission}}",
                 CheckParam: "{{$mAuthOpt.CheckFieldName}}",
-                Feature:    "{{$mAuthOpt.Feature}}",
             },
         {{end}}
     {{ end}}

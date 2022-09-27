@@ -3,9 +3,9 @@ package user
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/metadata"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/metadata"
 )
 
 const (
@@ -30,7 +30,7 @@ func NewMetadataSetEvent(ctx context.Context, aggregate *eventstore.Aggregate, k
 	}
 }
 
-func MetadataSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MetadataSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := metadata.SetEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func NewMetadataRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregat
 	}
 }
 
-func MetadataRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MetadataRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := metadata.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func NewMetadataRemovedAllEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func MetadataRemovedAllEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MetadataRemovedAllEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := metadata.RemovedAllEventMapper(event)
 	if err != nil {
 		return nil, err

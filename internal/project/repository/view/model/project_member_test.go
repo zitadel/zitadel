@@ -2,11 +2,12 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/lib/pq"
 	"reflect"
 	"testing"
+
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 func mockProjectMemberData(member *es_model.ProjectMember) []byte {
@@ -27,18 +28,18 @@ func TestProjectMemberAppendEvent(t *testing.T) {
 		{
 			name: "append added member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectMemberAdded, ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"Role"}})},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.MemberAddedType), ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: []string{"Role"}})},
 				member: &ProjectMemberView{},
 			},
-			result: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"Role"}},
+			result: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: []string{"Role"}},
 		},
 		{
 			name: "append changed member event",
 			args: args{
-				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectMemberAdded, ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: pq.StringArray{"RoleChanged"}})},
-				member: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"Role"}},
+				event:  &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.MemberAddedType), ResourceOwner: "OrgID", Data: mockProjectMemberData(&es_model.ProjectMember{UserID: "UserID", Roles: []string{"RoleChanged"}})},
+				member: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: []string{"Role"}},
 			},
-			result: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: pq.StringArray{"RoleChanged"}},
+			result: &ProjectMemberView{ProjectID: "AggregateID", UserID: "UserID", Roles: []string{"RoleChanged"}},
 		},
 	}
 	for _, tt := range tests {

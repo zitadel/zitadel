@@ -4,8 +4,7 @@ import (
 	"crypto/rand"
 	"time"
 
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 var (
@@ -17,7 +16,7 @@ var (
 
 type GeneratorConfig struct {
 	Length              uint
-	Expiry              types.Duration
+	Expiry              time.Duration
 	IncludeLowerLetters bool
 	IncludeUpperLetters bool
 	IncludeDigits       bool
@@ -97,13 +96,13 @@ func newGenerator(config GeneratorConfig) generator {
 	}
 	return generator{
 		length: config.Length,
-		expiry: config.Expiry.Duration,
+		expiry: config.Expiry,
 		runes:  runes,
 	}
 }
 
 func NewCode(g Generator) (*CryptoValue, string, error) {
-	code, err := generateRandomString(g.Length(), g.Runes())
+	code, err := GenerateRandomString(g.Length(), g.Runes())
 	if err != nil {
 		return nil, "", err
 	}
@@ -134,7 +133,7 @@ func VerifyCode(creationDate time.Time, expiry time.Duration, cryptoCode *Crypto
 	return errors.ThrowInvalidArgument(nil, "CODE-fW2gNa", "Errors.User.Code.GeneratorAlgNotSupported")
 }
 
-func generateRandomString(length uint, chars []rune) (string, error) {
+func GenerateRandomString(length uint, chars []rune) (string, error) {
 	if length == 0 {
 		return "", nil
 	}

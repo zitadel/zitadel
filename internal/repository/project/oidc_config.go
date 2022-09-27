@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -97,7 +97,93 @@ func NewOIDCConfigAddedEvent(
 	}
 }
 
-func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
+	c, ok := cmd.(*OIDCConfigAddedEvent)
+	if !ok {
+		return false
+	}
+
+	if e.Version != c.Version {
+		return false
+	}
+	if e.AppID != c.AppID {
+		return false
+	}
+	if e.ClientID != c.ClientID {
+		return false
+	}
+	if e.ClientSecret != c.ClientSecret {
+		return false
+	}
+	if len(e.RedirectUris) != len(c.RedirectUris) {
+		return false
+	}
+	for i, uri := range e.RedirectUris {
+		if uri != c.RedirectUris[i] {
+			return false
+		}
+	}
+	if len(e.ResponseTypes) != len(c.ResponseTypes) {
+		return false
+	}
+	for i, typ := range e.ResponseTypes {
+		if typ != c.ResponseTypes[i] {
+			return false
+		}
+	}
+	if len(e.GrantTypes) != len(c.GrantTypes) {
+		return false
+	}
+	for i, typ := range e.GrantTypes {
+		if typ != c.GrantTypes[i] {
+			return false
+		}
+	}
+	if e.ApplicationType != c.ApplicationType {
+		return false
+	}
+	if e.AuthMethodType != c.AuthMethodType {
+		return false
+	}
+	if len(e.PostLogoutRedirectUris) != len(c.PostLogoutRedirectUris) {
+		return false
+	}
+	for i, uri := range e.PostLogoutRedirectUris {
+		if uri != c.PostLogoutRedirectUris[i] {
+			return false
+		}
+	}
+	if e.DevMode != c.DevMode {
+		return false
+	}
+	if e.AccessTokenType != c.AccessTokenType {
+		return false
+	}
+	if e.AccessTokenRoleAssertion != c.AccessTokenRoleAssertion {
+		return false
+	}
+	if e.IDTokenRoleAssertion != c.IDTokenRoleAssertion {
+		return false
+	}
+	if e.IDTokenUserinfoAssertion != c.IDTokenUserinfoAssertion {
+		return false
+	}
+	if e.ClockSkew != c.ClockSkew {
+		return false
+	}
+	if len(e.AdditionalOrigins) != len(c.AdditionalOrigins) {
+		return false
+	}
+	for i, origin := range e.AdditionalOrigins {
+		if origin != c.AdditionalOrigins[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -248,7 +334,7 @@ func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigC
 	}
 }
 
-func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -293,7 +379,7 @@ func NewOIDCConfigSecretChangedEvent(
 	}
 }
 
-func OIDCConfigSecretChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigSecretChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -335,7 +421,7 @@ func NewOIDCConfigSecretCheckSucceededEvent(
 	}
 }
 
-func OIDCConfigSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -377,7 +463,7 @@ func NewOIDCConfigSecretCheckFailedEvent(
 	}
 }
 
-func OIDCConfigSecretCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigSecretCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

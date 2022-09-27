@@ -25,3 +25,15 @@ func IsNotFound(err error) bool {
 	_, ok := err.(NotFound)
 	return ok
 }
+
+func (err *NotFoundError) Is(target error) bool {
+	t, ok := target.(*NotFoundError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}
+
+func (err *NotFoundError) Unwrap() error {
+	return err.CaosError
+}

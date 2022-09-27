@@ -1,0 +1,168 @@
+@import 'main';
+@import 'bundle';
+
+
+// Include non-theme styles for core. -> mainly background of the login
+
+$custom-typography:
+  lgn-typography-config(
+    $font-family: 'Raleway'
+  );
+
+@include lgn-core($custom-typography);
+$light-text: white;
+$dark-text: black;
+
+$lgn-alternative-dark-brand: (
+    50: #ffffff,
+    100: #ffffff,
+    200: #ffffff,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #ffffff,
+    A200: #ffffff,
+    A400: #ffffff,
+    A700: #ffffff,
+    contrast: (
+        50: $light-text,
+        100: $light-text,
+        200: $light-text,
+        300: $light-text,
+        400: $light-text,
+        500: $dark-text,
+        600: $dark-text,
+        700: $dark-text,
+        800: $dark-text,
+        900: $dark-text,
+        A100: $light-text,
+        A200: $dark-text,
+        A400: $dark-text,
+        A700: $dark-text,
+    )
+);
+  
+$lgn-alternative-light-brand: (
+    50: #e0e0e0,
+    100: #b3b3b3,
+    200: #808080,
+    300: #4d4d4d,
+    400: #262626,
+    500: #000000,
+    600: #000000,
+    700: #000000,
+    800: #000000,
+    900: #000000,
+    A100: #a6a6a6,
+    A200: #8c8c8c,
+    A400: #737373,
+    A700: #666666,
+    contrast: (
+        50: $dark-text,
+        100: $dark-text,
+        200: $dark-text,
+        300: $dark-text,
+        400: $dark-text,
+        500: $light-text,
+        600: $light-text,
+        700: $light-text,
+        800: $light-text,
+        900: $light-text,
+        A100: $dark-text,
+        A200: $light-text,
+        A400: $light-text,
+        A700: $light-text,
+    )
+);
+  
+$lgn-alternative-light-warn: (
+    50: #F9E8EB,
+    100: #F0C5CC,
+    200: #E69EAB,
+    300: #DC7789,
+    400: #D55A6F,
+    500: #CD3D56,
+    600: #C8374F,
+    700: #C12F45,
+    800: #BA273C,
+    900: #AE1A2B,
+    A100: #FFE4E6,
+    A200: #FFB1B9,
+    A400: #FF7E8B,
+    A700: #FF6474,
+    contrast: (
+        50: $dark-text,
+        100: $dark-text,
+        200: $dark-text,
+        300: $dark-text,
+        400: $dark-text,
+        500: $light-text,
+        600: $light-text,
+        700: $light-text,
+        800: $light-text,
+        900: $light-text,
+        A100: $dark-text,
+        A200: $light-text,
+        A400: $light-text,
+        A700: $light-text,
+    )
+);
+
+$lgn-alternative-dark-warn: (
+    50: #FFE7EB,
+    100: #FFC4CE,
+    200: #FF9DAD,
+    300: #FF768C,
+    400: #FF5874,
+    500: #FF3B5B,
+    600: #FF3553,
+    700: #FF2D49,
+    800: #FF2640,
+    900: #FF192F,
+    A100: #FFFFFF,
+    A200: #FFFDFD,
+    A400: #FFCACE,
+    A700: #FFB1B7,
+    contrast: (
+        50: $dark-text,
+        100: $dark-text,
+        200: $dark-text,
+        300: $dark-text,
+        400: $dark-text,
+        500: $light-text,
+        600: $light-text,
+        700: $light-text,
+        800: $light-text,
+        900: $light-text,
+        A100: $dark-text,
+        A200: $light-text,
+        A400: $light-text,
+        A700: $light-text,
+    )
+);
+
+$light-primary: lgn-palette($lgn-alternative-light-brand);
+$light-accent: lgn-palette($lgn-alternative-light-brand);
+$light-warn: lgn-palette($lgn-alternative-light-warn);
+
+$dark-primary: lgn-palette($lgn-alternative-dark-brand);
+$dark-accent: lgn-palette($lgn-alternative-dark-brand);
+$dark-warn: lgn-palette($lgn-alternative-dark-warn);
+
+$light-theme: lgn-light-theme($light-primary, $light-accent, $light-warn);
+$dark-theme: lgn-dark-theme($dark-primary, $dark-accent, $dark-warn);
+
+// Include all theme styles for the components.
+@include zitadel-lgn-theme($dark-theme);
+
+.lgn-dark-theme {
+    @include zitadel-lgn-theme($dark-theme);
+}
+
+.lgn-light-theme {
+    @include zitadel-lgn-theme($light-theme);
+}

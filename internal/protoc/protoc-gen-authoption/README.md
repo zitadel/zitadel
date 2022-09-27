@@ -32,6 +32,6 @@ service MyService {
 Caos Auth Option is used for granting groups
 On each zitadel role is specified which auth methods are allowed to call
 
-Get protoc-get-authoption: ``go get github.com/caos/zitadel/internal/protoc/protoc-gen-authoption``
+Get protoc-get-authoption: ``go get github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption``
 
 Protc-Flag: ``--authoption_out=.``

@@ -1,0 +1,41 @@
+@import '../core/core';
+@import '../footer/footer_theme';
+@import '../header/header_theme';
+@import '../button/button_theme';
+@import '../input/input_theme';
+@import '../label/label_theme';
+@import '../radio/radio_theme';
+@import '../a/a_theme';
+@import '../identity_provider/identity_provider_theme';
+@import '../error/error_theme';
+@import '../qrcode/qrcode_theme';
+@import '../container/container_theme';
+@import '../account_selection/account_selection_theme';
+@import '../avatar/avatar_theme';
+@import '../checkbox/checkbox_theme';
+@import '../select/select_theme';
+@import '../list/list_theme';
+@import '../typography/typography';
+@import '../success_label/success_label_theme';
+@import 'theming';
+
+@mixin zitadel-lgn-theme() {
+    @include lgn-core-theme();
+    @include lgn-header-theme();
+    @include lgn-button-theme();
+    @include lgn-input-theme();
+    @include lgn-radio-theme();
+    @include lgn-checkbox-theme();
+    @include lgn-label-theme();
+    @include lgn-footer-theme();
+    @include lgn-a-theme();
+    @include lgn-error-theme();
+    @include lgn-qrcode-theme();
+    @include lgn-container-theme();
+    @include lgn-account-selection-theme();
+    @include lgn-avatar-theme();
+    @include lgn-select-theme();
+    @include lgn-list-theme();
+    @include lgn-idp-theme();
+    @include lgn-success-label-theme();
+}

@@ -28,6 +28,7 @@ const (
 	NextStepRegistration
 	NextStepProjectRequired
 	NextStepRedirectToExternalIDP
+	NextStepLoginSucceeded
 )
 
 type LoginStep struct{}
@@ -179,4 +180,10 @@ type RedirectToCallbackStep struct{}
 
 func (s *RedirectToCallbackStep) Type() NextStepType {
 	return NextStepRedirectToCallback
+}
+
+type LoginSucceededStep struct{}
+
+func (s *LoginSucceededStep) Type() NextStepType {
+	return NextStepLoginSucceeded
 }

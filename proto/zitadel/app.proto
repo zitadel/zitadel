@@ -8,7 +8,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.app.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/app";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/app";
 
 message App {
     string id = 1 [
@@ -30,6 +30,7 @@ message App {
     oneof config {
         OIDCConfig oidc_config = 5;
         APIConfig api_config = 6;
+        SAMLConfig saml_config = 7;
     }
 }
 
@@ -63,6 +64,8 @@ message AppNameQuery {
 }
 
 message OIDCConfig {
+    reserved "client_secret";
+    reserved 6;
     repeated string redirect_uris = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://console.zitadel.ch/auth/callback\"]";
@@ -88,12 +91,6 @@ message OIDCConfig {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334@ZITADEL\"";
             description: "generated oauth2/oidc client id";
-        }
-    ];
-    string client_secret = 6 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
-            description: "generated secret for this config";
         }
     ];
     OIDCAuthMethodType auth_method_type = 7 [
@@ -202,22 +199,25 @@ enum OIDCTokenType {
     OIDC_TOKEN_TYPE_JWT = 1;
 }
 
+message SAMLConfig {
+    oneof metadata{
+        bytes metadata_xml = 1;
+        string metadata_url = 2;
+    }
+}
+
 enum APIAuthMethodType {
     API_AUTH_METHOD_TYPE_BASIC = 0;
     API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT = 1;
 }
 
 message APIConfig {
+    reserved "client_secret";
+    reserved 2;
     string client_id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334@ZITADEL\"";
             description: "generated oauth2/oidc client_id";
-        }
-    ];
-    string client_secret = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gjöq34589uasgh\"";
-            description: "generated secret for this config";
         }
     ];
     APIAuthMethodType auth_method_type = 3 [

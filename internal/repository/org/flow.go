@@ -3,10 +3,10 @@ package org
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/flow"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/flow"
 )
 
 var (
@@ -38,7 +38,7 @@ func NewTriggerActionsSetEvent(
 	}
 }
 
-func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := flow.TriggerActionsSetEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func NewTriggerActionsCascadeRemovedEvent(
 	}
 }
 
-func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := flow.TriggerActionsCascadeRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func NewFlowClearedEvent(
 	}
 }
 
-func FlowClearedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func FlowClearedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := flow.FlowClearedEventMapper(event)
 	if err != nil {
 		return nil, err

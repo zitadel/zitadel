@@ -1,20 +1,21 @@
 package metadata
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	meta_pb "github.com/caos/zitadel/pkg/grpc/metadata"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	meta_pb "github.com/zitadel/zitadel/pkg/grpc/metadata"
 )
 
-func MetadataListToPb(dataList []*domain.Metadata) []*meta_pb.Metadata {
+func UserMetadataListToPb(dataList []*query.UserMetadata) []*meta_pb.Metadata {
 	mds := make([]*meta_pb.Metadata, len(dataList))
 	for i, data := range dataList {
-		mds[i] = DomainMetadataToPb(data)
+		mds[i] = UserMetadataToPb(data)
 	}
 	return mds
 }
 
-func DomainMetadataToPb(data *domain.Metadata) *meta_pb.Metadata {
+func UserMetadataToPb(data *query.UserMetadata) *meta_pb.Metadata {
 	return &meta_pb.Metadata{
 		Key:   data.Key,
 		Value: data.Value,
@@ -27,27 +28,47 @@ func DomainMetadataToPb(data *domain.Metadata) *meta_pb.Metadata {
 	}
 }
 
-func MetadataQueriesToModel(queries []*meta_pb.MetadataQuery) []*domain.MetadataSearchQuery {
-	q := make([]*domain.MetadataSearchQuery, len(queries))
-	for i, query := range queries {
-		q[i] = MetadataQueryToModel(query)
+func OrgMetadataListToPb(dataList []*query.OrgMetadata) []*meta_pb.Metadata {
+	mds := make([]*meta_pb.Metadata, len(dataList))
+	for i, data := range dataList {
+		mds[i] = OrgMetadataToPb(data)
 	}
-	return q
+	return mds
 }
 
-func MetadataQueryToModel(query *meta_pb.MetadataQuery) *domain.MetadataSearchQuery {
+func OrgMetadataToPb(data *query.OrgMetadata) *meta_pb.Metadata {
+	return &meta_pb.Metadata{
+		Key:   data.Key,
+		Value: data.Value,
+		Details: object.ToViewDetailsPb(
+			data.Sequence,
+			data.CreationDate,
+			data.ChangeDate,
+			data.ResourceOwner,
+		),
+	}
+}
+
+func MetadataQueriesToQuery(queries []*meta_pb.MetadataQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = MetadataQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func MetadataQueryToQuery(query *meta_pb.MetadataQuery) (query.SearchQuery, error) {
 	switch q := query.Query.(type) {
 	case *meta_pb.MetadataQuery_KeyQuery:
-		return MetadataKeyQueryToModel(q.KeyQuery)
+		return MetadataKeyQueryToQuery(q.KeyQuery)
 	default:
-		return nil
+		return nil, errors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
 	}
 }
 
-func MetadataKeyQueryToModel(q *meta_pb.MetadataKeyQuery) *domain.MetadataSearchQuery {
-	return &domain.MetadataSearchQuery{
-		Key:    domain.MetadataSearchKeyKey,
-		Method: object.TextMethodToModel(q.Method),
-		Value:  q.Key,
-	}
+func MetadataKeyQueryToQuery(q *meta_pb.MetadataKeyQuery) (query.SearchQuery, error) {
+	return query.NewUserMetadataKeySearchQuery(q.Key, object.TextMethodToQuery(q.Method))
 }

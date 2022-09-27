@@ -3,8 +3,9 @@ package fastcache
 import (
 	"bytes"
 	"encoding/gob"
-	"github.com/caos/zitadel/internal/errors"
 	"reflect"
+
+	"github.com/zitadel/zitadel/internal/errors"
 
 	"github.com/VictoriaMetrics/fastcache"
 )

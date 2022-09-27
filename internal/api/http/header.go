@@ -22,6 +22,9 @@ const (
 	ForwardedFor    = "x-forwarded-for"
 	XUserAgent      = "x-user-agent"
 	XGrpcWeb        = "x-grpc-web"
+	IfNoneMatch     = "If-None-Match"
+	LastModified    = "Last-Modified"
+	Etag            = "Etag"
 
 	ContentSecurityPolicy   = "content-security-policy"
 	XXSSProtection          = "x-xss-protection"
@@ -37,9 +40,9 @@ const (
 
 type key int
 
-var (
-	httpHeaders key
-	remoteAddr  key
+const (
+	httpHeaders key = iota
+	remoteAddr
 )
 
 func CopyHeadersToContext(h http.Handler) http.Handler {
@@ -54,6 +57,14 @@ func CopyHeadersToContext(h http.Handler) http.Handler {
 func HeadersFromCtx(ctx context.Context) (http.Header, bool) {
 	headers, ok := ctx.Value(httpHeaders).(http.Header)
 	return headers, ok
+}
+
+func OriginFromCtx(ctx context.Context) string {
+	headers, ok := ctx.Value(httpHeaders).(http.Header)
+	if !ok {
+		return ""
+	}
+	return headers.Get(Origin)
 }
 
 func RemoteIPFromCtx(ctx context.Context) string {

@@ -1,0 +1,108 @@
+---
+title: B2C
+---
+
+import Column from "../../../src/components/column";
+
+## Business to Consumer
+
+Users in general come with different needs. You may have end users, employees, or even customers from other parties (B2B).
+This groups of users usually don't share the same intentions and use applications differently.
+When planning your applications, investing time in researching your apps architecture is vital for later feature upgrades and enhancements as those changes come in with heftier price points if you have to make bigger changes.
+
+This guide introduces you to the grouping and structuring of ZITADEL projects which forms the base for all projects. This can be used as a quick start to the [B2B scenario](./b2b), which is merely focused on planning considerations if you are having projects with multiple organizations.
+
+The journey of this guide starts with creating an Organization, the outermost layer of ZITADEL within your instance, as it is the vessel for projects, roles, applications and users.
+Creation can be done from [ZITADEL Console](https://{your_domain}.zitadel.cloud/ui/console/orgs/create). You can choose your current account for the organization owner or create a new one.
+
+Depending on your Software Development Life Cycle (SDLC) you can create multiple organizations or projects to keep your applications environments seperated.
+
+### Custom domain
+
+Right after org creation you'll be greeted with the domain section of your organization.
+ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.cloud`, but you can create your own. Depending on the settings on the [Domain Policy](../../concepts/structure/policies) it has to be verified by saving a verification file on the specified location.
+We recommend that you create your domains early as they create a sense of confidence and trust for your application and changes later on might create additional migration effort.
+You can read more about how ZITADEL handles usernames [here](../manage/console/organizations#how-zitadel-handles-usernames).
+
+### Data Provisioning
+
+ZITADEL gives you a basic storage for users and manages phone and email addresses. It also allows you to store your own application data such as preferences or external identifiers to the metadata of a user.
+
+If you are migrating an existing project and you already have an external identity store you can consider bulk importing your user datasets.
+Read our [Management API definitions](../../apis/proto/management#importhumanuser) for more info. If the users email is not verified or no password is set, a initialization mail will be send.
+
+:::info
+Requests to the management API are rate limited. Read our [Rate limit Policy](../../legal/rate-limit-policy) for more info.
+:::
+
+### User Authentication
+
+User Authentication can be performed in multiple ways. Default method in ZITADEL is username and password with MFA enabled.
+ZITADEL allows you to configure Multifactor- and Passwordless Authentication in order to enhance security for your users. All authentication methods are available from the FREE Tier.
+To setup your organizations login policy, go to your organizations detail in [Console](https://{your_domain}.zitadel.cloud/ui/console/org).
+
+When planning your application consider the following questions about User Authentication:
+
+- What are the methods to authenticate your users?
+- Where will your users enter their credentials?
+- Do you offer password authentication?
+- What do you do to keep your users credentials safe?
+- Do you offer Multifactor Authentication?
+- Do you offer Login via Identity Provider?
+- Which languages do you have to provide?
+
+When looking at this questions, you may have to admit that building an Identity Management System is much more complex and complicated than you thought initially and implementing if yourself may be too much work.
+Particularly because you should focus building your applications.
+
+### Federation
+
+ZITADEL supports signup with OIDC Identity providers as well as JWT Identity Providers. On signup, ZITADEL imports user information to the own profile.
+//TODO extend this passage
+
+### Hosted Login
+
+ZITADEL offers a "secure by default approach" and comes with a Hosted Login which is a fixed endpoint for your users to authenticate.
+It's safe and secure and comes with Multifactor, Federated Login and Passwordless capabilities.
+OIDC (OpenID Connect) opens the doors to Single Sign On (SSO). Especially if you have more than one application, you may want a central and familiar authentication experience.
+With SSO, ZITADEL provides a seamless experience across all your apps.
+
+### Branding
+
+<Column>
+<div>
+
+Branding and customization is a very important part of your application.
+With ZITADEL you can modify colors, logos, icons as well as configure your typography styles, such that you can provide a consistent design throughout your applications.
+In addition to visual modifications, you can edit notification texts for your users.
+ZITADEL gives you handlebar similar templating for variables. Of course you can define texts for any language.
+We'd appreciate if you could contribute to our repo with translations of your language. Read on how to contribute [here](../manage/customize/texts).
+
+> Note that your console design changes to your design too
+
+</div>
+<img src="/img/guides/branding.jpeg" alt="branding in console"/>
+</Column>
+
+### Projects and applications
+
+As our Hosted Login is a separate authentication screen, you have to determine how you are directing your users from your applications.
+ZITADEL's Applications live under ZITADEL's Projects. You may add multiple applications for your different client-types (Native, Web, User Agent, or API). When setting up your applications consider reading our guide about [Authentication Flows](../integrate/login-users).
+
+### Access Control
+
+By having authenticated a user you need to ensure users and services have access to your application and APIs. This process is called Access Control and comprises User Authentication, Authorization and Policy Enforcement.
+Take the following considerations:
+
+- Does your application call your own APIs?
+- Does your application need to call third-party APIs?
+- Do **you** offer an API for third-party applications?
+
+The data required to check if a user has access to a certain API is stored within a user grant. This information typically is stored within roles or custom claims and can be accessed with an `access` or OIDC `id` token.
+
+Read more about Authorization in our [Guide](../integrate/oauth-recommended-flows).
+
+## Learn more
+
+- [Creating an organization](../manage/console/organizations#create-a-new-organization)
+- [Organization Branding](../manage/customize/branding)
+- [Authorization](../integrate/oauth-recommended-flows)

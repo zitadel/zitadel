@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -75,7 +75,7 @@ func NewProjectAddedEvent(
 	}
 }
 
-func ProjectAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ProjectAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -168,7 +168,7 @@ func ChangePrivateLabelingSetting(ChangePrivateLabelingSetting domain.PrivateLab
 	}
 }
 
-func ProjectChangeEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectChangeEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ProjectChangeEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -203,7 +203,7 @@ func NewProjectDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func ProjectDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &ProjectDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -231,7 +231,7 @@ func NewProjectReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func ProjectReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &ProjectReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -240,7 +240,8 @@ func ProjectReactivatedEventMapper(event *repository.Event) (eventstore.EventRea
 type ProjectRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name string
+	Name                     string
+	entityIDUniqueContraints []*eventstore.EventUniqueConstraint
 }
 
 func (e *ProjectRemovedEvent) Data() interface{} {
@@ -248,13 +249,20 @@ func (e *ProjectRemovedEvent) Data() interface{} {
 }
 
 func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	constraints := []*eventstore.EventUniqueConstraint{NewRemoveProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	if e.entityIDUniqueContraints != nil {
+		for _, constraint := range e.entityIDUniqueContraints {
+			constraints = append(constraints, constraint)
+		}
+	}
+	return constraints
 }
 
 func NewProjectRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name string,
+	entityIDUniqueContraints []*eventstore.EventUniqueConstraint,
 ) *ProjectRemovedEvent {
 	return &ProjectRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -262,11 +270,12 @@ func NewProjectRemovedEvent(
 			aggregate,
 			ProjectRemovedType,
 		),
-		Name: name,
+		Name:                     name,
+		entityIDUniqueContraints: entityIDUniqueContraints,
 	}
 }
 
-func ProjectRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &ProjectRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

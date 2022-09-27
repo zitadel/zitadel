@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type UserSearchRequest usr_model.UserSearchRequest
@@ -75,6 +75,8 @@ func (key UserSearchKey) ToColumnName() string {
 		return UserKeyPreferredLoginName
 	case usr_model.UserSearchKeyType:
 		return UserKeyType
+	case usr_model.UserSearchKeyInstanceID:
+		return UserKeyInstanceID
 	default:
 		return ""
 	}

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	es_locker "github.com/caos/zitadel/internal/eventstore/v1/locker"
+	es_locker "github.com/zitadel/zitadel/internal/eventstore/v1/locker"
 )
 
 const (
@@ -19,6 +19,6 @@ func NewLocker(client *sql.DB) *locker {
 	return &locker{dbClient: client}
 }
 
-func (l *locker) Renew(lockerID, viewModel string, waitTime time.Duration) error {
-	return es_locker.Renew(l.dbClient, lockTable, lockerID, viewModel, waitTime)
+func (l *locker) Renew(lockerID, viewModel, instanceID string, waitTime time.Duration) error {
+	return es_locker.Renew(l.dbClient, lockTable, lockerID, viewModel, instanceID, waitTime)
 }

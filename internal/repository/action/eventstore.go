@@ -1,6 +1,6 @@
 package action
 
-import "github.com/caos/zitadel/internal/eventstore"
+import "github.com/zitadel/zitadel/internal/eventstore"
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(AddedEventType, AddedEventMapper).

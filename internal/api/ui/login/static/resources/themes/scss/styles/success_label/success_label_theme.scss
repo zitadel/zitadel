@@ -1,0 +1,13 @@
+@import "../theming/theming";
+@import "success_label";
+
+@mixin lgn-success-label-theme() {
+  @include lgn-success-label-color();
+}
+
+@mixin lgn-success-label-color() {
+  .lgn-success-label {
+    color: var(--zitadel-color-success);
+    background-color: var(--zitadel-color-success-background);
+  }
+}

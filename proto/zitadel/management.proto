@@ -13,7 +13,6 @@ import "zitadel/text.proto";
 import "zitadel/message.proto";
 import "zitadel/change.proto";
 import "zitadel/auth_n_key.proto";
-import "zitadel/features.proto";
 import "zitadel/metadata.proto";
 import "zitadel/action.proto";
 
@@ -26,7 +25,7 @@ import "validate/validate.proto";
 
 package zitadel.management.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/management";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/management";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
@@ -34,17 +33,18 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         version: "1.0";
         description: "The management API is as the name states the interface where systems can mutate IAM objects like, organisations, projects, clients, users and so on if they have the necessary access rights.";
         contact:{
-            name: "CAOS developers of ZITADEL"
-            url: "https://zitadel.ch"
-            email: "hi@zitadel.ch"
+            name: "ZITADEL"
+            url: "https://zitadel.com"
+            email: "hi@zitadel.com"
         }
         license: {
             name: "Apache License 2.0",
-            url: "https://github.com/caos/zitadel/blob/main/LICENSE"
+            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE"
         };
     };
 
     schemes: HTTPS;
+
     consumes: "application/json";
     produces: "application/json";
 
@@ -54,11 +54,20 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     consumes: "application/grpc-web+proto";
     produces: "application/grpc-web+proto";
 
+    host: "api.zitadel.ch";
+    base_path: "/management/v1";
 
     external_docs: {
         description: "Detailed information about ZITADEL",
-        url: "https://docs.zitadel.ch"
+        url: "https://docs.zitadel.com"
     }
+
+    extensions: {
+		key: "x-zitadel-orgid";
+		value: {
+			string_value: "your-org-id";
+		}
+	}
 };
 
 
@@ -129,7 +138,6 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
-                //TODO: errors
             };
         };
     }
@@ -279,7 +287,8 @@ service ManagementService {
     // Changes the username
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/username"
+            put: "/users/{user_id}/username"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -296,7 +305,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
-            feature: "metadata.user"
         };
     }
 
@@ -309,7 +317,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
-            feature: "metadata.user"
         };
     }
 
@@ -322,7 +329,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
-            feature: "metadata.user"
         };
     }
 
@@ -334,7 +340,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
-            feature: "metadata.user"
         };
     }
 
@@ -346,7 +351,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
-            feature: "metadata.user"
         };
     }
 
@@ -359,7 +363,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
-            feature: "metadata.user"
         };
     }
 
@@ -574,6 +577,18 @@ service ManagementService {
         };
     }
 
+    // Adds a new passwordless authenticator link to the user and returns it directly
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/passwordless/_link"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "user.credential.write"
+        };
+    }
+
     // Adds a new passwordless authenticator link to the user and sends it to the registered email address
     // This link enables the user to register a new device if current passwordless devices are all platform authenticators
     // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
@@ -583,7 +598,7 @@ service ManagementService {
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
+            permission: "user.write"
         };
     }
 
@@ -646,10 +661,57 @@ service ManagementService {
         };
     }
 
-    // Removed a machine key
+    // Removes a machine key
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/keys/{key_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Returns a personal access token of a (machine) user
+    rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/pats/{token_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Returns all personal access tokens of a (machine) user which match the query
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/pats/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Generates a new personal access token for a machine user, details should be stored after return
+    rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/pats"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Removes a personal access token
+    rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/pats/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -779,6 +841,76 @@ service ManagementService {
         };
     }
 
+    // Sets a org metadata by key
+    rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
+        option (google.api.http) = {
+            post: "/metadata/{key}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    // Set a list of org metadata
+    rpc BulkSetOrgMetadata(BulkSetOrgMetadataRequest) returns (BulkSetOrgMetadataResponse) {
+        option (google.api.http) = {
+            post: "/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    // Returns the org metadata
+    rpc ListOrgMetadata(ListOrgMetadataRequest) returns (ListOrgMetadataResponse) {
+        option (google.api.http) = {
+            post: "/metadata/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.read"
+        };
+    }
+
+    // Returns the org metadata by key
+    rpc GetOrgMetadata(GetOrgMetadataRequest) returns (GetOrgMetadataResponse) {
+        option (google.api.http) = {
+            get: "/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.read"
+        };
+    }
+
+    // Removes a org metadata by key
+    rpc RemoveOrgMetadata(RemoveOrgMetadataRequest) returns (RemoveOrgMetadataResponse) {
+        option (google.api.http) = {
+            delete: "/metadata/{key}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
+    // Set a list of org metadata
+    rpc BulkRemoveOrgMetadata(BulkRemoveOrgMetadataRequest) returns (BulkRemoveOrgMetadataResponse) {
+        option (google.api.http) = {
+            delete: "/metadata/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.write"
+        };
+    }
+
     // Returns all registered domains of my organisation
     // Limit should always be set, there is a default limit set by the service
     rpc ListOrgDomains(ListOrgDomainsRequest) returns (ListOrgDomainsResponse) {
@@ -801,7 +933,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
-            feature: "custom_domain"
         };
     }
 
@@ -825,7 +956,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
-            feature: "custom_domain"
         };
     }
 
@@ -839,7 +969,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
-            feature: "custom_domain"
         };
     }
 
@@ -852,7 +981,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
-            feature: "custom_domain"
         };
     }
 
@@ -987,6 +1115,7 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "project.read"
+            check_field_name: "ProjectId"
         };
     }
 
@@ -1239,14 +1368,28 @@ service ManagementService {
         };
     }
 
-    // Adds a new api application
-    // Returns a client id
-    // Returns a new generated secret if needed (Depending on the configuration)
-    rpc AddAPIApp(AddAPIAppRequest) returns (AddAPIAppResponse) {
-        option (google.api.http) = {
-            post: "/projects/{project_id}/apps/api"
-            body: "*"
-        };
+  // Adds a new saml service provider
+  // Returns a entityID
+  rpc AddSAMLApp(AddSAMLAppRequest) returns (AddSAMLAppResponse) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/apps/saml"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  // Adds a new api application
+  // Returns a client id
+  // Returns a new generated secret if needed (Depending on the configuration)
+  rpc AddAPIApp(AddAPIAppRequest) returns (AddAPIAppResponse) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/apps/api"
+      body: "*"
+    };
 
         option (zitadel.v1.auth_option) = {
             permission: "project.app.write"
@@ -1280,12 +1423,25 @@ service ManagementService {
         };
     }
 
-    // Changes the configuration of the api application
-    rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
-        option (google.api.http) = {
-            put: "/projects/{project_id}/apps/{app_id}/api_config"
-            body: "*"
-        };
+  // Changes the configuration of the saml application
+  rpc UpdateSAMLAppConfig(UpdateSAMLAppConfigRequest) returns (UpdateSAMLAppConfigResponse) {
+    option (google.api.http) = {
+      put: "/projects/{project_id}/apps/{app_id}/saml_config"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
+  // Changes the configuration of the api application
+  rpc UpdateAPIAppConfig(UpdateAPIAppConfigRequest) returns (UpdateAPIAppConfigResponse) {
+    option (google.api.http) = {
+      put: "/projects/{project_id}/apps/{app_id}/api_config"
+      body: "*"
+    };
 
         option (zitadel.v1.auth_option) = {
             permission: "project.app.write"
@@ -1412,6 +1568,19 @@ service ManagementService {
         };
     }
 
+    // Returns the history of the project grant (each event)
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListProjectGrantChanges(ListProjectGrantChangesRequest) returns (ListProjectGrantChangesResponse) {
+        option (google.api.http) = {
+            post: "/projects/{project_id}/grants/{grant_id}/changes/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.read"
+            check_field_name: "GrantId"
+        };
+    }
+
     // Returns a project grant (ProjectGrant = Grant another organisation for my project)
     rpc GetProjectGrantByID(GetProjectGrantByIDRequest) returns (GetProjectGrantByIDResponse) {
         option (google.api.http) = {
@@ -1434,6 +1603,19 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.grant.read"
             check_field_name: "ProjectId"
+        };
+    }
+
+    // Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListAllProjectGrants(ListAllProjectGrantsRequest) returns (ListAllProjectGrantsResponse) {
+        option (google.api.http) = {
+            post: "/projectgrants/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.read"
         };
     }
 
@@ -1657,20 +1839,22 @@ service ManagementService {
         };
     }
 
-    rpc GetFeatures(GetFeaturesRequest) returns (GetFeaturesResponse) {
-        option (google.api.http) = {
-            get: "/features"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "features.read"
-        };
-    }
-
-    // Returns the org iam policy (this policy is managed by the iam administrator)
+    //deprecated: please use DomainPolicy instead
+    // Returns the domain policy (this policy is managed by the iam administrator)
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/orgiam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the domain policy (this policy is managed by the iam administrator)
+    rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/domain"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -1711,7 +1895,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy"
         };
     }
 
@@ -1725,7 +1908,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy"
         };
     }
 
@@ -1763,7 +1945,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -1775,7 +1956,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -1799,7 +1979,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy.factors"
         };
     }
 
@@ -1811,7 +1990,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy.factors"
         };
     }
 
@@ -1835,7 +2013,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy.factors"
         };
     }
 
@@ -1847,7 +2024,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "login_policy.factors"
         };
     }
 
@@ -1885,7 +2061,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "password_complexity_policy"
         };
     }
 
@@ -1899,7 +2074,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "password_complexity_policy"
         };
     }
 
@@ -2050,6 +2224,7 @@ service ManagementService {
 
     // Add a custom privacy policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc AddCustomPrivacyPolicy(AddCustomPrivacyPolicyRequest) returns (AddCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/privacy"
@@ -2058,12 +2233,12 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "privacy_policy"
         };
     }
 
     // Update the privacy complexity policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy"
@@ -2072,7 +2247,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "privacy_policy"
         };
     }
 
@@ -2121,7 +2295,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.read"
-            feature: "label_policy"
         };
     }
 
@@ -2135,7 +2308,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
         };
     }
 
@@ -2149,7 +2321,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
         };
     }
 
@@ -2163,7 +2334,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
         };
     }
 
@@ -2175,7 +2345,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
         };
     }
 
@@ -2187,7 +2356,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
         };
     }
 
@@ -2199,7 +2367,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
         };
     }
 
@@ -2211,7 +2378,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
         };
     }
 
@@ -2223,7 +2389,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
-            feature: "label_policy"
         };
     }
 
@@ -2272,7 +2437,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text.message"
         };
     }
 
@@ -2320,7 +2484,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text.message"
         };
     }
 
@@ -2369,7 +2532,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text.message"
         };
     }
 
@@ -2418,7 +2580,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text.message"
         };
     }
 
@@ -2467,7 +2628,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text.message"
         };
     }
 
@@ -2516,7 +2676,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text.message"
         };
     }
 
@@ -2564,7 +2723,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.write";
-            feature: "custom_text.login"
         };
     }
 
@@ -2614,7 +2772,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -2627,7 +2784,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -2642,7 +2798,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -2656,7 +2811,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -2669,7 +2823,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -2682,7 +2835,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -2695,7 +2847,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -2708,7 +2859,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
-            feature: "login_policy.idp"
         };
     }
 
@@ -2720,7 +2870,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.action.read"
-            feature: "actions"
         };
     }
 
@@ -2731,7 +2880,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.action.read"
-            feature: "actions"
         };
     }
 
@@ -2743,7 +2891,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.action.write"
-            feature: "actions"
         };
     }
 
@@ -2755,34 +2902,30 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.action.write"
-            feature: "actions"
         };
     }
 
-//TODO: enable in next release
-//    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
-//        option (google.api.http) = {
-//            post: "/actions/{id}/_deactivate"
-//            body: "*"
-//        };
-//
-//        option (zitadel.v1.auth_option) = {
-//            permission: "org.action.write"
-//            feature: "actions"
-//        };
-//    }
-//
-//    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
-//        option (google.api.http) = {
-//            post: "/actions/{id}/_reactivate"
-//            body: "*"
-//        };
-//
-//        option (zitadel.v1.auth_option) = {
-//            permission: "org.action.write"
-//            feature: "actions"
-//        };
-//    }
+    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_deactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+        };
+    }
+
+    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_reactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+        };
+    }
 
     rpc DeleteAction(DeleteActionRequest) returns (DeleteActionResponse) {
         option (google.api.http) = {
@@ -2792,7 +2935,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.action.delete"
-            feature: "actions"
         };
     }
 
@@ -2803,7 +2945,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.flow.read"
-            feature: "actions"
         };
     }
 
@@ -2814,7 +2955,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.flow.delete"
-            feature: "actions"
         };
     }
 
@@ -2826,7 +2966,6 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.flow.write"
-            feature: "actions"
         };
     }
 }
@@ -2849,8 +2988,10 @@ message GetOIDCInformationResponse {
 message GetIAMRequest {}
 
 message GetIAMResponse {
+    //deprecated: use default_org_id instead
     string global_org_id = 1;
     string iam_project_id = 2;
+    string default_org_id = 3;
 }
 
 //This is an empty request
@@ -2898,7 +3039,9 @@ message ListUserChangesRequest {
 }
 
 message ListUserChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -2921,7 +3064,7 @@ message AddHumanUserRequest {
         zitadel.user.v1.Gender gender = 6;
     }
     message Email {
-        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+        string email = 1 [(validate.rules).string.email = true];
         bool is_email_verified = 2;
     }
     message Phone {
@@ -2953,13 +3096,17 @@ message ImportHumanUserRequest {
         zitadel.user.v1.Gender gender = 6;
     }
     message Email {
-        string email = 1 [(validate.rules).string.email = true];  //TODO: check if no value is allowed
+        string email = 1 [(validate.rules).string.email = true];
         bool is_email_verified = 2;
     }
     message Phone {
         // has to be a global number
         string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
         bool is_phone_verified = 2;
+    }
+    message HashedPassword{
+        string value = 1;
+        string algorithm = 2;
     }
 
     string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -2968,14 +3115,19 @@ message ImportHumanUserRequest {
     Email email = 3 [(validate.rules).message.required = true];
     Phone phone = 4;
     string password = 5;
-    bool password_change_required = 6;
-    bool request_passwordless_registration = 7;
+    HashedPassword hashed_password = 6;
+    bool password_change_required = 7;
+    bool request_passwordless_registration = 8;
+
+    string otp_code = 9;
 }
 
 message ImportHumanUserResponse {
     message PasswordlessRegistration {
         string link = 1;
+        //deprecated: use expiration instead
         google.protobuf.Duration lifetime = 2;
+        google.protobuf.Duration expiration = 3;
     }
 
     string user_id = 1;
@@ -3152,7 +3304,7 @@ message UpdateHumanEmailResponse {
 
 message ResendHumanInitializationRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string email = 2 [(validate.rules).string.email = true];
+    string email = 2 [(validate.rules).string = {ignore_empty: true, email: true}];
 }
 
 message ResendHumanInitializationResponse {
@@ -3277,6 +3429,16 @@ message ListHumanPasswordlessResponse {
     repeated zitadel.user.v1.WebAuthNToken result = 1;
 }
 
+message AddPasswordlessRegistrationRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddPasswordlessRegistrationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string link = 2;
+    google.protobuf.Duration expiration = 3;
+}
+
 message SendPasswordlessRegistrationRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3350,6 +3512,51 @@ message RemoveMachineKeyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message GetPersonalAccessTokenByIDsRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetPersonalAccessTokenByIDsResponse {
+    zitadel.user.v1.PersonalAccessToken token = 1;
+}
+
+message ListPersonalAccessTokensRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 2;
+}
+
+message ListPersonalAccessTokensResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.PersonalAccessToken result = 2;
+}
+
+message AddPersonalAccessTokenRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp expiration_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the token will expire and no logins will be possible";
+        }
+    ];
+}
+
+message AddPersonalAccessTokenResponse {
+    string token_id = 1;
+    string token = 2;
+    zitadel.v1.ObjectDetails details = 3;
+}
+
+message RemovePersonalAccessTokenRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemovePersonalAccessTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message ListHumanLinkedIDPsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
@@ -3402,7 +3609,9 @@ message ListOrgChangesRequest {
 }
 
 message ListOrgChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3541,6 +3750,61 @@ message RemoveOrgMemberResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ListOrgMetadataRequest {
+    zitadel.v1.ListQuery query = 1;
+    repeated zitadel.metadata.v1.MetadataQuery queries = 2;
+}
+
+message ListOrgMetadataResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.metadata.v1.Metadata result = 2;
+}
+
+message GetOrgMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetOrgMetadataResponse {
+    zitadel.metadata.v1.Metadata metadata = 1;
+}
+
+message SetOrgMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetOrgMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkSetOrgMetadataRequest {
+    message Metadata {
+        string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+    }
+    repeated Metadata metadata = 1;
+}
+
+message BulkSetOrgMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveOrgMetadataRequest {
+    string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveOrgMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkRemoveOrgMetadataRequest {
+    repeated string keys = 1 [(validate.rules).repeated.items.string = {min_len: 1, max_len: 200}];
+}
+
+message BulkRemoveOrgMetadataResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetProjectByIDRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3589,7 +3853,9 @@ message ListProjectChangesRequest {
 }
 
 message ListProjectChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3796,7 +4062,9 @@ message ListAppChangesRequest {
 }
 
 message ListAppChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3836,6 +4104,21 @@ message AddOIDCAppResponse {
     ];
     bool none_compliant = 5;
     repeated zitadel.v1.LocalizedMessage compliance_problems = 6;
+}
+
+message AddSAMLAppRequest {
+  string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  oneof metadata {
+      option (validate.required) = true;
+      bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+      string metadata_url = 4 [(validate.rules).string.max_len = 200];
+  }
+}
+
+message AddSAMLAppResponse {
+  string app_id = 1;
+  zitadel.v1.ObjectDetails details = 2;
 }
 
 message AddAPIAppRequest {
@@ -3891,7 +4174,22 @@ message UpdateOIDCAppConfigRequest {
 }
 
 message UpdateOIDCAppConfigResponse {
-    zitadel.v1.ObjectDetails details = 1;
+  zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSAMLAppConfigRequest {
+  string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+  oneof metadata {
+      option (validate.required) = true;
+      bytes metadata_xml = 3 [(validate.rules).bytes.max_len = 500000];
+      string metadata_url = 4 [(validate.rules).string.max_len = 200];
+  }
+}
+
+message UpdateSAMLAppConfigResponse {
+  zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateAPIAppConfigRequest {
@@ -4005,6 +4303,20 @@ message RemoveAppKeyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ListProjectGrantChangesRequest {
+    //list limitations and ordering
+    zitadel.change.v1.ChangeQuery query = 1;
+    string project_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ListProjectGrantChangesResponse {
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
+    repeated zitadel.change.v1.Change result = 2;
+}
+
 message GetProjectGrantByIDRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -4023,6 +4335,18 @@ message ListProjectGrantsRequest {
 }
 
 message ListProjectGrantsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.project.v1.GrantedProject result = 2;
+}
+
+message ListAllProjectGrantsRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
+    repeated zitadel.project.v1.AllProjectGrantQuery queries = 2;
+}
+
+message ListAllProjectGrantsResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.project.v1.GrantedProject result = 2;
 }
@@ -4205,22 +4529,23 @@ message BulkRemoveUserGrantRequest {
 
 message BulkRemoveUserGrantResponse {}
 
-message GetFeaturesRequest {}
-
-message GetFeaturesResponse {
-    zitadel.features.v1.Features features = 1;
-}
-
 message GetOrgIAMPolicyRequest {}
 
 message GetOrgIAMPolicyResponse {
     zitadel.policy.v1.OrgIAMPolicy policy = 1;
 }
 
+message GetDomainPolicyRequest {}
+
+message GetDomainPolicyResponse {
+    zitadel.policy.v1.DomainPolicy policy = 1;
+}
+
 message GetLoginPolicyRequest {}
 
 message GetLoginPolicyResponse {
     zitadel.policy.v1.LoginPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LoginPolicy
     bool is_default = 2;
 }
 
@@ -4231,12 +4556,35 @@ message GetDefaultLoginPolicyResponse {
 }
 
 message AddCustomLoginPolicyRequest {
+    message IDP {
+        string idp_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        zitadel.idp.v1.IDPOwnerType ownerType = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    }
+
     bool allow_username_password = 1;
     bool allow_register = 2;
     bool allow_external_idp = 3;
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
     bool hide_password_reset = 6;
+    bool ignore_unknown_usernames = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
+    repeated zitadel.policy.v1.SecondFactorType second_factors = 14;
+    repeated zitadel.policy.v1.MultiFactorType multi_factors = 15;
+    repeated IDP idps = 16;
 }
 
 message AddCustomLoginPolicyResponse {
@@ -4250,6 +4598,21 @@ message UpdateCustomLoginPolicyRequest {
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
     bool hide_password_reset = 6;
+    bool ignore_unknown_usernames = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
 }
 
 message UpdateCustomLoginPolicyResponse {
@@ -4337,6 +4700,7 @@ message GetPasswordComplexityPolicyRequest {}
 
 message GetPasswordComplexityPolicyResponse {
     zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.PasswordComplexityPolicy
     bool is_default = 2;
 }
 
@@ -4383,6 +4747,7 @@ message GetPasswordAgePolicyRequest {}
 
 message GetPasswordAgePolicyResponse {
     zitadel.policy.v1.PasswordAgePolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.PasswordAgePolicy
     bool is_default = 2;
 }
 
@@ -4423,6 +4788,7 @@ message GetLockoutPolicyRequest {}
 
 message GetLockoutPolicyResponse {
     zitadel.policy.v1.LockoutPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LockoutPolicy
     bool is_default = 2;
 }
 
@@ -4473,6 +4839,7 @@ message GetDefaultPrivacyPolicyResponse {
 message AddCustomPrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -4482,6 +4849,7 @@ message AddCustomPrivacyPolicyResponse {
 message UpdateCustomPrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message UpdateCustomPrivacyPolicyResponse {
@@ -4500,6 +4868,7 @@ message GetLabelPolicyRequest {}
 
 message GetLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy
     bool is_default = 2;
 }
 
@@ -4508,6 +4877,7 @@ message GetPreviewLabelPolicyRequest {}
 
 message GetPreviewLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy
     bool is_default = 2;
 }
 
@@ -4520,10 +4890,10 @@ message GetDefaultLabelPolicyResponse {
 
 message AddCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {max_len: 50}];
-    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];
@@ -4544,7 +4914,7 @@ message UpdateCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {max_len: 50}];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];

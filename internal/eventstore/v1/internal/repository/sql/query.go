@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/caos/logging"
-	z_errors "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/lib/pq"
+	"github.com/zitadel/logging"
+
+	z_errors "github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (
@@ -23,6 +23,7 @@ const (
 		", editor_service" +
 		", editor_user" +
 		", resource_owner" +
+		", instance_id" +
 		", aggregate_type" +
 		", aggregate_id" +
 		", aggregate_version" +
@@ -32,7 +33,7 @@ const (
 func buildQuery(queryFactory *es_models.SearchQueryFactory) (query string, limit uint64, values []interface{}, rowScanner func(s scan, dest interface{}) error) {
 	searchQuery, err := queryFactory.Build()
 	if err != nil {
-		logging.Log("SQL-cshKu").WithError(err).Warn("search query factory invalid")
+		logging.New().WithError(err).Warn("search query factory invalid")
 		return "", 0, nil, nil
 	}
 	query, rowScanner = prepareColumns(searchQuery.Columns)
@@ -42,7 +43,7 @@ func buildQuery(queryFactory *es_models.SearchQueryFactory) (query string, limit
 	}
 	query += where
 
-	if searchQuery.Columns != es_models.Columns_Max_Sequence {
+	if searchQuery.Columns == es_models.Columns_Event {
 		query += " ORDER BY event_sequence"
 		if searchQuery.Desc {
 			query += " DESC"
@@ -59,27 +60,27 @@ func buildQuery(queryFactory *es_models.SearchQueryFactory) (query string, limit
 	return query, searchQuery.Limit, values, rowScanner
 }
 
-func prepareCondition(filters []*es_models.Filter) (clause string, values []interface{}) {
-	values = make([]interface{}, len(filters))
+func prepareCondition(filters [][]*es_models.Filter) (clause string, values []interface{}) {
+	values = make([]interface{}, 0, len(filters))
 	clauses := make([]string, len(filters))
 
 	if len(filters) == 0 {
 		return clause, values
 	}
 	for i, filter := range filters {
-		value := filter.GetValue()
-		switch value.(type) {
-		case []bool, []float64, []int64, []string, []es_models.AggregateType, []es_models.EventType, *[]bool, *[]float64, *[]int64, *[]string, *[]es_models.AggregateType, *[]es_models.EventType:
-			value = pq.Array(value)
-		}
+		subClauses := make([]string, 0, len(filter))
+		for _, f := range filter {
+			value := f.GetValue()
 
-		clauses[i] = getCondition(filter)
-		if clauses[i] == "" {
-			return "", nil
+			subClauses = append(subClauses, getCondition(f))
+			if subClauses[len(subClauses)-1] == "" {
+				return "", nil
+			}
+			values = append(values, value)
 		}
-		values[i] = value
+		clauses[i] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
-	return " WHERE " + strings.Join(clauses, " AND "), values
+	return " WHERE " + strings.Join(clauses, " OR "), values
 }
 
 type scan func(dest ...interface{}) error
@@ -97,6 +98,19 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 				return nil
 			}
 			return z_errors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
+		}
+	case es_models.Columns_InstanceIDs:
+		return "SELECT DISTINCT instance_id FROM eventstore.events", func(row scan, dest interface{}) (err error) {
+			instanceID, ok := dest.(*string)
+			if !ok {
+				return z_errors.ThrowInvalidArgument(nil, "SQL-Fef5h", "type must be *string]")
+			}
+			err = row(instanceID)
+			if err != nil {
+				logging.New().WithError(err).Warn("unable to scan row")
+				return z_errors.ThrowInternal(err, "SQL-SFef3", "unable to scan row")
+			}
+			return nil
 		}
 	case es_models.Columns_Event:
 		return selectStmt, func(row scan, dest interface{}) (err error) {
@@ -116,13 +130,14 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 				&event.EditorService,
 				&event.EditorUser,
 				&event.ResourceOwner,
+				&event.InstanceID,
 				&event.AggregateType,
 				&event.AggregateID,
 				&event.AggregateVersion,
 			)
 
 			if err != nil {
-				logging.Log("SQL-kn1Sw").WithError(err).Warn("unable to scan row")
+				logging.New().WithError(err).Warn("unable to scan row")
 				return z_errors.ThrowInternal(err, "SQL-J0hFS", "unable to scan row")
 			}
 
@@ -159,8 +174,11 @@ func getCondition(filter *es_models.Filter) (condition string) {
 }
 
 func getConditionFormat(operation es_models.Operation) string {
-	if operation == es_models.Operation_In {
+	switch operation {
+	case es_models.Operation_In:
 		return "%s %s ANY(?)"
+	case es_models.Operation_NotIn:
+		return "%s %s ALL(?)"
 	}
 	return "%s %s ?"
 }
@@ -175,6 +193,8 @@ func getField(field es_models.Field) string {
 		return "event_sequence"
 	case es_models.Field_ResourceOwner:
 		return "resource_owner"
+	case es_models.Field_InstanceID:
+		return "instance_id"
 	case es_models.Field_EditorService:
 		return "editor_service"
 	case es_models.Field_EditorUser:
@@ -195,6 +215,8 @@ func getOperation(operation es_models.Operation) string {
 		return ">"
 	case es_models.Operation_Less:
 		return "<"
+	case es_models.Operation_NotIn:
+		return "<>"
 	}
 	return ""
 }

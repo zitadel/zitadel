@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 
 type verifierMock struct{}
 
-func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, string, error) {
+func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
 	return "", "", "", "", "", nil
 }
 func (v *verifierMock) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
@@ -34,11 +34,8 @@ func (v *verifierMock) ProjectIDAndOriginsByClientID(ctx context.Context, client
 func (v *verifierMock) ExistsOrg(ctx context.Context, orgID string) error {
 	return nil
 }
-func (v *verifierMock) VerifierClientID(ctx context.Context, appName string) (string, error) {
-	return "", nil
-}
-func (v *verifierMock) CheckOrgFeatures(context.Context, string, ...string) error {
-	return nil
+func (v *verifierMock) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
+	return "", "", nil
 }
 
 func Test_authorize(t *testing.T) {
@@ -68,7 +65,7 @@ func Test_authorize(t *testing.T) {
 				info:    mockInfo("/no/token/needed"),
 				handler: emptyMockHandler,
 				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{})
+					verifier := authz.Start(&verifierMock{}, "", nil)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{})
 					return verifier
 				}(),
@@ -87,7 +84,7 @@ func Test_authorize(t *testing.T) {
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
 				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{})
+					verifier := authz.Start(&verifierMock{}, "", nil)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
 				}(),
@@ -107,7 +104,7 @@ func Test_authorize(t *testing.T) {
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
 				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{})
+					verifier := authz.Start(&verifierMock{}, "", nil)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
 				}(),
@@ -127,7 +124,7 @@ func Test_authorize(t *testing.T) {
 				info:    mockInfo("/need/authentication"),
 				handler: emptyMockHandler,
 				verifier: func() *authz.TokenVerifier {
-					verifier := authz.Start(&verifierMock{})
+					verifier := authz.Start(&verifierMock{}, "", nil)
 					verifier.RegisterServer("need", "need", authz.MethodMapping{"/need/authentication": authz.Option{Permission: "authenticated"}})
 					return verifier
 				}(),

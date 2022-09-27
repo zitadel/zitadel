@@ -3,7 +3,7 @@ package domain
 import (
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (
@@ -178,6 +178,7 @@ const (
 	LoginKeyPasswordlessRegistrationDone                 = "PasswordlessRegistrationDone."
 	LoginKeyPasswordlessRegistrationDoneTitle            = LoginKeyPasswordlessRegistrationDone + "Title"
 	LoginKeyPasswordlessRegistrationDoneDescription      = LoginKeyPasswordlessRegistrationDone + "Description"
+	LoginKeyPasswordlessRegistrationDoneDescriptionClose = LoginKeyPasswordlessRegistrationDone + "DescriptionClose"
 	LoginKeyPasswordlessRegistrationDoneNextButtonText   = LoginKeyPasswordlessRegistrationDone + "NextButtonText"
 	LoginKeyPasswordlessRegistrationDoneCancelButtonText = LoginKeyPasswordlessRegistrationDone + "CancelButtonText"
 
@@ -293,15 +294,15 @@ const (
 	LoginKeyFooterTOS           = LoginKeyFooter + "Tos"
 	LoginKeyFooterPrivacyPolicy = LoginKeyFooter + "PrivacyPolicy"
 	LoginKeyFooterHelp          = LoginKeyFooter + "Help"
-	LoginKeyFooterHelpLink      = LoginKeyFooter + "HelpLink"
 )
 
 type CustomLoginText struct {
 	models.ObjectRoot
 
-	State    PolicyState
-	Default  bool
-	Language language.Tag
+	State     PolicyState
+	Default   bool
+	Language  language.Tag
+	IsDefault bool
 
 	SelectAccount                    SelectAccountScreenText
 	Login                            LoginScreenText
@@ -635,7 +636,6 @@ type FooterText struct {
 	TOS           string
 	PrivacyPolicy string
 	Help          string
-	HelpLink      string
 }
 
 type PasswordlessPromptScreenText struct {
@@ -659,6 +659,7 @@ type PasswordlessRegistrationScreenText struct {
 type PasswordlessRegistrationDoneScreenText struct {
 	Title            string
 	Description      string
+	DescriptionClose string
 	NextButtonText   string
 	CancelButtonText string
 }

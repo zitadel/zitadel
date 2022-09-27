@@ -3,11 +3,12 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"golang.org/x/text/language"
 )
 
@@ -94,7 +95,7 @@ func ChangeGender(gender domain.Gender) func(event *HumanProfileChangedEvent) {
 	}
 }
 
-func HumanProfileChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanProfileChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	profileChanged := &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

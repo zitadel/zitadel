@@ -4,13 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/api/grpc/member"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/internal/api/grpc/member"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMemberRolesRequest) (*admin_pb.ListIAMMemberRolesResponse, error) {
-	roles := s.iam.GetIAMMemberRoles()
+	roles := s.query.GetIAMMemberRoles()
 	return &admin_pb.ListIAMMemberRolesResponse{
 		Roles:   roles,
 		Details: object.ToListDetails(uint64(len(roles)), 0, time.Now()),
@@ -18,18 +18,23 @@ func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMe
 }
 
 func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMembersRequest) (*admin_pb.ListIAMMembersResponse, error) {
-	res, err := s.iam.SearchIAMMembers(ctx, ListIAMMemberRequestToModel(req))
+	queries, err := ListIAMMembersRequestToQuery(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IAMMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.ListIAMMembersResponse{
-		Details: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
-		Result:  member.IAMMembersToPb(res.Result),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		//TODO: resource owner of user of the member instead of the membership resource owner
+		Result: member.MembersToPb("", res.Members),
 	}, nil
 }
 
 func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberRequest) (*admin_pb.AddIAMMemberResponse, error) {
-	member, err := s.command.AddIAMMember(ctx, AddIAMMemberToDomain(req))
+	member, err := s.command.AddInstanceMember(ctx, req.UserId, req.Roles...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +48,7 @@ func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberReq
 }
 
 func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMemberRequest) (*admin_pb.UpdateIAMMemberResponse, error) {
-	member, err := s.command.ChangeIAMMember(ctx, UpdateIAMMemberToDomain(req))
+	member, err := s.command.ChangeInstanceMember(ctx, UpdateIAMMemberToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +62,7 @@ func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMem
 }
 
 func (s *Server) RemoveIAMMember(ctx context.Context, req *admin_pb.RemoveIAMMemberRequest) (*admin_pb.RemoveIAMMemberResponse, error) {
-	objectDetails, err := s.command.RemoveIAMMember(ctx, req.UserId)
+	objectDetails, err := s.command.RemoveInstanceMember(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}

@@ -3,10 +3,10 @@ package command
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type HumanRefreshTokenWriteModel struct {
@@ -30,7 +30,7 @@ func NewHumanRefreshTokenWriteModel(userID, resourceOwner, tokenID string) *Huma
 	}
 }
 
-func (wm *HumanRefreshTokenWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanRefreshTokenWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanRefreshTokenAddedEvent:
@@ -67,7 +67,11 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 			}
 			wm.RefreshToken = e.RefreshToken
 			wm.IdleExpiration = e.CreationDate().Add(e.IdleExpiration)
-		case *user.HumanRefreshTokenRemovedEvent:
+		case *user.HumanRefreshTokenRemovedEvent,
+			*user.HumanSignedOutEvent,
+			*user.UserLockedEvent,
+			*user.UserDeactivatedEvent,
+			*user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		}
 	}
@@ -83,6 +87,9 @@ func (wm *HumanRefreshTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanRefreshTokenAddedType,
 			user.HumanRefreshTokenRenewedType,
 			user.HumanRefreshTokenRemovedType,
+			user.HumanSignedOutType,
+			user.UserLockedType,
+			user.UserDeactivatedType,
 			user.UserRemovedType).
 		Builder()
 

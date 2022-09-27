@@ -2,10 +2,11 @@ package policy
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
+
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -50,7 +51,7 @@ func NewPasswordComplexityPolicyAddedEvent(
 	}
 }
 
-func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PasswordComplexityPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &PasswordComplexityPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -129,7 +130,7 @@ func ChangeHasSymbol(hasSymbol bool) func(*PasswordComplexityPolicyChangedEvent)
 	}
 }
 
-func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PasswordComplexityPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &PasswordComplexityPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -160,7 +161,7 @@ func NewPasswordComplexityPolicyRemovedEvent(base *eventstore.BaseEvent) *Passwo
 	}
 }
 
-func PasswordComplexityPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PasswordComplexityPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &PasswordComplexityPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

@@ -3,14 +3,13 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
-	"github.com/caos/zitadel/internal/domain"
-	usr_model "github.com/caos/zitadel/internal/user/model"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
-	obj_pb "github.com/caos/zitadel/pkg/grpc/object"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
@@ -18,8 +17,23 @@ func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueReque
 	return &admin_pb.IsOrgUniqueResponse{IsUnique: isUnique}, err
 }
 
+func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgRequest) (*admin_pb.SetDefaultOrgResponse, error) {
+	details, err := s.command.SetDefaultOrg(ctx, req.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetDefaultOrgResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
+	org, err := s.query.OrgByID(ctx, true, authz.GetInstance(ctx).DefaultOrganisationID())
+	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err
+}
+
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
-	org, err := s.query.OrgByID(ctx, req.Id)
+	org, err := s.query.OrgByID(ctx, true, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -36,52 +50,48 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 		return nil, err
 	}
 	return &admin_pb.ListOrgsResponse{
-		Result: org_grpc.OrgViewsToPb(orgs.Orgs),
-		Details: &obj_pb.ListDetails{
-			TotalResult:       orgs.Count,
-			ProcessedSequence: orgs.Sequence,
-			ViewTimestamp:     timestamppb.New(orgs.Timestamp),
-		},
+		Result:  org_grpc.OrgViewsToPb(orgs.Orgs),
+		Details: object.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
 	}, nil
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*admin_pb.SetUpOrgResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Org.Name, s.iamDomain))
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Org.Name, authz.GetInstance(ctx).RequestedDomain()))
 	if err != nil {
 		return nil, err
 	}
-	human := setUpOrgHumanToDomain(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
-	org := setUpOrgOrgToDomain(req.Org)
+	human := setUpOrgHumanToCommand(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
 
-	objectDetails, err := s.command.SetUpOrg(ctx, org, human, userIDs, false)
+	userID, objectDetails, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
+		Name:         req.Org.Name,
+		CustomDomain: req.Org.Domain,
+		Human:        human,
+		Roles:        req.Roles,
+	}, userIDs...)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.SetUpOrgResponse{
 		Details: object.DomainToAddDetailsPb(objectDetails),
+		OrgId:   objectDetails.ResourceOwner,
+		UserId:  userID,
 	}, nil
 }
 
 func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain string) ([]string, error) {
-	users, err := s.users.SearchUsers(ctx, &usr_model.UserSearchRequest{
-		Queries: []*usr_model.UserSearchQuery{
-			{
-				Key:    usr_model.UserSearchKeyPreferredLoginName,
-				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  orgDomain,
-			},
-			{
-				Key:    usr_model.UserSearchKeyResourceOwner,
-				Method: domain.SearchMethodNotEquals,
-				Value:  authz.GetCtxData(ctx).OrgID,
-			},
-		},
-	})
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, len(users.Result))
-	for i, user := range users.Result {
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Users))
+	for i, user := range users.Users {
 		userIDs[i] = user.ID
 	}
 	return userIDs, nil

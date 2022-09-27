@@ -1,0 +1,5 @@
+@import "identity_provider_base";
+
+.lgn-idp {
+  @include lgn-idp-base;
+}

@@ -5,26 +5,43 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
-	user_pb "github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
+	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 func (s *Server) ListMyPasswordless(ctx context.Context, _ *auth_pb.ListMyPasswordlessRequest) (*auth_pb.ListMyPasswordlessResponse, error) {
-	tokens, err := s.repo.GetMyPasswordless(ctx)
+	query := new(query.UserAuthMethodSearchQueries)
+	err := query.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendStateQuery(domain.MFAStateReady)
+	if err != nil {
+		return nil, err
+	}
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyPasswordlessResponse{
-		Result: user_grpc.WebAuthNTokensViewToPb(tokens),
+		Result: user_grpc.UserAuthMethodsToWebAuthNTokenPb(authMethods),
 	}, nil
 }
 
 func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPasswordlessRequest) (*auth_pb.AddMyPasswordlessResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	token, err := s.command.HumanAddPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
+	token, err := s.command.HumanAddPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false, domain.AuthenticatorAttachmentUnspecified)
 	if err != nil {
 		return nil, err
 	}
@@ -42,20 +59,29 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 
 func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPasswordlessLinkRequest) (*auth_pb.AddMyPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.userCodeAlg)
 	if err != nil {
 		return nil, err
 	}
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner, passwordlessInitCode)
+	if err != nil {
+		return nil, err
+	}
+	origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
 	return &auth_pb.AddMyPasswordlessLinkResponse{
 		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		Link:       initCode.Link(s.defaults.Notifications.Endpoints.PasswordlessRegistration),
+		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }
 
 func (s *Server) SendMyPasswordlessLink(ctx context.Context, _ *auth_pb.SendMyPasswordlessLinkRequest) (*auth_pb.SendMyPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}

@@ -2,14 +2,27 @@ package command
 
 import (
 	"context"
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"reflect"
+
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
+
+func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
+	existingMember, err := c.projectGrantWriteModelByID(ctx, grantID, grant.AggregateID, resourceOwner)
+	if err != nil && !caos_errs.IsNotFound(err) {
+		return nil, err
+	}
+	if existingMember != nil && existingMember.State != domain.ProjectGrantStateUnspecified {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-2b8fs", "Errors.Project.Grant.AlreadyExisting")
+	}
+
+	return c.addProjectGrantWithID(ctx, grant, grantID, resourceOwner)
+}
 
 func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGrant, resourceOwner string) (_ *domain.ProjectGrant, err error) {
 	if !grant.IsValid() {
@@ -19,13 +32,21 @@ func (c *Commands) AddProjectGrant(ctx context.Context, grant *domain.ProjectGra
 	if err != nil {
 		return nil, err
 	}
-	grant.GrantID, err = c.idGenerator.Next()
+
+	grantID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
+
+	return c.addProjectGrantWithID(ctx, grant, grantID, resourceOwner)
+}
+
+func (c *Commands) addProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
+	grant.GrantID = grantID
+
 	addedGrant := NewProjectGrantWriteModel(grant.GrantID, grant.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedGrant.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		project.NewGrantAddedEvent(ctx, projectAgg, grant.GrantID, grant.GrantedOrgID, grant.RoleKeys))
 	if err != nil {
@@ -57,13 +78,13 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-0o0pL", "Errors.NoChangesFoundc")
 	}
 
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		project.NewGrantChangedEvent(ctx, projectAgg, grant.GrantID, grant.RoleKeys),
 	}
 
 	removedRoles := domain.GetRemovedRoles(existingGrant.RoleKeys, grant.RoleKeys)
 	if len(removedRoles) == 0 {
-		pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+		pushedEvents, err := c.eventstore.Push(ctx, events...)
 		if err != nil {
 			return nil, err
 		}
@@ -81,7 +102,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 		}
 		events = append(events, event)
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +113,7 @@ func (c *Commands) ChangeProjectGrant(ctx context.Context, grant *domain.Project
 	return projectGrantWriteModelToProjectGrant(existingGrant), nil
 }
 
-func (c *Commands) removeRoleFromProjectGrant(ctx context.Context, projectAgg *eventstore.Aggregate, projectID, projectGrantID, roleKey string, cascade bool) (_ eventstore.EventPusher, _ *ProjectGrantWriteModel, err error) {
+func (c *Commands) removeRoleFromProjectGrant(ctx context.Context, projectAgg *eventstore.Aggregate, projectID, projectGrantID, roleKey string, cascade bool) (_ eventstore.Command, _ *ProjectGrantWriteModel, err error) {
 	existingProjectGrant, err := c.projectGrantWriteModelByID(ctx, projectGrantID, projectID, "")
 	if err != nil {
 		return nil, nil, err
@@ -139,7 +160,7 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewGrantDeactivateEvent(ctx, projectAgg, grantID))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewGrantDeactivateEvent(ctx, projectAgg, grantID))
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +187,7 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 		return details, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-47fu8", "Errors.Project.Grant.NotInactive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewGrantReactivatedEvent(ctx, projectAgg, grantID))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewGrantReactivatedEvent(ctx, projectAgg, grantID))
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +210,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if err != nil {
 		return details, err
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	projectAgg := ProjectAggregateFromWriteModel(&existingGrant.WriteModel)
 	events = append(events, project.NewGrantRemovedEvent(ctx, projectAgg, grantID, existingGrant.GrantedOrgID))
 
@@ -201,7 +222,7 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 		}
 		events = append(events, event)
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}

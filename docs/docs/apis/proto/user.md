@@ -213,6 +213,20 @@ this query is always equals
 
 
 
+### PersonalAccessToken
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+| scopes | repeated string | - |  |
+
+
+
+
 ### Phone
 
 
@@ -360,6 +374,7 @@ UserTypeQuery is always equals
 | project_name |  string | - |  |
 | project_grant_id |  string | - |  |
 | avatar_url |  string | - |  |
+| preferred_login_name |  string | - |  |
 
 
 
@@ -489,6 +504,7 @@ UserTypeQuery is always equals
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.org_domain_query |  UserGrantOrgDomainQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.project_name_query |  UserGrantProjectNameQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.display_name_query |  UserGrantDisplayNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.user_type_query |  UserGrantUserTypeQuery | - |  |
 
 
 
@@ -524,6 +540,17 @@ UserTypeQuery is always equals
 | ----- | ---- | ----------- | ----------- |
 | user_name |  string | - | string.max_len: 200<br />  |
 | method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### UserGrantUserTypeQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  Type | - |  |
 
 
 

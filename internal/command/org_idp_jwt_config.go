@@ -3,8 +3,8 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func (c *Commands) ChangeIDPJWTConfig(ctx context.Context, config *domain.JWTIDPConfig, resourceOwner string) (*domain.JWTIDPConfig, error) {
@@ -40,7 +40,7 @@ func (c *Commands) ChangeIDPJWTConfig(ctx context.Context, config *domain.JWTIDP
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-2k9fs", "Errors.Org.IDPConfig.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

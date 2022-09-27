@@ -1,0 +1,12 @@
+@import 'error';
+
+@mixin lgn-error-theme() {
+    @include lgn-error-color();
+}
+
+@mixin lgn-error-color() {
+  
+    .lgn-error {
+      color: var(--zitadel-color-warn);
+    }
+}

@@ -1,6 +1,6 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { forkJoin, from, Subject } from 'rxjs';
@@ -10,6 +10,7 @@ import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { GrantedProject, Project, ProjectNameQuery, ProjectQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
+import { ProjectType } from '../project-members/project-members-datasource';
 
 export enum ProjectAutocompleteType {
   PROJECT_OWNED = 0,
@@ -17,7 +18,7 @@ export enum ProjectAutocompleteType {
 }
 
 @Component({
-  selector: 'app-search-project-autocomplete',
+  selector: 'cnsl-search-project-autocomplete',
   templateUrl: './search-project-autocomplete.component.html',
   styleUrls: ['./search-project-autocomplete.component.scss'],
 })
@@ -26,21 +27,18 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
   public removable: boolean = true;
   public addOnBlur: boolean = true;
   public separatorKeysCodes: number[] = [ENTER, COMMA];
-  public myControl: FormControl = new FormControl();
+  public myControl: UntypedFormControl = new UntypedFormControl();
   public names: string[] = [];
   public projects: Array<GrantedProject.AsObject | Project.AsObject | any> = [];
   public filteredProjects: Array<GrantedProject.AsObject | Project.AsObject | any> = [];
   public isLoading: boolean = false;
   @ViewChild('nameInput') public nameInput!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
-  @Input() public singleOutput: boolean = false;
   @Input() public autocompleteType!: ProjectAutocompleteType;
-  @Output() public selectionChanged: EventEmitter<
-    GrantedProject.AsObject[]
-    | GrantedProject.AsObject
-    | Project.AsObject
-    | Project.AsObject[]
-  > = new EventEmitter();
+  @Output() public selectionChanged: EventEmitter<{
+    project: Project.AsObject | GrantedProject.AsObject;
+    type: ProjectType;
+  }> = new EventEmitter();
 
   private unsubscribed$: Subject<void> = new Subject();
   constructor(private mgmtService: ManagementService) {
@@ -48,8 +46,8 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
       .pipe(
         takeUntil(this.unsubscribed$),
         debounceTime(200),
-        tap(() => this.isLoading = true),
-        switchMap(value => {
+        tap(() => (this.isLoading = true)),
+        switchMap((value) => {
           const query = new ProjectQuery();
           const nameQuery = new ProjectNameQuery();
           nameQuery.setName(value);
@@ -68,7 +66,8 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
               ]);
           }
         }),
-      ).subscribe((returnValue) => {
+      )
+      .subscribe((returnValue) => {
         switch (this.autocompleteType) {
           case ProjectAutocompleteType.PROJECT_GRANTED:
             this.isLoading = false;
@@ -81,10 +80,8 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
           default:
             this.isLoading = false;
             this.filteredProjects = [
-              ...(returnValue as (ListProjectsResponse.AsObject | ListProjectGrantsResponse.AsObject)[])[0]
-                .resultList,
-              ...(returnValue as (ListProjectsResponse.AsObject | ListProjectGrantsResponse.AsObject)[])[1]
-                .resultList,
+              ...(returnValue as (ListProjectsResponse.AsObject | ListProjectGrantsResponse.AsObject)[])[0].resultList,
+              ...(returnValue as (ListProjectsResponse.AsObject | ListProjectGrantsResponse.AsObject)[])[1].resultList,
             ];
             break;
         }
@@ -95,9 +92,8 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
     this.unsubscribed$.next();
   }
 
-  public displayFn(project?: any): string | undefined {
-    return (project && project.projectName) ? `${project.projectName}` :
-      (project && project.name) ? `${project.name}` : undefined;
+  public displayFn(project?: any): string {
+    return project && project.projectName ? `${project.projectName}` : project && project.name ? `${project.name}` : '';
   }
 
   public add(event: MatChipInputEvent): void {
@@ -111,6 +107,8 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
             return project.projectName === value;
           } else if (project?.name) {
             return project.name === value;
+          } else {
+            return false;
           }
         });
         if (index > -1) {
@@ -137,18 +135,16 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
   }
 
   public selected(event: MatAutocompleteSelectedEvent): void {
-    if (this.singleOutput) {
-      this.selectionChanged.emit(event.option.value);
-    } else {
-      if (this.projects && this.projects.length > 0) {
-        this.projects.push(event.option.value);
-      } else {
-        this.projects = [event.option.value];
-      }
-      this.selectionChanged.emit(this.projects);
+    const p: Project.AsObject | GrantedProject.AsObject = event.option.value;
+    const type = (p as Project.AsObject).id
+      ? ProjectType.PROJECTTYPE_OWNED
+      : (p as GrantedProject.AsObject).projectId
+      ? ProjectType.PROJECTTYPE_GRANTED
+      : ProjectType.PROJECTTYPE_OWNED;
 
-      this.nameInput.nativeElement.value = '';
-      this.myControl.setValue(null);
-    }
+    this.selectionChanged.emit({
+      project: p,
+      type: type,
+    });
   }
 }

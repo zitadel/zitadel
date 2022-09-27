@@ -2,41 +2,44 @@ package oidc
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
+	"net/http"
 	"time"
 
-	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/op"
 	"github.com/rakyll/statik/fs"
+	"github.com/zitadel/oidc/v2/pkg/op"
 	"golang.org/x/text/language"
 
-	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth/repository"
-	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/i18n"
-	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/api/assets"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/auth/repository"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
-type OPHandlerConfig struct {
-	OPConfig              *op.Config
-	StorageConfig         StorageConfig
-	UserAgentCookieConfig *middleware.UserAgentCookieConfig
-	Cache                 *middleware.CacheConfig
-	Endpoints             *EndpointConfig
-}
-
-type StorageConfig struct {
-	DefaultLoginURL                   string
+type Config struct {
+	CodeMethodS256                    bool
+	AuthMethodPost                    bool
+	AuthMethodPrivateKeyJWT           bool
+	GrantTypeRefreshToken             bool
+	RequestObjectSupported            bool
 	SigningKeyAlgorithm               string
-	DefaultAccessTokenLifetime        types.Duration
-	DefaultIdTokenLifetime            types.Duration
-	DefaultRefreshTokenIdleExpiration types.Duration
-	DefaultRefreshTokenExpiration     types.Duration
+	DefaultAccessTokenLifetime        time.Duration
+	DefaultIdTokenLifetime            time.Duration
+	DefaultRefreshTokenIdleExpiration time.Duration
+	DefaultRefreshTokenExpiration     time.Duration
+	UserAgentCookieConfig             *middleware.UserAgentCookieConfig
+	Cache                             *middleware.CacheConfig
+	CustomEndpoints                   *EndpointConfig
 }
 
 type EndpointConfig struct {
@@ -44,6 +47,7 @@ type EndpointConfig struct {
 	Token         *Endpoint
 	Introspection *Endpoint
 	Userinfo      *Endpoint
+	Revocation    *Endpoint
 	EndSession    *Endpoint
 	Keys          *Endpoint
 }
@@ -57,63 +61,128 @@ type OPStorage struct {
 	repo                              repository.Repository
 	command                           *command.Commands
 	query                             *query.Queries
+	eventstore                        *eventstore.Eventstore
 	defaultLoginURL                   string
 	defaultAccessTokenLifetime        time.Duration
 	defaultIdTokenLifetime            time.Duration
 	signingKeyAlgorithm               string
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
+	encAlg                            crypto.EncryptionAlgorithm
+	locker                            crdb.Locker
+	assetAPIPrefix                    func(ctx context.Context) string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig *crypto.KeyConfig, localDevMode bool) op.OpenIDProvider {
-	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
-	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
-	tokenKey, err := crypto.LoadKey(keyConfig, keyConfig.EncryptionKeyID)
-	logging.Log("OIDC-ADvbv").OnError(err).Panic("cannot load OP crypto key")
-	cryptoKey := []byte(tokenKey)
-	if len(cryptoKey) != 32 {
-		logging.Log("OIDC-Dsfds").Panic("OP crypto key must be exactly 32 bytes")
+func NewProvider(ctx context.Context, config Config, defaultLogoutRedirectURI string, externalSecure bool, command *command.Commands, query *query.Queries, repo repository.Repository, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *sql.DB, userAgentCookie, instanceHandler func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	copy(config.OPConfig.CryptoKey[:], cryptoKey)
-	config.OPConfig.CodeMethodS256 = true
-	config.OPConfig.GrantTypeRefreshToken = true
-	supportedLanguages, err := getSupportedLanguages()
-	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
-	config.OPConfig.SupportedUILocales = supportedLanguages
-	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	provider, err := op.NewOpenIDProvider(
+	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
+	options, err := createOptions(config, externalSecure, userAgentCookie, instanceHandler)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
+	}
+	provider, err := op.NewDynamicOpenIDProvider(
 		ctx,
-		config.OPConfig,
-		newStorage(config.StorageConfig, command, query, repo),
+		"",
+		opConfig,
+		storage,
+		options...,
+	)
+	if err != nil {
+		return nil, caos_errs.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
+	}
+	return provider, nil
+}
+
+func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []byte) (*op.Config, error) {
+	supportedLanguages, err := getSupportedLanguages()
+	if err != nil {
+		return nil, err
+	}
+	opConfig := &op.Config{
+		DefaultLogoutRedirectURI: defaultLogoutRedirectURI,
+		CodeMethodS256:           config.CodeMethodS256,
+		AuthMethodPost:           config.AuthMethodPost,
+		AuthMethodPrivateKeyJWT:  config.AuthMethodPrivateKeyJWT,
+		GrantTypeRefreshToken:    config.GrantTypeRefreshToken,
+		RequestObjectSupported:   config.RequestObjectSupported,
+		SupportedUILocales:       supportedLanguages,
+	}
+	if cryptoLength := len(cryptoKey); cryptoLength != 32 {
+		return nil, caos_errs.ThrowInternalf(nil, "OIDC-D43gf", "crypto key must be 32 bytes, but is %d", cryptoLength)
+	}
+	copy(opConfig.CryptoKey[:], cryptoKey)
+	return opConfig, nil
+}
+
+func createOptions(config Config, externalSecure bool, userAgentCookie, instanceHandler func(http.Handler) http.Handler) ([]op.Option, error) {
+	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
+	options := []op.Option{
 		op.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
-			middleware.NoCacheInterceptor,
-			cookieHandler,
+			middleware.NoCacheInterceptor().Handler,
+			instanceHandler,
+			userAgentCookie,
 			http_utils.CopyHeadersToContext,
 		),
-		op.WithCustomAuthEndpoint(op.NewEndpointWithURL(config.Endpoints.Auth.Path, config.Endpoints.Auth.URL)),
-		op.WithCustomTokenEndpoint(op.NewEndpointWithURL(config.Endpoints.Token.Path, config.Endpoints.Token.URL)),
-		op.WithCustomIntrospectionEndpoint(op.NewEndpointWithURL(config.Endpoints.Introspection.Path, config.Endpoints.Introspection.URL)),
-		op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(config.Endpoints.Userinfo.Path, config.Endpoints.Userinfo.URL)),
-		op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(config.Endpoints.EndSession.Path, config.Endpoints.EndSession.URL)),
-		op.WithCustomKeysEndpoint(op.NewEndpointWithURL(config.Endpoints.Keys.Path, config.Endpoints.Keys.URL)),
-	)
-	logging.Log("OIDC-asf13").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create provider")
-	return provider
+	}
+	if !externalSecure {
+		options = append(options, op.WithAllowInsecure())
+	}
+	endpoints := customEndpoints(config.CustomEndpoints)
+	if len(endpoints) != 0 {
+		options = append(options, endpoints...)
+	}
+	return options, nil
 }
 
-func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository) *OPStorage {
+func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
+	if endpointConfig == nil {
+		return nil
+	}
+	options := []op.Option{}
+	if endpointConfig.Auth != nil {
+		options = append(options, op.WithCustomAuthEndpoint(op.NewEndpointWithURL(endpointConfig.Auth.Path, endpointConfig.Auth.URL)))
+	}
+	if endpointConfig.Token != nil {
+		options = append(options, op.WithCustomTokenEndpoint(op.NewEndpointWithURL(endpointConfig.Token.Path, endpointConfig.Token.URL)))
+	}
+	if endpointConfig.Introspection != nil {
+		options = append(options, op.WithCustomIntrospectionEndpoint(op.NewEndpointWithURL(endpointConfig.Introspection.Path, endpointConfig.Introspection.URL)))
+	}
+	if endpointConfig.Userinfo != nil {
+		options = append(options, op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(endpointConfig.Userinfo.Path, endpointConfig.Userinfo.URL)))
+	}
+	if endpointConfig.Revocation != nil {
+		options = append(options, op.WithCustomRevocationEndpoint(op.NewEndpointWithURL(endpointConfig.Revocation.Path, endpointConfig.Revocation.URL)))
+	}
+	if endpointConfig.EndSession != nil {
+		options = append(options, op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(endpointConfig.EndSession.Path, endpointConfig.EndSession.URL)))
+	}
+	if endpointConfig.Keys != nil {
+		options = append(options, op.WithCustomKeysEndpoint(op.NewEndpointWithURL(endpointConfig.Keys.Path, endpointConfig.Keys.URL)))
+	}
+	return options
+}
+
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, projections *sql.DB, externalSecure bool) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
 		query:                             query,
-		defaultLoginURL:                   config.DefaultLoginURL,
+		eventstore:                        es,
+		defaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		signingKeyAlgorithm:               config.SigningKeyAlgorithm,
-		defaultAccessTokenLifetime:        config.DefaultAccessTokenLifetime.Duration,
-		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime.Duration,
-		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration.Duration,
-		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration.Duration,
+		defaultAccessTokenLifetime:        config.DefaultAccessTokenLifetime,
+		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime,
+		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
+		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
+		encAlg:                            encAlg,
+		locker:                            crdb.NewLocker(projections, locksTable, signingKey),
+		assetAPIPrefix:                    assets.AssetAPI(externalSecure),
 	}
 }
 

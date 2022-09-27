@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 type EventType string
@@ -28,6 +28,7 @@ type Event struct {
 	EditorService    string
 	EditorUser       string
 	ResourceOwner    string
+	InstanceID       string
 }
 
 func eventData(i interface{}) ([]byte, error) {

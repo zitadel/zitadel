@@ -3,9 +3,9 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type Application struct {
@@ -16,20 +16,12 @@ type Application struct {
 	Type       int32       `json:"appType,omitempty"`
 	OIDCConfig *OIDCConfig `json:"-"`
 	APIConfig  *APIConfig  `json:"-"`
+	SAMLConfig *SAMLConfig `json:"-"`
 }
 
 type ApplicationID struct {
 	es_models.ObjectRoot
 	AppID string `json:"appId"`
-}
-
-func GetApplication(apps []*Application, id string) (int, *Application) {
-	for i, a := range apps {
-		if a.AppID == id {
-			return i, a
-		}
-	}
-	return -1, nil
 }
 
 func (a *Application) setData(event *es_models.Event) error {

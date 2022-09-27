@@ -17,7 +17,6 @@ title: zitadel/options.proto
 | ----- | ---- | ----------- | ----------- |
 | permission |  string | - |  |
 | check_field_name |  string | - |  |
-| feature |  string | - |  |
 
 
 

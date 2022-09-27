@@ -1,0 +1,41 @@
+.project-grants-wrapper {
+  h1 {
+    margin: 0;
+  }
+
+  .desc {
+    margin: 1rem 0 0 0;
+    font-size: 14px;
+  }
+
+  .project-grants {
+    .role {
+      display: inline-block;
+      border-radius: 0.5rem;
+      border: 1px solid #ffffff30;
+      padding: 0.5rem 1rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.25rem;
+      margin-left: 0;
+      margin-right: 0.5rem;
+      cursor: pointer;
+    }
+
+    tr {
+      outline: none;
+    }
+
+    tr.detail-row {
+      height: 0;
+    }
+
+    .pointer {
+      outline: none;
+      cursor: pointer;
+    }
+
+    .role-row {
+      min-width: 100px;
+    }
+  }
+}

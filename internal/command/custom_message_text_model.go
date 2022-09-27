@@ -3,9 +3,9 @@ package command
 import (
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
 type CustomMessageTextReadModel struct {
@@ -79,6 +79,16 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 				wm.FooterText = ""
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
+			if wm.Language != e.Language {
+				continue
+			}
+			wm.Subject = ""
+			wm.Title = ""
+			wm.PreHeader = ""
+			wm.Text = ""
+			wm.Greeting = ""
+			wm.ButtonText = ""
+			wm.FooterText = ""
 			wm.State = domain.PolicyStateRemoved
 		}
 	}
@@ -159,7 +169,7 @@ func (wm *CustomMessageTemplatesReadModel) Reduce() error {
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
 			if _, ok := wm.CustomMessageTemplate[e.Template+e.Language.String()]; ok {
-				delete(wm.CustomMessageTemplate, e.Template)
+				delete(wm.CustomMessageTemplate, e.Template+e.Language.String())
 			}
 		}
 	}

@@ -2,11 +2,12 @@ package repository
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
+
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 type SearchRequest interface {
@@ -48,6 +49,9 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 		}
 
 		query = query.Count(&count)
+		if res == nil {
+			return count, nil
+		}
 		if request.GetLimit() != 0 {
 			query = query.Limit(request.GetLimit())
 		}
@@ -124,7 +128,7 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method domain.Se
 		if !ok {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "VIEW-Psois", "list contains only possible for strings")
 		}
-		query = query.Where("? <@ "+column, pq.Array([]string{valueText}))
+		query = query.Where("? <@ "+column, database.StringArray{valueText})
 	default:
 		return nil, nil
 	}

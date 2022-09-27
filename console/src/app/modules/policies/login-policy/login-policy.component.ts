@@ -1,99 +1,137 @@
-import { Component, Injector, OnDestroy, Type } from '@angular/core';
+import { Component, Injector, Input, OnInit, Type } from '@angular/core';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
+import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
+import { take } from 'rxjs';
 import {
   GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
   UpdateLoginPolicyRequest,
   UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDP, IDPLoginPolicyLink, IDPOwnerType, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddCustomLoginPolicyRequest,
   GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { GridPolicy, LOGIN_POLICY } from '../../policy-grid/policies';
+import { InfoSectionType } from '../../info-section/info-section.component';
+import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
+import { LoginMethodComponentType } from './factor-table/factor-table.component';
 
 @Component({
-  selector: 'app-login-policy',
+  selector: 'cnsl-login-policy',
   templateUrl: './login-policy.component.html',
   styleUrls: ['./login-policy.component.scss'],
 })
-export class LoginPolicyComponent implements OnDestroy {
+export class LoginPolicyComponent implements OnInit {
   public LoginMethodComponentType: any = LoginMethodComponentType;
-  public passwordlessTypes: Array<PasswordlessType> = [];
-  public loginData!: LoginPolicy.AsObject;
+  public passwordlessTypes: Array<PasswordlessType> = [
+    PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+    PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+  ];
+  public loginData?: LoginPolicy.AsObject;
 
-  private sub: Subscription = new Subscription();
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-  public idps: IDPLoginPolicyLink.AsObject[] = [];
+  @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public loading: boolean = false;
-  public disabled: boolean = true;
-
-  public IDPStylingType: any = IDPStylingType;
-  public currentPolicy: GridPolicy = LOGIN_POLICY;
+  public InfoSectionType: any = InfoSectionType;
+  public PasswordlessType: any = PasswordlessType;
+  public lifetimeForm: UntypedFormGroup = this.fb.group({
+    passwordCheckLifetime: [{ disabled: true, value: 240 }, [Validators.required]],
+    externalLoginCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+    mfaInitSkipLifetime: [{ disabled: true, value: 720 }, [Validators.required]],
+    secondFactorCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+    multiFactorCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+  });
   constructor(
-    private route: ActivatedRoute,
     private toast: ToastService,
-    private dialog: MatDialog,
     private injector: Injector,
-  ) {
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.passwordlessTypes = [
-            PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
-            PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
-          ];
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.passwordlessTypes = [
-            PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
-            PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
-          ];
-          break;
-      }
+    private fb: UntypedFormBuilder,
+    private authService: GrpcAuthService,
+    private dialog: MatDialog,
+  ) {}
 
-      return this.route.params;
-    })).subscribe(() => {
-      this.fetchData();
-    });
+  public fetchData(): void {
+    this.getData()
+      .then((resp) => {
+        if (resp.policy) {
+          this.loginData = resp.policy;
+          this.loading = false;
+
+          this.passwordCheckLifetime?.setValue(
+            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 240,
+          );
+
+          this.externalLoginCheckLifetime?.setValue(
+            this.loginData.externalLoginCheckLifetime?.seconds
+              ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
+
+          this.mfaInitSkipLifetime?.setValue(
+            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 720,
+          );
+
+          this.secondFactorCheckLifetime?.setValue(
+            this.loginData.secondFactorCheckLifetime?.seconds
+              ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
+
+          this.multiFactorCheckLifetime?.setValue(
+            this.loginData.multiFactorCheckLifetime?.seconds
+              ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60
+              : 12,
+          );
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
-  private fetchData(): void {
-    this.getData().then(resp => {
-      if (resp.policy) {
-        this.loginData = resp.policy;
-        this.loading = false;
-        this.disabled = this.isDefault;
-      }
-    });
-    this.getIdps().then(resp => {
-      this.idps = resp;
-    });
+  public ngOnInit(): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        this.service = this.injector.get(ManagementService as Type<ManagementService>);
+        this.passwordlessTypes = [
+          PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+          PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+        ];
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        this.service = this.injector.get(AdminService as Type<AdminService>);
+        this.passwordlessTypes = [
+          PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
+          PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
+        ];
+        break;
+    }
+    this.fetchData();
+    this.authService
+      .isAllowed(
+        this.serviceType === PolicyComponentServiceType.ADMIN
+          ? ['iam.policy.write']
+          : this.serviceType === PolicyComponentServiceType.MGMT
+          ? ['policy.write']
+          : [],
+      )
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.lifetimeForm.enable();
+        }
+      });
   }
 
-  public ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
-
-  private async getData():
-    Promise<AdminGetLoginPolicyResponse.AsObject | MgmtGetLoginPolicyResponse.AsObject> {
+  private async getData(): Promise<AdminGetLoginPolicyResponse.AsObject | MgmtGetLoginPolicyResponse.AsObject> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return (this.service as ManagementService).getLoginPolicy();
@@ -102,130 +140,170 @@ export class LoginPolicyComponent implements OnDestroy {
     }
   }
 
-  private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).listLoginPolicyIDPs()
-          .then((resp) => {
-            return resp.resultList;
-          });
-      case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).listLoginPolicyIDPs()
-          .then((providers) => {
-            return providers.resultList;
-          });
-    }
-  }
+  private async updateData(): Promise<UpdateLoginPolicyResponse.AsObject> {
+    if (this.loginData) {
+      switch (this.serviceType) {
+        case PolicyComponentServiceType.MGMT:
+          const mgmtreq = new AddCustomLoginPolicyRequest();
+          mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
+          mgmtreq.setAllowRegister(this.loginData.allowRegister);
+          mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+          mgmtreq.setForceMfa(this.loginData.forceMfa);
+          mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
+          mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+          mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
+          mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
 
-  private async updateData():
-    Promise<UpdateLoginPolicyResponse.AsObject> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        const mgmtreq = new AddCustomLoginPolicyRequest();
-        mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
-        mgmtreq.setAllowRegister(this.loginData.allowRegister);
-        mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-        mgmtreq.setForceMfa(this.loginData.forceMfa);
-        mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
-        mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
-        if ((this.loginData as LoginPolicy.AsObject).isDefault) {
-          return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
-        } else {
-          return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
-        }
-      case PolicyComponentServiceType.ADMIN:
-        const adminreq = new UpdateLoginPolicyRequest();
-        adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
-        adminreq.setAllowRegister(this.loginData.allowRegister);
-        adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-        adminreq.setForceMfa(this.loginData.forceMfa);
-        adminreq.setPasswordlessType(this.loginData.passwordlessType);
-        adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+          const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+          mgmtreq.setPasswordCheckLifetime(pcl);
 
-        return (this.service as AdminService).updateLoginPolicy(adminreq);
+          const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+          mgmtreq.setExternalLoginCheckLifetime(elcl);
+
+          const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+          mgmtreq.setMfaInitSkipLifetime(misl);
+
+          const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+          mgmtreq.setSecondFactorCheckLifetime(sfcl);
+
+          const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+          mgmtreq.setMultiFactorCheckLifetime(mficl);
+
+          mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+          mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
+          if (this.isDefault) {
+            return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
+          } else {
+            return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
+          }
+        case PolicyComponentServiceType.ADMIN:
+          const adminreq = new UpdateLoginPolicyRequest();
+          adminreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
+          adminreq.setAllowRegister(this.loginData.allowRegister);
+          adminreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+          adminreq.setForceMfa(this.loginData.forceMfa);
+          adminreq.setPasswordlessType(this.loginData.passwordlessType);
+          adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+
+          const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+          adminreq.setPasswordCheckLifetime(admin_pcl);
+
+          const admin_elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+          adminreq.setExternalLoginCheckLifetime(admin_elcl);
+
+          const admin_misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+          adminreq.setMfaInitSkipLifetime(admin_misl);
+
+          const admin_sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+          adminreq.setSecondFactorCheckLifetime(admin_sfcl);
+
+          const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+          adminreq.setMultiFactorCheckLifetime(admin_mficl);
+          adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+          adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
+          return (this.service as AdminService).updateLoginPolicy(adminreq);
+      }
+    } else {
+      return Promise.reject();
     }
   }
 
   public savePolicy(): void {
-    this.updateData().then(() => {
-      this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
-      this.loading = true;
-      setTimeout(() => {
-        this.fetchData();
-      }, 2000);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
-  }
-
-  public removePolicy(): void {
-    if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService).resetLoginPolicyToDefault().then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+    this.updateData()
+      .then(() => {
+        this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
         this.loading = true;
         setTimeout(() => {
           this.fetchData();
         }, 2000);
-      }).catch(error => {
+      })
+      .catch((error) => {
         this.toast.showError(error);
+      });
+  }
+
+  public removePolicy(): void {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      const dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: {
+          confirmKey: 'ACTIONS.RESET',
+          cancelKey: 'ACTIONS.CANCEL',
+          titleKey: 'SETTING.DIALOG.RESET.DEFAULTTITLE',
+          descriptionKey: 'SETTING.DIALOG.RESET.DEFAULTDESCRIPTION',
+          warnSectionKey: 'SETTING.DIALOG.RESET.LOGINPOLICY_DESCRIPTION',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          (this.service as ManagementService)
+            .resetLoginPolicyToDefault()
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+              this.loading = true;
+              setTimeout(() => {
+                this.fetchData();
+              }, 2000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
       });
     }
   }
 
-  public openDialog(): void {
-    const dialogRef = this.dialog.open(AddIdpDialogComponent, {
-      data: {
-        serviceType: this.serviceType,
-      },
-      width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe(resp => {
-      if (resp && resp.idp && resp.type) {
-        this.addIdp(resp.idp, resp.type).then(() => {
-          this.loading = true;
+  public removeFactor(request: Promise<unknown>): void {
+    // create policy before types can be removed
+    if (this.isDefault) {
+      this.updateData()
+        .then(() => {
+          return request;
+        })
+        .then(() => {
+          this.toast.showInfo('MFA.TOAST.DELETED', true);
           setTimeout(() => {
             this.fetchData();
           }, 2000);
-        }).catch(error => {
+        })
+        .catch((error) => {
           this.toast.showError(error);
         });
-      }
-    });
-  }
-
-  private addIdp(idp: IDP.AsObject | IDP.AsObject, ownerType: IDPOwnerType): Promise<any> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, ownerType);
-      case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).addIDPToLoginPolicy(idp.id);
+    } else {
+      request
+        .then(() => {
+          this.toast.showInfo('MFA.TOAST.DELETED', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 2000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
-  public removeIdp(idp: IDPLoginPolicyLink.AsObject): void {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        (this.service as ManagementService).removeIDPFromLoginPolicy(idp.idpId).then(() => {
-          const index = this.idps.findIndex(temp => temp === idp);
-          if (index > -1) {
-            this.idps.splice(index, 1);
-          }
-        }, error => {
-          this.toast.showError(error);
-        });
-        break;
-      case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService).removeIDPFromLoginPolicy(idp.idpId).then(() => {
-          const index = this.idps.findIndex(temp => temp === idp);
-          if (index > -1) {
-            this.idps.splice(index, 1);
-          }
-        }, error => {
-          this.toast.showError(error);
-        });
-        break;
-    }
+  public addFactor(request: Promise<unknown>): void {
+    // create policy before types can be added
+    const task: Promise<unknown> = this.isDefault
+      ? this.updateData().then(() => {
+          return request;
+        })
+      : request;
+
+    task
+      .then(() => {
+        this.toast.showInfo('MFA.TOAST.ADDED', true);
+        setTimeout(() => {
+          this.fetchData();
+        }, 2000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public get isDefault(): boolean {
@@ -234,5 +312,25 @@ export class LoginPolicyComponent implements OnDestroy {
     } else {
       return false;
     }
+  }
+
+  public get passwordCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('passwordCheckLifetime');
+  }
+
+  public get externalLoginCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('externalLoginCheckLifetime');
+  }
+
+  public get mfaInitSkipLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('mfaInitSkipLifetime');
+  }
+
+  public get secondFactorCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('secondFactorCheckLifetime');
+  }
+
+  public get multiFactorCheckLifetime(): AbstractControl | null {
+    return this.lifetimeForm.get('multiFactorCheckLifetime');
   }
 }

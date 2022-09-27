@@ -4,42 +4,64 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/logging"
-	"github.com/golang/protobuf/ptypes"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/authn"
-	"github.com/caos/zitadel/internal/api/grpc/metadata"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	key_model "github.com/caos/zitadel/internal/key/model"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
-	user_pb "github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/zitadel/zitadel/pkg/grpc/user"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/authn"
+	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
+	user_model "github.com/zitadel/zitadel/internal/user/model"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest) *user_model.UserSearchRequest {
+func ListUsersRequestToModel(req *mgmt_pb.ListUsersRequest) (*query.UserSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	req.Queries = append(req.Queries, &user_pb.SearchQuery{
-		Query: &user_pb.SearchQuery_ResourceOwner{
-			ResourceOwner: &user_pb.ResourceOwnerQuery{
-				OrgID: authz.GetCtxData(ctx).OrgID,
-			},
+	queries, err := user_grpc.UserQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.UserSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: UserFieldNameToSortingColumn(req.SortingColumn),
 		},
-	})
+		Queries: queries,
+	}, nil
+}
 
-	return &user_model.UserSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
-		Queries: user_grpc.UserQueriesToModel(req.Queries),
+func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
+	switch field {
+	case user.UserFieldName_USER_FIELD_NAME_EMAIL:
+		return query.HumanEmailCol
+	case user.UserFieldName_USER_FIELD_NAME_FIRST_NAME:
+		return query.HumanFirstNameCol
+	case user.UserFieldName_USER_FIELD_NAME_LAST_NAME:
+		return query.HumanLastNameCol
+	case user.UserFieldName_USER_FIELD_NAME_DISPLAY_NAME:
+		return query.HumanDisplayNameCol
+	case user.UserFieldName_USER_FIELD_NAME_USER_NAME:
+		return query.UserUsernameCol
+	case user.UserFieldName_USER_FIELD_NAME_STATE:
+		return query.UserStateCol
+	case user.UserFieldName_USER_FIELD_NAME_TYPE:
+		return query.UserTypeCol
+	case user.UserFieldName_USER_FIELD_NAME_NICK_NAME:
+		return query.HumanNickNameCol
+	default:
+		return query.UserIDCol
 	}
 }
 
-func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {
+func BulkSetUserMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {
 	metadata := make([]*domain.Metadata, len(req.Metadata))
 	for i, data := range req.Metadata {
 		metadata[i] = &domain.Metadata{
@@ -50,14 +72,20 @@ func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.
 	return metadata
 }
 
-func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) *domain.MetadataSearchRequest {
+func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) (*query.UserMetadataSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &domain.MetadataSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
-		Queries: metadata.MetadataQueriesToModel(req.Queries),
+	queries, err := metadata.MetadataQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
 	}
+	return &query.UserMetadataSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
 }
 
 func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human {
@@ -115,9 +143,14 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 			IsPhoneVerified: req.Phone.IsPhoneVerified,
 		}
 	}
+
 	if req.Password != "" {
-		human.Password = &domain.Password{SecretString: req.Password}
+		human.Password = domain.NewPassword(req.Password)
 		human.Password.ChangeRequired = req.PasswordChangeRequired
+	}
+
+	if req.HashedPassword != nil && req.HashedPassword.Value != "" && req.HashedPassword.Algorithm != "" {
+		human.HashedPassword = domain.NewHashedPassword(req.HashedPassword.Value, req.HashedPassword.Algorithm)
 	}
 
 	return human, req.RequestPasswordlessRegistration
@@ -186,32 +219,34 @@ func UpdateMachineRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateMachin
 	}
 }
 
-func ListMachineKeysRequestToModel(req *mgmt_pb.ListMachineKeysRequest) *key_model.AuthNKeySearchRequest {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &key_model.AuthNKeySearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		Queries: []*key_model.AuthNKeySearchQuery{
-			{
-				Key:    key_model.AuthNKeyObjectType,
-				Method: domain.SearchMethodEquals,
-				Value:  key_model.AuthNKeyObjectTypeUser,
-			}, {
-				Key:    key_model.AuthNKeyObjectID,
-				Method: domain.SearchMethodEquals,
-				Value:  req.UserId,
-			},
-		},
+func ListMachineKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*query.AuthNKeySearchQueries, error) {
+	resourcOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
 	}
+	userID, err := query.NewAuthNKeyAggregateIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	return &query.AuthNKeySearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: []query.SearchQuery{
+			resourcOwner,
+			userID,
+		},
+	}, nil
+
 }
 
 func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.MachineKey {
 	expDate := time.Time{}
 	if req.ExpirationDate != nil {
-		var err error
-		expDate, err = ptypes.Timestamp(req.ExpirationDate)
-		logging.Log("MANAG-iNshR").OnError(err).Debug("unable to parse expiration date")
+		expDate = req.ExpirationDate.AsTime()
 	}
 
 	return &domain.MachineKey{
@@ -223,8 +258,32 @@ func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.Mac
 	}
 }
 
-func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) *domain.ExternalIDP {
-	return &domain.ExternalIDP{
+func ListPersonalAccessTokensRequestToQuery(ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*query.PersonalAccessTokenSearchQueries, error) {
+	resourceOwner, err := query.NewPersonalAccessTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	userID, err := query.NewPersonalAccessTokenUserIDSearchQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	return &query.PersonalAccessTokenSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: []query.SearchQuery{
+			resourceOwner,
+			userID,
+		},
+	}, nil
+
+}
+
+func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) *domain.UserIDPLink {
+	return &domain.UserIDPLink{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   req.UserId,
 			ResourceOwner: authz.GetCtxData(ctx).OrgID,
@@ -234,31 +293,47 @@ func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.Remov
 	}
 }
 
-func ListHumanLinkedIDPsRequestToModel(req *mgmt_pb.ListHumanLinkedIDPsRequest) *user_model.ExternalIDPSearchRequest {
+func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.IDPUserLinksSearchQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &user_model.ExternalIDPSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
-		Queries: []*user_model.ExternalIDPSearchQuery{{Key: user_model.ExternalIDPSearchKeyUserID, Method: domain.SearchMethodEquals, Value: req.UserId}},
-	}
-}
-
-func ListUserMembershipsRequestToModel(req *mgmt_pb.ListUserMembershipsRequest) (*user_model.UserMembershipSearchRequest, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := user_grpc.MembershipQueriesToModel(req.Queries)
+	userQuery, err := query.NewIDPUserLinksUserIDSearchQuery(req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	queries = append(queries, &user_model.UserMembershipSearchQuery{
-		Key:    user_model.UserMembershipSearchKeyUserID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.UserId,
-	})
-	return &user_model.UserMembershipSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
+	resourceOwnerQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &query.IDPUserLinksSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: []query.SearchQuery{userQuery, resourceOwnerQuery},
+	}, nil
+}
+
+func ListUserMembershipsRequestToModel(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*query.MembershipSearchQuery, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := user_grpc.MembershipQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	userQuery, err := query.NewMembershipUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewMembershipResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, userQuery, ownerQuery)
+	return &query.MembershipSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

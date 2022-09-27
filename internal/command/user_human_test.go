@@ -9,34 +9,41 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/id"
-	id_mock "github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id"
+	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommandSide_AddHuman(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		idGenerator     id.Generator
-		secretGenerator crypto.Generator
 		userPasswordAlg crypto.HashAlgorithm
+		codeAlg         crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx   context.Context
-		orgID string
-		human *domain.Human
+		ctx             context.Context
+		orgID           string
+		human           *AddHuman
+		secretGenerator crypto.Generator
 	}
 	type res struct {
-		want *domain.Human
+		want *domain.HumanDetails
 		err  func(error) bool
 	}
+
+	userAgg := user.NewAggregate("user1", "org1")
+	instanceAgg := instance.NewAggregate("instance")
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -53,24 +60,23 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "",
-				human: &domain.Human{
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
-					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
 					},
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "org policy not found, precondition error",
+			name: "domain policy not found, precondition error",
 			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
@@ -80,30 +86,32 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
 					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
+					PreferredLanguage: language.English,
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsInternal,
 			},
 		},
 		{
 			name: "password policy not found, precondition error",
 			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -115,60 +123,40 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Password:  "pass",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
 					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
+					PreferredLanguage: language.English,
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsInternal,
 			},
 		},
 		{
 			name: "user invalid, invalid argument error",
 			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
-							),
-						),
-					),
 				),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-					},
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -178,21 +166,26 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
+							instance.NewSecretGeneratorAddedEvent(
+								context.Background(),
+								&instanceAgg.Aggregate,
+								domain.SecretGeneratorTypeInitCode,
+								0,
+								1*time.Hour,
+								true,
+								true,
+								true,
+								true,
 							),
 						),
 					),
@@ -200,13 +193,13 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								user.NewHumanAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
+									&userAgg.Aggregate,
 									"username",
 									"firstname",
 									"lastname",
 									"",
 									"firstname lastname",
-									language.Und,
+									language.English,
 									domain.GenderUnspecified,
 									"email@test.ch",
 									true,
@@ -214,12 +207,12 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
+									&userAgg.Aggregate,
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte("a"),
+										Crypted:    []byte(""),
 									},
 									time.Hour*1,
 								),
@@ -228,40 +221,31 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
 					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
+					PreferredLanguage: language.English,
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
-				want: &domain.Human{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "user1",
+				want: &domain.HumanDetails{
+					ID: "user1",
+					ObjectDetails: domain.ObjectDetails{
+						Sequence:      0,
+						EventDate:     time.Time{},
 						ResourceOwner: "org1",
 					},
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName:         "firstname",
-						LastName:          "lastname",
-						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
-					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
-					State: domain.UserStateInitial,
 				},
 			},
 		},
@@ -272,8 +256,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -290,10 +276,25 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(
+								context.Background(),
+								&instanceAgg.Aggregate,
+								domain.SecretGeneratorTypeInitCode,
+								0,
+								1*time.Hour,
+								true,
+								true,
+								true,
+								true,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("password", true, ""),
+								newAddHumanEvent("password", false, ""),
 							),
 							eventFromEventPusher(
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -302,9 +303,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte("a"),
+										Crypted:    []byte(""),
 									},
-									time.Hour*1,
+									1*time.Hour,
 								),
 							),
 						},
@@ -312,43 +313,30 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Password: &domain.Password{
-						SecretString: "password",
+				human: &AddHuman{
+					Username:  "username",
+					Password:  "password",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
 					},
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
-					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
+					PreferredLanguage: language.English,
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
-				want: &domain.Human{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "user1",
+				want: &domain.HumanDetails{
+					ID: "user1",
+					ObjectDetails: domain.ObjectDetails{
 						ResourceOwner: "org1",
 					},
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName:         "firstname",
-						LastName:          "lastname",
-						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
-					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
-					State: domain.UserStateInitial,
 				},
 			},
 		},
@@ -359,8 +347,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -368,7 +358,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&userAgg.Aggregate,
 								1,
 								false,
 								false,
@@ -384,52 +374,109 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 							eventFromEventPusher(
 								user.NewHumanEmailVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
+									&userAgg.Aggregate),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Password: &domain.Password{
-						SecretString: "password",
+				human: &AddHuman{
+					Username:  "username",
+					Password:  "password",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
 					},
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
-					},
-					Email: &domain.Email{
-						EmailAddress:    "email@test.ch",
-						IsEmailVerified: true,
+					PreferredLanguage:      language.English,
+					PasswordChangeRequired: true,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.HumanDetails{
+					ID: "user1",
+					ObjectDetails: domain.ObjectDetails{
+						ResourceOwner: "org1",
 					},
 				},
 			},
+		},
+		{
+			name: "add human email verified, trim spaces, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("password", true, ""),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&userAgg.Aggregate),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+					),
+				),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  " username ",
+					Password:  "password",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
+					},
+					PreferredLanguage:      language.English,
+					PasswordChangeRequired: true,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+			},
 			res: res{
-				want: &domain.Human{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "user1",
+				want: &domain.HumanDetails{
+					ID: "user1",
+					ObjectDetails: domain.ObjectDetails{
 						ResourceOwner: "org1",
 					},
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName:         "firstname",
-						LastName:          "lastname",
-						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
-					},
-					Email: &domain.Email{
-						EmailAddress:    "email@test.ch",
-						IsEmailVerified: true,
-					},
-					State: domain.UserStateActive,
 				},
 			},
 		},
@@ -440,8 +487,10 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -449,7 +498,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&userAgg.Aggregate,
 								1,
 								false,
 								false,
@@ -458,31 +507,40 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(
+								context.Background(),
+								&instanceAgg.Aggregate,
+								domain.SecretGeneratorTypeVerifyPhoneCode,
+								0,
+								1*time.Hour,
+								true,
+								true,
+								true,
+								true,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newAddHumanEvent("", false, "+41711234567"),
+								newAddHumanEvent("password", false, "+41711234567"),
 							),
 							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									time.Hour*1,
+								user.NewHumanEmailVerifiedEvent(
+									context.Background(),
+									&userAgg.Aggregate,
 								),
 							),
 							eventFromEventPusher(
 								user.NewHumanPhoneCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
+									&userAgg.Aggregate,
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte("a"),
+										Crypted:    []byte(""),
 									},
 									time.Hour*1)),
 						},
@@ -490,45 +548,34 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Password:  "password",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
 					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
+					Phone: Phone{
+						Number: "+41711234567",
 					},
-					Phone: &domain.Phone{
-						PhoneNumber: "+41711234567",
-					},
+					PreferredLanguage: language.English,
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
-				want: &domain.Human{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "user1",
+				want: &domain.HumanDetails{
+					ID: "user1",
+					ObjectDetails: domain.ObjectDetails{
 						ResourceOwner: "org1",
 					},
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName:         "firstname",
-						LastName:          "lastname",
-						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
-					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
-					Phone: &domain.Phone{
-						PhoneNumber: "+41711234567",
-					},
-					State: domain.UserStateInitial,
 				},
 			},
 		},
@@ -539,21 +586,26 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
+							instance.NewSecretGeneratorAddedEvent(
+								context.Background(),
+								&instanceAgg.Aggregate,
+								domain.SecretGeneratorTypeInitCode,
+								0,
+								1*time.Hour,
+								true,
+								true,
+								true,
+								true,
 							),
 						),
 					),
@@ -563,66 +615,55 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								newAddHumanEvent("", false, "+41711234567"),
 							),
 							eventFromEventPusher(
-								user.NewHumanInitialCodeAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
+								user.NewHumanInitialCodeAddedEvent(
+									context.Background(),
+									&userAgg.Aggregate,
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
 										Algorithm:  "enc",
 										KeyID:      "id",
-										Crypted:    []byte("a"),
+										Crypted:    []byte(""),
 									},
-									time.Hour*1,
+									1*time.Hour,
 								),
 							),
 							eventFromEventPusher(
-								user.NewHumanPhoneVerifiedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate),
+								user.NewHumanPhoneVerifiedEvent(
+									context.Background(),
+									&userAgg.Aggregate,
+								),
 							),
 						},
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
 					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
+					Phone: Phone{
+						Number:   "+41711234567",
+						Verified: true,
 					},
-					Phone: &domain.Phone{
-						PhoneNumber:     "+41711234567",
-						IsPhoneVerified: true,
-					},
+					PreferredLanguage: language.English,
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
-				want: &domain.Human{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "user1",
+				want: &domain.HumanDetails{
+					ID: "user1",
+					ObjectDetails: domain.ObjectDetails{
 						ResourceOwner: "org1",
 					},
-					Username: "username",
-					Profile: &domain.Profile{
-						FirstName:         "firstname",
-						LastName:          "lastname",
-						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
-					},
-					Email: &domain.Email{
-						EmailAddress: "email@test.ch",
-					},
-					Phone: &domain.Phone{
-						PhoneNumber: "+41711234567",
-					},
-					State: domain.UserStateInitial,
 				},
 			},
 		},
@@ -630,15 +671,16 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idGenerator:           tt.fields.idGenerator,
-				initializeUserCode:    tt.fields.secretGenerator,
-				phoneVerificationCode: tt.fields.secretGenerator,
-				userPasswordAlg:       tt.fields.userPasswordAlg,
+				eventstore:      tt.fields.eventstore,
+				userPasswordAlg: tt.fields.userPasswordAlg,
+				userEncryption:  tt.fields.codeAlg,
+				idGenerator:     tt.fields.idGenerator,
 			}
 			got, err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human)
 			if tt.res.err == nil {
-				assert.NoError(t, err)
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
@@ -652,17 +694,17 @@ func TestCommandSide_AddHuman(t *testing.T) {
 
 func TestCommandSide_ImportHuman(t *testing.T) {
 	type fields struct {
-		eventstore           *eventstore.Eventstore
-		idGenerator          id.Generator
-		secretGenerator      crypto.Generator
-		userPasswordAlg      crypto.HashAlgorithm
-		passwordlessInitCode crypto.Generator
+		eventstore      *eventstore.Eventstore
+		idGenerator     id.Generator
+		userPasswordAlg crypto.HashAlgorithm
 	}
 	type args struct {
-		ctx          context.Context
-		orgID        string
-		human        *domain.Human
-		passwordless bool
+		ctx                  context.Context
+		orgID                string
+		human                *domain.Human
+		passwordless         bool
+		secretGenerator      crypto.Generator
+		passwordlessInitCode crypto.Generator
 	}
 	type res struct {
 		wantHuman *domain.Human
@@ -697,7 +739,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -724,7 +766,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -734,8 +776,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -759,7 +803,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -769,8 +813,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -800,7 +846,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -810,8 +856,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -850,7 +898,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -863,13 +910,15 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						ChangeRequired: true,
 					},
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -882,7 +931,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
@@ -898,8 +947,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -930,7 +981,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -943,14 +993,16 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						ChangeRequired: false,
 					},
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
 						IsEmailVerified: true,
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -963,7 +1015,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -980,8 +1032,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1025,10 +1079,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
-				secretGenerator:      GetMockSecretGenerator(t),
-				userPasswordAlg:      crypto.CreateMockHashAlg(gomock.NewController(t)),
-				passwordlessInitCode: GetMockSecretGenerator(t),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1036,15 +1088,18 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
 						IsEmailVerified: true,
 					},
 				},
-				passwordless: true,
+				passwordless:         true,
+				secretGenerator:      GetMockSecretGenerator(t),
+				passwordlessInitCode: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1057,7 +1112,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -1084,8 +1139,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1129,10 +1186,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
-				secretGenerator:      GetMockSecretGenerator(t),
-				userPasswordAlg:      crypto.CreateMockHashAlg(gomock.NewController(t)),
-				passwordlessInitCode: GetMockSecretGenerator(t),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1144,15 +1199,18 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						ChangeRequired: false,
 					},
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
 						IsEmailVerified: true,
 					},
 				},
-				passwordless: true,
+				passwordless:         true,
+				secretGenerator:      GetMockSecretGenerator(t),
+				passwordlessInitCode: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1165,7 +1223,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress:    "email@test.ch",
@@ -1192,8 +1250,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1242,7 +1302,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1251,8 +1310,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Password: &domain.Password{
 						SecretString:   "password",
@@ -1265,6 +1325,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						PhoneNumber: "+41711234567",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1277,7 +1338,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
@@ -1296,8 +1357,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1340,7 +1403,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1349,8 +1411,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Password: &domain.Password{
 						SecretString:   "password",
@@ -1364,6 +1427,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						IsPhoneVerified: true,
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1376,7 +1440,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						FirstName:         "firstname",
 						LastName:          "lastname",
 						DisplayName:       "firstname lastname",
-						PreferredLanguage: language.Und,
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
@@ -1392,14 +1456,11 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idGenerator:           tt.fields.idGenerator,
-				initializeUserCode:    tt.fields.secretGenerator,
-				phoneVerificationCode: tt.fields.secretGenerator,
-				userPasswordAlg:       tt.fields.userPasswordAlg,
-				passwordlessInitCode:  tt.fields.passwordlessInitCode,
+				eventstore:      tt.fields.eventstore,
+				idGenerator:     tt.fields.idGenerator,
+				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless)
+			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1418,15 +1479,15 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		idGenerator     id.Generator
-		secretGenerator crypto.Generator
 		userPasswordAlg crypto.HashAlgorithm
 	}
 	type args struct {
-		ctx            context.Context
-		orgID          string
-		human          *domain.Human
-		externalIDP    *domain.ExternalIDP
-		orgMemberRoles []string
+		ctx             context.Context
+		orgID           string
+		human           *domain.Human
+		link            *domain.UserIDPLink
+		orgMemberRoles  []string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.Human
@@ -1460,7 +1521,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1490,7 +1551,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1500,8 +1561,10 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1528,7 +1591,121 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "login policy not found, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+					},
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+				},
+			},
+			res: res{
+				err: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "login policy registration not allowed, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+					},
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+				},
+			},
+			res: res{
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1538,8 +1715,10 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1547,12 +1726,32 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								1,
 								false,
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -1572,7 +1771,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1582,16 +1781,18 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
 								false,
+								true,
+								true,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								1,
 								false,
 								false,
@@ -1602,14 +1803,34 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"test.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"test.ch",
 							),
 						),
@@ -1633,7 +1854,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1643,16 +1864,18 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
 								false,
+								true,
+								true,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								1,
 								false,
 								false,
@@ -1663,33 +1886,53 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"test.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"test.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainRemovedEvent(context.Background(),
-								&org.NewAggregate("org2", "org2").Aggregate,
+								&org.NewAggregate("org2").Aggregate,
 								"test.ch",
 								true,
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"test.ch",
 							),
 						),
@@ -1716,7 +1959,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1734,6 +1976,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						EmailAddress: "email@test.ch",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -1762,8 +2005,10 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1771,12 +2016,32 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								1,
 								false,
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -1802,7 +2067,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1821,6 +2085,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						EmailAddress: "email@test.ch",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -1849,8 +2114,10 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("org1", "org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1858,12 +2125,32 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								1,
 								false,
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -1881,7 +2168,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1901,6 +2187,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						IsEmailVerified: true,
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -1930,8 +2217,10 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -1939,12 +2228,32 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								1,
 								false,
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -1980,7 +2289,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -2002,6 +2310,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						SecretString: "password",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -2033,8 +2342,10 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
 								true,
 							),
 						),
@@ -2042,12 +2353,32 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								1,
 								false,
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -2077,7 +2408,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -2100,6 +2430,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						SecretString: "password",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -2128,13 +2459,11 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idGenerator:           tt.fields.idGenerator,
-				initializeUserCode:    tt.fields.secretGenerator,
-				phoneVerificationCode: tt.fields.secretGenerator,
-				userPasswordAlg:       tt.fields.userPasswordAlg,
+				eventstore:      tt.fields.eventstore,
+				idGenerator:     tt.fields.idGenerator,
+				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.externalIDP, tt.args.orgMemberRoles)
+			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -2182,7 +2511,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2199,7 +2528,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -2296,7 +2625,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				userIDs: []string{"user1"},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2312,7 +2641,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				userIDs: []string{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2465,7 +2794,7 @@ func newAddHumanEvent(password string, changeRequired bool, phone string) *user.
 		"lastname",
 		"",
 		"firstname lastname",
-		language.Und,
+		language.English,
 		domain.GenderUnspecified,
 		"email@test.ch",
 		true,
@@ -2511,4 +2840,185 @@ func newRegisterHumanEvent(username, password string, changeRequired bool, phone
 		event.AddPhoneData(phone)
 	}
 	return event
+}
+
+func TestAddHumanCommand(t *testing.T) {
+	type args struct {
+		a           *user.Aggregate
+		human       *AddHuman
+		passwordAlg crypto.HashAlgorithm
+		filter      preparation.FilterToQueryReducer
+		codeAlg     crypto.EncryptionAlgorithm
+	}
+	agg := user.NewAggregate("id", "ro")
+	tests := []struct {
+		name string
+		args args
+		want Want
+	}{
+		{
+			name: "invalid email",
+			args: args{
+				a: agg,
+				human: &AddHuman{
+					Email: Email{
+						Address: "invalid",
+					},
+				},
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid first name",
+			args: args{
+				a: agg,
+				human: &AddHuman{
+					Username:          "username",
+					PreferredLanguage: language.English,
+					Email: Email{
+						Address: "support@zitadel.com",
+					},
+				},
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid last name",
+			args: args{
+				a: agg,
+				human: &AddHuman{
+					Username:          "username",
+					PreferredLanguage: language.English,
+					FirstName:         "hurst",
+					Email:             Email{Address: "support@zitadel.com"},
+				},
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid password",
+			args: args{
+				a: agg,
+				human: &AddHuman{
+					Email:             Email{Address: "support@zitadel.com"},
+					PreferredLanguage: language.English,
+					FirstName:         "gigi",
+					LastName:          "giraffe",
+					Password:          "short",
+					Username:          "username",
+				},
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainPolicyAddedEvent(
+								context.Background(),
+								&org.NewAggregate("id").Aggregate,
+								true,
+								true,
+								true,
+							),
+						}, nil
+					}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewPasswordComplexityPolicyAddedEvent(
+									context.Background(),
+									&org.NewAggregate("id").Aggregate,
+									8,
+									true,
+									true,
+									true,
+									true,
+								),
+							}, nil
+						}).
+					Filter(),
+			},
+			want: Want{
+				CreateErr: errors.ThrowInvalidArgument(nil, "COMMA-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a: agg,
+				human: &AddHuman{
+					Email:             Email{Address: "support@zitadel.com", Verified: true},
+					PreferredLanguage: language.English,
+					FirstName:         "gigi",
+					LastName:          "giraffe",
+					Password:          "password",
+					Username:          "username",
+				},
+				passwordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainPolicyAddedEvent(
+								context.Background(),
+								&org.NewAggregate("id").Aggregate,
+								true,
+								true,
+								true,
+							),
+						}, nil
+					}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewPasswordComplexityPolicyAddedEvent(
+									context.Background(),
+									&org.NewAggregate("id").Aggregate,
+									2,
+									false,
+									false,
+									false,
+									false,
+								),
+							}, nil
+						}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					func() *user.HumanAddedEvent {
+						event := user.NewHumanAddedEvent(
+							context.Background(),
+							&agg.Aggregate,
+							"username",
+							"gigi",
+							"giraffe",
+							"",
+							"gigi giraffe",
+							language.English,
+							0,
+							"support@zitadel.com",
+							true,
+						)
+						event.AddPasswordData(&crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							KeyID:      "",
+							Crypted:    []byte("password"),
+						}, false)
+						return event
+					}(),
+					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			AssertValidation(t, context.Background(), AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg, tt.args.codeAlg), tt.args.filter, tt.want)
+		})
+	}
 }

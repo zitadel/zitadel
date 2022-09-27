@@ -1,12 +1,15 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
+import "zitadel/idp.proto";
+import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.policy.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/policy";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/policy";
 
+//deprecated: please use DomainPolicy instead
 message OrgIAMPolicy {
     zitadel.v1.ObjectDetails details = 1;
     bool user_login_must_be_domain = 2 [
@@ -19,6 +22,31 @@ message OrgIAMPolicy {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
+}
+
+message DomainPolicy {
+    zitadel.v1.ObjectDetails details = 1;
+    bool user_login_must_be_domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the username has to end with the domain of it's organisation"
+        }
+    ];
+    bool is_default = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the organisation's admin changed the policy"
+        }
+    ];
+    bool validate_org_domains = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if organisation domains should be validated org count as validated automatically"
+        }
+    ];
+    bool smtp_sender_address_matches_instance_domain = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if the smtp sender address domain should match an existing domain on the instance"
+        }
+    ];
+
 }
 
 message LabelPolicy {
@@ -35,10 +63,10 @@ message LabelPolicy {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
-    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes
     bool hide_login_name_suffix = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.ch/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
         }
     ];
     // hex value for secondary color
@@ -128,6 +156,24 @@ message LoginPolicy {
             description: "defines if password reset link should be shown in the login screen"
         }
     ];
+    bool ignore_unknown_usernames = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if unknown username on login screen directly return an error or always display the password screen"
+        }
+    ];
+    string default_redirect_uri = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)"
+        }
+    ];
+    google.protobuf.Duration password_check_lifetime = 11;
+    google.protobuf.Duration external_login_check_lifetime = 12;
+    google.protobuf.Duration mfa_init_skip_lifetime = 13;
+    google.protobuf.Duration second_factor_check_lifetime = 14;
+    google.protobuf.Duration multi_factor_check_lifetime = 15;
+    repeated SecondFactorType second_factors = 16;
+    repeated MultiFactorType multi_factors = 17;
+    repeated zitadel.idp.v1.IDPLoginPolicyLink idps = 18;
 }
 
 enum SecondFactorType {
@@ -222,4 +268,5 @@ message PrivacyPolicy {
     string tos_link = 2;
     string privacy_link = 3;
     bool is_default = 4;
+    string help_link = 5;
 }

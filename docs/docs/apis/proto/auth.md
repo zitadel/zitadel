@@ -43,6 +43,18 @@ Returns my full blown user
     GET: /users/me
 
 
+### RemoveMyUser
+
+> **rpc** RemoveMyUser([RemoveMyUserRequest](#removemyuserrequest))
+[RemoveMyUserResponse](#removemyuserresponse)
+
+Changes the user state to deleted
+
+
+
+    DELETE: /users/me
+
+
 ### ListMyUserChanges
 
 > **rpc** ListMyUserChanges([ListMyUserChangesRequest](#listmyuserchangesrequest))
@@ -521,18 +533,6 @@ Returns a list of organisations where the authorized user has a user grant (auth
     POST: /global/projectorgs/_search
 
 
-### ListMyZitadelFeatures
-
-> **rpc** ListMyZitadelFeatures([ListMyZitadelFeaturesRequest](#listmyzitadelfeaturesrequest))
-[ListMyZitadelFeaturesResponse](#listmyzitadelfeaturesresponse)
-
-Returns a list of features, which are allowed on these organisation based on the subscription of the organisation
-
-
-
-    POST: /features/zitadel/me/_search
-
-
 ### ListMyZitadelPermissions
 
 > **rpc** ListMyZitadelPermissions([ListMyZitadelPermissionsRequest](#listmyzitadelpermissionsrequest))
@@ -568,6 +568,30 @@ Limit should always be set, there is a default limit set by the service
 
 
     POST: /memberships/me/_search
+
+
+### GetMyLabelPolicy
+
+> **rpc** GetMyLabelPolicy([GetMyLabelPolicyRequest](#getmylabelpolicyrequest))
+[GetMyLabelPolicyResponse](#getmylabelpolicyresponse)
+
+Returns the label policy of the current organisation
+
+
+
+    GET: /policies/label
+
+
+### GetMyPrivacyPolicy
+
+> **rpc** GetMyPrivacyPolicy([GetMyPrivacyPolicyRequest](#getmyprivacypolicyrequest))
+[GetMyPrivacyPolicyResponse](#getmyprivacypolicyresponse)
+
+Returns the privacy policy of the current organisation
+
+
+
+    GET: /policies/privacy
 
 
 
@@ -726,6 +750,23 @@ This is an empty request
 
 
 
+### GetMyLabelPolicyRequest
+This is an empty request
+
+
+
+
+### GetMyLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LabelPolicy | - |  |
+
+
+
+
 ### GetMyMetadataRequest
 
 
@@ -779,6 +820,23 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | phone |  zitadel.user.v1.Phone | - |  |
+
+
+
+
+### GetMyPrivacyPolicyRequest
+This is an empty request
+
+
+
+
+### GetMyPrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
 
 
 
@@ -1030,8 +1088,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -1072,23 +1129,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | result | repeated zitadel.user.v1.Session | - |  |
-
-
-
-
-### ListMyZitadelFeaturesRequest
-This is an empty request
-
-
-
-
-### ListMyZitadelFeaturesResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| result | repeated string | - |  |
 
 
 
@@ -1250,6 +1290,24 @@ This is an empty request
 
 
 
+### RemoveMyUserRequest
+This is an empty request
+the request parameters are read from the token-header
+
+
+
+
+### RemoveMyUserResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResendMyEmailVerificationRequest
 This is an empty request
 
@@ -1341,7 +1399,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| email |  string | TODO: check if no value is allowed | string.email: true<br />  |
+| email |  string | - | string.email: true<br />  |
 
 
 

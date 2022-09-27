@@ -5,12 +5,13 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/Masterminds/squirrel"
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/api/authz"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 var (
@@ -21,12 +22,24 @@ var (
 		name:  projection.FlowTypeCol,
 		table: flowsTriggersTable,
 	}
+	FlowsTriggersColumnChangeDate = Column{
+		name:  projection.FlowChangeDateCol,
+		table: flowsTriggersTable,
+	}
+	FlowsTriggersColumnSequence = Column{
+		name:  projection.FlowSequenceCol,
+		table: flowsTriggersTable,
+	}
 	FlowsTriggersColumnTriggerType = Column{
 		name:  projection.FlowTriggerTypeCol,
 		table: flowsTriggersTable,
 	}
 	FlowsTriggersColumnResourceOwner = Column{
 		name:  projection.FlowResourceOwnerCol,
+		table: flowsTriggersTable,
+	}
+	FlowsTriggersColumnInstanceID = Column{
+		name:  projection.FlowInstanceIDCol,
 		table: flowsTriggersTable,
 	}
 	FlowsTriggersColumnTriggerSequence = Column{
@@ -40,8 +53,6 @@ var (
 )
 
 type Flow struct {
-	ID            string
-	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
 	Sequence      uint64
@@ -51,13 +62,12 @@ type Flow struct {
 }
 
 func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string) (*Flow, error) {
-	query, scan := q.prepareFlowQuery()
+	query, scan := prepareFlowQuery(flowType)
 	stmt, args, err := query.Where(
 		sq.Eq{
-			FlowsTriggersColumnFlowType.identifier(): flowType,
-		},
-		sq.Eq{
+			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
+			FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-HBRh3", "Errors.Query.InvalidRequest")
@@ -70,18 +80,17 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	return scan(rows)
 }
 
-func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string) ([]*Action, error) {
-	stmt, scan := q.prepareTriggerActionsQuery()
+func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string) ([]*Action, error) {
+	stmt, scan := prepareTriggerActionsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			FlowsTriggersColumnFlowType.identifier(): flowType,
-		},
-		sq.Eq{
-			FlowsTriggersColumnTriggerType.identifier(): triggerType,
-		},
-		sq.Eq{
+			FlowsTriggersColumnFlowType.identifier():      flowType,
+			FlowsTriggersColumnTriggerType.identifier():   triggerType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
-		}).ToSql()
+			FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+			ActionColumnState.identifier():                domain.ActionStateActive,
+		},
+	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
@@ -94,53 +103,58 @@ func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType d
 }
 
 func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) ([]domain.FlowType, error) {
-	stmt, args, err := squirrel.StatementBuilder.
-		Select(FlowsTriggersColumnFlowType.identifier()).
-		From(flowsTriggersTable.identifier()).
-		Where(sq.Eq{
-			FlowsTriggersColumnActionID.identifier(): actionID,
-		}).
-		PlaceholderFormat(squirrel.Dollar).
-		ToSql()
+	stmt, scan := prepareFlowTypesQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			FlowsTriggersColumnActionID.identifier():   actionID,
+			FlowsTriggersColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		},
+	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-Dh311", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	rows, err := q.client.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Bhj4w", "Errors.Internal")
 	}
-	flowTypes := make([]domain.FlowType, 0)
-	for rows.Next() {
-		var flowType domain.FlowType
-		err := rows.Scan(
-			&flowType,
-		)
-		if err != nil {
-			return nil, err
-		}
-		flowTypes = append(flowTypes, flowType)
-	}
 
-	if err := rows.Close(); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Fbgnh", "Errors.Query.CloseRows")
-	}
-
-	return flowTypes, nil
+	return scan(rows)
 }
 
-func (q *Queries) prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action, error)) {
+func prepareFlowTypesQuery() (sq.SelectBuilder, func(*sql.Rows) ([]domain.FlowType, error)) {
+	return sq.Select(
+			FlowsTriggersColumnFlowType.identifier(),
+		).
+			From(flowsTriggersTable.identifier()).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) ([]domain.FlowType, error) {
+			types := []domain.FlowType{}
+			for rows.Next() {
+				var flowType domain.FlowType
+				err := rows.Scan(
+					&flowType,
+				)
+				if err != nil {
+					return nil, err
+				}
+				types = append(types, flowType)
+			}
+			return types, nil
+		}
+
+}
+
+func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
 			ActionColumnChangeDate.identifier(),
 			ActionColumnResourceOwner.identifier(),
-			//ActionColumnState.identifier(),
+			ActionColumnState.identifier(),
 			ActionColumnSequence.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
-			FlowsTriggersColumnTriggerType.identifier(),
-			FlowsTriggersColumnTriggerSequence.identifier(),
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
@@ -149,19 +163,15 @@ func (q *Queries) prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows
 			actions := make([]*Action, 0)
 			for rows.Next() {
 				action := new(Action)
-				var triggerType domain.TriggerType
-				var triggerSequence int
 				err := rows.Scan(
 					&action.ID,
 					&action.CreationDate,
 					&action.ChangeDate,
 					&action.ResourceOwner,
-					//&action.State, //TODO: state in next release
+					&action.State,
 					&action.Sequence,
 					&action.Name,
 					&action.Script,
-					&triggerType,
-					&triggerSequence,
 				)
 				if err != nil {
 					return nil, err
@@ -177,18 +187,22 @@ func (q *Queries) prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows
 		}
 }
 
-func (q *Queries) prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
 			ActionColumnChangeDate.identifier(),
 			ActionColumnResourceOwner.identifier(),
-			//ActionColumnState.identifier(),
+			ActionColumnState.identifier(),
 			ActionColumnSequence.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
 			FlowsTriggersColumnTriggerType.identifier(),
 			FlowsTriggersColumnTriggerSequence.identifier(),
+			FlowsTriggersColumnFlowType.identifier(),
+			FlowsTriggersColumnChangeDate.identifier(),
+			FlowsTriggersColumnSequence.identifier(),
+			FlowsTriggersColumnResourceOwner.identifier(),
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
@@ -196,27 +210,54 @@ func (q *Queries) prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, 
 		func(rows *sql.Rows) (*Flow, error) {
 			flow := &Flow{
 				TriggerActions: make(map[domain.TriggerType][]*Action),
+				Type:           flowType,
 			}
 			for rows.Next() {
-				action := new(Action)
-				var triggerType domain.TriggerType
-				var triggerSequence int
+				var (
+					actionID            sql.NullString
+					actionCreationDate  sql.NullTime
+					actionChangeDate    sql.NullTime
+					actionResourceOwner sql.NullString
+					actionState         sql.NullInt32
+					actionSequence      sql.NullInt64
+					actionName          sql.NullString
+					actionScript        sql.NullString
+
+					triggerType     domain.TriggerType
+					triggerSequence int
+				)
 				err := rows.Scan(
-					&action.ID,
-					&action.CreationDate,
-					&action.ChangeDate,
-					&action.ResourceOwner,
-					//&action.State, //TODO: state in next release
-					&action.Sequence,
-					&action.Name,
-					&action.Script,
+					&actionID,
+					&actionCreationDate,
+					&actionChangeDate,
+					&actionResourceOwner,
+					&actionState,
+					&actionSequence,
+					&actionName,
+					&actionScript,
 					&triggerType,
 					&triggerSequence,
+					&flow.Type,
+					&flow.ChangeDate,
+					&flow.Sequence,
+					&flow.ResourceOwner,
 				)
 				if err != nil {
 					return nil, err
 				}
-				flow.TriggerActions[triggerType] = append(flow.TriggerActions[triggerType], action)
+				if !actionID.Valid {
+					continue
+				}
+				flow.TriggerActions[triggerType] = append(flow.TriggerActions[triggerType], &Action{
+					ID:            actionID.String,
+					CreationDate:  actionCreationDate.Time,
+					ChangeDate:    actionChangeDate.Time,
+					ResourceOwner: actionResourceOwner.String,
+					State:         domain.ActionState(actionState.Int32),
+					Sequence:      uint64(actionSequence.Int64),
+					Name:          actionName.String,
+					Script:        actionScript.String,
+				})
 			}
 
 			if err := rows.Close(); err != nil {

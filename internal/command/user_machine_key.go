@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *domain.MachineKey, resourceOwner string) (*domain.MachineKey, error) {
@@ -32,7 +32,7 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *domain.Mac
 		return nil, err
 	}
 
-	events, err := c.eventstore.PushEvents(ctx,
+	events, err := c.eventstore.Push(ctx,
 		user.NewMachineKeyAddedEvent(
 			ctx,
 			UserAggregateFromWriteModel(&keyWriteModel.WriteModel),
@@ -62,7 +62,7 @@ func (c *Commands) RemoveUserMachineKey(ctx context.Context, userID, keyID, reso
 		return nil, errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.User.Machine.Key.NotFound")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.Push(ctx,
 		user.NewMachineKeyRemovedEvent(ctx, UserAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
 	if err != nil {
 		return nil, err

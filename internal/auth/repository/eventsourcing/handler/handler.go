@@ -1,20 +1,23 @@
 package handler
 
 import (
+	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
-	key_model "github.com/caos/zitadel/internal/key/model"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
+	query2 "github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type Configs map[string]*Config
 
 type Config struct {
-	MinimumCycleDuration types.Duration
+	MinimumCycleDuration time.Duration
 }
 
 type handler struct {
@@ -30,48 +33,23 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, keyChan chan<- *key_model.KeyView) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, queries *query2.Queries) []query.Handler {
 	return []query.Handler{
 		newUser(
-			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			systemDefaults.IamID),
+			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es}, queries),
 		newUserSession(
-			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
-		newUserMembership(
-			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
+			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}, queries),
 		newToken(
 			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
-		newKey(
-			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
-			keyChan),
-		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
-		newUserGrant(
-			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
-			systemDefaults.IamID),
-		newAuthNKeys(
-			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
-		newLoginPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			systemDefaults),
+			systemDefaults, queries),
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			systemDefaults),
-		newPasswordComplexityPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
-		newOrgIAMPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
-		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
-		newLabelPolicy(handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
-		newFeatures(handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
+			systemDefaults, queries),
 		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
-		newPrivacyPolicy(handler{view, bulkLimit, configs.cycleDuration("PrivacyPolicy"), errorCount, es}),
-		newCustomText(handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
-		newMetadata(handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
-		newLockoutPolicy(handler{view, bulkLimit, configs.cycleDuration("LockoutPolicy"), errorCount, es}),
 		newOrgProjectMapping(handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
 	}
 }
@@ -81,7 +59,7 @@ func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	if !ok {
 		return 3 * time.Minute
 	}
-	return c.MinimumCycleDuration.Duration
+	return c.MinimumCycleDuration
 }
 
 func (h *handler) MinimumCycleDuration() time.Duration {
@@ -94,4 +72,26 @@ func (h *handler) LockDuration() time.Duration {
 
 func (h *handler) QueryLimit() uint64 {
 	return h.bulkLimit
+}
+
+func withInstanceID(ctx context.Context, instanceID string) context.Context {
+	return authz.WithInstanceID(ctx, instanceID)
+}
+
+func newSearchQuery(sequences []*repository.CurrentSequence, aggregateTypes []models.AggregateType, instanceIDs []string) *models.SearchQuery {
+	searchQuery := models.NewSearchQuery()
+	for _, sequence := range sequences {
+		var seq uint64
+		for _, instanceID := range instanceIDs {
+			if sequence.InstanceID == instanceID {
+				seq = sequence.CurrentSequence
+				break
+			}
+		}
+		searchQuery.AddQuery().
+			AggregateTypeFilter(aggregateTypes...).
+			LatestSequenceFilter(seq).
+			InstanceIDFilter(sequence.InstanceID)
+	}
+	return searchQuery
 }

@@ -6,7 +6,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.change.v1;
 
-option go_package ="github.com/caos/zitadel/pkg/grpc/change";
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/change";
 
 message Change {
     google.protobuf.Timestamp change_date = 1 [
@@ -63,7 +63,7 @@ message ChangeQuery {
     uint32 limit = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "20";
-            description: "Maximum amount of events returned. Default is set to 1000 in https://github.com/caos/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If no limit is set or the limit exeeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
+            description: "Maximum amount of events returned. Default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If no limit is set or the limit exeeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
         }
     ];
     bool asc = 3 [

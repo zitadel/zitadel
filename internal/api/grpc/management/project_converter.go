@@ -1,14 +1,17 @@
 package management
 
 import (
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	proj_grpc "github.com/caos/zitadel/internal/api/grpc/project"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	proj_model "github.com/caos/zitadel/internal/project/model"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
-	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
+	"context"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	proj_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 )
 
 func ProjectCreateToDomain(req *mgmt_pb.AddProjectRequest) *domain.Project {
@@ -82,9 +85,9 @@ func UpdateProjectRoleRequestToDomain(req *mgmt_pb.UpdateProjectRoleRequest) *do
 	}
 }
 
-func ProjectGrantsToIDs(projectGrants []*proj_model.ProjectGrantView) []string {
-	converted := make([]string, len(projectGrants))
-	for i, grant := range projectGrants {
+func ProjectGrantsToIDs(projectGrants *query.ProjectGrants) []string {
+	converted := make([]string, len(projectGrants.ProjectGrants))
+	for i, grant := range projectGrants.ProjectGrants {
 		converted[i] = grant.GrantID
 	}
 	return converted
@@ -98,74 +101,91 @@ func UpdateProjectMemberRequestToDomain(req *mgmt_pb.UpdateProjectMemberRequest)
 	return domain.NewMember(req.ProjectId, req.UserId, req.Roles...)
 }
 
-func ListProjectsRequestToModel(req *mgmt_pb.ListProjectsRequest) (*proj_model.ProjectViewSearchRequest, error) {
+func listProjectRequestToModel(req *mgmt_pb.ListProjectsRequest) (*query.ProjectSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.ProjectQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectViewSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
+	return &query.ProjectSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }
 
-func ListGrantedProjectsRequestToModel(req *mgmt_pb.ListGrantedProjectsRequest) (*proj_model.ProjectGrantViewSearchRequest, error) {
+func listGrantedProjectsRequestToModel(req *mgmt_pb.ListGrantedProjectsRequest) (*query.ProjectGrantSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := proj_grpc.GrantedProjectQueriesToModel(req.Queries)
+	queries, err := proj_grpc.ProjectQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectGrantViewSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
+	return &query.ProjectGrantSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }
 
-func ListProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*proj_model.ProjectRoleSearchRequest, error) {
+func listProjectRolesRequestToModel(req *mgmt_pb.ListProjectRolesRequest) (*query.ProjectRoleSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.RoleQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectRoleSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
+	return &query.ProjectRoleSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }
 
-func ListGrantedProjectRolesRequestToModel(req *mgmt_pb.ListGrantedProjectRolesRequest) (*proj_model.ProjectRoleSearchRequest, error) {
+func listGrantedProjectRolesRequestToModel(req *mgmt_pb.ListGrantedProjectRolesRequest) (*query.ProjectRoleSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := proj_grpc.RoleQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &proj_model.ProjectRoleSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
+	return &query.ProjectRoleSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }
 
-func ListProjectMembersRequestToModel(req *mgmt_pb.ListProjectMembersRequest) (*proj_model.ProjectMemberSearchRequest, error) {
+func ListProjectMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListProjectMembersRequest) (*query.ProjectMembersQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := member_grpc.MemberQueriesToProjectMember(req.Queries)
-	return &proj_model.ProjectMemberSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
-		Queries: queries,
+	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewMemberResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, ownerQuery)
+	return &query.ProjectMembersQuery{
+		MembersQuery: query.MembersQuery{
+			SearchRequest: query.SearchRequest{
+				Offset: offset,
+				Limit:  limit,
+				Asc:    asc,
+				//SortingColumn: //TODO: sorting
+			},
+			Queries: queries,
+		},
+		ProjectID: req.ProjectId,
 	}, nil
 }

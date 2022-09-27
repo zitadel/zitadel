@@ -2,12 +2,14 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"reflect"
 	"sync"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 //Eventstore abstracts all functions needed to store valid events
@@ -19,7 +21,7 @@ type Eventstore struct {
 }
 
 type eventTypeInterceptors struct {
-	eventMapper func(*repository.Event) (EventReader, error)
+	eventMapper func(*repository.Event) (Event, error)
 }
 
 func NewEventstore(repo repository.Repository) *Eventstore {
@@ -36,10 +38,10 @@ func (es *Eventstore) Health(ctx context.Context) error {
 	return es.repo.Health(ctx)
 }
 
-//PushEvents pushes the events in a single transaction
+//Push pushes the events in a single transaction
 // an event needs at least an aggregate
-func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher) ([]EventReader, error) {
-	events, constraints, err := eventsToRepository(pushEvents)
+func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
+	events, constraints, err := commandsToRepository(authz.GetInstance(ctx).InstanceID(), cmds)
 	if err != nil {
 		return nil, err
 	}
@@ -57,37 +59,59 @@ func (es *Eventstore) PushEvents(ctx context.Context, pushEvents ...EventPusher)
 	return eventReaders, nil
 }
 
-func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
-	events = make([]*repository.Event, len(pushEvents))
-	for i, event := range pushEvents {
-		data, err := EventData(event)
+func (es *Eventstore) NewInstance(ctx context.Context, instanceID string) error {
+	return es.repo.CreateInstance(ctx, instanceID)
+}
+
+func commandsToRepository(instanceID string, cmds []Command) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
+	events = make([]*repository.Event, len(cmds))
+	for i, cmd := range cmds {
+		data, err := EventData(cmd)
 		if err != nil {
 			return nil, nil, err
 		}
+		if cmd.Aggregate().ID == "" {
+			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Afdfe", "aggregate id must not be empty")
+		}
+		if cmd.Aggregate().Type == "" {
+			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Dfg32", "aggregate type must not be empty")
+		}
+		if cmd.Type() == "" {
+			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Drg34", "event type must not be empty")
+		}
+		if cmd.Aggregate().Version == "" {
+			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Dgfg4", "aggregate version must not be empty")
+		}
 		events[i] = &repository.Event{
-			AggregateID:   event.Aggregate().ID,
-			AggregateType: repository.AggregateType(event.Aggregate().Type),
-			ResourceOwner: event.Aggregate().ResourceOwner,
-			EditorService: event.EditorService(),
-			EditorUser:    event.EditorUser(),
-			Type:          repository.EventType(event.Type()),
-			Version:       repository.Version(event.Aggregate().Version),
+			AggregateID:   cmd.Aggregate().ID,
+			AggregateType: repository.AggregateType(cmd.Aggregate().Type),
+			ResourceOwner: sql.NullString{String: cmd.Aggregate().ResourceOwner, Valid: cmd.Aggregate().ResourceOwner != ""},
+			InstanceID:    instanceID,
+			EditorService: cmd.EditorService(),
+			EditorUser:    cmd.EditorUser(),
+			Type:          repository.EventType(cmd.Type()),
+			Version:       repository.Version(cmd.Aggregate().Version),
 			Data:          data,
 		}
-		if len(event.UniqueConstraints()) > 0 {
-			constraints = append(constraints, uniqueConstraintsToRepository(event.UniqueConstraints())...)
+		if len(cmd.UniqueConstraints()) > 0 {
+			constraints = append(constraints, uniqueConstraintsToRepository(instanceID, cmd.UniqueConstraints())...)
 		}
 	}
 
 	return events, constraints, nil
 }
 
-func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {
+func uniqueConstraintsToRepository(instanceID string, constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {
 	uniqueConstraints = make([]*repository.UniqueConstraint, len(constraints))
 	for i, constraint := range constraints {
+		var id string
+		if !constraint.IsGlobal {
+			id = instanceID
+		}
 		uniqueConstraints[i] = &repository.UniqueConstraint{
 			UniqueType:   constraint.UniqueType,
 			UniqueField:  constraint.UniqueField,
+			InstanceID:   id,
 			Action:       uniqueConstraintActionToRepository(constraint.Action),
 			ErrorMessage: constraint.ErrorMessage,
 		}
@@ -95,10 +119,10 @@ func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (unique
 	return uniqueConstraints
 }
 
-//FilterEvents filters the stored events based on the searchQuery
+//Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
-func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQueryBuilder) ([]EventReader, error) {
-	query, err := queryFactory.build()
+func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
+	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -110,8 +134,8 @@ func (es *Eventstore) FilterEvents(ctx context.Context, queryFactory *SearchQuer
 	return es.mapEvents(events)
 }
 
-func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []EventReader, err error) {
-	mappedEvents = make([]EventReader, len(events))
+func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Event, err error) {
+	mappedEvents = make([]Event, len(events))
 
 	es.interceptorMutex.Lock()
 	defer es.interceptorMutex.Unlock()
@@ -138,12 +162,12 @@ type reducer interface {
 	// it only appends the newly added events
 	Reduce() error
 	//AppendEvents appends the passed events to an internal list of events
-	AppendEvents(...EventReader)
+	AppendEvents(...Event)
 }
 
 //FilterToReducer filters the events based on the search query, appends all events to the reducer and calls it's reduce function
 func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r reducer) error {
-	events, err := es.FilterEvents(ctx, searchQuery)
+	events, err := es.Filter(ctx, searchQuery)
 	if err != nil {
 		return err
 	}
@@ -155,14 +179,23 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 
 //LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
-	query, err := queryFactory.build()
+	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return 0, err
 	}
 	return es.repo.LatestSequence(ctx, query)
 }
 
-type queryReducer interface {
+//InstanceIDs returns the instance ids found by the search query
+func (es *Eventstore) InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error) {
+	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
+	return es.repo.InstanceIDs(ctx, query)
+}
+
+type QueryReducer interface {
 	reducer
 	//Query returns the SearchQueryFactory for the events needed in reducer
 	Query() *SearchQueryBuilder
@@ -170,8 +203,8 @@ type queryReducer interface {
 
 //FilterToQueryReducer filters the events based on the search query of the query function,
 // appends all events to the reducer and calls it's reduce function
-func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r queryReducer) error {
-	events, err := es.FilterEvents(ctx, r.Query())
+func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r QueryReducer) error {
+	events, err := es.Filter(ctx, r.Query())
 	if err != nil {
 		return err
 	}
@@ -181,7 +214,7 @@ func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r queryReducer) 
 }
 
 //RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
-func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (EventReader, error)) *Eventstore {
+func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (Event, error)) *Eventstore {
 	if mapper == nil || eventType == "" {
 		return es
 	}
@@ -195,7 +228,7 @@ func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func
 	return es
 }
 
-func EventData(event EventPusher) ([]byte, error) {
+func EventData(event Command) ([]byte, error) {
 	switch data := event.Data().(type) {
 	case nil:
 		return nil, nil
@@ -228,8 +261,4 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 	default:
 		return repository.UniqueConstraintAdd
 	}
-}
-
-func (es *Eventstore) Step20(ctx context.Context, latestSequence uint64) error {
-	return es.repo.Step20(ctx, latestSequence)
 }

@@ -3,7 +3,7 @@ package tracing
 import (
 	"runtime"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 )
 
 func GetCaller() string {

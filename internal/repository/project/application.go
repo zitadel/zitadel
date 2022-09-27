@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/caos/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
+
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -65,7 +66,7 @@ func NewApplicationAddedEvent(
 	}
 }
 
-func ApplicationAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -116,7 +117,7 @@ func NewApplicationChangedEvent(
 	}
 }
 
-func ApplicationChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -158,7 +159,7 @@ func NewApplicationDeactivatedEvent(
 	}
 }
 
-func ApplicationDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -200,7 +201,7 @@ func NewApplicationReactivatedEvent(
 	}
 }
 
-func ApplicationReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -216,8 +217,9 @@ func ApplicationReactivatedEventMapper(event *repository.Event) (eventstore.Even
 type ApplicationRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID string `json:"appId,omitempty"`
-	name  string
+	AppID    string `json:"appId,omitempty"`
+	name     string
+	entityID string
 }
 
 func (e *ApplicationRemovedEvent) Data() interface{} {
@@ -225,7 +227,11 @@ func (e *ApplicationRemovedEvent) Data() interface{} {
 }
 
 func (e *ApplicationRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
+	remove := []*eventstore.EventUniqueConstraint{NewRemoveApplicationUniqueConstraint(e.name, e.Aggregate().ID)}
+	if e.entityID != "" {
+		remove = append(remove, NewRemoveSAMLConfigEntityIDUniqueConstraint(e.entityID))
+	}
+	return remove
 }
 
 func NewApplicationRemovedEvent(
@@ -233,6 +239,7 @@ func NewApplicationRemovedEvent(
 	aggregate *eventstore.Aggregate,
 	appID,
 	name string,
+	entityID string,
 ) *ApplicationRemovedEvent {
 	return &ApplicationRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -240,12 +247,13 @@ func NewApplicationRemovedEvent(
 			aggregate,
 			ApplicationRemovedType,
 		),
-		AppID: appID,
-		name:  name,
+		AppID:    appID,
+		name:     name,
+		entityID: entityID,
 	}
 }
 
-func ApplicationRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

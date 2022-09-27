@@ -3,14 +3,12 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/caos/logging"
+	"github.com/zitadel/logging"
 
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/project/model"
-)
-
-const (
-	ProjectVersion = "v1"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/project/model"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 type Project struct {
@@ -52,14 +50,14 @@ func (p *Project) AppendEvents(events ...*es_models.Event) error {
 func (p *Project) AppendEvent(event *es_models.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 
-	switch event.Type {
-	case ProjectAdded, ProjectChanged:
+	switch eventstore.EventType(event.Type) {
+	case project.ProjectAddedType, project.ProjectChangedType:
 		return p.AppendAddProjectEvent(event)
-	case ProjectDeactivated:
+	case project.ProjectDeactivatedType:
 		return p.appendDeactivatedEvent()
-	case ProjectReactivated:
+	case project.ProjectReactivatedType:
 		return p.appendReactivatedEvent()
-	case ProjectRemoved:
+	case project.ProjectRemovedType:
 		return p.appendRemovedEvent()
 	}
 	return nil

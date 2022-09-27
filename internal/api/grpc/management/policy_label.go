@@ -3,38 +3,38 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetLabelPolicy(ctx context.Context, req *mgmt_pb.GetLabelPolicyRequest) (*mgmt_pb.GetLabelPolicyResponse, error) {
-	policy, err := s.org.GetLabelPolicy(ctx)
+	policy, err := s.query.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy), IsDefault: policy.Default}, nil
+	return &mgmt_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix(ctx)), IsDefault: policy.IsDefault}, nil
 }
 
 func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *mgmt_pb.GetPreviewLabelPolicyRequest) (*mgmt_pb.GetPreviewLabelPolicyResponse, error) {
-	policy, err := s.org.GetPreviewLabelPolicy(ctx)
+	policy, err := s.query.PreviewLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetPreviewLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
+	return &mgmt_pb.GetPreviewLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix(ctx)), IsDefault: policy.IsDefault}, nil
 }
 
 func (s *Server) GetDefaultLabelPolicy(ctx context.Context, req *mgmt_pb.GetDefaultLabelPolicyRequest) (*mgmt_pb.GetDefaultLabelPolicyResponse, error) {
-	policy, err := s.org.GetDefaultLabelPolicy(ctx)
+	policy, err := s.query.DefaultActiveLabelPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetDefaultLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
+	return &mgmt_pb.GetDefaultLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetAPIPrefix(ctx))}, nil
 }
 
 func (s *Server) AddCustomLabelPolicy(ctx context.Context, req *mgmt_pb.AddCustomLabelPolicyRequest) (*mgmt_pb.AddCustomLabelPolicyResponse, error) {
-	policy, err := s.command.AddLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID, addLabelPolicyToDomain(req))
+	policy, err := s.command.AddLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID, AddLabelPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}

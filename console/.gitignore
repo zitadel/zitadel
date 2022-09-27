@@ -30,6 +30,7 @@ speed-measure-plugin*.json
 .history/*
 
 # misc
+/.angular/cache
 /.sass-cache
 /connect.lock
 /coverage
@@ -46,3 +47,4 @@ Thumbs.db
 
 # Proto generated js files
 src/app/proto
+

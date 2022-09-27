@@ -3,14 +3,15 @@ package auth
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/api/grpc/user"
-	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func (s *Server) GetMyPhone(ctx context.Context, _ *auth_pb.GetMyPhoneRequest) (*auth_pb.GetMyPhoneResponse, error) {
-	phone, err := s.repo.MyPhone(ctx)
+	phone, err := s.query.GetHumanPhone(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +27,11 @@ func (s *Server) GetMyPhone(ctx context.Context, _ *auth_pb.GetMyPhoneRequest) (
 }
 
 func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest) (*auth_pb.SetMyPhoneResponse, error) {
-	phone, err := s.command.ChangeHumanPhone(ctx, UpdateMyPhoneToDomain(ctx, req), authz.GetCtxData(ctx).ResourceOwner)
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	phone, err := s.command.ChangeHumanPhone(ctx, UpdateMyPhoneToDomain(ctx, req), authz.GetCtxData(ctx).ResourceOwner, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +46,11 @@ func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest)
 
 func (s *Server) VerifyMyPhone(ctx context.Context, req *auth_pb.VerifyMyPhoneRequest) (*auth_pb.VerifyMyPhoneResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner)
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.VerifyHumanPhone(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +62,11 @@ func (s *Server) VerifyMyPhone(ctx context.Context, req *auth_pb.VerifyMyPhoneRe
 
 func (s *Server) ResendMyPhoneVerification(ctx context.Context, _ *auth_pb.ResendMyPhoneVerificationRequest) (*auth_pb.ResendMyPhoneVerificationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}

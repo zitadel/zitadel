@@ -2,29 +2,158 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/id"
-	id_mock "github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id"
+	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
+
+func TestAddAPIConfig(t *testing.T) {
+	type fields struct {
+		idGenerator id.Generator
+	}
+	type args struct {
+		a      *project.Aggregate
+		appID  string
+		name   string
+		filter preparation.FilterToQueryReducer
+	}
+
+	ctx := context.Background()
+	agg := project.NewAggregate("test", "test")
+
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Want
+	}{
+		{
+			name:   "invalid appID",
+			fields: fields{},
+			args: args{
+				a:     agg,
+				appID: "",
+				name:  "name",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name:   "invalid name",
+			fields: fields{},
+			args: args{
+				a:     agg,
+				appID: "appID",
+				name:  "",
+			},
+			want: Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name:   "project not exists",
+			fields: fields{},
+			args: args{
+				a:     agg,
+				appID: "id",
+				name:  "name",
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return nil, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				CreateErr: errors.ThrowNotFound(nil, "PROJE-Sf2gb", "Errors.Project.NotFound"),
+			},
+		},
+		{
+			name: "correct without client secret",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID"),
+			},
+			args: args{
+				a:     agg,
+				appID: "appID",
+				name:  "name",
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							project.NewProjectAddedEvent(
+								ctx,
+								&agg.Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						}, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(
+						ctx,
+						&agg.Aggregate,
+						"appID",
+						"name",
+					),
+					project.NewAPIConfigAddedEvent(ctx, &agg.Aggregate,
+						"appID",
+						"clientID@project",
+						nil,
+						domain.APIAuthMethodTypePrivateKeyJWT,
+					),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				idGenerator: tt.fields.idGenerator,
+			}
+			AssertValidation(t,
+				context.Background(),
+				c.AddAPIAppCommand(
+					&addAPIApp{
+						AddApp: AddApp{
+							Aggregate: *tt.args.a,
+							ID:        tt.args.appID,
+							Name:      tt.args.name,
+						},
+						AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
+					},
+					nil,
+				), tt.args.filter, tt.want)
+		})
+	}
+}
 
 func TestCommandSide_AddAPIApplication(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		idGenerator     id.Generator
-		secretGenerator crypto.Generator
+		eventstore  *eventstore.Eventstore
+		idGenerator id.Generator
 	}
 	type args struct {
-		ctx           context.Context
-		apiApp        *domain.APIApp
-		resourceOwner string
+		ctx             context.Context
+		apiApp          *domain.APIApp
+		resourceOwner   string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.APIApp
@@ -49,7 +178,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -72,7 +201,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -102,7 +231,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -144,8 +273,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -156,7 +284,8 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 					AppName:        "app",
 					AuthMethodType: domain.APIAuthMethodTypeBasic,
 				},
-				resourceOwner: "org1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.APIApp{
@@ -238,11 +367,10 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                 tt.fields.eventstore,
-				idGenerator:                tt.fields.idGenerator,
-				applicationSecretGenerator: tt.fields.secretGenerator,
+				eventstore:  tt.fields.eventstore,
+				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
+			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -295,7 +423,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -318,7 +446,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -341,7 +469,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -381,7 +509,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -472,14 +600,14 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 
 func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		secretGenerator crypto.Generator
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		appID         string
-		projectID     string
-		resourceOwner string
+		ctx             context.Context
+		appID           string
+		projectID       string
+		resourceOwner   string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.APIApp
@@ -504,7 +632,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -521,7 +649,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -539,7 +667,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: errors.IsNotFound,
 			},
 		},
 		{
@@ -585,13 +713,13 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				projectID:     "project1",
-				appID:         "app1",
-				resourceOwner: "org1",
+				ctx:             context.Background(),
+				projectID:       "project1",
+				appID:           "app1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.APIApp{
@@ -612,10 +740,9 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                 tt.fields.eventstore,
-				applicationSecretGenerator: tt.fields.secretGenerator,
+				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeAPIApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
+			got, err := r.ChangeAPIApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

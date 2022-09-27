@@ -1,7 +1,7 @@
 package org
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
@@ -44,9 +44,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(LoginPolicyIDPProviderAddedEventType, IdentityProviderAddedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyIDPProviderRemovedEventType, IdentityProviderRemovedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyIDPProviderCascadeRemovedEventType, IdentityProviderCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(OrgIAMPolicyAddedEventType, OrgIAMPolicyAddedEventMapper).
-		RegisterFilterEventMapper(OrgIAMPolicyChangedEventType, OrgIAMPolicyChangedEventMapper).
-		RegisterFilterEventMapper(OrgIAMPolicyRemovedEventType, OrgIAMPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(DomainPolicyAddedEventType, DomainPolicyAddedEventMapper).
+		RegisterFilterEventMapper(DomainPolicyChangedEventType, DomainPolicyChangedEventMapper).
+		RegisterFilterEventMapper(DomainPolicyRemovedEventType, DomainPolicyRemovedEventMapper).
 		RegisterFilterEventMapper(PasswordAgePolicyAddedEventType, PasswordAgePolicyAddedEventMapper).
 		RegisterFilterEventMapper(PasswordAgePolicyChangedEventType, PasswordAgePolicyChangedEventMapper).
 		RegisterFilterEventMapper(PasswordAgePolicyRemovedEventType, PasswordAgePolicyRemovedEventMapper).
@@ -77,9 +77,10 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(IDPOIDCConfigChangedEventType, IDPOIDCConfigChangedEventMapper).
 		RegisterFilterEventMapper(IDPJWTConfigAddedEventType, IDPJWTConfigAddedEventMapper).
 		RegisterFilterEventMapper(IDPJWTConfigChangedEventType, IDPJWTConfigChangedEventMapper).
-		RegisterFilterEventMapper(FeaturesSetEventType, FeaturesSetEventMapper).
-		RegisterFilterEventMapper(FeaturesRemovedEventType, FeaturesRemovedEventMapper).
 		RegisterFilterEventMapper(TriggerActionsSetEventType, TriggerActionsSetEventMapper).
 		RegisterFilterEventMapper(TriggerActionsCascadeRemovedEventType, TriggerActionsCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(FlowClearedEventType, FlowClearedEventMapper)
+		RegisterFilterEventMapper(FlowClearedEventType, FlowClearedEventMapper).
+		RegisterFilterEventMapper(MetadataSetType, MetadataSetEventMapper).
+		RegisterFilterEventMapper(MetadataRemovedType, MetadataRemovedEventMapper).
+		RegisterFilterEventMapper(MetadataRemovedAllType, MetadataRemovedAllEventMapper)
 }

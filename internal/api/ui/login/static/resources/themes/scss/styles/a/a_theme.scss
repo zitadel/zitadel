@@ -1,0 +1,16 @@
+@import "a";
+
+@mixin lgn-a-theme() {
+  @include lgn-a-color();
+}
+
+@mixin lgn-a-color() {
+  a:not(.lgn-stroked-button):not(.lgn-button):not(.lgn-raised-button):not(.lgn-idp) {
+    color: var(--zitadel-color-text-500);
+
+    &:hover,
+    &:active {
+      color: var(--zitadel-color-primary-500);
+    }
+  }
+}

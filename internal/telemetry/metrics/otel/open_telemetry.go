@@ -8,13 +8,14 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric"
-	export "go.opentelemetry.io/otel/sdk/export/metric"
+	"go.opentelemetry.io/otel/sdk/export/metric/aggregation"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
 	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	otel_resource "github.com/zitadel/zitadel/internal/telemetry/otel"
 )
 
 type Metrics struct {
@@ -26,14 +27,19 @@ type Metrics struct {
 }
 
 func NewMetrics(meterName string) (metrics.Metrics, error) {
+	resource, err := otel_resource.ResourceWithService()
+	if err != nil {
+		return nil, err
+	}
 	exporter, err := prometheus.New(
 		prometheus.Config{},
 		controller.New(
-			processor.New(
+			processor.NewFactory(
 				selector.NewWithHistogramDistribution(),
-				export.CumulativeExportKindSelector(),
+				aggregation.CumulativeTemporalitySelector(),
 				processor.WithMemory(true),
 			),
+			controller.WithResource(resource),
 		),
 	)
 	if err != nil {

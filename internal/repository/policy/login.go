@@ -2,11 +2,12 @@ package policy
 
 import (
 	"encoding/json"
+	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -19,12 +20,19 @@ const (
 type LoginPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AllowUserNamePassword bool                    `json:"allowUsernamePassword,omitempty"`
-	AllowRegister         bool                    `json:"allowRegister,omitempty"`
-	AllowExternalIDP      bool                    `json:"allowExternalIdp,omitempty"`
-	ForceMFA              bool                    `json:"forceMFA,omitempty"`
-	HidePasswordReset     bool                    `json:"hidePasswordReset,omitempty"`
-	PasswordlessType      domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	AllowUserNamePassword      bool                    `json:"allowUsernamePassword,omitempty"`
+	AllowRegister              bool                    `json:"allowRegister,omitempty"`
+	AllowExternalIDP           bool                    `json:"allowExternalIdp,omitempty"`
+	ForceMFA                   bool                    `json:"forceMFA,omitempty"`
+	HidePasswordReset          bool                    `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames     bool                    `json:"ignoreUnknownUsernames,omitempty"`
+	PasswordlessType           domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI         string                  `json:"defaultRedirectURI,omitempty"`
+	PasswordCheckLifetime      time.Duration           `json:"passwordCheckLifetime,omitempty"`
+	ExternalLoginCheckLifetime time.Duration           `json:"externalLoginCheckLifetime,omitempty"`
+	MFAInitSkipLifetime        time.Duration           `json:"mfaInitSkipLifetime,omitempty"`
+	SecondFactorCheckLifetime  time.Duration           `json:"secondFactorCheckLifetime,omitempty"`
+	MultiFactorCheckLifetime   time.Duration           `json:"multiFactorCheckLifetime,omitempty"`
 }
 
 func (e *LoginPolicyAddedEvent) Data() interface{} {
@@ -41,21 +49,35 @@ func NewLoginPolicyAddedEvent(
 	allowRegister,
 	allowExternalIDP,
 	forceMFA,
-	hidePasswordReset bool,
+	hidePasswordReset,
+	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
+	defaultRedirectURI string,
+	passwordCheckLifetime,
+	externalLoginCheckLifetime,
+	mfaInitSkipLifetime,
+	secondFactorCheckLifetime,
+	multiFactorCheckLifetime time.Duration,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
-		BaseEvent:             *base,
-		AllowExternalIDP:      allowExternalIDP,
-		AllowRegister:         allowRegister,
-		AllowUserNamePassword: allowUserNamePassword,
-		ForceMFA:              forceMFA,
-		PasswordlessType:      passwordlessType,
-		HidePasswordReset:     hidePasswordReset,
+		BaseEvent:                  *base,
+		AllowExternalIDP:           allowExternalIDP,
+		AllowRegister:              allowRegister,
+		AllowUserNamePassword:      allowUserNamePassword,
+		ForceMFA:                   forceMFA,
+		PasswordlessType:           passwordlessType,
+		HidePasswordReset:          hidePasswordReset,
+		IgnoreUnknownUsernames:     ignoreUnknownUsernames,
+		DefaultRedirectURI:         defaultRedirectURI,
+		PasswordCheckLifetime:      passwordCheckLifetime,
+		ExternalLoginCheckLifetime: externalLoginCheckLifetime,
+		MFAInitSkipLifetime:        mfaInitSkipLifetime,
+		SecondFactorCheckLifetime:  secondFactorCheckLifetime,
+		MultiFactorCheckLifetime:   multiFactorCheckLifetime,
 	}
 }
 
-func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LoginPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -71,15 +93,19 @@ func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReade
 type LoginPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AllowUserNamePassword *bool                    `json:"allowUsernamePassword,omitempty"`
-	AllowRegister         *bool                    `json:"allowRegister,omitempty"`
-	AllowExternalIDP      *bool                    `json:"allowExternalIdp,omitempty"`
-	ForceMFA              *bool                    `json:"forceMFA,omitempty"`
-	HidePasswordReset     *bool                    `json:"hidePasswordReset,omitempty"`
-	PasswordlessType      *domain.PasswordlessType `json:"passwordlessType,omitempty"`
-}
-
-type LoginPolicyEventData struct {
+	AllowUserNamePassword      *bool                    `json:"allowUsernamePassword,omitempty"`
+	AllowRegister              *bool                    `json:"allowRegister,omitempty"`
+	AllowExternalIDP           *bool                    `json:"allowExternalIdp,omitempty"`
+	ForceMFA                   *bool                    `json:"forceMFA,omitempty"`
+	HidePasswordReset          *bool                    `json:"hidePasswordReset,omitempty"`
+	IgnoreUnknownUsernames     *bool                    `json:"ignoreUnknownUsernames,omitempty"`
+	PasswordlessType           *domain.PasswordlessType `json:"passwordlessType,omitempty"`
+	DefaultRedirectURI         *string                  `json:"defaultRedirectURI,omitempty"`
+	PasswordCheckLifetime      *time.Duration           `json:"passwordCheckLifetime,omitempty"`
+	ExternalLoginCheckLifetime *time.Duration           `json:"externalLoginCheckLifetime,omitempty"`
+	MFAInitSkipLifetime        *time.Duration           `json:"mfaInitSkipLifetime,omitempty"`
+	SecondFactorCheckLifetime  *time.Duration           `json:"secondFactorCheckLifetime,omitempty"`
+	MultiFactorCheckLifetime   *time.Duration           `json:"multiFactorCheckLifetime,omitempty"`
 }
 
 func (e *LoginPolicyChangedEvent) Data() interface{} {
@@ -144,7 +170,49 @@ func ChangeHidePasswordReset(hidePasswordReset bool) func(*LoginPolicyChangedEve
 	}
 }
 
-func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangePasswordCheckLifetime(passwordCheckLifetime time.Duration) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.PasswordCheckLifetime = &passwordCheckLifetime
+	}
+}
+
+func ChangeExternalLoginCheckLifetime(externalLoginCheckLifetime time.Duration) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.ExternalLoginCheckLifetime = &externalLoginCheckLifetime
+	}
+}
+
+func ChangeMFAInitSkipLifetime(mfaInitSkipLifetime time.Duration) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.MFAInitSkipLifetime = &mfaInitSkipLifetime
+	}
+}
+
+func ChangeSecondFactorCheckLifetime(secondFactorCheckLifetime time.Duration) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.SecondFactorCheckLifetime = &secondFactorCheckLifetime
+	}
+}
+
+func ChangeMultiFactorCheckLifetime(multiFactorCheckLifetime time.Duration) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.MultiFactorCheckLifetime = &multiFactorCheckLifetime
+	}
+}
+
+func ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.IgnoreUnknownUsernames = &ignoreUnknownUsernames
+	}
+}
+
+func ChangeDefaultRedirectURI(defaultRedirectURI string) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.DefaultRedirectURI = &defaultRedirectURI
+	}
+}
+
+func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LoginPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -175,7 +243,7 @@ func NewLoginPolicyRemovedEvent(base *eventstore.BaseEvent) *LoginPolicyRemovedE
 	}
 }
 
-func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &LoginPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

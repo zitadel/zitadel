@@ -4,12 +4,8 @@ import { NgModule } from '@angular/core';
 import { AppCardComponent } from './app-card.component';
 
 @NgModule({
-    declarations: [AppCardComponent],
-    imports: [
-        CommonModule,
-    ],
-    exports: [
-        AppCardComponent,
-    ],
+  declarations: [AppCardComponent],
+  imports: [CommonModule],
+  exports: [AppCardComponent],
 })
-export class AppCardModule { }
+export class AppCardModule {}

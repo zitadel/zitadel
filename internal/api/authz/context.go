@@ -2,11 +2,12 @@ package authz
 
 import (
 	"context"
+	"strings"
 
-	"github.com/caos/zitadel/internal/api/grpc"
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/api/grpc"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type key int
@@ -15,6 +16,7 @@ const (
 	requestPermissionsKey key = 1
 	dataKey               key = 2
 	allPermissionsKey     key = 3
+	instanceKey           key = 4
 )
 
 type CtxData struct {
@@ -42,7 +44,7 @@ type Memberships []*Membership
 type Membership struct {
 	MemberType  MemberType
 	AggregateID string
-	//ObjectID differs from aggregate id if obejct is sub of an aggregate
+	//ObjectID differs from aggregate id if object is sub of an aggregate
 	ObjectID string
 
 	Roles []string
@@ -62,16 +64,12 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if orgID != "" {
-		err = t.ExistsOrg(ctx, orgID)
-		if err != nil {
-			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
-		}
-	}
-
 	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return CtxData{}, err
+	}
+	if strings.HasPrefix(method, "/zitadel.system.v1.SystemService") {
+		return CtxData{UserID: userID}, nil
 	}
 	var projectID string
 	var origins []string
@@ -87,6 +85,17 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	if orgID == "" {
 		orgID = resourceOwner
 	}
+
+	err = t.ExistsOrg(ctx, orgID)
+	if err != nil {
+		err = retry(func() error {
+			return t.ExistsOrg(ctx, orgID)
+		})
+		if err != nil {
+			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+		}
+	}
+
 	return CtxData{
 		UserID:            userID,
 		OrgID:             orgID,
@@ -120,7 +129,10 @@ func GetAllPermissionsFromCtx(ctx context.Context) []string {
 func checkOrigin(ctx context.Context, origins []string) error {
 	origin := grpc.GetGatewayHeader(ctx, http_util.Origin)
 	if origin == "" {
-		return nil
+		origin = http_util.OriginFromCtx(ctx)
+		if origin == "" {
+			return nil
+		}
 	}
 	if http_util.IsOriginAllowed(origins, origin) {
 		return nil

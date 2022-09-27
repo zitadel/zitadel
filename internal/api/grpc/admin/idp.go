@@ -3,13 +3,15 @@ package admin
 import (
 	"context"
 
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	object_pb "github.com/caos/zitadel/internal/api/grpc/object"
-	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
+	object_pb "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/query"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.DefaultIDPConfigByID(ctx, req.Id)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, true, req.Id, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -17,13 +19,17 @@ func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest
 }
 
 func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*admin_pb.ListIDPsResponse, error) {
-	resp, err := s.iam.SearchIDPConfigs(ctx, listIDPsToModel(req))
+	queries, err := listIDPsToModel(authz.GetInstance(ctx).InstanceID(), req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.query.IDPs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.ListIDPsResponse{
-		Result:  idp_grpc.IDPViewsToPb(resp.Result),
-		Details: object_pb.ToListDetails(resp.TotalResult, resp.Sequence, resp.Timestamp),
+		Result:  idp_grpc.IDPViewsToPb(resp.IDPs),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
 	}, nil
 }
 
@@ -88,15 +94,29 @@ func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPR
 }
 
 func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) (*admin_pb.RemoveIDPResponse, error) {
-	idpProviders, err := s.iam.IDPProvidersByIDPConfigID(ctx, req.IdpId)
+	providerQuery, err := query.NewIDPIDSearchQuery(req.IdpId)
 	if err != nil {
 		return nil, err
 	}
-	externalIDPs, err := s.iam.ExternalIDPsByIDPConfigID(ctx, req.IdpId)
+	idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{
+		Queries: []query.SearchQuery{providerQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, req.IdpId, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
+
+	idpQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(req.IdpId)
+	if err != nil {
+		return nil, err
+	}
+	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
+		Queries: []query.SearchQuery{idpQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, req.IdpId, idpsToDomain(idps.IDPs), idpUserLinksToDomain(userLinks.Links)...)
 	if err != nil {
 		return nil, err
 	}

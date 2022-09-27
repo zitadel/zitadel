@@ -3,9 +3,9 @@ package management
 import (
 	"testing"
 
-	"github.com/caos/zitadel/internal/test"
-	"github.com/caos/zitadel/pkg/grpc/idp"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/test"
+	"github.com/zitadel/zitadel/pkg/grpc/idp"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func Test_addOIDCIDPRequestToDomain(t *testing.T) {
@@ -35,7 +35,7 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := addOIDCIDPRequestToDomain(tt.args.req)
+			got := AddOIDCIDPRequestToDomain(tt.args.req)
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
 				"OIDCConfig.ClientSecret",
@@ -45,7 +45,7 @@ func Test_addOIDCIDPRequestToDomain(t *testing.T) {
 				"State",
 				"OIDCConfig.AuthorizationEndpoint",
 				"OIDCConfig.TokenEndpoint",
-				"Type", //TODO: default (0) is oidc
+				"Type",
 				"JWTConfig",
 			)
 		})
@@ -79,7 +79,7 @@ func Test_addOIDCIDPRequestToDomainOIDCIDPConfig(t *testing.T) {
 			got := addOIDCIDPRequestToDomainOIDCIDPConfig(tt.args.req)
 			test.AssertFieldsMapped(t, got,
 				"ObjectRoot",
-				"ClientSecret", //TODO: is client secret string enough for backend?
+				"ClientSecret",
 				"IDPConfigID",
 				"AuthorizationEndpoint",
 				"TokenEndpoint",
@@ -116,7 +116,7 @@ func Test_updateIDPToDomain(t *testing.T) {
 				"OIDCConfig",
 				"JWTConfig",
 				"State",
-				"Type", //TODO: type should not be changeable
+				"Type",
 			)
 		})
 	}

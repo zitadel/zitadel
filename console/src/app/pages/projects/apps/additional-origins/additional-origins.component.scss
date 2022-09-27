@@ -9,12 +9,12 @@
 
   button {
     margin-bottom: 14px;
-    margin-right: -.5rem;
+    margin-right: -0.5rem;
   }
 }
 
 .uri-list {
-  margin: 0 .5rem;
+  margin: 0 0.5rem;
   width: 100%;
 
   .uri-line {
@@ -24,6 +24,7 @@
     .uri {
       font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
       font-size: 14px;
+      overflow-x: auto;
     }
 
     .fill-space {
@@ -58,5 +59,5 @@
 .error {
   font-size: 13px;
   color: var(--warn);
-  margin: 0 .5rem 1.5rem .5rem;
+  margin: 0 0.5rem 1.5rem 0.5rem;
 }

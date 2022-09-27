@@ -1,106 +1,298 @@
-import React from 'react';
-import clsx from 'clsx';
-import Layout from '@theme/Layout';
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import styles from './styles.module.css';
-import ThemedImage from '@theme/ThemedImage';
+import Link from "@docusaurus/Link";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import Layout from "@theme/Layout";
+import ThemedImage from "@theme/ThemedImage";
+import clsx from "clsx";
+import React from "react";
+
+import Column from "../components/column";
+import {
+  HomeListWrapper,
+  ICONTYPE,
+  ListElement,
+  ListWrapper,
+} from "../components/list";
+import styles from "./styles.module.css";
 
 const features = [
   {
-    title: 'Guides',
-    darkImageUrl: 'img/index/Guides-dark.svg',
-    lightImageUrl: 'img/index/Guides-light.svg',
-    link: 'docs/guides/introduction',
+    title: "Guides",
+    darkImageUrl: "img/index/Guides-dark.svg",
+    lightImageUrl: "img/index/Guides-light.svg",
+    link: "docs/guides/overview",
     description: (
       <>
-        Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
+        Read our guides on how to manage your data and role associations in
+        ZITADEL and on what we recommend.
       </>
+    ),
+    content: (
+      <ListWrapper>
+        <Column>
+          <div>
+            <ListElement
+              link="docs/guides/start/quickstart"
+              type={ICONTYPE.START}
+              title="Get started"
+              description=""
+            />
+            <ListElement
+              link="docs/guides/manage/cloud/overview"
+              type={ICONTYPE.LOGIN}
+              title="ZITADEL Cloud"
+              description=""
+            />
+            <ListElement
+              link="docs/guides/integrate/login-users"
+              type={ICONTYPE.LOGIN}
+              title="Login Users"
+              description=""
+            />
+            <ListElement
+              link="docs/guides/integrate/access-zitadel-apis"
+              type={ICONTYPE.APIS}
+              title="Access APIs"
+              description=""
+            />
+          </div>
+          <div>
+            <ListElement
+              link="docs/guides/solution-scenarios/introduction"
+              iconClasses="las la-paragraph"
+              roundClasses="rounded rounded-split"
+              label="B2C"
+              title="Solution Scenarios"
+              description=""
+            />
+            <ListElement
+              link="docs/guides/manage/customize/branding"
+              type={ICONTYPE.PRIVATELABELING}
+              title="Customization"
+              description=""
+            />
+            <ListElement
+              link="docs/guides/deploy/overview"
+              type={ICONTYPE.SYSTEM}
+              title="Deploy"
+              description=""
+            />
+            <ListElement
+              link="docs/guides/trainings/introduction"
+              type={ICONTYPE.STORAGE}
+              title="Trainings"
+              description=""
+            />
+          </div>
+        </Column>
+      </ListWrapper>
     ),
   },
   {
-    title: 'Quickstarts',
-    darkImageUrl: 'img/index/Quickstarts-dark.svg',
-    lightImageUrl: 'img/index/Quickstarts-light.svg',
-    link: 'docs/quickstarts/introduction',
+    title: "Quickstarts",
+    darkImageUrl: "img/index/Quickstarts-dark.svg",
+    lightImageUrl: "img/index/Quickstarts-light.svg",
+    link: "docs/examples/introduction",
     description: (
-        <>
-          Learn how to integrate your applications and build secure workflows and APIs with ZITADEL
-        </>
+      <>
+        Learn how to integrate your applications and build secure workflows and
+        APIs with ZITADEL
+      </>
+    ),
+    content: (
+      <div className={styles.quickstartcontainer}>
+        <QuickstartLink
+          link="/docs/examples/login/angular"
+          imageSource="/img/tech/angular.svg"
+          title="Angular"
+          description="Add the user login to your application and query some data from the userinfo endpoint"
+        />
+        <QuickstartLink
+          link="/docs/examples/login/react"
+          imageSource="/img/tech/react.png"
+          title="React"
+          description="Logs into your application and queries some data from the userinfo endpoint"
+        />
+        <QuickstartLink
+          link="/docs/examples/login/flutter"
+          imageSource="/img/tech/flutter.svg"
+          title="Flutter"
+          description="Mobile Application working for iOS and Android that authenticates your user."
+        />
+        <QuickstartLink
+          link="/docs/examples/login/nextjs"
+          imageSource="/img/tech/nextjslight.svg"
+          lightImageSource="/img/tech/nextjs.svg"
+          title="NextJS"
+          description="A simple application to log into your user account and query some data from User endpoint."
+        />
+      </div>
     ),
   },
   {
-    title: 'APIs',
-    darkImageUrl: 'img/index/APIs-dark.svg',
-    lightImageUrl: 'img/index/APIs-light.svg',
-    link: '/docs/apis/introduction',
+    title: "APIs",
+    darkImageUrl: "img/index/APIs-dark.svg",
+    lightImageUrl: "img/index/APIs-light.svg",
+    link: "/docs/apis/introduction",
     description: (
-      <>
-        Learn more about our APIs and how to integrate them in your apps.
-      </>
+      <>Learn more about our APIs and how to integrate them in your apps.</>
+    ),
+    content: (
+      <div className={styles.apilinks}>
+        <ListWrapper>
+          <ListElement
+            link="./docs/apis/proto/auth"
+            type={ICONTYPE.APIS}
+            title="Proto Definitions"
+            description=""
+          />
+          <ListElement
+            link="./docs/apis/openidoauth/endpoints"
+            type={ICONTYPE.APIS}
+            title="OpenID Connect and OAuth"
+            description="Scopes, Claims, Authentication Methods, Grant Types"
+          />
+        </ListWrapper>
+      </div>
     ),
   },
   {
-    title: 'Concepts',
-    darkImageUrl: 'img/index/Concepts-dark.svg',
-    lightImageUrl: 'img/index/Concepts-light.svg',
-    link: 'docs/concepts/introduction',
+    title: "Concepts",
+    darkImageUrl: "img/index/Concepts-dark.svg",
+    lightImageUrl: "img/index/Concepts-light.svg",
+    link: "docs/concepts/introduction",
     description: (
       <>
-        Learn more about engineering and design principles, ZITADELs architecture and used technologies.
+        Learn more about engineering and design principles, ZITADELs
+        architecture and used technologies.
       </>
+    ),
+    content: (
+      <ListWrapper>
+        <ListElement
+          link="./docs/concepts/principles"
+          type={ICONTYPE.TASKS}
+          title="Principles"
+          description="Design and engineering principles"
+        />
+        <ListElement
+          link="./docs/concepts/architecture/software"
+          type={ICONTYPE.ARCHITECTURE}
+          title="Architecture"
+          description="Sotware-, Cluster- and Multi Cluster Architecture"
+        />
+        <ListElement
+          link="./docs/concepts/structure/overview"
+          type={ICONTYPE.ARCHITECTURE}
+          title="Structure"
+          description="Object structure of ZITADEL"
+        />
+      </ListWrapper>
     ),
   },
 ];
 
-function Feature({darkImageUrl, lightImageUrl, title, description, link}) {
-  const darkImgUrl = useBaseUrl(darkImageUrl);
-  const lightImgUrl = useBaseUrl(lightImageUrl);
+function QuickstartLink({ link, title, imageSource, lightImageSource }) {
   return (
-        <div className={clsx('col col--4 docs-link', styles.feature)}>
-          <Link to={useBaseUrl(link)}>
-          {darkImgUrl && lightImgUrl && (
-              <div className="text--center">
-                <ThemedImage
-                    className={styles.featureImage}
-                    alt={title}
-                    sources={{
-                      light: lightImgUrl,
-                      dark: darkImgUrl,
-                    }}
-                />
-              </div>
-          )}
-          <h3 className="text--center">{title}</h3>
-          <p className="text--center">{description}</p>
-          </Link>
-        </div>
+    <Link href={link} className={clsx("", styles.quickstart)}>
+      {/* <img className={styles.quickstartlinkimg} src={imageSource} alt={`${title}`}/> */}
+      <ThemedImage
+        className={styles.quickstartlinkimg}
+        alt={title}
+        sources={{
+          light: lightImageSource ? lightImageSource : imageSource,
+          dark: imageSource,
+        }}
+      />
+      <p>{title}</p>
+    </Link>
   );
 }
 
+function Feature({
+  darkImageUrl,
+  lightImageUrl,
+  title,
+  description,
+  link,
+  content,
+}) {
+  const darkImgUrl = useBaseUrl(darkImageUrl);
+  const lightImgUrl = useBaseUrl(lightImageUrl);
+
+  const themedImage = (
+    <ThemedImage
+      className={styles.featureImage}
+      alt={title}
+      sources={{
+        light: lightImgUrl,
+        dark: darkImgUrl,
+      }}
+    />
+  );
+  return (
+    <div className={clsx("col col--6 docs-link", styles.feature)}>
+      {darkImgUrl && lightImgUrl && (
+        <div className="">
+          <HomeListWrapper image={themedImage}>
+            <Link to={useBaseUrl(link)}>
+              <h3 className={styles.homelink}>
+                {title}
+                <i
+                  className={clsx("las la-angle-right", styles.homelinkicon)}
+                ></i>
+              </h3>
+            </Link>
+            <p className="">{description}</p>
+
+            {content}
+          </HomeListWrapper>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const Gigi = () => {
+  return (
+    
+      <div className={styles.gigiwrapper}>
+        <div className={styles.gigiwrapperrelative}>
+          <img height="151px" width="256px" src="/img/gigi.svg" />
+          <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
+        </div>
+      </div>
+    
+  );
+};
+
 export default function Home() {
   const context = useDocusaurusContext();
-  const {siteConfig = {}} = context;
+  const { siteConfig = {} } = context;
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description="This site bundles ZITADELs Documentations">
-      <header className={clsx('hero', styles.heroBanner)}>
+      description="This site bundles ZITADELs Documentations"
+    >
+      <header className={clsx("hero", styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
           <div className={styles.buttons}>
             <Link
               className={clsx(
-                'button button--outline button--lg get-started',
-                styles.getStarted,
+                "button button--outline button--lg get-started",
+                styles.getStarted
               )}
-              to={useBaseUrl('docs/guides/basics/get-started')}>
+              to={useBaseUrl("docs/guides/start/quickstart")}
+            >
               Get Started
             </Link>
           </div>
         </div>
+        <Link to="https://zitadel.com">
+          <Gigi />
+        </Link>
       </header>
       <main>
         {features && features.length > 0 && (

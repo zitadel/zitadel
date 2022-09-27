@@ -4,6 +4,9 @@ Errors:
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
+  RemoveFailed: Konnte nicht gelöscht werden
+  ProjectionName:
+    Invalid: Ungültiger Projektionsname
   Assets:
     EmptyKey: Asset Key ist leer
     Store:
@@ -18,30 +21,51 @@ Errors:
       SetPublicFailed: Bucket konnte nicht auf public gesetzt werden
     Object:
       PutFailed: Objekt konnte nicht erstellt werden
-      GetFaieled: Objekt konnte nicht gelesen werden
+      GetFailed: Objekt konnte nicht gelesen werden
+      NotFound: Objekt konnte nicht gefunden werden
       PresignedTokenFailed: Signiertes Token konnte nicht erstellt werden
       ListFailed: Objektliste konnte nicht gelesen werden
       RemoveFailed: Objekt konnte nicht gelöscht werden
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
+  Language:
+    NotParsed: Sprache konnte nicht gemapped werde
+  OIDCSettings:
+    NotFound: OIDC Konfiguration konnte nicht gefunden werden
+    AlreadyExists: OIDC Konfiguration existiert bereits
+  SecretGenerator:
+    AlreadyExists: Passwort Generator existiert bereits
+    TypeMissing: Passwort Generator Typ fehlt
+    NotFound: Passwort Generator nicht gefunden
+  SMSConfig:
+    NotFound: SMS Konfiguration nicht gefunden
+    AlreadyActive: SMS Konfiguration ist bereits aktiviert
+    AlreadyDeactivated: SMS Konfiguration ist bereits deaktiviert
+  SMTPConfig:
+    NotFound: SMTP Konfiguration nicht gefunden
+    AlreadyExists: SMTP Konfiguration existiert bereits
+    SenderAdressNotCustomDomain: Die Sender Adresse muss als Custom Domain auf der Instanz registriert sein.
+  Notification:
+    NoDomain: Keine Domäne für Nachricht gefunden
   User:
     NotFound: Benutzer konnte nicht gefunden werden
-    AlreadyExists: Benutzer existierts bereits
+    AlreadyExists: Benutzer existiert bereits
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
     UserIDMissing: User ID fehlt
-    OrgIamPolicyNil: Organisations Policy ist leer
+    DomainPolicyNil: Organisation Policy ist leer
     EmailAsUsernameNotAllowed: Benutzername darf keine E-Mail Adresse sein
     Invalid: Benutzerdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     AlreadyInactive: Benutzer ist bereits deaktiviert
     NotInactive: Benutzer ist nicht inaktiv
+    CantDeactivateInitial: Benutzer mit dem Status initial kann nur gelöscht und nicht deaktiviert werden
     ShouldBeActiveOrInitial: Benutzer ist nicht aktiv oder initialisiert
     AlreadyInitialised: Benutzer ist bereits initialisiert
     NotInitialised: Benutzer ist noch nicht initialisiert
     NotLocked: Benutzer ist nicht gesperrt
     NoChanges: Keine Änderungen gefunden
-    InitCodeNotFound: Kein Initialisierungs Code gefunden
+    InitCodeNotFound: Kein Initialisierungs-Code gefunden
     UsernameNotChanged: Benutzername wurde nicht verändert
     Profile:
       NotFound: Profil nicht gefunden
@@ -53,26 +77,29 @@ Errors:
       AlreadyVerified: Email ist bereits verifiziert
       NotChanged: Email wurde nicht geändert
     Phone:
-      NotFound: Telfonnummer nicht gefunden
+      NotFound: Telefonnummer nicht gefunden
       Invalid: Telefonnummer ist ungültig
       AlreadyVerified: Telefonnummer bereits verifiziert
     Address:
-      NotFound: Addresse nicht gefunden
-      NotChanged: Addresse wurde nicht geändert
+      NotFound: Adresse nicht gefunden
+      NotChanged: Adresse wurde nicht geändert
     Machine:
       Key:
         NotFound: Maschinen Key nicht gefunden
+    PAT:
+      NotFound: Persönliches Access Token nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
     NotMachine: Der Benutzer muss technisch sein
+    WrongType: Für diesen Benutzertyp nicht erlaubt
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
     Username:
       AlreadyExists: Benutzername ist bereits vergeben
-      Reservied: Benutzername ist bereits vergeben
+      Reserved: Benutzername ist bereits vergeben
     Code:
       Empty: Code ist leer
       NotFound: Code konnte nicht gefunden werden
       Expired: Code ist abgelaufen
-      GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
+      GeneratorAlgNotSupported: Generator Algorithmus wird nicht unterstützt
     Password:
       NotFound: Password nicht gefunden
       Empty: Passwort ist leer
@@ -81,7 +108,7 @@ Errors:
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
-      MinLengthNotAllowed: Angegebene Mindestläng ist nicht erlaubt
+      MinLengthNotAllowed: Angegebene Mindestlänge ist nicht erlaubt
       HasLower: Passwort beinhaltet keinen Kleinbuchstaben
       HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
@@ -115,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token ist ungültig
       NotFound: Refresh Token nicht gefunden
+  Instance:
+    NotFound: Instanz konnte nicht gefunden werden
+    AlreadyExists: Instanz exisitiert bereits
+    NotChanged: Instanz wurde nicht verändert
   Org:
     AlreadyExists: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
@@ -145,15 +176,19 @@ Errors:
     IdpIsNotOIDC: IDP Konfiguration ist nicht vom Typ OIDC
     Domain:
       AlreadyExists: Domäne existiert bereits
+      InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
     LoginPolicy:
       NotFound: Login Policy konnte nicht gefunden werden
       Invalid: Login Policy ist ungültig
+      RedirectURIInvalid: Default Redirect URI ist ungültig
       NotExisting: Login Policy existiert nicht auf dieser Organisation
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+      RegistrationNotAllowed: Registrierung ist nicht erlaubt
+      UsernamePasswordNotAllowed: Login mit Username / Passwort nicht erlaubt
       MFA:
         AlreadyExists: Multifaktor existiert bereits
         NotExisting: Multifaktor existiert nicht
@@ -168,27 +203,27 @@ Errors:
       NotChanged: Default Message Text wurde nicht verändert
       AlreadyExists: Default Message Text existiert bereits
       Invalid: Default Message Text ist ungültig
-    PasswordComplexity:
-      NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
-      Empty: Passwort Komplexitäts Policy ist leer
-      NotExisting: Passwort Komplexitäts Policy existiert nicht
-      AlreadyExists: Passwort Komplexitäts Policy existiert bereits
-    PasswordLockout:
+    PasswordComplexityPolicy:
+      NotFound: Passwortkomplexität Policy konnte nicht gefunden werden
+      Empty: Passwortkomplexität Policy ist leer
+      NotExisting: Passwortkomplexität Policy existiert nicht
+      AlreadyExists: Passwortkomplexität Policy existiert bereits
+    PasswordLockoutPolicy:
       NotFound: Password Lockout Policy konnte nicht gefunden werden
       Empty: Passwort Lockout Policy ist leer
       NotExisting: Passwort Lockout Policy existiert nicht
       AlreadyExists: Passwort Lockout Policy existiert bereits
-    PasswordAge:
+    PasswordAgePolicy:
       NotFound: Password Age Policy konnte nicht gefunden werden
       Empty: Passwort Age Policy ist leer
       NotExisting: Passwort Age Policy existiert nicht
       AlreadyExists: Passwort Age Policy existiert bereits
-    OrgIAM:
+    OrgIAMPolicy:
       Empty: Org IAM Policy ist leer
       NotExisting: Org IAM Policy existiert nicht
       AlreadyExists: Org IAM Policy existiert bereits
   Project:
-    ProjectIDMissing: Project Id fehlt
+    ProjectIDMissing: Project ID fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
     OrgNotExisting: Organisation existiert nicht
     UserNotExisting: User existiert nicht
@@ -203,7 +238,7 @@ Errors:
       AlreadyExists: Member existiert bereits
       NotExisting: Member existiert nicht
       NotFound: Member konnte nicht gefunden werden
-    MinimumOneRoleNeeded: Es muss mindestend eine Rolle hinzugefügt werden
+    MinimumOneRoleNeeded: Es muss mindestens eine Rolle hinzugefügt werden
     Role:
       AlreadyExists: Rolle existiert bereits
       Invalid: Rolle ist ungültig
@@ -213,12 +248,17 @@ Errors:
       AlreadyExists: Applikation existiert bereits
       NotFound: Applikation nicht gefunden
       Invalid: Applikation ist ungültig
-      NotExisting: Applikation exisitert nicht
+      NotExisting: Applikation existiert nicht
       IsNotOIDC: Applikation ist nicht vom Typ OIDC
       IsNotAPI: Applikation ist nicht vom Typ API
+      IsNotSAML: Applikation ist nicht vom Typ SAML
       NotActive: Applikation ist nicht aktiv
       NotInactive: Applikation ist nickt inaktiv
       OIDCConfigInvalid: OIDC Konfiguration ist ungültig
+      SAMLConfigInvalid: SAML Konfiguration ist ungültig
+      SAMLMetadataMissing: SAML Metadata ist nicht vorhanden
+      SAMLMetadataFormat: SAML Metadata Formatfehler
+      SAMLEntityIDAlreadyExisting: SAML EntityID existiert bereits
       APIConfigInvalid: API Konfiguration ist ungültig
       OIDCAuthMethodNoSecret: Gewählte OIDC Auth Method benötigt kein Secret
       APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
@@ -233,16 +273,14 @@ Errors:
       HasNotExistingRole: Eine der Rollen existiert nicht auf dem Projekt
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
-    UserIDMisisng: User ID fehlt
   IAM:
+    NotFound: Instanz nicht gefunden
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig
     MemberAlreadyExisting: Member existiert bereits
     MemberNotExisting: Member existiert nicht
-    IDMissing: Id fehlt
-    GlobalOrgMissing: Globale Organisation fehlt
-    GlobalOrgAlreadySet: Globale Organisation wurde bereits gesetzt
+    IDMissing: ID fehlt
     IAMProjectIDMissing: IAM Project ID fehlt
     IamProjectAlreadySet: IAM Project ID wurde bereits gesetzt
     IdpInvalid: IDP Konfiguration ist ungültig
@@ -257,18 +295,19 @@ Errors:
       NotChanged: Default Login Policy wurde nicht verändert
       NotExisting: Default Login Policy existiert nicht
       AlreadyExists: Default Login Policy existiert bereits
+      RedirectURIInvalid: Default Redirect URI ist ungültig
       MFA:
         AlreadyExists: Multifaktor existiert bereits
         NotExisting: Multifaktor existiert nicht
         Unspecified: Multifaktor ungültig
       IDP:
-        AlreadyExists: Identitäts Provider existiert bereits
-        NotExisting: Identitäts Provider existiert nicht
-        Invalid: Idp Provider ist ungültig
+        AlreadyExists: Identitätsprovider existiert bereits
+        NotExisting: Identitätsprovider existiert nicht
+        Invalid: IDP ist ungültig
       IDPConfig:
-        AlreadyExists: Identitäts Provider Konfiguration existiert bereits
-        NotInactive: Identitäts Provider Konfiguration nicht inaktive
-        NotActive: Identitäts Provider Konfiguration nicht aktive
+        AlreadyExists: Identitätsprovider Konfiguration existiert bereits
+        NotInactive: Identitätsprovider Konfiguration nicht inaktive
+        NotActive: Identitätsprovider Konfiguration nicht aktive
     LabelPolicy:
       NotFound: Default Private Label Policy konnte nicht gefunden
       NotChanged: Default Private Label Policy wurde nicht verändert
@@ -300,7 +339,7 @@ Errors:
       AlreadyExists: Default Password Lockout Policy existiert bereits
       Empty: Default Password Lockout Policy leer
       NotChanged: Default Password Lockout Policy wurde nicht verändert
-    OrgIAMPolicy:
+    DomainPolicy:
       NotFound: Default Org IAM Policy konnte nicht gefunden werden
       NotExisting: Default Org IAM Policy existiert nicht
       AlreadyExists: Default Org IAM Policy existiert bereits
@@ -323,7 +362,7 @@ Errors:
     NotFound: Benutzer Berechtigung konnte nicht gefunden werden
     Invalid: Benutzer Berechtigung ist ungültig
     NotChanged: Benutzer Berechtigung wurde nicht verändert
-    IDMissing: Id fehlt
+    IDMissing: ID fehlt
     NotActive: Benutzer Berechtigung ist nicht aktiv
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
@@ -332,9 +371,10 @@ Errors:
     AlreadyExists: Member existiert bereits
   IDPConfig:
     AlreadyExists: IDP Konfiguration mit diesem Name existiert bereits
-    NotExisting: Identitäts Provider Konfiguration existiert nicht
+    NotExisting: Identitätsprovider Konfiguration existiert nicht
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
+    AuditRetention: Änderungsverlauf ist ausserhalb der Audit Log Retention
   Token:
     NotFound: Token konnte nicht gefunden werden
   UserSession:
@@ -350,8 +390,6 @@ Errors:
       AlreadyExists: Schritt gestartet existiert bereits
     Done:
       AlreadyExists: Schritt ausgeführt existiert bereits
-  Features:
-    NotChanged: Feature hat nicht geändert
   CustomText:
     AlreadyExists: Kundenspezifischer Text existiert bereits
     Invalid: Kundenspezifischer Text ist ungültig
@@ -360,7 +398,7 @@ Errors:
     ReadError: Übersetzungsdatei konnte nicht gelesen werden
     MergeError: Übersetzungsdatei konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
     NotFound: Übersetzungsdatei existiert nicht
-  MetaData:
+  Metadata:
     NotFound: Meta Daten konnten nicht gefunden werden
     NoData: Meta Daten Liste ist leer
     Invalid: Meta Daten sind ungültig
@@ -370,6 +408,7 @@ Errors:
     NotFound: Action wurde nicht gefunden
     NotActive: Action ist nicht aktiv
     NotInactive: Action ist nicht inaktiv
+    MaxAllowed: Keine weitere aktiven Actions mehr erlaubt
   Flow:
     FlowTypeMissing: FlowType fehlt
     Empty: Flow ist bereits leer
@@ -379,7 +418,7 @@ Errors:
   Query:
     CloseRows: SQL Statement konnte nicht abgeschlossen werden
     SQLStatement: SQL Statement konnte nicht erstellt werden
-    InvalidRequest: Anfage ist ungültig
+    InvalidRequest: Anfrage ist ungültig
 EventTypes:
   user:
     added: Benutzer hinzugefügt
@@ -387,7 +426,7 @@ EventTypes:
     initialization: 
       code:
         added: Initialisierungscode generiert
-        sent: Initialiseriungscode versendet
+        sent: Initialisierungscode versendet
       check:
         succeeded: Benutzerinitialisierung erfolgreich
         failed: Benutzerinitialisierung fehlgeschlagen
@@ -421,7 +460,7 @@ EventTypes:
       initialization: 
         code:
           added: Initialisierungscode generiert
-          sent: Initialiseriungscode versendet
+          sent: Initialisierungscode versendet
         check:
           succeeded: Benutzerinitialisierung erfolgreich
           failed: Benutzerinitialisierung fehlgeschlagen
@@ -501,12 +540,12 @@ EventTypes:
             changed: Prüfsumme des Tokens für Passwortlos Login wurde verändert
         initialization:
           code:
-            added: Passwortlos Initialisierungcode wurde hinzugefügt
-            sent: Passwortlos Initialisierungcode wurde versendet
-            requested: Passwortlos Initialisierungcode wurde angefordert
+            added: Passwortlos Initialisierungsode wurde hinzugefügt
+            sent: Passwortlos Initialisierungsode wurde versendet
+            requested: Passwortlos Initialisierungsode wurde angefordert
             check:
-              succeeded: Passwortlos Initialisierungcode wurde erfolgreich geprüft
-              failed: Passwortlos Initialisierungcode Überprüfung ist fehlgeschlagen
+              succeeded: Passwortlos Initialisierungsode wurde erfolgreich geprüft
+              failed: Passwortlos Initialisierungsode Überprüfung ist fehlgeschlagen
       signed:
         out: Benutzer erfolgreich abgemeldet
       refresh:
@@ -562,6 +601,10 @@ EventTypes:
       cascade:
         removed: Berechtigung entfernt
         changed: Berechtigung geändert
+      metadata:
+        set: Benutzer Metadaten gesetzt
+        removed: Benutzer Metadaten gelöscht
+        removed.all: Alle Benutzer Metadaten gelöscht
   org:
     added: Organisation hinzugefügt
     changed: Organisation geändert
@@ -579,9 +622,6 @@ EventTypes:
         set: Primäre Domäne gesetzt
       reserved: Domäne reserviert
       released: Domäne freigegeben
-    features:
-      set: Feature hinzugefügt
-      removed: Feature entfernt
     name:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben
@@ -620,7 +660,7 @@ EventTypes:
       login:
         added: Login Richtlinie hinzugefügt
         changed: Login Richtlinie geändert
-        removed: Login Richtline gelöscht
+        removed: Login Richtlinie gelöscht
         idpprovider:
           added: Idp Provider zu Login Richtlinie hinzugefügt
           removed: Idp Provider aus Login Richtlinie gelöscht
@@ -632,15 +672,15 @@ EventTypes:
           removed: Multifaktor aus Login Richtlinie gelöscht
       password:
         complexity:
-          added: Passwort Komplexitäts Richtlinie hinzugefügt
-          changed: Passwort Komplexitäts Richtlinie geändert
-          removed: Passwort Komplexitäts Richtlinie gelöscht
+          added: Passwortkomplexität Richtlinie hinzugefügt
+          changed: Passwortkomplexität Richtlinie geändert
+          removed: Passwortkomplexität Richtlinie gelöscht
         age:
           added: Passwort Alter Richtlinie hinzugefügt
           changed: Passwort Alter Richtlinie geändert
           removed: Passwort Alter Richtlinie gelöscht
         lockout:
-          added: Passwort Sperrungs Richtlinie hinzugefügt
+          added: Passwort sperrungs Richtlinie hinzugefügt
           changed: Passwort Sperrungs Richtlinie geändert
           removed: Passwort Sperrungs Richtlinie gelöscht
       label:
@@ -720,6 +760,9 @@ EventTypes:
           added: Applikations Schlüssel hinzugefügt
           removed: Applikations Schlüssel entfernt
       config:
+        saml:
+          added: SAML Konfiguration hinzugefügt
+          changed: SAML Konfiguration geändert
         oidc:
           added: OIDC Konfiguration hinzugefügt
           changed: OIDC Konfiguration geändert
@@ -733,8 +776,8 @@ EventTypes:
   policy:
     password:
       complexity:
-        added: Passwortkomplexitätsrichtline hinzugefügt
-        changed: Passwortkomplexitätsrichtline geändert
+        added: Passwortkomplexität Richtlinie hinzugefügt
+        changed: Passwortkomplexität Richtline geändert
       age:
         added: Passwortaltersrichtlinie hinzugefügt
         changed: Passwortaltersrichtlinie geändert
@@ -783,8 +826,8 @@ EventTypes:
           added: Idp Provider zu Default Login Policy hinzugefügt
           removed: Idp Provider aus Default Login Policy gelöscht
       label:
-        added: Label Richtline hinzugefügt
-        changed: Label Richtline geändert
+        added: Label Richtlinie hinzugefügt
+        changed: Label Richtlinie geändert
         activated: Label Richtline aktiviert
         logo:
           added: Logo zu Label Richtlinie hinzugefügt
@@ -803,6 +846,35 @@ EventTypes:
           removed: Schrift von Label Richtlinie entfernt
         assets:
           removed: Bilder und Schrift von Label Richtlinie entfernt
+    default:
+      language:
+        set: Standard Sprache gesetzt
+    oidc:
+      settings:
+        added: OIDC Konfiguration hinzugefügt
+        changed: OIDC Konfiguration geändert
+        removed: OIDC Konfiguration gelöscht
+    secret:
+      generator:
+        added: Passwort Generator hinzugefügt
+        changed: Passwort Generator geändert
+        removed: Passwort Generator gelöscht
+    smtp:
+      config:
+        added: SMTP Konfiguration hinzugefügt
+        changed: SMTP Konfiguration geändert
+        password:
+          changed: SMTP Konfigurations Passwort geändert
+    sms:
+      config:
+        twilio:
+          added: Twilio SMS Provider hinzugefügt
+          changed: Twilio SMS Provider geändert
+          token:
+            changed: Twilio SMS Provider Token geändert
+          removed: Twilio SMS Provider entfernt
+          activated: Twilio SMS Provider aktiviert
+          deactivated: Twilio SMS Provider deaktiviert
   key_pair:
     added: Schlüsselpaar hinzugefügt
   action:
@@ -811,8 +883,10 @@ EventTypes:
     deactivated: Aktion deaktiviert
     reactivated: Aktion reaktiviert
     removed: Aktion gelöscht
+
 Application:
   OIDC:
+    UnsupportedVersion: Deine OIDC Version wird nicht unterstützt
     V1:
       NotCompliant: Deine Konfiguration ist nicht konform und weicht vom OIDC 1.0 Standard ab.
       NoRedirectUris: Es muss mindestens eine Redirect URI erfasst sein.

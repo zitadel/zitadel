@@ -1,0 +1,23 @@
+<h1 mat-dialog-title>
+  <span>{{ 'APP.PAGES.DIALOG.CONFIG.TITLE' | translate }} {{ data?.number }}</span>
+</h1>
+<div mat-dialog-content>
+  <cnsl-auth-method-radio
+    [authMethods]="data.authMethods"
+    [selected]="data.initialAuthMethod"
+    [current]="data.currentAuthMethod"
+    [isOIDC]="data.isOIDC"
+    (selectedMethod)="authmethod = $event"
+    [compact]="true"
+  >
+  </cnsl-auth-method-radio>
+</div>
+<div mat-dialog-actions class="action">
+  <button color="primary" mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CLOSE' | translate }}
+  </button>
+
+  <button [disabled]="!authmethod" cdkFocusInitial color="primary" mat-raised-button (click)="closeDialogWithMethod()">
+    {{ 'ACTIONS.SELECT' | translate }}
+  </button>
+</div>

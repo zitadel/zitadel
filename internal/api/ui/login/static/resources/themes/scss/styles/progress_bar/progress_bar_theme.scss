@@ -1,0 +1,12 @@
+@import '../theming/theming';
+@import 'progress_bar';
+
+@mixin lgn-progress-bar-theme() {
+    @include lgn-progress-bar-color();
+}
+
+@mixin lgn-progress-bar-color() {
+    .lgn-progress-bar {
+      border-color: var(--zitadel-color-input-border);
+    }  
+}

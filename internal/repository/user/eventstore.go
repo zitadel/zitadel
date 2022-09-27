@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
@@ -42,6 +42,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(UserReactivatedType, UserReactivatedEventMapper).
 		RegisterFilterEventMapper(UserRemovedType, UserRemovedEventMapper).
 		RegisterFilterEventMapper(UserTokenAddedType, UserTokenAddedEventMapper).
+		RegisterFilterEventMapper(UserTokenRemovedType, UserTokenRemovedEventMapper).
 		RegisterFilterEventMapper(UserDomainClaimedType, DomainClaimedEventMapper).
 		RegisterFilterEventMapper(UserDomainClaimedSentType, DomainClaimedSentEventMapper).
 		RegisterFilterEventMapper(UserUserNameChangedType, UsernameChangedEventMapper).
@@ -60,10 +61,10 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanPasswordCodeSentType, HumanPasswordCodeSentEventMapper).
 		RegisterFilterEventMapper(HumanPasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
 		RegisterFilterEventMapper(HumanPasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
-		RegisterFilterEventMapper(HumanExternalIDPAddedType, HumanExternalIDPAddedEventMapper).
-		RegisterFilterEventMapper(HumanExternalIDPRemovedType, HumanExternalIDPRemovedEventMapper).
-		RegisterFilterEventMapper(HumanExternalIDPCascadeRemovedType, HumanExternalIDPCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(HumanExternalLoginCheckSucceededType, HumanExternalIDPCheckSucceededEventMapper).
+		RegisterFilterEventMapper(UserIDPLinkAddedType, UserIDPLinkAddedEventMapper).
+		RegisterFilterEventMapper(UserIDPLinkRemovedType, UserIDPLinkRemovedEventMapper).
+		RegisterFilterEventMapper(UserIDPLinkCascadeRemovedType, UserIDPLinkCascadeRemovedEventMapper).
+		RegisterFilterEventMapper(UserIDPLoginCheckSucceededType, UserIDPCheckSucceededEventMapper).
 		RegisterFilterEventMapper(HumanEmailChangedType, HumanEmailChangedEventMapper).
 		RegisterFilterEventMapper(HumanEmailVerifiedType, HumanEmailVerifiedEventMapper).
 		RegisterFilterEventMapper(HumanEmailVerificationFailedType, HumanEmailVerificationFailedEventMapper).
@@ -110,5 +111,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(MachineAddedEventType, MachineAddedEventMapper).
 		RegisterFilterEventMapper(MachineChangedEventType, MachineChangedEventMapper).
 		RegisterFilterEventMapper(MachineKeyAddedEventType, MachineKeyAddedEventMapper).
-		RegisterFilterEventMapper(MachineKeyRemovedEventType, MachineKeyRemovedEventMapper)
+		RegisterFilterEventMapper(MachineKeyRemovedEventType, MachineKeyRemovedEventMapper).
+		RegisterFilterEventMapper(PersonalAccessTokenAddedType, PersonalAccessTokenAddedEventMapper).
+		RegisterFilterEventMapper(PersonalAccessTokenRemovedType, PersonalAccessTokenRemovedEventMapper)
 }

@@ -4,13 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/handler"
-	"github.com/caos/zitadel/internal/id"
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
 
 var (
@@ -27,11 +26,13 @@ type StatementHandlerConfig struct {
 	MaxFailureCount   uint
 	BulkLimit         uint64
 
-	Reducers []handler.AggregateReducer
+	Reducers  []handler.AggregateReducer
+	InitCheck *handler.Check
 }
 
 type StatementHandler struct {
 	*handler.ProjectionHandler
+	Locker
 
 	client                  *sql.DB
 	sequenceTable           string
@@ -40,25 +41,17 @@ type StatementHandler struct {
 	maxFailureCount         uint
 	failureCountStmt        string
 	setFailureCountStmt     string
-	lockStmt                string
 
 	aggregates []eventstore.AggregateType
 	reduces    map[eventstore.EventType]handler.Reduce
 
-	workerName string
-	bulkLimit  uint64
+	bulkLimit uint64
 }
 
 func NewStatementHandler(
 	ctx context.Context,
 	config StatementHandlerConfig,
 ) StatementHandler {
-	workerName, err := os.Hostname()
-	if err != nil || workerName == "" {
-		workerName, err = id.SonyFlakeGenerator.Next()
-		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
-	}
-
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(config.Reducers))
 	reduces := make(map[eventstore.EventType]handler.Reduce, len(config.Reducers))
 	for _, aggReducer := range config.Reducers {
@@ -69,7 +62,6 @@ func NewStatementHandler(
 	}
 
 	h := StatementHandler{
-		ProjectionHandler:       handler.NewProjectionHandler(config.ProjectionHandlerConfig),
 		client:                  config.Client,
 		sequenceTable:           config.SequenceTable,
 		maxFailureCount:         config.MaxFailureCount,
@@ -77,126 +69,127 @@ func NewStatementHandler(
 		updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, config.SequenceTable),
 		failureCountStmt:        fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
 		setFailureCountStmt:     fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
-		lockStmt:                fmt.Sprintf(lockStmtFormat, config.LockTable),
 		aggregates:              aggregateTypes,
 		reduces:                 reduces,
-		workerName:              workerName,
 		bulkLimit:               config.BulkLimit,
+		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionName),
 	}
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock)
 
-	go h.ProjectionHandler.Process(
-		ctx,
-		h.reduce,
-		h.Update,
-		h.Lock,
-		h.Unlock,
-		h.SearchQuery,
-	)
+	err := h.Init(ctx, config.InitCheck)
+	logging.OnError(err).WithField("projection", config.ProjectionName).Fatal("unable to initialize projections")
 
-	h.ProjectionHandler.Handler.Subscribe(h.aggregates...)
+	h.Subscribe(h.aggregates...)
 
 	return h
 }
 
-func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64, error) {
-	sequences, err := h.currentSequences(h.client.Query)
+func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {
+	sequences, err := h.currentSequences(ctx, h.client.QueryContext, instanceIDs)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	queryBuilder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(h.bulkLimit)
+
 	for _, aggregateType := range h.aggregates {
-		queryBuilder.
-			AddQuery().
-			AggregateTypes(aggregateType).
-			SequenceGreater(sequences[aggregateType])
+		for _, instanceID := range instanceIDs {
+			var seq uint64
+			for _, sequence := range sequences[aggregateType] {
+				if sequence.instanceID == instanceID {
+					seq = sequence.sequence
+					break
+				}
+			}
+			queryBuilder.
+				AddQuery().
+				AggregateTypes(aggregateType).
+				SequenceGreater(seq).
+				InstanceID(instanceID)
+		}
 	}
 
 	return queryBuilder, h.bulkLimit, nil
 }
 
-//Update implements handler.Update
-func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (unexecutedStmts []*handler.Statement, err error) {
+// Update implements handler.Update
+func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (index int, err error) {
+	if len(stmts) == 0 {
+		return -1, nil
+	}
+	instanceIDs := make([]string, 0, len(stmts))
+	for _, stmt := range stmts {
+		instanceIDs = appendToInstanceIDs(instanceIDs, stmt.InstanceID)
+	}
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
-		return stmts, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
+		return -1, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
 	}
 
-	sequences, err := h.currentSequences(tx.Query)
+	sequences, err := h.currentSequences(ctx, tx.QueryContext, instanceIDs)
 	if err != nil {
 		tx.Rollback()
-		return stmts, err
+		return -1, err
 	}
 
 	//checks for events between create statement and current sequence
 	// because there could be events between current sequence and a creation event
 	// and we cannot check via stmt.PreviousSequence
 	if stmts[0].PreviousSequence == 0 {
-		previousStmts, err := h.fetchPreviousStmts(ctx, stmts[0].Sequence, sequences, reduce)
+		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].Sequence, stmts[0].InstanceID, sequences, reduce)
 		if err != nil {
 			tx.Rollback()
-			return stmts, err
+			return -1, err
 		}
 		stmts = append(previousStmts, stmts...)
 	}
 
-	lastSuccessfulIdx := h.executeStmts(tx, stmts, sequences)
+	lastSuccessfulIdx := h.executeStmts(tx, &stmts, sequences)
 
 	if lastSuccessfulIdx >= 0 {
 		err = h.updateCurrentSequences(tx, sequences)
 		if err != nil {
 			tx.Rollback()
-			return stmts, err
+			return -1, err
 		}
 	}
 
 	if err = tx.Commit(); err != nil {
-		return stmts, err
+		return -1, err
 	}
 
-	if lastSuccessfulIdx == -1 {
-		return stmts, handler.ErrSomeStmtsFailed
+	if lastSuccessfulIdx < len(stmts)-1 {
+		return lastSuccessfulIdx, handler.ErrSomeStmtsFailed
 	}
 
-	unexecutedStmts = make([]*handler.Statement, len(stmts)-(lastSuccessfulIdx+1))
-	copy(unexecutedStmts, stmts[lastSuccessfulIdx+1:])
-	stmts = nil
-
-	if len(unexecutedStmts) > 0 {
-		return unexecutedStmts, handler.ErrSomeStmtsFailed
-	}
-
-	return unexecutedStmts, nil
+	return lastSuccessfulIdx, nil
 }
 
-func (h *StatementHandler) fetchPreviousStmts(
-	ctx context.Context,
-	stmtSeq uint64,
-	sequences currentSequences,
-	reduce handler.Reduce,
-) (previousStmts []*handler.Statement, err error) {
-
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, stmtSeq uint64, instanceID string, sequences currentSequences, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
+	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).SetTx(tx)
 	queriesAdded := false
 	for _, aggregateType := range h.aggregates {
-		if stmtSeq <= sequences[aggregateType] {
-			continue
+		for _, sequence := range sequences[aggregateType] {
+			if stmtSeq <= sequence.sequence && instanceID == sequence.instanceID {
+				continue
+			}
+
+			query.
+				AddQuery().
+				AggregateTypes(aggregateType).
+				SequenceGreater(sequence.sequence).
+				SequenceLess(stmtSeq).
+				InstanceID(sequence.instanceID)
+
+			queriesAdded = true
 		}
-
-		query.
-			AddQuery().
-			AggregateTypes(aggregateType).
-			SequenceGreater(sequences[aggregateType]).
-			SequenceLess(stmtSeq)
-
-		queriesAdded = true
 	}
 
 	if !queriesAdded {
 		return nil, nil
 	}
 
-	events, err := h.Eventstore.FilterEvents(ctx, query)
+	events, err := h.Eventstore.Filter(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -213,22 +206,33 @@ func (h *StatementHandler) fetchPreviousStmts(
 
 func (h *StatementHandler) executeStmts(
 	tx *sql.Tx,
-	stmts []*handler.Statement,
+	stmts *[]*handler.Statement,
 	sequences currentSequences,
 ) int {
 
 	lastSuccessfulIdx := -1
-	for i, stmt := range stmts {
-		if stmt.Sequence <= sequences[stmt.AggregateType] {
-			continue
-		}
-		if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequences[stmt.AggregateType] {
-			logging.LogWithFields("CRDB-jJBJn", "projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "seq", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequences[stmt.AggregateType]).Warn("sequences do not match")
-			break
+stmts:
+	for i := 0; i < len(*stmts); i++ {
+		stmt := (*stmts)[i]
+		for _, sequence := range sequences[stmt.AggregateType] {
+			if stmt.Sequence <= sequence.sequence && stmt.InstanceID == sequence.instanceID {
+				logging.WithFields("statement", stmt, "currentSequence", sequence).Debug("statement dropped")
+				if i < len(*stmts)-1 {
+					copy((*stmts)[i:], (*stmts)[i+1:])
+				}
+				*stmts = (*stmts)[:len(*stmts)-1]
+				i--
+				continue stmts
+			}
+			if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequence.sequence && stmt.InstanceID == sequence.instanceID {
+				logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "sequence", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequence.sequence).Warn("sequences do not match")
+				break stmts
+			}
 		}
 		err := h.executeStmt(tx, stmt)
 		if err == nil {
-			sequences[stmt.AggregateType], lastSuccessfulIdx = stmt.Sequence, i
+			updateSequences(sequences, stmt)
+			lastSuccessfulIdx = i
 			continue
 		}
 
@@ -237,13 +241,15 @@ func (h *StatementHandler) executeStmts(
 			break
 		}
 
-		sequences[stmt.AggregateType], lastSuccessfulIdx = stmt.Sequence, i
+		updateSequences(sequences, stmt)
+		lastSuccessfulIdx = i
+		continue
 	}
 	return lastSuccessfulIdx
 }
 
-//executeStmt handles sql statements
-//an error is returned if the statement could not be inserted properly
+// executeStmt handles sql statements
+// an error is returned if the statement could not be inserted properly
 func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt *handler.Statement) error {
 	if stmt.IsNoop() {
 		return nil
@@ -265,4 +271,26 @@ func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt *handler.Statement) erro
 		return errors.ThrowInternal(err, "CRDB-qWgwT", "unable to release savepoint")
 	}
 	return nil
+}
+
+func updateSequences(sequences currentSequences, stmt *handler.Statement) {
+	for _, sequence := range sequences[stmt.AggregateType] {
+		if sequence.instanceID == stmt.InstanceID {
+			sequence.sequence = stmt.Sequence
+			return
+		}
+	}
+	sequences[stmt.AggregateType] = append(sequences[stmt.AggregateType], &instanceSequence{
+		instanceID: stmt.InstanceID,
+		sequence:   stmt.Sequence,
+	})
+}
+
+func appendToInstanceIDs(instances []string, id string) []string {
+	for _, instance := range instances {
+		if instance == id {
+			return instances
+		}
+	}
+	return append(instances, id)
 }

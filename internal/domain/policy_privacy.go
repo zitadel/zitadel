@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type PrivacyPolicy struct {
@@ -12,4 +12,5 @@ type PrivacyPolicy struct {
 
 	TOSLink     string
 	PrivacyLink string
+	HelpLink    string
 }

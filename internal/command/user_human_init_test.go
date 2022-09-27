@@ -9,25 +9,25 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func TestCommandSide_ResendInitialMail(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		secretGenerator crypto.Generator
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		email         string
-		resourceOwner string
+		ctx             context.Context
+		userID          string
+		email           string
+		resourceOwner   string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -150,13 +150,13 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
-				email:         "email@test.ch",
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				email:           "email@test.ch",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -208,12 +208,12 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -269,13 +269,13 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
-				email:         "email2@test.ch",
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				email:           "email2@test.ch",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -287,10 +287,9 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
-				initializeUserCode: tt.fields.secretGenerator,
+				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ResendInitialMail(tt.args.ctx, tt.args.userID, tt.args.email, tt.args.resourceOwner)
+			got, err := r.ResendInitialMail(tt.args.ctx, tt.args.userID, tt.args.email, tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -307,15 +306,15 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 func TestCommandSide_VerifyInitCode(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
-		secretGenerator crypto.Generator
 		userPasswordAlg crypto.HashAlgorithm
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		code          string
-		resourceOwner string
-		password      string
+		ctx             context.Context
+		userID          string
+		code            string
+		resourceOwner   string
+		password        string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -453,13 +452,13 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				code:          "test",
-				resourceOwner: "org1",
+				ctx:             context.Background(),
+				userID:          "user1",
+				code:            "test",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -513,13 +512,13 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				code:          "a",
-				resourceOwner: "org1",
+				ctx:             context.Background(),
+				userID:          "user1",
+				code:            "a",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -596,15 +595,15 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				code:          "a",
-				resourceOwner: "org1",
-				password:      "password",
+				ctx:             context.Background(),
+				userID:          "user1",
+				code:            "a",
+				resourceOwner:   "org1",
+				password:        "password",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -616,11 +615,10 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
-				initializeUserCode: tt.fields.secretGenerator,
-				userPasswordAlg:    tt.fields.userPasswordAlg,
+				eventstore:      tt.fields.eventstore,
+				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password)
+			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -3,10 +3,10 @@ package command
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type HumanWebAuthNWriteModel struct {
@@ -35,7 +35,7 @@ func NewHumanWebAuthNWriteModel(userID, webAuthNTokenID, resourceOwner string) *
 	}
 }
 
-func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanWebAuthNWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanWebAuthNAddedEvent:
@@ -160,7 +160,7 @@ func NewHumanU2FTokensReadModel(userID, resourceOwner string) *HumanU2FTokensRea
 	}
 }
 
-func (wm *HumanU2FTokensReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanU2FTokensReadModel) AppendEvents(events ...eventstore.Event) {
 	wm.WriteModel.AppendEvents(events...)
 }
 
@@ -243,7 +243,7 @@ func NewHumanPasswordlessTokensReadModel(userID, resourceOwner string) *HumanPas
 	}
 }
 
-func (wm *HumanPasswordlessTokensReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanPasswordlessTokensReadModel) AppendEvents(events ...eventstore.Event) {
 	wm.WriteModel.AppendEvents(events...)
 }
 
@@ -317,8 +317,7 @@ type HumanU2FLoginReadModel struct {
 	Challenge            string
 	AllowedCredentialIDs [][]byte
 	UserVerification     domain.UserVerificationRequirement
-	User
-	State domain.UserState
+	State                domain.UserState
 }
 
 func NewHumanU2FLoginReadModel(userID, authReqID, resourceOwner string) *HumanU2FLoginReadModel {
@@ -331,7 +330,7 @@ func NewHumanU2FLoginReadModel(userID, authReqID, resourceOwner string) *HumanU2
 	}
 }
 
-func (wm *HumanU2FLoginReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanU2FLoginReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanU2FBeginLoginEvent:
@@ -392,7 +391,7 @@ func NewHumanPasswordlessLoginReadModel(userID, authReqID, resourceOwner string)
 	}
 }
 
-func (wm *HumanPasswordlessLoginReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanPasswordlessLoginReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanPasswordlessBeginLoginEvent:
@@ -454,7 +453,7 @@ func NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner string
 	}
 }
 
-func (wm *HumanPasswordlessInitCodeWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanPasswordlessInitCodeWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanPasswordlessInitCodeAddedEvent:

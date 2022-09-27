@@ -1,0 +1,12 @@
+@import '../theming/theming';
+@import 'select';
+
+@mixin lgn-select-theme() {
+    @include lgn-select-color();
+}
+
+@mixin lgn-select-color() {
+    .lgn-select, select {
+        background-image: var(--zitadel-icon-select);
+    }
+}

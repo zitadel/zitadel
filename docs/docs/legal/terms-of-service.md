@@ -15,6 +15,7 @@ The terms of service (**"TOS"**) outlined in this document establish the most im
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
 * [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
+* [**Service Description**](cloud-service-description) - What service we offer under this agreement
 * [**Service Level Description**](service-level-description) - What service levels do we guarantee you
 * [**Support Service Descriptions**](support-services) - How we provide support services to you
 
@@ -27,7 +28,6 @@ The following policies complement the TOS. When accepting the TOS, you accept th
 This Agreement is extended with additional terms, in case your Subscription requires a Dedicated Instance. When you enter the Agreement with us, you accept these additional agreements.
 
 * [**Dedicated Instance Terms**](terms-of-service-dedicated) - How we provide our services for a dedicated instance
-* [**Annex to the Dedicated Instance Terms**](dedicated-instance-annex) - Describe differences of services and guarantees with different providers
 
 ### Alterations
 
@@ -61,9 +61,7 @@ The [Annex of the data processing agreement](data-processing-agreement#annex-reg
 
 We offer Support Services directly related to the use of our Services. The Description of Support Services is available as [Annex](support-services) to this document.
 
-Customers without a Subscription or a Subscription plan that does not include Support Services should post inquiries and issues regarding ZITADEL from customers to our [GitHub Discussions](https://github.com/caos/zitadel/discussions), whenever feasible.
-
-If you need support integrating or setting up ZITADEL, please contact our consulting team.
+Customers without a subscription can contact us via the official [communication channels](https://zitadel.com/contact).
 
 ### Limited influence
 
@@ -113,7 +111,7 @@ You will ensure that your vicarious agents, customers and third parties fulfill 
 
 ### Credit and payment
 
-Signup to our Services does not require you to open a payment account. However, a payment account is required for the purchase of our Subscriptions. The costs for the services you have purchased will be debited periodically and in advance from your payment account.
+Signup to our Services does not require you to open a payment account. However, a payment account is required for the purchase of our Subscriptions. The costs for the services you have purchased will be debited periodically from your payment account.
 
 ### Payment procedure
 
@@ -163,7 +161,7 @@ In the event of the termination of the contract, we reserve the right to irrevoc
 
 ## Data protection
 
-Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](privacy-policy) and [Data Processing Agreement](data-processing-agreement), or our [Trust Site](https://zitadel.ch/trust/) for more information about how we process and protect your data.
+Please consult the annex to this Framework Agreement, specifically our [Privacy Policy](privacy-policy) and [Data Processing Agreement](data-processing-agreement), or our [Trust Site](https://zitadel.com/trust/) for more information about how we process and protect your data.
 
 ## Liability
 
@@ -195,9 +193,9 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 ### Entry into force
 
-These TOS shall enter into force as of 16.06.2021.
+These TOS shall enter into force as of 15.07.2022.
 
-Last revised: July 20, 2021
+Last revised: June 14, 2022
 
 ### Amendments
 

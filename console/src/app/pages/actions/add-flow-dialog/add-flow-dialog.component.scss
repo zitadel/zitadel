@@ -1,0 +1,18 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.script {
+  min-height: 200px;
+}
+
+.action {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+}

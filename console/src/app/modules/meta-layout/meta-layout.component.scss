@@ -1,47 +1,23 @@
 .meta-wrapper {
   display: flex;
+  flex-direction: column;
   height: 100%;
-  overflow-x: hidden;
-  transition: all .3s cubic-bezier(.645, .045, .355, 1);
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  position: relative;
 
   .main-content {
     display: relative;
     width: 100%;
-    overflow-y: auto;
     padding-bottom: 2rem;
-
-    &.hidden {
-      flex-basis: 100%;
-    }
+    padding-right: 1rem;
+    min-width: 0;
   }
 
   .meta {
-    position: relative;
-    flex: 1 0 300px;
-    padding: 1rem;
-    max-width: 300px;
-
-    @media only screen and (min-width: 1500px) {
-      flex-basis: 400px;
-      max-width: 400px;
-    }
-
     .meta-content {
-      max-height: calc(100vh - 60px);
       display: flex;
       flex-direction: column;
-    }
-
-    &.hidden {
-      flex: 0 0 0 !important;
-      width: 0;
-      padding: 1px;
-
-      .hide {
-        transform: rotate(180deg);
-        visibility: visible;
-        opacity: 1;
-      }
+      flex-shrink: 1;
     }
 
     &::after {
@@ -51,27 +27,16 @@
       left: 0;
       height: 50%;
     }
+  }
 
-    .hide {
-      position: absolute;
-      left: -40px;
-      top: .5rem;
-      opacity: 0;
-      transition: all .3s ease-in-out;
+  @media only screen and (min-width: 1100px) {
+    flex-direction: row;
 
-      i {
-        font-size: 1.5rem;
-      }
-
-      &:hover {
-        visibility: visible;
-      }
-    }
-
-    &:hover {
-      .hide {
-        opacity: 1;
-      }
+    .meta {
+      padding: 1rem 0 1rem 1rem;
+      flex: 1 0 300px;
+      max-width: 300px;
+      min-width: 0;
     }
   }
 }

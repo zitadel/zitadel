@@ -1,14 +1,14 @@
 package idp
 
 import (
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	idp_pb "github.com/caos/zitadel/pkg/grpc/idp"
+	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/query"
+	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 )
 
-func IDPViewsToPb(idps []*iam_model.IDPConfigView) []*idp_pb.IDP {
+func IDPViewsToPb(idps []*query.IDP) []*idp_pb.IDP {
 	resp := make([]*idp_pb.IDP, len(idps))
 	for i, idp := range idps {
 		resp[i] = ModelIDPViewToPb(idp)
@@ -16,80 +16,80 @@ func IDPViewsToPb(idps []*iam_model.IDPConfigView) []*idp_pb.IDP {
 	return resp
 }
 
-func ModelIDPViewToPb(idp *iam_model.IDPConfigView) *idp_pb.IDP {
+func ModelIDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 	return &idp_pb.IDP{
-		Id:           idp.IDPConfigID,
+		Id:           idp.ID,
 		State:        ModelIDPStateToPb(idp.State),
 		Name:         idp.Name,
 		StylingType:  ModelIDPStylingTypeToPb(idp.StylingType),
 		AutoRegister: idp.AutoRegister,
-		Owner:        ModelIDPProviderTypeToPb(idp.IDPProviderType),
+		Owner:        ModelIDPProviderTypeToPb(idp.OwnerType),
 		Config:       ModelIDPViewToConfigPb(idp),
 		Details: obj_grpc.ToViewDetailsPb(
 			idp.Sequence,
 			idp.CreationDate,
 			idp.ChangeDate,
-			idp.AggregateID,
+			idp.ResourceOwner,
 		),
 	}
 }
 
-func IDPViewToPb(idp *domain.IDPConfigView) *idp_pb.IDP {
+func IDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 	mapped := &idp_pb.IDP{
-		Id:           idp.AggregateID,
+		Owner:        ownerTypeToPB(idp.OwnerType),
+		Id:           idp.ID,
 		State:        IDPStateToPb(idp.State),
 		Name:         idp.Name,
 		StylingType:  IDPStylingTypeToPb(idp.StylingType),
 		AutoRegister: idp.AutoRegister,
 		Config:       IDPViewToConfigPb(idp),
-		Details:      obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, idp.AggregateID),
+		Details:      obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, idp.ID),
 	}
 	return mapped
 }
 
-func ExternalIDPViewsToLoginPolicyLinkPb(links []*iam_model.IDPProviderView) []*idp_pb.IDPLoginPolicyLink {
+func IDPLoginPolicyLinksToPb(links []*query.IDPLoginPolicyLink) []*idp_pb.IDPLoginPolicyLink {
 	l := make([]*idp_pb.IDPLoginPolicyLink, len(links))
 	for i, link := range links {
-		l[i] = ExternalIDPViewToLoginPolicyLinkPb(link)
+		l[i] = IDPLoginPolicyLinkToPb(link)
 	}
 	return l
 }
 
-func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb.IDPLoginPolicyLink {
+func IDPLoginPolicyLinkToPb(link *query.IDPLoginPolicyLink) *idp_pb.IDPLoginPolicyLink {
 	return &idp_pb.IDPLoginPolicyLink{
-		IdpId:   link.IDPConfigID,
-		IdpName: link.Name,
-		IdpType: IDPTypeToPb(link.IDPConfigType),
+		IdpId:   link.IDPID,
+		IdpName: link.IDPName,
+		IdpType: IDPTypeToPb(link.IDPType),
 	}
 }
 
-func IDPsToUserLinkPb(res []*user_model.ExternalIDPView) []*idp_pb.IDPUserLink {
+func IDPUserLinksToPb(res []*query.IDPUserLink) []*idp_pb.IDPUserLink {
 	links := make([]*idp_pb.IDPUserLink, len(res))
 	for i, link := range res {
-		links[i] = ExternalIDPViewToUserLinkPb(link)
+		links[i] = IDPUserLinkToPb(link)
 	}
 	return links
 }
 
-func ExternalIDPViewToUserLinkPb(link *user_model.ExternalIDPView) *idp_pb.IDPUserLink {
+func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 	return &idp_pb.IDPUserLink{
 		UserId:           link.UserID,
-		IdpId:            link.IDPConfigID,
+		IdpId:            link.IDPID,
 		IdpName:          link.IDPName,
-		ProvidedUserId:   link.ExternalUserID,
-		ProvidedUserName: link.UserDisplayName,
-		//TODO: as soon as saml is implemented we need to switch here
-		//IdpType: IDPTypeToPb(link.Type),
+		ProvidedUserId:   link.ProvidedUserID,
+		ProvidedUserName: link.ProvidedUsername,
+		IdpType:          IDPTypeToPb(link.IDPType),
 	}
 }
 
-func IDPTypeToPb(idpType iam_model.IdpConfigType) idp_pb.IDPType {
+func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
 	switch idpType {
-	case iam_model.IDPConfigTypeOIDC:
+	case domain.IDPConfigTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	case iam_model.IDPConfigTypeSAML:
+	case domain.IDPConfigTypeSAML:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
-	case iam_model.IDPConfigTypeJWT:
+	case domain.IDPConfigTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
@@ -107,11 +107,11 @@ func IDPStateToPb(state domain.IDPConfigState) idp_pb.IDPState {
 	}
 }
 
-func ModelIDPStateToPb(state iam_model.IDPConfigState) idp_pb.IDPState {
+func ModelIDPStateToPb(state domain.IDPConfigState) idp_pb.IDPState {
 	switch state {
-	case iam_model.IDPConfigStateActive:
+	case domain.IDPConfigStateActive:
 		return idp_pb.IDPState_IDP_STATE_ACTIVE
-	case iam_model.IDPConfigStateInactive:
+	case domain.IDPConfigStateInactive:
 		return idp_pb.IDPState_IDP_STATE_INACTIVE
 	default:
 		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
@@ -127,9 +127,9 @@ func IDPStylingTypeToDomain(stylingType idp_pb.IDPStylingType) domain.IDPConfigS
 	}
 }
 
-func ModelIDPStylingTypeToPb(stylingType iam_model.IDPStylingType) idp_pb.IDPStylingType {
+func ModelIDPStylingTypeToPb(stylingType domain.IDPConfigStylingType) idp_pb.IDPStylingType {
 	switch stylingType {
-	case iam_model.IDPStylingTypeGoogle:
+	case domain.IDPConfigStylingTypeGoogle:
 		return idp_pb.IDPStylingType_STYLING_TYPE_GOOGLE
 	default:
 		return idp_pb.IDPStylingType_STYLING_TYPE_UNSPECIFIED
@@ -145,65 +145,63 @@ func IDPStylingTypeToPb(stylingType domain.IDPConfigStylingType) idp_pb.IDPStyli
 	}
 }
 
-func ModelIDPViewToConfigPb(config *iam_model.IDPConfigView) idp_pb.IDPConfig {
-	if config.IsOIDC {
+func ModelIDPViewToConfigPb(config *query.IDP) idp_pb.IDPConfig {
+	if config.OIDCIDP != nil {
 		return &idp_pb.IDP_OidcConfig{
 			OidcConfig: &idp_pb.OIDCConfig{
-				ClientId:           config.OIDCClientID,
-				Issuer:             config.OIDCIssuer,
-				Scopes:             config.OIDCScopes,
-				DisplayNameMapping: ModelMappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-				UsernameMapping:    ModelMappingFieldToPb(config.OIDCUsernameMapping),
+				ClientId:           config.ClientID,
+				Issuer:             config.OIDCIDP.Issuer,
+				Scopes:             config.Scopes,
+				DisplayNameMapping: ModelMappingFieldToPb(config.DisplayNameMapping),
+				UsernameMapping:    ModelMappingFieldToPb(config.UsernameMapping),
 			},
 		}
 	}
 	return &idp_pb.IDP_JwtConfig{
 		JwtConfig: &idp_pb.JWTConfig{
-			JwtEndpoint:  config.JWTEndpoint,
-			Issuer:       config.JWTIssuer,
-			KeysEndpoint: config.JWTKeysEndpoint,
-			HeaderName:   config.JWTHeaderName,
+			JwtEndpoint:  config.Endpoint,
+			Issuer:       config.JWTIDP.Issuer,
+			KeysEndpoint: config.KeysEndpoint,
+			HeaderName:   config.HeaderName,
 		},
 	}
 }
 
-func IDPViewToConfigPb(config *domain.IDPConfigView) idp_pb.IDPConfig {
-	if config.IsOIDC {
+func IDPViewToConfigPb(config *query.IDP) idp_pb.IDPConfig {
+	if config.OIDCIDP != nil {
 		return &idp_pb.IDP_OidcConfig{
 			OidcConfig: &idp_pb.OIDCConfig{
-				ClientId:           config.OIDCClientID,
-				Issuer:             config.OIDCIssuer,
-				Scopes:             config.OIDCScopes,
-				DisplayNameMapping: MappingFieldToPb(config.OIDCIDPDisplayNameMapping),
-				UsernameMapping:    MappingFieldToPb(config.OIDCUsernameMapping),
+				ClientId:           config.ClientID,
+				Issuer:             config.OIDCIDP.Issuer,
+				Scopes:             config.Scopes,
+				DisplayNameMapping: MappingFieldToPb(config.DisplayNameMapping),
+				UsernameMapping:    MappingFieldToPb(config.UsernameMapping),
 			},
 		}
 	}
 	return &idp_pb.IDP_JwtConfig{
 		JwtConfig: &idp_pb.JWTConfig{
-			JwtEndpoint:  config.JWTEndpoint,
-			Issuer:       config.JWTIssuer,
-			KeysEndpoint: config.JWTKeysEndpoint,
+			JwtEndpoint:  config.JWTIDP.Endpoint,
+			Issuer:       config.JWTIDP.Issuer,
+			KeysEndpoint: config.JWTIDP.KeysEndpoint,
 		},
 	}
 }
 
-func FieldNameToModel(fieldName idp_pb.IDPFieldName) iam_model.IDPConfigSearchKey {
+func FieldNameToModel(fieldName idp_pb.IDPFieldName) query.Column {
 	switch fieldName {
-	// case admin.IdpSearchKey_IDPSEARCHKEY_IDP_CONFIG_ID: //TODO: not implemented in proto
-	// 	return iam_model.IDPConfigSearchKeyIdpConfigID
 	case idp_pb.IDPFieldName_IDP_FIELD_NAME_NAME:
-		return iam_model.IDPConfigSearchKeyName
+		return query.IDPNameCol
 	default:
-		return iam_model.IDPConfigSearchKeyUnspecified
+		return query.Column{}
 	}
 }
 
-func ModelMappingFieldToPb(mappingField iam_model.OIDCMappingField) idp_pb.OIDCMappingField {
+func ModelMappingFieldToPb(mappingField domain.OIDCMappingField) idp_pb.OIDCMappingField {
 	switch mappingField {
-	case iam_model.OIDCMappingFieldEmail:
+	case domain.OIDCMappingFieldEmail:
 		return idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_EMAIL
-	case iam_model.OIDCMappingFieldPreferredLoginName:
+	case domain.OIDCMappingFieldPreferredLoginName:
 		return idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_PREFERRED_USERNAME
 	default:
 		return idp_pb.OIDCMappingField_OIDC_MAPPING_FIELD_UNSPECIFIED
@@ -232,11 +230,11 @@ func MappingFieldToDomain(mappingField idp_pb.OIDCMappingField) domain.OIDCMappi
 	}
 }
 
-func ModelIDPProviderTypeToPb(typ iam_model.IDPProviderType) idp_pb.IDPOwnerType {
+func ModelIDPProviderTypeToPb(typ domain.IdentityProviderType) idp_pb.IDPOwnerType {
 	switch typ {
-	case iam_model.IDPProviderTypeOrg:
+	case domain.IdentityProviderTypeOrg:
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG
-	case iam_model.IDPProviderTypeSystem:
+	case domain.IdentityProviderTypeSystem:
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
 	default:
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
@@ -286,5 +284,15 @@ func IDPOwnerTypeQueryToModel(query *idp_pb.IDPOwnerTypeQuery) *iam_model.IDPCon
 		Key:    iam_model.IDPConfigSearchKeyIdpProviderType,
 		Method: domain.SearchMethodEquals,
 		Value:  IDPProviderTypeModelFromPb(query.OwnerType),
+	}
+}
+func ownerTypeToPB(typ domain.IdentityProviderType) idp_pb.IDPOwnerType {
+	switch typ {
+	case domain.IdentityProviderTypeOrg:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG
+	case domain.IdentityProviderTypeSystem:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
+	default:
+		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
 	}
 }

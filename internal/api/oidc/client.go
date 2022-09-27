@@ -5,21 +5,17 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/caos/oidc/pkg/oidc"
-	"github.com/caos/oidc/pkg/op"
-	"golang.org/x/text/language"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v2/pkg/op"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/auth_request/model"
-	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
-	proj_model "github.com/caos/zitadel/internal/project/model"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -36,22 +32,32 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	client, err := o.repo.ApplicationByClientID(ctx, id)
+	client, err := o.query.AppByOIDCClientID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	if client.State != proj_model.AppStateActive {
+	if client.State != domain.AppStateActive {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
-	projectRoles, err := o.repo.ProjectRolesByProjectID(client.ProjectID)
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(client.ProjectID)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
+	}
+	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
-	allowedScopes := make([]string, len(projectRoles))
-	for i, role := range projectRoles {
+	allowedScopes := make([]string, len(projectRoles.ProjectRoles))
+	for i, role := range projectRoles.ProjectRoles {
 		allowedScopes[i] = ScopeProjectRolePrefix + role.Key
 	}
-	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, allowedScopes)
+
+	accessTokenLifetime, idTokenLifetime, _, _, err := o.getOIDCSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return ClientFromBusiness(client, o.defaultLoginURL, accessTokenLifetime, idTokenLifetime, allowedScopes)
 }
 
 func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
@@ -61,38 +67,42 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	key, err := o.repo.MachineKeyByID(ctx, keyID)
+	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer)
 	if err != nil {
 		return nil, err
 	}
-	if key.AuthIdentifier != issuer {
-		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
-	}
-	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
+	publicKey, err := crypto.BytesToPublicKey(publicKeyData)
 	if err != nil {
 		return nil, err
 	}
 	return &jose.JSONWebKey{
-		KeyID: key.ID,
+		KeyID: keyID,
 		Use:   "sig",
 		Key:   publicKey,
 	}, nil
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
-	user, err := o.repo.UserByID(ctx, subject)
+	user, err := o.query.GetUserByID(ctx, true, subject)
 	if err != nil {
 		return nil, err
 	}
 	for i := len(scopes) - 1; i >= 0; i-- {
 		scope := scopes[i]
-		if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
+		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 			var orgID string
-			org, err := o.query.OrgByDomainGlobal(ctx, strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
+			org, err := o.query.OrgByDomainGlobal(ctx, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 			if err == nil {
 				orgID = org.ID
 			}
 			if orgID != user.ResourceOwner {
+				scopes[i] = scopes[len(scopes)-1]
+				scopes[len(scopes)-1] = ""
+				scopes = scopes[:len(scopes)-1]
+			}
+		}
+		if strings.HasPrefix(scope, domain.OrgIDScope) {
+			if strings.TrimPrefix(scope, domain.OrgIDScope) != user.ResourceOwner {
 				scopes[i] = scopes[len(scopes)-1]
 				scopes[len(scopes)-1] = ""
 				scopes = scopes[:len(scopes)-1]
@@ -109,32 +119,93 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})
-	return o.repo.AuthorizeClientIDSecret(ctx, id, secret)
+	app, err := o.query.AppByClientID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if app.OIDCConfig != nil {
+		return o.command.VerifyOIDCClientSecret(ctx, app.ProjectID, app.ID, secret)
+	}
+	return o.command.VerifyAPIClientSecret(ctx, app.ProjectID, app.ID, secret)
 }
 
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.UserInfoSetter, tokenID, subject, origin string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
+	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
-		app, err := o.repo.ApplicationByClientID(ctx, token.ApplicationID)
+		app, err := o.query.AppByOIDCClientID(ctx, token.ApplicationID)
 		if err != nil {
 			return err
 		}
-		if origin != "" && !http.IsOriginAllowed(app.OriginAllowList, origin) {
+		if origin != "" && !http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
 			return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 		}
 	}
-	return o.SetUserinfoFromScopes(ctx, userInfo, token.UserID, token.ApplicationID, token.Scopes)
+	return o.setUserinfo(ctx, userInfo, token.UserID, token.ApplicationID, token.Scopes)
 }
 
 func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := o.repo.UserByID(ctx, userID)
+	if applicationID != "" {
+		app, err := o.query.AppByOIDCClientID(ctx, applicationID)
+		if err != nil {
+			return err
+		}
+		if app.OIDCConfig.AssertIDTokenRole {
+			scopes, err = o.assertProjectRoleScopes(ctx, applicationID, scopes)
+			if err != nil {
+				return errors.ThrowPreconditionFailed(err, "OIDC-Dfe2s", "Errors.Internal")
+			}
+		}
+	}
+	return o.setUserinfo(ctx, userInfo, userID, applicationID, scopes)
+}
+
+func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
+	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+	}
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+	}
+	if token.IsPAT {
+		err = o.assertClientScopesForPAT(ctx, token, clientID)
+		if err != nil {
+			return errors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
+		}
+	}
+	for _, aud := range token.Audience {
+		if aud == clientID || aud == projectID {
+			err := o.setUserinfo(ctx, introspection, token.UserID, clientID, token.Scopes)
+			if err != nil {
+				return err
+			}
+			introspection.SetScopes(token.Scopes)
+			introspection.SetClientID(token.ApplicationID)
+			introspection.SetTokenType(oidc.BearerToken)
+			introspection.SetExpiration(token.Expiration)
+			introspection.SetIssuedAt(token.CreationDate)
+			introspection.SetNotBefore(token.CreationDate)
+			introspection.SetAudience(token.Audience)
+			introspection.SetIssuer(op.IssuerFromContext(ctx))
+			introspection.SetJWTID(token.ID)
+			return nil
+		}
+	}
+	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+}
+
+func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return err
 	}
@@ -144,38 +215,31 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 		case oidc.ScopeOpenID:
 			userInfo.SetSubject(user.ID)
 		case oidc.ScopeEmail:
-			if user.HumanView == nil {
+			if user.Human == nil {
 				continue
 			}
-			userInfo.SetEmail(user.Email, user.IsEmailVerified)
+			userInfo.SetEmail(user.Human.Email, user.Human.IsEmailVerified)
 		case oidc.ScopeProfile:
 			userInfo.SetPreferredUsername(user.PreferredLoginName)
 			userInfo.SetUpdatedAt(user.ChangeDate)
-			if user.HumanView != nil {
-				userInfo.SetName(user.DisplayName)
-				userInfo.SetFamilyName(user.LastName)
-				userInfo.SetGivenName(user.FirstName)
-				userInfo.SetNickname(user.NickName)
-				userInfo.SetGender(oidc.Gender(getGender(user.Gender)))
-				locale, _ := language.Parse(user.PreferredLanguage)
-				userInfo.SetLocale(locale)
-				userInfo.SetPicture(user.AvatarURL)
+			if user.Human != nil {
+				userInfo.SetName(user.Human.DisplayName)
+				userInfo.SetFamilyName(user.Human.LastName)
+				userInfo.SetGivenName(user.Human.FirstName)
+				userInfo.SetNickname(user.Human.NickName)
+				userInfo.SetGender(getGender(user.Human.Gender))
+				userInfo.SetLocale(user.Human.PreferredLanguage)
+				userInfo.SetPicture(domain.AvatarURL(o.assetAPIPrefix(ctx), user.ResourceOwner, user.Human.AvatarKey))
 			} else {
-				userInfo.SetName(user.MachineView.Name)
+				userInfo.SetName(user.Machine.Name)
 			}
 		case oidc.ScopePhone:
-			if user.HumanView == nil {
+			if user.Human == nil {
 				continue
 			}
-			userInfo.SetPhone(user.Phone, user.IsPhoneVerified)
+			userInfo.SetPhone(user.Human.Phone, user.Human.IsPhoneVerified)
 		case oidc.ScopeAddress:
-			if user.HumanView == nil {
-				continue
-			}
-			if user.StreetAddress == "" && user.Locality == "" && user.Region == "" && user.PostalCode == "" && user.Country == "" {
-				continue
-			}
-			userInfo.SetAddress(oidc.NewUserInfoAddress(user.StreetAddress, user.Locality, user.Region, user.PostalCode, user.Country, ""))
+			//TODO: handle address for human users as soon as implemented
 		case ScopeUserMetaData:
 			userMetaData, err := o.assertUserMetaData(ctx, userID)
 			if err != nil {
@@ -197,8 +261,18 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 			}
-			if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
-				userInfo.AppendClaims(model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
+			if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+				userInfo.AppendClaims(domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
+			}
+			if strings.HasPrefix(scope, domain.OrgIDScope) {
+				userInfo.AppendClaims(domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
+				resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+				if err != nil {
+					return err
+				}
+				for claim, value := range resourceOwnerClaims {
+					userInfo.AppendClaims(claim, value)
+				}
 			}
 		}
 	}
@@ -213,29 +287,6 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
 	return nil
-}
-
-func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
-	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
-	}
-	app, err := o.repo.ApplicationByClientID(ctx, clientID)
-	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
-	}
-	for _, aud := range token.Audience {
-		if aud == clientID || aud == app.ProjectID {
-			err := o.SetUserinfoFromScopes(ctx, introspection, token.UserID, clientID, token.Scopes)
-			if err != nil {
-				return err
-			}
-			introspection.SetScopes(token.Scopes)
-			introspection.SetClientID(token.ApplicationID)
-			return nil
-		}
-	}
-	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }
 
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
@@ -261,8 +312,19 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
-		} else if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
-			claims = appendClaim(claims, model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
+		}
+		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+			claims = appendClaim(claims, domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
+		}
+		if strings.HasPrefix(scope, domain.OrgIDScope) {
+			claims = appendClaim(claims, domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
+			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			for claim, value := range resourceOwnerClaims {
+				claims = appendClaim(claims, claim, value)
+			}
 		}
 	}
 	if len(roles) == 0 || clientID == "" {
@@ -279,17 +341,27 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
-	app, err := o.repo.ApplicationByClientID(ctx, applicationID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}
-	grants, err := o.repo.UserGrantsByProjectAndUserID(app.ProjectID, userID)
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	userIDQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery, userIDQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
 	projectRoles := make(map[string]map[string]string)
 	for _, requestedRole := range requestedRoles {
-		for _, grant := range grants {
+		for _, grant := range grants.UserGrants {
 			checkGrantedRoles(projectRoles, grant, requestedRole)
 		}
 	}
@@ -297,24 +369,24 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
-	metaData, err := o.repo.SearchUserMetadata(ctx, userID)
+	metaData, err := o.query.SearchUserMetadata(ctx, true, userID, &query.UserMetadataSearchQueries{})
 	if err != nil {
 		return nil, err
 	}
 
 	userMetaData := make(map[string]string)
-	for _, md := range metaData.Result {
+	for _, md := range metaData.Metadata {
 		userMetaData[md.Key] = base64.RawURLEncoding.EncodeToString(md.Value)
 	}
 	return userMetaData, nil
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	user, err := o.repo.UserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return nil, err
 	}
-	resourceOwner, err := o.query.OrgByID(ctx, user.ResourceOwner)
+	resourceOwner, err := o.query.OrgByID(ctx, true, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -325,8 +397,8 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 	}, nil
 }
 
-func checkGrantedRoles(roles map[string]map[string]string, grant *grant_model.UserGrantView, requestedRole string) {
-	for _, grantedRole := range grant.RoleKeys {
+func checkGrantedRoles(roles map[string]map[string]string, grant *query.UserGrant, requestedRole string) {
+	for _, grantedRole := range grant.Roles {
 		if requestedRole == grantedRole {
 			appendRole(roles, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain)
 		}
@@ -340,13 +412,13 @@ func appendRole(roles map[string]map[string]string, role, orgID, orgPrimaryDomai
 	roles[role][orgID] = orgPrimaryDomain
 }
 
-func getGender(gender user_model.Gender) string {
+func getGender(gender domain.Gender) oidc.Gender {
 	switch gender {
-	case user_model.GenderFemale:
+	case domain.GenderFemale:
 		return "female"
-	case user_model.GenderMale:
+	case domain.GenderMale:
 		return "male"
-	case user_model.GenderDiverse:
+	case domain.GenderDiverse:
 		return "diverse"
 	}
 	return ""

@@ -1,9 +1,9 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/metadata"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/metadata"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 type UserMetadataWriteModel struct {
@@ -22,7 +22,7 @@ func NewUserMetadataWriteModel(userID, resourceOwner, key string) *UserMetadataW
 	}
 }
 
-func (wm *UserMetadataWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserMetadataWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.MetadataSetEvent:
@@ -68,7 +68,7 @@ func NewUserMetadataListWriteModel(userID, resourceOwner string) *UserMetadataLi
 	}
 }
 
-func (wm *UserMetadataListWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserMetadataListWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.MetadataSetEvent:
@@ -112,7 +112,7 @@ func NewUserMetadataByOrgListWriteModel(resourceOwner string) *UserMetadataByOrg
 	}
 }
 
-func (wm *UserMetadataByOrgListWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserMetadataByOrgListWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.MetadataSetEvent:

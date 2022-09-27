@@ -1,10 +1,10 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 type ProjectGrantWriteModel struct {
@@ -26,7 +26,7 @@ func NewProjectGrantWriteModel(grantID, projectID, resourceOwner string) *Projec
 	}
 }
 
-func (wm *ProjectGrantWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ProjectGrantWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:

@@ -2,6 +2,7 @@ import { PlatformLocation } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthConfig } from 'angular-oauth2-oidc';
 
 import { AdminServiceClient } from '../proto/generated/zitadel/AdminServiceClientPb';
@@ -27,35 +28,37 @@ export class GrpcService {
     private authenticationService: AuthenticationService,
     private storageService: StorageService,
     private dialog: MatDialog,
-  ) { }
+    private translate: TranslateService,
+  ) {}
 
   public async loadAppEnvironment(): Promise<any> {
-    return this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
-        if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
+    return this.http
+      .get('./assets/environment.json')
+      .toPromise()
+      .then((data: any) => {
+        if (data && data.api && data.issuer) {
           const interceptors = {
             unaryInterceptors: [
               new OrgInterceptor(this.storageService),
               new AuthInterceptor(this.authenticationService, this.storageService, this.dialog),
-              new I18nInterceptor(),
+              new I18nInterceptor(this.translate),
             ],
           };
 
           this.auth = new AuthServiceClient(
-            data.authServiceUrl,
+            data.api,
             null,
             // @ts-ignore
             interceptors,
           );
           this.mgmt = new ManagementServiceClient(
-            data.mgmtServiceUrl,
+            data.api,
             null,
             // @ts-ignore
             interceptors,
           );
           this.admin = new AdminServiceClient(
-            // TODO: replace with service url
-            data.mgmtServiceUrl,
+            data.api,
             null,
             // @ts-ignore
             interceptors,
@@ -69,12 +72,14 @@ export class GrpcService {
             issuer: data.issuer,
             redirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'auth/callback',
             postLogoutRedirectUri: window.location.origin + this.platformLocation.getBaseHrefFromDOM() + 'signedout',
+            requireHttps: false,
           };
 
           this.authenticationService.initConfig(authConfig);
         }
         return Promise.resolve(data);
-      }).catch(() => {
+      })
+      .catch(() => {
         console.error('Failed to load environment from assets');
       });
   }

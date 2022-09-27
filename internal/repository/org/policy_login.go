@@ -2,11 +2,13 @@ package org
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore"
+	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/eventstore"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
 var (
@@ -26,8 +28,15 @@ func NewLoginPolicyAddedEvent(
 	allowRegister,
 	allowExternalIDP,
 	forceMFA,
-	hidePasswordReset bool,
+	hidePasswordReset,
+	ignoreUnknownUsernames bool,
 	passwordlessType domain.PasswordlessType,
+	defaultRedirectURI string,
+	passwordCheckLifetime,
+	externalLoginCheckLifetime,
+	mfaInitSkipLifetime,
+	secondFactorCheckLifetime,
+	multiFactorCheckLifetime time.Duration,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
 		LoginPolicyAddedEvent: *policy.NewLoginPolicyAddedEvent(
@@ -40,11 +49,18 @@ func NewLoginPolicyAddedEvent(
 			allowExternalIDP,
 			forceMFA,
 			hidePasswordReset,
-			passwordlessType),
+			ignoreUnknownUsernames,
+			passwordlessType,
+			defaultRedirectURI,
+			passwordCheckLifetime,
+			externalLoginCheckLifetime,
+			mfaInitSkipLifetime,
+			secondFactorCheckLifetime,
+			multiFactorCheckLifetime),
 	}
 }
 
-func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.LoginPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -75,7 +91,7 @@ func NewLoginPolicyChangedEvent(
 	return &LoginPolicyChangedEvent{LoginPolicyChangedEvent: *changedEvent}, nil
 }
 
-func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.LoginPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -102,7 +118,7 @@ func NewLoginPolicyRemovedEvent(
 	}
 }
 
-func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.LoginPolicyRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

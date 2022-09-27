@@ -1,0 +1,14 @@
+<div class="max-width-container">
+  <div class="project-roles-wrapper">
+    <h1>{{ 'PROJECT.ROLE.TITLE' | translate }}</h1>
+    <p class="desc cnsl-secondary-text">{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}</p>
+
+    <cnsl-project-roles-table
+      class="project-roles"
+      [disabled]="(['project.role.write$', 'project.role.write:' + projectId] | hasRole | async) === false"
+      [actionsVisible]="true"
+      [projectId]="projectId"
+    >
+    </cnsl-project-roles-table>
+  </div>
+</div>

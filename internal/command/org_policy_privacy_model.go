@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/policy"
 )
 
 type OrgPrivacyPolicyWriteModel struct {
@@ -24,7 +24,7 @@ func NewOrgPrivacyPolicyWriteModel(orgID string) *OrgPrivacyPolicyWriteModel {
 	}
 }
 
-func (wm *OrgPrivacyPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgPrivacyPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.PrivacyPolicyAddedEvent:
@@ -57,7 +57,8 @@ func (wm *OrgPrivacyPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tosLink,
-	privacyLink string,
+	privacyLink,
+	helpLink string,
 ) (*org.PrivacyPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PrivacyPolicyChanges, 0)
@@ -66,6 +67,9 @@ func (wm *OrgPrivacyPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.PrivacyLink != privacyLink {
 		changes = append(changes, policy.ChangePrivacyLink(privacyLink))
+	}
+	if wm.HelpLink != helpLink {
+		changes = append(changes, policy.ChangeHelpLink(helpLink))
 	}
 	if len(changes) == 0 {
 		return nil, false

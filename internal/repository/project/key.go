@@ -3,12 +3,13 @@ package project
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -61,7 +62,7 @@ func NewApplicationKeyAddedEvent(
 	}
 }
 
-func ApplicationKeyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationKeyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationKeyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -103,7 +104,7 @@ func NewApplicationKeyRemovedEvent(
 	}
 }
 
-func ApplicationKeyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationKeyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	applicationKeyRemoved := &ApplicationKeyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

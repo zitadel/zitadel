@@ -1,6 +1,6 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { from, Subject } from 'rxjs';
@@ -8,9 +8,8 @@ import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Role, RoleDisplayNameQuery, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
-
 @Component({
-  selector: 'app-search-roles-autocomplete',
+  selector: 'cnsl-search-roles-autocomplete',
   templateUrl: './search-roles-autocomplete.component.html',
   styleUrls: ['./search-roles-autocomplete.component.scss'],
 })
@@ -19,7 +18,7 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
   public removable: boolean = true;
   public addOnBlur: boolean = true;
   public separatorKeysCodes: number[] = [ENTER, COMMA];
-  public myControl: FormControl = new FormControl();
+  public myControl: UntypedFormControl = new UntypedFormControl();
   public names: string[] = [];
   public roles: Array<Role.AsObject> = [];
   public filteredRoles: Array<Role.AsObject> = [];
@@ -36,8 +35,8 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
       .pipe(
         takeUntil(this.unsubscribed$),
         debounceTime(200),
-        tap(() => this.isLoading = true),
-        switchMap(value => {
+        tap(() => (this.isLoading = true)),
+        switchMap((value) => {
           const query = new RoleQuery();
 
           // const key = new RoleKeyQuery();
@@ -50,20 +49,24 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
 
           return from(this.mgmtService.listProjectRoles(this.projectId, 10, 0, [query]));
         }),
-      ).subscribe((resp) => {
-        this.isLoading = false;
-        this.filteredRoles = resp.resultList;
-      }, error => {
-        this.isLoading = false;
-      });
+      )
+      .subscribe(
+        (resp) => {
+          this.isLoading = false;
+          this.filteredRoles = resp.resultList;
+        },
+        (error) => {
+          this.isLoading = false;
+        },
+      );
   }
 
   public ngOnDestroy(): void {
     this.unsubscribed$.next();
   }
 
-  public displayFn(project?: Role.AsObject): string | undefined {
-    return project ? `${project.displayName}` : undefined;
+  public displayFn(project?: Role.AsObject): string {
+    return project ? `${project.displayName}` : '';
   }
 
   public add(event: MatChipInputEvent): void {
@@ -75,6 +78,8 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
         const index = this.filteredRoles.findIndex((role) => {
           if (role.key) {
             return role.key === value;
+          } else {
+            return false;
           }
         });
         if (index > -1) {
@@ -116,7 +121,6 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
         this.nameInput.nativeElement.value = '';
         this.myControl.setValue(null);
       }
-
     }
   }
 }

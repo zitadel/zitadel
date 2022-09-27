@@ -1,81 +1,147 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { MatSelectChange } from '@angular/material/select';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { IamMembersDataSource } from 'src/app/pages/iam/iam-members/iam-members-datasource';
+import { InstanceMembersDataSource } from 'src/app/pages/instance/instance-members/instance-members-datasource';
 import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
+import { ProjectGrantMembersDataSource } from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { getMembershipColor } from 'src/app/utils/color';
 
+import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
-type MemberDatasource = OrgMembersDataSource | ProjectMembersDataSource | IamMembersDataSource;
+type MemberDatasource =
+  | OrgMembersDataSource
+  | ProjectMembersDataSource
+  | ProjectGrantMembersDataSource
+  | InstanceMembersDataSource;
 
 @Component({
-    selector: 'app-members-table',
-    templateUrl: './members-table.component.html',
-    styleUrls: ['./members-table.component.scss'],
+  selector: 'cnsl-members-table',
+  templateUrl: './members-table.component.html',
+  styleUrls: ['./members-table.component.scss'],
 })
 export class MembersTableComponent implements OnInit, OnDestroy {
-    public INITIALPAGESIZE: number = 25;
-    @Input() public canDelete: boolean = false;
-    @Input() public canWrite: boolean = false;
-    @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-    @ViewChild(MatTable) public table!: MatTable<Member.AsObject>;
-    @Input() public dataSource!: MemberDatasource;
-    public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
-    @Input() public memberRoleOptions: string[] = [];
-    @Input() public factoryLoadFunc!: Function;
-    @Input() public refreshTrigger!: Observable<void>;
-    @Output() public updateRoles: EventEmitter<{ member: Member.AsObject, change: MatSelectChange; }> = new EventEmitter();
-    @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
-    @Output() public deleteMember: EventEmitter<Member.AsObject> = new EventEmitter();
+  public INITIALPAGESIZE: number = 25;
+  @Input() public canDelete: boolean | null = false;
+  @Input() public canWrite: boolean | null = false;
+  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
+  @ViewChild(MatTable) public table!: MatTable<Member.AsObject>;
+  @Input() public dataSource?: MemberDatasource;
+  public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
+  @Input() public memberRoleOptions: string[] = [];
+  @Input() public factoryLoadFunc!: Function;
+  @Input() public refreshTrigger!: Observable<void>;
+  @Output() public updateRoles: EventEmitter<{ member: Member.AsObject; change: string[] }> = new EventEmitter();
+  @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
+  @Output() public deleteMember: EventEmitter<Member.AsObject> = new EventEmitter();
 
-    private destroyed: Subject<void> = new Subject();
+  private destroyed: Subject<void> = new Subject();
+  public displayedColumns: string[] = ['select', 'userId', 'displayName', 'loginname', 'email', 'roles'];
 
-    /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-    public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'loginname', 'email', 'roles'];
+  constructor(private dialog: MatDialog) {
+    this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
+      this.changedSelection.emit(this.selection.selected);
+    });
+  }
 
-    constructor() {
-        this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe(_ => {
-            this.changedSelection.emit(this.selection.selected);
-        });
+  public ngOnInit(): void {
+    this.refreshTrigger.pipe(takeUntil(this.destroyed)).subscribe(() => {
+      this.changePage(this.paginator);
+    });
+
+    if (this.canDelete || this.canWrite) {
+      this.displayedColumns.push('actions');
     }
+  }
 
-    public ngOnInit(): void {
-        this.refreshTrigger.pipe(takeUntil(this.destroyed)).subscribe(() => {
-            this.changePage(this.paginator);
-        });
+  public ngOnDestroy(): void {
+    this.destroyed.next();
+  }
 
-        if (this.canDelete) {
-            this.displayedColumns.push('actions');
+  public getColor(role: string) {
+    return getMembershipColor(role)[500];
+  }
+
+  public removeRole(member: Member.AsObject, role: string) {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'GRANTS.DIALOG.DELETE_TITLE',
+        descriptionKey: 'GRANTS.DIALOG.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        const newRoles = Object.assign([], member.rolesList);
+        const index = newRoles.findIndex((r) => r === role);
+        if (index > -1) {
+          newRoles.splice(index, 1);
+          member.rolesList = newRoles;
+          this.updateRoles.emit({ member: member, change: newRoles });
         }
-    }
+      }
+    });
+  }
 
-    public ngOnDestroy(): void {
-        this.destroyed.next();
-    }
+  public addRole(member: Member.AsObject) {
+    const dialogRef = this.dialog.open(AddMemberRolesDialogComponent, {
+      data: {
+        user: member.displayName,
+        allRoles: this.memberRoleOptions,
+        selectedRoles: member.rolesList,
+      },
+      width: '400px',
+    });
 
-    public isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.dataSource.membersSubject.value.length;
-        return numSelected === numRows;
-    }
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp && resp.length) {
+        member.rolesList = resp;
+        this.updateRoles.emit({ member: member, change: resp });
+      }
+    });
+  }
 
-    public masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.dataSource.membersSubject.value.forEach(row => this.selection.select(row));
-    }
+  public isAllSelected(): boolean {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource?.membersSubject.value.length;
+    return numSelected === numRows;
+  }
 
-    public changePage(event?: PageEvent): any {
-        this.selection.clear();
-        return this.factoryLoadFunc(event ?? this.paginator);
-    }
+  public masterToggle(): void {
+    this.isAllSelected()
+      ? this.selection.clear()
+      : this.dataSource?.membersSubject.value.forEach((row: Member.AsObject) => this.selection.select(row));
+  }
 
-    public triggerDeleteMember(member: any): void {
+  public changePage(event?: PageEvent): any {
+    this.selection.clear();
+    return this.factoryLoadFunc(event ?? this.paginator);
+  }
+
+  public triggerDeleteMember(member: any): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'MEMBER.DIALOG.DELETE_TITLE',
+        descriptionKey: 'MEMBER.DIALOG.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
         this.deleteMember.emit(member);
-    }
+      }
+    });
+  }
 }

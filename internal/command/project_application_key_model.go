@@ -3,10 +3,10 @@ package command
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 type ApplicationKeyWriteModel struct {
@@ -33,7 +33,7 @@ func NewApplicationKeyWriteModel(projectID, appID, keyID, resourceOwner string) 
 	}
 }
 
-func (wm *ApplicationKeyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ApplicationKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.ApplicationRemovedEvent:

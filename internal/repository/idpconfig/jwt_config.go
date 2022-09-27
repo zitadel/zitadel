@@ -3,10 +3,10 @@ package idpconfig
 import (
 	"encoding/json"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -50,7 +50,7 @@ func NewJWTConfigAddedEvent(
 	}
 }
 
-func JWTConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func JWTConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &JWTConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -126,7 +126,7 @@ func ChangeHeaderName(headerName string) func(*JWTConfigChangedEvent) {
 	}
 }
 
-func JWTConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func JWTConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &JWTConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

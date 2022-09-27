@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 func getTestCtx(userID, orgID string) context.Context {
@@ -15,7 +15,7 @@ type testVerifier struct {
 	memberships []*Membership
 }
 
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, string, error) {
+func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
 	return "userID", "agentID", "clientID", "de", "orgID", nil
 }
 func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*Membership, error) {
@@ -30,12 +30,8 @@ func (v *testVerifier) ExistsOrg(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, error) {
-	return "clientID", nil
-}
-
-func (v *testVerifier) CheckOrgFeatures(context.Context, string, ...string) error {
-	return nil
+func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
+	return "clientID", "projectID", nil
 }
 
 func equalStringArray(a, b []string) bool {
@@ -72,7 +68,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 					{
 						Roles: []string{"ORG_OWNER"},
 					},
-				}}),
+				}}, "", nil),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -95,7 +91,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 			name: "No Grants",
 			args: args{
 				ctxData:      CtxData{},
-				verifier:     Start(&testVerifier{memberships: []*Membership{}}),
+				verifier:     Start(&testVerifier{memberships: []*Membership{}}, "", nil),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{
@@ -123,7 +119,7 @@ func Test_GetUserMethodPermissions(t *testing.T) {
 						MemberType:  MemberTypeIam,
 						Roles:       []string{"IAM_OWNER"},
 					},
-				}}),
+				}}, "", nil),
 				requiredPerm: "project.read",
 				authConfig: Config{
 					RolePermissionMappings: []RoleMapping{

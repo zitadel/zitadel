@@ -1,7 +1,7 @@
 package project
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
@@ -41,5 +41,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(APIConfigChangedType, APIConfigChangedEventMapper).
 		RegisterFilterEventMapper(APIConfigSecretChangedType, APIConfigSecretChangedEventMapper).
 		RegisterFilterEventMapper(ApplicationKeyAddedEventType, ApplicationKeyAddedEventMapper).
-		RegisterFilterEventMapper(ApplicationKeyRemovedEventType, ApplicationKeyRemovedEventMapper)
+		RegisterFilterEventMapper(ApplicationKeyRemovedEventType, ApplicationKeyRemovedEventMapper).
+		RegisterFilterEventMapper(SAMLConfigAddedType, SAMLConfigAddedEventMapper).
+		RegisterFilterEventMapper(SAMLConfigChangedType, SAMLConfigChangedEventMapper)
 }

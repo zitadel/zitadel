@@ -2,24 +2,24 @@ package command
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/repository/mock"
-	action_repo "github.com/caos/zitadel/internal/repository/action"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
-	key_repo "github.com/caos/zitadel/internal/repository/keypair"
-	"github.com/caos/zitadel/internal/repository/org"
-	proj_repo "github.com/caos/zitadel/internal/repository/project"
-	usr_repo "github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	action_repo "github.com/zitadel/zitadel/internal/repository/action"
+	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
+	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
+	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
 
 type expect func(mockRepository *mock.MockRepository)
@@ -40,7 +40,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	return es
 }
 
-func eventPusherToEvents(eventsPushes ...eventstore.EventPusher) []*repository.Event {
+func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event {
 	events := make([]*repository.Event, len(eventsPushes))
 	for i, event := range eventsPushes {
 		data, err := eventstore.EventData(event)
@@ -50,7 +50,7 @@ func eventPusherToEvents(eventsPushes ...eventstore.EventPusher) []*repository.E
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
 			AggregateType: repository.AggregateType(event.Aggregate().Type),
-			ResourceOwner: event.Aggregate().ResourceOwner,
+			ResourceOwner: sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 			EditorService: event.EditorService(),
 			EditorUser:    event.EditorUser(),
 			Type:          repository.EventType(event.Type()),
@@ -137,7 +137,7 @@ func expectFilterOrgMemberNotFound() expect {
 	}
 }
 
-func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
+func eventFromEventPusher(event eventstore.Command) *repository.Event {
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{
 		ID:                            "",
@@ -152,11 +152,31 @@ func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
 		Version:                       repository.Version(event.Aggregate().Version),
 		AggregateID:                   event.Aggregate().ID,
 		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
-		ResourceOwner:                 event.Aggregate().ResourceOwner,
+		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 	}
 }
 
-func eventFromEventPusherWithCreationDateNow(event eventstore.EventPusher) *repository.Event {
+func eventFromEventPusherWithInstanceID(instanceID string, event eventstore.Command) *repository.Event {
+	data, _ := eventstore.EventData(event)
+	return &repository.Event{
+		ID:                            "",
+		Sequence:                      0,
+		PreviousAggregateSequence:     0,
+		PreviousAggregateTypeSequence: 0,
+		CreationDate:                  time.Time{},
+		Type:                          repository.EventType(event.Type()),
+		Data:                          data,
+		EditorService:                 event.EditorService(),
+		EditorUser:                    event.EditorUser(),
+		Version:                       repository.Version(event.Aggregate().Version),
+		AggregateID:                   event.Aggregate().ID,
+		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
+		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
+		InstanceID:                    instanceID,
+	}
+}
+
+func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *repository.Event {
 	e := eventFromEventPusher(event)
 	e.CreationDate = time.Now()
 	return e
@@ -164,6 +184,15 @@ func eventFromEventPusherWithCreationDateNow(event eventstore.EventPusher) *repo
 
 func uniqueConstraintsFromEventConstraint(constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
 	return &repository.UniqueConstraint{
+		UniqueType:   constraint.UniqueType,
+		UniqueField:  constraint.UniqueField,
+		ErrorMessage: constraint.ErrorMessage,
+		Action:       repository.UniqueConstraintAction(constraint.Action)}
+}
+
+func uniqueConstraintsFromEventConstraintWithInstanceID(instanceID string, constraint *eventstore.EventUniqueConstraint) *repository.UniqueConstraint {
+	return &repository.UniqueConstraint{
+		InstanceID:   instanceID,
 		UniqueType:   constraint.UniqueType,
 		UniqueField:  constraint.UniqueField,
 		ErrorMessage: constraint.ErrorMessage,
@@ -182,47 +211,36 @@ func GetMockSecretGenerator(t *testing.T) crypto.Generator {
 	return generator
 }
 
-func GetMockVerifier(t *testing.T, features ...string) *testVerifier {
-	return &testVerifier{
-		features: features,
-	}
+type mockInstance struct{}
+
+func (m *mockInstance) InstanceID() string {
+	return "INSTANCE"
 }
 
-type testVerifier struct {
-	features []string
+func (m *mockInstance) ProjectID() string {
+	return "projectID"
 }
 
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, string, error) {
-	return "userID", "agentID", "clientID", "de", "orgID", nil
-}
-func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
-	return nil, nil
+func (m *mockInstance) ConsoleClientID() string {
+	return "consoleID"
 }
 
-func (v *testVerifier) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (string, []string, error) {
-	return "", nil, nil
+func (m *mockInstance) ConsoleApplicationID() string {
+	return "consoleApplicationID"
 }
 
-func (v *testVerifier) ExistsOrg(ctx context.Context, orgID string) error {
-	return nil
+func (m *mockInstance) DefaultLanguage() language.Tag {
+	return language.English
 }
 
-func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, error) {
-	return "clientID", nil
+func (m *mockInstance) DefaultOrganisationID() string {
+	return "orgID"
 }
 
-func (v *testVerifier) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
-	for _, feature := range requiredFeatures {
-		hasFeature := false
-		for _, f := range v.features {
-			if f == feature {
-				hasFeature = true
-				break
-			}
-		}
-		if !hasFeature {
-			return errors.ThrowPermissionDenied(nil, "id", "missing feature")
-		}
-	}
-	return nil
+func (m *mockInstance) RequestedDomain() string {
+	return "zitadel.cloud"
+}
+
+func (m *mockInstance) RequestedHost() string {
+	return "zitadel.cloud:443"
 }

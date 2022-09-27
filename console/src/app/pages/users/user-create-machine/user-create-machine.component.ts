@@ -1,82 +1,91 @@
+import { Location } from '@angular/common';
 import { Component, OnDestroy } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AddMachineUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-user-create-machine',
-    templateUrl: './user-create-machine.component.html',
-    styleUrls: ['./user-create-machine.component.scss'],
+  selector: 'cnsl-user-create-machine',
+  templateUrl: './user-create-machine.component.html',
+  styleUrls: ['./user-create-machine.component.scss'],
 })
 export class UserCreateMachineComponent implements OnDestroy {
-    public user: AddMachineUserRequest.AsObject = new AddMachineUserRequest().toObject();
-    public userForm!: FormGroup;
+  public user: AddMachineUserRequest.AsObject = new AddMachineUserRequest().toObject();
+  public userForm!: UntypedFormGroup;
 
-    private sub: Subscription = new Subscription();
-    public loading: boolean = false;
+  private sub: Subscription = new Subscription();
+  public loading: boolean = false;
 
-    constructor(
-        private router: Router,
-        private toast: ToastService,
-        public userService: ManagementService,
-        private fb: FormBuilder,
-    ) {
-        this.initForm();
-    }
+  constructor(
+    private router: Router,
+    private toast: ToastService,
+    public userService: ManagementService,
+    private fb: UntypedFormBuilder,
+    private _location: Location,
+    breadcrumbService: BreadcrumbService,
+  ) {
+    breadcrumbService.setBreadcrumb([
+      new Breadcrumb({
+        type: BreadcrumbType.ORG,
+        routerLink: ['/org'],
+      }),
+    ]);
+    this.initForm();
+  }
 
-    private initForm(): void {
-        this.userForm = this.fb.group({
-            userName: ['',
-                [
-                    Validators.required,
-                    Validators.minLength(2),
-                ],
-            ],
-            name: ['', [Validators.required]],
-            description: ['', []],
-        });
-    }
+  private initForm(): void {
+    this.userForm = this.fb.group({
+      userName: ['', [Validators.required, Validators.minLength(2)]],
+      name: ['', [Validators.required]],
+      description: ['', []],
+    });
+  }
 
-    public createUser(): void {
-        this.user = this.userForm.value;
+  public createUser(): void {
+    this.user = this.userForm.value;
 
-        this.loading = true;
+    this.loading = true;
 
-        const machineReq = new AddMachineUserRequest();
-        machineReq.setDescription(this.description?.value);
-        machineReq.setName(this.name?.value);
-        machineReq.setUserName(this.userName?.value);
+    const machineReq = new AddMachineUserRequest();
+    machineReq.setDescription(this.description?.value);
+    machineReq.setName(this.name?.value);
+    machineReq.setUserName(this.userName?.value);
 
-        this.userService
-            .addMachineUser(machineReq)
-            .then((data) => {
-                this.loading = false;
-                this.toast.showInfo('USER.TOAST.CREATED', true);
-                const id = data.userId;
-                if (id) {
-                    this.router.navigate(['users', id]);
-                }
-            })
-            .catch((error: any) => {
-                this.loading = false;
-                this.toast.showError(error);
-            });
-    }
+    this.userService
+      .addMachineUser(machineReq)
+      .then((data) => {
+        this.loading = false;
+        this.toast.showInfo('USER.TOAST.CREATED', true);
+        const id = data.userId;
+        if (id) {
+          this.router.navigate(['users', id]);
+        }
+      })
+      .catch((error: any) => {
+        this.loading = false;
+        this.toast.showError(error);
+      });
+  }
 
-    ngOnDestroy(): void {
-        this.sub.unsubscribe();
-    }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
 
-    public get name(): AbstractControl | null {
-        return this.userForm.get('name');
-    }
-    public get description(): AbstractControl | null {
-        return this.userForm.get('description');
-    }
-    public get userName(): AbstractControl | null {
-        return this.userForm.get('userName');
-    }
+  public close(): void {
+    this._location.back();
+  }
+
+  public get name(): AbstractControl | null {
+    return this.userForm.get('name');
+  }
+  public get description(): AbstractControl | null {
+    return this.userForm.get('description');
+  }
+  public get userName(): AbstractControl | null {
+    return this.userForm.get('userName');
+  }
 }

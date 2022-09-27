@@ -4,10 +4,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/caos/logging"
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/console"
 	"github.com/dop251/goja_nodejs/require"
+	"github.com/zitadel/logging"
 )
 
 var ErrHalt = errors.New("interrupt")

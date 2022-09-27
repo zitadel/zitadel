@@ -9,15 +9,15 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
-	"github.com/caos/logging"
-	"github.com/ghodss/yaml"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
+	"sigs.k8s.io/yaml"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 const (
@@ -41,21 +41,21 @@ type Message struct {
 	Text string
 }
 
-func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, error) {
+func NewTranslator(dir http.FileSystem, defaultLanguage language.Tag, cookieName string) (*Translator, error) {
 	t := new(Translator)
 	var err error
-	t.bundle, err = newBundle(dir, config.DefaultLanguage)
+	t.bundle, err = newBundle(dir, defaultLanguage)
 	if err != nil {
 		return nil, err
 	}
 	t.cookieHandler = http_util.NewCookieHandler()
-	t.cookieName = config.CookieName
+	t.cookieName = cookieName
 	return t, nil
 }
 
 func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle, error) {
 	bundle := i18n.NewBundle(defaultLanguage)
-	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+	bundle.RegisterUnmarshalFunc("yaml", func(data []byte, v interface{}) error { return yaml.Unmarshal(data, v) })
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	i18nDir, err := dir.Open(i18nPath)
@@ -69,7 +69,7 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle,
 	}
 	for _, file := range files {
 		if err := addFileFromFileSystemToBundle(dir, bundle, file); err != nil {
-			return nil, errors.ThrowNotFound(err, "I18N-ZS2AW", "cannot append file to Bundle")
+			return nil, errors.ThrowNotFoundf(err, "I18N-ZS2AW", "cannot append file %s to Bundle", file.Name())
 		}
 	}
 	return bundle, nil
@@ -85,8 +85,8 @@ func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, fil
 	if err != nil {
 		return err
 	}
-	bundle.MustParseMessageFileBytes(content, file.Name())
-	return nil
+	_, err = bundle.ParseMessageFileBytes(content, file.Name())
+	return err
 }
 
 func SupportedLanguages(dir http.FileSystem) ([]language.Tag, error) {
@@ -145,8 +145,8 @@ func (t *Translator) Lang(r *http.Request) language.Tag {
 	return tag
 }
 
-func (t *Translator) SetLangCookie(w http.ResponseWriter, lang language.Tag) {
-	t.cookieHandler.SetCookie(w, t.cookieName, lang.String())
+func (t *Translator) SetLangCookie(w http.ResponseWriter, r *http.Request, lang language.Tag) {
+	t.cookieHandler.SetCookie(w, t.cookieName, r.Host, lang.String())
 }
 
 func (t *Translator) localizerFromRequest(r *http.Request) *i18n.Localizer {
@@ -177,7 +177,7 @@ func (t *Translator) langsFromCtx(ctx context.Context) []string {
 	langs := t.preferredLanguages
 	if ctx != nil {
 		ctxData := authz.GetCtxData(ctx)
-		if ctxData.PreferredLanguage != "" {
+		if ctxData.PreferredLanguage != language.Und.String() {
 			langs = append(langs, authz.GetCtxData(ctx).PreferredLanguage)
 		}
 		langs = append(langs, getAcceptLanguageHeader(ctx))
@@ -190,6 +190,10 @@ func (t *Translator) SetPreferredLanguages(langs ...string) {
 }
 
 func getAcceptLanguageHeader(ctx context.Context) string {
+	acceptLanguage := metautils.ExtractIncoming(ctx).Get("accept-language")
+	if acceptLanguage != "" {
+		return acceptLanguage
+	}
 	return metautils.ExtractIncoming(ctx).Get("grpcgateway-accept-language")
 }
 
@@ -199,7 +203,7 @@ func localize(localizer *i18n.Localizer, id string, args map[string]interface{})
 		TemplateData: args,
 	})
 	if err != nil {
-		logging.Log("I18N-MsF5sx").WithError(err).Warnf("missing translation")
+		logging.WithFields("id", id, "args", args).WithError(err).Warnf("missing translation")
 		return id
 	}
 	return s

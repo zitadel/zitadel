@@ -2,19 +2,59 @@ package command
 
 import (
 	"context"
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/project"
+	"strings"
+
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
-func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
-	events, addedProject, err := c.addProject(ctx, project, resourceOwner, ownerUserID)
+func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {
+	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	if existingProject.State != domain.ProjectStateUnspecified {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
+	}
+	return c.addProjectWithID(ctx, project, resourceOwner, projectID)
+}
+
+func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
+	if !project.IsValid() {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
+	}
+
+	projectID, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.addProjectWithIDWithOwner(ctx, project, resourceOwner, ownerUserID, projectID)
+}
+
+func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {
+	projectAdd.AggregateID = projectID
+	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
+	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
+
+	events := []eventstore.Command{
+		project.NewProjectAddedEvent(
+			ctx,
+			projectAgg,
+			projectAdd.Name,
+			projectAdd.ProjectRoleAssertion,
+			projectAdd.ProjectRoleCheck,
+			projectAdd.HasProjectCheck,
+			projectAdd.PrivateLabelingSetting),
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -25,26 +65,16 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 	return projectWriteModelToProject(addedProject), nil
 }
 
-func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID string) (_ []eventstore.EventPusher, _ *ProjectWriteModel, err error) {
+func (c *Commands) addProjectWithIDWithOwner(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID, projectID string) (_ *domain.Project, err error) {
 	if !projectAdd.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
 	}
-	projectAdd.AggregateID, err = c.idGenerator.Next()
-	if err != nil {
-		return nil, nil, err
-	}
+	projectAdd.AggregateID = projectID
 	addedProject := NewProjectWriteModel(projectAdd.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
 
 	projectRole := domain.RoleProjectOwner
-	iam, err := c.GetIAM(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	if iam.GlobalOrgID == resourceOwner {
-		projectRole = domain.RoleProjectOwnerGlobal
-	}
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		project.NewProjectAddedEvent(
 			ctx,
 			projectAgg,
@@ -55,7 +85,67 @@ func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, r
 			projectAdd.PrivateLabelingSetting),
 		project.NewProjectMemberAddedEvent(ctx, projectAgg, ownerUserID, projectRole),
 	}
-	return events, addedProject, nil
+
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(addedProject, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return projectWriteModelToProject(addedProject), nil
+}
+
+func AddProjectCommand(
+	a *project.Aggregate,
+	name string,
+	owner string,
+	projectRoleAssertion bool,
+	projectRoleCheck bool,
+	hasProjectCheck bool,
+	privateLabelingSetting domain.PrivateLabelingSetting,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if name = strings.TrimSpace(name); name == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-C01yo", "Errors.Invalid.Argument")
+		}
+		if !privateLabelingSetting.Valid() {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-AO52V", "Errors.Invalid.Argument")
+		}
+		if owner == "" {
+			return nil, errors.ThrowPreconditionFailed(nil, "PROJE-hzxwo", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			return []eventstore.Command{
+				project.NewProjectAddedEvent(ctx, &a.Aggregate,
+					name,
+					projectRoleAssertion,
+					projectRoleCheck,
+					hasProjectCheck,
+					privateLabelingSetting,
+				),
+				project.NewProjectMemberAddedEvent(ctx, &a.Aggregate,
+					owner,
+					domain.RoleProjectOwner),
+			}, nil
+		}, nil
+	}
+}
+
+func projectWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, resourceOwner string) (project *ProjectWriteModel, err error) {
+	project = NewProjectWriteModel(projectID, resourceOwner)
+	events, err := filter(ctx, project.Query())
+	if err != nil {
+		return nil, err
+	}
+
+	project.AppendEvents(events...)
+	if err := project.Reduce(); err != nil {
+		return nil, err
+	}
+
+	return project, nil
 }
 
 func (c *Commands) getProjectByID(ctx context.Context, projectID, resourceOwner string) (*domain.Project, error) {
@@ -108,7 +198,7 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.NoChangesFound")
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +226,7 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +239,7 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 
 func (c *Commands) ReactivateProject(ctx context.Context, projectID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.ProjectIDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3ihsF", "Errors.Project.ProjectIDMissing")
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
@@ -164,7 +254,7 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -187,9 +277,20 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
+
+	samlEntityIDsAgg, err := c.getSAMLEntityIdsWriteModelByProjectID(ctx, projectID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+
+	uniqueConstraints := make([]*eventstore.EventUniqueConstraint, len(samlEntityIDsAgg.EntityIDs))
+	for i, entityID := range samlEntityIDsAgg.EntityIDs {
+		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
+	}
+
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	events := []eventstore.EventPusher{
-		project.NewProjectRemovedEvent(ctx, projectAgg, existingProject.Name),
+	events := []eventstore.Command{
+		project.NewProjectRemovedEvent(ctx, projectAgg, existingProject.Name, uniqueConstraints),
 	}
 
 	for _, grantID := range cascadingUserGrantIDs {
@@ -201,7 +302,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		events = append(events, event)
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -219,4 +320,13 @@ func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, reso
 		return nil, err
 	}
 	return projectWriteModel, nil
+}
+
+func (c *Commands) getSAMLEntityIdsWriteModelByProjectID(ctx context.Context, projectID, resourceOwner string) (*SAMLEntityIDsWriteModel, error) {
+	samlEntityIDsAgg := NewSAMLEntityIDsWriteModel(projectID, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, samlEntityIDsAgg)
+	if err != nil {
+		return nil, err
+	}
+	return samlEntityIDsAgg, nil
 }

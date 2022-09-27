@@ -3,10 +3,10 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	action_grpc "github.com/caos/zitadel/internal/api/grpc/action"
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
+	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsRequest) (*mgmt_pb.ListActionsResponse, error) {
@@ -35,7 +35,7 @@ func (s *Server) GetAction(ctx context.Context, req *mgmt_pb.GetActionRequest) (
 }
 
 func (s *Server) CreateAction(ctx context.Context, req *mgmt_pb.CreateActionRequest) (*mgmt_pb.CreateActionResponse, error) {
-	id, details, err := s.command.AddAction(ctx, createActionRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	id, details, err := s.command.AddAction(ctx, CreateActionRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

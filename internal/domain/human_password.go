@@ -1,10 +1,11 @@
 package domain
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/crypto"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 type Password struct {

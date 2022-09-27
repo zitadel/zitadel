@@ -1,8 +1,8 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 type ProjectMemberWriteModel struct {
@@ -21,7 +21,7 @@ func NewProjectMemberWriteModel(projectID, userID, resourceOwner string) *Projec
 	}
 }
 
-func (wm *ProjectMemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ProjectMemberWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.MemberAddedEvent:

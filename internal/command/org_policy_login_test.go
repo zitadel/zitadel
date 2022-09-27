@@ -3,24 +3,32 @@ package command
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/policy"
-	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/repository/user"
+)
+
+var (
+	duration10 = time.Hour * 10
+	duration20 = time.Hour * 20
+	duration30 = time.Hour * 30
+	duration40 = time.Hour * 40
+	duration50 = time.Hour * 50
 )
 
 func TestCommandSide_AddLoginPolicy(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier orgFeatureChecker
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -64,13 +72,20 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"https://example.com/redirect",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -80,52 +95,22 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					AllowExternalIDP:      true,
-					ForceMFA:              true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
 				},
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
-			},
-		},
-		{
-			name: "loginpolicy not allowed, permission denied error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								false,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-							),
-						),
-					),
-				),
-				tokenVerifier: GetMockVerifier(t),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					AllowExternalIDP:      true,
-					ForceMFA:              true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
 			},
 		},
 		{
@@ -134,47 +119,47 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								false,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-							),
-						),
-					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLoginPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
+									true,
 									true,
 									true,
 									true,
 									true,
 									true,
 									domain.PasswordlessTypeAllowed,
+									"https://example.com/redirect",
+									time.Hour*1,
+									time.Hour*2,
+									time.Hour*3,
+									time.Hour*4,
+									time.Hour*5,
 								),
 							),
 						},
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					AllowExternalIDP:      true,
-					ForceMFA:              true,
-					HidePasswordReset:     true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
 				},
 			},
 			res: res{
@@ -183,12 +168,270 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					AllowExternalIDP:      true,
-					ForceMFA:              true,
-					HidePasswordReset:     true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+				},
+			},
+		},
+		{
+			name: "add policy with invalid factors, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.LoginPolicy{
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+					SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeUnspecified},
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add policy factors,ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLoginPolicyAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									true,
+									true,
+									true,
+									true,
+									true,
+									true,
+									domain.PasswordlessTypeAllowed,
+									"https://example.com/redirect",
+									time.Hour*1,
+									time.Hour*2,
+									time.Hour*3,
+									time.Hour*4,
+									time.Hour*5,
+								),
+							),
+							eventFromEventPusher(
+								org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									domain.SecondFactorTypeOTP,
+								),
+							),
+							eventFromEventPusher(
+								org.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									domain.MultiFactorTypeU2FWithPIN,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.LoginPolicy{
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+					SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					MultiFactors:               []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+				},
+			},
+			res: res{
+				want: &domain.LoginPolicy{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "org1",
+						ResourceOwner: "org1",
+					},
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+				},
+			},
+		},
+		{
+			name: "add policy with unknown idp, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.LoginPolicy{
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+					IDPProviders: []*domain.IDPProvider{
+						{
+							Type:        domain.IdentityProviderTypeSystem,
+							IDPConfigID: "invalid",
+						},
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "add policy idp, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewIDPConfigAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewLoginPolicyAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									true,
+									true,
+									true,
+									true,
+									true,
+									true,
+									domain.PasswordlessTypeAllowed,
+									"https://example.com/redirect",
+									time.Hour*1,
+									time.Hour*2,
+									time.Hour*3,
+									time.Hour*4,
+									time.Hour*5,
+								),
+							),
+							eventFromEventPusher(
+								org.NewIdentityProviderAddedEvent(context.Background(),
+									&org.NewAggregate("org1").Aggregate,
+									"config1",
+									domain.IdentityProviderTypeSystem,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &domain.LoginPolicy{
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+					IDPProviders: []*domain.IDPProvider{
+						{
+							Type:        domain.IdentityProviderTypeSystem,
+							IDPConfigID: "config1",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.LoginPolicy{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "org1",
+						ResourceOwner: "org1",
+					},
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
 				},
 			},
 		},
@@ -196,8 +439,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
-				tokenVerifier: tt.fields.tokenVerifier,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddLoginPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -215,8 +457,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 
 func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier orgFeatureChecker
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -243,11 +484,13 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					AllowExternalIDP:      true,
-					ForceMFA:              true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
+					AllowRegister:          true,
+					AllowUsernamePassword:  true,
+					AllowExternalIDP:       true,
+					ForceMFA:               true,
+					IgnoreUnknownUsernames: true,
+					PasswordlessType:       domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:     "https://example.com/redirect",
 				},
 			},
 			res: res{
@@ -266,64 +509,17 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					AllowExternalIDP:      true,
-					ForceMFA:              true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
+					AllowRegister:          true,
+					AllowUsernamePassword:  true,
+					AllowExternalIDP:       true,
+					ForceMFA:               true,
+					IgnoreUnknownUsernames: true,
+					PasswordlessType:       domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:     "https://example.com/redirect",
 				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
-			},
-		},
-		{
-			name: "not allowed, permission denied error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
-								true,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								false,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-							),
-						),
-					),
-				),
-				tokenVerifier: GetMockVerifier(t),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					AllowExternalIDP:      true,
-					ForceMFA:              true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPermissionDenied,
 			},
 		},
 		{
@@ -334,42 +530,42 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								true,
 								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								false,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"https://example.com/redirect",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					AllowExternalIDP:      true,
-					ForceMFA:              true,
-					HidePasswordReset:     true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
 				},
 			},
 			res: res{
@@ -384,48 +580,63 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewLoginPolicyAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								false,
-								false,
-								false,
-								false,
-								false,
-								domain.PasswordlessTypeNotAllowed,
+								"https://example.com/redirect",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newLoginPolicyChangedEvent(context.Background(), "org1", false, false, false, false, false, domain.PasswordlessTypeNotAllowed),
+								newLoginPolicyChangedEvent(context.Background(),
+									"org1",
+									false,
+									false,
+									false,
+									false,
+									false,
+									false,
+									domain.PasswordlessTypeNotAllowed,
+									"",
+									&duration10,
+									&duration20,
+									&duration30,
+									&duration40,
+									&duration50,
+								),
 							),
 						},
 					),
 				),
-				tokenVerifier: GetMockVerifier(t, domain.FeatureLoginPolicyUsernameLogin),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
 				policy: &domain.LoginPolicy{
-					AllowRegister:         false,
-					AllowUsernamePassword: false,
-					AllowExternalIDP:      false,
-					ForceMFA:              false,
-					PasswordlessType:      domain.PasswordlessTypeNotAllowed,
+					AllowRegister:              false,
+					AllowUsernamePassword:      false,
+					AllowExternalIDP:           false,
+					ForceMFA:                   false,
+					IgnoreUnknownUsernames:     false,
+					PasswordlessType:           domain.PasswordlessTypeNotAllowed,
+					DefaultRedirectURI:         "",
+					PasswordCheckLifetime:      time.Hour * 10,
+					ExternalLoginCheckLifetime: time.Hour * 20,
+					MFAInitSkipLifetime:        time.Hour * 30,
+					SecondFactorCheckLifetime:  time.Hour * 40,
+					MultiFactorCheckLifetime:   time.Hour * 50,
 				},
 			},
 			res: res{
@@ -434,12 +645,19 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
 					},
-					AllowRegister:         false,
-					AllowUsernamePassword: false,
-					AllowExternalIDP:      false,
-					ForceMFA:              false,
-					HidePasswordReset:     false,
-					PasswordlessType:      domain.PasswordlessTypeNotAllowed,
+					AllowRegister:              false,
+					AllowUsernamePassword:      false,
+					AllowExternalIDP:           false,
+					ForceMFA:                   false,
+					HidePasswordReset:          false,
+					IgnoreUnknownUsernames:     false,
+					PasswordlessType:           domain.PasswordlessTypeNotAllowed,
+					DefaultRedirectURI:         "",
+					PasswordCheckLifetime:      time.Hour * 10,
+					ExternalLoginCheckLifetime: time.Hour * 20,
+					MFAInitSkipLifetime:        time.Hour * 30,
+					SecondFactorCheckLifetime:  time.Hour * 40,
+					MultiFactorCheckLifetime:   time.Hour * 50,
 				},
 			},
 		},
@@ -447,8 +665,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
-				tokenVerifier: tt.fields.tokenVerifier,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.ChangeLoginPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
@@ -520,13 +737,20 @@ func TestCommandSide_RemoveLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -534,7 +758,7 @@ func TestCommandSide_RemoveLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLoginPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate),
+									&org.NewAggregate("org1").Aggregate),
 							),
 						},
 					),
@@ -653,13 +877,20 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -687,20 +918,27 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,
@@ -712,7 +950,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "or1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								domain.IdentityProviderTypeOrg,
 							),
@@ -741,20 +979,27 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,
@@ -768,7 +1013,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewIdentityProviderAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"config1",
 									domain.IdentityProviderTypeOrg),
 							),
@@ -802,7 +1047,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIDPProviderToLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			got, err := r.AddIDPToLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -824,7 +1069,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 		ctx                 context.Context
 		resourceOwner       string
 		provider            *domain.IDPProvider
-		cascadeExternalIDPs []*domain.ExternalIDP
+		cascadeExternalIDPs []*domain.UserIDPLink
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -898,13 +1143,20 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -932,27 +1184,34 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								domain.IdentityProviderTypeOrg,
 							),
 						),
 						eventFromEventPusher(
 							org.NewIdentityProviderRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 							),
 						),
@@ -978,20 +1237,27 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								domain.IdentityProviderTypeOrg,
 							),
@@ -1001,7 +1267,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewIdentityProviderRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"config1"),
 							),
 						},
@@ -1031,20 +1297,27 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								domain.IdentityProviderTypeOrg,
 							),
@@ -1054,7 +1327,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewIdentityProviderRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"config1"),
 							),
 						},
@@ -1069,7 +1342,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					Name:        "name",
 					Type:        domain.IdentityProviderTypeOrg,
 				},
-				cascadeExternalIDPs: []*domain.ExternalIDP{
+				cascadeExternalIDPs: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",
@@ -1092,20 +1365,27 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
+								true,
 								true,
 								true,
 								true,
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIdentityProviderAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								"config1",
 								domain.IdentityProviderTypeOrg,
 							),
@@ -1113,7 +1393,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"config1", "", "externaluser1"),
 						),
@@ -1122,15 +1402,15 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewIdentityProviderRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									"config1"),
 							),
 							eventFromEventPusher(
-								user.NewHumanExternalIDPCascadeRemovedEvent(context.Background(),
+								user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"config1", "externaluser1")),
 						},
-						uniqueConstraintsFromEventConstraint(user.NewRemoveExternalIDPUniqueConstraint("config1", "externaluser1")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("config1", "externaluser1")),
 					),
 				),
 			},
@@ -1140,7 +1420,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
-				cascadeExternalIDPs: []*domain.ExternalIDP{
+				cascadeExternalIDPs: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",
@@ -1162,7 +1442,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveIDPProviderFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider, tt.args.cascadeExternalIDPs...)
+			got, err := r.RemoveIDPFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider, tt.args.cascadeExternalIDPs...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1233,7 +1513,7 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.SecondFactorTypeOTP,
 							),
 						),
@@ -1259,7 +1539,7 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									domain.SecondFactorTypeOTP),
 							),
 						},
@@ -1369,13 +1649,13 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.SecondFactorTypeOTP,
 							),
 						),
 						eventFromEventPusher(
 							org.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.SecondFactorTypeOTP,
 							),
 						),
@@ -1399,7 +1679,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicySecondFactorAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.SecondFactorTypeOTP,
 							),
 						),
@@ -1408,7 +1688,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLoginPolicySecondFactorRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									domain.SecondFactorTypeOTP),
 							),
 						},
@@ -1500,7 +1780,7 @@ func TestCommandSide_AddMultiFactorLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.MultiFactorTypeU2FWithPIN,
 							),
 						),
@@ -1526,7 +1806,7 @@ func TestCommandSide_AddMultiFactorLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									domain.MultiFactorTypeU2FWithPIN),
 							),
 						},
@@ -1636,13 +1916,13 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.MultiFactorTypeU2FWithPIN,
 							),
 						),
 						eventFromEventPusher(
 							org.NewLoginPolicyMultiFactorRemovedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.MultiFactorTypeU2FWithPIN,
 							),
 						),
@@ -1666,7 +1946,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyMultiFactorAddedEvent(context.Background(),
-								&org.NewAggregate("org1", "org1").Aggregate,
+								&org.NewAggregate("org1").Aggregate,
 								domain.MultiFactorTypeU2FWithPIN,
 							),
 						),
@@ -1675,7 +1955,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewLoginPolicyMultiFactorRemovedEvent(context.Background(),
-									&org.NewAggregate("org1", "org1").Aggregate,
+									&org.NewAggregate("org1").Aggregate,
 									domain.MultiFactorTypeU2FWithPIN),
 							),
 						},
@@ -1710,17 +1990,38 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 	}
 }
 
-func newLoginPolicyChangedEvent(ctx context.Context, orgID string, usernamePassword, register, externalIDP, mfa, passwordReset bool, passwordlessType domain.PasswordlessType) *org.LoginPolicyChangedEvent {
+func newLoginPolicyChangedEvent(ctx context.Context, orgID string, usernamePassword, register, externalIDP, mfa, passwordReset, ignoreUnknownUsernames bool,
+	passwordlessType domain.PasswordlessType,
+	redirectURI string,
+	passwordLifetime, externalLoginLifetime, mfaInitSkipLifetime, secondFactorLifetime, multiFactorLifetime *time.Duration) *org.LoginPolicyChangedEvent {
+	changes := []policy.LoginPolicyChanges{
+		policy.ChangeAllowUserNamePassword(usernamePassword),
+		policy.ChangeAllowRegister(register),
+		policy.ChangeAllowExternalIDP(externalIDP),
+		policy.ChangeForceMFA(mfa),
+		policy.ChangeHidePasswordReset(passwordReset),
+		policy.ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames),
+		policy.ChangePasswordlessType(passwordlessType),
+		policy.ChangeDefaultRedirectURI(redirectURI),
+	}
+	if passwordLifetime != nil {
+		changes = append(changes, policy.ChangePasswordCheckLifetime(*passwordLifetime))
+	}
+	if externalLoginLifetime != nil {
+		changes = append(changes, policy.ChangeExternalLoginCheckLifetime(*externalLoginLifetime))
+	}
+	if mfaInitSkipLifetime != nil {
+		changes = append(changes, policy.ChangeMFAInitSkipLifetime(*mfaInitSkipLifetime))
+	}
+	if secondFactorLifetime != nil {
+		changes = append(changes, policy.ChangeSecondFactorCheckLifetime(*secondFactorLifetime))
+	}
+	if multiFactorLifetime != nil {
+		changes = append(changes, policy.ChangeMultiFactorCheckLifetime(*multiFactorLifetime))
+	}
 	event, _ := org.NewLoginPolicyChangedEvent(ctx,
-		&org.NewAggregate(orgID, orgID).Aggregate,
-		[]policy.LoginPolicyChanges{
-			policy.ChangeAllowUserNamePassword(usernamePassword),
-			policy.ChangeAllowRegister(register),
-			policy.ChangeAllowExternalIDP(externalIDP),
-			policy.ChangeForceMFA(mfa),
-			policy.ChangeHidePasswordReset(passwordReset),
-			policy.ChangePasswordlessType(passwordlessType),
-		},
+		&org.NewAggregate(orgID).Aggregate,
+		changes,
 	)
 	return event
 }

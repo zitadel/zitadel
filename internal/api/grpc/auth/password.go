@@ -2,10 +2,11 @@ package auth
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/api/grpc/object"
 
-	"github.com/caos/zitadel/internal/api/authz"
-	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/internal/api/grpc/object"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func (s *Server) UpdateMyPassword(ctx context.Context, req *auth_pb.UpdateMyPasswordRequest) (*auth_pb.UpdateMyPasswordResponse, error) {

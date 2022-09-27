@@ -4,17 +4,9 @@ import { MatRippleModule } from '@angular/material/core';
 
 import { AvatarComponent } from './avatar.component';
 
-
-
 @NgModule({
-    declarations: [AvatarComponent],
-    imports: [
-        CommonModule,
-        MatRippleModule,
-    ],
-    exports: [
-        AvatarComponent,
-    ],
+  declarations: [AvatarComponent],
+  imports: [CommonModule, MatRippleModule],
+  exports: [AvatarComponent],
 })
-export class AvatarModule { }
-
+export class AvatarModule {}

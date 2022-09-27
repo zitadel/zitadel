@@ -7,7 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 func NewRepo(t *testing.T) *MockRepository {
@@ -26,6 +26,16 @@ func (m *MockRepository) ExpectFilterEvents(events ...*repository.Event) *MockRe
 
 func (m *MockRepository) ExpectFilterEventsError(err error) *MockRepository {
 	m.EXPECT().Filter(gomock.Any(), gomock.Any()).Return(nil, err)
+	return m
+}
+
+func (m *MockRepository) ExpectInstanceIDs(instanceIDs ...string) *MockRepository {
+	m.EXPECT().InstanceIDs(gomock.Any(), gomock.Any()).Return(instanceIDs, nil)
+	return m
+}
+
+func (m *MockRepository) ExpectInstanceIDsError(err error) *MockRepository {
+	m.EXPECT().InstanceIDs(gomock.Any(), gomock.Any()).Return(nil, err)
 	return m
 }
 

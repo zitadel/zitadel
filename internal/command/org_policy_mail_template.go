@@ -3,9 +3,9 @@ package command
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func (c *Commands) AddMailTemplate(ctx context.Context, resourceOwner string, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
@@ -25,7 +25,7 @@ func (c *Commands) AddMailTemplate(ctx context.Context, resourceOwner string, po
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
 	if err != nil {
 		return nil, err
 	}
@@ -55,10 +55,10 @@ func (c *Commands) ChangeMailTemplate(ctx context.Context, resourceOwner string,
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.MailTemplateWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.Template)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.MailTemplate.NotChanged")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-49hfj", "Errors.Org.MailTemplate.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +83,6 @@ func (c *Commands) RemoveMailTemplate(ctx context.Context, orgID string) error {
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 
-	_, err = c.eventstore.PushEvents(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.Push(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
 	return err
 }

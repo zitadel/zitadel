@@ -2,13 +2,15 @@ package command
 
 import (
 	"context"
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
+
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordString string, oneTime bool) (objectDetails *domain.ObjectDetails, err error) {
@@ -33,7 +35,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordStrin
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, passwordEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, passwordEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +46,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordStrin
 	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
 }
 
-func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string) (err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string, passwordVerificationCode crypto.Generator) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -63,7 +65,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
 	}
 
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.passwordVerificationCode)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, passwordVerificationCode)
 	if err != nil {
 		return err
 	}
@@ -77,7 +79,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 	if err != nil {
 		return err
 	}
-	_, err = c.eventstore.PushEvents(ctx, passwordEvent)
+	_, err = c.eventstore.Push(ctx, passwordEvent)
 	return err
 }
 
@@ -111,11 +113,11 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	eventPusher, err := c.changePassword(ctx, userAgentID, password, userAgg, existingPassword)
+	command, err := c.changePassword(ctx, userAgentID, password, userAgg, existingPassword)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, eventPusher)
+	pushedEvents, err := c.eventstore.Push(ctx, command)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +128,7 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
 }
 
-func (c *Commands) changePassword(ctx context.Context, userAgentID string, password *domain.Password, userAgg *eventstore.Aggregate, existingPassword *HumanPasswordWriteModel) (event eventstore.EventPusher, err error) {
+func (c *Commands) changePassword(ctx context.Context, userAgentID string, password *domain.Password, userAgg *eventstore.Aggregate, existingPassword *HumanPasswordWriteModel) (event eventstore.Command, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -146,7 +148,7 @@ func (c *Commands) changePassword(ctx context.Context, userAgentID string, passw
 	return user.NewHumanPasswordChangedEvent(ctx, userAgg, password.SecretCrypto, password.ChangeRequired, userAgentID), nil
 }
 
-func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType, passwordVerificationCode crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-M00oL", "Errors.User.UserIDMissing")
 	}
@@ -162,11 +164,11 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.NotInitialised")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	passwordCode, err := domain.NewPasswordCode(c.passwordVerificationCode)
+	passwordCode, err := domain.NewPasswordCode(passwordVerificationCode)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanPasswordCodeAddedEvent(ctx, userAgg, passwordCode.Code, passwordCode.Expiry, notifyType))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPasswordCodeAddedEvent(ctx, userAgg, passwordCode.Code, passwordCode.Expiry, notifyType))
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +192,7 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg))
+	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg))
 	return err
 }
 
@@ -203,6 +205,14 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	}
 	if password == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
+	}
+
+	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
+	}
+	if !loginPolicy.AllowUsernamePassword {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
 	}
 
 	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)
@@ -222,10 +232,10 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	err = crypto.CompareHash(existingPassword.Secret, []byte(password), c.userPasswordAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
-		_, err = c.eventstore.PushEvents(ctx, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		_, err = c.eventstore.Push(ctx, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	events = append(events, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 {
 		if existingPassword.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
@@ -233,7 +243,7 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		}
 
 	}
-	_, err = c.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.Push(ctx, events...)
 	logging.Log("COMMAND-9fj7s").OnError(err).Error("error create password check failed event")
 	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-452ad", "Errors.User.Password.Invalid")
 }

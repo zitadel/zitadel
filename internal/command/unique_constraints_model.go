@@ -3,17 +3,18 @@ package command
 import (
 	"context"
 
-	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/repository/idpconfig"
-	"github.com/caos/zitadel/internal/repository/member"
-	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/policy"
-	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/member"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
 
 type UniqueConstraintReadModel struct {
@@ -25,7 +26,7 @@ type UniqueConstraintReadModel struct {
 }
 
 type commandProvider interface {
-	getOrgIAMPolicy(ctx context.Context, orgID string) (*domain.OrgIAMPolicy, error)
+	getOrgDomainPolicy(ctx context.Context, orgID string) (*domain.DomainPolicy, error)
 }
 
 func NewUniqueConstraintReadModel(ctx context.Context, provider commandProvider) *UniqueConstraintReadModel {
@@ -35,7 +36,7 @@ func NewUniqueConstraintReadModel(ctx context.Context, provider commandProvider)
 	}
 }
 
-func (rm *UniqueConstraintReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *UniqueConstraintReadModel) AppendEvents(events ...eventstore.Event) {
 	rm.WriteModel.AppendEvents(events...)
 }
 
@@ -50,14 +51,14 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.NewAddOrgDomainUniqueConstraint(e.Domain))
 		case *org.DomainRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, org.UniqueOrgDomain)
-		case *iam.IDPConfigAddedEvent:
+		case *instance.IDPConfigAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner))
-		case *iam.IDPConfigChangedEvent:
+		case *instance.IDPConfigChangedEvent:
 			if e.Name == nil {
 				continue
 			}
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
-		case *iam.IDPConfigRemovedEvent:
+		case *instance.IDPConfigRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.UniqueIDPConfigNameType)
 		case *org.IDPConfigAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner))
@@ -68,7 +69,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner))
 		case *org.IDPConfigRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.ConfigID, idpconfig.UniqueIDPConfigNameType)
-		case *iam.MailTextAddedEvent:
+		case *instance.MailTextAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.MailTextType+e.Language, policy.NewAddMailTextUniqueConstraint(e.Aggregate().ID, e.MailTextType, e.Language))
 		case *org.MailTextAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.MailTextType+e.Language, policy.NewAddMailTextUniqueConstraint(e.Aggregate().ID, e.MailTextType, e.Language))
@@ -92,6 +93,10 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID))
 		case *project.ApplicationChangedEvent:
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID))
+		case *project.SAMLConfigAddedEvent:
+			rm.addUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewAddSAMLConfigEntityIDUniqueConstraint(e.EntityID))
+		case *project.SAMLConfigChangedEvent:
+			rm.addUniqueConstraint(e.Aggregate().ID, e.AppID, project.NewRemoveSAMLConfigEntityIDUniqueConstraint(e.EntityID))
 		case *project.ApplicationRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.AppID, project.UniqueAppNameType)
 		case *project.GrantAddedEvent:
@@ -109,21 +114,21 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 		case *project.RoleRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Key, project.UniqueRoleType)
 		case *user.HumanAddedEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-0k9Gs").WithError(err).Error("could not read policy for human added event unique constraint")
 				continue
 			}
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.HumanRegisteredEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-m9fod").WithError(err).Error("could not read policy for human registered event unique constraint")
 				continue
 			}
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.MachineAddedEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-2n8vs").WithError(err).Error("could not read policy for machine added event unique constraint")
 				continue
@@ -131,38 +136,38 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.UserRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.UniqueUsername)
-			rm.listRemoveUniqueConstraint(e.Aggregate().ID, user.UniqueExternalIDPType)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, user.UniqueUserIDPLinkType)
 		case *user.UsernameChangedEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-5n8gk").WithError(err).Error("could not read policy for username changed event unique constraint")
 				continue
 			}
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.DomainClaimedEvent:
-			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-xb8uf").WithError(err).Error("could not read policy for domain claimed event unique constraint")
 				continue
 			}
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
-		case *user.HumanExternalIDPAddedEvent:
-			rm.addUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID))
-		case *user.HumanExternalIDPRemovedEvent:
-			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueExternalIDPType)
-		case *user.HumanExternalIDPCascadeRemovedEvent:
-			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueExternalIDPType)
+		case *user.UserIDPLinkAddedEvent:
+			rm.addUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.NewAddUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID))
+		case *user.UserIDPLinkRemovedEvent:
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueUserIDPLinkType)
+		case *user.UserIDPLinkCascadeRemovedEvent:
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueUserIDPLinkType)
 		case *usergrant.UserGrantAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, usergrant.NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID))
 		case *usergrant.UserGrantRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, usergrant.UniqueUserGrant)
 		case *usergrant.UserGrantCascadeRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, usergrant.UniqueUserGrant)
-		case *iam.MemberAddedEvent:
+		case *instance.MemberAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.UserID, member.NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID))
-		case *iam.MemberRemovedEvent:
+		case *instance.MemberRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
-		case *iam.MemberCascadeRemovedEvent:
+		case *instance.MemberCascadeRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		case *org.MemberAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.UserID, member.NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID))
@@ -184,7 +189,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().AggregateTypes(
-		iam.AggregateType,
+		instance.AggregateType,
 		org.AggregateType,
 		project.AggregateType,
 		user.AggregateType,
@@ -194,13 +199,13 @@ func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 			org.OrgChangedEventType,
 			org.OrgDomainVerifiedEventType,
 			org.OrgDomainRemovedEventType,
-			iam.IDPConfigAddedEventType,
-			iam.IDPConfigChangedEventType,
-			iam.IDPConfigRemovedEventType,
+			instance.IDPConfigAddedEventType,
+			instance.IDPConfigChangedEventType,
+			instance.IDPConfigRemovedEventType,
 			org.IDPConfigAddedEventType,
 			org.IDPConfigChangedEventType,
 			org.IDPConfigRemovedEventType,
-			iam.MailTextAddedEventType,
+			instance.MailTextAddedEventType,
 			org.MailTextAddedEventType,
 			org.MailTextRemovedEventType,
 			project.ProjectAddedType,
@@ -224,15 +229,15 @@ func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserUserNameChangedType,
 			user.UserDomainClaimedType,
 			user.UserRemovedType,
-			user.HumanExternalIDPAddedType,
-			user.HumanExternalIDPRemovedType,
-			user.HumanExternalIDPCascadeRemovedType,
+			user.UserIDPLinkAddedType,
+			user.UserIDPLinkRemovedType,
+			user.UserIDPLinkCascadeRemovedType,
 			usergrant.UserGrantAddedType,
 			usergrant.UserGrantRemovedType,
 			usergrant.UserGrantCascadeRemovedType,
-			iam.MemberAddedEventType,
-			iam.MemberRemovedEventType,
-			iam.MemberCascadeRemovedEventType,
+			instance.MemberAddedEventType,
+			instance.MemberRemovedEventType,
+			instance.MemberCascadeRemovedEventType,
 			org.MemberAddedEventType,
 			org.MemberRemovedEventType,
 			org.MemberCascadeRemovedEventType,

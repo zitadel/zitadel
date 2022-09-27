@@ -3,9 +3,10 @@ package repository
 import (
 	"database/sql/driver"
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
 	"strconv"
 	"testing"
+
+	"github.com/zitadel/zitadel/internal/domain"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"

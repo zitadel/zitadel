@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/user/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type TokenSearchRequest model.TokenSearchRequest
@@ -57,12 +57,16 @@ func (key TokenSearchKey) ToColumnName() string {
 		return TokenKeyUserAgentID
 	case model.TokenSearchKeyUserID:
 		return TokenKeyUserID
+	case model.TokenSearchKeyRefreshTokenID:
+		return TokenKeyRefreshTokenID
 	case model.TokenSearchKeyApplicationID:
 		return TokenKeyApplicationID
 	case model.TokenSearchKeyExpiration:
 		return TokenKeyExpiration
 	case model.TokenSearchKeyResourceOwner:
 		return TokenKeyResourceOwner
+	case model.TokenSearchKeyInstanceID:
+		return TokenKeyInstanceID
 	default:
 		return ""
 	}

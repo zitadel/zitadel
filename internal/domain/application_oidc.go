@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (
@@ -146,10 +146,15 @@ func (a *OIDCApp) OriginsValid() bool {
 	return true
 }
 
-func (a *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
-	grantTypes := make([]OIDCGrantType, 0)
-	implicit := false
-	for _, r := range a.ResponseTypes {
+func ContainsRequiredGrantTypes(responseTypes []OIDCResponseType, grantTypes []OIDCGrantType) bool {
+	required := RequiredOIDCGrantTypes(responseTypes)
+	return ContainsOIDCGrantTypes(required, grantTypes)
+}
+
+func RequiredOIDCGrantTypes(responseTypes []OIDCResponseType) (grantTypes []OIDCGrantType) {
+	var implicit bool
+
+	for _, r := range responseTypes {
 		switch r {
 		case OIDCResponseTypeCode:
 			grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
@@ -160,7 +165,21 @@ func (a *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
 			}
 		}
 	}
+
 	return grantTypes
+}
+
+func (a *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
+	return RequiredOIDCGrantTypes(a.ResponseTypes)
+}
+
+func ContainsOIDCGrantTypes(shouldContain, list []OIDCGrantType) bool {
+	for _, should := range shouldContain {
+		if !containsOIDCGrantType(list, should) {
+			return false
+		}
+	}
+	return true
 }
 
 func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) bool {
@@ -181,16 +200,38 @@ func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTy
 	case OIDCVersionV1:
 		return GetOIDCV1Compliance(appType, grantTypes, authMethod, redirectUris)
 	}
-	return nil
+	return &Compliance{
+		NoneCompliant: true,
+		Problems:      []string{"Application.OIDC.UnsupportedVersion"},
+	}
 }
 
 func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
 	compliance := &Compliance{NoneCompliant: false}
-	if redirectUris == nil || len(redirectUris) == 0 {
+
+	checkGrantTypesCombination(compliance, grantTypes)
+	checkRedirectURIs(compliance, grantTypes, appType, redirectUris)
+	checkApplicaitonType(compliance, appType, authMethod)
+
+	if compliance.NoneCompliant {
+		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
+	}
+	return compliance
+}
+
+func checkGrantTypesCombination(compliance *Compliance, grantTypes []OIDCGrantType) {
+	if containsOIDCGrantType(grantTypes, OIDCGrantTypeRefreshToken) && !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+		compliance.NoneCompliant = true
+		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.GrantType.Refresh.NoAuthCode")
+	}
+}
+
+func checkRedirectURIs(compliance *Compliance, grantTypes []OIDCGrantType, appType OIDCApplicationType, redirectUris []string) {
+	if len(redirectUris) == 0 {
 		compliance.NoneCompliant = true
 		compliance.Problems = append([]string{"Application.OIDC.V1.NoRedirectUris"}, compliance.Problems...)
 	}
-	CheckGrantTypes(compliance, grantTypes)
+
 	if containsOIDCGrantType(grantTypes, OIDCGrantTypeImplicit) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		CheckRedirectUrisImplicitAndCode(compliance, appType, redirectUris)
 	} else {
@@ -201,7 +242,9 @@ func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType
 			CheckRedirectUrisCode(compliance, appType, redirectUris)
 		}
 	}
+}
 
+func checkApplicaitonType(compliance *Compliance, appType OIDCApplicationType, authMethod OIDCAuthMethodType) {
 	switch appType {
 	case OIDCApplicationTypeNative:
 		GetOIDCV1NativeApplicationCompliance(compliance, authMethod)
@@ -210,14 +253,6 @@ func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType
 	}
 	if compliance.NoneCompliant {
 		compliance.Problems = append([]string{"Application.OIDC.V1.NotCompliant"}, compliance.Problems...)
-	}
-	return compliance
-}
-
-func CheckGrantTypes(compliance *Compliance, grantTypes []OIDCGrantType) {
-	if containsOIDCGrantType(grantTypes, OIDCGrantTypeRefreshToken) && !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
-		compliance.NoneCompliant = true
-		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.GrantType.Refresh.NoAuthCode")
 	}
 }
 
@@ -344,4 +379,23 @@ func isHTTPLoopbackLocalhost(uri string) bool {
 		strings.HasPrefix(uri, httpLoopbackV6WithPort) ||
 		strings.HasPrefix(uri, httpLoopbackV6LongWithoutPort) ||
 		strings.HasPrefix(uri, httpLoopbackV6LongWithPort)
+}
+
+func OIDCOriginAllowList(redirectURIs, additionalOrigins []string) ([]string, error) {
+	allowList := make([]string, 0)
+	for _, redirect := range redirectURIs {
+		origin, err := http_util.GetOriginFromURLString(redirect)
+		if err != nil {
+			return nil, err
+		}
+		if !http_util.IsOriginAllowed(allowList, origin) {
+			allowList = append(allowList, origin)
+		}
+	}
+	for _, origin := range additionalOrigins {
+		if !http_util.IsOriginAllowed(allowList, origin) {
+			allowList = append(allowList, origin)
+		}
+	}
+	return allowList, nil
 }

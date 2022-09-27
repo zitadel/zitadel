@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/caos/zitadel/internal/domain"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/domain"
+	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
 type LabelPolicySearchRequest iam_model.LabelPolicySearchRequest
@@ -55,6 +55,9 @@ func (key LabelPolicySearchKey) ToColumnName() string {
 		return LabelPolicyKeyAggregateID
 	case iam_model.LabelPolicySearchKeyState:
 		return LabelPolicyKeyState
+	case iam_model.LabelPolicySearchKeyInstanceID:
+		return LabelPolicyKeyInstanceID
+
 	default:
 		return ""
 	}

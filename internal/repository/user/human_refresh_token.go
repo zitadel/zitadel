@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -78,7 +78,7 @@ func NewHumanRefreshTokenAddedEvent(
 	}
 }
 
-func HumanRefreshTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanRefreshTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	refreshTokenAdded := &HumanRefreshTokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -129,7 +129,7 @@ func NewHumanRefreshTokenRenewedEvent(
 	}
 }
 
-func HumanRefreshTokenRenewedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanRefreshTokenRenewedEventEventMapper(event *repository.Event) (eventstore.Event, error) {
 	tokenAdded := &HumanRefreshTokenRenewedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -174,7 +174,7 @@ func NewHumanRefreshTokenRemovedEvent(
 	}
 }
 
-func HumanRefreshTokenRemovedEventEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanRefreshTokenRemovedEventEventMapper(event *repository.Event) (eventstore.Event, error) {
 	tokenAdded := &HumanRefreshTokenRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

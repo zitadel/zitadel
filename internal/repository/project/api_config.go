@@ -3,12 +3,13 @@ package project
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
+
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -57,7 +58,26 @@ func NewAPIConfigAddedEvent(
 	}
 }
 
-func APIConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func (e *APIConfigAddedEvent) Validate(cmd eventstore.Command) bool {
+	c, ok := cmd.(*APIConfigAddedEvent)
+	if !ok {
+		return false
+	}
+
+	if e.AppID != c.AppID {
+		return false
+	}
+	if e.ClientID != c.ClientID {
+		return false
+	}
+	if e.AuthMethodType != c.AuthMethodType {
+		return false
+	}
+
+	return true
+}
+
+func APIConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &APIConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -118,7 +138,7 @@ func ChangeAPIAuthMethodType(authMethodType domain.APIAuthMethodType) func(event
 	}
 }
 
-func APIConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func APIConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &APIConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -163,7 +183,7 @@ func NewAPIConfigSecretChangedEvent(
 	}
 }
 
-func APIConfigSecretChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func APIConfigSecretChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &APIConfigSecretChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -205,7 +225,7 @@ func NewAPIConfigSecretCheckSucceededEvent(
 	}
 }
 
-func APIConfigSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func APIConfigSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &APIConfigSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -247,7 +267,7 @@ func NewAPIConfigSecretCheckFailedEvent(
 	}
 }
 
-func APIConfigSecretCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func APIConfigSecretCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &APIConfigSecretCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

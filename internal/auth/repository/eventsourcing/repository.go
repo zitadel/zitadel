@@ -2,35 +2,23 @@ package eventsourcing
 
 import (
 	"context"
+	"database/sql"
 
-	"github.com/caos/logging"
-	"github.com/rakyll/statik/fs"
-
-	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
-	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/auth_request/repository/cache"
-	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/command"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/crypto"
-	es2 "github.com/caos/zitadel/internal/eventstore"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	"github.com/caos/zitadel/internal/id"
-	key_model "github.com/caos/zitadel/internal/key/model"
-	"github.com/caos/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/spooler"
+	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/auth_request/repository/cache"
+	"github.com/zitadel/zitadel/internal/command"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
+	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
+	es_spol "github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type Config struct {
 	SearchLimit uint64
-	Domain      string
-	APIDomain   string
-	Eventstore  v1.Config
-	AuthRequest cache.Config
-	View        types.SQL
 	Spooler     spooler.SpoolerConfig
 }
 
@@ -41,84 +29,63 @@ type EsRepository struct {
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
 	eventstore.RefreshTokenRepo
-	eventstore.KeyRepository
-	eventstore.ApplicationRepo
 	eventstore.UserSessionRepo
-	eventstore.UserGrantRepo
 	eventstore.OrgRepository
-	eventstore.IAMRepository
-	eventstore.FeaturesRepo
 }
 
-func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository, esV2 *es2.Eventstore) (*EsRepository, error) {
-	es, err := v1.Start(conf.Eventstore)
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
+	es, err := v1.Start(dbClient)
+	if err != nil {
+		return nil, err
+	}
+	idGenerator := id.SonyFlakeGenerator()
+
+	view, err := auth_view.StartView(dbClient, oidcEncryption, queries, idGenerator, es)
 	if err != nil {
 		return nil, err
 	}
 
-	sqlClient, err := conf.View.Start()
-	if err != nil {
-		return nil, err
-	}
+	authReq := cache.Start(dbClient)
 
-	keyAlgorithm, err := crypto.NewAESCrypto(systemDefaults.KeyConfig.EncryptionConfig)
-	if err != nil {
-		return nil, err
-	}
-	idGenerator := id.SonyFlakeGenerator
-
-	assetsAPI := conf.APIDomain + "/assets/v1/"
-
-	view, err := auth_view.StartView(sqlClient, keyAlgorithm, idGenerator, assetsAPI)
-	if err != nil {
-		return nil, err
-	}
-
-	authReq, err := cache.Start(conf.AuthRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	statikLoginFS, err := fs.NewWithNamespace("login")
-	logging.Log("CONFI-20opp").OnError(err).Panic("unable to start login statik dir")
-
-	keyChan := make(chan *key_model.KeyView)
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, keyChan)
-	locker := spooler.NewLocker(sqlClient)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, systemDefaults, queries)
 
 	userRepo := eventstore.UserRepo{
-		SearchLimit:     conf.SearchLimit,
-		Eventstore:      es,
-		View:            view,
-		SystemDefaults:  systemDefaults,
-		PrefixAvatarURL: assetsAPI,
+		SearchLimit:    conf.SearchLimit,
+		Eventstore:     es,
+		View:           view,
+		Query:          queries,
+		SystemDefaults: systemDefaults,
+	}
+	//TODO: remove as soon as possible
+	queryView := queryViewWrapper{
+		queries,
+		view,
 	}
 	return &EsRepository{
 		spool,
 		es,
 		userRepo,
 		eventstore.AuthRequestRepo{
-			Command:                    command,
-			OrgViewProvider:            queries,
-			AuthRequests:               authReq,
-			View:                       view,
-			Eventstore:                 es,
-			UserSessionViewProvider:    view,
-			UserViewProvider:           view,
-			UserCommandProvider:        command,
-			UserEventProvider:          &userRepo,
-			IDPProviderViewProvider:    view,
-			LoginPolicyViewProvider:    view,
-			LockoutPolicyViewProvider:  view,
-			UserGrantProvider:          view,
-			ProjectProvider:            view,
-			IdGenerator:                idGenerator,
-			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
-			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
-			MFAInitSkippedLifeTime:     systemDefaults.VerificationLifetimes.MFAInitSkip.Duration,
-			SecondFactorCheckLifeTime:  systemDefaults.VerificationLifetimes.SecondFactorCheck.Duration,
-			MultiFactorCheckLifeTime:   systemDefaults.VerificationLifetimes.MultiFactorCheck.Duration,
-			IAMID:                      systemDefaults.IamID,
+			PrivacyPolicyProvider:     queries,
+			LabelPolicyProvider:       queries,
+			Command:                   command,
+			Query:                     queries,
+			OrgViewProvider:           queries,
+			AuthRequests:              authReq,
+			View:                      view,
+			Eventstore:                es,
+			UserCodeAlg:               userEncryption,
+			UserSessionViewProvider:   view,
+			UserViewProvider:          view,
+			UserCommandProvider:       command,
+			UserEventProvider:         &userRepo,
+			IDPProviderViewProvider:   view,
+			LockoutPolicyViewProvider: queries,
+			LoginPolicyViewProvider:   queries,
+			UserGrantProvider:         queryView,
+			ProjectProvider:           queryView,
+			ApplicationProvider:       queries,
+			IdGenerator:               idGenerator,
 		},
 		eventstore.TokenRepo{
 			View:       view,
@@ -128,52 +95,42 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			View:         view,
 			Eventstore:   es,
 			SearchLimit:  conf.SearchLimit,
-			KeyAlgorithm: keyAlgorithm,
+			KeyAlgorithm: oidcEncryption,
 		},
-		eventstore.KeyRepository{
-			View:                     view,
-			Commands:                 command,
-			Eventstore:               esV2,
-			SigningKeyRotationCheck:  systemDefaults.KeyConfig.SigningKeyRotationCheck.Duration,
-			SigningKeyGracefulPeriod: systemDefaults.KeyConfig.SigningKeyGracefulPeriod.Duration,
-			KeyAlgorithm:             keyAlgorithm,
-			Locker:                   locker,
-			KeyChan:                  keyChan,
-		},
-		eventstore.ApplicationRepo{
-			Commands: command,
-			View:     view,
-		},
-
 		eventstore.UserSessionRepo{
 			View: view,
-		},
-		eventstore.UserGrantRepo{
-			SearchLimit: conf.SearchLimit,
-			View:        view,
-			IamID:       systemDefaults.IamID,
-			Auth:        authZ,
-			AuthZRepo:   authZRepo,
-			Query:       queries,
 		},
 		eventstore.OrgRepository{
 			SearchLimit:    conf.SearchLimit,
 			View:           view,
 			SystemDefaults: systemDefaults,
 			Eventstore:     es,
-		},
-		eventstore.IAMRepository{
-			IAMID:          systemDefaults.IamID,
-			LoginDir:       statikLoginFS,
-			IAMV2QuerySide: queries,
-		},
-		eventstore.FeaturesRepo{
-			Eventstore: es,
-			View:       view,
+			Query:          queries,
 		},
 	}, nil
 }
 
+type queryViewWrapper struct {
+	*query.Queries
+	*auth_view.View
+}
+
+func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, projectID, userID string) ([]*query.UserGrant, error) {
+	userGrantProjectID, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	userGrantUserID, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
+	grants, err := q.Queries.UserGrants(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return grants.UserGrants, nil
+}
 func (repo *EsRepository) Health(ctx context.Context) error {
 	if err := repo.UserRepo.Health(ctx); err != nil {
 		return err

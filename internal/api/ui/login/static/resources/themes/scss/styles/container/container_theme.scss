@@ -1,0 +1,20 @@
+@import 'container';
+
+@mixin lgn-container-theme() {
+    @include lgn-container-color();
+}
+
+@mixin lgn-container-color() {
+  
+    .lgn-error {
+        .lgn-error-message {
+            color: var(--zitadel-color-warn);
+        }
+    }
+
+    .lgn-login-profile {
+        .lgn-names {
+            border-color: var(--zitadel-color-divider);
+        }
+    }
+}

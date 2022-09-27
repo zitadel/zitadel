@@ -3,9 +3,9 @@ package command
 import (
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 type OrgCustomLoginTextReadModel struct {
@@ -24,7 +24,7 @@ func NewOrgCustomLoginTextReadModel(orgID string, lang language.Tag) *OrgCustomL
 	}
 }
 
-func (wm *OrgCustomLoginTextReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgCustomLoginTextReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.CustomTextSetEvent:
@@ -79,7 +79,7 @@ func NewOrgCustomLoginTextsReadModel(orgID string) *OrgCustomLoginTextsReadModel
 	}
 }
 
-func (wm *OrgCustomLoginTextsReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgCustomLoginTextsReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.CustomTextSetEvent:

@@ -2,10 +2,23 @@ package command
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/domain"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/repository/project"
+
+	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/repository/project"
 )
+
+type AddApp struct {
+	Aggregate project.Aggregate
+	ID        string
+	Name      string
+}
+
+func newAppClientSecret(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.HashAlgorithm) (value *crypto.CryptoValue, plain string, err error) {
+	return newCryptoCodeWithPlain(ctx, filter, domain.SecretGeneratorTypeAppSecret, alg)
+}
 
 func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
@@ -23,7 +36,7 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		project.NewApplicationChangedEvent(ctx, projectAgg, appChange.GetAppID(), existingApp.Name, appChange.GetApplicationName()))
 	if err != nil {
@@ -52,7 +65,7 @@ func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, 
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dsh35", "Errors.Project.App.NotActive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +93,7 @@ func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, 
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationReactivatedEvent(ctx, projectAgg, appID))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationReactivatedEvent(ctx, projectAgg, appID))
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +118,13 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name))
+	entityID := ""
+	samlWriteModel, err := c.getSAMLAppWriteModel(ctx, projectID, appID, resourceOwner)
+	if err == nil && samlWriteModel.State != domain.AppStateUnspecified && samlWriteModel.State != domain.AppStateRemoved && samlWriteModel.saml {
+		entityID = samlWriteModel.EntityID
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationRemovedEvent(ctx, projectAgg, appID, existingApp.Name, entityID))
 	if err != nil {
 		return nil, err
 	}

@@ -3,13 +3,19 @@ title: Support Services
 custom_edit_url: null
 --- 
 
+:::note
+
+This document describes the current version of our offering. For terms regarding to our previous offering, which is being shut down on 31.12.2022, please refer to the [agreements under docs-v1.zitadel.com](https://docs-v1.zitadel.com/).
+
+:::
+
 ## Introduction
 
 This annex of the [Framework Agreement](terms-of-service) and the [Support Service Terms and Conditions](terms-support-service) describes the support services offered by us for our Services.
 
 Support Services for products and services provided by CAOS is offered to customers according to the terms and conditions outlined in this document. The customer may purchase support services from CAOS Ltd. directly.
 
-Last revised: August 23, 2021
+Last revised: June 14, 2022
 
 ## Support Services
 
@@ -19,31 +25,38 @@ Last revised: August 23, 2021
 
 **Ticket** means a discrete technical or non-technical issue that was submitted by the customer and exists in the support portal. A ticket includes a record of all communication associated with the issue.
 
-### Description of Services
+## Description of Services
 
-Customers in ZITADEL Cloud FREE plan or using the Open Source Version of ZITADEL are excluded from the support plans. Support features for Subscription plans are as follows:
+### Cloud
 
-Subscription Plans | FREE | OUTPOST | STARBASE | FORTRESS | DEDICATED STANDARD | DEDICATED ADVANCED
---- | --- | --- | --- | --- | --- | ---
-Support hours | not applicable | Business hours | Business hours | Business hours | Business hours | Extended hours
-Response Time <br/> (Severity 1) | n/a | Best effort | 4 business hours | 1 business hour | 2 business hours | 1 business hour
-eMail Support | n/a | yes | yes | yes | yes | yes
-Chat Support | n/a | no | yes | yes | yes | yes
-Phone Support | n/a | no | yes | yes | yes | yes
-Technical Account Manager | n/a | n/a | n/a | n/a | n/a | 2h / week
+Support features for cloud subscriptions are as follows:
 
-CAOS and Customer may mutually agree on different support hours in writing.
+Subscription Plans | Default | Extended SLA  | Self-hosted or dedicated
+--- | --- | --- | ---
+Support hours | Business hours | Business hours | Business hours
+Response Time (Severity 1) | Best effort | 1 business hour | bespoke
+eMail Support | yes | yes | yes
+Phone Support | no | no | yes
+Chat Support |  no | no | optional
+
+If you want to add a [Technical Account Manager] or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
+
+### Self-hosting and dedicated instances
+
+Support plans for self-hosting and dedicated instances according to your purchase order.
+
+Customers can choose support hours (business, extended, 24x7), initial response time, Technical account manager, and communication channels.
 
 ### SLO - Initial response time
 
 CAOS service level objective (SLO) for Support Services  is defined in terms of initial response time to a support request, as outlined in the table below per plan. CAOS will use reasonable efforts to resolve support requests, but does not guarantee a work-around, resolution or resolution time.
 
-Subscription Plans | FREE | OUTPOST | STARBASE | FORTRESS | DEDICATED STANDARD | DEDICATED ADVANCED
---- | --- | --- | --- | --- | --- | ---
-Severity 1| not applicable | not applicable | 4 business hours | 1 business hours | 2 business hours | 1 business hours
-Severity 2| not applicable | not applicable | 12 business hours | 2 business hours | 12 business hours | 2 business hours
-Severity 3| not applicable | not applicable | 24 business hours | 12 business hours | 24 business hours | 12 business hours
-Severity 4| not applicable | not applicable | 48 business hours | 24 business hours | 48 business hours | 24 business hours
+Subscription Plans | Default | Extended SLA
+--- | --- | --- 
+Severity 1| Best effort | 1 business hour
+Severity 2| Best effort | 2 business hour
+Severity 3| Best effort | 12 business hour
+Severity 4| Best effort | 24 business hour
 
 If we fail to provide the initial response time objective, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
 
@@ -55,13 +68,13 @@ If we fail to provide the initial response time objective, you will be entitled 
 
 Support Feature | Contact information
 --- | ---
-eMail Support | support@zitadel.ch
+eMail Support | support@zitadel.com
 Chat Support | Private chat channel between CAOS and Customer that is opened when Subscription becomes active
 Phone Support | +41 43 215 27 34
 
-- ZITADEL Cloud system status, incidents and maintenance windows will be communicated via [our status page](https://status.zitadel.ch).
-- Questions regarding pricing, billing, and invoicing of our services should be addressed to billing@caos.ch.
-- Security related questions and incidents can also be directly addressed to security@caos.ch.
+- ZITADEL Cloud system status, incidents and maintenance windows will be communicated via [our status page](https://status.zitadel.com).
+- Questions regarding pricing, billing, and invoicing of our services should be addressed to billing@zitadel.com
+- Security related questions and incidents can also be directly addressed to security@zitadel.com
 
 ### Technical account manager
 
@@ -70,7 +83,7 @@ CAOS will enhance its support offering by providing eligible clients with a Tech
 - Provide support and advice regarding best practices on platform, product and configuration covered by the applicable Support Services;
 - Participate in review calls every other week at mutually agreed times addressing customer’s operational issues.
 
-We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans. If you require consulting for your projects, please request a quote via our [website](https://zitadel.ch/contact).
+We offer TAM services only bundled with specific subscription plans, and the option to add more TAM hours to these plans. If you require consulting for your projects, please request a quote via our [website](https://zitadel.com/contact).
 
 ## Support
 
@@ -117,6 +130,6 @@ Severity Level | Description
 The customer may escalate support requests following the escalation process:
 
 1. For non-urgent needs, the client may request management escalation within the ticket. A manager will review the request and provide a response within one business day.
-2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to hi@caos.ch. A manager will review the request and provide response within two business hours.
+2. For urgent needs, the client may escalate directly by calling +41 43 456 84 69 and emailing to hi@zitadel.com. A manager will review the request and provide response within two business hours.
 
 If we fail to provide a response to the escalation, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
