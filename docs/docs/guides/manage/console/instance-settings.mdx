@@ -57,13 +57,13 @@ In the notification settings you can configure your SMTP Server settings and you
 On each instance we configure our default SMTP provider. To make sure, that you only send some E-Mails from domains you own. You need to add a custom domain on your instance.
 Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a custom domain.
 
-![Notification Providers](/img/console_instance_policy_notification.png)
+<img src="/img/guides/console/smtp.png" alt="SMTP" width="400px" />
 
 ### SMS
 
-No default provider is configured to send some sms to your users. If you like to validate the phone numbers of your users make sure to add your twilio configuration.
+No default provider is configured to send some SMS to your users. If you like to validate the phone numbers of your users make sure to add your twilio configuration.
 
-![Notification Providers](/img/console_instance_policy_notification_twilio.png)
+<img src="/img/guides/console/twilio.png" alt="Twilio" width="400px" />
 
 ## Login Behaviour and Access
 
@@ -77,7 +77,11 @@ The Login Policy defines how the login process should look like and which authen
 | Force MFA                 | Force a user to register and use a multifactor authentication                      |
 | Passwordless              | Choose if passwordless login is allowed or not                                     |
 
-![Login Policy](/img/manuals/policies/console_org_login.png)
+<img
+  src="/img/guides/console/loginpolicy.png"
+  alt="Login Bahaviour and Access"
+  width="600px"
+/>
 
 ### Passwordless
 
@@ -95,8 +99,6 @@ Secondfactors:
 
 - OTP (One Time Password)
 - U2F (Universal Second Factor)
-
-![Second- and Multifactors](/img/manuals/policies/console_org_second_and_multi_factors.png)
 
 ## Identity Providers
 
@@ -118,7 +120,11 @@ The following properties can be set:
 - Has Number
 - Has Symbol
 
-![Password Complexity Policy](/img/manuals/policies/console_org_pw_complexity.png)
+<img
+  src="/img/guides/console/complexity.png"
+  alt="Password Complexity"
+  width="600px"
+/>
 
 ## Lockout
 
@@ -129,6 +135,8 @@ The following settings are available:
 - Maximum Password Attempts: When the user has reached the maximum password attempts the account will be locked
 
 If an account is locked, the administrator has to unlock it in the ZITADEL console
+
+<img src="/img/guides/console/lockout.png" alt="Lockout" width="600px" />
 
 ## Domain settings
 
@@ -151,7 +159,11 @@ When focused on an input field you can see the language attribute, which can the
 Example:
 `https://demo.com/tos-{{.Lang}}`
 
-![Privacy Policy](/img/manuals/policies/console_org_privacy.png)
+<img
+  src="/img/guides/console/privacypolicy.png"
+  alt="Privacy Policy"
+  width="600px"
+/>
 
 ## Message texts
 

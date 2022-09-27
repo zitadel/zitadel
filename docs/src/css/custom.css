@@ -127,6 +127,7 @@
   --gigibannerforeground: black;
   --footer-border: rgba(0, 0, 0, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
+  --ifm-pagination-nav-color-hover: #000000;
 }
 
 .get-started {
@@ -166,7 +167,7 @@
 }
 
 :root[data-theme="dark"] .navbar:not(.navbar-sidebar--show) {
-  background-color: #15173580;
+  background-color: rgba(var(--ifm-background-color, 0.2));
   backdrop-filter: saturate(110%) blur(5px);
 }
 
@@ -236,8 +237,8 @@ h2 {
 }
 
 :root[data-theme="dark"] {
-  --ifm-navbar-background-color: #1b2036;
-  --ifm-footer-background-color: #121430;
+  --ifm-navbar-background-color: #141c2d; /*  #1b2036; */
+  --ifm-footer-background-color: #00000020; /* #121430; */
   --ifm-menu-color-background-active: #ffffff10;
   --ifm-menu-color-active: #ffffff;
   --ifm-menu-color-background-hover: #3c405850;
@@ -259,7 +260,7 @@ h2 {
   --ifm-color-primary-light: #ff4180;
   --ifm-color-primary-lighter: #ff6396;
   --ifm-color-primary-lightest: #ff90b4;
-  --ifm-background-color: #141735;
+  --ifm-background-color: #141c2d; /*  #141735; */
   --ifm-hero-background-color: #0f1022;
   --ifm-hero-text-color: #ffffff;
   --get-started-bg: var(--ifm-font-color-base);
@@ -273,17 +274,18 @@ h2 {
   --ifm-color-success-dark: #cbf4c9;
   --ifm-color-info-dark: #6c8eef;
   --ifm-color-info-contrast-background: #3c4257;
-  --ifm-table-stripe-background: #1a1d46;
+  --ifm-table-stripe-background: #1a253c; /* #1a1d46; */
   --ifm-color-secondary-contrast-background: #3c4257;
   --ifm-code-background: #3c4257;
-  --ifm-alert-background-color-highlight: #ffc1c1;
+  --ifm-alert-background-color: #92400e50;
+  --ifm-alert-background-color-highlight: #fbbf24;
+  --ifm-color-warning-contrast-background: #92400e50;
+  --ifm-color-warning-contrast-foreground: #fbbf24;
   --ifm-color-warning-dark: #4f566b;
-  --ifm-color-warning-contrast-background: #4f566b;
-  --ifm-color-warning-contrast-foreground: #ffc1c1;
   --ifm-toc-border-color: rgba(135, 149, 161, 0.2);
   --ifm-table-border-color: rgba(135, 149, 161, 0.2);
-  --card-background: #1a1d46;
-  --list-background: #1a1d46;
+  --card-background: #1a253c; /* #1a1d46; */
+  --list-background: #1a253c; /* #1a1d46; */
   --apiauthbackground: linear-gradient(40deg, #506e6e90 30%, #506e6e90);
   --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
   --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
@@ -294,6 +296,7 @@ h2 {
   --gigibannerforeground: white;
   --footer-border: rgba(255, 255, 255, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
+  --ifm-pagination-nav-color-hover: #ffffff;
 }
 
 .get-started:hover {
@@ -312,6 +315,8 @@ i {
 
 main .container img {
   border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
 }
 
 .rounded {
@@ -477,4 +482,10 @@ table th {
 
 a {
   transition: all 1s ease;
+}
+
+.alert {
+  font-size: 14px;
+  border: none;
+  font-weight: 600;
 }
