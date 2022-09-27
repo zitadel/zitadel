@@ -103,6 +103,7 @@
   align-items: center;
   background: var(--list-background);
   border-radius: 1rem;
+  border: 1px solid var(--card-border);
 }
 
 .quickstart p {
