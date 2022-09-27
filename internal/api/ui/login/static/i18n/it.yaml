@@ -87,7 +87,7 @@ InitMFAPrompt:
 
 InitMFAOTP:
   Title: Verificazione a due fattori
-  Description:  Creare il fattore 2. Scaricate un'app di autenticazione, se non ne avete già una.
+  Description:  Scarica un'app di autenticazione e aggiungi la tua chiave
   OTPDescription: Scannerizza il codice con la tua app di autenticazione (ad esempio Google Authenticator) o copia la chiave segreta e inserisci il codice generato nel campo sottostante.
   SecretLabel: Chiave
   CodeLabel: Codice
