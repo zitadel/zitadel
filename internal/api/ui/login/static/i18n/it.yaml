@@ -104,7 +104,7 @@ InitMFAU2F:
 
 InitMFADone:
   Title: Verificazione a due fattori effettuata
-  Description: Fantastico! Avete appena impostato con successo il vostro fattore 2 e reso il vostro account molto più sicuro. Il secondo fattore deve essere inserito a ogni accesso.
+  Description: Fantastico! Hai appena impostato un secondo fattore e quindi reso il tuo account molto più sicuro. Il secondo fattore deve essere inserito a ogni accesso.
   NextButtonText: Avanti
   CancelButtonText: annulla
 
