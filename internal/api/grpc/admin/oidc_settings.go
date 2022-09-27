@@ -18,6 +18,16 @@ func (s *Server) GetOIDCSettings(ctx context.Context, _ *admin_pb.GetOIDCSetting
 	}, nil
 }
 
+func (s *Server) AddOIDCSettings(ctx context.Context, req *admin_pb.AddOIDCSettingsRequest) (*admin_pb.AddOIDCSettingsResponse, error) {
+	result, err := s.command.AddOIDCSettings(ctx, AddOIDCConfigToConfig(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddOIDCSettingsResponse{
+		Details: object.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
 func (s *Server) UpdateOIDCSettings(ctx context.Context, req *admin_pb.UpdateOIDCSettingsRequest) (*admin_pb.UpdateOIDCSettingsResponse, error) {
 	result, err := s.command.ChangeOIDCSettings(ctx, UpdateOIDCConfigToConfig(req))
 	if err != nil {
