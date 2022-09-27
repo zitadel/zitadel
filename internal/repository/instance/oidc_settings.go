@@ -14,7 +14,6 @@ const (
 	oidcSettingsPrefix           = "oidc.settings."
 	OIDCSettingsAddedEventType   = instanceEventTypePrefix + oidcSettingsPrefix + "added"
 	OIDCSettingsChangedEventType = instanceEventTypePrefix + oidcSettingsPrefix + "changed"
-	OIDCSettingsRemovedEventType = instanceEventTypePrefix + oidcSettingsPrefix + "removed"
 )
 
 type OIDCSettingsAddedEvent struct {

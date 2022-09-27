@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -58,7 +57,7 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 		return nil, err
 	}
 	if smtpConfigWriteModel.State != domain.SMTPConfigStateActive {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
 	}
 	var smtpPassword *crypto.CryptoValue
 	if password != "" {
@@ -180,7 +179,7 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, ho
 				return nil, err
 			}
 			if !hasChanged {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
+				return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
 			}
 			return []eventstore.Command{
 				changedEvent,
