@@ -104,6 +104,12 @@ type InstanceSetup struct {
 	EmailTemplate     []byte
 	MessageTexts      []*domain.CustomMessageText
 	SMTPConfiguration *smtp.EmailConfig
+	OIDCSettings      *struct {
+		AccessTokenLifetime        time.Duration
+		IdTokenLifetime            time.Duration
+		RefreshTokenIdleExpiration time.Duration
+		RefreshTokenExpiration     time.Duration
+	}
 }
 
 type ZitadelConfig struct {
@@ -342,6 +348,18 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 				setup.SMTPConfiguration.SMTP.User,
 				[]byte(setup.SMTPConfiguration.SMTP.Password),
 				setup.SMTPConfiguration.Tls,
+			),
+		)
+	}
+
+	if setup.OIDCSettings != nil {
+		validations = append(validations,
+			c.prepareAddOIDCSettings(
+				instanceAgg,
+				setup.OIDCSettings.AccessTokenLifetime,
+				setup.OIDCSettings.IdTokenLifetime,
+				setup.OIDCSettings.RefreshTokenIdleExpiration,
+				setup.OIDCSettings.RefreshTokenExpiration,
 			),
 		)
 	}

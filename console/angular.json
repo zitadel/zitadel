@@ -32,6 +32,7 @@
               "grpc-web",
               "@angular/common/locales/de",
               "codemirror/mode/javascript/javascript",
+              "codemirror/mode/xml/xml",
               "src/app/proto/generated/zitadel/admin_pb",
               "src/app/proto/generated/zitadel/org_pb",
               "src/app/proto/generated/zitadel/management_pb",

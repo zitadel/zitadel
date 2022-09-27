@@ -51,7 +51,13 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	for i, role := range projectRoles.ProjectRoles {
 		allowedScopes[i] = ScopeProjectRolePrefix + role.Key
 	}
-	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, allowedScopes)
+
+	accessTokenLifetime, idTokenLifetime, _, _, err := o.getOIDCSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return ClientFromBusiness(client, o.defaultLoginURL, accessTokenLifetime, idTokenLifetime, allowedScopes)
 }
 
 func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
