@@ -447,6 +447,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           return (this.service as ManagementService)
             .addCustomLabelPolicy(req0)
             .then(() => {
+              this.previewData.isDefault = false;
               this.toast.showInfo('POLICY.TOAST.SET', true);
 
               reloadPolicy();
