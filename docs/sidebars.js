@@ -301,7 +301,7 @@ module.exports = {
         "concepts/structure/granted_projects",
         "concepts/structure/users",
         "concepts/structure/managers",
-        "concepts/zitadel/objects/jwt_idp",
+        "concepts/structure/jwt_idp",
       ],
     },
     {

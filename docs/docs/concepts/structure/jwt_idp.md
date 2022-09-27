@@ -19,14 +19,14 @@ The authentication process then might look like the following:
 
 ![JWT IDP Architecture](/img/concepts/objects/jwt_idp.png)
 
-1. The user is logged into th existing application and the WAF holds the session information. It might even send a JWT to the application.
+1. The user is logged into the existing application and the WAF holds the session information. It might even send a JWT to the application.
    The new application is opened by clicking on a link in the existing application.
-2. The application bootstaps and since it cannot find a session, it will create an OIDC Authorization Request to ZITADEL.
+2. The application bootstraps and since it cannot find a session, it will create an OIDC Authorization Request to ZITADEL.
    In this request it provides a scope to directly request the JWT IDP.
 3. ZITADEL will do so and redirect to the preconfigured JWT Endpoint. While the endpoint is behind the WAF, ZITADEL is able to receive a JWT from a defined http header.
    It will then validate its signature, which might require to call the configured Keys Endpoint.
-   If the signature is valid and token is not expired, ZITADEL will then use the token and the enclosed `sub` claim as if was an id_token returned from a OIDC IDP:
-   It will try to match a user's external identity and if not possible, create a new users with the information the provided token.
+   If the signature is valid and token is not expired, ZITADEL will then use the token and the enclosed `sub` claim as if it was an id_token returned from an OIDC IDP:
+   It will try to match a user's external identity and if not possible, create a new user with the information of the provided token.
    Prerequisite for this is that the IDP setting `autoregister` is set to `true`.
 4. ZITADEL will then redirect to its main instance and the login flow will proceed.
 5. The user will be redirected to the Callback Endpoint of the new Application, where the application will exchange the code for tokens.
@@ -38,7 +38,7 @@ To further explain and illustrate how a JWT IDP works, we will assume the follow
 
 - the **Existing Application** is deployed under `apps.test.com/existing/`
 - the **New Application** is deployed under `new.test.com`
-- the **Login UI of ZITADEL** is deployed under `accounts.zitadel.test.com`
+- the **Login UI of ZITADEL** is deployed under `accounts.test.com`
 
 The **JWT IDP Configuration** might then be:
   - **JWT Endpoint** (Endpoint where ZITADEL will redirect to):<br/>`https://apps.test.com/existing/auth-new`
@@ -48,7 +48,7 @@ The **JWT IDP Configuration** might then be:
 
 Therefore, if the user is redirected from ZITADEL to the JWT Endpoint on the WAF (`https://apps.test.com/existing/auth-new`), 
 the session cookies previously issued by the WAF, will be sent along by the browser due to the path being on the same domain as the exiting application.
-The WAF will reuse the session and send the JWT in the HTTP header `x-custom-tkn` to its upstream, the ZITADEL JWT Endpoint (`https://accounts.zitadel.test.com/login/jwt/authorize`).
+The WAF will reuse the session and send the JWT in the HTTP header `x-custom-tkn` to its upstream, the ZITADEL JWT Endpoint (`https://accounts.test.com/ui/login/login/jwt/authorize`).
 
 For the signature validation, ZITADEL must be able to connect to Keys Endpoint (`https://issuer.test.internal/keys`) 
 and it will check if the token was signed (claim `iss`) by the defined Issuer (`https://issuer.test.internal`).
