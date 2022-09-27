@@ -142,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token 无效
       NotFound: 未找到 Refresh Token
+  Instance:
+    NotFound: 没有找到实例
+    AlreadyExists: 实例已经存在
+    NotChanged: 实例没有改变
   Org:
     AlreadyExists: 组织名称已被占用
     Invalid: 组织无效
