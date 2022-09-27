@@ -41,7 +41,7 @@ func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequ
 }
 
 func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequest) (*system_pb.AddInstanceResponse, error) {
-	id, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.DefaultInstance))
+	id, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
 	if err != nil {
 		return nil, err
 	}

@@ -67,7 +67,7 @@ InitUser:
   Description: You have received a code, which you have to enter in the form below, to verify your email and set your new password.
   CodeLabel: Code
   NewPasswordLabel: New Password
-  NewPasswordConfirmLabel: Confirm Password
+  NewPasswordConfirm: Confirm Password
   NextButtonText: next
   ResendButtonText: resend
 
@@ -239,6 +239,7 @@ ExternalRegistrationUserOverview:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -282,7 +283,7 @@ LinkingUsersDone:
   CancelButtonText: cancel
   NextButtonText: next
 
-ExternalNotFoundOption:
+ExternalNotFound:
   Title: External User
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
@@ -296,6 +297,7 @@ ExternalNotFoundOption:
   English: English
   Italian: Italiano
   French: Français
+  Chinese: 简体中文
 
 Footer:
   PoweredBy: Powered By

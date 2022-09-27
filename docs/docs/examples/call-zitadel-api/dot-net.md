@@ -7,7 +7,7 @@ It demonstrates how to fetch some data from the ZITADEL management API.
 
 At the end of the guide you should have an application able to read the details of your organization.
 
-If you need any other information about the .NET SDK go to the [documentation](https://caos.github.io/zitadel-net/) of the SDK itself.
+If you need any other information about the .NET SDK go to the [documentation](https://zitadel.github.io/zitadel-net/) of the SDK itself.
 ## Prerequisites
 
 The client [SDK](https://github.com/zitadel/zitadel-net) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API.
