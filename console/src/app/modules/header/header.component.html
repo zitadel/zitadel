@@ -2,7 +2,7 @@
   <div class="header-content">
     <a
       class="title custom"
-      [routerLink]="authService.zitadelPermissions.getValue().length === 0 ? ['/users', 'me'] : ['/']"
+      [routerLink]="['/']"
       *ngIf="org && labelpolicy && labelpolicy.disableWatermark; else defaultHome"
     >
       <img
@@ -23,7 +23,7 @@
     </a>
 
     <ng-template #defaultHome>
-      <a class="title" [routerLink]="['/']">
+      <a class="title" [routerLink]="authService.zitadelPermissions.getValue().length === 0 ? ['/users', 'me'] : ['/']">
         <img
           class="logo"
           alt="zitadel logo"
