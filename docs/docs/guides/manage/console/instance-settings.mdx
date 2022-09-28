@@ -167,7 +167,29 @@ Example:
 
 ## Message texts
 
+These are the texts for your notification mails. Available for change are:
+
+| Message Text   | Description                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Domain Claim   | Enable self register possibility in the login ui                                                                 |
+| Initialization | The mail after a user has been created. A code is part of the message which then must be verified on first login |
+| Passwordless   | Possibility to login with an external identity (e.g Google, Microsoft, Apple, etc)                               |
+| Password Reset | Force a user to register and use a multifactor authentication                                                    |
+| Verify Email   | Choose if passwordless login is allowed or not                                                                   |
+
+You can set the locale of the translations on the right.
+
+<img
+  src="/img/guides/console/messagetexts.png"
+  alt="Message texts"
+  width="600px"
+/>
+
 ## Login interface texts
+
+These are the texts for the login. Just like for message texts, you can select the locale on the right.
+
+<img src="/img/guides/console/logintexts.png" alt="Login texts" width="600px" />
 
 ## OIDC token lifetimes and expiration
 
@@ -179,7 +201,11 @@ You can set the following times:
 - Refresh Token Expiration
 - Refresh Token Idle Expiration
 
-![OIDC Token Lifetimes](/img/manuals/policies/console_policy_oidc.png)
+<img
+  src="/img/guides/console/oidcsettings.png"
+  alt="OIDC Token Lifetimes"
+  width="400px"
+/>
 
 ## Secret appearance
 
@@ -194,6 +220,10 @@ The following secrets can be configured:
 - Passwordless initialization code
 - Application secrets
 
-![OIDC Token Lifetimes](/img/manuals/policies/console_policy_secrets.png)
+<img
+  src="/img/guides/console/secretappearance.png"
+  alt="Secret appearance"
+  width="400px"
+/>
 
 If your done with your instance settings, you can proceed setting up your organizations. Again, make sure you get an understanding on how your project is structured and then continue.

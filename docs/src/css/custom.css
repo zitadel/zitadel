@@ -73,7 +73,7 @@
   --ifm-background-color: #fafafa;
   --ifm-navbar-background-color: #ffffff;
   --ifm-footer-background-color: #f4f4f4;
-  --ifm-menu-color-background-active: #7e21ce10;
+  --ifm-menu-color-background-active: #00000010;
   --ifm-menu-color-active: #000000;
   --ifm-menu-color-background-hover: #f7fafc;
   --ifm-font-color-base: #6b7280;
@@ -100,7 +100,8 @@
   --ifm-footer-padding-vertical: 50px;
   --ifm-heading-font-weight: 500;
   --ifm-heading-color: #000000;
-  --ifm-font-color-base: #6b7280;
+  --ifm-font-color-base: #000000dd; /*#6b7280;*/
+  --font-color-strong: #000000;
   --ifm-navbar-link-hover-color: #000000;
   --ifm-heading-color: #000000;
   --ifm-color-success-contrast-foreground: #0e6245;
@@ -243,7 +244,7 @@ h2 {
   --ifm-menu-color-active: #ffffff;
   --ifm-menu-color-background-hover: #3c405850;
   --ifm-font-color-base: #dddddd;
-  --ifm-menu-color: #dddddd;
+  --ifm-menu-color: #c1c9d2;
   --ifm-link-color: #ff2069;
   --docsearch-searchbox-background: #454a66;
   --docsearch-searchbox-focus-background: #454a66;
@@ -267,7 +268,8 @@ h2 {
   --get-started: #ff1f69;
   --ifm-footer-color: #ffffff50;
   --ifm-heading-color: #ffffff;
-  --ifm-font-color-base: #c1c9d2;
+  --ifm-font-color-base: #ffffffdd; /*#c1c9d2; */
+  --font-color-strong: #ffffff;
   --ifm-navbar-link-hover-color: #ffffff;
   --ifm-color-success-contrast-foreground: #cbf4c9;
   --ifm-color-success-contrast-background: #4f566b;
@@ -468,10 +470,6 @@ main .container img {
   border-top: 1px solid var(--footer-border);
 }
 
-table {
-  border-radius: 0.5rem;
-}
-
 table th {
   padding: 0.5rem 1rem;
   text-transform: uppercase;
@@ -488,4 +486,8 @@ a {
   font-size: 14px;
   border: none;
   font-weight: 600;
+}
+
+p strong {
+  color: var(--font-color-strong);
 }
