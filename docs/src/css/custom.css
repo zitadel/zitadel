@@ -238,7 +238,7 @@ h2 {
 }
 
 :root[data-theme="dark"] {
-  --ifm-navbar-background-color: #141c2d; /*  #1b2036; */
+  --ifm-navbar-background-color: #1b2036; /*#141c2d;*/
   --ifm-footer-background-color: #00000020; /* #121430; */
   --ifm-menu-color-background-active: #ffffff10;
   --ifm-menu-color-active: #ffffff;
@@ -261,14 +261,14 @@ h2 {
   --ifm-color-primary-light: #ff4180;
   --ifm-color-primary-lighter: #ff6396;
   --ifm-color-primary-lightest: #ff90b4;
-  --ifm-background-color: #141c2d; /*  #141735; */
+  --ifm-background-color: #141735; /* #141c2d; */
   --ifm-hero-background-color: #0f1022;
   --ifm-hero-text-color: #ffffff;
   --get-started-bg: var(--ifm-font-color-base);
   --get-started: #ff1f69;
   --ifm-footer-color: #ffffff50;
   --ifm-heading-color: #ffffff;
-  --ifm-font-color-base: #ffffffdd; /*#c1c9d2; */
+  --ifm-font-color-base: #ffffffdd; /* #c1c9d2; */
   --font-color-strong: #ffffff;
   --ifm-navbar-link-hover-color: #ffffff;
   --ifm-color-success-contrast-foreground: #cbf4c9;
