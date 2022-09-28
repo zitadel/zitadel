@@ -142,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Le jeton de rafraîchissement n'est pas valide
       NotFound: Jeton de rafraîchissement non trouvé
+  Instance:
+    NotFound: Instance non trouvée
+    AlreadyExists: L'instance existe déjà
+    NotChanged: L'instance n'a pas changé
   Org:
     AlreadyExists: Le nom de l'organisation est déjà pris
     Invalid: L'organisation n'est pas valide
@@ -394,7 +398,7 @@ Errors:
     ReadError: Erreur de lecture du fichier de traduction
     MergeError: Le fichier de traduction n'a pas pu être fusionné avec les traductions personnalisées.
     NotFound: Le fichier de traduction n'existe pas
-  MetaData:
+  Metadata:
     NotFound: Métadonnées non trouvées
     NoData: La liste des métadonnées est vide
     Invalid: Les métadonnées ne sont pas valides

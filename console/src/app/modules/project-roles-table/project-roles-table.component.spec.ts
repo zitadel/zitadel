@@ -9,14 +9,12 @@ describe('ProjectRolesTableComponent', () => {
   let component: ProjectRolesTableComponent;
   let fixture: ComponentFixture<ProjectRolesTableComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [ProjectRolesTableComponent],
-        imports: [NoopAnimationsModule, MatSortModule, MatTableModule],
-      }).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [ProjectRolesTableComponent],
+      imports: [NoopAnimationsModule, MatSortModule, MatTableModule],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ProjectRolesTableComponent);

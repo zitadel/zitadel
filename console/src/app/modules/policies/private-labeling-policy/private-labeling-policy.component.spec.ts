@@ -9,8 +9,7 @@ describe('PrivateLabelingPolicyComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PrivateLabelingPolicyComponent],
-    })
-      .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {

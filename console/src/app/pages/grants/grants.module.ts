@@ -9,16 +9,7 @@ import { GrantsRoutingModule } from './grants-routing.module';
 import { GrantsComponent } from './grants.component';
 
 @NgModule({
-    declarations: [
-        GrantsComponent,
-    ],
-    imports: [
-        CommonModule,
-        GrantsRoutingModule,
-        UserGrantsModule,
-        TranslateModule,
-        HasRoleModule,
-        HasRolePipeModule,
-    ],
+  declarations: [GrantsComponent],
+  imports: [CommonModule, GrantsRoutingModule, UserGrantsModule, TranslateModule, HasRoleModule, HasRolePipeModule],
 })
-export class GrantsModule { }
+export class GrantsModule {}

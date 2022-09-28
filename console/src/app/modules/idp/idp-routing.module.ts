@@ -4,15 +4,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { IdpComponent } from './idp.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: IdpComponent,
-        data: { animation: 'DetailPage' },
-    },
+  {
+    path: '',
+    component: IdpComponent,
+    data: { animation: 'DetailPage' },
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class IdpRoutingModule { }
+export class IdpRoutingModule {}

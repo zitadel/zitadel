@@ -23,7 +23,7 @@ type TokenRepo struct {
 }
 
 func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string) (bool, error) {
-	token, err := repo.TokenByID(ctx, userID, tokenID)
+	token, err := repo.TokenByIDs(ctx, userID, tokenID)
 	if err == nil {
 		return token.Expiration.After(time.Now().UTC()), nil
 	}
@@ -33,8 +33,8 @@ func (repo *TokenRepo) IsTokenValid(ctx context.Context, userID, tokenID string)
 	return false, err
 }
 
-func (repo *TokenRepo) TokenByID(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error) {
-	token, viewErr := repo.View.TokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
+func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error) {
+	token, viewErr := repo.View.TokenByIDs(tokenID, userID, authz.GetInstance(ctx).InstanceID())
 	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}

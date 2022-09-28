@@ -27,9 +27,9 @@ export class ProjectGrantMembersDataSource extends DataSource<Member.AsObject> {
 
     this.loadingSubject.next(true);
 
-    from(this.service.listProjectGrantMembers(projectId,
-      grantId, pageSize, offset)).pipe(
-        map(resp => {
+    from(this.service.listProjectGrantMembers(projectId, grantId, pageSize, offset))
+      .pipe(
+        map((resp) => {
           this.totalResult = resp.details?.totalResult || 0;
           if (resp.details?.viewTimestamp) {
             this.viewTimestamp = resp.details?.viewTimestamp;
@@ -38,7 +38,8 @@ export class ProjectGrantMembersDataSource extends DataSource<Member.AsObject> {
         }),
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
-      ).subscribe(members => {
+      )
+      .subscribe((members) => {
         this.membersSubject.next(members);
       });
   }

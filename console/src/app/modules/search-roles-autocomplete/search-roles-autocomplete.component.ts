@@ -8,7 +8,6 @@ import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Role, RoleDisplayNameQuery, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
-
 @Component({
   selector: 'cnsl-search-roles-autocomplete',
   templateUrl: './search-roles-autocomplete.component.html',
@@ -36,8 +35,8 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
       .pipe(
         takeUntil(this.unsubscribed$),
         debounceTime(200),
-        tap(() => this.isLoading = true),
-        switchMap(value => {
+        tap(() => (this.isLoading = true)),
+        switchMap((value) => {
           const query = new RoleQuery();
 
           // const key = new RoleKeyQuery();
@@ -50,12 +49,16 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
 
           return from(this.mgmtService.listProjectRoles(this.projectId, 10, 0, [query]));
         }),
-      ).subscribe((resp) => {
-        this.isLoading = false;
-        this.filteredRoles = resp.resultList;
-      }, error => {
-        this.isLoading = false;
-      });
+      )
+      .subscribe(
+        (resp) => {
+          this.isLoading = false;
+          this.filteredRoles = resp.resultList;
+        },
+        (error) => {
+          this.isLoading = false;
+        },
+      );
   }
 
   public ngOnDestroy(): void {
@@ -118,7 +121,6 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
         this.nameInput.nativeElement.value = '';
         this.myControl.setValue(null);
       }
-
     }
   }
 }

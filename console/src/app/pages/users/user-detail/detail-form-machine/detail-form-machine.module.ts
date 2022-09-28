@@ -9,24 +9,19 @@ import { InputModule } from 'src/app/modules/input/input.module';
 
 import { DetailFormMachineComponent } from './detail-form-machine.component';
 
-
 @NgModule({
-    declarations: [
-        DetailFormMachineComponent,
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        TranslateModule,
-        InputModule,
-        MatSelectModule,
-        MatButtonModule,
-        MatIconModule,
-        TranslateModule,
-    ],
-    exports: [
-        DetailFormMachineComponent,
-    ],
+  declarations: [DetailFormMachineComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TranslateModule,
+    InputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    TranslateModule,
+  ],
+  exports: [DetailFormMachineComponent],
 })
-export class DetailFormMachineModule { }
+export class DetailFormMachineModule {}

@@ -107,8 +107,15 @@ module.exports = {
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
             "guides/manage/customize/user-metadata",
-          ],
+          ]
         },
+        {
+          type: 'category',
+          label: 'Terraform',
+          items: [
+            "guides/manage/terraform/basics",
+          ]
+        }
       ],
     },
     {
@@ -240,6 +247,15 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Observability",
+      collapsed: false,
+      items: [
+        "apis/observability/metrics",
+        "apis/observability/health",
+      ],
+    },
+    {
+      type: "category",
       label: "Rate Limits",
       collapsed: false,
       items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
@@ -280,6 +296,8 @@ module.exports = {
         "concepts/structure/granted_projects",
         "concepts/structure/users",
         "concepts/structure/policies",
+        "concepts/structure/managers",
+        "concepts/structure/jwt_idp",
       ],
     },
     {
@@ -292,7 +310,10 @@ module.exports = {
       type: "category",
       label: "Features",
       collapsed: false,
-      items: ["concepts/features/actions"],
+      items: [
+        "concepts/features/actions",
+        "concepts/features/selfservice"
+      ],
     },
   ],
   manuals: [
