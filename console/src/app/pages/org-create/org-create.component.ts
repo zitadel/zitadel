@@ -10,6 +10,7 @@ import { SetUpOrgRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -49,14 +50,18 @@ function passwordConfirmValidator(c: AbstractControl): any {
   ],
 })
 export class OrgCreateComponent {
-  public orgForm!: UntypedFormGroup;
-  public userForm!: UntypedFormGroup;
-  public pwdForm!: UntypedFormGroup;
+  public orgForm: UntypedFormGroup = this.fb.group({
+    name: ['', [Validators.required]],
+    domain: [''],
+  });
+
+  public userForm?: UntypedFormGroup;
+  public pwdForm?: UntypedFormGroup;
 
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en'];
+  public languages: string[] = ['de', 'en', 'it', 'fr'];
 
-  public policy!: PasswordComplexityPolicy.AsObject;
+  public policy?: PasswordComplexityPolicy.AsObject;
   public usePassword: boolean = false;
 
   public forSelf: boolean = true;
@@ -69,7 +74,16 @@ export class OrgCreateComponent {
     private fb: UntypedFormBuilder,
     private mgmtService: ManagementService,
     private authService: GrpcAuthService,
+    breadcrumbService: BreadcrumbService,
   ) {
+    const instanceBread = new Breadcrumb({
+      type: BreadcrumbType.INSTANCE,
+      name: 'Instance',
+      routerLink: ['/instance'],
+    });
+
+    breadcrumbService.setBreadcrumb([instanceBread]);
+
     this.authService
       .isAllowed(['iam.write'])
       .pipe(take(1))
@@ -79,12 +93,11 @@ export class OrgCreateComponent {
         }
       });
 
-    this.orgForm = this.fb.group({
-      name: ['', [Validators.required]],
-      domain: [''],
-    });
-
     this.initForm();
+
+    this.adminService.getSupportedLanguages().then((supportedResp) => {
+      this.languages = supportedResp.languagesList;
+    });
   }
 
   public createSteps: number = 2;
@@ -96,7 +109,9 @@ export class OrgCreateComponent {
     createOrgRequest.setDomain(this.domain?.value);
 
     const humanRequest: SetUpOrgRequest.Human = new SetUpOrgRequest.Human();
-    humanRequest.setEmail(new SetUpOrgRequest.Human.Email().setEmail(this.email?.value));
+    humanRequest.setEmail(
+      new SetUpOrgRequest.Human.Email().setEmail(this.email?.value).setIsEmailVerified(this.isVerified?.value),
+    );
     humanRequest.setUserName(this.userName?.value);
 
     const profile: SetUpOrgRequest.Human.Profile = new SetUpOrgRequest.Human.Profile();
@@ -113,16 +128,8 @@ export class OrgCreateComponent {
 
     this.adminService
       .SetUpOrg(createOrgRequest, humanRequest)
-      .then((resp) => {
+      .then(() => {
         this.router.navigate(['/orgs']);
-
-        // const orgResp = org.getOrg();
-        // if (orgResp) {
-        //     this.authService.setActiveOrg(orgResp.toObject());
-        //     this.router.navigate(['/org']);
-        // } else {
-        //     this.router.navigate(['/org', 'overview']);
-        // }
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -143,6 +150,7 @@ export class OrgCreateComponent {
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required]],
+      isVerified: [false, []],
       gender: [''],
       nickName: [''],
       preferredLanguage: [''],
@@ -228,39 +236,43 @@ export class OrgCreateComponent {
   }
 
   public get userName(): AbstractControl | null {
-    return this.userForm.get('userName');
+    return this.userForm?.get('userName') ?? null;
   }
 
   public get firstName(): AbstractControl | null {
-    return this.userForm.get('firstName');
+    return this.userForm?.get('firstName') ?? null;
   }
 
   public get lastName(): AbstractControl | null {
-    return this.userForm.get('lastName');
+    return this.userForm?.get('lastName') ?? null;
   }
 
   public get email(): AbstractControl | null {
-    return this.userForm.get('email');
+    return this.userForm?.get('email') ?? null;
+  }
+
+  public get isVerified(): AbstractControl | null {
+    return this.userForm?.get('isVerified') ?? null;
   }
 
   public get nickName(): AbstractControl | null {
-    return this.userForm.get('nickName');
+    return this.userForm?.get('nickName') ?? null;
   }
 
   public get preferredLanguage(): AbstractControl | null {
-    return this.userForm.get('preferredLanguage');
+    return this.userForm?.get('preferredLanguage') ?? null;
   }
 
   public get gender(): AbstractControl | null {
-    return this.userForm.get('gender');
+    return this.userForm?.get('gender') ?? null;
   }
 
   public get password(): AbstractControl | null {
-    return this.pwdForm.get('password');
+    return this.pwdForm?.get('password') ?? null;
   }
 
   public get confirmPassword(): AbstractControl | null {
-    return this.pwdForm.get('confirmPassword');
+    return this.pwdForm?.get('confirmPassword') ?? null;
   }
 
   public close(): void {

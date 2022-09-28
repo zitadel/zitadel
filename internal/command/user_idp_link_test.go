@@ -79,6 +79,23 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
 				),
 			},
 			args: args{
@@ -104,6 +121,23 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
 				),
 			},
 			args: args{
@@ -129,6 +163,23 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(),
 				),
@@ -156,6 +207,23 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewIDPConfigAddedEvent(context.Background(),
@@ -205,6 +273,23 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(
+								context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"userName",
+								"firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.German,
+								domain.GenderFemale,
+								"email@Address.ch",
+								false,
+							),
+						),
+					),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(

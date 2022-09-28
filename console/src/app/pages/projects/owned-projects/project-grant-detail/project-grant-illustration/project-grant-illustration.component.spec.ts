@@ -8,9 +8,8 @@ describe('ProjectGrantIllustrationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ProjectGrantIllustrationComponent ]
-    })
-    .compileComponents();
+      declarations: [ProjectGrantIllustrationComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

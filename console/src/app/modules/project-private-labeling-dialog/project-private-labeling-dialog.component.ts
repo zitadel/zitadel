@@ -14,13 +14,14 @@ export class ProjectPrivateLabelingDialogComponent {
     PrivateLabelingSetting.PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY,
     PrivateLabelingSetting.PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY,
   ];
-  constructor(public dialogRef: MatDialogRef<ProjectPrivateLabelingDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor(
+    public dialogRef: MatDialogRef<ProjectPrivateLabelingDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+  ) {
     this.setting = data.setting;
   }
 
   closeDialog(setting?: PrivateLabelingSetting): void {
     this.dialogRef.close(setting);
   }
-
 }

@@ -17,11 +17,12 @@ export default defineConfig({
   defaultCommandTimeout: 10000,
 
   env: {
-    ORGANIZATION: process.env.CYPRESS_ORGANIZATION || 'zitadel'
+    ORGANIZATION: process.env.CYPRESS_ORGANIZATION || 'zitadel',
+    BACKEND_URL: process.env.CYPRESS_BACKEND_URL || baseUrl().replace("/ui/console", "")
   },
 
   e2e: {
-    baseUrl: process.env.CYPRESS_BASE_URL || 'http://localhost:8080',
+    baseUrl: baseUrl(),
     experimentalSessionAndOrigin: true,
     setupNodeEvents(on, config) {
 
@@ -39,3 +40,7 @@ export default defineConfig({
     },
   },
 });
+
+function baseUrl(){
+  return process.env.CYPRESS_BASE_URL || 'http://localhost:8080/ui/console'
+}

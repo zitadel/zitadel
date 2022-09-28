@@ -217,7 +217,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.projects2 SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"instance-id",

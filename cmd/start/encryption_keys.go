@@ -10,6 +10,7 @@ var (
 		"domainVerificationKey",
 		"idpConfigKey",
 		"oidcKey",
+		"samlKey",
 		"otpKey",
 		"smsKey",
 		"smtpKey",
@@ -23,6 +24,7 @@ type encryptionKeys struct {
 	DomainVerification crypto.EncryptionAlgorithm
 	IDPConfig          crypto.EncryptionAlgorithm
 	OIDC               crypto.EncryptionAlgorithm
+	SAML               crypto.EncryptionAlgorithm
 	OTP                crypto.EncryptionAlgorithm
 	SMS                crypto.EncryptionAlgorithm
 	SMTP               crypto.EncryptionAlgorithm
@@ -46,6 +48,10 @@ func ensureEncryptionKeys(keyConfig *encryptionKeyConfig, keyStorage crypto.KeyS
 		return nil, err
 	}
 	keys.OIDC, err = crypto.NewAESCrypto(keyConfig.OIDC, keyStorage)
+	if err != nil {
+		return nil, err
+	}
+	keys.SAML, err = crypto.NewAESCrypto(keyConfig.SAML, keyStorage)
 	if err != nil {
 		return nil, err
 	}

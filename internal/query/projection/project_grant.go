@@ -3,8 +3,7 @@ package projection
 import (
 	"context"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -53,7 +52,7 @@ func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(ProjectGrantColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ProjectGrantColumnResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("pg_ro_idx", []string{ProjectGrantColumnResourceOwner})),
 			crdb.WithIndex(crdb.NewIndex("granted_org_idx", []string{ProjectGrantColumnGrantedOrgID})),
 		),
 	)
@@ -125,7 +124,7 @@ func (p *projectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 			handler.NewCol(ProjectGrantColumnState, domain.ProjectGrantStateActive),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnGrantedOrgID, e.GrantedOrgID),
-			handler.NewCol(ProjectGrantColumnRoleKeys, pq.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
 		},
 	), nil
 }
@@ -140,7 +139,7 @@ func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 		[]handler.Column{
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectGrantColumnRoleKeys, pq.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
@@ -159,7 +158,7 @@ func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectGrantColumnRoleKeys, pq.StringArray(e.RoleKeys)),
+			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),

@@ -62,6 +62,8 @@
                     </option>
                     <option value="fr" id="fr" {{if (selectedLanguage "fr")}} selected {{end}}>{{t "RegistrationUser.French"}}
                     </option>
+                    <option value="zh" id="zh" {{if (selectedLanguage "zh")}} selected {{end}}>{{t "RegistrationUser.Chinese"}}
+                    </option>
                 </select>
             </div>
             <div class="lgn-field" >
@@ -97,7 +99,7 @@
         </div>
 
         <div class="lgn-field">
-            {{ .PasswordPolicyDescription }}
+            {{ template "password-complexity-policy-description" . }}
         </div>
 
         {{ if or .TOSLink .PrivacyLink }}

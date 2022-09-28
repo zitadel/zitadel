@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -32,7 +33,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(keypair.AddedEventType),
 					keypair.AggregateType,
-					keypairAddedEventData(time.Now().Add(time.Hour)),
+					keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(time.Hour)),
 				), keypair.AddedEventMapper),
 			},
 			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
@@ -44,7 +45,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.keys2 (id, creation_date, change_date, resource_owner, instance_id, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.keys4 (id, creation_date, change_date, resource_owner, instance_id, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -57,7 +58,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys2_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys4_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -71,7 +72,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys2_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys4_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -89,7 +90,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(keypair.AddedEventType),
 					keypair.AggregateType,
-					keypairAddedEventData(time.Now().Add(-time.Hour)),
+					keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(-time.Hour)),
 				), keypair.AddedEventMapper),
 			},
 			reduce: (&keyProjection{}).reduceKeyPairAdded,
@@ -119,7 +120,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.keys2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.keys4 SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"instance-id",
@@ -146,6 +147,10 @@ func TestKeyProjection_reduces(t *testing.T) {
 	}
 }
 
-func keypairAddedEventData(t time.Time) []byte {
-	return []byte(`{"algorithm": "algorithm", "usage": 0, "privateKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}, "publicKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHVibGljS2V5"}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
+func keypairAddedEventData(usage domain.KeyUsage, t time.Time) []byte {
+	return []byte(`{"algorithm": "algorithm", "usage": ` + fmt.Sprintf("%d", usage) + `, "privateKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}, "publicKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHVibGljS2V5"}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
+}
+
+func certificateAddedEventData(usage domain.KeyUsage, t time.Time) []byte {
+	return []byte(`{"algorithm": "algorithm", "usage": ` + fmt.Sprintf("%d", usage) + `, "certificate": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
 }

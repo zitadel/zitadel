@@ -116,6 +116,13 @@ func (p *customTextProjection) reduceSet(event eventstore.Event) (*handler.State
 	return crdb.NewUpsertStatement(
 		&customTextEvent,
 		[]handler.Column{
+			handler.NewCol(CustomTextInstanceIDCol, nil),
+			handler.NewCol(CustomTextAggregateIDCol, nil),
+			handler.NewCol(CustomTextTemplateCol, nil),
+			handler.NewCol(CustomTextKeyCol, nil),
+			handler.NewCol(CustomTextLanguageCol, nil),
+		},
+		[]handler.Column{
 			handler.NewCol(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCol(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 			handler.NewCol(CustomTextCreationDateCol, customTextEvent.CreationDate()),

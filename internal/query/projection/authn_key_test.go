@@ -162,7 +162,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys2 SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys2 SET enabled = $1 WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"appId",
@@ -190,7 +190,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys2 SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys2 SET enabled = $1 WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
 								true,
 								"appId",
@@ -265,7 +265,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys2 SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys2 SET enabled = $1 WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"appId",
@@ -293,7 +293,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys2 SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys2 SET enabled = $1 WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
 								true,
 								"appId",
@@ -456,7 +456,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.authn_keys2 SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"instance-id",

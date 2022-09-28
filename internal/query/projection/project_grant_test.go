@@ -3,8 +3,7 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -163,7 +162,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								pq.StringArray{"admin", "user"},
+								database.StringArray{"admin", "user"},
 								"grant-id",
 								"agg-id",
 							},
@@ -194,7 +193,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
-								pq.StringArray{"admin", "user"},
+								database.StringArray{"admin", "user"},
 								"grant-id",
 								"agg-id",
 							},
@@ -232,7 +231,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 								domain.ProjectGrantStateActive,
 								uint64(15),
 								"granted-org-id",
-								pq.StringArray{"admin", "user"},
+								database.StringArray{"admin", "user"},
 							},
 						},
 					},
@@ -257,7 +256,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.project_grants2 SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"instance-id",

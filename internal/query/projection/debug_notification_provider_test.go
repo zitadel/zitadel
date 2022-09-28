@@ -236,7 +236,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.notification_providers2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (aggregate_id = $3)",
+							expectedStmt: "UPDATE projections.notification_providers2 SET owner_removed = $1 WHERE (instance_id = $2) AND (aggregate_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"instance-id",

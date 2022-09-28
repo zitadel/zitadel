@@ -15,6 +15,9 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 	if userID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}
+	if err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
+		return err
+	}
 
 	linkWriteModel := NewUserIDPLinkWriteModel(userID, link.IDPConfigID, link.ExternalUserID, resourceOwner)
 	userAgg := UserAggregateFromWriteModel(&linkWriteModel.WriteModel)
@@ -34,6 +37,10 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 	}
 	if len(links) == 0 {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
+	}
+
+	if err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
+		return err
 	}
 
 	events := make([]eventstore.Command, len(links))
@@ -58,6 +65,7 @@ func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggrega
 	if !link.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid")
 	}
+
 	_, err := c.getOrgIDPConfigByID(ctx, link.IDPConfigID, human.ResourceOwner)
 	if caos_errs.IsNotFound(err) {
 		_, err = c.getInstanceIDPConfigByID(ctx, link.IDPConfigID)

@@ -44,9 +44,8 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 		baseData:    l.getBaseData(r, authReq, "Change Password", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
-	policy, description, _ := l.getPasswordComplexityPolicy(r, authReq, authReq.UserOrgID)
+	policy := l.getPasswordComplexityPolicy(r, authReq.UserOrgID)
 	if policy != nil {
-		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
 		if policy.HasUppercase {
 			data.HasUppercase = UpperCaseRegex

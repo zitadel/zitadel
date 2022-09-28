@@ -1,7 +1,7 @@
 <cnsl-top-view
   title="{{ project?.projectName }}"
   [hasActions]="false"
-  docLink="https://docs.zitadel.com/docs/guides/basics/projects#what-is-a-granted-project"
+  docLink="https://docs.zitadel.com/docs/guides/manage/console/projects#what-is-a-granted-project"
   sub="{{ 'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate }} {{ 'ACTIONS.OF' | translate }} <strong>{{
     project?.projectOwnerName
   }}</strong>"
@@ -54,7 +54,12 @@
     </ng-template>
 
     <div metainfo>
-      <cnsl-changes *ngIf="project" [changeType]="ChangeType.PROJECT_GRANT" [id]="project.projectId" [secId]="project.grantId"></cnsl-changes>
+      <cnsl-changes
+        *ngIf="project"
+        [changeType]="ChangeType.PROJECT_GRANT"
+        [id]="project.projectId"
+        [secId]="project.grantId"
+      ></cnsl-changes>
     </div>
   </cnsl-meta-layout>
 </div>

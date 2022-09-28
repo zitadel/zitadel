@@ -1,15 +1,15 @@
 <cnsl-top-view
   *ngIf="user"
-  title="{{ user?.human ? user.human?.profile?.displayName : user?.machine?.name }}"
-  docLink="https://docs.zitadel.com/docs/guides/basics/projects"
-  sub="{{ user?.preferredLoginName }}"
-  [isActive]="user?.state === UserState.USER_STATE_ACTIVE"
-  [isInactive]="user?.state === UserState.USER_STATE_INACTIVE"
-  stateTooltip="{{ 'USER.STATE.' + user?.state | translate }}"
+  title="{{ user.human ? user.human.profile?.displayName : user.machine?.name }}"
+  docLink="https://docs.zitadel.com/docs/guides/manage/console/projects"
+  sub="{{ user.preferredLoginName }}"
+  [isActive]="user.state === UserState.USER_STATE_ACTIVE"
+  [isInactive]="user.state === UserState.USER_STATE_INACTIVE"
+  stateTooltip="{{ 'USER.STATE.' + user.state | translate }}"
   (backClicked)="navigateBack()"
-  [hasActions]="['user.write$', 'user.write:' + user?.id] | hasRole | async"
+  [hasActions]="['user.write$', 'user.write:' + user.id] | hasRole | async"
 >
-  <ng-template topActions cnslHasRole [hasRole]="['user.write$', 'user.write:' + user?.id]">
+  <ng-template topActions cnslHasRole [hasRole]="['user.write$', 'user.write:' + user.id]">
     <button mat-menu-item color="warn" *ngIf="user?.state === UserState.USER_STATE_LOCKED" (click)="unlockUser()">
       {{ 'USER.PAGES.UNLOCK' | translate }}
     </button>
@@ -27,7 +27,7 @@
     >
       {{ 'USER.PAGES.REACTIVATE' | translate }}
     </button>
-    <ng-template cnslHasRole [hasRole]="['user.delete$', 'user.delete:' + user?.id]">
+    <ng-template cnslHasRole [hasRole]="['user.delete$', 'user.delete:' + user.id]">
       <button mat-menu-item matTooltip="{{ 'USER.PAGES.DELETE' | translate }}" (click)="deleteUser()">
         <span [style.color]="'var(--warn)'">{{ 'USER.PAGES.DELETE' | translate }}</span>
       </button>
@@ -60,7 +60,7 @@
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
         <ng-container *ngIf="currentSetting === 'general'">
-          <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user?.id]">
+          <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user.id]">
             <cnsl-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
               <cnsl-detail-form
                 [preferredLoginName]="user.preferredLoginName"
@@ -92,7 +92,7 @@
               <cnsl-contact
                 [disablePhoneCode]="true"
                 [state]="user.state"
-                [canWrite]="['user.write:' + user?.id, 'user.write$'] | hasRole | async"
+                [canWrite]="['user.write:' + user.id, 'user.write$'] | hasRole | async"
                 *ngIf="user?.human"
                 [human]="user.human"
                 (editType)="openEditDialog($event)"
@@ -146,7 +146,7 @@
         </ng-container>
 
         <ng-container *ngIf="currentSetting && currentSetting === 'pat'">
-          <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user?.id]">
+          <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user.id]">
             <cnsl-card
               *ngIf="user.machine && user.id"
               title="{{ 'USER.MACHINE.TOKENSTITLE' | translate }}"
@@ -158,7 +158,7 @@
         </ng-container>
 
         <ng-container *ngIf="currentSetting && currentSetting === 'keys'">
-          <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user?.id]">
+          <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user.id]">
             <cnsl-card
               *ngIf="user.machine && user.id"
               title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"

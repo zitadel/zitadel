@@ -1,4 +1,4 @@
-<span class="title" mat-dialog-title>{{ 'ORG.PAGES.ORGDOMAIN.TITLE' | translate }} {{ domain.domainName }}</span>
+<span class="title" mat-dialog-title>{{ 'ORG.PAGES.ORGDOMAIN.TITLE' | translate }} {{ domain?.domainName }}</span>
 <div mat-dialog-content>
   <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate }}</p>
 
@@ -7,17 +7,17 @@
   }}</cnsl-info-section>
 
   <p
-    *ngIf="domain.validationType !== DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED && !(dns || http)"
+    *ngIf="domain?.validationType !== DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED && !(dns || http)"
     class="desc"
   >
     {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING' | translate: domain }}
     {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING_TYPE' | translate }}
-    {{ 'ORG.PAGES.ORGDOMAIN.TYPES.' + domain.validationType | translate }}
+    {{ 'ORG.PAGES.ORGDOMAIN.TYPES.' + domain?.validationType | translate }}
   </p>
 
   <div class="btn-container">
     <button
-      [disabled]="domain.validationType === DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED"
+      [disabled]="domain?.validationType === DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED"
       color="primary"
       type="submit"
       mat-raised-button
@@ -44,7 +44,7 @@
 
     <div *ngIf="http">
       <p>HTTP TOKEN</p>
-      <p class="entry">{{ http?.url }}.txt</p>
+      <p class="entry">{{ http.url }}.txt</p>
 
       <div class="btn-container">
         <button mat-stroked-button (click)="saveFile()" color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
@@ -57,8 +57,8 @@
 
     <div *ngIf="dns">
       <p>DNS TOKEN</p>
-      <div class="domain-line" *ngIf="dns?.token">
-        <p class="entry">{{ dns?.token }}</p>
+      <div class="domain-line" *ngIf="dns.token">
+        <p class="entry">{{ dns.token }}</p>
         <button
           color="primary"
           [disabled]="copied === data.clientSecret"
@@ -76,7 +76,7 @@
         </button>
         <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
       </div>
-      <p class="entry">{{ dns?.url }}</p>
+      <p class="entry">{{ dns.url }}</p>
     </div>
   </ng-container>
 </div>

@@ -142,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token non è valido
       NotFound: Refresh Token non trovato
+  Instance:
+    NotFound: Istanza non trovata
+    AlreadyExists: L'istanza esiste già
+    NotChanged: Istanza non modificata
   Org:
     AlreadyExists: Nome dell'organizzazione già preso
     Invalid: L'organizzazione non è valida
@@ -249,8 +253,13 @@ Errors:
       NotInactive: L'applicazione non è inattiva
       OIDCConfigInvalid: La configurazione OIDC non è valida
       APIConfigInvalid: La configurazione API non è valida
-      IsNotOIDC: L'applicazione non è di tipo oidc
+      SAMLConfigInvalid: La configurazione SAML non è valida
+      IsNotOIDC: L'applicazione non è di tipo OIDC
       IsNotAPI: L'applicazione non è di tipo API
+      IsNotSAML: L'applicazione non è di tipo SAML
+      SAMLMetadataMissing: Mancano i metadati SAML
+      SAMLMetadataFormat: Errore nel formato dei metadati SAML
+      SAMLEntityIDAlreadyExisting: EntityID SAML già esistente
       OIDCAuthMethodNoSecret: Il metodo di autorizzazione OIDC scelto non richiede un segreto
       APIAuthMethodNoSecret: Il metodo di autorizzazione API scelto non richiede un segreto
       AuthMethodNoPrivateKeyJWT: Il metodo di autorizzazione scelto non richiede una chiave
@@ -265,6 +274,7 @@ Errors:
       NotActive: Grant del progetto non è attivo
       NotInactive: Grant del progetto non è inattivo
   IAM:
+    NotFound: Istanza non trovata
     Member:
       RolesNotChanged: I ruoli non sono stati cambiati
     MemberInvalid: Il membro non è valido
@@ -388,7 +398,7 @@ Errors:
     ReadError: Errore nella lettura del file di traduzione
     MergeError: Il file di traduzione non può essere unito alle traduzioni personalizzate
     NotFound: Il file di traduzione non esiste
-  MetaData:
+  Metadata:
     NotFound: Metadati non trovati
     NoData: L'elenco dei metadati è vuoto
     Invalid: I metadati non sono validi
@@ -750,6 +760,9 @@ EventTypes:
           added: Chiave di applicazione aggiunta
           removed: Chiave di applicazione rimossa
       config:
+        saml:
+          added: Configurazione SAML aggiunta
+          changed: Configurazione SAML modificata
         oidc:
           added: Configurazione OIDC aggiunta
           changed: Configurazione OIDC modificata

@@ -158,7 +158,14 @@ func (p *messageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	}
 	return crdb.NewUpsertStatement(
 		&templateEvent,
-		cols), nil
+		[]handler.Column{
+			handler.NewCol(MessageTextInstanceIDCol, nil),
+			handler.NewCol(MessageTextAggregateIDCol, nil),
+			handler.NewCol(MessageTextTypeCol, nil),
+			handler.NewCol(MessageTextLanguageCol, nil),
+		},
+		cols,
+	), nil
 }
 
 func (p *messageTextProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {

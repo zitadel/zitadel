@@ -3,8 +3,7 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -250,7 +249,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 								"client-id",
 								anyArg{},
 								"issuer",
-								pq.StringArray{"profile"},
+								database.StringArray{"profile"},
 								domain.OIDCMappingFieldUnspecified,
 								domain.OIDCMappingFieldPreferredLoginName,
 								"https://api.zitadel.ch/authorize",
@@ -309,7 +308,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 								"issuer",
 								"https://api.zitadel.ch/authorize",
 								"https://api.zitadel.ch/token",
-								pq.StringArray{"profile"},
+								database.StringArray{"profile"},
 								domain.OIDCMappingFieldUnspecified,
 								domain.OIDCMappingFieldPreferredLoginName,
 								"idp-config-id",
@@ -681,7 +680,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 								"client-id",
 								anyArg{},
 								"issuer",
-								pq.StringArray{"profile"},
+								database.StringArray{"profile"},
 								domain.OIDCMappingFieldUnspecified,
 								domain.OIDCMappingFieldPreferredLoginName,
 								"https://api.zitadel.ch/authorize",
@@ -740,7 +739,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 								"issuer",
 								"https://api.zitadel.ch/authorize",
 								"https://api.zitadel.ch/token",
-								pq.StringArray{"profile"},
+								database.StringArray{"profile"},
 								domain.OIDCMappingFieldUnspecified,
 								domain.OIDCMappingFieldPreferredLoginName,
 								"idp-config-id",
@@ -904,7 +903,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.idps2 SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"instance-id",

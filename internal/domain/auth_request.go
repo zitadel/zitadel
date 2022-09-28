@@ -37,6 +37,7 @@ type AuthRequest struct {
 	RequestedOrgID           string
 	RequestedOrgName         string
 	RequestedPrimaryDomain   string
+	RequestedOrgDomain       bool
 	ApplicationResourceOwner string
 	PrivateLabelingSetting   PrivateLabelingSetting
 	SelectedIDPConfigID      string
@@ -119,6 +120,8 @@ func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
 	switch requestType {
 	case AuthRequestTypeOIDC:
 		return &AuthRequest{Request: &AuthRequestOIDC{}}, nil
+	case AuthRequestTypeSAML:
+		return &AuthRequest{Request: &AuthRequestSAML{}}, nil
 	}
 	return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
 }
@@ -151,25 +154,24 @@ func (a *AuthRequest) AppendAudIfNotExisting(aud string) {
 	a.Audience = append(a.Audience, aud)
 }
 
-func (a *AuthRequest) GetScopeProjectIDsForAud() []string {
-	projectIDs := make([]string, 0)
-	switch request := a.Request.(type) {
-	case *AuthRequestOIDC:
-		for _, scope := range request.Scopes {
-			if strings.HasPrefix(scope, ProjectIDScope) && strings.HasSuffix(scope, AudSuffix) {
-				projectIDs = append(projectIDs, strings.TrimSuffix(strings.TrimPrefix(scope, ProjectIDScope), AudSuffix))
-			}
-		}
-	}
-	return projectIDs
-}
-
 func (a *AuthRequest) GetScopeOrgPrimaryDomain() string {
 	switch request := a.Request.(type) {
 	case *AuthRequestOIDC:
 		for _, scope := range request.Scopes {
 			if strings.HasPrefix(scope, OrgDomainPrimaryScope) {
 				return strings.TrimPrefix(scope, OrgDomainPrimaryScope)
+			}
+		}
+	}
+	return ""
+}
+
+func (a *AuthRequest) GetScopeOrgID() string {
+	switch request := a.Request.(type) {
+	case *AuthRequestOIDC:
+		for _, scope := range request.Scopes {
+			if strings.HasPrefix(scope, OrgIDScope) {
+				return strings.TrimPrefix(scope, OrgIDScope)
 			}
 		}
 	}

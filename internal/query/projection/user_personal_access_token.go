@@ -3,8 +3,7 @@ package projection
 import (
 	"context"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -50,8 +49,8 @@ func newPersonalAccessTokenProjection(ctx context.Context, config crdb.Statement
 			crdb.NewColumn(PersonalAccessTokenColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{PersonalAccessTokenColumnUserID})),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{PersonalAccessTokenColumnResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("pat_user_idx", []string{PersonalAccessTokenColumnUserID})),
+			crdb.WithIndex(crdb.NewIndex("pat_ro_idx", []string{PersonalAccessTokenColumnResourceOwner})),
 		),
 	)
 
@@ -106,7 +105,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 			handler.NewCol(PersonalAccessTokenColumnSequence, e.Sequence()),
 			handler.NewCol(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
 			handler.NewCol(PersonalAccessTokenColumnExpiration, e.Expiration),
-			handler.NewCol(PersonalAccessTokenColumnScopes, pq.StringArray(e.Scopes)),
+			handler.NewCol(PersonalAccessTokenColumnScopes, database.StringArray(e.Scopes)),
 		},
 	), nil
 }

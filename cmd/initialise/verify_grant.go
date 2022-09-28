@@ -10,12 +10,6 @@ import (
 	"github.com/zitadel/logging"
 )
 
-var (
-	searchGrant = "SELECT * FROM [SHOW GRANTS ON DATABASE %s] where grantee = $1 AND privilege_type = 'ALL'"
-	//go:embed sql/03_grant_user.sql
-	grantStmt string
-)
-
 func newGrant() *cobra.Command {
 	return &cobra.Command{
 		Use:   "grant",
@@ -23,10 +17,10 @@ func newGrant() *cobra.Command {
 		Long: `Sets ALL grant to the database user.
 
 Prereqesits:
-- cockroachdb
+- cockroachDB or postgreSQL
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.New())
+			config := MustNewConfig(viper.GetViper())
 
 			err := initialise(config.Database, VerifyGrant(config.Database.Database(), config.Database.Username()))
 			logging.OnError(err).Fatal("unable to set grant")
@@ -34,12 +28,10 @@ Prereqesits:
 	}
 }
 
-func VerifyGrant(database, username string) func(*sql.DB) error {
+func VerifyGrant(databaseName, username string) func(*sql.DB) error {
 	return func(db *sql.DB) error {
-		logging.WithFields("user", username, "database", database).Info("verify grant")
-		return verify(db,
-			exists(fmt.Sprintf(searchGrant, database), username),
-			exec(fmt.Sprintf(grantStmt, database, username)),
-		)
+		logging.WithFields("user", username, "database", databaseName).Info("verify grant")
+
+		return exec(db, fmt.Sprintf(grantStmt, databaseName, username), nil)
 	}
 }

@@ -13,12 +13,12 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./domain-verification.component.scss'],
 })
 export class DomainVerificationComponent {
-  public domain!: Domain.AsObject;
+  public domain?: Domain.AsObject;
 
   public DomainValidationType: any = DomainValidationType;
 
-  public http!: GenerateOrgDomainValidationResponse.AsObject;
-  public dns!: GenerateOrgDomainValidationResponse.AsObject;
+  public http?: GenerateOrgDomainValidationResponse.AsObject;
+  public dns?: GenerateOrgDomainValidationResponse.AsObject;
 
   public copied: string = '';
 
@@ -34,25 +34,30 @@ export class DomainVerificationComponent {
     private mgmtService: ManagementService,
   ) {
     this.domain = data.domain;
-    if (this.domain.validationType === DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED) {
+
+    if (this.domain?.validationType === DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED) {
       this.showNew = true;
     }
   }
 
   async loadHttpToken(): Promise<void> {
-    this.mgmtService
-      .generateOrgDomainValidation(this.domain.domainName, DomainValidationType.DOMAIN_VALIDATION_TYPE_HTTP)
-      .then((http) => {
-        this.http = http;
-      });
+    if (this.domain) {
+      this.mgmtService
+        .generateOrgDomainValidation(this.domain.domainName, DomainValidationType.DOMAIN_VALIDATION_TYPE_HTTP)
+        .then((http) => {
+          this.http = http;
+        });
+    }
   }
 
   async loadDnsToken(): Promise<void> {
-    this.mgmtService
-      .generateOrgDomainValidation(this.domain.domainName, DomainValidationType.DOMAIN_VALIDATION_TYPE_DNS)
-      .then((dns) => {
-        this.dns = dns;
-      });
+    if (this.domain) {
+      this.mgmtService
+        .generateOrgDomainValidation(this.domain.domainName, DomainValidationType.DOMAIN_VALIDATION_TYPE_DNS)
+        .then((dns) => {
+          this.dns = dns;
+        });
+    }
   }
 
   public closeDialog(): void {
@@ -61,21 +66,25 @@ export class DomainVerificationComponent {
 
   public validate(): void {
     this.validating = true;
-    this.mgmtService
-      .validateOrgDomain(this.domain.domainName)
-      .then(() => {
-        this.dialogRef.close(true);
-        this.toast.showInfo('ORG.PAGES.ORGDOMAIN.VERIFICATION_SUCCESSFUL', true);
-        this.validating = false;
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-        this.validating = false;
-      });
+    if (this.domain) {
+      this.mgmtService
+        .validateOrgDomain(this.domain.domainName)
+        .then(() => {
+          this.dialogRef.close(true);
+          this.toast.showInfo('ORG.PAGES.ORGDOMAIN.VERIFICATION_SUCCESSFUL', true);
+          this.validating = false;
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this.validating = false;
+        });
+    }
   }
 
   public saveFile(): void {
-    const blob = new Blob([this.http.token], { type: 'text/plain;charset=utf-8' });
-    saveAs(blob, this.http.token + '.txt');
+    if (this.http) {
+      const blob = new Blob([this.http.token], { type: 'text/plain;charset=utf-8' });
+      saveAs(blob, this.http.token + '.txt');
+    }
   }
 }

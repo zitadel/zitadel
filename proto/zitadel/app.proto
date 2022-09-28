@@ -30,6 +30,7 @@ message App {
     oneof config {
         OIDCConfig oidc_config = 5;
         APIConfig api_config = 6;
+        SAMLConfig saml_config = 7;
     }
 }
 
@@ -196,6 +197,13 @@ enum OIDCVersion {
 enum OIDCTokenType {
     OIDC_TOKEN_TYPE_BEARER = 0;
     OIDC_TOKEN_TYPE_JWT = 1;
+}
+
+message SAMLConfig {
+    oneof metadata{
+        bytes metadata_xml = 1;
+        string metadata_url = 2;
+    }
 }
 
 enum APIAuthMethodType {

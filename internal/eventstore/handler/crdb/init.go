@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lib/pq"
+	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 )
 
@@ -280,7 +279,7 @@ func isErrAlreadyExists(err error) bool {
 	if !errors.As(err, &caosErr) {
 		return false
 	}
-	sqlErr, ok := caosErr.GetParent().(*pq.Error)
+	sqlErr, ok := caosErr.GetParent().(*pgconn.PgError)
 	if !ok {
 		return false
 	}
@@ -288,14 +287,11 @@ func isErrAlreadyExists(err error) bool {
 }
 
 func createTableStatement(table *Table, tableName string, suffix string) string {
-	stmt := fmt.Sprintf("CREATE TABLE %s (%s, PRIMARY KEY (%s)",
+	stmt := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s, PRIMARY KEY (%s)",
 		tableName+suffix,
 		createColumnsStatement(table.columns, tableName),
 		strings.Join(table.primaryKey, ", "),
 	)
-	for _, index := range table.indices {
-		stmt += fmt.Sprintf(", INDEX %s (%s)", index.Name, strings.Join(index.Columns, ","))
-	}
 	for _, key := range table.foreignKeys {
 		ref := tableName
 		if len(key.RefColumns) > 0 {
@@ -309,7 +305,13 @@ func createTableStatement(table *Table, tableName string, suffix string) string 
 	for _, constraint := range table.constraints {
 		stmt += fmt.Sprintf(", CONSTRAINT %s UNIQUE (%s)", constraint.Name, strings.Join(constraint.Columns, ","))
 	}
-	return stmt + ");"
+
+	stmt += ");"
+
+	for _, index := range table.indices {
+		stmt += fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s (%s);", index.Name, tableName+suffix, strings.Join(index.Columns, ","))
+	}
+	return stmt
 }
 
 func createViewStatement(viewName string, selectStmt string) string {
@@ -321,7 +323,7 @@ func createViewStatement(viewName string, selectStmt string) string {
 
 func createIndexStatement(index *Index) func(config execConfig) string {
 	return func(config execConfig) string {
-		stmt := fmt.Sprintf("CREATE INDEX %s ON %s (%s)",
+		stmt := fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s (%s)",
 			index.Name,
 			config.tableName,
 			strings.Join(index.Columns, ","),
@@ -380,7 +382,7 @@ func columnType(columnType ColumnType) string {
 	case ColumnTypeJSONB:
 		return "JSONB"
 	case ColumnTypeBytes:
-		return "BYTES"
+		return "BYTEA"
 	default:
 		panic("unknown column type")
 	}

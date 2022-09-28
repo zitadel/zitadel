@@ -10,22 +10,18 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { FormFieldModule } from '../form-field/form-field.module';
 import { PaginatorComponent } from './paginator.component';
 
-
-
 @NgModule({
-    declarations: [PaginatorComponent],
-    imports: [
-        CommonModule,
-        FormsModule,
-        TranslateModule,
-        MatButtonModule,
-        TimestampToDatePipeModule,
-        FormFieldModule,
-        MatSelectModule,
-        LocalizedDatePipeModule,
-    ],
-    exports: [
-        PaginatorComponent,
-    ],
+  declarations: [PaginatorComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+    MatButtonModule,
+    TimestampToDatePipeModule,
+    FormFieldModule,
+    MatSelectModule,
+    LocalizedDatePipeModule,
+  ],
+  exports: [PaginatorComponent],
 })
-export class PaginatorModule { }
+export class PaginatorModule {}

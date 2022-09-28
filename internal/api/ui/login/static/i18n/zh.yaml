@@ -1,0 +1,377 @@
+Login:
+  Title: 欢迎回来！
+  Description: 输入您的登录数据。
+  TitleLinking: 登录以进行用户链接
+  DescriptionLinking: 输入您的登录数据以将您的外部用户与 ZITADEL 用户关联。
+  LoginNameLabel: 登录名
+  UsernamePlaceHolder: 用户名
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: 使用外部用户登录。
+  MustBeMemberOfOrg: 用户必须是 {{.OrgName}} 组织的成员。
+  RegisterButtonText: 注册
+  NextButtonText: 继续
+
+SelectAccount:
+  Title: 选择账户
+  Description: 使用您的 ZITADEL 帐户
+  TitleLinking: 选择用于用户链接的帐户
+  DescriptionLinking: 选择您的帐户以与您的外部用户关联。
+  OtherUser: 其他用户
+  SessionState0: 启用
+  SessionState1: 停用
+  MustBeMemberOfOrg: 用户必须是 {{.OrgName}} 组织的成员。
+
+Password:
+  Title: 密码
+  Description: 输入您的登录数据。
+  PasswordLabel: 密码
+  MinLength: 密码
+  HasUppercase: 大写字母
+  HasLowercase: 小写字母
+  HasNumber: 数字
+  HasSymbol: 符号
+  Confirmation: 确认匹配
+  ResetLinkText: 重设密码
+  BackButtonText: 后退
+  NextButtonText: 继续
+
+UsernameChange:
+  Title: 更改用户名
+  Description: 设置您的新用户名
+  UsernameLabel: 用户名
+  CancelButtonText: 取消
+  NextButtonText: 继续
+
+UsernameChangeDone:
+  Title: 用户名已更改
+  Description: 您的用户名已成功更改。
+  NextButtonText: 继续
+
+InitPassword: 
+  Title: 设置密码
+  Description: 您将到一个验证码，您必须在下面输入该验证码以设置您的新密码。
+  CodeLabel: 验证码
+  NewPasswordLabel: 新密码
+  NewPasswordConfirmLabel: 确认密码
+  ResendButtonText: 重新发送
+  NextButtonText: 继续
+
+InitPasswordDone:
+  Title: 密码设置
+  Description: 密码设置成功
+  NextButtonText: 继续
+  CancelButtonText: 取消
+
+InitUser:
+  Title: 激活用户
+  Description: 您将收到一个验证码，您必须在下面输入该验证码，以验证您的电子邮件并设置您的新密码。
+  CodeLabel: 验证码
+  NewPasswordLabel: 新密码
+  NewPasswordConfirm: 确认密码
+  NextButtonText: 继续
+  ResendButtonText: 重新发送
+
+InitUserDone:
+  Title: 用户已激活
+  Description: 邮箱验证和密码设置成功
+  NextButtonText: 继续
+  CancelButtonText: 取消
+
+InitMFAPrompt:
+  Title: 多因素身份认证设置
+  Description: 您想设置多因素身份认证吗？
+  Provider0: OTP（一次性密码）
+  Provider1: U2F（通用两步验证）
+  NextButtonText: 继续
+  SkipButtonText: 跳过
+
+InitMFAOTP:
+  Title: 多因素验证
+  Description: 验证您的多因素身份认证。
+  OTPDescription: 使用您的身份验证器应用程序（例如 Google Authenticator）扫描代码或复制密码并在下方插入生成的代码。
+  SecretLabel: 秘钥
+  CodeLabel: 验证码
+  NextButtonText: 继续
+  CancelButtonText: 取消
+
+InitMFAU2F:
+  Title: 多因素身份认证设置 U2F / WebAuthN
+  Description: 通过提供名称添加您的令牌，然后单击下面的“注册令牌”按钮。
+  TokenNameLabel: 令牌/机器的名称
+  NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
+  RegisterTokenButtonText: 注册令牌
+  ErrorRetry: 重试、创建新挑战码或选择不同的方法。
+
+InitMFADone:
+  Title: 多因素身份认证验证完成
+  Description: 多因素验证成功完成。必须在每次登录时输入多因素身份认证。
+  NextButtonText: 继续
+  CancelButtonText: 取消
+
+MFAProvider:
+  Provider0: OTP（一次性密码）
+  Provider1: U2F（通用第二因素身份认证）
+  ChooseOther: 或选择其他选项
+
+VerifyMFAOTP:
+  Title: 验证多因素
+  Description: 验证您的多因素
+  CodeLabel: 验证码
+  NextButtonText: 继续
+
+VerifyMFAU2F:
+  Title: 多因素验证
+  Description: 验证您的多因素 U2F / WebAuthN 令牌
+  NotSupported: 您的浏览器不支持 WebAuthN。确保您使用的是最新版本或将您的浏览器更改为受支持的版本（Chrome、Safari、Firefox）
+  ErrorRetry: 重试、创建新请求或选择其他方法。
+  ValidateTokenButtonText: 验证令牌
+
+Passwordless:
+  Title: 无密码登录
+  Description: 验证您的令牌
+  NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
+  ErrorRetry: 重试、创建新挑战码或选择不同的方法。
+  LoginWithPwButtonText: 使用密码登录
+  ValidateTokenButtonText: 验证令牌
+
+PasswordlessPrompt:
+  Title: 无密码登录设置
+  Description: 您想设置无密码登录吗？
+  DescriptionInit: 您需要设置无密码登录，使用您提供的链接来注册您的设备。
+  PasswordlessButtonText: 去设置无密码登录
+  NextButtonText: 继续
+  SkipButtonText: 跳过
+
+PasswordlessRegistration:
+  Title: 无密码设置
+  Description: 通过提供名称添加您的令牌，然后单击下面的“注册令牌”按钮。
+  TokenNameLabel: 令牌/机器的名称
+  NotSupported: 您的浏览器不支持 WebAuthN。请确保它是最新的或使用其他版本（例如 Chrome、Safari、Firefox）
+  RegisterTokenButtonText: 注册令牌
+  ErrorRetry: 重试、创建新挑战码或选择不同的方法。
+
+PasswordlessRegistrationDone:
+  Title: 无密码登录设置完成
+  Description: 已成功添加无密码令牌。
+  DescriptionClose: 您现在可以关闭此窗口
+  NextButtonText: 继续
+  CancelButtonText: 取消
+
+PasswordChange:
+  Title: 更改密码
+  Description: 更改您的密码。输入您的旧密码和新密码。
+  OldPasswordLabel: 旧密码
+  NewPasswordLabel: 新密码
+  NewPasswordConfirmLabel: 确认密码
+  CancelButtonText: 取消
+  NextButtonText: 继续
+
+PasswordChangeDone:
+  Title: 更改密码
+  Description: 您的密码已成功更改。
+  NextButtonText: 继续
+
+PasswordResetDone:
+  Title: 重置链
+  Description: 请检查您的电子邮件以重置您的密码。
+  NextButtonText: 继续
+
+EmailVerification:
+  Title: 电子邮件验证
+  Description: 我们已向您发送一封电子邮件以验证您的地址。请在下面的表格中输入验证码。
+  CodeLabel: 验证码
+  NextButtonText: 继续
+  ResendButtonText: 重新发送
+
+EmailVerificationDone:
+  Title: 电子邮件验证
+  Description: 您的电子邮件地址已成功验证。
+  NextButtonText: 继续
+  CancelButtonText: 取消
+  LoginButtonText: 登录
+
+RegisterOption:
+  Title: 注册选项
+  Description: 选择您的注册方式
+  RegisterUsernamePasswordButtonText: 使用用户名密码
+  ExternalLoginDescription: 或使用外部身份提供者
+
+RegistrationUser:
+  Title: 注册
+  Description: 输入您的用户数据。您的电子邮件地址将用作登录名。
+  DescriptionOrgRegister: 输入您的用户数据。
+  EmailLabel: 电子邮箱
+  UsernameLabel: 用户名
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  LanguageLabel: 语言
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  GenderLabel: 性别
+  Female: 女性
+  Male: 男性
+  Diverse: 其他 / X
+  PasswordLabel: 密码
+  PasswordConfirmLabel: 确认密码
+  TosAndPrivacyLabel: 条款和条款
+  TosConfirm: 我接受
+  TosLinkText: 服务条款
+  TosConfirmAnd: 和
+  PrivacyLinkText: 隐私政策
+  ExternalLogin: 使用外部身份提供者注册
+  BackButtonText: 返回
+  NextButtonText: 继续
+
+ExternalRegistrationUserOverview:
+  Title: 外部用户注册
+  Description: 我们已从所选提供商处获取您的用户详细信息。您现在可以更改或完善它们。
+  EmailLabel: 电子邮件
+  UsernameLabel: 用户名
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  NicknameLabel: 昵称
+  PhoneLabel: 手机号码
+  LanguageLabel: 语言
+  German: 德语
+  English: 英语
+  Italian: 意大利语
+  French: 法语
+  Chinese: 简体中文
+  TosAndPrivacyLabel: 条款和条款
+  TosConfirm: 我接受
+  TosLinkText: 服务条款
+  TosConfirmAnd: 和
+  PrivacyLinkText: 隐私政策
+  ExternalLogin: 使用外部身份提供者注册
+  BackButtonText: 返回
+  NextButtonText: 保存
+
+RegistrationOrg:
+  Title: 注册组织
+  Description: 输入您的组织名称和用户数据。
+  OrgNameLabel: 组织名称
+  EmailLabel: 电子邮件
+  UsernameLabel: 用户名
+  FirstnameLabel: 名
+  LastnameLabel: 姓
+  PasswordLabel: 密码
+  PasswordConfirmLabel: 确认密码
+  TosAndPrivacyLabel: 条款和条款
+  TosConfirm: 我接受
+  TosLinkText: 服务条款
+  TosConfirmAnd: 和
+  PrivacyLinkText: 隐私政策
+  SaveButtonText: 创建组织
+
+LoginSuccess:
+  Title: 登陆成功
+  AutoRedirectDescription: 您将被自动引导至您的应用程序。如果没有，请单击下面的按钮。之后您可以关闭窗口。
+  RedirectedDescription: 您现在可以关闭此窗口。
+  NextButtonText: 继续
+
+LogoutDone:
+  Title: 退出登录
+  Description: 您已成功退出登录。
+  LoginButtonText: 登录
+
+LinkingUsersDone:
+  Title: 用户链接
+  Description: 用户链接完成。
+  CancelButtonText: 取消
+  NextButtonText: 继续
+
+ExternalNotFound:
+  Title: 外部用户
+  Description: 未找到外部用户。你想绑定你已存在的用户还是自动注册一个新用户。
+  LinkButtonText: 绑定
+  AutoRegisterButtonText: 注册
+  TosAndPrivacyLabel: 条款和条款
+  TosConfirm: 我接受
+  TosLinkText: 服务条款
+  TosConfirmAnd: 和
+  PrivacyLinkText: 隐私政策
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+
+Footer:
+  PoweredBy: Powered By
+  Tos: 服务条款
+  PrivacyPolicy: 隐私政策
+  Help: 帮助
+
+Errors:
+  Internal: 发生了内部错误
+  AuthRequest:
+    NotFound: 找不到授权请求
+    UserAgentNotCorresponding: 用户代理未响应
+    UserAgentNotFound: 未找到用户代理 ID
+    TokenNotFound: 找不到令牌
+    RequestTypeNotSupported: 不支持请求的类型
+    MissingParameters: 缺少必需的参数
+  User:
+    NotFound: 找不到用户
+    Inactive: 用户处于停用状态
+    NotFoundOnOrg: 在所选组织中找不到用户
+    NotAllowedOrg: 用户不是所需组织的成员
+    NotMatchingUserID: 身份验证请求中的用户信息不匹配
+    UserIDMissing: 用户 ID 为空
+    Invalid: 无效的用户数据
+    DomainNotAllowedAsUsername: 域名已存在，但无法使用
+    NotAllowedToLink: 不允许用户使用外部身份提供者注册
+    Password:
+      ConfirmationWrong: 密码不一致
+      Empty: 密码为空
+      Invalid: 密码无效
+      InvalidAndLocked: 密码无效且用户被锁定，请联系您的管理员。
+    UsernameOrPassword:
+      Invalid: 用户名或密码无效
+    PasswordComplexityPolicy:
+      NotFound: 未找到密码策略
+      MinLength: 密码太短
+      HasLower: 密码必须包含小写字母
+      HasUpper: 密码必须包含大写字母
+      HasNumber: 密码必须包含数字
+      HasSymbol: 密码必须包含符号
+    Code:
+      Expired: 验证码已过期
+      Invalid: 无效的验证码
+      Empty: 验证码不能为空
+      CryptoCodeNil: 加密代码为空
+      NotFound: 找不到验证码
+      GeneratorAlgNotSupported: 不支持的生成器算法
+    EmailVerify:
+      UserIDEmpty: 用户 ID 为空
+    ExternalData:
+      CouldNotRead: 无法正确读取外部数据
+    MFA:
+      NoProviders: 没有可用的多因素提供商
+      OTP:
+        AlreadyReady: OTP (一次性密码) 已设置
+        NotExisting: OTP (一次性密码) 不存在
+        InvalidCode: 无效的验证码
+        NotReady: OTP (一次性密码) 还没准备好
+    Locked: 用户被锁定
+    SomethingWentWrong: 似乎出问题了
+    NotActive: 用户已停用
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP 类型未实现
+      NotAllowed: 不允许使用外部身份提供者登录
+      IDPConfigIDEmpty: 身份提供者 ID 为空
+      ExternalUserIDEmpty: 外部用户 ID 为空
+      UserDisplayNameEmpty: 用户显示名称为空
+      NoExternalUserData: 未收到外部用户数据
+    GrantRequired: 无法登录，用户需要在应用程序上拥有至少一项授权，请联系您的管理员。
+    ProjectRequired: 无法登录，用户的组织必须授予项目，请联系您的管理员。
+  IdentityProvider:
+    InvalidConfig: 身份提供者配置无效
+  IAM:
+    LockoutPolicy:
+      NotExisting: 用户锁定政策不存在
+
+optional: (可选)

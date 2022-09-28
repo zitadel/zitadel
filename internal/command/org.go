@@ -134,7 +134,7 @@ func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner
 }
 
 func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner string, claimedUserIDs []string) (*domain.Org, error) {
-	if name == "" {
+	if name = strings.TrimSpace(name); name == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}
 
@@ -173,6 +173,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 }
 
 func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.ObjectDetails, error) {
+	name = strings.TrimSpace(name)
 	if orgID == "" || name == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}
@@ -185,7 +186,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 		return nil, errors.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.Name == name {
-		return nil, errors.ThrowNotFound(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
+		return nil, errors.ThrowPreconditionFailed(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
 	events := make([]eventstore.Command, 0)

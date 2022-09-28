@@ -4,8 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -52,7 +51,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 								uint64(15),
 								"agg-id",
 								time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-								pq.StringArray{"openid"},
+								database.StringArray{"openid"},
 							},
 						},
 					},
@@ -131,7 +130,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.personal_access_tokens2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.personal_access_tokens2 SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"instance-id",

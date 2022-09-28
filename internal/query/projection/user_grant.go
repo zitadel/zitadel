@@ -3,8 +3,7 @@ package projection
 import (
 	"context"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -17,7 +16,7 @@ import (
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants2"
+	UserGrantProjectionTable = "projections.user_grants3"
 
 	UserGrantID            = "id"
 	UserGrantCreationDate  = "creation_date"
@@ -57,8 +56,8 @@ func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{UserGrantUserID})),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("user_grant3_user_idx", []string{UserGrantUserID})),
+			crdb.WithIndex(crdb.NewIndex("user_grant3_ro_idx", []string{UserGrantResourceOwner})),
 		),
 	)
 
@@ -164,14 +163,14 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantUserID, e.UserID),
 			handler.NewCol(UserGrantProjectID, e.ProjectID),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
-			handler.NewCol(UserGrantRoles, pq.StringArray(e.RoleKeys)),
+			handler.NewCol(UserGrantRoles, database.StringArray(e.RoleKeys)),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},
 	), nil
 }
 
 func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
-	var roles pq.StringArray
+	var roles database.StringArray
 
 	switch e := event.(type) {
 	case *usergrant.UserGrantChangedEvent:
@@ -321,7 +320,7 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			crdb.NewArrayIntersectCol(UserGrantRoles, pq.StringArray(keys)),
+			crdb.NewArrayIntersectCol(UserGrantRoles, database.StringArray(keys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, grantID),

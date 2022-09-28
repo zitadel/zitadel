@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, take } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -12,6 +12,7 @@ import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -21,7 +22,7 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./org-detail.component.scss'],
 })
 export class OrgDetailComponent implements OnInit, OnDestroy {
-  public org!: Org.AsObject;
+  public org?: Org.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
   public OrgState: any = OrgState;
@@ -36,12 +37,12 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
 
   public InfoSectionType: any = InfoSectionType;
   constructor(
+    auth: GrpcAuthService,
     private dialog: MatDialog,
     public mgmtService: ManagementService,
     private toast: ToastService,
     private router: Router,
     breadcrumbService: BreadcrumbService,
-    activatedRoute: ActivatedRoute,
   ) {
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
@@ -49,7 +50,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     };
     breadcrumbService.setBreadcrumb([bread]);
 
-    activatedRoute.fragment.pipe(takeUntil(this.destroy$)).subscribe((orgId) => {
+    auth.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
       this.getData();
     });
   }
@@ -80,7 +81,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             .reactivateOrg()
             .then(() => {
               this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
-              this.org.state = OrgState.ORG_STATE_ACTIVE;
+              this.org!.state = OrgState.ORG_STATE_ACTIVE;
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -103,7 +104,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
             .deactivateOrg()
             .then(() => {
               this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
-              this.org.state = OrgState.ORG_STATE_INACTIVE;
+              this.org!.state = OrgState.ORG_STATE_INACTIVE;
             })
             .catch((error) => {
               this.toast.showError(error);

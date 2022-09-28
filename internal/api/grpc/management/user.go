@@ -116,7 +116,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMetadataResponse{
-		Result:  metadata.MetadataListToPb(res.Metadata),
+		Result:  metadata.UserMetadataListToPb(res.Metadata),
 		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
@@ -131,7 +131,7 @@ func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetada
 		return nil, err
 	}
 	return &mgmt_pb.GetUserMetadataResponse{
-		Metadata: metadata.DomainMetadataToPb(data),
+		Metadata: metadata.UserMetadataToPb(data),
 	}, nil
 }
 
@@ -152,7 +152,7 @@ func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetada
 
 func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUserMetadataRequest) (*mgmt_pb.BulkSetUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, BulkSetMetadataToDomain(req)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, BulkSetUserMetadataToDomain(req)...)
 	if err != nil {
 		return nil, err
 	}

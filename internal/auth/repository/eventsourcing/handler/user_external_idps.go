@@ -109,7 +109,7 @@ func (i *ExternalIDP) processUser(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, externalIDP.InstanceID, event)
+		return i.view.DeleteExternalIDP(externalIDP.ExternalUserID, externalIDP.IDPConfigID, event.InstanceID, event)
 	case user.UserRemovedType:
 		return i.view.DeleteExternalIDPsByUserID(event.AggregateID, event.InstanceID, event)
 	default:
@@ -125,13 +125,16 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 	switch eventstore.EventType(event.Type) {
 	case instance.IDPConfigChangedEventType, org.IDPConfigChangedEventType:
 		configView := new(iam_view_model.IDPConfigView)
-		config := new(query2.IDP)
+		var config *query2.IDP
 		if eventstore.EventType(event.Type) == instance.IDPConfigChangedEventType {
-			configView.AppendEvent(iam_model.IDPProviderTypeSystem, event)
+			err = configView.AppendEvent(iam_model.IDPProviderTypeSystem, event)
 		} else {
-			configView.AppendEvent(iam_model.IDPProviderTypeOrg, event)
+			err = configView.AppendEvent(iam_model.IDPProviderTypeOrg, event)
 		}
-		exterinalIDPs, err := i.view.ExternalIDPsByIDPConfigID(configView.IDPConfigID, configView.InstanceID)
+		if err != nil {
+			return err
+		}
+		exterinalIDPs, err := i.view.ExternalIDPsByIDPConfigID(configView.IDPConfigID, event.InstanceID)
 		if err != nil {
 			return err
 		}
@@ -150,7 +153,6 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 	default:
 		return i.view.ProcessedExternalIDPSequence(event)
 	}
-	return nil
 }
 
 func (i *ExternalIDP) fillData(externalIDP *usr_view_model.ExternalIDPView) error {

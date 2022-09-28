@@ -42,7 +42,7 @@ func Test_instanceInterceptor_Handler(t *testing.T) {
 				request: httptest.NewRequest("", "/url", nil),
 			},
 			res{
-				statusCode: 403,
+				statusCode: 404,
 				context:    nil,
 			},
 		},
@@ -109,7 +109,7 @@ func Test_instanceInterceptor_HandlerFunc(t *testing.T) {
 				request: httptest.NewRequest("", "/url", nil),
 			},
 			res{
-				statusCode: 403,
+				statusCode: 404,
 				context:    nil,
 			},
 		},
@@ -229,7 +229,7 @@ type testHandler struct {
 	context context.Context
 }
 
-func (t *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (t *testHandler) ServeHTTP(_ http.ResponseWriter, r *http.Request) {
 	t.context = r.Context()
 }
 
@@ -237,7 +237,7 @@ type mockInstanceVerifier struct {
 	host string
 }
 
-func (m *mockInstanceVerifier) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
+func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, host string) (authz.Instance, error) {
 	if host != m.host {
 		return nil, fmt.Errorf("invalid host")
 	}

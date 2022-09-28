@@ -17,4 +17,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class PrivateLabelingPolicyRoutingModule { }
+export class PrivateLabelingPolicyRoutingModule {}

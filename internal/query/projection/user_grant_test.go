@@ -3,8 +3,7 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -48,7 +47,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_grants2 (id, resource_owner, instance_id, creation_date, change_date, sequence, user_id, project_id, grant_id, roles, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO projections.user_grants3 (id, resource_owner, instance_id, creation_date, change_date, sequence, user_id, project_id, grant_id, roles, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
@@ -59,7 +58,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 								"user-id",
 								"project-id",
 								"",
-								pq.StringArray{"role"},
+								database.StringArray{"role"},
 								domain.UserGrantStateActive,
 							},
 						},
@@ -87,10 +86,10 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
-								pq.StringArray{"role"},
+								database.StringArray{"role"},
 								uint64(15),
 								"agg-id",
 							},
@@ -119,10 +118,10 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
-								pq.StringArray{"role"},
+								database.StringArray{"role"},
 								uint64(15),
 								"agg-id",
 							},
@@ -149,7 +148,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								anyArg{},
 							},
@@ -176,7 +175,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								anyArg{},
 							},
@@ -203,7 +202,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserGrantStateInactive,
@@ -233,7 +232,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserGrantStateActive,
@@ -263,7 +262,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								anyArg{},
 							},
@@ -290,7 +289,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (project_id = $1)",
 							expectedArgs: []interface{}{
 								anyArg{},
 							},
@@ -317,7 +316,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (grant_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (grant_id = $1)",
 							expectedArgs: []interface{}{
 								"grantID",
 							},
@@ -344,7 +343,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (roles) = (array_remove(roles, $1)) WHERE (project_id = $2)",
+							expectedStmt: "UPDATE projections.user_grants3 SET roles = array_remove(roles, $1) WHERE (project_id = $2)",
 							expectedArgs: []interface{}{
 								"key",
 								"agg-id",
@@ -372,9 +371,9 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::STRING[]))) WHERE (grant_id = $2)",
+							expectedStmt: "UPDATE projections.user_grants3 SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::TEXT[]))) WHERE (grant_id = $2)",
 							expectedArgs: []interface{}{
-								pq.StringArray{"key"},
+								database.StringArray{"key"},
 								"grantID",
 							},
 						},
@@ -400,7 +399,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (owner_removed) = ($1) WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.user_grants3 SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"instance-id",

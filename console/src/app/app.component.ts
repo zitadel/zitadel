@@ -184,20 +184,6 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
     );
 
-    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((route) => {
-      const { org } = route;
-      if (org) {
-        this.authService
-          .getActiveOrg(org)
-          .then((queriedOrg) => {
-            this.org = queriedOrg;
-          })
-          .catch((error) => {
-            this.router.navigate(['/users/me']);
-          });
-      }
-    });
-
     this.getProjectCount();
 
     this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
@@ -265,22 +251,19 @@ export class AppComponent implements OnDestroy {
 
   public changedOrg(org: Org.AsObject): void {
     this.themeService.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/org'], { fragment: org.id });
-    });
+    this.router.navigate(['/org']);
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['en', 'de']);
+    this.translate.addLangs(['en', 'de', 'zh']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
-        // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de|it/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/en|de|it|zh/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it|zh/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	IDPUserLinkTable             = "projections.idp_user_links2"
+	IDPUserLinkTable             = "projections.idp_user_links3"
 	IDPUserLinkIDPIDCol          = "idp_id"
 	IDPUserLinkUserIDCol         = "user_id"
 	IDPUserLinkExternalUserIDCol = "external_user_id"
@@ -48,7 +48,7 @@ func newIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(IDPUserLinkOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(IDPUserLinkInstanceIDCol, IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{IDPUserLinkUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("idp_user3_idx", []string{IDPUserLinkUserIDCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

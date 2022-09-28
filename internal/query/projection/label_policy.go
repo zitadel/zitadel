@@ -339,6 +339,11 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 	return crdb.NewCopyStatement(
 		event,
 		[]handler.Column{
+			handler.NewCol(LabelPolicyInstanceIDCol, nil),
+			handler.NewCol(LabelPolicyIDCol, nil),
+			handler.NewCol(LabelPolicyStateCol, nil),
+		},
+		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
 			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(LabelPolicyStateCol, domain.LabelPolicyStateActive),

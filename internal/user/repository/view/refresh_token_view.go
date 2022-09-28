@@ -2,7 +2,6 @@ package view
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -92,6 +91,6 @@ func DeleteUserRefreshTokens(db *gorm.DB, table, userID, instanceID string) erro
 }
 
 func DeleteApplicationRefreshTokens(db *gorm.DB, table string, appIDs []string) error {
-	delete := repository.PrepareDeleteByKey(table, usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyApplicationID), pq.StringArray(appIDs))
+	delete := repository.PrepareDeleteByKey(table, usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyApplicationID), appIDs)
 	return delete(db)
 }

@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -19,6 +20,7 @@ import (
 )
 
 func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) (*domain.ObjectDetails, error) {
+	userName = strings.TrimSpace(userName)
 	if orgID == "" || userID == "" || userName == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2N9fs", "Errors.IDMissing")
 	}
@@ -263,7 +265,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 
-	audience = domain.AddAudScopeToAudience(audience, scopes)
+	audience = domain.AddAudScopeToAudience(ctx, audience, scopes)
 
 	preferredLanguage := ""
 	existingHuman, err := c.getHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)

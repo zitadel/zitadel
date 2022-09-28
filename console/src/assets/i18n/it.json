@@ -182,8 +182,9 @@
     "SIDEWIDE": "Tasti rapidi globali",
     "SHORTCUTS": {
       "HOME": "Vai alla panoramica",
-      "SYSTEM": "Vai al pagina di sistema",
+      "INSTANCE": "Vai alla pagina dell' istanza",
       "ORG": "Vai all'organizzazione",
+      "ORGSETTINGS": "Alle impostazioni dell'organizzazione",
       "ORGSWITCHER": "Cambia organizzazione",
       "ME": "Vai al profilo",
       "PROJECTS": "Vai ai progetti",
@@ -481,7 +482,7 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "La password deve essere lunga almeno {{valore}} caratteri.",
+      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
       "NOTEQUAL": "Le password fornite non corrispondono."
     },
     "ID": "ID",
@@ -539,12 +540,12 @@
       "INVALIDPATTERN": "La password non soddisfa le regole definite.",
       "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail",
       "REQUIRED": "Il campo di input \u00e8 vuoto.",
-      "MINLENGTH": "La password deve essere lunga almeno {{requiredLength}} caratteri.",
+      "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
       "NOEMAIL": "Il nome utente non pu\u00f2 essere un indirizzo e-mail.",
-      "UPPERCASEMISSING": "La password deve includere un carattere maiuscolo.",
-      "LOWERCASEMISSING": "La password deve includere un carattere minuscolo.",
-      "SYMBOLERROR": "La password deve includere un simbolo o un segno di punteggiatura.",
-      "NUMBERERROR": "La password deve includere una cifra."
+      "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
+      "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
+      "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
+      "NUMBERERROR": "Deve includere una cifra."
     },
     "STATE": {
       "0": "Sconosciuto",
@@ -663,6 +664,8 @@
       "3": "Post creazione"
     },
     "ADDTRIGGER": "Aggiungi trigger",
+    "FLOWCHANGED": "Il processo è stato modificato con successo.",
+    "FLOWCLEARED": "Il processo è stato eliminato con successo.",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",
@@ -684,8 +687,8 @@
         "DELETE_SUCCESS": "Azione rimossa con successo."
       },
       "CLEAR": {
-        "TITLE": "Flow zurücksetzen?",
-        "DESCRIPTION": "Stai per cancellare un'azione. Questa azione non può essere annullata. Vuoi continuare?"
+        "TITLE": "Elimina processo",
+        "DESCRIPTION": "Stai per eliminare un processo. Questa azione non può essere annullata. Vuoi continuare?"
       }
     },
     "TOAST": {
@@ -889,7 +892,8 @@
       "de": "Deutsch",
       "en": "English",
       "it": "Italiano",
-      "fr": "Français"
+      "fr": "Français",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -975,9 +979,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Complessit\u00e0 della password",
       "DESCRIPTION": "Assicura che tutte le password impostate corrispondano a un modello specifico",
-      "SYMBOLANDNUMBERERROR": "La password deve essere composta da una cifra e un simbolo/segno di interpunzione.",
-      "SYMBOLERROR": "La password deve includere un simbolo/segno di punteggiatura.",
-      "NUMBERERROR": "La password deve includere una cifra.",
+      "SYMBOLANDNUMBERERROR": "Deve essere composta da una cifra e un simbolo/segno di interpunzione.",
+      "SYMBOLERROR": "Deve includere un simbolo/segno di punteggiatura.",
+      "NUMBERERROR": "Deve includere una cifra.",
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
     },
     "PRIVATELABELING": {
@@ -1002,6 +1006,7 @@
       "MAXSIZE": "La dimensione massima \u00e8 limitata a 524kB",
       "EMAILNOSVG": "Il formato di file SVG non \u00e8 supportato nelle email. Perci\u00f2 carica il tuo logo in PNG o in un altro formato supportato.",
       "MAXSIZEEXCEEDED": "Dimensione massima di 524kB superata.",
+      "NOSVGSUPPORTED": "SVG non sono supportati",
       "FONTINLOGINONLY": "Il carattere \u00e8 attualmente visualizzato solo nell'interfaccia di accesso.",
       "VIEWS": {
         "PREVIEW": "Anteprima",
@@ -1068,7 +1073,8 @@
         "de": "Deutsch",
         "en": "English",
         "it": "Italiano",
-        "fr": "Français"
+        "fr": "Français",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1359,6 +1365,7 @@
       "GRANTEDORGDOMAIN": "Dominio",
       "RESOURCEOWNER": "Resource owner",
       "GRANTEDORGNAME": "Nome dell'organizzazione",
+      "GRANTID": "Grant Id",
       "CREATIONDATE": "Data di creazione",
       "CHANGEDATE": "Ultima modifica",
       "DATES": "Date",
@@ -1603,9 +1610,9 @@
       "TITLE": "Applicazione",
       "ID": "ID",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
-      "CREATE_OIDC": "Applicazione OIDC",
-      "CREATE_OIDC_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
-      "CREATE_OIDC_DESC_SUB": "Una configurazione raccomandata sar\u00e0 generata automaticamente.",
+      "CREATE": "Crea Applicazione",
+      "CREATE_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
+      "CREATE_DESC_SUB": "Una configurazione raccomandata sar\u00e0 generata automaticamente.",
       "STATE": "Stato",
       "DATECREATED": "Creato",
       "DATECHANGED": "Cambiato",
@@ -1658,6 +1665,10 @@
     "ADDITIONALORIGINSDESC": "Se vuoi aggiungere ulteriori Origini alla tua app che non \u00e8 usata come reindirizzamento puoi farlo qui.",
     "ORIGINS": "Origini",
     "NOTANORIGIN": "Il valore inserito non \u00e8 un'origine",
+    "PROSWITCH": "Sono un professionista. Salta questo passo.",
+    "NAMEANDTYPESECTION": "Nome e tipo",
+    "TITLEFIRST": "Nome dell' applicazione",
+    "TYPETITLE": "Che tipo di applicazione vuoi creare?",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1666,10 +1677,6 @@
       "CURRENT": "Configurazione attuale",
       "TOKENSECTIONTITLE": "Opzioni AuthToken",
       "REDIRECTSECTIONTITLE": "Impostazioni di reindirizzamento",
-      "PROSWITCH": "Sono un professionista. Salta questo passo.",
-      "NAMEANDTYPESECTION": "Nome e tipo",
-      "TITLEFIRST": "Inserisci un nome.",
-      "TYPETITLE": "Che tipo di applicazione vuoi creare?",
       "REDIRECTTITLE": "Specifica gli URI a cui il login sar\u00e0 reindirizzato.",
       "POSTREDIRECTTITLE": "Questo \u00e8 l'URI di reindirizzamento dopo il logout.",
       "REDIRECTDESCRIPTIONWEB": "Gli URI di reindirizzamento devono iniziare con https://. http:// \u00e8 valido solo con la modalit\u00e0 di sviluppo abilitata (DEV Mode).",
@@ -1761,6 +1768,18 @@
         "1": "Private Key JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Applicazioni SAMML"
+      },
+      "CONFIGSECTION": "Configurazione SAML",
+      "URL": "URL in cui si trova il file di metadati",
+      "OR": "o",
+      "XML": "Carica Metadata XML",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadati dal file"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
@@ -1813,7 +1832,8 @@
     "de": "Deutsch",
     "en": "English",
     "it": "Italiano",
-    "fr": "Français"
+    "fr": "Français",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

@@ -181,16 +181,17 @@
     "UNDERORGCONTEXT": "Dans les pages de l'organisation",
     "SIDEWIDE": "Raccourcis pour l'ensemble du site",
     "SHORTCUTS": {
-      "HOME": "<strong>A</strong>ller à <strong>A</strong>ccueil",
-      "SYSTEM": "<strong>A</strong>ller à <strong>S</strong>ystème",
-      "ORG": "<strong>A</strong>ller à <strong>O</strong>rganisation",
+      "HOME": "Aller à Accueil",
+      "INSTANCE": "Vers l'aperçu des instances",
+      "ORG": "Aller à Organisation",
+      "ORGSETTINGS": "Vers les paramètres de l'organisation",
       "ORGSWITCHER": "Modifier l'organisation",
       "ME": "Aller à son propre profil",
-      "PROJECTS": "<strong>A</strong>ller à <strong>P</strong>rojets",
-      "USERS": "<strong>A</strong>ller à <strong>U</strong>tilisateurs",
-      "USERGRANTS": "<strong>A</strong>ller à<strong>A</strong>utorisations",
-      "ACTIONS": "<strong>A</strong>ller à Actions et <strong>F</strong>lux",
-      "DOMAINS": "<strong>A</strong>ller à <strong>D</strong>omaines"
+      "PROJECTS": "Aller à Projets",
+      "USERS": "Aller à Utilisateurs",
+      "USERGRANTS": "Aller à Autorisations",
+      "ACTIONS": "Aller à Actions et Flux",
+      "DOMAINS": "Aller à Domaines"
     }
   },
   "RESOURCEID": "Id de la ressource",
@@ -481,7 +482,7 @@
       "SET": "Définir un nouveau mot de passe",
       "RESENDNOTIFICATION": "Envoyer le lien de réinitialisation du mot de passe",
       "REQUIRED": "Certains champs obligatoires sont manquants.",
-      "MINLENGTHERROR": "Le mot de passe doit comporter au moins{{value}} caractères.",
+      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères.",
       "NOTEQUAL": "Les mots de passe fournis ne correspondent pas."
     },
     "ID": "ID",
@@ -541,10 +542,10 @@
       "REQUIRED": "Le champ de saisie est vide.",
       "MINLENGTH": "Le mot de passe doit comporter au moins{{length}} caractères.",
       "NOEMAIL": "Le nom d'utilisateur ne peut pas être une adresse électronique.",
-      "UPPERCASEMISSING": "Le mot de passe doit comporter un caractère majuscule.",
-      "LOWERCASEMISSING": "Le mot de passe doit inclure un caractère minuscule.",
-      "SYMBOLERROR": "Le mot de passe doit inclure un symbole ou un signe de ponctuation.",
-      "NUMBERERROR": "Le mot de passe doit contenir un chiffre."
+      "UPPERCASEMISSING": "Doit inclure un caractère majuscule.",
+      "LOWERCASEMISSING": "Doit inclure un caractère minuscule.",
+      "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
+      "NUMBERERROR": "Doit inclure un chiffre."
     },
     "STATE": {
       "0": "Inconnu",
@@ -663,6 +664,8 @@
       "3": "Post création"
     },
     "ADDTRIGGER": "Ajouter un déclencheur",
+    "FLOWCHANGED": "Le processus a été modifié",
+    "FLOWCLEARED": "Le processus a été supprimé avec succès",
     "TIMEOUT": "Délai d'attente",
     "TIMEOUTINSEC": "Délai en secondes",
     "ALLOWEDTOFAIL": "Autorisé à échouer",
@@ -889,7 +892,8 @@
       "de": "Deutsch",
       "en": "English",
       "it": "Italiano",
-      "fr": "Français"
+      "fr": "Français",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -975,9 +979,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Complexité des mots de passe",
       "DESCRIPTION": "Assure que tous les mots de passe définis correspondent à un modèle spécifique.",
-      "SYMBOLANDNUMBERERROR": "Le mot de passe doit être composé d'un chiffre et d'un symbole/une marque de ponctuation.",
-      "SYMBOLERROR": "Le mot de passe doit comprendre un symbole ou un signe de ponctuation.",
-      "NUMBERERROR": "Le mot de passe doit comprendre un chiffre.",
+      "SYMBOLANDNUMBERERROR": "Doit être composé d'un chiffre et d'un symbole/signe de ponctuation.",
+      "SYMBOLERROR": "Doit inclure un symbole/un signe de ponctuation.",
+      "NUMBERERROR": "Doit inclure un chiffre.",
       "PATTERNERROR": "Le mot de passe ne correspond pas au modèle requis."
     },
     "PRIVATELABELING": {
@@ -1002,6 +1006,7 @@
       "MAXSIZE": "La taille maximale est limitée à 524 Ko.",
       "EMAILNOSVG": "Le format de fichier SVG n'est pas supporté dans les emails. Téléchargez donc votre logo en PNG ou dans un autre format pris en charge.",
       "MAXSIZEEXCEEDED": "La taille maximale de 524kB est dépassée.",
+      "NOSVGSUPPORTED": "SVG n'est pas pris en charge",
       "FONTINLOGINONLY": "La police n'est actuellement affichée que dans l'interface de connexion.",
       "VIEWS": {
         "PREVIEW": "Aperçu",
@@ -1068,7 +1073,8 @@
         "de": "Deutsch",
         "en": "English",
         "it": "Italiano",
-        "fr": "Français"
+        "fr": "Français",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1359,6 +1365,7 @@
       "GRANTEDORGDOMAIN": "Domaine",
       "RESOURCEOWNER": "Propriétaire de la ressource",
       "GRANTEDORGNAME": "Nom de l'organisation",
+      "GRANTID": "Grant Id",
       "CREATIONDATE": "Date de création",
       "CHANGEDATE": "Dernière modification",
       "DATES": "Dates",
@@ -1520,7 +1527,7 @@
     "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Les changements qui en résultent sont irrévocables. Voulez-vous vraiment le faire ?",
     "DELETE_SELECTION_TITLE": "Supprimer Idp",
     "DELETE_SELECTION_DESCRIPTION": "Vous êtes sur le point de supprimer un fournisseur d'identité. Les changements qui en résultent sont irrévocables. Voulez-vous vraiment le faire ?",
-    "EMPTY": "Aucun IPD disponible",
+    "EMPTY": "Aucun IDP disponible",
     "OIDC": {
       "GENERAL": "Informations générales",
       "TITLE": "Configuration de l'OIDC",
@@ -1813,7 +1820,8 @@
     "de": "Deutsch",
     "en": "English",
     "it": "Italiano",
-    "fr": "Français"
+    "fr": "Français",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

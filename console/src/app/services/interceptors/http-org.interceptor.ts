@@ -13,11 +13,8 @@ export abstract class HttpOrgInterceptor implements HttpInterceptor {
     return this.oauthModuleConfig.resourceServer.allowedUrls || [];
   }
 
-  constructor(
-    private storageService: StorageService,
-    protected oauthModuleConfig: OAuthModuleConfig,
-  ) {
-    const org: Org.AsObject | null = (this.storageService.getItem(StorageKey.organization, StorageLocation.session));
+  constructor(private storageService: StorageService, protected oauthModuleConfig: OAuthModuleConfig) {
+    const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
 
     if (org) {
       this.org = org;
@@ -29,16 +26,18 @@ export abstract class HttpOrgInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    return next.handle(req.clone({
-      setHeaders: {
-        [orgKey]: this.org.id
-      },
-    }));
+    return next.handle(
+      req.clone({
+        setHeaders: {
+          [orgKey]: this.org.id,
+        },
+      }),
+    );
   }
 
   private urlValidation(toIntercept: string): boolean {
     const URLS = ['https://api.zitadel.dev/assets', 'https://api.zitadel.ch/assets'];
 
-    return URLS.findIndex(url => toIntercept.startsWith(url)) > -1;
+    return URLS.findIndex((url) => toIntercept.startsWith(url)) > -1;
   }
 }
