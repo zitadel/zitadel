@@ -71,7 +71,7 @@ export function login(
         cy.get('#submit-button').click();
 
         cy.wait('@password').then((interception) => {
-          if (interception.response.body.indexOf('Multifactor Setup') === -1) {
+          if (interception.response.body.indexOf('/ui/login/mfa/prompt') === -1) {
             return;
           }
 
