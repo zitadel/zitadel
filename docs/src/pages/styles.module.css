@@ -74,6 +74,7 @@
   height: 70px;
   width: 70px;
   margin: 1rem 1rem 1rem 0 !important;
+  border-radius: 50% !important;
 }
 
 .homelink:hover,
