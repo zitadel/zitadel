@@ -72,3 +72,17 @@ You can choose from
 - **Use organization setting**: The branding of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown.
 
 In a B2B use case, you would typically use the organization setting. If you want to omit organization detection, you can preselect an organization with the primary domain [scope](/docs/apis/openidoauth/scopes#reserved-scopes) (ex. `urn:zitadel:iam:org:domain:primary:{domainname}`).
+
+## Project Settings
+
+On default the login screen will be shown in the private labeling settings of the system.
+With the [primary domain scope](../../apis/openidoauth/scopes#reserves-scopes) it is possible to trigger the setting of the given organization.
+But this will also restrict, the login to user of the given organization.
+
+With the private labeling setting it is possible to choose which settings should trigger.
+
+| Setting                                | Description                                                                                                                                                                                                                                                  |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Unspecified                            | If nothing is specified the default will trigger. (System settings)                                                                                                                                                                                          |
+| Enforce project resource owner policy  | This setting will enforce the private labeling of the organization (resource owner) of the project through the whole login process.                                                                                                                          |
+| Allow Login User resource owner policy | With this setting first the private labeling of the organization (resource owner) of the project will trigger. As soon as the user and its organization (resource owner) is identified by ZITADEL, the settings will change to the organization of the user. |
