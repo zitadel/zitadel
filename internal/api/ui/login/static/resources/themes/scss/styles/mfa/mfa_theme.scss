@@ -1,0 +1,9 @@
+@import "../theming/theming";
+@import "list";
+
+@mixin lgn-mfa-theme() {
+  .mfa-types {
+    display: flex;
+    flex-direction: row;
+  }
+}
