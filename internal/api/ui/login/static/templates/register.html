@@ -51,40 +51,6 @@
 
         <div class="double-col">
             <div class="lgn-field">
-                <label class="lgn-label" for="languages">{{t "RegistrationUser.LanguageLabel"}}</label>
-                <select id="languages" name="language">
-                    <option value=""></option>
-                    <option value="de" id="de" {{if (selectedLanguage "de")}} selected {{end}}>{{t "RegistrationUser.German"}}
-                    </option>
-                    <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "RegistrationUser.English"}}
-                    </option>
-                    <option value="it" id="it" {{if (selectedLanguage "it")}} selected {{end}}>{{t "RegistrationUser.Italian"}}
-                    </option>
-                    <option value="fr" id="fr" {{if (selectedLanguage "fr")}} selected {{end}}>{{t "RegistrationUser.French"}}
-                    </option>
-                    <option value="zh" id="zh" {{if (selectedLanguage "zh")}} selected {{end}}>{{t "RegistrationUser.Chinese"}}
-                    </option>
-                </select>
-            </div>
-            <div class="lgn-field" >
-                <label class="lgn-label" for="genders">
-                    {{t "RegistrationUser.GenderLabel"}}
-                    <span class="optional">{{t "optional"}}</span>
-                </label>
-                <select id="genders" name="gender">
-                    <option value=""></option>
-                    <option value="1" id="female" {{if (selectedGender 1)}} selected {{end}}>{{t "RegistrationUser.Female"}}
-                    </option>
-                    <option value="2" id="male" {{if (selectedGender 2)}} selected {{end}}>{{t "RegistrationUser.Male"}}
-                    </option>
-                    <option value="3" id="diverse" {{if (selectedGender 3)}} selected {{end}}>{{t "RegistrationUser.Diverse"}}
-                    </option>
-                </select>
-            </div>
-        </div>
-
-        <div class="double-col">
-            <div class="lgn-field">
                 <label class="lgn-label" for="register-password">{{t "RegistrationUser.PasswordLabel"}}</label>
                 <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
                     data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
