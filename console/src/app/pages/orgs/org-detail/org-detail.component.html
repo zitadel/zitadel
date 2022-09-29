@@ -50,6 +50,7 @@
       [metadata]="metadata"
       [disabled]="(['org.write'] | hasRole | async) === false"
       (editClicked)="editMetadata()"
+      (refresh)="loadMetadata()"
     ></cnsl-metadata>
 
     <ng-template #nopolicyreadpermission>

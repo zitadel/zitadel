@@ -17,7 +17,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
+import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
 @Component({
@@ -357,7 +357,7 @@ export class AuthUserDetailComponent implements OnDestroy {
           this.metadata = resp.resultList.map((md) => {
             return {
               key: md.key,
-              value: atob(md.value as string),
+              value: Buffer.from(md.value as string, 'base64').toString('ascii'),
             };
           });
         })
@@ -371,7 +371,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   public editMetadata(): void {
     if (this.user && this.user.id) {
       const setFcn = (key: string, value: string): Promise<any> =>
-        this.mgmt.setUserMetadata(key, btoa(value), this.user?.id ?? '');
+        this.mgmt.setUserMetadata(key, Buffer.from(value).toString('base64'), this.user?.id ?? '');
       const removeFcn = (key: string): Promise<any> => this.mgmt.removeUserMetadata(key, this.user?.id ?? '');
 
       const dialogRef = this.dialog.open(MetadataDialogComponent, {

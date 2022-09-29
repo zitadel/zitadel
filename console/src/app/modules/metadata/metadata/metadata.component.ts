@@ -11,6 +11,7 @@ export class MetadataComponent {
   @Input() public disabled: boolean = false;
   @Input() public loading: boolean = false;
   @Output() public editClicked: EventEmitter<void> = new EventEmitter();
+  @Output() public refresh: EventEmitter<void> = new EventEmitter();
 
   constructor() {}
 }

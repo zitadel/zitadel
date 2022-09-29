@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs';
-import { catchError, finalize, map, take } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
@@ -17,6 +17,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { Buffer } from 'buffer';
 
 @Component({
   selector: 'cnsl-org-detail',
@@ -206,7 +207,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         this.metadata = resp.resultList.map((md) => {
           return {
             key: md.key,
-            value: atob(md.value as string),
+            value: Buffer.from(md.value as string, 'base64').toString('ascii'),
           };
         });
       })
