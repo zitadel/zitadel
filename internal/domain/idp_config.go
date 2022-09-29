@@ -101,7 +101,7 @@ func (s IDPConfigState) Valid() bool {
 }
 
 func (s IDPConfigState) Exists() bool {
-	return s != IDPConfigStateUnspecified || s == IDPConfigStateRemoved
+	return s != IDPConfigStateUnspecified && s != IDPConfigStateRemoved
 }
 
 type IDPConfigStylingType int32
