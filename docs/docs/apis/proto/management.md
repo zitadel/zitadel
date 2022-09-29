@@ -804,6 +804,19 @@ Sets the state of my organisation to active
     POST: /orgs/me/_reactivate
 
 
+### RemoveOrg
+
+> **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
+[RemoveOrgResponse](#removeorgresponse)
+
+Sets the state of my organisation to deactivated
+Users of this organisation will not be able login
+
+
+
+    DELETE: /orgs/me
+
+
 ### SetOrgMetadata
 
 > **rpc** SetOrgMetadata([SetOrgMetadataRequest](#setorgmetadatarequest))
@@ -874,19 +887,6 @@ Set a list of org metadata
 
 
     DELETE: /metadata/_bulk
-
-
-### RemoveOrg
-
-> **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
-[RemoveOrgResponse](#removeorgresponse)
-
-Sets the state of my organisation to deactivated
-Users of this organisation will not be able login
-
-
-
-    DELETE: /orgs/me
 
 
 ### ListOrgDomains
@@ -3104,7 +3104,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | primary_color |  string | - | string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes |  |
 | warn_color |  string | - | string.max_len: 50<br />  |
 | background_color |  string | - | string.max_len: 50<br />  |
 | font_color |  string | - | string.max_len: 50<br />  |
@@ -6962,23 +6962,6 @@ This is an empty response
 
 
 
-### RemoveOrgRequest
-
-
-
-
-
-### RemoveOrgResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### RemoveOrgMetadataRequest
 
 
@@ -6991,6 +6974,23 @@ This is an empty response
 
 
 ### RemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveOrgRequest
+
+
+
+
+
+### RemoveOrgResponse
 
 
 
