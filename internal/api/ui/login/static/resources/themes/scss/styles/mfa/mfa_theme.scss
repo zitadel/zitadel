@@ -1,9 +1,36 @@
 @import "../theming/theming";
-@import "list";
 
 @mixin lgn-mfa-theme() {
   .mfa-types {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 1rem;
+
+    .mfa-or {
+      font-size: 14px;
+    }
+
+    .mfa {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      input {
+        display: none;
+
+        + .mfa-img {
+          border: 1px solid #ffffff20;
+        }
+
+        &:checked + .mfa-img {
+          border: 1px solid #ffffff;
+          border-radius: 1rem;
+          padding: 1rem;
+          margin-bottom: 0.5rem;
+        }
+      }
+    }
   }
 }

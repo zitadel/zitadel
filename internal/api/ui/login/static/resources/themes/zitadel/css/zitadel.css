@@ -2945,4 +2945,32 @@ ul li i.lgn-valid {
   background-color: var(--zitadel-color-success-background);
 }
 
+.mfa-types {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-top: 1rem;
+}
+.mfa-types .mfa-or {
+  font-size: 14px;
+}
+.mfa-types .mfa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.mfa-types .mfa input {
+  display: none;
+}
+.mfa-types .mfa input + .mfa-img {
+  border: 1px solid #ffffff20;
+}
+.mfa-types .mfa input:checked + .mfa-img {
+  border: 1px solid #ffffff;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
 /*# sourceMappingURL=zitadel.css.map */

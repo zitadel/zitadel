@@ -15,13 +15,29 @@
   <div class="mfa-types">
     {{ range $provider := .MFAProviders}} {{ $providerName := (t (printf
     "InitMFAPrompt.Provider%v" $provider)) }}
-    <div class="lgn-radio block">
+    <div class="mfa block">
       <input
         id="{{ $provider }}"
         type="radio"
         name="provider"
         value="{{ $provider }}"
       />
+      {{ if eq $provider 0 }}
+      <div class="mfa-img">
+        <img width="100px" height="100px" alt="OTP" src="{{ resourceThemeUrl
+        "mfa-otp.svg" }}" />
+      </div>
+      {{ end }}
+
+      <span></span>
+
+      {{ if eq $provider 1 }}
+      <div class="mfa-img">
+        <img width="100px" height="100px" alt="OTP" src="{{ resourceThemeUrl
+        "logo-u2f.svg" }}" />
+      </div>
+      {{ end }}
+
       <label for="{{ $provider }}">{{ $providerName }}</label>
     </div>
     {{ end }}
