@@ -483,6 +483,7 @@ select::placeholder,
   transform: scale(0);
 }
 .lgn-radio input[type=radio] {
+  display: block;
   opacity: 0;
   margin: 0;
   width: 0;
@@ -1411,6 +1412,7 @@ select::placeholder,
   transform: scale(0);
 }
 .lgn-radio input[type=radio] {
+  display: block;
   opacity: 0;
   margin: 0;
   width: 0;

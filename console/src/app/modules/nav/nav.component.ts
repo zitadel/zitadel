@@ -73,7 +73,7 @@ export class NavComponent implements OnDestroy {
 
   @Input() public isDarkTheme: boolean = true;
   @Input() public user!: User.AsObject;
-  @Input() public labelpolicy!: LabelPolicy.AsObject;
+  @Input() public labelpolicy?: LabelPolicy.AsObject;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
       return result.matches;

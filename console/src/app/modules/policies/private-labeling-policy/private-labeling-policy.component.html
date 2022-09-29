@@ -162,7 +162,7 @@
                   "
                   matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
                 >
-                  <i class="las la-ban"></i>
+                  <i class="las la-trash"></i>
                 </button>
               </ng-container>
               <ng-template #addLogoButton>
@@ -233,7 +233,7 @@
                   "
                   matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
                 >
-                  <i class="las la-ban"></i>
+                  <i class="las la-trash"></i>
                 </button>
               </ng-container>
               <ng-template #addIconButton>
@@ -514,7 +514,7 @@
               (click)="deleteFont()"
               matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
             >
-              <i class="las la-ban"></i>
+              <i class="las la-trash"></i>
             </button>
           </div>
 
@@ -568,7 +568,7 @@
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
-        <div class="adv-container" *ngIf="previewData">
+        <div class="adv-container">
           <mat-slide-toggle
             class="toggle"
             color="primary"
