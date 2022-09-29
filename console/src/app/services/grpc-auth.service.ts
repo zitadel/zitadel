@@ -132,7 +132,7 @@ export class GrpcAuthService {
       ),
     ),
   );
-  private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private cachedOrgs: Org.AsObject[] = [];
