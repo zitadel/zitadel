@@ -51,7 +51,6 @@ export class AccountsCardComponent implements OnInit {
         login_hint: loginHint,
       },
     };
-    (configWithPrompt as any).customQueryParams['login_hint'] = loginHint;
     this.authService.authenticate(configWithPrompt);
   }
 
