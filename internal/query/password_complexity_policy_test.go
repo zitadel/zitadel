@@ -28,19 +28,19 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.password_complexity_policies.id,`+
-						` projections.password_complexity_policies.sequence,`+
-						` projections.password_complexity_policies.creation_date,`+
-						` projections.password_complexity_policies.change_date,`+
-						` projections.password_complexity_policies.resource_owner,`+
-						` projections.password_complexity_policies.min_length,`+
-						` projections.password_complexity_policies.has_lowercase,`+
-						` projections.password_complexity_policies.has_uppercase,`+
-						` projections.password_complexity_policies.has_number,`+
-						` projections.password_complexity_policies.has_symbol,`+
-						` projections.password_complexity_policies.is_default,`+
-						` projections.password_complexity_policies.state`+
-						` FROM projections.password_complexity_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_complexity_policies2.id,`+
+						` projections.password_complexity_policies2.sequence,`+
+						` projections.password_complexity_policies2.creation_date,`+
+						` projections.password_complexity_policies2.change_date,`+
+						` projections.password_complexity_policies2.resource_owner,`+
+						` projections.password_complexity_policies2.min_length,`+
+						` projections.password_complexity_policies2.has_lowercase,`+
+						` projections.password_complexity_policies2.has_uppercase,`+
+						` projections.password_complexity_policies2.has_number,`+
+						` projections.password_complexity_policies2.has_symbol,`+
+						` projections.password_complexity_policies2.is_default,`+
+						` projections.password_complexity_policies2.state`+
+						` FROM projections.password_complexity_policies2`),
 					nil,
 					nil,
 				),
@@ -58,19 +58,19 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.password_complexity_policies.id,`+
-						` projections.password_complexity_policies.sequence,`+
-						` projections.password_complexity_policies.creation_date,`+
-						` projections.password_complexity_policies.change_date,`+
-						` projections.password_complexity_policies.resource_owner,`+
-						` projections.password_complexity_policies.min_length,`+
-						` projections.password_complexity_policies.has_lowercase,`+
-						` projections.password_complexity_policies.has_uppercase,`+
-						` projections.password_complexity_policies.has_number,`+
-						` projections.password_complexity_policies.has_symbol,`+
-						` projections.password_complexity_policies.is_default,`+
-						` projections.password_complexity_policies.state`+
-						` FROM projections.password_complexity_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_complexity_policies2.id,`+
+						` projections.password_complexity_policies2.sequence,`+
+						` projections.password_complexity_policies2.creation_date,`+
+						` projections.password_complexity_policies2.change_date,`+
+						` projections.password_complexity_policies2.resource_owner,`+
+						` projections.password_complexity_policies2.min_length,`+
+						` projections.password_complexity_policies2.has_lowercase,`+
+						` projections.password_complexity_policies2.has_uppercase,`+
+						` projections.password_complexity_policies2.has_number,`+
+						` projections.password_complexity_policies2.has_symbol,`+
+						` projections.password_complexity_policies2.is_default,`+
+						` projections.password_complexity_policies2.state`+
+						` FROM projections.password_complexity_policies2`),
 					[]string{
 						"id",
 						"sequence",
@@ -121,19 +121,19 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.password_complexity_policies.id,`+
-						` projections.password_complexity_policies.sequence,`+
-						` projections.password_complexity_policies.creation_date,`+
-						` projections.password_complexity_policies.change_date,`+
-						` projections.password_complexity_policies.resource_owner,`+
-						` projections.password_complexity_policies.min_length,`+
-						` projections.password_complexity_policies.has_lowercase,`+
-						` projections.password_complexity_policies.has_uppercase,`+
-						` projections.password_complexity_policies.has_number,`+
-						` projections.password_complexity_policies.has_symbol,`+
-						` projections.password_complexity_policies.is_default,`+
-						` projections.password_complexity_policies.state`+
-						` FROM projections.password_complexity_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_complexity_policies2.id,`+
+						` projections.password_complexity_policies2.sequence,`+
+						` projections.password_complexity_policies2.creation_date,`+
+						` projections.password_complexity_policies2.change_date,`+
+						` projections.password_complexity_policies2.resource_owner,`+
+						` projections.password_complexity_policies2.min_length,`+
+						` projections.password_complexity_policies2.has_lowercase,`+
+						` projections.password_complexity_policies2.has_uppercase,`+
+						` projections.password_complexity_policies2.has_number,`+
+						` projections.password_complexity_policies2.has_symbol,`+
+						` projections.password_complexity_policies2.is_default,`+
+						` projections.password_complexity_policies2.state`+
+						` FROM projections.password_complexity_policies2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

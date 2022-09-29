@@ -25,16 +25,16 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRolesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
-						` projections.project_roles.creation_date,`+
-						` projections.project_roles.change_date,`+
-						` projections.project_roles.resource_owner,`+
-						` projections.project_roles.sequence,`+
-						` projections.project_roles.role_key,`+
-						` projections.project_roles.display_name,`+
-						` projections.project_roles.group_name,`+
+					regexp.QuoteMeta(`SELECT projections.project_roles2.project_id,`+
+						` projections.project_roles2.creation_date,`+
+						` projections.project_roles2.change_date,`+
+						` projections.project_roles2.resource_owner,`+
+						` projections.project_roles2.sequence,`+
+						` projections.project_roles2.role_key,`+
+						` projections.project_roles2.display_name,`+
+						` projections.project_roles2.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.project_roles`),
+						` FROM projections.project_roles2`),
 					nil,
 					nil,
 				),
@@ -46,16 +46,16 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRolesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
-						` projections.project_roles.creation_date,`+
-						` projections.project_roles.change_date,`+
-						` projections.project_roles.resource_owner,`+
-						` projections.project_roles.sequence,`+
-						` projections.project_roles.role_key,`+
-						` projections.project_roles.display_name,`+
-						` projections.project_roles.group_name,`+
+					regexp.QuoteMeta(`SELECT projections.project_roles2.project_id,`+
+						` projections.project_roles2.creation_date,`+
+						` projections.project_roles2.change_date,`+
+						` projections.project_roles2.resource_owner,`+
+						` projections.project_roles2.sequence,`+
+						` projections.project_roles2.role_key,`+
+						` projections.project_roles2.display_name,`+
+						` projections.project_roles2.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.project_roles`),
+						` FROM projections.project_roles2`),
 					[]string{
 						"project_id",
 						"creation_date",
@@ -104,16 +104,16 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRolesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
-						` projections.project_roles.creation_date,`+
-						` projections.project_roles.change_date,`+
-						` projections.project_roles.resource_owner,`+
-						` projections.project_roles.sequence,`+
-						` projections.project_roles.role_key,`+
-						` projections.project_roles.display_name,`+
-						` projections.project_roles.group_name,`+
+					regexp.QuoteMeta(`SELECT projections.project_roles2.project_id,`+
+						` projections.project_roles2.creation_date,`+
+						` projections.project_roles2.change_date,`+
+						` projections.project_roles2.resource_owner,`+
+						` projections.project_roles2.sequence,`+
+						` projections.project_roles2.role_key,`+
+						` projections.project_roles2.display_name,`+
+						` projections.project_roles2.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.project_roles`),
+						` FROM projections.project_roles2`),
 					[]string{
 						"project_id",
 						"creation_date",
@@ -182,16 +182,16 @@ func Test_ProjectRolePrepares(t *testing.T) {
 			prepare: prepareProjectRolesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.project_roles.project_id,`+
-						` projections.project_roles.creation_date,`+
-						` projections.project_roles.change_date,`+
-						` projections.project_roles.resource_owner,`+
-						` projections.project_roles.sequence,`+
-						` projections.project_roles.role_key,`+
-						` projections.project_roles.display_name,`+
-						` projections.project_roles.group_name,`+
+					regexp.QuoteMeta(`SELECT projections.project_roles2.project_id,`+
+						` projections.project_roles2.creation_date,`+
+						` projections.project_roles2.change_date,`+
+						` projections.project_roles2.resource_owner,`+
+						` projections.project_roles2.sequence,`+
+						` projections.project_roles2.role_key,`+
+						` projections.project_roles2.display_name,`+
+						` projections.project_roles2.group_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.project_roles`),
+						` FROM projections.project_roles2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

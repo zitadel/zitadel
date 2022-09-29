@@ -108,7 +108,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "  ",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: errors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -192,7 +192,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username ",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: errors.IsPreconditionFailed,
 			},
 		},
 		{

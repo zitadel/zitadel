@@ -39,14 +39,14 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script,`+
-						` projections.flows_triggers.trigger_type,`+
-						` projections.flows_triggers.trigger_sequence,`+
-						` projections.flows_triggers.flow_type,`+
-						` projections.flows_triggers.change_date,`+
-						` projections.flows_triggers.sequence,`+
-						` projections.flows_triggers.resource_owner`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` projections.flow_triggers2.trigger_type,`+
+						` projections.flow_triggers2.trigger_sequence,`+
+						` projections.flow_triggers2.flow_type,`+
+						` projections.flow_triggers2.change_date,`+
+						` projections.flow_triggers2.sequence,`+
+						` projections.flow_triggers2.resource_owner`+
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					nil,
 					nil,
 				),
@@ -71,14 +71,14 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script,`+
-						` projections.flows_triggers.trigger_type,`+
-						` projections.flows_triggers.trigger_sequence,`+
-						` projections.flows_triggers.flow_type,`+
-						` projections.flows_triggers.change_date,`+
-						` projections.flows_triggers.sequence,`+
-						` projections.flows_triggers.resource_owner`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` projections.flow_triggers2.trigger_type,`+
+						` projections.flow_triggers2.trigger_sequence,`+
+						` projections.flow_triggers2.flow_type,`+
+						` projections.flow_triggers2.change_date,`+
+						` projections.flow_triggers2.sequence,`+
+						` projections.flow_triggers2.resource_owner`+
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -152,14 +152,14 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script,`+
-						` projections.flows_triggers.trigger_type,`+
-						` projections.flows_triggers.trigger_sequence,`+
-						` projections.flows_triggers.flow_type,`+
-						` projections.flows_triggers.change_date,`+
-						` projections.flows_triggers.sequence,`+
-						` projections.flows_triggers.resource_owner`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` projections.flow_triggers2.trigger_type,`+
+						` projections.flow_triggers2.trigger_sequence,`+
+						` projections.flow_triggers2.flow_type,`+
+						` projections.flow_triggers2.change_date,`+
+						` projections.flow_triggers2.sequence,`+
+						` projections.flow_triggers2.resource_owner`+
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -261,14 +261,14 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script,`+
-						` projections.flows_triggers.trigger_type,`+
-						` projections.flows_triggers.trigger_sequence,`+
-						` projections.flows_triggers.flow_type,`+
-						` projections.flows_triggers.change_date,`+
-						` projections.flows_triggers.sequence,`+
-						` projections.flows_triggers.resource_owner`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` projections.flow_triggers2.trigger_type,`+
+						` projections.flow_triggers2.trigger_sequence,`+
+						` projections.flow_triggers2.flow_type,`+
+						` projections.flow_triggers2.change_date,`+
+						` projections.flow_triggers2.sequence,`+
+						` projections.flow_triggers2.resource_owner`+
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -329,14 +329,14 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script,`+
-						` projections.flows_triggers.trigger_type,`+
-						` projections.flows_triggers.trigger_sequence,`+
-						` projections.flows_triggers.flow_type,`+
-						` projections.flows_triggers.change_date,`+
-						` projections.flows_triggers.sequence,`+
-						` projections.flows_triggers.resource_owner`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` projections.flow_triggers2.trigger_type,`+
+						` projections.flow_triggers2.trigger_sequence,`+
+						` projections.flow_triggers2.flow_type,`+
+						` projections.flow_triggers2.change_date,`+
+						` projections.flow_triggers2.sequence,`+
+						` projections.flow_triggers2.resource_owner`+
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -361,8 +361,8 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					nil,
 					nil,
 				),
@@ -382,8 +382,8 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -434,8 +434,8 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -506,8 +506,8 @@ func Test_FlowPrepares(t *testing.T) {
 						` projections.actions2.sequence,`+
 						` projections.actions2.name,`+
 						` projections.actions2.script`+
-						` FROM projections.flows_triggers`+
-						` LEFT JOIN projections.actions2 ON projections.flows_triggers.action_id = projections.actions2.id`),
+						` FROM projections.flow_triggers2`+
+						` LEFT JOIN projections.actions2 ON projections.flow_triggers2.action_id = projections.actions2.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -524,8 +524,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.flows_triggers.flow_type`+
-						` FROM projections.flows_triggers`),
+					regexp.QuoteMeta(`SELECT projections.flow_triggers2.flow_type`+
+						` FROM projections.flow_triggers2`),
 					nil,
 					nil,
 				),
@@ -537,8 +537,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.flows_triggers.flow_type`+
-						` FROM projections.flows_triggers`),
+					regexp.QuoteMeta(`SELECT projections.flow_triggers2.flow_type`+
+						` FROM projections.flow_triggers2`),
 					[]string{
 						"flow_type",
 					},
@@ -558,8 +558,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.flows_triggers.flow_type`+
-						` FROM projections.flows_triggers`),
+					regexp.QuoteMeta(`SELECT projections.flow_triggers2.flow_type`+
+						` FROM projections.flow_triggers2`),
 					[]string{
 						"flow_type",
 					},
@@ -583,8 +583,8 @@ func Test_FlowPrepares(t *testing.T) {
 			prepare: prepareFlowTypesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.flows_triggers.flow_type`+
-						` FROM projections.flows_triggers`),
+					regexp.QuoteMeta(`SELECT projections.flow_triggers2.flow_type`+
+						` FROM projections.flow_triggers2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
