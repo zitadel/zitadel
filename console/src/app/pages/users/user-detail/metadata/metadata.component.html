@@ -1,13 +1,7 @@
 <cnsl-card class="metadata-details" title="{{ 'USER.METADATA.TITLE' | translate }}">
   <div class="metadata-actions">
     <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
-    <button
-      [disabled]="(['user.write:' + userId, 'user.write'] | hasRole | async) === false"
-      mat-raised-button
-      color="primary"
-      class="edit"
-      (click)="editMetadata()"
-    >
+    <button [disabled]="disabled" mat-raised-button color="primary" class="edit" (click)="editClicked.emit()">
       {{ 'ACTIONS.EDIT' | translate }}
     </button>
   </div>

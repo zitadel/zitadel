@@ -9,11 +9,14 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { MetadataDialogComponent } from '../metadata-dialog/metadata-dialog.component';
 
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
@@ -30,6 +33,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   private subscription: Subscription = new Subscription();
 
   public loading: boolean = false;
+  public loadingMetadata: boolean = false;
 
   public ChangeType: any = ChangeType;
   public userLoginMustBeDomain: boolean = false;
@@ -37,6 +41,8 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
+
+  public metadata: Metadata.AsObject[] = [];
 
   public settingsList: SidenavSetting[] = [
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
@@ -55,6 +61,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public userService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
+    private mgmt: ManagementService,
     private breadcrumbService: BreadcrumbService,
     private mediaMatcher: MediaMatcher,
     private _location: Location,
@@ -103,6 +110,8 @@ export class AuthUserDetailComponent implements OnDestroy {
       .then((resp) => {
         if (resp.user) {
           this.user = resp.user;
+
+          this.loadMetadata();
 
           this.breadcrumbService.setBreadcrumb([
             new Breadcrumb({
@@ -336,5 +345,40 @@ export class AuthUserDetailComponent implements OnDestroy {
           });
       }
     });
+  }
+
+  public loadMetadata(): Promise<any> | void {
+    if (this.user) {
+      this.loadingMetadata = true;
+      return this.mgmt
+        .listUserMetadata(this.user.id)
+        .then((resp) => {
+          this.loadingMetadata = false;
+          this.metadata = resp.resultList.map((md) => {
+            return {
+              key: md.key,
+              value: atob(md.value as string),
+            };
+          });
+        })
+        .catch((error) => {
+          this.loadingMetadata = false;
+          this.toast.showError(error);
+        });
+    }
+  }
+
+  public editMetadata(): void {
+    if (this.user) {
+      const dialogRef = this.dialog.open(MetadataDialogComponent, {
+        data: {
+          userId: this.user.id,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.loadMetadata();
+      });
+    }
   }
 }

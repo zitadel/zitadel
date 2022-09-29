@@ -19,6 +19,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
+import { MetadataDialogComponent } from '../metadata-dialog/metadata-dialog.component';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
@@ -42,7 +43,9 @@ export class UserDetailComponent implements OnInit {
   public languages: string[] = ['de', 'en', 'it', 'fr'];
 
   public ChangeType: any = ChangeType;
+
   public loading: boolean = true;
+  public loadingMetadata: boolean = true;
 
   public UserState: any = UserState;
   public copied: string = '';
@@ -446,6 +449,41 @@ export class UserDetailComponent implements OnInit {
           }
         });
         break;
+    }
+  }
+
+  public loadMetadata(): Promise<any> | void {
+    if (this.user) {
+      this.loadingMetadata = true;
+      return this.mgmtUserService
+        .listUserMetadata(this.user.id)
+        .then((resp) => {
+          this.loadingMetadata = false;
+          this.metadata = resp.resultList.map((md) => {
+            return {
+              key: md.key,
+              value: atob(md.value as string),
+            };
+          });
+        })
+        .catch((error) => {
+          this.loadingMetadata = false;
+          this.toast.showError(error);
+        });
+    }
+  }
+
+  public editMetadata(): void {
+    if (this.user) {
+      const dialogRef = this.dialog.open(MetadataDialogComponent, {
+        data: {
+          userId: this.user.id,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.loadMetadata();
+      });
     }
   }
 }
