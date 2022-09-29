@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
+import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -19,7 +20,6 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
-import { MetadataDialogComponent } from '../metadata-dialog/metadata-dialog.component';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
@@ -475,9 +475,15 @@ export class UserDetailComponent implements OnInit {
 
   public editMetadata(): void {
     if (this.user) {
+      const setFcn = (key: string, value: string): Promise<any> =>
+        this.mgmtUserService.setUserMetadata(key, btoa(value), this.user.id);
+      const removeFcn = (key: string): Promise<any> => this.mgmtUserService.removeUserMetadata(key, this.user.id);
+
       const dialogRef = this.dialog.open(MetadataDialogComponent, {
         data: {
-          userId: this.user.id,
+          metadata: this.metadata,
+          setFcn: setFcn,
+          removeFcn: removeFcn,
         },
       });
 

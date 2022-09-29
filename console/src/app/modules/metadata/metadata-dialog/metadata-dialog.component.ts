@@ -14,61 +14,16 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class MetadataDialogComponent {
   public metadata: Partial<Metadata.AsObject>[] = [];
-  public injData: any = {};
-  public loading: boolean = true;
+  public loading: boolean = false;
   public ts!: Timestamp.AsObject | undefined;
 
   constructor(
     private managementService: ManagementService,
-    private authService: GrpcAuthService,
     private toast: ToastService,
     public dialogRef: MatDialogRef<MetadataDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
-    this.injData = data;
-    this.load();
-  }
-
-  public load(): void {
-    this.loadMetadata()
-      .then(() => {
-        this.loading = false;
-        if (this.metadata.length === 0) {
-          this.addEntry();
-        }
-      })
-      .catch((error) => {
-        this.loading = false;
-        this.toast.showError(error);
-        if (this.metadata.length === 0) {
-          this.addEntry();
-        }
-      });
-  }
-
-  public loadMetadata(): Promise<void> {
-    this.loading = true;
-    if (this.injData.userId) {
-      return this.managementService.listUserMetadata(this.injData.userId).then((resp) => {
-        this.metadata = resp.resultList.map((md) => {
-          return {
-            key: md.key,
-            value: Buffer.from(md.value as string, 'base64'),
-          };
-        });
-        this.ts = resp.details?.viewTimestamp;
-      });
-    } else {
-      return this.authService.listMyMetadata().then((resp) => {
-        this.metadata = resp.resultList.map((md) => {
-          return {
-            key: md.key,
-            value: Buffer.from(md.value as string, 'base64'),
-          };
-        });
-        this.ts = resp.details?.viewTimestamp;
-      });
-    }
+    this.metadata = data.metadata;
   }
 
   public addEntry(): void {
@@ -104,24 +59,24 @@ export class MetadataDialogComponent {
 
   public setMetadata(key: string, value: string): void {
     if (key && value) {
-      this.managementService
-        .setUserMetadata(key, btoa(value), this.injData.userId)
+      this.data
+        .setFcn(key, value)
         .then(() => {
           this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
         })
-        .catch((error) => {
+        .catch((error: any) => {
           this.toast.showError(error);
         });
     }
   }
 
   public removeMetadata(key: string): Promise<void> {
-    return this.managementService
-      .removeUserMetadata(key, this.injData.userId)
-      .then((resp) => {
+    return this.data
+      .removeFcn(key)
+      .then((resp: any) => {
         this.toast.showInfo('USER.METADATA.REMOVESUCCESS', true);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         this.toast.showError(error);
       });
   }

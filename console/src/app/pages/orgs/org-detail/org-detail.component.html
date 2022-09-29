@@ -46,6 +46,12 @@
       <cnsl-settings-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-settings-grid>
     </ng-container>
 
+    <cnsl-metadata
+      [metadata]="metadata"
+      [disabled]="(['org.write'] | hasRole | async) === false"
+      (editClicked)="editMetadata()"
+    ></cnsl-metadata>
+
     <ng-template #nopolicyreadpermission>
       <div class="no-permission-warn-wrapper">
         <cnsl-info-section class="info-section-warn" [fitWidth]="true" [type]="InfoSectionType.ALERT">{{

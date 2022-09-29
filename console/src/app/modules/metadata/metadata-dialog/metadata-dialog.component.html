@@ -3,9 +3,6 @@
   <span class="fill-space"></span>
   <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
   <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-  <button class="icon-button" mat-icon-button (click)="load()">
-    <mat-icon class="icon">refresh</mat-icon>
-  </button>
 </div>
 <p class="desc">{{ 'USER.METADATA.DESCRIPTION' | translate }}</p>
 <div mat-dialog-content class="metadata-dialog-content">

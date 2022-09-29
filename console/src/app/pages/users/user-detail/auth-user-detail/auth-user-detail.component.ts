@@ -6,6 +6,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -16,7 +17,6 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { MetadataDialogComponent } from '../metadata-dialog/metadata-dialog.component';
 
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
@@ -369,10 +369,16 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public editMetadata(): void {
-    if (this.user) {
+    if (this.user && this.user.id) {
+      const setFcn = (key: string, value: string): Promise<any> =>
+        this.mgmt.setUserMetadata(key, btoa(value), this.user?.id ?? '');
+      const removeFcn = (key: string): Promise<any> => this.mgmt.removeUserMetadata(key, this.user?.id ?? '');
+
       const dialogRef = this.dialog.open(MetadataDialogComponent, {
         data: {
-          userId: this.user.id,
+          metadata: this.metadata,
+          setFcn: setFcn,
+          removeFcn: removeFcn,
         },
       });
 
