@@ -1,43 +1,25 @@
 @import "../theming/theming";
+@import "mfa";
 
 @mixin lgn-mfa-theme() {
-  .mfa-types {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-evenly;
-    margin-top: 1rem;
-
-    .mfa-or {
-      font-size: 14px;
-    }
-
+  .lgn-mfa-options {
     .mfa {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
       input[type="radio"] + label {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
         .mfa-img {
-          border: 1px solid #ffffff20;
-          display: flex;
+          border: 1px solid var(--zitadel-color-input-border);
+          background-color: var(--zitadel-color-input-background);
+
+          &:hover {
+            border: 1px solid var(--zitadel-color-input-border-hover);
+          }
         }
       }
 
       input[type="radio"] {
-        display: none;
-
         &:checked {
           & + label {
             .mfa-img {
-              border: 1px solid #ffffff;
-              border-radius: 1rem;
-              padding: 1rem;
-              margin-bottom: 0.5rem;
+              border: 1px solid var(--zitadel-color-primary);
             }
           }
         }

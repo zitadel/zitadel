@@ -12,7 +12,7 @@
 
   <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
-  <div class="mfa-types">
+  <div class="lgn-mfa-options">
     {{ range $provider := .MFAProviders}} {{ $providerName := (t (printf
     "InitMFAPrompt.Provider%v" $provider)) }}
     <div class="mfa">
@@ -21,6 +21,7 @@
         type="radio"
         name="provider"
         value="{{ $provider }}"
+        required
       />
 
       <label for="{{ $provider }}"
