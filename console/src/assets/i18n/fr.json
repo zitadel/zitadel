@@ -326,17 +326,6 @@
         "NEW": "Ajouter un nouveau"
       }
     },
-    "METADATA": {
-      "TITLE": "Métadonnées",
-      "DESCRIPTION": "",
-      "KEY": "Clé",
-      "VALUE": "Valeur",
-      "ADD": "Nouvelle entrée",
-      "SAVE": "Enregistrer",
-      "EMPTY": "Pas de métadonnées",
-      "SETSUCCESS": "Élément sauvegardé avec succès",
-      "REMOVESUCCESS": "Élément supprimé avec succès"
-    },
     "MFA": {
       "TABLETYPE": "Type",
       "TABLESTATE": "Statut",
@@ -638,6 +627,17 @@
       },
       "DELETED": "Jeton supprimé avec succès."
     }
+  },
+  "METADATA": {
+    "TITLE": "Métadonnées",
+    "DESCRIPTION": "",
+    "KEY": "Clé",
+    "VALUE": "Valeur",
+    "ADD": "Nouvelle entrée",
+    "SAVE": "Enregistrer",
+    "EMPTY": "Pas de métadonnées",
+    "SETSUCCESS": "Élément sauvegardé avec succès",
+    "REMOVESUCCESS": "Élément supprimé avec succès"
   },
   "FLOWS": {
     "TITLE": "Actions et flux",

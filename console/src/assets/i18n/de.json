@@ -326,17 +326,6 @@
         "NEW": "Hinzufügen"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadata",
-      "DESCRIPTION": "",
-      "KEY": "Schlüssel",
-      "VALUE": "Wert",
-      "ADD": "Neues Element",
-      "SAVE": "Speichern",
-      "EMPTY": "Keine Metadaten",
-      "SETSUCCESS": "Element erfolgreich gespeichert",
-      "REMOVESUCCESS": "Element erfolgreich gelöscht"
-    },
     "MFA": {
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
@@ -638,6 +627,17 @@
       },
       "DELETED": "Personal Access Token gelöscht."
     }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "DESCRIPTION": "",
+    "KEY": "Schlüssel",
+    "VALUE": "Wert",
+    "ADD": "Neues Element",
+    "SAVE": "Speichern",
+    "EMPTY": "Keine Metadaten",
+    "SETSUCCESS": "Element erfolgreich gespeichert",
+    "REMOVESUCCESS": "Element erfolgreich gelöscht"
   },
   "FLOWS": {
     "TITLE": "Aktionen und Abläufe",

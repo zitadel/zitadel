@@ -326,17 +326,6 @@
         "NEW": "Aggiungi nuovo"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadati",
-      "DESCRIPTION": "",
-      "KEY": "Chiave",
-      "VALUE": "Valore",
-      "ADD": "Nuova voce",
-      "SAVE": "Salva",
-      "EMPTY": "Nessun metadato",
-      "SETSUCCESS": "Salvato con successo",
-      "REMOVESUCCESS": "Rimosso con successo"
-    },
     "MFA": {
       "TABLETYPE": "Tipo",
       "TABLESTATE": "Stato",
@@ -638,6 +627,17 @@
       },
       "DELETED": "Token eliminato con successo."
     }
+  },
+  "METADATA": {
+    "TITLE": "Metadati",
+    "DESCRIPTION": "",
+    "KEY": "Chiave",
+    "VALUE": "Valore",
+    "ADD": "Nuova voce",
+    "SAVE": "Salva",
+    "EMPTY": "Nessun metadato",
+    "SETSUCCESS": "Salvato con successo",
+    "REMOVESUCCESS": "Rimosso con successo"
   },
   "FLOWS": {
     "TITLE": "Azioni e Processi",

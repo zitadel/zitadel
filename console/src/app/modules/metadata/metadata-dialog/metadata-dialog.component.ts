@@ -60,7 +60,7 @@ export class MetadataDialogComponent {
       this.data
         .setFcn(key, value)
         .then(() => {
-          this.toast.showInfo('USER.METADATA.SETSUCCESS', true);
+          this.toast.showInfo('METADATA.SETSUCCESS', true);
         })
         .catch((error: any) => {
           this.toast.showError(error);
@@ -72,7 +72,7 @@ export class MetadataDialogComponent {
     return this.data
       .removeFcn(key)
       .then((resp: any) => {
-        this.toast.showInfo('USER.METADATA.REMOVESUCCESS', true);
+        this.toast.showInfo('METADATA.REMOVESUCCESS', true);
       })
       .catch((error: any) => {
         this.toast.showError(error);

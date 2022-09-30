@@ -326,17 +326,6 @@
         "NEW": "添加"
       }
     },
-    "METADATA": {
-      "TITLE": "元数据",
-      "DESCRIPTION": "",
-      "KEY": "键",
-      "VALUE": "值",
-      "ADD": "新条目",
-      "SAVE": "保存",
-      "EMPTY": "暂无元数据",
-      "SETSUCCESS": "键值对保存成功",
-      "REMOVESUCCESS": "键值对删除成功"
-    },
     "MFA": {
       "TABLETYPE": "类型",
       "TABLESTATE": "状态",
@@ -638,6 +627,17 @@
       },
       "DELETED": "成功删除令牌。"
     }
+  },
+  "METADATA": {
+    "TITLE": "元数据",
+    "DESCRIPTION": "",
+    "KEY": "键",
+    "VALUE": "值",
+    "ADD": "新条目",
+    "SAVE": "保存",
+    "EMPTY": "暂无元数据",
+    "SETSUCCESS": "键值对保存成功",
+    "REMOVESUCCESS": "键值对删除成功"
   },
   "FLOWS": {
     "TITLE": "动作和流程",

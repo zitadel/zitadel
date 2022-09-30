@@ -1,19 +1,19 @@
 <div class="title-row">
-  <h1 class="metadata-title">{{ 'USER.METADATA.TITLE' | translate }}</h1>
+  <h1 class="metadata-title">{{ 'METADATA.TITLE' | translate }}</h1>
   <span class="fill-space"></span>
   <p *ngIf="ts" class="ts cnsl-secondary-text">{{ ts | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</p>
   <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
 </div>
-<p class="desc">{{ 'USER.METADATA.DESCRIPTION' | translate }}</p>
+<p class="desc">{{ 'METADATA.DESCRIPTION' | translate }}</p>
 <div mat-dialog-content class="metadata-dialog-content">
   <form *ngFor="let md of metadata; index as i" (ngSubmit)="saveElement(i)">
     <div class="content">
       <cnsl-form-field #key id="key{{ i }}" class="formfield">
-        <cnsl-label>{{ 'USER.METADATA.KEY' | translate }}</cnsl-label>
+        <cnsl-label>{{ 'METADATA.KEY' | translate }}</cnsl-label>
         <input cnslInput [(ngModel)]="md.key" [ngModelOptions]="{ standalone: true }" />
       </cnsl-form-field>
       <cnsl-form-field #value id="value{{ i }}" class="formfield">
-        <cnsl-label>{{ 'USER.METADATA.VALUE' | translate }}</cnsl-label>
+        <cnsl-label>{{ 'METADATA.VALUE' | translate }}</cnsl-label>
         <input cnslInput [(ngModel)]="md.value" [ngModelOptions]="{ standalone: true }" />
       </cnsl-form-field>
 
