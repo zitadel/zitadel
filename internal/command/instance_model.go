@@ -23,6 +23,7 @@ type InstanceWriteModel struct {
 func NewInstanceWriteModel(instanceID string) *InstanceWriteModel {
 	return &InstanceWriteModel{
 		WriteModel: eventstore.WriteModel{
+			InstanceID:    instanceID,
 			AggregateID:   instanceID,
 			ResourceOwner: instanceID,
 		},

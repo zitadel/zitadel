@@ -6,13 +6,11 @@ describe('GridComponent', () => {
   let component: ProjectGridComponent;
   let fixture: ComponentFixture<ProjectGridComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [ProjectGridComponent],
-      }).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [ProjectGridComponent],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ProjectGridComponent);

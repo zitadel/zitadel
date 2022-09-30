@@ -9,19 +9,8 @@ import { InputModule } from '../input/input.module';
 import { NameDialogComponent } from './name-dialog.component';
 
 @NgModule({
-  declarations: [
-    NameDialogComponent,
-  ],
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatButtonModule,
-    TranslateModule,
-    InputModule,
-    FormsModule,
-  ],
-  exports: [
-    NameDialogComponent,
-  ],
+  declarations: [NameDialogComponent],
+  imports: [CommonModule, MatDialogModule, MatButtonModule, TranslateModule, InputModule, FormsModule],
+  exports: [NameDialogComponent],
 })
-export class NameDialogModule { }
+export class NameDialogModule {}

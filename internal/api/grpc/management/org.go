@@ -6,7 +6,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
+	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -296,4 +298,73 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, or
 		userIDs[i] = user.ID
 	}
 	return userIDs, nil
+}
+
+func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetadataRequest) (*mgmt_pb.ListOrgMetadataResponse, error) {
+	metadataQueries, err := ListOrgMetadataToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchOrgMetadata(ctx, true, authz.GetCtxData(ctx).OrgID, metadataQueries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListOrgMetadataResponse{
+		Result:  metadata.OrgMetadataListToPb(res.Metadata),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+	}, nil
+}
+
+func (s *Server) GetOrgMetadata(ctx context.Context, req *mgmt_pb.GetOrgMetadataRequest) (*mgmt_pb.GetOrgMetadataResponse, error) {
+	data, err := s.query.GetOrgMetadataByKey(ctx, true, authz.GetCtxData(ctx).OrgID, req.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetOrgMetadataResponse{
+		Metadata: metadata.OrgMetadataToPb(data),
+	}, nil
+}
+
+func (s *Server) SetOrgMetadata(ctx context.Context, req *mgmt_pb.SetOrgMetadataRequest) (*mgmt_pb.SetOrgMetadataResponse, error) {
+	result, err := s.command.SetOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, &domain.Metadata{Key: req.Key, Value: req.Value})
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetOrgMetadataResponse{
+		Details: obj_grpc.AddToDetailsPb(
+			result.Sequence,
+			result.ChangeDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) BulkSetOrgMetadata(ctx context.Context, req *mgmt_pb.BulkSetOrgMetadataRequest) (*mgmt_pb.BulkSetOrgMetadataResponse, error) {
+	result, err := s.command.BulkSetOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, BulkSetOrgMetadataToDomain(req)...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkSetOrgMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) RemoveOrgMetadata(ctx context.Context, req *mgmt_pb.RemoveOrgMetadataRequest) (*mgmt_pb.RemoveOrgMetadataResponse, error) {
+	result, err := s.command.RemoveOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, req.Key)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveOrgMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) BulkRemoveOrgMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveOrgMetadataRequest) (*mgmt_pb.BulkRemoveOrgMetadataResponse, error) {
+	result, err := s.command.BulkRemoveOrgMetadata(ctx, authz.GetCtxData(ctx).OrgID, req.Keys...)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.BulkRemoveOrgMetadataResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(result),
+	}, nil
 }

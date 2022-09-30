@@ -145,7 +145,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
-	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPI(config.ExternalSecure), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
+	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
@@ -181,7 +181,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.Database(), config.DefaultInstance)); err != nil {
+	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, adminRepo, config.Database.Database(), config.DefaultInstance, config.ExternalDomain)); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.Database(), commands, queries, config.SystemDefaults, adminRepo, config.ExternalSecure, keys.User)); err != nil {

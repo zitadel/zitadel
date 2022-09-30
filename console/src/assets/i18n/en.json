@@ -1360,6 +1360,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Resource Owner",
       "GRANTEDORGNAME": "Organization Name",
+      "GRANTID": "Grant Id",
       "CREATIONDATE": "Creation Date",
       "CHANGEDATE": "Last modified",
       "DATES": "Dates",

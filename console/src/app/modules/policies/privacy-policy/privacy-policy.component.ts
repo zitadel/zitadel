@@ -4,13 +4,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {
-    GetPrivacyPolicyResponse as AdminGetPrivacyPolicyResponse,
-    UpdatePrivacyPolicyRequest,
+  GetPrivacyPolicyResponse as AdminGetPrivacyPolicyResponse,
+  UpdatePrivacyPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    AddCustomPrivacyPolicyRequest,
-    GetPrivacyPolicyResponse,
-    UpdateCustomPrivacyPolicyRequest,
+  AddCustomPrivacyPolicyRequest,
+  GetPrivacyPolicyResponse,
+  UpdateCustomPrivacyPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';

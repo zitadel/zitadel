@@ -104,6 +104,12 @@ type InstanceSetup struct {
 	EmailTemplate     []byte
 	MessageTexts      []*domain.CustomMessageText
 	SMTPConfiguration *smtp.EmailConfig
+	OIDCSettings      *struct {
+		AccessTokenLifetime        time.Duration
+		IdTokenLifetime            time.Duration
+		RefreshTokenIdleExpiration time.Duration
+		RefreshTokenExpiration     time.Duration
+	}
 }
 
 type ZitadelConfig struct {
@@ -346,6 +352,18 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
+	if setup.OIDCSettings != nil {
+		validations = append(validations,
+			c.prepareAddOIDCSettings(
+				instanceAgg,
+				setup.OIDCSettings.AccessTokenLifetime,
+				setup.OIDCSettings.IdTokenLifetime,
+				setup.OIDCSettings.RefreshTokenIdleExpiration,
+				setup.OIDCSettings.RefreshTokenExpiration,
+			),
+		)
+	}
+
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return "", nil, err
@@ -359,6 +377,24 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
+	}, nil
+}
+
+func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.prepareUpdateInstance(instanceAgg, name)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
 
@@ -376,7 +412,7 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
 
@@ -394,7 +430,7 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
 
@@ -496,6 +532,27 @@ func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggrega
 		return nil, errors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
 	}
 	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
+}
+
+func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if name == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-092mid", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := getInstanceWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			if writeModel.State == domain.InstanceStateUnspecified {
+				return nil, errors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
+			}
+			if writeModel.Name == name {
+				return nil, errors.ThrowPreconditionFailed(nil, "INST-alpxism", "Errors.Instance.NotChanged")
+			}
+			return []eventstore.Command{instance.NewInstanceChangedEvent(ctx, &a.Aggregate, name)}, nil
+		}, nil
+	}
 }
 
 func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {

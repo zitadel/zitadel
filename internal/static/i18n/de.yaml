@@ -142,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token ist ungültig
       NotFound: Refresh Token nicht gefunden
+  Instance:
+    NotFound: Instanz konnte nicht gefunden werden
+    AlreadyExists: Instanz exisitiert bereits
+    NotChanged: Instanz wurde nicht verändert
   Org:
     AlreadyExists: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
@@ -394,7 +398,7 @@ Errors:
     ReadError: Übersetzungsdatei konnte nicht gelesen werden
     MergeError: Übersetzungsdatei konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
     NotFound: Übersetzungsdatei existiert nicht
-  MetaData:
+  Metadata:
     NotFound: Meta Daten konnten nicht gefunden werden
     NoData: Meta Daten Liste ist leer
     Invalid: Meta Daten sind ungültig

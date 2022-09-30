@@ -13,19 +13,19 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { AddKeyDialogComponent } from './add-key-dialog.component';
 
 @NgModule({
-    declarations: [AddKeyDialogComponent],
-    imports: [
-        CommonModule,
-        TranslateModule,
-        MatButtonModule,
-        InputModule,
-        MatSelectModule,
-        MatIconModule,
-        FormsModule,
-        MatDatepickerModule,
-        MatMomentDateModule,
-        ReactiveFormsModule,
-        LocalizedDatePipeModule,
-    ],
+  declarations: [AddKeyDialogComponent],
+  imports: [
+    CommonModule,
+    TranslateModule,
+    MatButtonModule,
+    InputModule,
+    MatSelectModule,
+    MatIconModule,
+    FormsModule,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    ReactiveFormsModule,
+    LocalizedDatePipeModule,
+  ],
 })
-export class AddKeyDialogModule { }
+export class AddKeyDialogModule {}

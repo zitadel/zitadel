@@ -8,9 +8,8 @@ describe('KeyboardShortcutsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ KeyboardShortcutsComponent ]
-    })
-    .compileComponents();
+      declarations: [KeyboardShortcutsComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

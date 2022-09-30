@@ -6,16 +6,16 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
-    AddMultiFactorToLoginPolicyRequest as AdminAddMultiFactorToLoginPolicyRequest,
-    AddSecondFactorToLoginPolicyRequest as AdminAddSecondFactorToLoginPolicyRequest,
-    RemoveMultiFactorFromLoginPolicyRequest as AdminRemoveMultiFactorFromLoginPolicyRequest,
-    RemoveSecondFactorFromLoginPolicyRequest as AdminRemoveSecondFactorFromLoginPolicyRequest,
+  AddMultiFactorToLoginPolicyRequest as AdminAddMultiFactorToLoginPolicyRequest,
+  AddSecondFactorToLoginPolicyRequest as AdminAddSecondFactorToLoginPolicyRequest,
+  RemoveMultiFactorFromLoginPolicyRequest as AdminRemoveMultiFactorFromLoginPolicyRequest,
+  RemoveSecondFactorFromLoginPolicyRequest as AdminRemoveSecondFactorFromLoginPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-    AddMultiFactorToLoginPolicyRequest as MgmtAddMultiFactorToLoginPolicyRequest,
-    AddSecondFactorToLoginPolicyRequest as MgmtAddSecondFactorToLoginPolicyRequest,
-    RemoveMultiFactorFromLoginPolicyRequest as MgmtRemoveMultiFactorFromLoginPolicyRequest,
-    RemoveSecondFactorFromLoginPolicyRequest as MgmtRemoveSecondFactorFromLoginPolicyRequest,
+  AddMultiFactorToLoginPolicyRequest as MgmtAddMultiFactorToLoginPolicyRequest,
+  AddSecondFactorToLoginPolicyRequest as MgmtAddSecondFactorToLoginPolicyRequest,
+  RemoveMultiFactorFromLoginPolicyRequest as MgmtRemoveMultiFactorFromLoginPolicyRequest,
+  RemoveSecondFactorFromLoginPolicyRequest as MgmtRemoveSecondFactorFromLoginPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { MultiFactorType, SecondFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
