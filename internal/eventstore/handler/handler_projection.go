@@ -62,6 +62,7 @@ func NewProjectionHandler(
 	query SearchQuery,
 	lock Lock,
 	unlock Unlock,
+	initialized <-chan bool,
 ) *ProjectionHandler {
 	concurrentInstances := int(config.ConcurrentInstances)
 	if concurrentInstances < 1 {
@@ -82,9 +83,12 @@ func NewProjectionHandler(
 		concurrentInstances: concurrentInstances,
 	}
 
-	go h.subscribe(ctx)
+	go func() {
+		<-initialized
+		go h.subscribe(ctx)
 
-	go h.schedule(ctx)
+		go h.schedule(ctx)
+	}()
 
 	return h
 }

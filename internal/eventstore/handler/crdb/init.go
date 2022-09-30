@@ -186,9 +186,10 @@ type ForeignKey struct {
 }
 
 // Init implements handler.Init
-func (h *StatementHandler) Init(ctx context.Context, checks ...*handler.Check) error {
+func (h *StatementHandler) Init(ctx context.Context, initialized chan<- bool, checks ...*handler.Check) error {
 	for _, check := range checks {
 		if check == nil || check.IsNoop() {
+			initialized <- true
 			return nil
 		}
 		tx, err := h.client.BeginTx(ctx, nil)
@@ -211,6 +212,7 @@ func (h *StatementHandler) Init(ctx context.Context, checks ...*handler.Check) e
 			return err
 		}
 	}
+	initialized <- true
 	return nil
 }
 
