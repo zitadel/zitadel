@@ -4,17 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strings"
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
 	z_errs "github.com/zitadel/zitadel/internal/errors"
@@ -26,63 +22,6 @@ func WithHTTP(ctx context.Context) Option {
 			requireHTTP(ctx, &http.Client{Transport: new(transport)}, runtime, module)
 		}
 	}
-}
-
-func SetHTTPConfig(config *HTTPConfig) {
-	httpConfig = config
-}
-
-var httpConfig *HTTPConfig
-
-type HTTPConfig struct {
-	DenyList []AddressChecker
-}
-
-func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
-	if to.Type() != reflect.TypeOf(HTTPConfig{}) {
-		return from.Interface(), nil
-	}
-
-	config := struct {
-		DenyList []string
-	}{}
-
-	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
-		WeaklyTypedInput: true,
-		Result:           &config,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if err = decoder.Decode(from.Interface()); err != nil {
-		return nil, err
-	}
-
-	c := HTTPConfig{
-		DenyList: make([]AddressChecker, len(config.DenyList)),
-	}
-
-	for i, entry := range config.DenyList {
-		if c.DenyList[i], err = parseDenyListEntry(entry); err != nil {
-			return nil, err
-		}
-	}
-
-	return c, nil
-}
-
-type transport struct{}
-
-func (*transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if httpConfig == nil {
-		return http.DefaultTransport.RoundTrip(req)
-	}
-	if isHostBlocked(httpConfig.DenyList, req.URL) {
-		return nil, z_errs.ThrowInvalidArgument(nil, "ACTIO-N72d0", "host is denied")
-	}
-	return http.DefaultTransport.RoundTrip(req)
 }
 
 type HTTP struct {
@@ -127,7 +66,7 @@ func (c *HTTP) fetchConfigFromArg(arg *goja.Object) (config fetchConfig, err err
 			}
 			config.Body = bytes.NewReader(body)
 		default:
-			return config, errors.New("unimplemented")
+			return config, z_errs.ThrowInvalidArgument(nil, "ACTIO-OfUeA", "key is invalid")
 		}
 	}
 	return config, nil
@@ -156,7 +95,7 @@ func (r *response) Text() goja.Value {
 
 func (c *HTTP) fetch(ctx context.Context) func(call goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
-		req := c.buildHTTPRequest(call.Arguments)
+		req := c.buildHTTPRequest(ctx, call.Arguments)
 		if deadline, ok := ctx.Deadline(); ok {
 			c.client.Timeout = time.Until(deadline)
 		}
@@ -177,13 +116,13 @@ func (c *HTTP) fetch(ctx context.Context) func(call goja.FunctionCall) goja.Valu
 	}
 }
 
-func (c *HTTP) buildHTTPRequest(args []goja.Value) (req *http.Request) {
+func (c *HTTP) buildHTTPRequest(ctx context.Context, args []goja.Value) (req *http.Request) {
 	if len(args) > 2 {
 		logging.WithFields("count", len(args)).Debug("more than 2 args provided")
 		panic("too many args")
 	}
 
-	if len(args) < 1 {
+	if len(args) == 0 {
 		panic("no url provided")
 	}
 
@@ -196,7 +135,7 @@ func (c *HTTP) buildHTTPRequest(args []goja.Value) (req *http.Request) {
 		}
 	}
 
-	req, err = http.NewRequest(config.Method, args[0].Export().(string), config.Body)
+	req, err = http.NewRequestWithContext(ctx, config.Method, args[0].Export().(string), config.Body)
 	if err != nil {
 		panic(err)
 	}
@@ -214,7 +153,7 @@ func parseHeaders(headers *goja.Object) http.Header {
 		switch headerValue := header.(type) {
 		case string:
 			values = strings.Split(headerValue, ",")
-		case []interface{}:
+		case []any:
 			for _, v := range headerValue {
 				values = append(values, v.(string))
 			}
@@ -227,11 +166,16 @@ func parseHeaders(headers *goja.Object) http.Header {
 	return h
 }
 
-func parseDenyListEntry(entry string) (AddressChecker, error) {
-	if checker, err := NewIPChecker(entry); err == nil {
-		return checker, nil
+type transport struct{}
+
+func (*transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if httpConfig == nil {
+		return http.DefaultTransport.RoundTrip(req)
 	}
-	return &DomainChecker{Domain: entry}, nil
+	if isHostBlocked(httpConfig.DenyList, req.URL) {
+		return nil, z_errs.ThrowInvalidArgument(nil, "ACTIO-N72d0", "host is denied")
+	}
+	return http.DefaultTransport.RoundTrip(req)
 }
 
 func isHostBlocked(denyList []AddressChecker, address *url.URL) bool {
@@ -245,41 +189,4 @@ func isHostBlocked(denyList []AddressChecker, address *url.URL) bool {
 
 type AddressChecker interface {
 	Matches(string) bool
-}
-
-func NewIPChecker(i string) (AddressChecker, error) {
-	_, network, err := net.ParseCIDR(i)
-	if err == nil {
-		return &IPChecker{Net: network}, nil
-	}
-	if ip := net.ParseIP(i); ip != nil {
-		return &IPChecker{IP: ip}, nil
-	}
-	return nil, z_errs.ThrowInvalidArgument(nil, "ACTIO-ddJ7h", "invalid ip")
-
-}
-
-type IPChecker struct {
-	Net *net.IPNet
-	IP  net.IP
-}
-
-func (c *IPChecker) Matches(address string) bool {
-	ip := net.ParseIP(address)
-	if ip == nil {
-		return false
-	}
-
-	if c.IP != nil {
-		return c.IP.Equal(ip)
-	}
-	return c.Net.Contains(ip)
-}
-
-type DomainChecker struct {
-	Domain string
-}
-
-func (c *DomainChecker) Matches(domain string) bool {
-	return c.Domain == domain
 }

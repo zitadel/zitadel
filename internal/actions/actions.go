@@ -3,6 +3,7 @@ package actions
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/dop251/goja_nodejs/require"
 	z_errs "github.com/zitadel/zitadel/internal/errors"
@@ -42,33 +43,11 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 	errCh := make(chan error)
 	defer close(errCh)
 
-	go func() {
-		defer func() {
-			r := recover()
-			if r != nil && !config.allowedToFail {
-				err, ok := r.(error)
-				if !ok {
-					e, ok := r.(string)
-					if ok {
-						err = errors.New(e)
-					}
-				}
-				errCh <- err
-				return
-			}
-		}()
-		err = fn(config.ctxParam.fields, config.apiParam.fields)
-		if err != nil && !config.allowedToFail {
-			errCh <- err
-			return
-		}
-		errCh <- nil
-	}()
-	return <-errCh
+	return executeFn(ctx, config, fn)
 }
 
-func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields, script string, opts []Option) (*runConfig, error) {
-	config := newRunConfig(ctx, opts...)
+func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields, script string, opts []Option) (config *runConfig, err error) {
+	config = newRunConfig(ctx, opts...)
 	if config.timeout == 0 {
 		return nil, z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
 	}
@@ -87,24 +66,40 @@ func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields,
 		registry.RegisterNativeModule(name, loader)
 	}
 
-	errCh := make(chan error)
-	//load function in seperate go routine to recover panics
-	go func() {
-		defer func() {
-			r := recover()
-			if r != nil {
-				errCh <- r.(error)
-				return
-			}
-		}()
-		_, err := config.vm.RunString(script)
-		if err != nil {
-			errCh <- err
+	// overload error if function panics
+	defer func() {
+		r := recover()
+		if r != nil {
+			err = r.(error)
 			return
 		}
-		errCh <- nil
 	}()
-	return config, <-errCh
+	_, err = config.vm.RunString(script)
+	return config, err
+}
+
+func executeFn(ctx context.Context, config *runConfig, fn jsAction) (err error) {
+	defer func() {
+		r := recover()
+		if r != nil && !config.allowedToFail {
+			var ok bool
+			if err, ok = r.(error); ok {
+				return
+			}
+
+			e, ok := r.(string)
+			if ok {
+				err = errors.New(e)
+				return
+			}
+			err = fmt.Errorf("unknown error occured: %v", r)
+		}
+	}()
+	err = fn(config.ctxParam.fields, config.apiParam.fields)
+	if err != nil && !config.allowedToFail {
+		return err
+	}
+	return nil
 }
 
 func ActionToOptions(a *query.Action) []Option {

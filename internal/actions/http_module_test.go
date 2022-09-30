@@ -1,8 +1,14 @@
 package actions
 
 import (
+	"bytes"
+	"net/http"
 	"net/url"
+	"reflect"
 	"testing"
+
+	"github.com/dop251/goja"
+	"github.com/zitadel/zitadel/internal/errors"
 )
 
 func Test_isHostBlocked(t *testing.T) {
@@ -75,3 +81,252 @@ func mustNewURL(t *testing.T, raw string) *url.URL {
 	}
 	return u
 }
+
+func TestHTTP_fetchConfigFromArg(t *testing.T) {
+	runtime := goja.New()
+	runtime.SetFieldNameMapper(goja.UncapFieldNameMapper())
+
+	type args struct {
+		arg *goja.Object
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantConfig fetchConfig
+		wantErr    func(error) bool
+	}{
+		{
+			name: "no fetch option provided",
+			args: args{
+				arg: runtime.ToValue(
+					struct{}{},
+				).ToObject(runtime),
+			},
+			wantConfig: fetchConfig{},
+			wantErr: func(err error) bool {
+				return err == nil
+			},
+		},
+		{
+			name: "header set as string",
+			args: args{
+				arg: runtime.ToValue(
+					&struct {
+						Headers map[string]string
+					}{
+						Headers: map[string]string{
+							"Authorization": "Bearer token",
+						},
+					},
+				).ToObject(runtime),
+			},
+			wantConfig: fetchConfig{
+				Headers: http.Header{
+					"Authorization": {"Bearer token"},
+				},
+			},
+			wantErr: func(err error) bool {
+				return err == nil
+			},
+		},
+		{
+			name: "header set as list",
+			args: args{
+				arg: runtime.ToValue(
+					&struct {
+						Headers map[string][]any
+					}{
+						Headers: map[string][]any{
+							"Authorization": {"Bearer token"},
+						},
+					},
+				).ToObject(runtime),
+			},
+			wantConfig: fetchConfig{
+				Headers: http.Header{
+					"Authorization": {"Bearer token"},
+				},
+			},
+			wantErr: func(err error) bool {
+				return err == nil
+			},
+		},
+		{
+			name: "method set",
+			args: args{
+				arg: runtime.ToValue(
+					&struct {
+						Method string
+					}{
+						Method: http.MethodPost,
+					},
+				).ToObject(runtime),
+			},
+			wantConfig: fetchConfig{
+				Method: http.MethodPost,
+			},
+			wantErr: func(err error) bool {
+				return err == nil
+			},
+		},
+		{
+			name: "body set",
+			args: args{
+				arg: runtime.ToValue(
+					&struct {
+						Body struct{ Id string }
+					}{
+						Body: struct{ Id string }{
+							Id: "asdf123",
+						},
+					},
+				).ToObject(runtime),
+			},
+			wantConfig: fetchConfig{
+				Body: bytes.NewReader([]byte(`{"id":"asdf123"}`)),
+			},
+			wantErr: func(err error) bool {
+				return err == nil
+			},
+		},
+		{
+			name: "invalid header",
+			args: args{
+				arg: runtime.ToValue(
+					&struct {
+						NotExists struct{}
+					}{
+						NotExists: struct{}{},
+					},
+				).ToObject(runtime),
+			},
+			wantConfig: fetchConfig{},
+			wantErr: func(err error) bool {
+				return errors.IsErrorInvalidArgument(err)
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &HTTP{
+				runtime: runtime,
+				client:  http.DefaultClient,
+			}
+			gotConfig, err := c.fetchConfigFromArg(tt.args.arg)
+			if !tt.wantErr(err) {
+				t.Errorf("HTTP.fetchConfigFromArg() error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(gotConfig.Headers, tt.wantConfig.Headers) {
+				t.Errorf("config.Headers got = %#v, want %#v", gotConfig.Headers, tt.wantConfig.Headers)
+			}
+			if gotConfig.Method != tt.wantConfig.Method {
+				t.Errorf("config.Method got = %#v, want %#v", gotConfig.Method, tt.wantConfig.Method)
+			}
+
+			if tt.wantConfig.Body == nil {
+				if gotConfig.Body != nil {
+					t.Errorf("didn't expect a body")
+				}
+				return
+			}
+
+			gotBody := make([]byte, gotConfig.Body.(*bytes.Reader).Len())
+			wantBody := make([]byte, tt.wantConfig.Body.(*bytes.Reader).Len())
+
+			gotConfig.Body.Read(gotBody)
+			tt.wantConfig.Body.Read(wantBody)
+
+			if !reflect.DeepEqual(gotBody, wantBody) {
+				t.Errorf("config.Body got = %s, want %s", gotBody, wantBody)
+			}
+		})
+	}
+}
+
+// func TestHTTP_buildHTTPRequest(t *testing.T) {
+// 	runtime := goja.New()
+// 	type args struct {
+// 		args []goja.Value
+// 	}
+// 	tests := []struct {
+// 		name    string
+// 		args    args
+// 		wantReq *http.Request
+// 	}{
+// 		{
+// 			name: "only url",
+// 			args: args{
+// 				args: []goja.Value{
+// 					runtime.ToValue("http://my-url.ch"),
+// 				},
+// 			},
+// 			wantReq: &http.Request{
+// 				Method: http.MethodGet,
+// 				URL:    mustNewURL(t, "http://localhost:8080"),
+// 				Header: defaultFetchConfig.Headers,
+// 				Body:   nil,
+// 			},
+// 		},
+// 		// {
+// 		// 	name: "no params",
+// 		// 	args: args{
+// 		// 		args: []goja.Value{},
+// 		// 	},
+// 		// 	wantReq: &http.Request{
+// 		// 		Method: http.MethodGet,
+// 		// 		URL:    mustNewURL(t, "http://localhost:8080"),
+// 		// 		Header: http.Header{},
+// 		// 		Body:   nil,
+// 		// 	},
+// 		// },
+// 		// {
+// 		// 	name: "only url",
+// 		// 	args: args{
+// 		// 		args: []goja.Value{},
+// 		// 	},
+// 		// 	wantReq: &http.Request{
+// 		// 		Method: http.MethodGet,
+// 		// 		URL:    mustNewURL(t, "http://localhost:8080"),
+// 		// 		Header: http.Header{},
+// 		// 		Body:   nil,
+// 		// 	},
+// 		// },
+// 		// {
+// 		// 	name: "overwrite headers",
+// 		// 	args: args{
+// 		// 		args: []goja.Value{},
+// 		// 	},
+// 		// 	wantReq: &http.Request{
+// 		// 		Method: http.MethodGet,
+// 		// 		URL:    mustNewURL(t, "http://localhost:8080"),
+// 		// 		Header: http.Header{},
+// 		// 		Body:   nil,
+// 		// 	},
+// 		// },
+// 		// {
+// 		// 	name: "post with body",
+// 		// 	args: args{
+// 		// 		args: []goja.Value{},
+// 		// 	},
+// 		// 	wantReq: &http.Request{
+// 		// 		Method: http.MethodGet,
+// 		// 		URL:    mustNewURL(t, "http://localhost:8080"),
+// 		// 		Header: http.Header{},
+// 		// 		Body:   nil,
+// 		// 	},
+// 		// },
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			c := &HTTP{
+// 				runtime: runtime,
+// 			}
+// 			gotReq := c.buildHTTPRequest(context.Background(), tt.args.args)
+
+// 			if !reflect.DeepEqual(gotReq, tt.wantReq) {
+// 				t.Errorf("HTTP.buildHTTPRequest() = %#v, want %#v", gotReq, tt.wantReq)
+// 			}
+// 		})
+// 	}
+// }

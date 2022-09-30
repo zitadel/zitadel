@@ -8,7 +8,10 @@ import (
 )
 
 func TestSetFields(t *testing.T) {
-	testFn := func(a string) { fmt.Println(a) }
+	primitveFn := func(a string) { fmt.Println(a) }
+	complexFn := func(*FieldConfig) interface{} {
+		return primitveFn
+	}
 	tests := []struct {
 		name        string
 		setFields   FieldOption
@@ -24,9 +27,16 @@ func TestSetFields(t *testing.T) {
 		},
 		{
 			name:      "field is method",
-			setFields: SetFields("value", testFn),
+			setFields: SetFields("value", primitveFn),
 			want: fields{
-				"value": testFn,
+				"value": primitveFn,
+			},
+		},
+		{
+			name:      "field is complex method",
+			setFields: SetFields("value", complexFn),
+			want: fields{
+				"value": primitveFn,
 			},
 		},
 		{
@@ -59,13 +69,13 @@ func TestSetFields(t *testing.T) {
 				"field",
 				SetFields("sub1", 5),
 				SetFields("sub2", "asdf"),
-				SetFields("sub3", testFn),
+				SetFields("sub3", primitveFn),
 			),
 			want: fields{
 				"field": fields{
 					"sub1": 5,
 					"sub2": "asdf",
-					"sub3": testFn,
+					"sub3": primitveFn,
 				},
 			},
 		},
@@ -74,7 +84,7 @@ func TestSetFields(t *testing.T) {
 			setFields: SetFields(
 				"field",
 				SetFields("sub", 5),
-				SetFields("sub", testFn),
+				SetFields("sub", primitveFn),
 			),
 			shouldPanic: true,
 		},
@@ -95,6 +105,58 @@ func TestSetFields(t *testing.T) {
 				SetFields("sub", 5),
 			),
 			shouldPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			panicked := false
+			if tt.shouldPanic {
+				defer func() {
+					if panicked != tt.shouldPanic {
+						t.Errorf("wanted panic: %v got %v", tt.shouldPanic, panicked)
+					}
+				}()
+				defer func() {
+					recover()
+					panicked = true
+				}()
+			}
+			config := &FieldConfig{
+				Runtime: goja.New(),
+				fields:  fields{},
+			}
+			tt.setFields(config)
+			if !tt.shouldPanic && fmt.Sprint(config.fields) != fmt.Sprint(tt.want) {
+				t.Errorf("SetFields() = %v, want %v", fmt.Sprint(config.fields), fmt.Sprint(tt.want))
+			}
+		})
+	}
+}
+
+func TestSetFieldsExecuteMethods(t *testing.T) {
+	primitveFn := func(a string) { fmt.Println(a) }
+	complexFn := func(*FieldConfig) interface{} {
+		return primitveFn
+	}
+	tests := []struct {
+		name        string
+		setFields   FieldOption
+		want        fields
+		shouldPanic bool
+	}{
+		{
+			name:      "field is method",
+			setFields: SetFields("value", primitveFn),
+			want: fields{
+				"value": primitveFn,
+			},
+		},
+		{
+			name:      "field is complex method",
+			setFields: SetFields("value", complexFn),
+			want: fields{
+				"value": primitveFn,
+			},
 		},
 	}
 	for _, tt := range tests {
