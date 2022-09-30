@@ -17,18 +17,29 @@
       flex-direction: column;
       align-items: center;
 
-      input {
+      input[type="radio"] + label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .mfa-img {
+          border: 1px solid #ffffff20;
+          display: flex;
+        }
+      }
+
+      input[type="radio"] {
         display: none;
 
-        + .mfa-img {
-          border: 1px solid #ffffff20;
-        }
-
-        &:checked + .mfa-img {
-          border: 1px solid #ffffff;
-          border-radius: 1rem;
-          padding: 1rem;
-          margin-bottom: 0.5rem;
+        &:checked {
+          & + label {
+            .mfa-img {
+              border: 1px solid #ffffff;
+              border-radius: 1rem;
+              padding: 1rem;
+              margin-bottom: 0.5rem;
+            }
+          }
         }
       }
     }
