@@ -291,6 +291,7 @@ module.exports = {
         "concepts/structure/applications",
         "concepts/structure/granted_projects",
         "concepts/structure/users",
+        "concepts/structure/managers",
         "concepts/structure/policies",
         "concepts/structure/jwt_idp",
       ],
