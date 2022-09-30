@@ -60,8 +60,8 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
-  public previewData!: LabelPolicy.AsObject;
-  public data!: LabelPolicy.AsObject;
+  public previewData?: LabelPolicy.AsObject;
+  public data?: LabelPolicy.AsObject;
 
   public panelOpenState: boolean = false;
   public isHoveringOverDarkLogo: boolean = false;
@@ -447,6 +447,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           return (this.service as ManagementService)
             .addCustomLabelPolicy(req0)
             .then(() => {
+              if (this.previewData) {
+                this.previewData.isDefault = false;
+              }
               this.toast.showInfo('POLICY.TOAST.SET', true);
 
               reloadPolicy();
@@ -493,60 +496,78 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   }
 
   public setDarkBackgroundColorAndSave($event: string): void {
-    this.previewData.backgroundColorDark = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.backgroundColorDark = $event;
+      this.savePolicy();
+    }
   }
 
   public setDarkPrimaryColorAndSave($event: string): void {
-    this.previewData.primaryColorDark = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.primaryColorDark = $event;
+      this.savePolicy();
+    }
   }
 
   public setDarkWarnColorAndSave($event: string): void {
-    this.previewData.warnColorDark = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.warnColorDark = $event;
+      this.savePolicy();
+    }
   }
 
   public setDarkFontColorAndSave($event: string): void {
-    this.previewData.fontColorDark = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.fontColorDark = $event;
+      this.savePolicy();
+    }
   }
 
   public setBackgroundColorAndSave($event: string): void {
-    this.previewData.backgroundColor = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.backgroundColor = $event;
+      this.savePolicy();
+    }
   }
 
   public setPrimaryColorAndSave($event: string): void {
-    this.previewData.primaryColor = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.primaryColor = $event;
+      this.savePolicy();
+    }
   }
 
   public setWarnColorAndSave($event: string): void {
-    this.previewData.warnColor = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.warnColor = $event;
+      this.savePolicy();
+    }
   }
 
   public setFontColorAndSave($event: string): void {
-    this.previewData.fontColor = $event;
-    this.savePolicy();
+    if (this.previewData) {
+      this.previewData.fontColor = $event;
+      this.savePolicy();
+    }
   }
 
   public overwriteValues(req: AddCustomLabelPolicyRequest | UpdateCustomLabelPolicyRequest): void {
-    req.setBackgroundColorDark(this.previewData.backgroundColorDark);
-    req.setBackgroundColor(this.previewData.backgroundColor);
+    if (this.previewData) {
+      req.setBackgroundColorDark(this.previewData.backgroundColorDark);
+      req.setBackgroundColor(this.previewData.backgroundColor);
 
-    req.setFontColorDark(this.previewData.fontColorDark);
-    req.setFontColor(this.previewData.fontColor);
+      req.setFontColorDark(this.previewData.fontColorDark);
+      req.setFontColor(this.previewData.fontColor);
 
-    req.setPrimaryColorDark(this.previewData.primaryColorDark);
-    req.setPrimaryColor(this.previewData.primaryColor);
+      req.setPrimaryColorDark(this.previewData.primaryColorDark);
+      req.setPrimaryColor(this.previewData.primaryColor);
 
-    req.setWarnColorDark(this.previewData.warnColorDark);
-    req.setWarnColor(this.previewData.warnColor);
+      req.setWarnColorDark(this.previewData.warnColorDark);
+      req.setWarnColor(this.previewData.warnColor);
 
-    req.setDisableWatermark(this.previewData.disableWatermark);
-    req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
+      req.setDisableWatermark(this.previewData.disableWatermark);
+      req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
+    }
   }
 
   public activatePolicy(): Promise<any> {
