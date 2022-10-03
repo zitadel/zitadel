@@ -88,6 +88,7 @@ title: zitadel/policy.proto
 | second_factors | repeated SecondFactorType | - |  |
 | multi_factors | repeated MultiFactorType | - |  |
 | idps | repeated zitadel.idp.v1.IDPLoginPolicyLink | - |  |
+| allow_domain_discovery |  bool | If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success. |  |
 
 
 

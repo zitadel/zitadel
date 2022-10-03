@@ -30,32 +30,33 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.login_policies.aggregate_id,`+
-						` projections.login_policies.creation_date,`+
-						` projections.login_policies.change_date,`+
-						` projections.login_policies.sequence,`+
-						` projections.login_policies.allow_register,`+
-						` projections.login_policies.allow_username_password,`+
-						` projections.login_policies.allow_external_idps,`+
-						` projections.login_policies.force_mfa,`+
-						` projections.login_policies.second_factors,`+
-						` projections.login_policies.multi_factors,`+
-						` projections.login_policies.passwordless_type,`+
-						` projections.login_policies.is_default,`+
-						` projections.login_policies.hide_password_reset,`+
-						` projections.login_policies.ignore_unknown_usernames,`+
-						` projections.login_policies.default_redirect_uri,`+
-						` projections.login_policies.password_check_lifetime,`+
-						` projections.login_policies.external_login_check_lifetime,`+
-						` projections.login_policies.mfa_init_skip_lifetime,`+
-						` projections.login_policies.second_factor_check_lifetime,`+
-						` projections.login_policies.multi_factor_check_lifetime,`+
+					regexp.QuoteMeta(`SELECT projections.login_policie2.aggregate_id,`+
+						` projections.login_policie2.creation_date,`+
+						` projections.login_policie2.change_date,`+
+						` projections.login_policie2.sequence,`+
+						` projections.login_policie2.allow_register,`+
+						` projections.login_policie2.allow_username_password,`+
+						` projections.login_policie2.allow_external_idps,`+
+						` projections.login_policie2.force_mfa,`+
+						` projections.login_policie2.second_factors,`+
+						` projections.login_policie2.multi_factors,`+
+						` projections.login_policie2.passwordless_type,`+
+						` projections.login_policie2.is_default,`+
+						` projections.login_policie2.hide_password_reset,`+
+						` projections.login_policie2.ignore_unknown_usernames,`+
+						` projections.login_policie2.allow_domain_discovery,`+
+						` projections.login_policie2.default_redirect_uri,`+
+						` projections.login_policie2.password_check_lifetime,`+
+						` projections.login_policie2.external_login_check_lifetime,`+
+						` projections.login_policie2.mfa_init_skip_lifetime,`+
+						` projections.login_policie2.second_factor_check_lifetime,`+
+						` projections.login_policie2.multi_factor_check_lifetime,`+
 						` projections.idp_login_policy_links3.idp_id,`+
 						` projections.idps2.name,`+
 						` projections.idps2.type`+
-						` FROM projections.login_policies`+
+						` FROM projections.login_policie2`+
 						` LEFT JOIN projections.idp_login_policy_links3 ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
+						` projections.login_policie2.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
 						` LEFT JOIN projections.idps2 ON`+
 						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					nil,
@@ -75,32 +76,33 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies.aggregate_id,`+
-						` projections.login_policies.creation_date,`+
-						` projections.login_policies.change_date,`+
-						` projections.login_policies.sequence,`+
-						` projections.login_policies.allow_register,`+
-						` projections.login_policies.allow_username_password,`+
-						` projections.login_policies.allow_external_idps,`+
-						` projections.login_policies.force_mfa,`+
-						` projections.login_policies.second_factors,`+
-						` projections.login_policies.multi_factors,`+
-						` projections.login_policies.passwordless_type,`+
-						` projections.login_policies.is_default,`+
-						` projections.login_policies.hide_password_reset,`+
-						` projections.login_policies.ignore_unknown_usernames,`+
-						` projections.login_policies.default_redirect_uri,`+
-						` projections.login_policies.password_check_lifetime,`+
-						` projections.login_policies.external_login_check_lifetime,`+
-						` projections.login_policies.mfa_init_skip_lifetime,`+
-						` projections.login_policies.second_factor_check_lifetime,`+
-						` projections.login_policies.multi_factor_check_lifetime,`+
+					regexp.QuoteMeta(`SELECT projections.login_policie2.aggregate_id,`+
+						` projections.login_policie2.creation_date,`+
+						` projections.login_policie2.change_date,`+
+						` projections.login_policie2.sequence,`+
+						` projections.login_policie2.allow_register,`+
+						` projections.login_policie2.allow_username_password,`+
+						` projections.login_policie2.allow_external_idps,`+
+						` projections.login_policie2.force_mfa,`+
+						` projections.login_policie2.second_factors,`+
+						` projections.login_policie2.multi_factors,`+
+						` projections.login_policie2.passwordless_type,`+
+						` projections.login_policie2.is_default,`+
+						` projections.login_policie2.hide_password_reset,`+
+						` projections.login_policie2.ignore_unknown_usernames,`+
+						` projections.login_policie2.allow_domain_discovery,`+
+						` projections.login_policie2.default_redirect_uri,`+
+						` projections.login_policie2.password_check_lifetime,`+
+						` projections.login_policie2.external_login_check_lifetime,`+
+						` projections.login_policie2.mfa_init_skip_lifetime,`+
+						` projections.login_policie2.second_factor_check_lifetime,`+
+						` projections.login_policie2.multi_factor_check_lifetime,`+
 						` projections.idp_login_policy_links3.idp_id,`+
 						` projections.idps2.name,`+
 						` projections.idps2.type`+
-						` FROM projections.login_policies`+
+						` FROM projections.login_policie2`+
 						` LEFT JOIN projections.idp_login_policy_links3 ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
+						` projections.login_policie2.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
 						` LEFT JOIN projections.idps2 ON`+
 						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					[]string{
@@ -118,6 +120,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"is_default",
 						"hide_password_reset",
 						"ignore_unknown_usernames",
+						"allow_domain_discovery",
 						"default_redirect_uri",
 						"password_check_lifetime",
 						"external_login_check_lifetime",
@@ -140,6 +143,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 						domain.PasswordlessTypeAllowed,
+						true,
 						true,
 						true,
 						true,
@@ -170,6 +174,7 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				IsDefault:                  true,
 				HidePasswordReset:          true,
 				IgnoreUnknownUsernames:     true,
+				AllowDomainDiscovery:       true,
 				DefaultRedirectURI:         "https://example.com/redirect",
 				PasswordCheckLifetime:      time.Hour * 2,
 				ExternalLoginCheckLifetime: time.Hour * 2,
@@ -190,32 +195,33 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.login_policies.aggregate_id,`+
-						` projections.login_policies.creation_date,`+
-						` projections.login_policies.change_date,`+
-						` projections.login_policies.sequence,`+
-						` projections.login_policies.allow_register,`+
-						` projections.login_policies.allow_username_password,`+
-						` projections.login_policies.allow_external_idps,`+
-						` projections.login_policies.force_mfa,`+
-						` projections.login_policies.second_factors,`+
-						` projections.login_policies.multi_factors,`+
-						` projections.login_policies.passwordless_type,`+
-						` projections.login_policies.is_default,`+
-						` projections.login_policies.hide_password_reset,`+
-						` projections.login_policies.ignore_unknown_usernames,`+
-						` projections.login_policies.default_redirect_uri,`+
-						` projections.login_policies.password_check_lifetime,`+
-						` projections.login_policies.external_login_check_lifetime,`+
-						` projections.login_policies.mfa_init_skip_lifetime,`+
-						` projections.login_policies.second_factor_check_lifetime,`+
-						` projections.login_policies.multi_factor_check_lifetime,`+
+					regexp.QuoteMeta(`SELECT projections.login_policie2.aggregate_id,`+
+						` projections.login_policie2.creation_date,`+
+						` projections.login_policie2.change_date,`+
+						` projections.login_policie2.sequence,`+
+						` projections.login_policie2.allow_register,`+
+						` projections.login_policie2.allow_username_password,`+
+						` projections.login_policie2.allow_external_idps,`+
+						` projections.login_policie2.force_mfa,`+
+						` projections.login_policie2.second_factors,`+
+						` projections.login_policie2.multi_factors,`+
+						` projections.login_policie2.passwordless_type,`+
+						` projections.login_policie2.is_default,`+
+						` projections.login_policie2.hide_password_reset,`+
+						` projections.login_policie2.ignore_unknown_usernames,`+
+						` projections.login_policie2.allow_domain_discovery,`+
+						` projections.login_policie2.default_redirect_uri,`+
+						` projections.login_policie2.password_check_lifetime,`+
+						` projections.login_policie2.external_login_check_lifetime,`+
+						` projections.login_policie2.mfa_init_skip_lifetime,`+
+						` projections.login_policie2.second_factor_check_lifetime,`+
+						` projections.login_policie2.multi_factor_check_lifetime,`+
 						` projections.idp_login_policy_links3.idp_id,`+
 						` projections.idps2.name,`+
 						` projections.idps2.type`+
-						` FROM projections.login_policies`+
+						` FROM projections.login_policie2`+
 						` LEFT JOIN projections.idp_login_policy_links3 ON `+
-						` projections.login_policies.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
+						` projections.login_policie2.aggregate_id = projections.idp_login_policy_links3.aggregate_id`+
 						` LEFT JOIN projections.idps2 ON`+
 						` projections.idp_login_policy_links3.idp_id = projections.idps2.id`),
 					sql.ErrConnDone,
@@ -234,8 +240,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies.second_factors`+
-						` FROM projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policie2.second_factors`+
+						` FROM projections.login_policie2`),
 					[]string{
 						"second_factors",
 					},
@@ -255,8 +261,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies.second_factors`+
-						` FROM projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policie2.second_factors`+
+						` FROM projections.login_policie2`),
 					[]string{
 						"second_factors",
 					},
@@ -277,8 +283,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies.second_factors`+
-						` FROM projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policie2.second_factors`+
+						` FROM projections.login_policie2`),
 					[]string{
 						"second_factors",
 					},
@@ -294,8 +300,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.login_policies.second_factors`+
-						` FROM projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policie2.second_factors`+
+						` FROM projections.login_policie2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -312,8 +318,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies.multi_factors`+
-						` FROM projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policie2.multi_factors`+
+						` FROM projections.login_policie2`),
 					[]string{
 						"multi_factors",
 					},
@@ -333,8 +339,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies.multi_factors`+
-						` FROM projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policie2.multi_factors`+
+						` FROM projections.login_policie2`),
 					[]string{
 						"multi_factors",
 					},
@@ -355,8 +361,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.login_policies.multi_factors`+
-						` FROM projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policie2.multi_factors`+
+						` FROM projections.login_policie2`),
 					[]string{
 						"multi_factors",
 					},
@@ -372,8 +378,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.login_policies.multi_factors`+
-						` FROM projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policie2.multi_factors`+
+						` FROM projections.login_policie2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

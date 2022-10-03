@@ -71,6 +71,7 @@ type InstanceSetup struct {
 		ForceMFA                   bool
 		HidePasswordReset          bool
 		IgnoreUnknownUsername      bool
+		AllowDomainDiscovery       bool
 		PasswordlessType           domain.PasswordlessType
 		DefaultRedirectURI         string
 		PasswordCheckLifetime      time.Duration
@@ -217,6 +218,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.HidePasswordReset,
 			setup.LoginPolicy.IgnoreUnknownUsername,
+			setup.LoginPolicy.AllowDomainDiscovery,
 			setup.LoginPolicy.PasswordlessType,
 			setup.LoginPolicy.DefaultRedirectURI,
 			setup.LoginPolicy.PasswordCheckLifetime,

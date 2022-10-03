@@ -17,6 +17,7 @@ type LoginPolicyWriteModel struct {
 	ForceMFA                   bool
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
+	AllowDomainDiscovery       bool
 	PasswordlessType           domain.PasswordlessType
 	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
@@ -38,6 +39,7 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.PasswordlessType = e.PasswordlessType
 			wm.HidePasswordReset = e.HidePasswordReset
 			wm.IgnoreUnknownUsernames = e.IgnoreUnknownUsernames
+			wm.AllowDomainDiscovery = e.AllowDomainDiscovery
 			wm.DefaultRedirectURI = e.DefaultRedirectURI
 			wm.PasswordCheckLifetime = e.PasswordCheckLifetime
 			wm.ExternalLoginCheckLifetime = e.ExternalLoginCheckLifetime
@@ -63,6 +65,9 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			}
 			if e.IgnoreUnknownUsernames != nil {
 				wm.IgnoreUnknownUsernames = *e.IgnoreUnknownUsernames
+			}
+			if e.AllowDomainDiscovery != nil {
+				wm.AllowDomainDiscovery = *e.AllowDomainDiscovery
 			}
 			if e.PasswordlessType != nil {
 				wm.PasswordlessType = *e.PasswordlessType

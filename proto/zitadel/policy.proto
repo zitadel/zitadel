@@ -173,6 +173,12 @@ message LoginPolicy {
     repeated SecondFactorType second_factors = 16;
     repeated MultiFactorType multi_factors = 17;
     repeated zitadel.idp.v1.IDPLoginPolicyLink idps = 18;
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    bool allow_domain_discovery = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+        }
+    ];
 }
 
 enum SecondFactorType {

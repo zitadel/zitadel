@@ -30,6 +30,7 @@ type LoginPolicy struct {
 	IsDefault                  bool
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
+	AllowDomainDiscovery       bool
 	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
@@ -111,6 +112,10 @@ var (
 	}
 	LoginPolicyColumnIgnoreUnknownUsernames = Column{
 		name:  projection.IgnoreUnknownUsernames,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnAllowDomainDiscovery = Column{
+		name:  projection.AllowDomainDiscovery,
 		table: loginPolicyTable,
 	}
 	LoginPolicyColumnDefaultRedirectURI = Column{
@@ -305,6 +310,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnIsDefault.identifier(),
 			LoginPolicyColumnHidePasswordReset.identifier(),
 			LoginPolicyColumnIgnoreUnknownUsernames.identifier(),
+			LoginPolicyColumnAllowDomainDiscovery.identifier(),
 			LoginPolicyColumnDefaultRedirectURI.identifier(),
 			LoginPolicyColumnPasswordCheckLifetime.identifier(),
 			LoginPolicyColumnExternalLoginCheckLifetime.identifier(),
@@ -343,6 +349,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					&p.IsDefault,
 					&p.HidePasswordReset,
 					&p.IgnoreUnknownUsernames,
+					&p.AllowDomainDiscovery,
 					&defaultRedirectURI,
 					&p.PasswordCheckLifetime,
 					&p.ExternalLoginCheckLifetime,
