@@ -1,0 +1,29 @@
+@import "../theming/theming";
+@import "mfa";
+
+@mixin lgn-mfa-theme() {
+  .lgn-mfa-options {
+    .mfa {
+      input[type="radio"] + label {
+        .mfa-img {
+          border: 1px solid var(--zitadel-color-input-border);
+          background-color: var(--zitadel-color-input-background);
+
+          &:hover {
+            border: 1px solid var(--zitadel-color-input-border-hover);
+          }
+        }
+      }
+
+      input[type="radio"] {
+        &:checked {
+          & + label {
+            .mfa-img {
+              border: 1px solid var(--zitadel-color-primary);
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+@mixin lgn-mfa-base {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin: 2rem 0;
+
+  .mfa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding: 0 0.5rem;
+
+    input[type="radio"] + label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      span {
+        text-align: center;
+      }
+
+      .mfa-img {
+        border: 1px solid var(--zitadel-color-input-border);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        display: flex;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s ease;
+
+        &:hover {
+          border: 1px solid var(--zitadel-color-input-border-active);
+        }
+      }
+    }
+
+    input[type="radio"] {
+      display: none;
+
+      &:checked {
+        & + label {
+          .mfa-img {
+            border: 1px solid var(--zitadel-color-primary);
+          }
+        }
+      }
+    }
+  }
+}
