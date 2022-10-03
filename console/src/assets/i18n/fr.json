@@ -825,7 +825,8 @@
     "STATE": {
       "0": "Non défini",
       "1": "Actif",
-      "2": "Désactivé"
+      "2": "Désactivé",
+      "3": "Supprimé"
     },
     "MEMBER": {
       "TITLE": "Gestionnaires de l'organisation",

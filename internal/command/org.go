@@ -280,6 +280,9 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, errors.ThrowPreconditionFailed(err, "COMMA-wG9p1", "Errors.Org.NotFound")
 			}
+			if writeModel.State == domain.OrgStateRemoved {
+				return nil, errors.ThrowInvalidArgument(nil, "COMMA-pSAVZ", "Errors.NoChangesFound")
+			}
 			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}, nil
 		}, nil
 	}

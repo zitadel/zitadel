@@ -825,7 +825,8 @@
     "STATE": {
       "0": "Non definito",
       "1": "Attivo",
-      "2": "Disattivato"
+      "2": "Disattivato",
+      "3": "Rimosso"
     },
     "MEMBER": {
       "TITLE": "Manager dell'organizzazione",

@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -185,9 +186,9 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
-			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
+			InstanceID(authz.GetInstance(ctx).InstanceID()).
 			AddQuery().
-			AggregateTypes(keypair.AggregateType).
+			AggregateTypes(keypair.AggregateType, org.AggregateType).
 			Builder(),
 	)
 }
