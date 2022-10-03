@@ -29,7 +29,7 @@ const (
 	gracefulPeriod = 10 * time.Minute
 )
 
-//SigningKey wraps the query.PrivateKey to implement the op.SigningKey interface
+// SigningKey wraps the query.PrivateKey to implement the op.SigningKey interface
 type SigningKey struct {
 	algorithm jose.SignatureAlgorithm
 	id        string
@@ -48,7 +48,7 @@ func (s *SigningKey) ID() string {
 	return s.id
 }
 
-//PublicKey wraps the query.PublicKey to implement the op.Key interface
+// PublicKey wraps the query.PublicKey to implement the op.Key interface
 type PublicKey struct {
 	key query.PublicKey
 }
@@ -69,7 +69,7 @@ func (s *PublicKey) ID() string {
 	return s.key.ID()
 }
 
-//KeySet implements the op.Storage interface
+// KeySet implements the op.Storage interface
 func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -87,16 +87,17 @@ func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
 	return keys, err
 }
 
-//SignatureAlgorithms implements the op.Storage interface
+// SignatureAlgorithms implements the op.Storage interface
 func (o *OPStorage) SignatureAlgorithms(ctx context.Context) ([]jose.SignatureAlgorithm, error) {
 	key, err := o.SigningKey(ctx)
 	if err != nil {
+		logging.WithError(err).Warn("unable to fetch signing key")
 		return nil, err
 	}
 	return []jose.SignatureAlgorithm{key.SignatureAlgorithm()}, nil
 }
 
-//SigningKey implements the op.Storage interface
+// SigningKey implements the op.Storage interface
 func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err error) {
 	err = retry(func() error {
 		key, err = o.getSigningKey(ctx)

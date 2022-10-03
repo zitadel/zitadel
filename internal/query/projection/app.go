@@ -84,7 +84,7 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(AppColumnOwnerRemoved, crdb.ColumnTypeBool),
+			crdb.NewColumn(AppColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
 			crdb.WithIndex(crdb.NewIndex("app4_project_id_idx", []string{AppColumnProjectID})),
