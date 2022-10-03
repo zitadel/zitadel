@@ -57,6 +57,7 @@ on read: the timestamp of the last event reduced by the projection
 
 on manipulation: the |  |
 | resource_owner |  string | resource_owner is the organisation an object belongs to |  |
+| resource_owner_removed |  bool | - |  |
 
 
 

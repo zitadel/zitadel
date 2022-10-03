@@ -10,6 +10,7 @@ func writeModelToObjectDetails(writeModel *eventstore.WriteModel) *domain.Object
 		Sequence:      writeModel.ProcessedSequence,
 		ResourceOwner: writeModel.ResourceOwner,
 		EventDate:     writeModel.ChangeDate,
+		//TODO: do we need to know if the owner is deleted here?
 	}
 }
 
@@ -18,5 +19,6 @@ func pushedEventsToObjectDetails(events []eventstore.Event) *domain.ObjectDetail
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
+		//TODO: do we need to know if the owner is removed?
 	}
 }

@@ -12,8 +12,9 @@ import (
 
 func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:      objectDetail.Sequence,
-		ResourceOwner: objectDetail.ResourceOwner,
+		Sequence:             objectDetail.Sequence,
+		ResourceOwner:        objectDetail.ResourceOwner,
+		ResourceOwnerRemoved: objectDetail.OwnerRemoved,
 	}
 	if !objectDetail.EventDate.IsZero() {
 		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
@@ -23,8 +24,9 @@ func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.Obje
 
 func DomainToAddDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:      objectDetail.Sequence,
-		ResourceOwner: objectDetail.ResourceOwner,
+		Sequence:             objectDetail.Sequence,
+		ResourceOwner:        objectDetail.ResourceOwner,
+		ResourceOwnerRemoved: objectDetail.OwnerRemoved,
 	}
 	if !objectDetail.EventDate.IsZero() {
 		details.CreationDate = timestamppb.New(objectDetail.EventDate)

@@ -391,11 +391,7 @@ func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
@@ -409,11 +405,7 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
@@ -427,11 +419,7 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string, externalPort uint16, externalSecure bool) error {
