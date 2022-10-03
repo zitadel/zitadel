@@ -190,6 +190,7 @@ func (h *StatementHandler) Init(ctx context.Context, initialized chan<- bool, ch
 	for _, check := range checks {
 		if check == nil || check.IsNoop() {
 			initialized <- true
+			close(initialized)
 			return nil
 		}
 		tx, err := h.client.BeginTx(ctx, nil)
@@ -213,6 +214,7 @@ func (h *StatementHandler) Init(ctx context.Context, initialized chan<- bool, ch
 		}
 	}
 	initialized <- true
+	close(initialized)
 	return nil
 }
 
