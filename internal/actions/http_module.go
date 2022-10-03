@@ -52,7 +52,7 @@ var defaultFetchConfig = fetchConfig{
 	},
 }
 
-func (c *HTTP) fetchConfigFromArg(arg *goja.Object) (config fetchConfig, err error) {
+func (c *HTTP) fetchConfigFromArg(arg *goja.Object, config *fetchConfig) (err error) {
 	for _, key := range arg.Keys() {
 		switch key {
 		case "headers":
@@ -62,14 +62,14 @@ func (c *HTTP) fetchConfigFromArg(arg *goja.Object) (config fetchConfig, err err
 		case "body":
 			body, err := arg.Get(key).ToObject(c.runtime).MarshalJSON()
 			if err != nil {
-				return config, err
+				return err
 			}
 			config.Body = bytes.NewReader(body)
 		default:
-			return config, z_errs.ThrowInvalidArgument(nil, "ACTIO-OfUeA", "key is invalid")
+			return z_errs.ThrowInvalidArgument(nil, "ACTIO-OfUeA", "key is invalid")
 		}
 	}
-	return config, nil
+	return nil
 }
 
 type response struct {
@@ -129,8 +129,7 @@ func (c *HTTP) buildHTTPRequest(ctx context.Context, args []goja.Value) (req *ht
 	config := defaultFetchConfig
 	var err error
 	if len(args) == 2 {
-		config, err = c.fetchConfigFromArg(args[1].ToObject(c.runtime))
-		if err != nil {
+		if err = c.fetchConfigFromArg(args[1].ToObject(c.runtime), &config); err != nil {
 			panic(err)
 		}
 	}
