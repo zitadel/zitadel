@@ -24,8 +24,7 @@ const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
 const METADATA: SidenavSetting = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA' };
 const IDP: SidenavSetting = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' };
-const PASSWORDLESS: SidenavSetting = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS' };
-const MFA: SidenavSetting = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA' };
+const SECURITY: SidenavSetting = { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' };
 const PERSONALACCESSTOKEN: SidenavSetting = { id: 'pat', i18nKey: 'USER.SETTINGS.PAT' };
 const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS' };
 const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' };
@@ -118,7 +117,7 @@ export class UserDetailComponent implements OnInit {
             this.user = resp.user;
 
             if (this.user.human) {
-              this.settingsList = [GENERAL, MFA, PASSWORDLESS, IDP, GRANTS, MEMBERSHIPS, METADATA];
+              this.settingsList = [GENERAL, SECURITY, IDP, GRANTS, MEMBERSHIPS, METADATA];
             } else if (this.user.machine) {
               this.settingsList = [GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA];
             }
@@ -385,6 +384,9 @@ export class UserDetailComponent implements OnInit {
   public resendInitEmail(): void {
     const dialogRef = this.dialog.open(ResendEmailDialogComponent, {
       width: '400px',
+      data: {
+        email: this.user.human?.email?.email ?? '',
+      },
     });
 
     dialogRef.afterClosed().subscribe((resp) => {

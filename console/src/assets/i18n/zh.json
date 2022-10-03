@@ -212,10 +212,9 @@
       "TITLE": "设置",
       "GENERAL": "通用",
       "IDP": "身份提供者",
-      "MFA": "多因素认证",
+      "SECURITY": "密码和安全",
       "KEYS": "秘钥",
       "PAT": "个人访问令牌",
-      "PASSWORDLESS": "无密码认证",
       "USERGRANTS": "授权",
       "MEMBERSHIPS": "成员身份",
       "METADATA": "元数据"
@@ -494,6 +493,7 @@
     "EMAILVERIFIED": "电子邮件已验证",
     "NOTVERIFIED": "未验证",
     "PREFERRED_LOGINNAME": "首选登录名",
+    "ISINITIAL": "该用户尚未通过验证。单击按钮触发新的初始化邮件。",
     "LOGINMETHODS": {
       "TITLE": "联系信息",
       "DESCRIPTION": "提供的信息用于向您发送重要信息，例如密码重置电子邮件。",

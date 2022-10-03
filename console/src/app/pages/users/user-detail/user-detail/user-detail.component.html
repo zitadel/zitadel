@@ -59,6 +59,17 @@
         >
         <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
+        <div *ngIf="user && user.state === UserState.USER_STATE_INITIAL">
+          <cnsl-info-section class="is-initial-info-section" [type]="InfoSectionType.ALERT">
+            <div class="is-initial-row">
+              <span>{{ 'USER.ISINITIAL' | translate }}</span>
+              <button [disabled]="(canWrite$ | async) === false" mat-stroked-button (click)="resendInitEmail()">
+                {{ 'USER.RESENDINITIALEMAIL' | translate }}
+              </button>
+            </div>
+          </cnsl-info-section>
+        </div>
+
         <ng-container *ngIf="currentSetting === 'general'">
           <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:' + user.id]">
             <cnsl-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
@@ -73,30 +84,6 @@
                 (changeUsernameClicked)="changeUsername()"
               >
               </cnsl-detail-form>
-            </cnsl-card>
-
-            <cnsl-card *ngIf="user.human" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
-              <div class="contact-method-col">
-                <div class="contact-method-row">
-                  <div class="left">
-                    <span class="label cnsl-secondary-text">{{ 'USER.PASSWORD.LABEL' | translate }}</span>
-                    <span>*********</span>
-
-                    <ng-content select="[pwdAction]"></ng-content>
-                  </div>
-
-                  <div class="right">
-                    <a
-                      matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
-                      [disabled]="['user.write:' + user.id, 'user.write$'] | hasRole | async"
-                      [routerLink]="['password']"
-                      mat-icon-button
-                    >
-                      <i class="las la-pen"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
             </cnsl-card>
 
             <cnsl-card
@@ -136,16 +123,6 @@
                   "
                 >
                   {{ 'USER.PASSWORD.RESENDNOTIFICATION' | translate }}
-                </button>
-                <button
-                  emailAction
-                  [disabled]="(canWrite$ | async) === false"
-                  class="resendemail"
-                  *ngIf="user.state === UserState.USER_STATE_INITIAL"
-                  mat-stroked-button
-                  (click)="resendInitEmail()"
-                >
-                  {{ 'USER.RESENDINITIALEMAIL' | translate }}
                 </button>
               </cnsl-contact>
             </cnsl-card>
@@ -193,12 +170,34 @@
           </ng-template>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting && currentSetting === 'passwordless'">
+        <ng-container *ngIf="currentSetting && currentSetting === 'security'">
+          <cnsl-card *ngIf="user.human" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
+            <div class="contact-method-col">
+              <div class="contact-method-row">
+                <div class="left">
+                  <span class="label cnsl-secondary-text">{{ 'USER.PASSWORD.LABEL' | translate }}</span>
+                  <span>*********</span>
+
+                  <ng-content select="[pwdAction]"></ng-content>
+                </div>
+
+                <div class="right">
+                  <a
+                    matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
+                    [disabled]="(['user.write:' + user.id, 'user.write$'] | hasRole | async) === false"
+                    [routerLink]="['password']"
+                    mat-icon-button
+                  >
+                    <i class="las la-pen"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </cnsl-card>
+
           <cnsl-passwordless *ngIf="user && !!user.human" [user]="user" [disabled]="(canWrite$ | async) === false">
           </cnsl-passwordless>
-        </ng-container>
 
-        <ng-container *ngIf="currentSetting && currentSetting === 'mfa'">
           <cnsl-user-mfa *ngIf="user && user.human" [user]="user"></cnsl-user-mfa>
         </ng-container>
 
