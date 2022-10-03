@@ -8,9 +8,8 @@ describe('NavToggleComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NavToggleComponent ]
-    })
-    .compileComponents();
+      declarations: [NavToggleComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NavToggleComponent);
     component = fixture.componentInstance;

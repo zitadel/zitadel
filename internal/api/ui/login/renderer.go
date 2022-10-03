@@ -507,7 +507,7 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	if authReq == nil {
 		return false
 	}
-	if authReq.RequestedOrgID == "" {
+	if authReq.RequestedOrgID == "" || !authReq.RequestedOrgDomain {
 		return false
 	}
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
@@ -611,12 +611,11 @@ type profileData struct {
 type passwordData struct {
 	baseData
 	profileData
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
+	MinLength    uint64
+	HasUppercase string
+	HasLowercase string
+	HasNumber    string
+	HasSymbol    string
 }
 
 type userSelectionData struct {

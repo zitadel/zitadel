@@ -57,7 +57,7 @@ We accept contributions through pull requests. You need a github account for tha
 
 7. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request [correct tagging](#commit-messages) is required and will be requested by the reviewers.
 
-8.  On GitHub, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:main`. Request review from one of the maintainers.
+8. On GitHub, [send a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) to `zitadel:main`. Request review from one of the maintainers.
 
 ### Reviewing a Pull Request
 
@@ -107,7 +107,6 @@ We add the label "good first issue" for problems we think are a good starting po
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
 
-
 ### Backend / Login
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
@@ -117,6 +116,7 @@ Then, you test your changes via the console your binary is serving at http://<sp
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
 The commands in this section are tested against the following software versions:
+
 - [Docker version 20.10.17](https://docs.docker.com/engine/install/)
 - [Goreleaser version v1.8.3](https://goreleaser.com/install/)
 - [Go version 1.19](https://go.dev/doc/install)
@@ -143,7 +143,7 @@ goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifac
 > Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`  
 > Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`  
 > Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . -t zitadel-npm-console --target angular-export -o internal/api/ui/console/static/`  
-> Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`  
+> Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
@@ -175,6 +175,9 @@ By executing the commands from this section, you run everything you need to deve
 Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](https://www.cockroachlabs.com/docs/v22.1/start-a-local-cluster-in-docker-mac.html) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
+
+We use angular-eslint/Prettier for linting/formatting, so please run `npm run lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
 The commands in this section are tested against the following software versions:
@@ -189,10 +192,10 @@ The commands in this section are tested against the following software versions:
   <summary>Note for WSL2 on Windows 10</summary>
   Following the suggestions <a href="https://stackoverflow.com/questions/62641553/setup-cypress-on-wsl-ubuntu-for-windows-10">here </a> subsequently <a href="https://github.com/microsoft/WSL/issues/4106">here </a> may  need to XLaunch and configure your DISPLAY variable. Use at your own risk.
 
-  1. Install `VcXsrv Windows X Server`
-  2. Set the target of your shortcut to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
-  3. In WSL2 run `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0` to set your DISPLAY variable
-  4. When starting XLaunch, make sure to disable access control
+1. Install `VcXsrv Windows X Server`
+2. Set the target of your shortcut to `"C:\Program Files\VcXsrv\xlaunch.exe" -ac`
+3. In WSL2 run `export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0` to set your DISPLAY variable
+4. When starting XLaunch, make sure to disable access control
 </details>
 
 Run the database and the latest backend locally.
@@ -210,13 +213,13 @@ You can now run a local development server with live code reloading at http://lo
 To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
 
 1. Navigate to http://localhost:8080/ui/console/projects.
-2. When prompted, login with *zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost* and *Password1!*
-3. Select the *ZITADEL* project.
-3. Select the *Console* application.
-4. Select *Redirect Settings*
-5. Add *http://<span because="breaks the link"></span>localhost:4200/auth/callback* to the *Redirect URIs*
-6. Add *http://<span because="breaks the link"></span>localhost:4200/signedout* to the *Post Logout URIs*
-7. Select the *Save* button
+2. When prompted, login with _zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost_ and _Password1!_
+3. Select the _ZITADEL_ project.
+4. Select the _Console_ application.
+5. Select _Redirect Settings_
+6. Add _http://<span because="breaks the link"></span>localhost:4200/auth/callback_ to the _Redirect URIs_
+7. Add _http://<span because="breaks the link"></span>localhost:4200/signedout_ to the _Post Logout URIs_
+8. Select the _Save_ button
 
 You can run the local console development server now.
 
@@ -287,7 +290,7 @@ You may edit the texts in these files or create a new file for additional langua
 ## Want to start ZITADEL?
 
 You can find an installation guide for all the different environments here:
-[https://docs.zitadel.com/docs/guides/installation](https://docs.zitadel.com/docs/guides/installation)
+[https://docs.zitadel.com/docs/guides/deploy/overview](https://docs.zitadel.com/docs/guides/deploy/overview)
 
 ## **Did you find a security flaw?**
 

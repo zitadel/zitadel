@@ -3,16 +3,9 @@ import { NgModule } from '@angular/core';
 
 import { HasRolePipe } from './has-role.pipe';
 
-
 @NgModule({
-    declarations: [
-        HasRolePipe,
-    ],
-    imports: [
-        CommonModule,
-    ],
-    exports: [
-        HasRolePipe,
-    ],
+  declarations: [HasRolePipe],
+  imports: [CommonModule],
+  exports: [HasRolePipe],
 })
-export class HasRolePipeModule { }
+export class HasRolePipeModule {}

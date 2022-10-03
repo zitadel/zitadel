@@ -8,9 +8,8 @@ describe('AddTokenDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AddTokenDialogComponent ]
-    })
-    .compileComponents();
+      declarations: [AddTokenDialogComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

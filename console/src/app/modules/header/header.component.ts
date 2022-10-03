@@ -45,7 +45,7 @@ export class HeaderComponent implements OnDestroy {
   ];
   constructor(
     public authenticationService: AuthenticationService,
-    private authService: GrpcAuthService,
+    public authService: GrpcAuthService,
     public mgmtService: ManagementService,
     public breadcrumbService: BreadcrumbService,
     public router: Router,

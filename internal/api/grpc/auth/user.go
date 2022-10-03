@@ -76,7 +76,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 		return nil, err
 	}
 	return &auth_pb.ListMyMetadataResponse{
-		Result:  metadata.MetadataListToPb(res.Metadata),
+		Result:  metadata.UserMetadataListToPb(res.Metadata),
 		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
@@ -87,7 +87,7 @@ func (s *Server) GetMyMetadata(ctx context.Context, req *auth_pb.GetMyMetadataRe
 		return nil, err
 	}
 	return &auth_pb.GetMyMetadataResponse{
-		Metadata: metadata.DomainMetadataToPb(data),
+		Metadata: metadata.UserMetadataToPb(data),
 	}, nil
 }
 

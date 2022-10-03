@@ -1366,6 +1366,7 @@
       "GRANTEDORGDOMAIN": "Dominio",
       "RESOURCEOWNER": "Resource owner",
       "GRANTEDORGNAME": "Nome dell'organizzazione",
+      "GRANTID": "Grant Id",
       "CREATIONDATE": "Data di creazione",
       "CHANGEDATE": "Ultima modifica",
       "DATES": "Date",

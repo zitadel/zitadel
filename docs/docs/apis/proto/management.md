@@ -804,6 +804,78 @@ Sets the state of my organisation to active
     POST: /orgs/me/_reactivate
 
 
+### SetOrgMetadata
+
+> **rpc** SetOrgMetadata([SetOrgMetadataRequest](#setorgmetadatarequest))
+[SetOrgMetadataResponse](#setorgmetadataresponse)
+
+Sets a org metadata by key
+
+
+
+    POST: /metadata/{key}
+
+
+### BulkSetOrgMetadata
+
+> **rpc** BulkSetOrgMetadata([BulkSetOrgMetadataRequest](#bulksetorgmetadatarequest))
+[BulkSetOrgMetadataResponse](#bulksetorgmetadataresponse)
+
+Set a list of org metadata
+
+
+
+    POST: /metadata/_bulk
+
+
+### ListOrgMetadata
+
+> **rpc** ListOrgMetadata([ListOrgMetadataRequest](#listorgmetadatarequest))
+[ListOrgMetadataResponse](#listorgmetadataresponse)
+
+Returns the org metadata
+
+
+
+    POST: /metadata/_search
+
+
+### GetOrgMetadata
+
+> **rpc** GetOrgMetadata([GetOrgMetadataRequest](#getorgmetadatarequest))
+[GetOrgMetadataResponse](#getorgmetadataresponse)
+
+Returns the org metadata by key
+
+
+
+    GET: /metadata/{key}
+
+
+### RemoveOrgMetadata
+
+> **rpc** RemoveOrgMetadata([RemoveOrgMetadataRequest](#removeorgmetadatarequest))
+[RemoveOrgMetadataResponse](#removeorgmetadataresponse)
+
+Removes a org metadata by key
+
+
+
+    DELETE: /metadata/{key}
+
+
+### BulkRemoveOrgMetadata
+
+> **rpc** BulkRemoveOrgMetadata([BulkRemoveOrgMetadataRequest](#bulkremoveorgmetadatarequest))
+[BulkRemoveOrgMetadataResponse](#bulkremoveorgmetadataresponse)
+
+Set a list of org metadata
+
+
+
+    DELETE: /metadata/_bulk
+
+
 ### ListOrgDomains
 
 > **rpc** ListOrgDomains([ListOrgDomainsRequest](#listorgdomainsrequest))
@@ -3019,7 +3091,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | primary_color |  string | - | string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes |  |
 | warn_color |  string | - | string.max_len: 50<br />  |
 | background_color |  string | - | string.max_len: 50<br />  |
 | font_color |  string | - | string.max_len: 50<br />  |
@@ -3805,6 +3877,28 @@ This is an empty request
 
 
 
+### BulkRemoveOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### BulkRemoveUserGrantRequest
 
 
@@ -3835,6 +3929,40 @@ This is an empty request
 
 
 ### BulkRemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata | repeated BulkSetOrgMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetOrgMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetOrgMetadataResponse
 
 
 
@@ -4945,6 +5073,28 @@ This is an empty request
 
 
 
+### GetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
 ### GetPasswordAgePolicyRequest
 This is an empty request
 
@@ -5770,6 +5920,30 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | list limitations and ordering |  |
 | result | repeated zitadel.member.v1.Member | criterias the client is looking for |  |
+
+
+
+
+### ListOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -6775,6 +6949,28 @@ This is an empty response
 
 
 
+### RemoveOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemovePersonalAccessTokenRequest
 
 
@@ -7638,6 +7834,29 @@ This is an empty request
 
 
 ### SetHumanPasswordResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetOrgMetadataResponse
 
 
 
