@@ -25,7 +25,7 @@
     "@angular/router": "^14.2.4",
     "@angular/service-worker": "^14.2.4",
     "@ctrl/ngx-codemirror": "^5.1.1",
-    "@grpc/grpc-js": "^1.7.0",
+    "@grpc/grpc-js": "^1.7.1",
     "@ngx-translate/core": "^14.0.0",
     "@types/file-saver": "^2.0.2",
     "@types/google-protobuf": "^3.15.3",
