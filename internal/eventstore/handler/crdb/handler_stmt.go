@@ -74,9 +74,11 @@ func NewStatementHandler(
 		bulkLimit:               config.BulkLimit,
 		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionName),
 	}
-	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock)
 
-	err := h.Init(ctx, config.InitCheck)
+	initialized := make(chan bool)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, initialized)
+
+	err := h.Init(ctx, initialized, config.InitCheck)
 	logging.OnError(err).WithField("projection", config.ProjectionName).Fatal("unable to initialize projections")
 
 	h.Subscribe(h.aggregates...)
