@@ -7,7 +7,7 @@ Login:
   UsernamePlaceHolder: nome utente
   LoginnamePlaceHolder: nomeutente@dominio
   ExternalUserDescription: Accedi con un utente esterno.
-  MustBeMemberOfOrg: 'L''utente deve essere membro dell''organizzazione {{.OrgName}}.'
+  MustBeMemberOfOrg: "L'utente deve essere membro dell'organizzazione {{.OrgName}}."
   RegisterButtonText: registrare
   NextButtonText: Avanti
 
@@ -19,7 +19,7 @@ SelectAccount:
   OtherUser: Altro utente
   SessionState0: attivo
   SessionState1: inattivo
-  MustBeMemberOfOrg: 'L''utente deve essere membro dell''organizzazione {{.OrgName}}.'
+  MustBeMemberOfOrg: "L'utente deve essere membro dell'organizzazione {{.OrgName}}."
 
 Password:
   Title: Password
@@ -87,7 +87,7 @@ InitMFAPrompt:
 
 InitMFAOTP:
   Title: Verificazione a due fattori
-  Description:  Scarica un'app di autenticazione e aggiungi la tua chiave
+  Description: Scarica un'app di autenticazione e aggiungi la tua chiave
   OTPDescription: Scannerizza il codice con la tua app di autenticazione (ad esempio Google Authenticator) o copia la chiave segreta e inserisci il codice generato nel campo sottostante.
   SecretLabel: Chiave
   CodeLabel: Codice
@@ -95,15 +95,15 @@ InitMFAOTP:
   CancelButtonText: annulla
 
 InitMFAU2F:
-  Title: Imposta U2F a 2 fattori / WebAuthN
-  Description: Aggiungi il tuo dispositivo da 2 fattori come FaceID, Windows Hello o Impronte digitali, fornendo un nome (ad es. MyPhone, MacBook) e facendo clic sul pulsante "Registra" qui sotto.
+  Title: Aggiungi chiave di sicurezza
+  Description: Una chiave di sicurezza è un metodo di verifica che può essere integrato nel telefono, utilizzare il Bluetooth o collegarlo direttamente alla porta USB del computer.
   TokenNameLabel: Nome del dispositivo a due fattori
   NotSupported: WebAuthN non è supportato dal tuo browser. Assicurati che sia aggiornato o usane uno diverso (ad esempio Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Registra
+  RegisterTokenButtonText: Aggiungi chiave
   ErrorRetry: Riprova, crea una nuova richiesta o scegli un metodo diverso.
 
 InitMFADone:
-  Title: Verificazione a due fattori effettuata
+  Title: Chiave aggiunta con successo
   Description: Fantastico! Hai appena impostato un secondo fattore e quindi reso il tuo account molto più sicuro. Il secondo fattore deve essere inserito a ogni accesso.
   NextButtonText: Avanti
   CancelButtonText: annulla
@@ -189,7 +189,7 @@ EmailVerificationDone:
   NextButtonText: Avanti
   CancelButtonText: annulla
   LoginButtonText: Accedi
-  
+
 RegisterOption:
   Title: Opzioni di registrazione
   Description: Scegli come vuoi registrarti
@@ -219,7 +219,7 @@ RegistrationUser:
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
-  TosConfirmAnd: e 
+  TosConfirmAnd: e
   PrivacyLinkText: l'informativa sulla privacy
   ExternalLogin: o registrati con un utente esterno
   BackButtonText: indietro
