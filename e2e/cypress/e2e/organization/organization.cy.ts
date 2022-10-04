@@ -31,8 +31,8 @@ describe('organization', () => {
   describe('remove org metadata', () => {
     beforeEach('ensure it exists', () => {
       apiAuth().then((api) => {
-        ensureOrganizationMetadataExists(api, testMetadataKeyRemove, testMetadataValueRemove);
         cy.visit(`/org`);
+        ensureOrganizationMetadataExists(api, testMetadataKeyRemove, testMetadataValueRemove);
       });
     });
 
