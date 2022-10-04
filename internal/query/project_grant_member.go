@@ -33,10 +33,6 @@ var (
 		name:  projection.MemberChangeDate,
 		table: projectGrantMemberTable,
 	}
-	ProjectGrantMemberSequence = Column{
-		name:  projection.MemberSequence,
-		table: projectGrantMemberTable,
-	}
 	ProjectGrantMemberResourceOwner = Column{
 		name:  projection.MemberResourceOwner,
 		table: projectGrantMemberTable,
@@ -106,7 +102,6 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 	return sq.Select(
 			ProjectGrantMemberCreationDate.identifier(),
 			ProjectGrantMemberChangeDate.identifier(),
-			ProjectGrantMemberSequence.identifier(),
 			ProjectGrantMemberResourceOwner.identifier(),
 			ProjectGrantMemberUserID.identifier(),
 			ProjectGrantMemberRoles.identifier(),
@@ -146,7 +141,6 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 				err := rows.Scan(
 					&member.CreationDate,
 					&member.ChangeDate,
-					&member.Sequence,
 					&member.ResourceOwner,
 					&member.UserID,
 					&member.Roles,

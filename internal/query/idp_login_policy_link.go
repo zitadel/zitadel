@@ -52,10 +52,6 @@ var (
 		name:  projection.IDPLoginPolicyLinkChangeDateCol,
 		table: idpLoginPolicyLinkTable,
 	}
-	IDPLoginPolicyLinkSequenceCol = Column{
-		name:  projection.IDPLoginPolicyLinkSequenceCol,
-		table: idpLoginPolicyLinkTable,
-	}
 	IDPLoginPolicyLinkAggregateIDCol = Column{
 		name:  projection.IDPLoginPolicyLinkAggregateIDCol,
 		table: idpLoginPolicyLinkTable,

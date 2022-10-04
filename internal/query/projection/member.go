@@ -14,7 +14,6 @@ const (
 
 	MemberCreationDate  = "creation_date"
 	MemberChangeDate    = "change_date"
-	MemberSequence      = "sequence"
 	MemberResourceOwner = "resource_owner"
 	MemberInstanceID    = "instance_id"
 )
@@ -25,7 +24,6 @@ var (
 		crdb.NewColumn(MemberChangeDate, crdb.ColumnTypeTimestamp),
 		crdb.NewColumn(MemberUserIDCol, crdb.ColumnTypeText),
 		crdb.NewColumn(MemberRolesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
-		crdb.NewColumn(MemberSequence, crdb.ColumnTypeInt64),
 		crdb.NewColumn(MemberResourceOwner, crdb.ColumnTypeText),
 		crdb.NewColumn(MemberInstanceID, crdb.ColumnTypeText),
 	}
@@ -59,7 +57,6 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
 			handler.NewCol(MemberCreationDate, e.CreationDate()),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
-			handler.NewCol(MemberSequence, e.Sequence()),
 			handler.NewCol(MemberResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(MemberInstanceID, e.Aggregate().InstanceID),
 		}}
@@ -76,7 +73,6 @@ func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (
 		cols: []handler.Column{
 			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
-			handler.NewCol(MemberSequence, e.Sequence()),
 		},
 		conds: []handler.Condition{
 			handler.NewCond(MemberUserIDCol, e.UserID),

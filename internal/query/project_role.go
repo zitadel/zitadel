@@ -32,10 +32,6 @@ var (
 		name:  projection.ProjectRoleColumnInstanceID,
 		table: projectRolesTable,
 	}
-	ProjectRoleColumnSequence = Column{
-		name:  projection.ProjectRoleColumnSequence,
-		table: projectRolesTable,
-	}
 	ProjectRoleColumnProjectID = Column{
 		name:  projection.ProjectRoleColumnProjectID,
 		table: projectRolesTable,
@@ -64,7 +60,6 @@ type ProjectRole struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 
 	Key         string
 	DisplayName string
@@ -201,7 +196,6 @@ func prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRole
 			ProjectRoleColumnCreationDate.identifier(),
 			ProjectRoleColumnChangeDate.identifier(),
 			ProjectRoleColumnResourceOwner.identifier(),
-			ProjectRoleColumnSequence.identifier(),
 			ProjectRoleColumnKey.identifier(),
 			ProjectRoleColumnDisplayName.identifier(),
 			ProjectRoleColumnGroupName.identifier(),
@@ -217,7 +211,6 @@ func prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRole
 					&project.CreationDate,
 					&project.ChangeDate,
 					&project.ResourceOwner,
-					&project.Sequence,
 					&project.Key,
 					&project.DisplayName,
 					&project.Group,

@@ -64,10 +64,6 @@ var (
 		name:  projection.IDPUserLinkChangeDateCol,
 		table: idpUserLinkTable,
 	}
-	IDPUserLinkSequenceCol = Column{
-		name:  projection.IDPUserLinkSequenceCol,
-		table: idpUserLinkTable,
-	}
 	IDPUserLinkResourceOwnerCol = Column{
 		name:  projection.IDPUserLinkResourceOwnerCol,
 		table: idpUserLinkTable,

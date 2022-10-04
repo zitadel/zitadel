@@ -18,7 +18,6 @@ const (
 	OIDCSettingsColumnChangeDate                 = "change_date"
 	OIDCSettingsColumnResourceOwner              = "resource_owner"
 	OIDCSettingsColumnInstanceID                 = "instance_id"
-	OIDCSettingsColumnSequence                   = "sequence"
 	OIDCSettingsColumnAccessTokenLifetime        = "access_token_lifetime"
 	OIDCSettingsColumnIdTokenLifetime            = "id_token_lifetime"
 	OIDCSettingsColumnRefreshTokenIdleExpiration = "refresh_token_idle_expiration"
@@ -40,7 +39,6 @@ func newOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(OIDCSettingsColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(OIDCSettingsColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(OIDCSettingsColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCSettingsColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnAccessTokenLifetime, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnIdTokenLifetime, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnRefreshTokenIdleExpiration, crdb.ColumnTypeInt64),
@@ -84,7 +82,6 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event)
 			handler.NewCol(OIDCSettingsColumnChangeDate, e.CreationDate()),
 			handler.NewCol(OIDCSettingsColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(OIDCSettingsColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(OIDCSettingsColumnSequence, e.Sequence()),
 			handler.NewCol(OIDCSettingsColumnAccessTokenLifetime, e.AccessTokenLifetime),
 			handler.NewCol(OIDCSettingsColumnIdTokenLifetime, e.IdTokenLifetime),
 			handler.NewCol(OIDCSettingsColumnRefreshTokenIdleExpiration, e.RefreshTokenIdleExpiration),
@@ -102,7 +99,6 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Even
 	columns := make([]handler.Column, 0, 6)
 	columns = append(columns,
 		handler.NewCol(OIDCSettingsColumnChangeDate, e.CreationDate()),
-		handler.NewCol(OIDCSettingsColumnSequence, e.Sequence()),
 	)
 	if e.AccessTokenLifetime != nil {
 		columns = append(columns, handler.NewCol(OIDCSettingsColumnAccessTokenLifetime, *e.AccessTokenLifetime))

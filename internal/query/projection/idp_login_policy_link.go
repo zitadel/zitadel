@@ -20,7 +20,6 @@ const (
 	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
 	IDPLoginPolicyLinkCreationDateCol  = "creation_date"
 	IDPLoginPolicyLinkChangeDateCol    = "change_date"
-	IDPLoginPolicyLinkSequenceCol      = "sequence"
 	IDPLoginPolicyLinkResourceOwnerCol = "resource_owner"
 	IDPLoginPolicyLinkInstanceIDCol    = "instance_id"
 	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
@@ -40,7 +39,6 @@ func newIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(IDPLoginPolicyLinkAggregateIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(IDPLoginPolicyLinkChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(IDPLoginPolicyLinkSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkProviderTypeCol, crdb.ColumnTypeEnum),
@@ -131,7 +129,6 @@ func (p *idpLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*han
 			handler.NewCol(IDPLoginPolicyLinkAggregateIDCol, idp.Aggregate().ID),
 			handler.NewCol(IDPLoginPolicyLinkCreationDateCol, idp.CreationDate()),
 			handler.NewCol(IDPLoginPolicyLinkChangeDateCol, idp.CreationDate()),
-			handler.NewCol(IDPLoginPolicyLinkSequenceCol, idp.Sequence()),
 			handler.NewCol(IDPLoginPolicyLinkResourceOwnerCol, idp.Aggregate().ResourceOwner),
 			handler.NewCol(IDPLoginPolicyLinkInstanceIDCol, idp.Aggregate().InstanceID),
 			handler.NewCol(IDPLoginPolicyLinkProviderTypeCol, providerType),

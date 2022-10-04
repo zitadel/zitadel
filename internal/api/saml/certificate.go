@@ -153,7 +153,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 
 func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return p.eventstore.LatestSequence(ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxCreationDate).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AddQuery().
 			AggregateTypes(keypair.AggregateType).

@@ -19,7 +19,6 @@ const (
 	SMSColumnAggregateID   = "aggregate_id"
 	SMSColumnCreationDate  = "creation_date"
 	SMSColumnChangeDate    = "change_date"
-	SMSColumnSequence      = "sequence"
 	SMSColumnState         = "state"
 	SMSColumnResourceOwner = "resource_owner"
 	SMSColumnInstanceID    = "instance_id"
@@ -46,7 +45,6 @@ func newSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(SMSColumnAggregateID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(SMSColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SMSColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SMSColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(SMSColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSColumnInstanceID, crdb.ColumnTypeText),
@@ -120,7 +118,6 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 				handler.NewCol(SMSColumnResourceOwner, e.Aggregate().ResourceOwner),
 				handler.NewCol(SMSColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSColumnState, domain.SMSConfigStateInactive),
-				handler.NewCol(SMSColumnSequence, e.Sequence()),
 			},
 		),
 		crdb.AddCreateStatement(
@@ -162,7 +159,6 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
-				handler.NewCol(SMSColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(SMSColumnID, e.ID),
@@ -195,7 +191,6 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
-				handler.NewCol(SMSColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(SMSColumnID, e.ID),
@@ -215,7 +210,6 @@ func (p *smsConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (
 		[]handler.Column{
 			handler.NewCol(SMSColumnState, domain.SMSConfigStateActive),
 			handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
-			handler.NewCol(SMSColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(SMSColumnID, e.ID),
@@ -234,7 +228,6 @@ func (p *smsConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event)
 		[]handler.Column{
 			handler.NewCol(SMSColumnState, domain.SMSConfigStateInactive),
 			handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
-			handler.NewCol(SMSColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(SMSColumnID, e.ID),

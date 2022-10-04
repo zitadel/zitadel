@@ -49,7 +49,6 @@ type Members struct {
 type Member struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
-	Sequence      uint64
 	ResourceOwner string
 
 	UserID             string

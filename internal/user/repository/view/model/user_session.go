@@ -42,7 +42,6 @@ type UserSessionView struct {
 	SecondFactorVerificationType int32     `json:"-" gorm:"column:second_factor_verification_type"`
 	MultiFactorVerification      time.Time `json:"-" gorm:"column:multi_factor_verification"`
 	MultiFactorVerificationType  int32     `json:"-" gorm:"column:multi_factor_verification_type"`
-	Sequence                     uint64    `json:"-" gorm:"column:sequence"`
 	InstanceID                   string    `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
@@ -75,7 +74,6 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		SecondFactorVerificationType: domain.MFAType(userSession.SecondFactorVerificationType),
 		MultiFactorVerification:      userSession.MultiFactorVerification,
 		MultiFactorVerificationType:  domain.MFAType(userSession.MultiFactorVerificationType),
-		Sequence:                     userSession.Sequence,
 	}
 }
 
@@ -88,7 +86,6 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 }
 
 func (v *UserSessionView) AppendEvent(event *models.Event) error {
-	v.Sequence = event.Sequence
 	v.ChangeDate = event.CreationDate
 	switch eventstore.EventType(event.Type) {
 	case user.UserV1PasswordCheckSucceededType,

@@ -16,7 +16,6 @@ import (
 
 type PrivacyPolicy struct {
 	ID            string
-	Sequence      uint64
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
@@ -35,10 +34,6 @@ var (
 	}
 	PrivacyColID = Column{
 		name:  projection.PrivacyPolicyIDCol,
-		table: privacyTable,
-	}
-	PrivacyColSequence = Column{
-		name:  projection.PrivacyPolicySequenceCol,
 		table: privacyTable,
 	}
 	PrivacyColCreationDate = Column{
@@ -132,7 +127,6 @@ func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bo
 func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPolicy, error)) {
 	return sq.Select(
 			PrivacyColID.identifier(),
-			PrivacyColSequence.identifier(),
 			PrivacyColCreationDate.identifier(),
 			PrivacyColChangeDate.identifier(),
 			PrivacyColResourceOwner.identifier(),
@@ -147,7 +141,6 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 			policy := new(PrivacyPolicy)
 			err := row.Scan(
 				&policy.ID,
-				&policy.Sequence,
 				&policy.CreationDate,
 				&policy.ChangeDate,
 				&policy.ResourceOwner,

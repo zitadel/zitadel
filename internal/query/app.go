@@ -27,7 +27,6 @@ type App struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	State         domain.AppState
-	Sequence      uint64
 
 	ProjectID string
 	Name      string
@@ -115,10 +114,6 @@ var (
 	}
 	AppColumnState = Column{
 		name:  projection.AppColumnState,
-		table: appsTable,
-	}
-	AppColumnSequence = Column{
-		name:  projection.AppColumnSequence,
 		table: appsTable,
 	}
 )
@@ -445,7 +440,6 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppColumnChangeDate.identifier(),
 			AppColumnResourceOwner.identifier(),
 			AppColumnState.identifier(),
-			AppColumnSequence.identifier(),
 
 			AppAPIConfigColumnAppID.identifier(),
 			AppAPIConfigColumnClientID.identifier(),
@@ -493,7 +487,6 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&app.ChangeDate,
 				&app.ResourceOwner,
 				&app.State,
-				&app.Sequence,
 
 				&apiConfig.appID,
 				&apiConfig.clientID,
@@ -567,7 +560,6 @@ func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, err
 			ProjectColumnChangeDate.identifier(),
 			ProjectColumnResourceOwner.identifier(),
 			ProjectColumnState.identifier(),
-			ProjectColumnSequence.identifier(),
 			ProjectColumnName.identifier(),
 			ProjectColumnProjectRoleAssertion.identifier(),
 			ProjectColumnProjectRoleCheck.identifier(),
@@ -587,7 +579,6 @@ func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, err
 				&p.ChangeDate,
 				&p.ResourceOwner,
 				&p.State,
-				&p.Sequence,
 				&p.Name,
 				&p.ProjectRoleAssertion,
 				&p.ProjectRoleCheck,
@@ -613,7 +604,6 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppColumnChangeDate.identifier(),
 			AppColumnResourceOwner.identifier(),
 			AppColumnState.identifier(),
-			AppColumnSequence.identifier(),
 
 			AppAPIConfigColumnAppID.identifier(),
 			AppAPIConfigColumnClientID.identifier(),
@@ -664,7 +654,6 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&app.ChangeDate,
 					&app.ResourceOwner,
 					&app.State,
-					&app.Sequence,
 
 					&apiConfig.appID,
 					&apiConfig.clientID,

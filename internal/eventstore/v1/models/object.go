@@ -6,11 +6,10 @@ import (
 
 type ObjectRoot struct {
 	AggregateID   string    `json:"-"`
-	Sequence      uint64    `json:"-"`
 	ResourceOwner string    `json:"-"`
 	InstanceID    string    `json:"-"`
 	CreationDate  time.Time `json:"-"`
-	ChangeDate    time.Time `json:"-"`
+	ChangeDate    time.Time `json:"-"` //TODO: use change date instead of sequence
 }
 
 func (o *ObjectRoot) AppendEvent(event *Event) {
@@ -30,8 +29,6 @@ func (o *ObjectRoot) AppendEvent(event *Event) {
 	if o.CreationDate.IsZero() {
 		o.CreationDate = o.ChangeDate
 	}
-
-	o.Sequence = event.Sequence
 }
 func (o *ObjectRoot) IsZero() bool {
 	return o.AggregateID == ""

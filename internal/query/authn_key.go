@@ -39,10 +39,6 @@ var (
 		name:  projection.AuthNKeyAggregateIDCol,
 		table: authNKeyTable,
 	}
-	AuthNKeyColumnSequence = Column{
-		name:  projection.AuthNKeySequenceCol,
-		table: authNKeyTable,
-	}
 	AuthNKeyColumnObjectID = Column{
 		name:  projection.AuthNKeyObjectIDCol,
 		table: authNKeyTable,
@@ -78,7 +74,6 @@ type AuthNKey struct {
 	ID            string
 	CreationDate  time.Time
 	ResourceOwner string
-	Sequence      uint64
 
 	Expiration time.Time
 	Type       domain.AuthNKeyType
@@ -185,7 +180,6 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
 			AuthNKeyColumnResourceOwner.identifier(),
-			AuthNKeyColumnSequence.identifier(),
 			AuthNKeyColumnExpiration.identifier(),
 			AuthNKeyColumnType.identifier(),
 			countColumn.identifier(),
@@ -199,7 +193,6 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 					&authNKey.ID,
 					&authNKey.CreationDate,
 					&authNKey.ResourceOwner,
-					&authNKey.Sequence,
 					&authNKey.Expiration,
 					&authNKey.Type,
 					&count,
@@ -228,7 +221,6 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
 			AuthNKeyColumnResourceOwner.identifier(),
-			AuthNKeyColumnSequence.identifier(),
 			AuthNKeyColumnExpiration.identifier(),
 			AuthNKeyColumnType.identifier(),
 		).From(authNKeyTable.identifier()).PlaceholderFormat(sq.Dollar),
@@ -238,7 +230,6 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 				&authNKey.ID,
 				&authNKey.CreationDate,
 				&authNKey.ResourceOwner,
-				&authNKey.Sequence,
 				&authNKey.Expiration,
 				&authNKey.Type,
 			)

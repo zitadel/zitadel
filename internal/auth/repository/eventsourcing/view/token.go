@@ -92,8 +92,8 @@ func (v *View) UpdateTokenSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(tokenTable)
 }
 
-func (v *View) GetLatestTokenFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(tokenTable, instanceID, sequence)
+func (v *View) GetLatestTokenFailedEvent(instanceID, eventID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(tokenTable, instanceID, eventID)
 }
 
 func (v *View) ProcessedTokenFailedEvent(failedEvent *repository.FailedEvent) error {

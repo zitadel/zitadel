@@ -540,8 +540,8 @@ func TestStatementHandler_Update(t *testing.T) {
 					ProjectionName: "my_projection",
 				},
 				sequenceTable:           "my_sequences",
-				currentSequenceStmt:     fmt.Sprintf(currentSequenceStmtFormat, "my_sequences"),
-				updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, "my_sequences"),
+				currentSequenceStmt:     fmt.Sprintf(latestEventStmtFormat, "my_sequences"),
+				updateSequencesBaseStmt: fmt.Sprintf(updateEventIDStmtFormat, "my_sequences"),
 				client:                  client,
 			}
 
@@ -571,7 +571,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 	type args struct {
 		ctx       context.Context
 		stmtSeq   uint64
-		sequences currentSequences
+		sequences events
 		reduce    handler.Reduce
 	}
 	type want struct {
@@ -609,9 +609,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				reduce: testReduce(),
-				sequences: currentSequences{
-					"testAgg": []*instanceSequence{
-						{sequence: 5},
+				sequences: events{
+					"testAgg": []*instanceEvents{
+						{eventID: 5},
 					},
 				},
 				stmtSeq: 6,
@@ -634,9 +634,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				reduce: testReduce(),
-				sequences: currentSequences{
-					"testAgg": []*instanceSequence{
-						{sequence: 5},
+				sequences: events{
+					"testAgg": []*instanceEvents{
+						{eventID: 5},
 					},
 				},
 				stmtSeq: 6,
@@ -658,9 +658,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				reduce: testReduce(),
-				sequences: currentSequences{
-					"testAgg": []*instanceSequence{
-						{sequence: 5},
+				sequences: events{
+					"testAgg": []*instanceEvents{
+						{eventID: 5},
 					},
 				},
 				stmtSeq: 10,
@@ -704,9 +704,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				reduce: testReduceErr(errReduce),
-				sequences: currentSequences{
-					"testAgg": []*instanceSequence{
-						{sequence: 5},
+				sequences: events{
+					"testAgg": []*instanceEvents{
+						{eventID: 5},
 					},
 				},
 				stmtSeq: 10,
@@ -767,7 +767,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 	}
 	type args struct {
 		stmts     []*handler.Statement
-		sequences currentSequences
+		sequences events
 	}
 	type want struct {
 		expectations []mockExpectation
@@ -799,9 +799,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 				},
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
-						{sequence: 5},
+				sequences: events{
+					"agg": []*instanceEvents{
+						{eventID: 5},
 					},
 				},
 			},
@@ -843,9 +843,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 				},
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
-						{sequence: 2},
+				sequences: events{
+					"agg": []*instanceEvents{
+						{eventID: 2},
 					},
 				},
 			},
@@ -907,9 +907,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 				},
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
-						{sequence: 2},
+				sequences: events{
+					"agg": []*instanceEvents{
+						{eventID: 2},
 					},
 				},
 			},
@@ -976,9 +976,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							},
 						}),
 				},
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
-						{sequence: 2},
+				sequences: events{
+					"agg": []*instanceEvents{
+						{eventID: 2},
 					},
 				},
 			},
@@ -1066,9 +1066,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 						),
 					),
 				},
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
-						{sequence: 2},
+				sequences: events{
+					"agg": []*instanceEvents{
+						{eventID: 2},
 					},
 				},
 			},
@@ -1357,7 +1357,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 	type want struct {
 		expectations []mockExpectation
 		isErr        func(error) bool
-		sequences    currentSequences
+		sequences    events
 	}
 	tests := []struct {
 		name   string
@@ -1401,7 +1401,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				expectations: []mockExpectation{
 					expectCurrentSequenceNoRows("my_table", "my_projection", []string{"instanceID"}),
 				},
-				sequences: currentSequences{},
+				sequences: events{},
 			},
 		},
 		{
@@ -1422,7 +1422,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				expectations: []mockExpectation{
 					expectCurrentSequenceScanErr("my_table", "my_projection", []string{"instanceID"}),
 				},
-				sequences: currentSequences{},
+				sequences: events{},
 			},
 		},
 		{
@@ -1443,10 +1443,10 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				expectations: []mockExpectation{
 					expectCurrentSequence("my_table", "my_projection", 5, "agg", []string{"instanceID"}),
 				},
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
+				sequences: events{
+					"agg": []*instanceEvents{
 						{
-							sequence:   5,
+							eventID:    5,
 							instanceID: "instanceID",
 						},
 					},
@@ -1471,14 +1471,14 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 				expectations: []mockExpectation{
 					expectCurrentSequence("my_table", "my_projection", 5, "agg", []string{"instanceID1", "instanceID2"}),
 				},
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
+				sequences: events{
+					"agg": []*instanceEvents{
 						{
-							sequence:   5,
+							eventID:    5,
 							instanceID: "instanceID1",
 						},
 						{
-							sequence:   5,
+							eventID:    5,
 							instanceID: "instanceID2",
 						},
 					},
@@ -1493,7 +1493,7 @@ func TestStatementHandler_currentSequence(t *testing.T) {
 					ProjectionName: tt.fields.projectionName,
 				},
 				sequenceTable:       tt.fields.sequenceTable,
-				currentSequenceStmt: fmt.Sprintf(currentSequenceStmtFormat, tt.fields.sequenceTable),
+				currentSequenceStmt: fmt.Sprintf(latestEventStmtFormat, tt.fields.sequenceTable),
 			}
 
 			h.aggregates = tt.fields.aggregates
@@ -1545,7 +1545,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 		aggregates     []eventstore.AggregateType
 	}
 	type args struct {
-		sequences currentSequences
+		sequences events
 	}
 	type want struct {
 		expectations []mockExpectation
@@ -1565,10 +1565,10 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
+				sequences: events{
+					"agg": []*instanceEvents{
 						{
-							sequence:   5,
+							eventID:    5,
 							instanceID: "instanceID",
 						},
 					},
@@ -1591,10 +1591,10 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
+				sequences: events{
+					"agg": []*instanceEvents{
 						{
-							sequence:   5,
+							eventID:    5,
 							instanceID: "instanceID",
 						},
 					},
@@ -1617,10 +1617,10 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
+				sequences: events{
+					"agg": []*instanceEvents{
 						{
-							sequence:   5,
+							eventID:    5,
 							instanceID: "instanceID",
 						},
 					},
@@ -1643,20 +1643,20 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 				aggregates:     []eventstore.AggregateType{"agg"},
 			},
 			args: args{
-				sequences: currentSequences{
-					"agg": []*instanceSequence{
+				sequences: events{
+					"agg": []*instanceEvents{
 						{
-							sequence:   5,
+							eventID:    5,
 							instanceID: "instanceID",
 						},
 					},
-					"agg2": []*instanceSequence{
+					"agg2": []*instanceEvents{
 						{
-							sequence:   6,
+							eventID:    6,
 							instanceID: "instanceID",
 						},
 						{
-							sequence:   10,
+							eventID:    10,
 							instanceID: "instanceID2",
 						},
 					},
@@ -1667,20 +1667,20 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					return err == nil
 				},
 				expectations: []mockExpectation{
-					expectUpdateThreeCurrentSequence(t, "my_table", "my_projection", currentSequences{
-						"agg": []*instanceSequence{
+					expectUpdateThreeCurrentSequence(t, "my_table", "my_projection", events{
+						"agg": []*instanceEvents{
 							{
-								sequence:   5,
+								eventID:    5,
 								instanceID: "instanceID",
 							},
 						},
-						"agg2": []*instanceSequence{
+						"agg2": []*instanceEvents{
 							{
-								sequence:   6,
+								eventID:    6,
 								instanceID: "instanceID",
 							},
 							{
-								sequence:   10,
+								eventID:    10,
 								instanceID: "instanceID2",
 							},
 						},
@@ -1697,7 +1697,7 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 					ProjectionName: tt.fields.projectionName,
 				},
 				sequenceTable:           tt.fields.sequenceTable,
-				updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, tt.fields.sequenceTable),
+				updateSequencesBaseStmt: fmt.Sprintf(updateEventIDStmtFormat, tt.fields.sequenceTable),
 			}
 
 			h.aggregates = tt.fields.aggregates

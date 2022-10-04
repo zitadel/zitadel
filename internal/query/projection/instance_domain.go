@@ -16,7 +16,6 @@ const (
 	InstanceDomainInstanceIDCol   = "instance_id"
 	InstanceDomainCreationDateCol = "creation_date"
 	InstanceDomainChangeDateCol   = "change_date"
-	InstanceDomainSequenceCol     = "sequence"
 	InstanceDomainDomainCol       = "domain"
 	InstanceDomainIsGeneratedCol  = "is_generated"
 	InstanceDomainIsPrimaryCol    = "is_primary"
@@ -35,7 +34,6 @@ func newInstanceDomainProjection(ctx context.Context, config crdb.StatementHandl
 			crdb.NewColumn(InstanceDomainInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(InstanceDomainCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(InstanceDomainChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(InstanceDomainSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(InstanceDomainDomainCol, crdb.ColumnTypeText),
 			crdb.NewColumn(InstanceDomainIsGeneratedCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(InstanceDomainIsPrimaryCol, crdb.ColumnTypeBool),
@@ -79,7 +77,6 @@ func (p *instanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*h
 		[]handler.Column{
 			handler.NewCol(InstanceDomainCreationDateCol, e.CreationDate()),
 			handler.NewCol(InstanceDomainChangeDateCol, e.CreationDate()),
-			handler.NewCol(InstanceDomainSequenceCol, e.Sequence()),
 			handler.NewCol(InstanceDomainDomainCol, e.Domain),
 			handler.NewCol(InstanceDomainInstanceIDCol, e.Aggregate().ID),
 			handler.NewCol(InstanceDomainIsGeneratedCol, e.Generated),
@@ -98,7 +95,6 @@ func (p *instanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(InstanceDomainChangeDateCol, e.CreationDate()),
-				handler.NewCol(InstanceDomainSequenceCol, e.Sequence()),
 				handler.NewCol(InstanceDomainIsPrimaryCol, false),
 			},
 			[]handler.Condition{
@@ -109,7 +105,6 @@ func (p *instanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(InstanceDomainChangeDateCol, e.CreationDate()),
-				handler.NewCol(InstanceDomainSequenceCol, e.Sequence()),
 				handler.NewCol(InstanceDomainIsPrimaryCol, true),
 			},
 			[]handler.Condition{

@@ -20,7 +20,6 @@ const (
 	OrgColumnResourceOwner = "resource_owner"
 	OrgColumnInstanceID    = "instance_id"
 	OrgColumnState         = "org_state"
-	OrgColumnSequence      = "sequence"
 	OrgColumnName          = "name"
 	OrgColumnDomain        = "primary_domain"
 )
@@ -41,7 +40,6 @@ func newOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(OrgColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgColumnState, crdb.ColumnTypeEnum),
-			crdb.NewColumn(OrgColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OrgColumnName, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgColumnDomain, crdb.ColumnTypeText, crdb.Default("")),
 		},
@@ -97,7 +95,6 @@ func (p *orgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Stateme
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
 			handler.NewCol(OrgColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(OrgColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(OrgColumnSequence, e.Sequence()),
 			handler.NewCol(OrgColumnName, e.Name),
 			handler.NewCol(OrgColumnState, domain.OrgStateActive),
 		},
@@ -116,7 +113,6 @@ func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
-			handler.NewCol(OrgColumnSequence, e.Sequence()),
 			handler.NewCol(OrgColumnName, e.Name),
 		},
 		[]handler.Condition{
@@ -134,7 +130,6 @@ func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
-			handler.NewCol(OrgColumnSequence, e.Sequence()),
 			handler.NewCol(OrgColumnState, domain.OrgStateInactive),
 		},
 		[]handler.Condition{
@@ -152,7 +147,6 @@ func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
-			handler.NewCol(OrgColumnSequence, e.Sequence()),
 			handler.NewCol(OrgColumnState, domain.OrgStateActive),
 		},
 		[]handler.Condition{
@@ -170,7 +164,6 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 		e,
 		[]handler.Column{
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
-			handler.NewCol(OrgColumnSequence, e.Sequence()),
 			handler.NewCol(OrgColumnDomain, e.Domain),
 		},
 		[]handler.Condition{

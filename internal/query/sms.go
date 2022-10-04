@@ -27,7 +27,6 @@ type SMSConfig struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	State         domain.SMSConfigState
-	Sequence      uint64
 
 	TwilioConfig *Twilio
 }
@@ -81,10 +80,6 @@ var (
 	}
 	SMSConfigColumnState = Column{
 		name:  projection.SMSColumnState,
-		table: smsConfigsTable,
-	}
-	SMSConfigColumnSequence = Column{
-		name:  projection.SMSColumnSequence,
 		table: smsConfigsTable,
 	}
 )
@@ -179,7 +174,6 @@ func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, erro
 			SMSConfigColumnChangeDate.identifier(),
 			SMSConfigColumnResourceOwner.identifier(),
 			SMSConfigColumnState.identifier(),
-			SMSConfigColumnSequence.identifier(),
 
 			SMSTwilioConfigColumnSMSID.identifier(),
 			SMSTwilioConfigColumnSID.identifier(),
@@ -201,7 +195,6 @@ func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, erro
 				&config.ChangeDate,
 				&config.ResourceOwner,
 				&config.State,
-				&config.Sequence,
 
 				&twilioConfig.smsID,
 				&twilioConfig.sid,
@@ -230,7 +223,6 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 			SMSConfigColumnChangeDate.identifier(),
 			SMSConfigColumnResourceOwner.identifier(),
 			SMSConfigColumnState.identifier(),
-			SMSConfigColumnSequence.identifier(),
 
 			SMSTwilioConfigColumnSMSID.identifier(),
 			SMSTwilioConfigColumnSID.identifier(),
@@ -255,7 +247,6 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 					&config.ChangeDate,
 					&config.ResourceOwner,
 					&config.State,
-					&config.Sequence,
 
 					&twilioConfig.smsID,
 					&twilioConfig.sid,

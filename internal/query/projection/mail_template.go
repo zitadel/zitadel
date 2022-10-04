@@ -20,7 +20,6 @@ const (
 	MailTemplateInstanceIDCol   = "instance_id"
 	MailTemplateCreationDateCol = "creation_date"
 	MailTemplateChangeDateCol   = "change_date"
-	MailTemplateSequenceCol     = "sequence"
 	MailTemplateStateCol        = "state"
 	MailTemplateIsDefaultCol    = "is_default"
 	MailTemplateTemplateCol     = "template"
@@ -40,7 +39,6 @@ func newMailTemplateProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(MailTemplateInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MailTemplateCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(MailTemplateChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(MailTemplateSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(MailTemplateStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(MailTemplateIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(MailTemplateTemplateCol, crdb.ColumnTypeBytes),
@@ -107,7 +105,6 @@ func (p *mailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(MailTemplateInstanceIDCol, templateEvent.Aggregate().InstanceID),
 			handler.NewCol(MailTemplateCreationDateCol, templateEvent.CreationDate()),
 			handler.NewCol(MailTemplateChangeDateCol, templateEvent.CreationDate()),
-			handler.NewCol(MailTemplateSequenceCol, templateEvent.Sequence()),
 			handler.NewCol(MailTemplateStateCol, domain.PolicyStateActive),
 			handler.NewCol(MailTemplateIsDefaultCol, isDefault),
 			handler.NewCol(MailTemplateTemplateCol, templateEvent.Template),
@@ -126,7 +123,6 @@ func (p *mailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 	}
 	cols := []handler.Column{
 		handler.NewCol(MailTemplateChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(MailTemplateSequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.Template != nil {
 		cols = append(cols, handler.NewCol(MailTemplateTemplateCol, *policyEvent.Template))

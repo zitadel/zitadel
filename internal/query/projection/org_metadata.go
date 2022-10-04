@@ -16,7 +16,6 @@ const (
 	OrgMetadataColumnOrgID         = "org_id"
 	OrgMetadataColumnCreationDate  = "creation_date"
 	OrgMetadataColumnChangeDate    = "change_date"
-	OrgMetadataColumnSequence      = "sequence"
 	OrgMetadataColumnResourceOwner = "resource_owner"
 	OrgMetadataColumnInstanceID    = "instance_id"
 	OrgMetadataColumnKey           = "key"
@@ -36,7 +35,6 @@ func newOrgMetadataProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(OrgMetadataColumnOrgID, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgMetadataColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(OrgMetadataColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(OrgMetadataColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OrgMetadataColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgMetadataColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgMetadataColumnKey, crdb.ColumnTypeText),
@@ -95,7 +93,6 @@ func (p *orgMetadataProjection) reduceMetadataSet(event eventstore.Event) (*hand
 			handler.NewCol(OrgMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(OrgMetadataColumnCreationDate, e.CreationDate()),
 			handler.NewCol(OrgMetadataColumnChangeDate, e.CreationDate()),
-			handler.NewCol(OrgMetadataColumnSequence, e.Sequence()),
 			handler.NewCol(OrgMetadataColumnValue, e.Value),
 		},
 	), nil

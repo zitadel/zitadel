@@ -19,7 +19,6 @@ const (
 	IDPUserLinkExternalUserIDCol = "external_user_id"
 	IDPUserLinkCreationDateCol   = "creation_date"
 	IDPUserLinkChangeDateCol     = "change_date"
-	IDPUserLinkSequenceCol       = "sequence"
 	IDPUserLinkResourceOwnerCol  = "resource_owner"
 	IDPUserLinkInstanceIDCol     = "instance_id"
 	IDPUserLinkDisplayNameCol    = "display_name"
@@ -40,7 +39,6 @@ func newIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(IDPUserLinkExternalUserIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPUserLinkCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(IDPUserLinkChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(IDPUserLinkSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(IDPUserLinkResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPUserLinkInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPUserLinkDisplayNameCol, crdb.ColumnTypeText),
@@ -114,7 +112,6 @@ func (p *idpUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.St
 			handler.NewCol(IDPUserLinkExternalUserIDCol, e.ExternalUserID),
 			handler.NewCol(IDPUserLinkCreationDateCol, e.CreationDate()),
 			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
-			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
 			handler.NewCol(IDPUserLinkResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCol(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCol(IDPUserLinkDisplayNameCol, e.DisplayName),

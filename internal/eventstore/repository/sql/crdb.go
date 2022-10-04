@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgconn"
@@ -24,11 +25,11 @@ const (
 	//
 	//previous_data selects the needed data of the latest event of the aggregate
 	// and buffers it (crdb inmemory)
-	crdbInsert = "WITH previous_data (aggregate_type_sequence, aggregate_sequence, resource_owner) AS (" +
-		"SELECT agg_type.seq, agg.seq, agg.ro FROM " +
+	crdbInsert = "WITH previous_data (resource_owner) AS (" +
+		"SELECT agg.ro FROM " +
 		"(" +
 		//max sequence of requested aggregate type
-		" SELECT MAX(event_sequence) seq, 1 join_me" +
+		" SELECT MAX(creation_date) seq, 1 join_me" +
 		" FROM eventstore.events" +
 		" WHERE aggregate_type = $2" +
 		" AND (CASE WHEN $9::TEXT IS NULL THEN instance_id is null else instance_id = $9::TEXT END)" +
@@ -66,17 +67,14 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" NOW() AS creation_date," +
+		" statement_timestamp() AS creation_date," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
 		" COALESCE((resource_owner), $8::VARCHAR) AS resource_owner," +
-		" $9::VARCHAR AS instance_id," +
-		" NEXTVAL(CONCAT('eventstore.', (CASE WHEN $9 <> '' THEN CONCAT('i_', $9) ELSE 'system' END), '_seq'))," +
-		" aggregate_sequence AS previous_aggregate_sequence," +
-		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
+		" $9::VARCHAR AS instance_id" +
 		"FROM previous_data " +
-		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner, instance_id"
+		"RETURNING id, creation_date, resource_owner, instance_id"
 
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
@@ -109,10 +107,6 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 
-		var (
-			previousAggregateSequence     Sequence
-			previousAggregateTypeSequence Sequence
-		)
 		for _, event := range events {
 			err := tx.QueryRowContext(ctx, crdbInsert,
 				event.Type,
@@ -124,10 +118,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorService,
 				event.ResourceOwner,
 				event.InstanceID,
-			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
-
-			event.PreviousAggregateSequence = uint64(previousAggregateSequence)
-			event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
+			).Scan(&event.ID, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
 
 			if err != nil {
 				logging.WithFields(
@@ -155,23 +146,6 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 }
 
 var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
-
-func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
-	row := db.client.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID)
-	if row.Err() != nil {
-		return caos_errs.ThrowInvalidArgument(row.Err(), "SQL-7gtFA", "Errors.InvalidArgument")
-	}
-	var sequenceName string
-	if err := row.Scan(&sequenceName); err != nil || !instanceRegexp.MatchString(sequenceName) {
-		return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
-	}
-
-	if _, err := db.client.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
-		return caos_errs.ThrowInternal(err, "SQL-7gtFA", "Errors.Internal")
-	}
-
-	return nil
-}
 
 // handleUniqueConstraints adds or removes unique constraints
 func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*repository.UniqueConstraint) (err error) {
@@ -219,14 +193,10 @@ func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery)
 	return events, nil
 }
 
-// LatestSequence returns the latest sequence found by the search query
-func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *repository.SearchQuery) (uint64, error) {
-	var seq Sequence
-	err := query(ctx, db, searchQuery, &seq)
-	if err != nil {
-		return 0, err
-	}
-	return uint64(seq), nil
+// LatestCreationDate returns the latest creation date found by the search query
+func (db *CRDB) LatestCreationDate(ctx context.Context, searchQuery *repository.SearchQuery) (creationDate time.Time, err error) {
+	err = query(ctx, db, searchQuery, &creationDate)
+	return creationDate, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
@@ -243,21 +213,18 @@ func (db *CRDB) db() *sql.DB {
 	return db.client
 }
 
-func (db *CRDB) orderByEventSequence(desc bool) string {
+func (db *CRDB) orderByCreationDate(desc bool) string {
 	if desc {
-		return " ORDER BY event_sequence DESC"
+		return " ORDER BY creation_date DESC"
 	}
 
-	return " ORDER BY event_sequence"
+	return " ORDER BY creation_date"
 }
 
 func (db *CRDB) eventQuery() string {
 	return "SELECT" +
 		" creation_date" +
 		", event_type" +
-		", event_sequence" +
-		", previous_aggregate_sequence" +
-		", previous_aggregate_type_sequence" +
 		", event_data" +
 		", editor_service" +
 		", editor_user" +
@@ -269,8 +236,8 @@ func (db *CRDB) eventQuery() string {
 		" FROM eventstore.events"
 }
 
-func (db *CRDB) maxSequenceQuery() string {
-	return "SELECT MAX(event_sequence) FROM eventstore.events"
+func (db *CRDB) maxCreationDateQuery() string {
+	return "SELECT MAX(creation_date) FROM eventstore.events"
 }
 
 func (db *CRDB) instanceIDsQuery() string {
@@ -283,8 +250,6 @@ func (db *CRDB) columnName(col repository.Field) string {
 		return "aggregate_id"
 	case repository.FieldAggregateType:
 		return "aggregate_type"
-	case repository.FieldSequence:
-		return "event_sequence"
 	case repository.FieldResourceOwner:
 		return "resource_owner"
 	case repository.FieldInstanceID:
@@ -300,7 +265,7 @@ func (db *CRDB) columnName(col repository.Field) string {
 	case repository.FieldCreationDate:
 		return "creation_date"
 	default:
-		return ""
+		panic("invalid column")
 	}
 }
 

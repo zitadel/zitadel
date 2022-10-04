@@ -39,10 +39,6 @@ var (
 		name:  projection.ActionInstanceIDCol,
 		table: actionTable,
 	}
-	ActionColumnSequence = Column{
-		name:  projection.ActionSequenceCol,
-		table: actionTable,
-	}
 	ActionColumnState = Column{
 		name:  projection.ActionStateCol,
 		table: actionTable,
@@ -76,7 +72,6 @@ type Action struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	State         domain.ActionState
-	Sequence      uint64
 
 	Name          string
 	Script        string
@@ -158,7 +153,6 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 			ActionColumnCreationDate.identifier(),
 			ActionColumnChangeDate.identifier(),
 			ActionColumnResourceOwner.identifier(),
-			ActionColumnSequence.identifier(),
 			ActionColumnState.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
@@ -176,7 +170,6 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 					&action.CreationDate,
 					&action.ChangeDate,
 					&action.ResourceOwner,
-					&action.Sequence,
 					&action.State,
 					&action.Name,
 					&action.Script,
@@ -209,7 +202,6 @@ func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)
 			ActionColumnCreationDate.identifier(),
 			ActionColumnChangeDate.identifier(),
 			ActionColumnResourceOwner.identifier(),
-			ActionColumnSequence.identifier(),
 			ActionColumnState.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
@@ -223,7 +215,6 @@ func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)
 				&action.CreationDate,
 				&action.ChangeDate,
 				&action.ResourceOwner,
-				&action.Sequence,
 				&action.State,
 				&action.Name,
 				&action.Script,

@@ -40,10 +40,6 @@ var (
 		name:  projection.SMTPConfigColumnInstanceID,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnSequence = Column{
-		name:  projection.SMTPConfigColumnSequence,
-		table: smtpConfigsTable,
-	}
 	SMTPConfigColumnTLS = Column{
 		name:  projection.SMTPConfigColumnTLS,
 		table: smtpConfigsTable,
@@ -80,7 +76,6 @@ type SMTPConfig struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 
 	TLS           bool
 	SenderAddress string
@@ -112,7 +107,6 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
-			SMTPConfigColumnSequence.identifier(),
 			SMTPConfigColumnTLS.identifier(),
 			SMTPConfigColumnSenderAddress.identifier(),
 			SMTPConfigColumnSenderName.identifier(),
@@ -127,7 +121,6 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 				&config.CreationDate,
 				&config.ChangeDate,
 				&config.ResourceOwner,
-				&config.Sequence,
 				&config.TLS,
 				&config.SenderAddress,
 				&config.SenderName,

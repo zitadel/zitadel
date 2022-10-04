@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -65,8 +66,8 @@ func NewStatementHandler(
 		client:                  config.Client,
 		sequenceTable:           config.SequenceTable,
 		maxFailureCount:         config.MaxFailureCount,
-		currentSequenceStmt:     fmt.Sprintf(currentSequenceStmtFormat, config.SequenceTable),
-		updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, config.SequenceTable),
+		currentSequenceStmt:     fmt.Sprintf(latestEventStmtFormat, config.SequenceTable),
+		updateSequencesBaseStmt: fmt.Sprintf(updateEventIDStmtFormat, config.SequenceTable),
 		failureCountStmt:        fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
 		setFailureCountStmt:     fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
 		aggregates:              aggregateTypes,
@@ -96,18 +97,19 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 
 	for _, aggregateType := range h.aggregates {
 		for _, instanceID := range instanceIDs {
-			var seq uint64
+			var creationDate time.Time
 			for _, sequence := range sequences[aggregateType] {
 				if sequence.instanceID == instanceID {
-					seq = sequence.sequence
+					eventID = sequence.eventID
 					break
 				}
 			}
 			queryBuilder.
 				AddQuery().
 				AggregateTypes(aggregateType).
-				SequenceGreater(seq).
-				InstanceID(instanceID)
+				CreationDateAfter(creationDate)
+			// SequenceGreater(eventID).
+			InstanceID(instanceID)
 		}
 	}
 
@@ -167,19 +169,19 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	return lastSuccessfulIdx, nil
 }
 
-func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, stmtSeq uint64, instanceID string, sequences currentSequences, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
+func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, stmtSeq uint64, instanceID string, sequences events, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).SetTx(tx)
 	queriesAdded := false
 	for _, aggregateType := range h.aggregates {
 		for _, sequence := range sequences[aggregateType] {
-			if stmtSeq <= sequence.sequence && instanceID == sequence.instanceID {
+			if stmtSeq <= sequence.eventID && instanceID == sequence.instanceID {
 				continue
 			}
 
 			query.
 				AddQuery().
 				AggregateTypes(aggregateType).
-				SequenceGreater(sequence.sequence).
+				SequenceGreater(sequence.eventID).
 				SequenceLess(stmtSeq).
 				InstanceID(sequence.instanceID)
 
@@ -209,7 +211,7 @@ func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, s
 func (h *StatementHandler) executeStmts(
 	tx *sql.Tx,
 	stmts *[]*handler.Statement,
-	sequences currentSequences,
+	sequences events,
 ) int {
 
 	lastSuccessfulIdx := -1
@@ -217,7 +219,7 @@ stmts:
 	for i := 0; i < len(*stmts); i++ {
 		stmt := (*stmts)[i]
 		for _, sequence := range sequences[stmt.AggregateType] {
-			if stmt.Sequence <= sequence.sequence && stmt.InstanceID == sequence.instanceID {
+			if stmt.Sequence <= sequence.eventID && stmt.InstanceID == sequence.instanceID {
 				logging.WithFields("statement", stmt, "currentSequence", sequence).Debug("statement dropped")
 				if i < len(*stmts)-1 {
 					copy((*stmts)[i:], (*stmts)[i+1:])
@@ -226,8 +228,8 @@ stmts:
 				i--
 				continue stmts
 			}
-			if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequence.sequence && stmt.InstanceID == sequence.instanceID {
-				logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "sequence", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequence.sequence).Warn("sequences do not match")
+			if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequence.eventID && stmt.InstanceID == sequence.instanceID {
+				logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "sequence", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequence.eventID).Warn("sequences do not match")
 				break stmts
 			}
 		}
@@ -275,16 +277,16 @@ func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt *handler.Statement) erro
 	return nil
 }
 
-func updateSequences(sequences currentSequences, stmt *handler.Statement) {
+func updateSequences(sequences events, stmt *handler.Statement) {
 	for _, sequence := range sequences[stmt.AggregateType] {
 		if sequence.instanceID == stmt.InstanceID {
-			sequence.sequence = stmt.Sequence
+			sequence.eventID = stmt.Sequence
 			return
 		}
 	}
-	sequences[stmt.AggregateType] = append(sequences[stmt.AggregateType], &instanceSequence{
+	sequences[stmt.AggregateType] = append(sequences[stmt.AggregateType], &instanceEvents{
 		instanceID: stmt.InstanceID,
-		sequence:   stmt.Sequence,
+		eventID:    stmt.Sequence,
 	})
 }
 

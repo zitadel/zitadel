@@ -16,7 +16,6 @@ import (
 
 type MailTemplate struct {
 	AggregateID  string
-	Sequence     uint64
 	CreationDate time.Time
 	ChangeDate   time.Time
 	State        domain.PolicyState
@@ -35,10 +34,6 @@ var (
 	}
 	MailTemplateColInstanceID = Column{
 		name:  projection.MailTemplateInstanceIDCol,
-		table: mailTemplateTable,
-	}
-	MailTemplateColSequence = Column{
-		name:  projection.MailTemplateSequenceCol,
 		table: mailTemplateTable,
 	}
 	MailTemplateColCreationDate = Column{
@@ -108,7 +103,6 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (*MailTemplate, error
 func prepareMailTemplateQuery() (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
 	return sq.Select(
 			MailTemplateColAggregateID.identifier(),
-			MailTemplateColSequence.identifier(),
 			MailTemplateColCreationDate.identifier(),
 			MailTemplateColChangeDate.identifier(),
 			MailTemplateColTemplate.identifier(),
@@ -120,7 +114,6 @@ func prepareMailTemplateQuery() (sq.SelectBuilder, func(*sql.Row) (*MailTemplate
 			policy := new(MailTemplate)
 			err := row.Scan(
 				&policy.AggregateID,
-				&policy.Sequence,
 				&policy.CreationDate,
 				&policy.ChangeDate,
 				&policy.Template,

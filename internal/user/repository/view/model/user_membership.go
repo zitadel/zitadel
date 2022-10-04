@@ -40,13 +40,11 @@ type UserMembershipView struct {
 	ChangeDate        time.Time            `json:"-" gorm:"column:change_date"`
 	ResourceOwner     string               `json:"-" gorm:"column:resource_owner"`
 	ResourceOwnerName string               `json:"-" gorm:"column:resource_owner_name"`
-	Sequence          uint64               `json:"-" gorm:"column:sequence"`
 	InstanceID        string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func (u *UserMembershipView) AppendEvent(event *models.Event) (err error) {
 	u.ChangeDate = event.CreationDate
-	u.Sequence = event.Sequence
 
 	switch eventstore.EventType(event.Type) {
 	case instance.MemberAddedEventType:

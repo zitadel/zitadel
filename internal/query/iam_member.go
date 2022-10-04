@@ -33,10 +33,6 @@ var (
 		name:  projection.MemberChangeDate,
 		table: instanceMemberTable,
 	}
-	InstanceMemberSequence = Column{
-		name:  projection.MemberSequence,
-		table: instanceMemberTable,
-	}
 	InstanceMemberResourceOwner = Column{
 		name:  projection.MemberResourceOwner,
 		table: instanceMemberTable,
@@ -91,7 +87,6 @@ func prepareInstanceMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members,
 	return sq.Select(
 			InstanceMemberCreationDate.identifier(),
 			InstanceMemberChangeDate.identifier(),
-			InstanceMemberSequence.identifier(),
 			InstanceMemberResourceOwner.identifier(),
 			InstanceMemberUserID.identifier(),
 			InstanceMemberRoles.identifier(),
@@ -130,7 +125,6 @@ func prepareInstanceMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members,
 				err := rows.Scan(
 					&member.CreationDate,
 					&member.ChangeDate,
-					&member.Sequence,
 					&member.ResourceOwner,
 					&member.UserID,
 					&member.Roles,

@@ -17,7 +17,6 @@ import (
 
 type LockoutPolicy struct {
 	ID            string
-	Sequence      uint64
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
@@ -39,10 +38,6 @@ var (
 	}
 	LockoutColInstanceID = Column{
 		name:  projection.LockoutPolicyInstanceIDCol,
-		table: lockoutTable,
-	}
-	LockoutColSequence = Column{
-		name:  projection.LockoutPolicySequenceCol,
 		table: lockoutTable,
 	}
 	LockoutColCreationDate = Column{
@@ -124,7 +119,6 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (*LockoutPolicy, err
 func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
 	return sq.Select(
 			LockoutColID.identifier(),
-			LockoutColSequence.identifier(),
 			LockoutColCreationDate.identifier(),
 			LockoutColChangeDate.identifier(),
 			LockoutColResourceOwner.identifier(),
@@ -138,7 +132,6 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 			policy := new(LockoutPolicy)
 			err := row.Scan(
 				&policy.ID,
-				&policy.Sequence,
 				&policy.CreationDate,
 				&policy.ChangeDate,
 				&policy.ResourceOwner,

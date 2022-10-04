@@ -27,7 +27,6 @@ type CustomTexts struct {
 
 type CustomText struct {
 	AggregateID  string
-	Sequence     uint64
 	CreationDate time.Time
 	ChangeDate   time.Time
 
@@ -47,10 +46,6 @@ var (
 	}
 	CustomTextColInstanceID = Column{
 		name:  projection.CustomTextInstanceIDCol,
-		table: customTextTable,
-	}
-	CustomTextColSequence = Column{
-		name:  projection.CustomTextSequenceCol,
 		table: customTextTable,
 	}
 	CustomTextColCreationDate = Column{
@@ -207,7 +202,6 @@ func (q *Queries) readLoginTranslationFile(ctx context.Context, lang string) ([]
 func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts, error)) {
 	return sq.Select(
 			CustomTextColAggregateID.identifier(),
-			CustomTextColSequence.identifier(),
 			CustomTextColCreationDate.identifier(),
 			CustomTextColChangeDate.identifier(),
 			CustomTextColLanguage.identifier(),
@@ -224,7 +218,6 @@ func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts,
 				lang := ""
 				err := rows.Scan(
 					&customText.AggregateID,
-					&customText.Sequence,
 					&customText.CreationDate,
 					&customText.ChangeDate,
 					&lang,
@@ -265,7 +258,6 @@ func CustomTextToDomain(text *CustomText) *domain.CustomText {
 	return &domain.CustomText{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:  text.AggregateID,
-			Sequence:     text.Sequence,
 			CreationDate: text.CreationDate,
 			ChangeDate:   text.ChangeDate,
 		},

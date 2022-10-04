@@ -4,9 +4,6 @@ type Application interface {
 	GetAppID() string
 	GetApplicationName() string
 	GetState() AppState
-	//GetSequence() uint64
-	//GetChangeDate() time.Time
-	//GetResourceOwner() string
 }
 
 type AppState int32

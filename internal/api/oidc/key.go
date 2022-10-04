@@ -29,7 +29,7 @@ const (
 	gracefulPeriod = 10 * time.Minute
 )
 
-//SigningKey wraps the query.PrivateKey to implement the op.SigningKey interface
+// SigningKey wraps the query.PrivateKey to implement the op.SigningKey interface
 type SigningKey struct {
 	algorithm jose.SignatureAlgorithm
 	id        string
@@ -48,7 +48,7 @@ func (s *SigningKey) ID() string {
 	return s.id
 }
 
-//PublicKey wraps the query.PublicKey to implement the op.Key interface
+// PublicKey wraps the query.PublicKey to implement the op.Key interface
 type PublicKey struct {
 	key query.PublicKey
 }
@@ -69,7 +69,7 @@ func (s *PublicKey) ID() string {
 	return s.key.ID()
 }
 
-//KeySet implements the op.Storage interface
+// KeySet implements the op.Storage interface
 func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -87,7 +87,7 @@ func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
 	return keys, err
 }
 
-//SignatureAlgorithms implements the op.Storage interface
+// SignatureAlgorithms implements the op.Storage interface
 func (o *OPStorage) SignatureAlgorithms(ctx context.Context) ([]jose.SignatureAlgorithm, error) {
 	key, err := o.SigningKey(ctx)
 	if err != nil {
@@ -96,7 +96,7 @@ func (o *OPStorage) SignatureAlgorithms(ctx context.Context) ([]jose.SignatureAl
 	return []jose.SignatureAlgorithm{key.SignatureAlgorithm()}, nil
 }
 
-//SigningKey implements the op.Storage interface
+// SigningKey implements the op.Storage interface
 func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err error) {
 	err = retry(func() error {
 		key, err = o.getSigningKey(ctx)
@@ -138,12 +138,12 @@ func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, seq
 	return errors.ThrowInternal(nil, "OIDC-Df1bh", "")
 }
 
-func (o *OPStorage) ensureIsLatestKey(ctx context.Context, sequence uint64) (bool, error) {
-	maxSequence, err := o.getMaxKeySequence(ctx)
+func (o *OPStorage) ensureIsLatestKey(ctx context.Context, creationDate time.Time) (bool, error) {
+	maxCreationDate, err := o.getMaxKeyCreationDate(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence == maxSequence, nil
+	return creationDate == maxCreationDate, nil
 }
 
 func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
@@ -181,9 +181,9 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	return o.command.GenerateSigningKeyPair(setOIDCCtx(ctx), algorithm)
 }
 
-func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
+func (o *OPStorage) getMaxKeyCreationDate(ctx context.Context) (time.Time, error) {
 	return o.eventstore.LatestSequence(ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxCreationDate).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AddQuery().
 			AggregateTypes(keypair.AggregateType).

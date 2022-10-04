@@ -3,21 +3,7 @@ package model
 import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
-
-	"time"
 )
-
-type ExternalIDPView struct {
-	UserID          string
-	IDPConfigID     string
-	ExternalUserID  string
-	IDPName         string
-	UserDisplayName string
-	CreationDate    time.Time
-	ChangeDate      time.Time
-	ResourceOwner   string
-	Sequence        uint64
-}
 
 type ExternalIDPSearchRequest struct {
 	Offset        uint64
@@ -42,15 +28,6 @@ type ExternalIDPSearchQuery struct {
 	Key    ExternalIDPSearchKey
 	Method domain.SearchMethod
 	Value  interface{}
-}
-
-type ExternalIDPSearchResponse struct {
-	Offset      uint64
-	Limit       uint64
-	TotalResult uint64
-	Result      []*ExternalIDPView
-	Sequence    uint64
-	Timestamp   time.Time
 }
 
 func (r *ExternalIDPSearchRequest) EnsureLimit(limit uint64) error {

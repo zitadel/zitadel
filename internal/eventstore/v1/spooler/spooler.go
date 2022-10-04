@@ -205,11 +205,11 @@ func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID s
 }
 
 func HandleError(event *models.Event, failedErr error,
-	latestFailedEvent func(sequence uint64, instanceID string) (*repository.FailedEvent, error),
+	latestFailedEvent func(eventID, instanceID string) (*repository.FailedEvent, error),
 	processFailedEvent func(*repository.FailedEvent) error,
 	processSequence func(*models.Event) error,
 	errorCountUntilSkip uint64) error {
-	failedEvent, err := latestFailedEvent(event.Sequence, event.InstanceID)
+	failedEvent, err := latestFailedEvent(event.ID, event.InstanceID)
 	if err != nil {
 		return err
 	}

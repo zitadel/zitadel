@@ -17,7 +17,6 @@ const (
 	SecretGeneratorColumnAggregateID         = "aggregate_id"
 	SecretGeneratorColumnCreationDate        = "creation_date"
 	SecretGeneratorColumnChangeDate          = "change_date"
-	SecretGeneratorColumnSequence            = "sequence"
 	SecretGeneratorColumnResourceOwner       = "resource_owner"
 	SecretGeneratorColumnInstanceID          = "instance_id"
 	SecretGeneratorColumnLength              = "length"
@@ -42,7 +41,6 @@ func newSecretGeneratorProjection(ctx context.Context, config crdb.StatementHand
 			crdb.NewColumn(SecretGeneratorColumnAggregateID, crdb.ColumnTypeText),
 			crdb.NewColumn(SecretGeneratorColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(SecretGeneratorColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SecretGeneratorColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SecretGeneratorColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SecretGeneratorColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(SecretGeneratorColumnLength, crdb.ColumnTypeInt64),
@@ -95,7 +93,6 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.
 			handler.NewCol(SecretGeneratorColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SecretGeneratorColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(SecretGeneratorColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(SecretGeneratorColumnSequence, e.Sequence()),
 			handler.NewCol(SecretGeneratorColumnLength, e.Length),
 			handler.NewCol(SecretGeneratorColumnExpiry, e.Expiry),
 			handler.NewCol(SecretGeneratorColumnIncludeLowerLetters, e.IncludeLowerLetters),
@@ -113,8 +110,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 	}
 
 	columns := make([]handler.Column, 0, 7)
-	columns = append(columns, handler.NewCol(SecretGeneratorColumnChangeDate, e.CreationDate()),
-		handler.NewCol(SecretGeneratorColumnSequence, e.Sequence()))
+	columns = append(columns, handler.NewCol(SecretGeneratorColumnChangeDate, e.CreationDate()))
 	if e.Length != nil {
 		columns = append(columns, handler.NewCol(SecretGeneratorColumnLength, *e.Length))
 	}

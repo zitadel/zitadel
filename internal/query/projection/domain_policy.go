@@ -19,7 +19,6 @@ const (
 	DomainPolicyIDCol                                     = "id"
 	DomainPolicyCreationDateCol                           = "creation_date"
 	DomainPolicyChangeDateCol                             = "change_date"
-	DomainPolicySequenceCol                               = "sequence"
 	DomainPolicyStateCol                                  = "state"
 	DomainPolicyUserLoginMustBeDomainCol                  = "user_login_must_be_domain"
 	DomainPolicyValidateOrgDomainsCol                     = "validate_org_domains"
@@ -42,7 +41,6 @@ func newDomainPolicyProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(DomainPolicyIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(DomainPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(DomainPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DomainPolicySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(DomainPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(DomainPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(DomainPolicyValidateOrgDomainsCol, crdb.ColumnTypeBool),
@@ -111,7 +109,6 @@ func (p *domainPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 		[]handler.Column{
 			handler.NewCol(DomainPolicyCreationDateCol, policyEvent.CreationDate()),
 			handler.NewCol(DomainPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(DomainPolicySequenceCol, policyEvent.Sequence()),
 			handler.NewCol(DomainPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(DomainPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(DomainPolicyUserLoginMustBeDomainCol, policyEvent.UserLoginMustBeDomain),
@@ -135,7 +132,6 @@ func (p *domainPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 	}
 	cols := []handler.Column{
 		handler.NewCol(DomainPolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(DomainPolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.UserLoginMustBeDomain != nil {
 		cols = append(cols, handler.NewCol(DomainPolicyUserLoginMustBeDomainCol, *policyEvent.UserLoginMustBeDomain))

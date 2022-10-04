@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -75,15 +74,15 @@ func Test_getOperation(t *testing.T) {
 func Test_getField(t *testing.T) {
 	t.Run("all fields", func(t *testing.T) {
 		for field, expected := range map[es_models.Field]string{
-			es_models.Field_AggregateType:  "aggregate_type",
-			es_models.Field_AggregateID:    "aggregate_id",
-			es_models.Field_LatestSequence: "event_sequence",
-			es_models.Field_ResourceOwner:  "resource_owner",
-			es_models.Field_InstanceID:     "instance_id",
-			es_models.Field_EditorService:  "editor_service",
-			es_models.Field_EditorUser:     "editor_user",
-			es_models.Field_EventType:      "event_type",
-			es_models.Field(-1):            "",
+			es_models.Field_AggregateType: "aggregate_type",
+			es_models.Field_AggregateID:   "aggregate_id",
+			// es_models.Field_LatestSequence: "event_sequence",
+			es_models.Field_ResourceOwner: "resource_owner",
+			es_models.Field_InstanceID:    "instance_id",
+			es_models.Field_EditorService: "editor_service",
+			es_models.Field_EditorUser:    "editor_user",
+			es_models.Field_EventType:     "event_type",
+			es_models.Field(-1):           "",
 		} {
 			if got := getField(field); got != expected {
 				t.Errorf("getField() = %v, want %v", got, expected)
@@ -139,16 +138,16 @@ func Test_getCondition(t *testing.T) {
 			args: args{filter: es_models.NewFilter(es_models.Field_AggregateID, "", es_models.Operation_Equals)},
 			want: "aggregate_id = ?",
 		},
-		{
-			name: "greater",
-			args: args{filter: es_models.NewFilter(es_models.Field_LatestSequence, 0, es_models.Operation_Greater)},
-			want: "event_sequence > ?",
-		},
-		{
-			name: "less",
-			args: args{filter: es_models.NewFilter(es_models.Field_LatestSequence, 5000, es_models.Operation_Less)},
-			want: "event_sequence < ?",
-		},
+		// {
+		// 	name: "greater",
+		// 	args: args{filter: es_models.NewFilter(es_models.Field_LatestSequence, 0, es_models.Operation_Greater)},
+		// 	want: "event_sequence > ?",
+		// },
+		// {
+		// 	name: "less",
+		// 	args: args{filter: es_models.NewFilter(es_models.Field_LatestSequence, 5000, es_models.Operation_Less)},
+		// 	want: "event_sequence < ?",
+		// },
 		{
 			name: "in list",
 			args: args{filter: es_models.NewFilter(es_models.Field_AggregateType, []es_models.AggregateType{"movies", "actors"}, es_models.Operation_In)},
@@ -207,7 +206,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "max column",
 			args: args{
-				columns: es_models.Columns_Max_Sequence,
+				columns: es_models.Columns_Max_CreationDate,
 				dest:    new(Sequence),
 			},
 			res: res{
@@ -219,7 +218,7 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "max sequence wrong dest type",
 			args: args{
-				columns: es_models.Columns_Max_Sequence,
+				columns: es_models.Columns_Max_CreationDate,
 				dest:    new(uint64),
 			},
 			res: res{
@@ -227,18 +226,18 @@ func Test_prepareColumns(t *testing.T) {
 				dbErr: errors.IsErrorInvalidArgument,
 			},
 		},
-		{
-			name: "event",
-			args: args{
-				columns: es_models.Columns_Event,
-				dest:    new(es_models.Event),
-			},
-			res: res{
-				query:    "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
-				dbRow:    []interface{}{time.Time{}, es_models.EventType(""), uint64(5), Sequence(0), Data(nil), "", "", "", "", es_models.AggregateType("user"), "hodor", es_models.Version("")},
-				expected: es_models.Event{AggregateID: "hodor", AggregateType: "user", Sequence: 5, Data: make(Data, 0)},
-			},
-		},
+		// {
+		// 	name: "event",
+		// 	args: args{
+		// 		columns: es_models.Columns_Event,
+		// 		dest:    new(es_models.Event),
+		// 	},
+		// 	res: res{
+		// 		query:    "SELECT creation_date, event_type, event_sequence, previous_aggregate_sequence, event_data, editor_service, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events",
+		// 		dbRow:    []interface{}{time.Time{}, es_models.EventType(""), uint64(5), Sequence(0), Data(nil), "", "", "", "", es_models.AggregateType("user"), "hodor", es_models.Version("")},
+		// 		expected: es_models.Event{AggregateID: "hodor", AggregateType: "user", Sequence: 5, Data: make(Data, 0)},
+		// 	},
+		// },
 		{
 			name: "event wrong dest type",
 			args: args{

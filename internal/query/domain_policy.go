@@ -17,7 +17,6 @@ import (
 
 type DomainPolicy struct {
 	ID            string
-	Sequence      uint64
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
@@ -36,10 +35,6 @@ var (
 	}
 	DomainPolicyColID = Column{
 		name:  projection.DomainPolicyIDCol,
-		table: domainPolicyTable,
-	}
-	DomainPolicyColSequence = Column{
-		name:  projection.DomainPolicySequenceCol,
 		table: domainPolicyTable,
 	}
 	DomainPolicyColCreationDate = Column{
@@ -129,7 +124,6 @@ func (q *Queries) DefaultDomainPolicy(ctx context.Context) (*DomainPolicy, error
 func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy, error)) {
 	return sq.Select(
 			DomainPolicyColID.identifier(),
-			DomainPolicyColSequence.identifier(),
 			DomainPolicyColCreationDate.identifier(),
 			DomainPolicyColChangeDate.identifier(),
 			DomainPolicyColResourceOwner.identifier(),
@@ -144,7 +138,6 @@ func prepareDomainPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*DomainPolicy
 			policy := new(DomainPolicy)
 			err := row.Scan(
 				&policy.ID,
-				&policy.Sequence,
 				&policy.CreationDate,
 				&policy.ChangeDate,
 				&policy.ResourceOwner,

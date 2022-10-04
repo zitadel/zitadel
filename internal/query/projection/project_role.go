@@ -17,7 +17,6 @@ const (
 	ProjectRoleColumnKey           = "role_key"
 	ProjectRoleColumnCreationDate  = "creation_date"
 	ProjectRoleColumnChangeDate    = "change_date"
-	ProjectRoleColumnSequence      = "sequence"
 	ProjectRoleColumnResourceOwner = "resource_owner"
 	ProjectRoleColumnInstanceID    = "instance_id"
 	ProjectRoleColumnDisplayName   = "display_name"
@@ -38,7 +37,6 @@ func newProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(ProjectRoleColumnKey, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(ProjectRoleColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ProjectRoleColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ProjectRoleColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnDisplayName, crdb.ColumnTypeText),
@@ -91,7 +89,6 @@ func (p *projectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (
 			handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectRoleColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectRoleColumnDisplayName, e.DisplayName),
 			handler.NewCol(ProjectRoleColumnGroupName, e.Group),
 		},
@@ -107,8 +104,7 @@ func (p *projectRoleProjection) reduceProjectRoleChanged(event eventstore.Event)
 		return crdb.NewNoOpStatement(e), nil
 	}
 	columns := make([]handler.Column, 0, 7)
-	columns = append(columns, handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
-		handler.NewCol(ProjectRoleColumnSequence, e.Sequence()))
+	columns = append(columns, handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()))
 	if e.DisplayName != nil {
 		columns = append(columns, handler.NewCol(ProjectRoleColumnDisplayName, *e.DisplayName))
 	}

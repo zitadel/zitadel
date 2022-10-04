@@ -17,7 +17,6 @@ const (
 	ProjectColumnID                     = "id"
 	ProjectColumnCreationDate           = "creation_date"
 	ProjectColumnChangeDate             = "change_date"
-	ProjectColumnSequence               = "sequence"
 	ProjectColumnState                  = "state"
 	ProjectColumnResourceOwner          = "resource_owner"
 	ProjectColumnInstanceID             = "instance_id"
@@ -41,7 +40,6 @@ func newProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(ProjectColumnID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(ProjectColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ProjectColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ProjectColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(ProjectColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectColumnInstanceID, crdb.ColumnTypeText),
@@ -102,7 +100,6 @@ func (p *projectProjection) reduceProjectAdded(event eventstore.Event) (*handler
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(ProjectColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(ProjectColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectColumnName, e.Name),
 			handler.NewCol(ProjectColumnProjectRoleAssertion, e.ProjectRoleAssertion),
 			handler.NewCol(ProjectColumnProjectRoleCheck, e.ProjectRoleCheck),
@@ -123,8 +120,7 @@ func (p *projectProjection) reduceProjectChanged(event eventstore.Event) (*handl
 	}
 
 	columns := make([]handler.Column, 0, 7)
-	columns = append(columns, handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
-		handler.NewCol(ProjectColumnSequence, e.Sequence()))
+	columns = append(columns, handler.NewCol(ProjectColumnChangeDate, e.CreationDate()))
 	if e.Name != nil {
 		columns = append(columns, handler.NewCol(ProjectColumnName, *e.Name))
 	}
@@ -158,7 +154,6 @@ func (p *projectProjection) reduceProjectDeactivated(event eventstore.Event) (*h
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectColumnState, domain.ProjectStateInactive),
 		},
 		[]handler.Condition{
@@ -176,7 +171,6 @@ func (p *projectProjection) reduceProjectReactivated(event eventstore.Event) (*h
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectColumnState, domain.ProjectStateActive),
 		},
 		[]handler.Condition{

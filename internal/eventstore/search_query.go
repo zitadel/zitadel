@@ -22,16 +22,15 @@ type SearchQueryBuilder struct {
 }
 
 type SearchQuery struct {
-	builder              *SearchQueryBuilder
-	aggregateTypes       []AggregateType
-	aggregateIDs         []string
-	instanceID           string
-	excludedInstanceIDs  []string
-	eventSequenceGreater uint64
-	eventSequenceLess    uint64
-	eventTypes           []EventType
-	eventData            map[string]interface{}
-	creationDateAfter    time.Time
+	builder             *SearchQueryBuilder
+	aggregateTypes      []AggregateType
+	aggregateIDs        []string
+	instanceID          string
+	excludedInstanceIDs []string
+	eventTypes          []EventType
+	eventData           map[string]interface{}
+	creationDateAfter   time.Time
+	creationDateBefore  time.Time
 }
 
 // Columns defines which fields of the event are needed for the query
@@ -40,8 +39,8 @@ type Columns repository.Columns
 const (
 	//ColumnsEvent represents all fields of an event
 	ColumnsEvent Columns = repository.ColumnsEvent
-	// ColumnsMaxSequence represents the latest sequence of the filtered events
-	ColumnsMaxSequence Columns = repository.ColumnsMaxSequence
+	// ColumnsMaxCreationDate represents the latest creation date of the filtered events
+	ColumnsMaxCreationDate Columns = repository.ColumnsMaxCreationDate
 	// ColumnsInstanceIDs represents the instance ids of the filtered events
 	ColumnsInstanceIDs Columns = repository.ColumnsInstanceIDs
 )
@@ -147,18 +146,6 @@ func (query *SearchQuery) AggregateTypes(types ...AggregateType) *SearchQuery {
 	return query
 }
 
-// SequenceGreater filters for events with sequence greater the requested sequence
-func (query *SearchQuery) SequenceGreater(sequence uint64) *SearchQuery {
-	query.eventSequenceGreater = sequence
-	return query
-}
-
-// SequenceLess filters for events with sequence less the requested sequence
-func (query *SearchQuery) SequenceLess(sequence uint64) *SearchQuery {
-	query.eventSequenceLess = sequence
-	return query
-}
-
 // AggregateIDs filters for events with the given aggregate id's
 func (query *SearchQuery) AggregateIDs(ids ...string) *SearchQuery {
 	query.aggregateIDs = ids
@@ -177,9 +164,15 @@ func (query *SearchQuery) ExcludedInstanceID(instanceIDs ...string) *SearchQuery
 	return query
 }
 
-// CreationDateNewer filters for events which happened after the specified time
-func (query *SearchQuery) CreationDateAfter(time time.Time) *SearchQuery {
-	query.creationDateAfter = time
+// CreationDateAfter filters for events which happened after the specified time
+func (query *SearchQuery) CreationDateAfter(t time.Time) *SearchQuery {
+	query.creationDateAfter = t
+	return query
+}
+
+// CreationDateBefore filters for events which happened before the specified time
+func (query *SearchQuery) CreationDateBefore(t time.Time) *SearchQuery {
+	query.creationDateBefore = t
 	return query
 }
 
@@ -202,10 +195,10 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 }
 
 func (query *SearchQuery) matches(event Event) bool {
-	if query.eventSequenceLess > 0 && event.Sequence() >= query.eventSequenceLess {
+	if !query.creationDateBefore.IsZero() && query.creationDateBefore.Before(event.CreationDate()) {
 		return false
 	}
-	if query.eventSequenceGreater > 0 && event.Sequence() <= query.eventSequenceGreater {
+	if !query.creationDateAfter.IsZero() && query.creationDateAfter.After(event.CreationDate()) {
 		return false
 	}
 	if ok := isAggreagteTypes(event.Aggregate(), query.aggregateTypes...); len(query.aggregateTypes) > 0 && !ok {
@@ -238,11 +231,10 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 			query.aggregateIDFilter,
 			query.eventTypeFilter,
 			query.eventDataFilter,
-			query.eventSequenceGreaterFilter,
-			query.eventSequenceLessFilter,
 			query.instanceIDFilter,
 			query.excludedInstanceIDFilter,
 			query.creationDateAfterFilter,
+			query.creationDateBeforeFilter,
 			query.builder.resourceOwnerFilter,
 			query.builder.instanceIDFilter,
 		} {
@@ -303,28 +295,6 @@ func (query *SearchQuery) aggregateTypeFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldAggregateType, aggregateTypes, repository.OperationIn)
 }
 
-func (query *SearchQuery) eventSequenceGreaterFilter() *repository.Filter {
-	if query.eventSequenceGreater == 0 {
-		return nil
-	}
-	sortOrder := repository.OperationGreater
-	if query.builder.desc {
-		sortOrder = repository.OperationLess
-	}
-	return repository.NewFilter(repository.FieldSequence, query.eventSequenceGreater, sortOrder)
-}
-
-func (query *SearchQuery) eventSequenceLessFilter() *repository.Filter {
-	if query.eventSequenceLess == 0 {
-		return nil
-	}
-	sortOrder := repository.OperationLess
-	if query.builder.desc {
-		sortOrder = repository.OperationGreater
-	}
-	return repository.NewFilter(repository.FieldSequence, query.eventSequenceLess, sortOrder)
-}
-
 func (query *SearchQuery) instanceIDFilter() *repository.Filter {
 	if query.instanceID == "" {
 		return nil
@@ -357,7 +327,28 @@ func (query *SearchQuery) creationDateAfterFilter() *repository.Filter {
 	if query.creationDateAfter.IsZero() {
 		return nil
 	}
-	return repository.NewFilter(repository.FieldCreationDate, query.creationDateAfter, repository.OperationGreater)
+
+	// TODO: needeD?
+	sortOrder := repository.OperationGreater
+	if query.builder.desc {
+		sortOrder = repository.OperationLess
+	}
+
+	return repository.NewFilter(repository.FieldCreationDate, query.creationDateAfter, sortOrder)
+}
+
+func (query *SearchQuery) creationDateBeforeFilter() *repository.Filter {
+	if query.creationDateBefore.IsZero() {
+		return nil
+	}
+
+	// TODO: needeD?
+	sortOrder := repository.OperationGreater
+	if query.builder.desc {
+		sortOrder = repository.OperationLess
+	}
+
+	return repository.NewFilter(repository.FieldCreationDate, query.creationDateBefore, sortOrder)
 }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {

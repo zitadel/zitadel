@@ -19,7 +19,6 @@ const (
 	ActionResourceOwnerCol = "resource_owner"
 	ActionInstanceIDCol    = "instance_id"
 	ActionStateCol         = "action_state"
-	ActionSequenceCol      = "sequence"
 	ActionNameCol          = "name"
 	ActionScriptCol        = "script"
 	ActionTimeoutCol       = "timeout"
@@ -42,7 +41,6 @@ func newActionProjection(ctx context.Context, config crdb.StatementHandlerConfig
 			crdb.NewColumn(ActionResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(ActionInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(ActionStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(ActionSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ActionNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(ActionScriptCol, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(ActionTimeoutCol, crdb.ColumnTypeInt64, crdb.Default(0)),
@@ -99,7 +97,6 @@ func (p *actionProjection) reduceActionAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
 			handler.NewCol(ActionResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCol(ActionInstanceIDCol, e.Aggregate().InstanceID),
-			handler.NewCol(ActionSequenceCol, e.Sequence()),
 			handler.NewCol(ActionNameCol, e.Name),
 			handler.NewCol(ActionScriptCol, e.Script),
 			handler.NewCol(ActionTimeoutCol, e.Timeout),
@@ -116,7 +113,6 @@ func (p *actionProjection) reduceActionChanged(event eventstore.Event) (*handler
 	}
 	values := []handler.Column{
 		handler.NewCol(ActionChangeDateCol, e.CreationDate()),
-		handler.NewCol(ActionSequenceCol, e.Sequence()),
 	}
 	if e.Name != nil {
 		values = append(values, handler.NewCol(ActionNameCol, *e.Name))
@@ -148,7 +144,6 @@ func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 		e,
 		[]handler.Column{
 			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
-			handler.NewCol(ActionSequenceCol, e.Sequence()),
 			handler.NewCol(ActionStateCol, domain.ActionStateInactive),
 		},
 		[]handler.Condition{
@@ -166,7 +161,6 @@ func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*han
 		e,
 		[]handler.Column{
 			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
-			handler.NewCol(ActionSequenceCol, e.Sequence()),
 			handler.NewCol(ActionStateCol, domain.ActionStateActive),
 		},
 		[]handler.Condition{

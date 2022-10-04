@@ -50,7 +50,6 @@ type UserView struct {
 	LastLogin          time.Time            `json:"-" gorm:"column:last_login"`
 	LoginNames         database.StringArray `json:"-" gorm:"column:login_names"`
 	PreferredLoginName string               `json:"-" gorm:"column:preferred_login_name"`
-	Sequence           uint64               `json:"-" gorm:"column:sequence"`
 	Type               userType             `json:"-" gorm:"column:user_type"`
 	UserName           string               `json:"userName" gorm:"column:user_name"`
 	InstanceID         string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
@@ -150,7 +149,6 @@ func UserToModel(user *UserView) *model.UserView {
 		LastLogin:          user.LastLogin,
 		PreferredLoginName: user.PreferredLoginName,
 		LoginNames:         user.LoginNames,
-		Sequence:           user.Sequence,
 	}
 	if !user.HumanView.IsZero() {
 		userView.HumanView = &model.HumanView{
@@ -233,7 +231,6 @@ func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mode
 
 func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	u.ChangeDate = event.CreationDate
-	u.Sequence = event.Sequence
 	switch eventstore.EventType(event.Type) {
 	case user.MachineAddedEventType:
 		u.CreationDate = event.CreationDate
@@ -310,14 +307,14 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 	case user.UserV1MFAOTPAddedType,
 		user.HumanMFAOTPAddedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("event", event.ID, "instance", event.InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
 		if u.HumanView == nil {
-			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
+			logging.WithFields("event", event.ID, "instance", event.InstanceID).Warn("event is ignored because human not exists")
 			return errors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateReady)

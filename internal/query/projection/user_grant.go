@@ -20,7 +20,6 @@ const (
 	UserGrantID            = "id"
 	UserGrantCreationDate  = "creation_date"
 	UserGrantChangeDate    = "change_date"
-	UserGrantSequence      = "sequence"
 	UserGrantState         = "state"
 	UserGrantResourceOwner = "resource_owner"
 	UserGrantInstanceID    = "instance_id"
@@ -43,7 +42,6 @@ func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(UserGrantChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(UserGrantSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(UserGrantState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(UserGrantResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantInstanceID, crdb.ColumnTypeText),
@@ -147,7 +145,6 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(UserGrantCreationDate, e.CreationDate()),
 			handler.NewCol(UserGrantChangeDate, e.CreationDate()),
-			handler.NewCol(UserGrantSequence, e.Sequence()),
 			handler.NewCol(UserGrantUserID, e.UserID),
 			handler.NewCol(UserGrantProjectID, e.ProjectID),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
@@ -174,7 +171,6 @@ func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.St
 		[]handler.Column{
 			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
 			handler.NewCol(UserGrantRoles, roles),
-			handler.NewCol(UserGrantSequence, event.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
@@ -208,7 +204,6 @@ func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 		[]handler.Column{
 			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
 			handler.NewCol(UserGrantState, domain.UserGrantStateInactive),
-			handler.NewCol(UserGrantSequence, event.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
@@ -226,7 +221,6 @@ func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 		[]handler.Column{
 			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
-			handler.NewCol(UserGrantSequence, event.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),

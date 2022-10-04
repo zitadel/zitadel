@@ -33,7 +33,6 @@ type MessageTexts struct {
 
 type MessageText struct {
 	AggregateID  string
-	Sequence     uint64
 	CreationDate time.Time
 	ChangeDate   time.Time
 	State        domain.PolicyState
@@ -61,10 +60,6 @@ var (
 	}
 	MessageTextColInstanceID = Column{
 		name:  projection.MessageTextInstanceIDCol,
-		table: messageTextTable,
-	}
-	MessageTextColSequence = Column{
-		name:  projection.MessageTextSequenceCol,
 		table: messageTextTable,
 	}
 	MessageTextColCreationDate = Column{
@@ -224,7 +219,6 @@ func (q *Queries) readNotificationTextMessages(ctx context.Context, language str
 func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
 	return sq.Select(
 			MessageTextColAggregateID.identifier(),
-			MessageTextColSequence.identifier(),
 			MessageTextColCreationDate.identifier(),
 			MessageTextColChangeDate.identifier(),
 			MessageTextColState.identifier(),
@@ -251,7 +245,6 @@ func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, 
 			footer := sql.NullString{}
 			err := row.Scan(
 				&msg.AggregateID,
-				&msg.Sequence,
 				&msg.CreationDate,
 				&msg.ChangeDate,
 				&msg.State,

@@ -19,7 +19,6 @@ const (
 	ComplexityPolicyIDCol            = "id"
 	ComplexityPolicyCreationDateCol  = "creation_date"
 	ComplexityPolicyChangeDateCol    = "change_date"
-	ComplexityPolicySequenceCol      = "sequence"
 	ComplexityPolicyStateCol         = "state"
 	ComplexityPolicyIsDefaultCol     = "is_default"
 	ComplexityPolicyResourceOwnerCol = "resource_owner"
@@ -44,7 +43,6 @@ func newPasswordComplexityProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(ComplexityPolicyIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(ComplexityPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(ComplexityPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ComplexityPolicySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ComplexityPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(ComplexityPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(ComplexityPolicyResourceOwnerCol, crdb.ColumnTypeText),
@@ -115,7 +113,6 @@ func (p *passwordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 		[]handler.Column{
 			handler.NewCol(ComplexityPolicyCreationDateCol, policyEvent.CreationDate()),
 			handler.NewCol(ComplexityPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(ComplexityPolicySequenceCol, policyEvent.Sequence()),
 			handler.NewCol(ComplexityPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(ComplexityPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(ComplexityPolicyMinLengthCol, policyEvent.MinLength),
@@ -141,7 +138,6 @@ func (p *passwordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 	}
 	cols := []handler.Column{
 		handler.NewCol(ComplexityPolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(ComplexityPolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.MinLength != nil {
 		cols = append(cols, handler.NewCol(ComplexityPolicyMinLengthCol, *policyEvent.MinLength))

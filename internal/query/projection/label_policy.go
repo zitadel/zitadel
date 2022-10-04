@@ -19,7 +19,6 @@ const (
 	LabelPolicyIDCol                  = "id"
 	LabelPolicyCreationDateCol        = "creation_date"
 	LabelPolicyChangeDateCol          = "change_date"
-	LabelPolicySequenceCol            = "sequence"
 	LabelPolicyStateCol               = "state"
 	LabelPolicyIsDefaultCol           = "is_default"
 	LabelPolicyResourceOwnerCol       = "resource_owner"
@@ -57,7 +56,6 @@ func newLabelPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LabelPolicyIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LabelPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(LabelPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(LabelPolicySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(LabelPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(LabelPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LabelPolicyResourceOwnerCol, crdb.ColumnTypeText),
@@ -235,7 +233,6 @@ func (p *labelPolicyProjection) reduceAdded(event eventstore.Event) (*handler.St
 		[]handler.Column{
 			handler.NewCol(LabelPolicyCreationDateCol, policyEvent.CreationDate()),
 			handler.NewCol(LabelPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, policyEvent.Sequence()),
 			handler.NewCol(LabelPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
 			handler.NewCol(LabelPolicyIsDefaultCol, isDefault),
@@ -267,7 +264,6 @@ func (p *labelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.
 	}
 	cols := []handler.Column{
 		handler.NewCol(LabelPolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(LabelPolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.PrimaryColor != nil {
 		cols = append(cols, handler.NewCol(LabelPolicyLightPrimaryColorCol, *policyEvent.PrimaryColor))
@@ -339,7 +335,6 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 		},
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(LabelPolicyStateCol, domain.LabelPolicyStateActive),
 			handler.NewCol(LabelPolicyCreationDateCol, nil),
 			handler.NewCol(LabelPolicyResourceOwnerCol, nil),
@@ -365,7 +360,6 @@ func (p *labelPolicyProjection) reduceActivated(event eventstore.Event) (*handle
 		},
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, nil),
-			handler.NewCol(LabelPolicySequenceCol, nil),
 			handler.NewCol(LabelPolicyStateCol, nil),
 			handler.NewCol(LabelPolicyCreationDateCol, nil),
 			handler.NewCol(LabelPolicyResourceOwnerCol, nil),
@@ -415,7 +409,6 @@ func (p *labelPolicyProjection) reduceLogoAdded(event eventstore.Event) (*handle
 		event,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			storeKey,
 		},
 		[]handler.Condition{
@@ -443,7 +436,6 @@ func (p *labelPolicyProjection) reduceLogoRemoved(event eventstore.Event) (*hand
 		event,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(col, nil),
 		},
 		[]handler.Condition{
@@ -471,7 +463,6 @@ func (p *labelPolicyProjection) reduceIconAdded(event eventstore.Event) (*handle
 		event,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			storeKey,
 		},
 		[]handler.Condition{
@@ -499,7 +490,6 @@ func (p *labelPolicyProjection) reduceIconRemoved(event eventstore.Event) (*hand
 		event,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(col, nil),
 		},
 		[]handler.Condition{
@@ -523,7 +513,6 @@ func (p *labelPolicyProjection) reduceFontAdded(event eventstore.Event) (*handle
 		event,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			storeKey,
 		},
 		[]handler.Condition{
@@ -547,7 +536,6 @@ func (p *labelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 		event,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(col, nil),
 		},
 		[]handler.Condition{
@@ -568,7 +556,6 @@ func (p *labelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*ha
 		event,
 		[]handler.Column{
 			handler.NewCol(LabelPolicyChangeDateCol, event.CreationDate()),
-			handler.NewCol(LabelPolicySequenceCol, event.Sequence()),
 			handler.NewCol(LabelPolicyLightLogoURLCol, nil),
 			handler.NewCol(LabelPolicyLightIconURLCol, nil),
 			handler.NewCol(LabelPolicyDarkLogoURLCol, nil),

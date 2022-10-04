@@ -31,7 +31,6 @@ type LabelPolicyView struct {
 
 	CreationDate time.Time
 	ChangeDate   time.Time
-	Sequence     uint64
 }
 
 type LabelPolicySearchRequest struct {
@@ -62,6 +61,5 @@ type LabelPolicySearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*LabelPolicyView
-	Sequence    uint64
 	Timestamp   time.Time
 }

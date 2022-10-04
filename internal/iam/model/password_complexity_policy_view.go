@@ -17,7 +17,6 @@ type PasswordComplexityPolicyView struct {
 
 	CreationDate time.Time
 	ChangeDate   time.Time
-	Sequence     uint64
 }
 
 type PasswordComplexityPolicySearchRequest struct {

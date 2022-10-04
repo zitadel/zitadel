@@ -7,7 +7,7 @@ import (
 type View struct {
 	Database                 string
 	ViewName                 string
-	CurrentSequence          uint64
 	EventTimestamp           time.Time
+	EventID                  string
 	LastSuccessfulSpoolerRun time.Time
 }

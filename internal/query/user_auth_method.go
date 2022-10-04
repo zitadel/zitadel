@@ -41,10 +41,6 @@ var (
 		name:  projection.UserAuthMethodUserIDCol,
 		table: userAuthMethodTable,
 	}
-	UserAuthMethodColumnSequence = Column{
-		name:  projection.UserAuthMethodSequenceCol,
-		table: userAuthMethodTable,
-	}
 	UserAuthMethodColumnName = Column{
 		name:  projection.UserAuthMethodNameCol,
 		table: userAuthMethodTable,
@@ -69,7 +65,6 @@ type AuthMethod struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	State         domain.MFAState
-	Sequence      uint64
 
 	TokenID string
 	Name    string
@@ -200,7 +195,6 @@ func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMeth
 			UserAuthMethodColumnChangeDate.identifier(),
 			UserAuthMethodColumnResourceOwner.identifier(),
 			UserAuthMethodColumnUserID.identifier(),
-			UserAuthMethodColumnSequence.identifier(),
 			UserAuthMethodColumnName.identifier(),
 			UserAuthMethodColumnState.identifier(),
 			UserAuthMethodColumnMethodType.identifier(),
@@ -217,7 +211,6 @@ func prepareUserAuthMethodsQuery() (sq.SelectBuilder, func(*sql.Rows) (*AuthMeth
 					&authMethod.ChangeDate,
 					&authMethod.ResourceOwner,
 					&authMethod.UserID,
-					&authMethod.Sequence,
 					&authMethod.Name,
 					&authMethod.State,
 					&authMethod.Type,

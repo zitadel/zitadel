@@ -5,26 +5,13 @@ import (
 	"time"
 )
 
-//Event represents all information about a manipulation of an aggregate
+// Event represents all information about a manipulation of an aggregate
 type Event struct {
 	//ID is a generated uuid for this event
 	ID string
 
-	//Sequence is the sequence of the event
-	Sequence uint64
-
-	//PreviousAggregateSequence is the sequence of the previous sequence of the aggregate (e.g. org.250989)
-	// if it's 0 then it's the first event of this aggregate
-	PreviousAggregateSequence uint64
-
-	//PreviousAggregateTypeSequence is the sequence of the previous sequence of the aggregate root (e.g. org)
-	// the first event of the aggregate has previous aggregate root sequence 0
-	PreviousAggregateTypeSequence uint64
-
 	//CreationDate is the time the event is created
-	// it's used for human readability.
-	// Don't use it for event ordering,
-	// time drifts in different services could cause integrity problems
+	// it's used for human readability AND event ordering
 	CreationDate time.Time
 
 	//Type describes the cause of the event (e.g. user.added)
@@ -61,8 +48,8 @@ type Event struct {
 	InstanceID string
 }
 
-//EventType is the description of the change
+// EventType is the description of the change
 type EventType string
 
-//AggregateType is the object name
+// AggregateType is the object name
 type AggregateType string

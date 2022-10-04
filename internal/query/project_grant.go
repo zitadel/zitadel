@@ -45,10 +45,6 @@ var (
 		name:  projection.ProjectGrantColumnState,
 		table: projectGrantsTable,
 	}
-	ProjectGrantColumnSequence = Column{
-		name:  projection.ProjectGrantColumnSequence,
-		table: projectGrantsTable,
-	}
 	ProjectGrantColumnProjectID = Column{
 		name:  projection.ProjectGrantColumnProjectID,
 		table: projectGrantsTable,
@@ -87,7 +83,6 @@ type ProjectGrant struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	State         domain.ProjectGrantState
-	Sequence      uint64
 
 	ProjectName       string
 	GrantedOrgID      string
@@ -249,7 +244,6 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 			ProjectGrantColumnChangeDate.identifier(),
 			ProjectGrantColumnResourceOwner.identifier(),
 			ProjectGrantColumnState.identifier(),
-			ProjectGrantColumnSequence.identifier(),
 			ProjectColumnName.identifier(),
 			ProjectGrantColumnGrantedOrgID.identifier(),
 			ProjectGrantColumnGrantedOrgName.identifier(),
@@ -273,7 +267,6 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 				&grant.ChangeDate,
 				&grant.ResourceOwner,
 				&grant.State,
-				&grant.Sequence,
 				&projectName,
 				&grant.GrantedOrgID,
 				&orgName,
@@ -307,7 +300,6 @@ func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGra
 			ProjectGrantColumnChangeDate.identifier(),
 			ProjectGrantColumnResourceOwner.identifier(),
 			ProjectGrantColumnState.identifier(),
-			ProjectGrantColumnSequence.identifier(),
 			ProjectColumnName.identifier(),
 			ProjectGrantColumnGrantedOrgID.identifier(),
 			ProjectGrantColumnGrantedOrgName.identifier(),
@@ -335,7 +327,6 @@ func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGra
 					&grant.ChangeDate,
 					&grant.ResourceOwner,
 					&grant.State,
-					&grant.Sequence,
 					&projectName,
 					&grant.GrantedOrgID,
 					&orgName,

@@ -39,7 +39,6 @@ type RefreshTokenView struct {
 	AuthTime              time.Time            `json:"authTime" gorm:"column:auth_time"`
 	IdleExpiration        time.Time            `json:"-" gorm:"column:idle_expiration"`
 	Expiration            time.Time            `json:"-" gorm:"column:expiration"`
-	Sequence              uint64               `json:"-" gorm:"column:sequence"`
 	InstanceID            string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
@@ -67,7 +66,6 @@ func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenVie
 		AuthTime:              token.AuthTime,
 		IdleExpiration:        token.IdleExpiration,
 		Expiration:            token.Expiration,
-		Sequence:              token.Sequence,
 	}
 }
 
@@ -102,7 +100,6 @@ func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event *es_models.Event) (
 
 func (t *RefreshTokenView) AppendEvent(event *es_models.Event) error {
 	t.ChangeDate = event.CreationDate
-	t.Sequence = event.Sequence
 	switch eventstore.EventType(event.Type) {
 	case user_repo.HumanRefreshTokenAddedType:
 		t.setRootData(event)

@@ -21,7 +21,6 @@ type RefreshTokenView struct {
 	IdleExpiration        time.Time
 	Expiration            time.Time
 	Scopes                []string
-	Sequence              uint64
 	Token                 string
 }
 
@@ -56,7 +55,6 @@ type RefreshTokenSearchResponse struct {
 	Offset      uint64
 	Limit       uint64
 	TotalResult uint64
-	Sequence    uint64
 	Timestamp   time.Time
 	Result      []*RefreshTokenView
 }

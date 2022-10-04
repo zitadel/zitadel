@@ -37,10 +37,6 @@ var (
 		name:  projection.OIDCSettingsColumnInstanceID,
 		table: oidcSettingsTable,
 	}
-	OIDCSettingsColumnSequence = Column{
-		name:  projection.OIDCSettingsColumnSequence,
-		table: oidcSettingsTable,
-	}
 	OIDCSettingsColumnAccessTokenLifetime = Column{
 		name:  projection.OIDCSettingsColumnAccessTokenLifetime,
 		table: oidcSettingsTable,
@@ -64,7 +60,6 @@ type OIDCSettings struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 
 	AccessTokenLifetime        time.Duration
 	IdTokenLifetime            time.Duration
@@ -92,7 +87,6 @@ func prepareOIDCSettingsQuery() (sq.SelectBuilder, func(*sql.Row) (*OIDCSettings
 			OIDCSettingsColumnCreationDate.identifier(),
 			OIDCSettingsColumnChangeDate.identifier(),
 			OIDCSettingsColumnResourceOwner.identifier(),
-			OIDCSettingsColumnSequence.identifier(),
 			OIDCSettingsColumnAccessTokenLifetime.identifier(),
 			OIDCSettingsColumnIdTokenLifetime.identifier(),
 			OIDCSettingsColumnRefreshTokenIdleExpiration.identifier(),
@@ -105,7 +99,6 @@ func prepareOIDCSettingsQuery() (sq.SelectBuilder, func(*sql.Row) (*OIDCSettings
 				&oidcSettings.CreationDate,
 				&oidcSettings.ChangeDate,
 				&oidcSettings.ResourceOwner,
-				&oidcSettings.Sequence,
 				&oidcSettings.AccessTokenLifetime,
 				&oidcSettings.IdTokenLifetime,
 				&oidcSettings.RefreshTokenIdleExpiration,

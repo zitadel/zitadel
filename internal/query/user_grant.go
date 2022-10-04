@@ -19,7 +19,6 @@ type UserGrant struct {
 	ID           string
 	CreationDate time.Time
 	ChangeDate   time.Time
-	Sequence     uint64
 	Roles        database.StringArray
 	GrantID      string
 	State        domain.UserGrantState
@@ -165,10 +164,6 @@ var (
 		name:  projection.UserGrantChangeDate,
 		table: userGrantTable,
 	}
-	UserGrantSequence = Column{
-		name:  projection.UserGrantSequence,
-		table: userGrantTable,
-	}
 	UserGrantUserID = Column{
 		name:  projection.UserGrantUserID,
 		table: userGrantTable,
@@ -245,7 +240,6 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			UserGrantID.identifier(),
 			UserGrantCreationDate.identifier(),
 			UserGrantChangeDate.identifier(),
-			UserGrantSequence.identifier(),
 			UserGrantGrantID.identifier(),
 			UserGrantRoles.identifier(),
 			UserGrantState.identifier(),
@@ -301,7 +295,6 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				&g.ID,
 				&g.CreationDate,
 				&g.ChangeDate,
-				&g.Sequence,
 				&g.GrantID,
 				&g.Roles,
 				&g.State,
@@ -353,7 +346,6 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			UserGrantID.identifier(),
 			UserGrantCreationDate.identifier(),
 			UserGrantChangeDate.identifier(),
-			UserGrantSequence.identifier(),
 			UserGrantGrantID.identifier(),
 			UserGrantRoles.identifier(),
 			UserGrantState.identifier(),
@@ -414,7 +406,6 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 					&g.ID,
 					&g.CreationDate,
 					&g.ChangeDate,
-					&g.Sequence,
 					&g.GrantID,
 					&g.Roles,
 					&g.State,

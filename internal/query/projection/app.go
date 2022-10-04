@@ -26,7 +26,6 @@ const (
 	AppColumnResourceOwner = "resource_owner"
 	AppColumnInstanceID    = "instance_id"
 	AppColumnState         = "state"
-	AppColumnSequence      = "sequence"
 
 	appAPITableSuffix              = "api_configs"
 	AppAPIConfigColumnAppID        = "app_id"
@@ -81,7 +80,6 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
-			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
 		},
 			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
 			crdb.WithIndex(crdb.NewIndex("app3_project_id_idx", []string{AppColumnProjectID})),
@@ -223,7 +221,6 @@ func (p *appProjection) reduceAppAdded(event eventstore.Event) (*handler.Stateme
 			handler.NewCol(AppColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(AppColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(AppColumnState, domain.AppStateActive),
-			handler.NewCol(AppColumnSequence, e.Sequence()),
 		},
 	), nil
 }
@@ -241,7 +238,6 @@ func (p *appProjection) reduceAppChanged(event eventstore.Event) (*handler.State
 		[]handler.Column{
 			handler.NewCol(AppColumnName, e.Name),
 			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-			handler.NewCol(AppColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
@@ -260,7 +256,6 @@ func (p *appProjection) reduceAppDeactivated(event eventstore.Event) (*handler.S
 		[]handler.Column{
 			handler.NewCol(AppColumnState, domain.AppStateInactive),
 			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-			handler.NewCol(AppColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
@@ -279,7 +274,6 @@ func (p *appProjection) reduceAppReactivated(event eventstore.Event) (*handler.S
 		[]handler.Column{
 			handler.NewCol(AppColumnState, domain.AppStateActive),
 			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-			handler.NewCol(AppColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
@@ -336,7 +330,6 @@ func (p *appProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-				handler.NewCol(AppColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
@@ -374,7 +367,6 @@ func (p *appProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-				handler.NewCol(AppColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
@@ -404,7 +396,6 @@ func (p *appProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-				handler.NewCol(AppColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
@@ -447,7 +438,6 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-				handler.NewCol(AppColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
@@ -524,7 +514,6 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-				handler.NewCol(AppColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
@@ -554,7 +543,6 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-				handler.NewCol(AppColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
@@ -584,7 +572,6 @@ func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-				handler.NewCol(AppColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),
@@ -628,7 +615,6 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
-				handler.NewCol(AppColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppColumnID, e.AppID),

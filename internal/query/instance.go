@@ -39,10 +39,6 @@ var (
 		name:  projection.InstanceColumnChangeDate,
 		table: instanceTable,
 	}
-	InstanceColumnSequence = Column{
-		name:  projection.InstanceColumnSequence,
-		table: instanceTable,
-	}
 	InstanceColumnDefaultOrgID = Column{
 		name:  projection.InstanceColumnDefaultOrgID,
 		table: instanceTable,
@@ -69,7 +65,6 @@ type Instance struct {
 	ID           string
 	ChangeDate   time.Time
 	CreationDate time.Time
-	Sequence     uint64
 	Name         string
 
 	DefaultOrgID string
@@ -207,7 +202,6 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
-			InstanceColumnSequence.identifier(),
 			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
 			InstanceColumnConsoleID.identifier(),
@@ -222,7 +216,6 @@ func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Insta
 				&instance.ID,
 				&instance.CreationDate,
 				&instance.ChangeDate,
-				&instance.Sequence,
 				&instance.DefaultOrgID,
 				&instance.IAMProjectID,
 				&instance.ConsoleID,
@@ -254,7 +247,6 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 				instanceFilterIDColumn.identifier(),
 				InstanceColumnCreationDate.identifier(),
 				InstanceColumnChangeDate.identifier(),
-				InstanceColumnSequence.identifier(),
 				InstanceColumnName.identifier(),
 				InstanceColumnDefaultOrgID.identifier(),
 				InstanceColumnProjectID.identifier(),
@@ -266,7 +258,6 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 				InstanceDomainIsGeneratedCol.identifier(),
 				InstanceDomainCreationDateCol.identifier(),
 				InstanceDomainChangeDateCol.identifier(),
-				InstanceDomainSequenceCol.identifier(),
 			).FromSelect(builder, InstancesFilterTableAlias).
 				LeftJoin(join(InstanceColumnID, instanceFilterIDColumn)).
 				LeftJoin(join(InstanceDomainInstanceIDCol, instanceFilterIDColumn)).
@@ -285,14 +276,12 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 					isGenerated  sql.NullBool
 					changeDate   sql.NullTime
 					creationDate sql.NullTime
-					sequence     sql.NullInt64
 				)
 				err := rows.Scan(
 					&count,
 					&instance.ID,
 					&instance.CreationDate,
 					&instance.ChangeDate,
-					&instance.Sequence,
 					&instance.Name,
 					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
@@ -304,7 +293,6 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 					&isGenerated,
 					&changeDate,
 					&creationDate,
-					&sequence,
 				)
 				if err != nil {
 					return nil, err
@@ -316,7 +304,6 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 				instanceDomain := &InstanceDomain{
 					CreationDate: creationDate.Time,
 					ChangeDate:   changeDate.Time,
-					Sequence:     uint64(sequence.Int64),
 					Domain:       domain.String,
 					IsPrimary:    isPrimary.Bool,
 					IsGenerated:  isGenerated.Bool,
@@ -349,7 +336,6 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 			InstanceColumnID.identifier(),
 			InstanceColumnCreationDate.identifier(),
 			InstanceColumnChangeDate.identifier(),
-			InstanceColumnSequence.identifier(),
 			InstanceColumnName.identifier(),
 			InstanceColumnDefaultOrgID.identifier(),
 			InstanceColumnProjectID.identifier(),
@@ -361,7 +347,6 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 			InstanceDomainIsGeneratedCol.identifier(),
 			InstanceDomainCreationDateCol.identifier(),
 			InstanceDomainChangeDateCol.identifier(),
-			InstanceDomainSequenceCol.identifier(),
 		).
 			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
@@ -379,13 +364,11 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					isGenerated  sql.NullBool
 					changeDate   sql.NullTime
 					creationDate sql.NullTime
-					sequence     sql.NullInt64
 				)
 				err := rows.Scan(
 					&instance.ID,
 					&instance.CreationDate,
 					&instance.ChangeDate,
-					&instance.Sequence,
 					&instance.Name,
 					&instance.DefaultOrgID,
 					&instance.IAMProjectID,
@@ -397,7 +380,6 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					&isGenerated,
 					&changeDate,
 					&creationDate,
-					&sequence,
 				)
 				if err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
@@ -408,7 +390,6 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 				instance.Domains = append(instance.Domains, &InstanceDomain{
 					CreationDate: creationDate.Time,
 					ChangeDate:   changeDate.Time,
-					Sequence:     uint64(sequence.Int64),
 					Domain:       domain.String,
 					IsPrimary:    isPrimary.Bool,
 					IsGenerated:  isGenerated.Bool,

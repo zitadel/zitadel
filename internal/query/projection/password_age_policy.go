@@ -19,7 +19,6 @@ const (
 	AgePolicyIDCol             = "id"
 	AgePolicyCreationDateCol   = "creation_date"
 	AgePolicyChangeDateCol     = "change_date"
-	AgePolicySequenceCol       = "sequence"
 	AgePolicyStateCol          = "state"
 	AgePolicyIsDefaultCol      = "is_default"
 	AgePolicyResourceOwnerCol  = "resource_owner"
@@ -41,7 +40,6 @@ func newPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(AgePolicyIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AgePolicyCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(AgePolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(AgePolicySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(AgePolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AgePolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(AgePolicyResourceOwnerCol, crdb.ColumnTypeText),
@@ -109,7 +107,6 @@ func (p *passwordAgeProjection) reduceAdded(event eventstore.Event) (*handler.St
 		[]handler.Column{
 			handler.NewCol(AgePolicyCreationDateCol, policyEvent.CreationDate()),
 			handler.NewCol(AgePolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(AgePolicySequenceCol, policyEvent.Sequence()),
 			handler.NewCol(AgePolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(AgePolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(AgePolicyExpireWarnDaysCol, policyEvent.ExpireWarnDays),
@@ -132,7 +129,6 @@ func (p *passwordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 	}
 	cols := []handler.Column{
 		handler.NewCol(AgePolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(AgePolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.ExpireWarnDays != nil {
 		cols = append(cols, handler.NewCol(AgePolicyExpireWarnDaysCol, *policyEvent.ExpireWarnDays))

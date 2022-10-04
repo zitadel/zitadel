@@ -67,10 +67,6 @@ func (r *ProjectGrantViewSearchRequest) GetSearchQuery(key ProjectGrantViewSearc
 	return -1, nil
 }
 
-func (r *ProjectGrantViewSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: orgID})
-}
-
 func (r *ProjectGrantViewSearchRequest) AppendNotMyOrgQuery(orgID string) {
 	r.Queries = append(r.Queries, &ProjectGrantViewSearchQuery{Key: GrantedProjectSearchKeyOrgID, Method: domain.SearchMethodNotEquals, Value: orgID})
 }

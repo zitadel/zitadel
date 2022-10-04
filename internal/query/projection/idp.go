@@ -25,7 +25,6 @@ const (
 	IDPIDCol            = "id"
 	IDPCreationDateCol  = "creation_date"
 	IDPChangeDateCol    = "change_date"
-	IDPSequenceCol      = "sequence"
 	IDPResourceOwnerCol = "resource_owner"
 	IDPInstanceIDCol    = "instance_id"
 	IDPStateCol         = "state"
@@ -67,7 +66,6 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(IDPChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(IDPSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(IDPResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPStateCol, crdb.ColumnTypeEnum),
@@ -221,7 +219,6 @@ func (p *idpProjection) reduceIDPAdded(event eventstore.Event) (*handler.Stateme
 			handler.NewCol(IDPIDCol, idpEvent.ConfigID),
 			handler.NewCol(IDPCreationDateCol, idpEvent.CreationDate()),
 			handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-			handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 			handler.NewCol(IDPResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 			handler.NewCol(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
@@ -260,7 +257,6 @@ func (p *idpProjection) reduceIDPChanged(event eventstore.Event) (*handler.State
 
 	cols = append(cols,
 		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 	)
 
 	return crdb.NewUpdateStatement(
@@ -289,7 +285,6 @@ func (p *idpProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.S
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateInactive),
 			handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-			handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
@@ -314,7 +309,6 @@ func (p *idpProjection) reduceIDPReactivated(event eventstore.Event) (*handler.S
 		[]handler.Column{
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
 			handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-			handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(IDPIDCol, idpEvent.ConfigID),
@@ -358,7 +352,6 @@ func (p *idpProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTypeCol, domain.IDPConfigTypeOIDC),
 			},
 			[]handler.Condition{
@@ -430,7 +423,6 @@ func (p *idpProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
@@ -463,7 +455,6 @@ func (p *idpProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.S
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTypeCol, domain.IDPConfigTypeJWT),
 			},
 			[]handler.Condition{
@@ -520,7 +511,6 @@ func (p *idpProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),

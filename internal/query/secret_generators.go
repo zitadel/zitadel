@@ -45,10 +45,6 @@ var (
 		name:  projection.SecretGeneratorColumnResourceOwner,
 		table: secretGeneratorsTable,
 	}
-	SecretGeneratorColumnSequence = Column{
-		name:  projection.SecretGeneratorColumnSequence,
-		table: secretGeneratorsTable,
-	}
 	SecretGeneratorColumnLength = Column{
 		name:  projection.SecretGeneratorColumnLength,
 		table: secretGeneratorsTable,
@@ -85,7 +81,6 @@ type SecretGenerator struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 
 	GeneratorType       domain.SecretGeneratorType
 	Length              uint
@@ -188,7 +183,6 @@ func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGen
 			SecretGeneratorColumnCreationDate.identifier(),
 			SecretGeneratorColumnChangeDate.identifier(),
 			SecretGeneratorColumnResourceOwner.identifier(),
-			SecretGeneratorColumnSequence.identifier(),
 			SecretGeneratorColumnLength.identifier(),
 			SecretGeneratorColumnExpiry.identifier(),
 			SecretGeneratorColumnIncludeLowerLetters.identifier(),
@@ -204,7 +198,6 @@ func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGen
 				&secretGenerator.CreationDate,
 				&secretGenerator.ChangeDate,
 				&secretGenerator.ResourceOwner,
-				&secretGenerator.Sequence,
 				&secretGenerator.Length,
 				&secretGenerator.Expiry,
 				&secretGenerator.IncludeLowerLetters,
@@ -229,7 +222,6 @@ func prepareSecretGeneratorsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SecretG
 			SecretGeneratorColumnCreationDate.identifier(),
 			SecretGeneratorColumnChangeDate.identifier(),
 			SecretGeneratorColumnResourceOwner.identifier(),
-			SecretGeneratorColumnSequence.identifier(),
 			SecretGeneratorColumnLength.identifier(),
 			SecretGeneratorColumnExpiry.identifier(),
 			SecretGeneratorColumnIncludeLowerLetters.identifier(),
@@ -249,7 +241,6 @@ func prepareSecretGeneratorsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SecretG
 					&secretGenerator.CreationDate,
 					&secretGenerator.ChangeDate,
 					&secretGenerator.ResourceOwner,
-					&secretGenerator.Sequence,
 					&secretGenerator.Length,
 					&secretGenerator.Expiry,
 					&secretGenerator.IncludeLowerLetters,

@@ -1,9 +1,9 @@
 package model
 
 type FailedEvent struct {
-	Database       string
-	ViewName       string
-	FailedSequence uint64
-	FailureCount   uint64
-	ErrMsg         string
+	Database     string
+	ViewName     string
+	EventID      string
+	FailureCount uint64
+	ErrMsg       string
 }

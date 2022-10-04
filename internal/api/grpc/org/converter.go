@@ -67,7 +67,6 @@ func OrgViewToPb(org *query.Org) *org_pb.Org {
 		Name:          org.Name,
 		PrimaryDomain: org.Domain,
 		Details: object.ToViewDetailsPb(
-			org.Sequence,
 			org.CreationDate,
 			org.ChangeDate,
 			org.ResourceOwner,
@@ -88,7 +87,7 @@ func OrgToPb(org *query.Org) *org_pb.Org {
 		Id:            org.ID,
 		Name:          org.Name,
 		PrimaryDomain: org.Domain,
-		Details:       object.ToViewDetailsPb(org.Sequence, org.CreationDate, org.ChangeDate, org.ResourceOwner),
+		Details:       object.ToViewDetailsPb(org.CreationDate, org.ChangeDate, org.ResourceOwner),
 		State:         OrgStateToPb(org.State),
 	}
 }
@@ -140,7 +139,6 @@ func DomainToPb(d *query.Domain) *org_pb.Domain {
 		IsPrimary:      d.IsPrimary,
 		ValidationType: DomainValidationTypeFromModel(d.ValidationType),
 		Details: object.ToViewDetailsPb(
-			d.Sequence,
 			d.CreationDate,
 			d.ChangeDate,
 			d.OrgID,

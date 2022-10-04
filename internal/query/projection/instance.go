@@ -21,7 +21,6 @@ const (
 	InstanceColumnProjectID       = "iam_project_id"
 	InstanceColumnConsoleID       = "console_client_id"
 	InstanceColumnConsoleAppID    = "console_app_id"
-	InstanceColumnSequence        = "sequence"
 	InstanceColumnDefaultLanguage = "default_language"
 )
 
@@ -43,7 +42,6 @@ func newInstanceProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(InstanceColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(InstanceColumnConsoleAppID, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(InstanceColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(InstanceColumnDefaultLanguage, crdb.ColumnTypeText, crdb.Default("")),
 		},
 			crdb.NewPrimaryKey(InstanceColumnID),
@@ -98,7 +96,6 @@ func (p *instanceProjection) reduceInstanceAdded(event eventstore.Event) (*handl
 			handler.NewCol(InstanceColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(InstanceColumnCreationDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
-			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnName, e.Name),
 		},
 	), nil
@@ -114,7 +111,6 @@ func (p *instanceProjection) reduceInstanceChanged(event eventstore.Event) (*han
 		[]handler.Column{
 			handler.NewCol(InstanceColumnName, e.Name),
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
-			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
@@ -131,7 +127,6 @@ func (p *instanceProjection) reduceDefaultOrgSet(event eventstore.Event) (*handl
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
-			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnDefaultOrgID, e.OrgID),
 		},
 		[]handler.Condition{
@@ -149,7 +144,6 @@ func (p *instanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
-			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnProjectID, e.ProjectID),
 		},
 		[]handler.Condition{
@@ -167,7 +161,6 @@ func (p *instanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
-			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnConsoleID, e.ClientID),
 			handler.NewCol(InstanceColumnConsoleAppID, e.AppID),
 		},
@@ -186,7 +179,6 @@ func (p *instanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
-			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnDefaultLanguage, e.Language.String()),
 		},
 		[]handler.Condition{

@@ -13,10 +13,10 @@ import (
 
 const (
 	failedEventsColumnProjectionName = "projection_name"
-	failedEventsColumnFailedSequence = "failed_sequence"
 	failedEventsColumnFailureCount   = "failure_count"
 	failedEventsColumnError          = "error"
 	failedEventsColumnInstanceID     = "instance_id"
+	failedeventsColumnEventID        = "event_id"
 )
 
 var (
@@ -25,10 +25,6 @@ var (
 	}
 	FailedEventsColumnProjectionName = Column{
 		name:  failedEventsColumnProjectionName,
-		table: failedEventsTable,
-	}
-	FailedEventsColumnFailedSequence = Column{
-		name:  failedEventsColumnFailedSequence,
 		table: failedEventsTable,
 	}
 	FailedEventsColumnFailureCount = Column{
@@ -43,6 +39,10 @@ var (
 		name:  failedEventsColumnInstanceID,
 		table: failedEventsTable,
 	}
+	FailedEventsColumnEventID = Column{
+		name:  failedeventsColumnEventID,
+		table: failedEventsTable,
+	}
 )
 
 type FailedEvents struct {
@@ -52,9 +52,9 @@ type FailedEvents struct {
 
 type FailedEvent struct {
 	ProjectionName string
-	FailedSequence uint64
 	FailureCount   uint64
 	Error          string
+	EventID        string
 }
 
 type FailedEventSearchQueries struct {
@@ -76,11 +76,11 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 	return scan(rows)
 }
 
-func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName string, sequence uint64) (err error) {
+func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName, eventID string) (err error) {
 	stmt, args, err := sq.Delete(projection.FailedEventsTable).
 		Where(sq.Eq{
 			failedEventsColumnProjectionName: projectionName,
-			failedEventsColumnFailedSequence: sequence,
+			failedeventsColumnEventID:        eventID,
 		}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -118,7 +118,7 @@ func (q *FailedEventSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 func prepareFailedEventQuery(instanceIDs ...string) (sq.SelectBuilder, func(*sql.Row) (*FailedEvent, error)) {
 	return sq.Select(
 			FailedEventsColumnProjectionName.identifier(),
-			FailedEventsColumnFailedSequence.identifier(),
+			FailedEventsColumnEventID.identifier(),
 			FailedEventsColumnFailureCount.identifier(),
 			FailedEventsColumnError.identifier()).
 			From(failedEventsTable.identifier()).PlaceholderFormat(sq.Dollar),
@@ -126,7 +126,7 @@ func prepareFailedEventQuery(instanceIDs ...string) (sq.SelectBuilder, func(*sql
 			p := new(FailedEvent)
 			err := row.Scan(
 				&p.ProjectionName,
-				&p.FailedSequence,
+				&p.EventID,
 				&p.FailureCount,
 				&p.Error,
 			)
@@ -143,7 +143,7 @@ func prepareFailedEventQuery(instanceIDs ...string) (sq.SelectBuilder, func(*sql
 func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvents, error)) {
 	return sq.Select(
 			FailedEventsColumnProjectionName.identifier(),
-			FailedEventsColumnFailedSequence.identifier(),
+			FailedEventsColumnEventID.identifier(),
 			FailedEventsColumnFailureCount.identifier(),
 			FailedEventsColumnError.identifier(),
 			countColumn.identifier()).
@@ -155,7 +155,7 @@ func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvent
 				failedEvent := new(FailedEvent)
 				err := rows.Scan(
 					&failedEvent.ProjectionName,
-					&failedEvent.FailedSequence,
+					&failedEvent.EventID,
 					&failedEvent.FailureCount,
 					&failedEvent.Error,
 					&count,

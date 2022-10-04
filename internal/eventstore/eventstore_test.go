@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
@@ -688,22 +689,16 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 }
 
 type testRepo struct {
-	events    []*repository.Event
-	sequence  uint64
-	instances []string
-	err       error
-	t         *testing.T
+	events       []*repository.Event
+	creationDate time.Time
+	instances    []string
+	err          error
+	t            *testing.T
 }
 
 func (repo *testRepo) Health(ctx context.Context) error {
 	return nil
 }
-
-func (repo *testRepo) CreateInstance(ctx context.Context, instance string) error {
-	return nil
-}
-
-func (repo *testRepo) Step20(context.Context, uint64) error { return nil }
 
 func (repo *testRepo) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	if repo.err != nil {
@@ -729,11 +724,11 @@ func (repo *testRepo) Filter(ctx context.Context, searchQuery *repository.Search
 	return repo.events, nil
 }
 
-func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *repository.SearchQuery) (uint64, error) {
+func (repo *testRepo) LatestCreationDate(ctx context.Context, queryFactory *repository.SearchQuery) (time.Time, error) {
 	if repo.err != nil {
-		return 0, repo.err
+		return time.Time{}, repo.err
 	}
-	return repo.sequence, nil
+	return repo.creationDate, nil
 }
 
 func (repo *testRepo) InstanceIDs(ctx context.Context, queryFactory *repository.SearchQuery) ([]string, error) {
@@ -1145,7 +1140,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 	}
 }
 
-func TestEventstore_LatestSequence(t *testing.T) {
+func TestEventstore_LatestCreationDate(t *testing.T) {
 	type args struct {
 		query *SearchQueryBuilder
 	}
@@ -1174,7 +1169,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxCreationDate,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1197,7 +1192,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxCreationDate,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1220,7 +1215,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsMaxSequence,
+					columns: repository.ColumnsMaxCreationDate,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1231,8 +1226,8 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			},
 			fields: fields{
 				repo: &testRepo{
-					sequence: 50,
-					t:        t,
+					// sequence: 50,
+					t: t,
 				},
 			},
 			res: res{
@@ -1246,7 +1241,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 				repo: tt.fields.repo,
 			}
 
-			_, err := es.LatestSequence(context.Background(), tt.args.query)
+			_, err := es.LatestCreationDate(context.Background(), tt.args.query)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
@@ -1498,9 +1493,9 @@ func compareEvents(t *testing.T, want, got *repository.Event) {
 	if want.Version != got.Version {
 		t.Errorf("wrong version got %q want %q", got.Version, want.Version)
 	}
-	if want.PreviousAggregateSequence != got.PreviousAggregateSequence {
-		t.Errorf("wrong previous sequence got %d want %d", got.PreviousAggregateSequence, want.PreviousAggregateSequence)
-	}
+	// if want.PreviousAggregateSequence != got.PreviousAggregateSequence {
+	// 	t.Errorf("wrong previous sequence got %d want %d", got.PreviousAggregateSequence, want.PreviousAggregateSequence)
+	// }
 }
 
 func TestEventstore_mapEvents(t *testing.T) {

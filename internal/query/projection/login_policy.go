@@ -19,7 +19,6 @@ const (
 	LoginPolicyInstanceIDCol            = "instance_id"
 	LoginPolicyCreationDateCol          = "creation_date"
 	LoginPolicyChangeDateCol            = "change_date"
-	LoginPolicySequenceCol              = "sequence"
 	LoginPolicyIsDefaultCol             = "is_default"
 	LoginPolicyAllowRegisterCol         = "allow_register"
 	LoginPolicyAllowUsernamePasswordCol = "allow_username_password"
@@ -52,7 +51,6 @@ func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LoginPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(LoginPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(LoginPolicySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(LoginPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LoginPolicyAllowRegisterCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(LoginPolicyAllowUsernamePasswordCol, crdb.ColumnTypeBool),
@@ -163,7 +161,6 @@ func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		handler.NewCol(LoginPolicyCreationDateCol, policyEvent.CreationDate()),
 		handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
 		handler.NewCol(LoginPolicyAllowRegisterCol, policyEvent.AllowRegister),
 		handler.NewCol(LoginPolicyAllowUsernamePasswordCol, policyEvent.AllowUserNamePassword),
 		handler.NewCol(LoginPolicyAllowExternalIDPsCol, policyEvent.AllowExternalIDP),
@@ -194,7 +191,6 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 
 	cols := []handler.Column{
 		handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.AllowRegister != nil {
 		cols = append(cols, handler.NewCol(LoginPolicyAllowRegisterCol, *policyEvent.AllowRegister))
@@ -260,7 +256,6 @@ func (p *loginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
 			crdb.NewArrayAppendCol(LoginPolicyMFAsCol, policyEvent.MFAType),
 		},
 		[]handler.Condition{
@@ -284,7 +279,6 @@ func (p *loginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
 			crdb.NewArrayRemoveCol(LoginPolicyMFAsCol, policyEvent.MFAType),
 		},
 		[]handler.Condition{
@@ -321,7 +315,6 @@ func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
 			crdb.NewArrayAppendCol(LoginPolicy2FAsCol, policyEvent.MFAType),
 		},
 		[]handler.Condition{
@@ -345,7 +338,6 @@ func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handl
 		&policyEvent,
 		[]handler.Column{
 			handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),
 			crdb.NewArrayRemoveCol(LoginPolicy2FAsCol, policyEvent.MFAType),
 		},
 		[]handler.Condition{

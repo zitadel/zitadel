@@ -11,11 +11,11 @@ import (
 )
 
 type FailedEvent struct {
-	ViewName       string `gorm:"column:view_name;primary_key"`
-	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key"`
-	FailureCount   uint64 `gorm:"column:failure_count"`
-	ErrMsg         string `gorm:"column:err_msg"`
-	InstanceID     string `gorm:"column:instance_id"`
+	ViewName     string `gorm:"column:view_name;primary_key"`
+	EventID      string `gorm:"column:event_id;primary_key"`
+	FailureCount uint64 `gorm:"column:failure_count"`
+	ErrMsg       string `gorm:"column:err_msg"`
+	InstanceID   string `gorm:"column:instance_id"`
 }
 
 type FailedEventSearchQuery struct {
@@ -41,7 +41,7 @@ type FailedEventSearchKey int32
 const (
 	FailedEventKeyUndefined FailedEventSearchKey = iota
 	FailedEventKeyViewName
-	FailedEventKeyFailedSequence
+	FailedEventKeyFailedID
 	FailedEventKeyInstanceID
 )
 
@@ -51,8 +51,8 @@ func (key failedEventSearchKey) ToColumnName() string {
 	switch FailedEventSearchKey(key) {
 	case FailedEventKeyViewName:
 		return "view_name"
-	case FailedEventKeyFailedSequence:
-		return "failed_sequence"
+	case FailedEventKeyFailedID:
+		return "event_id"
 	case FailedEventKeyInstanceID:
 		return "instance_id"
 	default:
@@ -62,20 +62,20 @@ func (key failedEventSearchKey) ToColumnName() string {
 
 func FailedEventFromModel(failedEvent *view_model.FailedEvent) *FailedEvent {
 	return &FailedEvent{
-		ViewName:       failedEvent.Database + "." + failedEvent.ViewName,
-		FailureCount:   failedEvent.FailureCount,
-		FailedSequence: failedEvent.FailedSequence,
-		ErrMsg:         failedEvent.ErrMsg,
+		ViewName:     failedEvent.Database + "." + failedEvent.ViewName,
+		FailureCount: failedEvent.FailureCount,
+		EventID:      failedEvent.EventID,
+		ErrMsg:       failedEvent.ErrMsg,
 	}
 }
 func FailedEventToModel(failedEvent *FailedEvent) *view_model.FailedEvent {
 	dbView := strings.Split(failedEvent.ViewName, ".")
 	return &view_model.FailedEvent{
-		Database:       dbView[0],
-		ViewName:       dbView[1],
-		FailureCount:   failedEvent.FailureCount,
-		FailedSequence: failedEvent.FailedSequence,
-		ErrMsg:         failedEvent.ErrMsg,
+		Database:     dbView[0],
+		ViewName:     dbView[1],
+		FailureCount: failedEvent.FailureCount,
+		EventID:      failedEvent.EventID,
+		ErrMsg:       failedEvent.ErrMsg,
 	}
 }
 
@@ -92,17 +92,17 @@ func SaveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error 
 func RemoveFailedEvent(db *gorm.DB, table string, failedEvent *FailedEvent) error {
 	delete := PrepareDeleteByKeys(table,
 		Key{Key: failedEventSearchKey(FailedEventKeyViewName), Value: failedEvent.ViewName},
-		Key{Key: failedEventSearchKey(FailedEventKeyFailedSequence), Value: failedEvent.FailedSequence},
+		Key{Key: failedEventSearchKey(FailedEventKeyFailedID), Value: failedEvent.EventID},
 		Key{Key: failedEventSearchKey(FailedEventKeyInstanceID), Value: failedEvent.InstanceID},
 	)
 	return delete(db)
 }
 
-func LatestFailedEvent(db *gorm.DB, table, viewName, instanceID string, sequence uint64) (*FailedEvent, error) {
+func LatestFailedEvent(db *gorm.DB, table, viewName, instanceID string, eventID string) (*FailedEvent, error) {
 	failedEvent := new(FailedEvent)
 	queries := []SearchQuery{
 		FailedEventSearchQuery{Key: FailedEventKeyViewName, Method: domain.SearchMethodEqualsIgnoreCase, Value: viewName},
-		FailedEventSearchQuery{Key: FailedEventKeyFailedSequence, Method: domain.SearchMethodEquals, Value: sequence},
+		FailedEventSearchQuery{Key: FailedEventKeyFailedID, Method: domain.SearchMethodEquals, Value: eventID},
 		FailedEventSearchQuery{Key: FailedEventKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID},
 	}
 	query := PrepareGetByQuery(table, queries...)
@@ -114,9 +114,9 @@ func LatestFailedEvent(db *gorm.DB, table, viewName, instanceID string, sequence
 
 	if errors.IsNotFound(err) {
 		return &FailedEvent{
-			ViewName:       viewName,
-			FailedSequence: sequence,
-			FailureCount:   0,
+			ViewName:     viewName,
+			EventID:      eventID,
+			FailureCount: 0,
 		}, nil
 	}
 	return nil, errors.ThrowInternalf(err, "VIEW-9LyCB", "unable to get failed events of %s", viewName)

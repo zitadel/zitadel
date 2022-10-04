@@ -24,7 +24,6 @@ type Changes struct {
 type Change struct {
 	ChangeDate            time.Time
 	EventType             string
-	Sequence              uint64
 	ResourceOwner         string
 	ModifierId            string
 	ModifierName          string
@@ -33,24 +32,24 @@ type Change struct {
 	ModifierAvatarKey     string
 }
 
-func (q *Queries) OrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) OrgChanges(ctx context.Context, orgID string, lastCreationDate time.Time, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(org.AggregateType).
 			AggregateIDs(orgID)
 	}
-	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
+	return q.changes(ctx, query, lastCreationDate, limit, sortAscending, auditLogRetention)
 
 }
 
-func (q *Queries) ProjectChanges(ctx context.Context, projectID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) ProjectChanges(ctx context.Context, projectID string, lastCreationDate time.Time, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID)
 	}
-	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
+	return q.changes(ctx, query, lastCreationDate, limit, sortAscending, auditLogRetention)
 }
 
-func (q *Queries) ProjectGrantChanges(ctx context.Context, projectID, grantID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) ProjectGrantChanges(ctx context.Context, projectID, grantID string, lastCreationDate time.Time, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -58,10 +57,10 @@ func (q *Queries) ProjectGrantChanges(ctx context.Context, projectID, grantID st
 				"grantId": grantID,
 			})
 	}
-	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
+	return q.changes(ctx, query, lastCreationDate, limit, sortAscending, auditLogRetention)
 }
 
-func (q *Queries) ApplicationChanges(ctx context.Context, projectID, appID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) ApplicationChanges(ctx context.Context, projectID, appID string, lastCreationDate time.Time, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -69,23 +68,23 @@ func (q *Queries) ApplicationChanges(ctx context.Context, projectID, appID strin
 				"appId": appID,
 			})
 	}
-	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
+	return q.changes(ctx, query, lastCreationDate, limit, sortAscending, auditLogRetention)
 }
 
-func (q *Queries) UserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) UserChanges(ctx context.Context, userID string, lastCreationDate time.Time, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
 	query := func(query *eventstore.SearchQuery) {
 		query.AggregateTypes(user.AggregateType).
 			AggregateIDs(userID)
 	}
-	return q.changes(ctx, query, lastSequence, limit, sortAscending, auditLogRetention)
+	return q.changes(ctx, query, lastCreationDate, limit, sortAscending, auditLogRetention)
 }
 
-func (q *Queries) changes(ctx context.Context, query func(query *eventstore.SearchQuery), lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
+func (q *Queries) changes(ctx context.Context, query func(query *eventstore.SearchQuery), lastCreationDate time.Time, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(limit)
 	if !sortAscending {
 		builder.OrderDesc()
 	}
-	search := builder.AddQuery().SequenceGreater(lastSequence) //always use greater (less is done automatically by sorting desc)
+	search := builder.AddQuery().CreationDateAfter(lastCreationDate) //always use greater (less is done automatically by sorting desc)
 	query(search)
 
 	events, err := q.eventstore.Filter(ctx, builder)
@@ -104,7 +103,6 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 		change := &Change{
 			ChangeDate:        event.CreationDate(),
 			EventType:         string(event.Type()),
-			Sequence:          event.Sequence(),
 			ResourceOwner:     event.Aggregate().ResourceOwner,
 			ModifierId:        event.EditorUser(),
 			ModifierName:      event.EditorUser(),

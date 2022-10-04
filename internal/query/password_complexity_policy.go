@@ -16,7 +16,6 @@ import (
 
 type PasswordComplexityPolicy struct {
 	ID            string
-	Sequence      uint64
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
@@ -89,10 +88,6 @@ var (
 		name:  projection.ComplexityPolicyIDCol,
 		table: passwordComplexityTable,
 	}
-	PasswordComplexityColSequence = Column{
-		name:  projection.ComplexityPolicySequenceCol,
-		table: passwordComplexityTable,
-	}
 	PasswordComplexityColCreationDate = Column{
 		name:  projection.ComplexityPolicyCreationDateCol,
 		table: passwordComplexityTable,
@@ -142,7 +137,6 @@ var (
 func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordComplexityPolicy, error)) {
 	return sq.Select(
 			PasswordComplexityColID.identifier(),
-			PasswordComplexityColSequence.identifier(),
 			PasswordComplexityColCreationDate.identifier(),
 			PasswordComplexityColChangeDate.identifier(),
 			PasswordComplexityColResourceOwner.identifier(),
@@ -159,7 +153,6 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 			policy := new(PasswordComplexityPolicy)
 			err := row.Scan(
 				&policy.ID,
-				&policy.Sequence,
 				&policy.CreationDate,
 				&policy.ChangeDate,
 				&policy.ResourceOwner,

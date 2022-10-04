@@ -3,12 +3,7 @@ package model
 import (
 	"time"
 
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
 
 type UserView struct {
@@ -17,7 +12,6 @@ type UserView struct {
 	CreationDate       time.Time
 	ChangeDate         time.Time
 	State              UserState
-	Sequence           uint64
 	ResourceOwner      string
 	LastLogin          time.Time
 	PreferredLoginName string
@@ -102,15 +96,6 @@ type UserSearchQuery struct {
 	Value  interface{}
 }
 
-type UserSearchResponse struct {
-	Offset      uint64
-	Limit       uint64
-	TotalResult uint64
-	Result      []*UserView
-	Sequence    uint64
-	Timestamp   time.Time
-}
-
 type UserState int32
 
 const (
@@ -131,20 +116,6 @@ const (
 	GenderMale
 	GenderDiverse
 )
-
-func (r *UserSearchRequest) EnsureLimit(limit uint64) error {
-	if r.Limit > limit {
-		return errors.ThrowInvalidArgument(nil, "SEARCH-zz62F", "Errors.Limit.ExceedsDefault")
-	}
-	if r.Limit == 0 {
-		r.Limit = limit
-	}
-	return nil
-}
-
-func (r *UserSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &UserSearchQuery{Key: UserSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: orgID})
-}
 
 func (u *UserView) MFATypesSetupPossible(level domain.MFALevel, policy *domain.LoginPolicy) []domain.MFAType {
 	types := make([]domain.MFAType, 0)
@@ -212,96 +183,4 @@ func (u *UserView) IsPasswordlessReady() bool {
 		}
 	}
 	return false
-}
-
-func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) bool {
-	if !policy.ForceMFA {
-		return true
-	}
-	switch u.MFAMaxSetUp {
-	case domain.MFALevelSecondFactor:
-		return policy.HasSecondFactors()
-	case domain.MFALevelMultiFactor:
-		return policy.HasMultiFactors()
-	default:
-		return false
-	}
-}
-
-func (u *UserView) GetProfile() (*Profile, error) {
-	if u.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-WLTce", "Errors.User.NotHuman")
-	}
-	return &Profile{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID:   u.ID,
-			Sequence:      u.Sequence,
-			ResourceOwner: u.ResourceOwner,
-			CreationDate:  u.CreationDate,
-			ChangeDate:    u.ChangeDate,
-		},
-		FirstName:          u.FirstName,
-		LastName:           u.LastName,
-		NickName:           u.NickName,
-		DisplayName:        u.DisplayName,
-		PreferredLanguage:  language.Make(u.PreferredLanguage),
-		Gender:             u.Gender,
-		PreferredLoginName: u.PreferredLoginName,
-		LoginNames:         u.LoginNames,
-		AvatarKey:          u.AvatarKey,
-	}, nil
-}
-
-func (u *UserView) GetPhone() (*Phone, error) {
-	if u.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-him4a", "Errors.User.NotHuman")
-	}
-	return &Phone{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID:   u.ID,
-			Sequence:      u.Sequence,
-			ResourceOwner: u.ResourceOwner,
-			CreationDate:  u.CreationDate,
-			ChangeDate:    u.ChangeDate,
-		},
-		PhoneNumber:     u.Phone,
-		IsPhoneVerified: u.IsPhoneVerified,
-	}, nil
-}
-
-func (u *UserView) GetEmail() (*Email, error) {
-	if u.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-PWd6K", "Errors.User.NotHuman")
-	}
-	return &Email{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID:   u.ID,
-			Sequence:      u.Sequence,
-			ResourceOwner: u.ResourceOwner,
-			CreationDate:  u.CreationDate,
-			ChangeDate:    u.ChangeDate,
-		},
-		EmailAddress:    u.Email,
-		IsEmailVerified: u.IsEmailVerified,
-	}, nil
-}
-
-func (u *UserView) GetAddress() (*Address, error) {
-	if u.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-DN61m", "Errors.User.NotHuman")
-	}
-	return &Address{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID:   u.ID,
-			Sequence:      u.Sequence,
-			ResourceOwner: u.ResourceOwner,
-			CreationDate:  u.CreationDate,
-			ChangeDate:    u.ChangeDate,
-		},
-		Country:       u.Country,
-		Locality:      u.Locality,
-		PostalCode:    u.PostalCode,
-		Region:        u.Region,
-		StreetAddress: u.StreetAddress,
-	}, nil
 }

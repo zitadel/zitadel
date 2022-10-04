@@ -18,7 +18,6 @@ type IDPProviderView struct {
 
 	CreationDate time.Time
 	ChangeDate   time.Time
-	Sequence     uint64
 }
 
 type IDPProviderSearchRequest struct {
@@ -50,7 +49,6 @@ type IDPProviderSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*IDPProviderView
-	Sequence    uint64
 	Timestamp   time.Time
 }
 

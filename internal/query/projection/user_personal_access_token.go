@@ -17,7 +17,6 @@ const (
 	PersonalAccessTokenColumnID            = "id"
 	PersonalAccessTokenColumnCreationDate  = "creation_date"
 	PersonalAccessTokenColumnChangeDate    = "change_date"
-	PersonalAccessTokenColumnSequence      = "sequence"
 	PersonalAccessTokenColumnResourceOwner = "resource_owner"
 	PersonalAccessTokenColumnInstanceID    = "instance_id"
 	PersonalAccessTokenColumnUserID        = "user_id"
@@ -38,7 +37,6 @@ func newPersonalAccessTokenProjection(ctx context.Context, config crdb.Statement
 			crdb.NewColumn(PersonalAccessTokenColumnID, crdb.ColumnTypeText),
 			crdb.NewColumn(PersonalAccessTokenColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(PersonalAccessTokenColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(PersonalAccessTokenColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(PersonalAccessTokenColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(PersonalAccessTokenColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(PersonalAccessTokenColumnUserID, crdb.ColumnTypeText),
@@ -90,7 +88,6 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 			handler.NewCol(PersonalAccessTokenColumnChangeDate, e.CreationDate()),
 			handler.NewCol(PersonalAccessTokenColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(PersonalAccessTokenColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(PersonalAccessTokenColumnSequence, e.Sequence()),
 			handler.NewCol(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
 			handler.NewCol(PersonalAccessTokenColumnExpiration, e.Expiration),
 			handler.NewCol(PersonalAccessTokenColumnScopes, database.StringArray(e.Scopes)),

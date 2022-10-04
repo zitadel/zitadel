@@ -15,12 +15,10 @@ func (et EventType) String() string {
 }
 
 type Event struct {
-	ID               string
-	Sequence         uint64
-	CreationDate     time.Time
-	Type             EventType
-	PreviousSequence uint64
-	Data             []byte
+	ID           string
+	CreationDate time.Time
+	Type         EventType
+	Data         []byte
 
 	AggregateID      string
 	AggregateType    AggregateType

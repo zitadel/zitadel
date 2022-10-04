@@ -7,8 +7,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (
@@ -97,30 +95,30 @@ func (db *dbMock) expectRollback(err error) *dbMock {
 	return db
 }
 
-func (db *dbMock) expectInsertEvent(e *models.Event, returnedSequence uint64) *dbMock {
-	db.mock.ExpectQuery(expectedInsertStatement).
-		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, e.InstanceID, Sequence(e.PreviousSequence),
-			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence), Sequence(e.PreviousSequence),
-		).
-		WillReturnRows(
-			sqlmock.NewRows([]string{"event_sequence", "creation_date"}).
-				AddRow(returnedSequence, time.Now().UTC()),
-		)
+// func (db *dbMock) expectInsertEvent(e *models.Event, returnedSequence uint64) *dbMock {
+// 	db.mock.ExpectQuery(expectedInsertStatement).
+// 		WithArgs(
+// 			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, e.InstanceID, Sequence(e.PreviousSequence),
+// 			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence), Sequence(e.PreviousSequence),
+// 		).
+// 		WillReturnRows(
+// 			sqlmock.NewRows([]string{"event_sequence", "creation_date"}).
+// 				AddRow(returnedSequence, time.Now().UTC()),
+// 		)
 
-	return db
-}
+// 	return db
+// }
 
-func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
-	db.mock.ExpectQuery(expectedInsertStatement).
-		WithArgs(
-			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, e.InstanceID, Sequence(e.PreviousSequence),
-			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence), Sequence(e.PreviousSequence),
-		).
-		WillReturnError(sql.ErrTxDone)
+// func (db *dbMock) expectInsertEventError(e *models.Event) *dbMock {
+// 	db.mock.ExpectQuery(expectedInsertStatement).
+// 		WithArgs(
+// 			e.Type, e.AggregateType, e.AggregateID, e.AggregateVersion, sqlmock.AnyArg(), Data(e.Data), e.EditorUser, e.EditorService, e.ResourceOwner, e.InstanceID, Sequence(e.PreviousSequence),
+// 			e.AggregateType, e.AggregateID, Sequence(e.PreviousSequence), Sequence(e.PreviousSequence),
+// 		).
+// 		WillReturnError(sql.ErrTxDone)
 
-	return db
-}
+// 	return db
+// }
 
 func (db *dbMock) expectFilterEventsLimit(aggregateType string, limit uint64, eventCount int) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)

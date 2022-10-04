@@ -23,7 +23,6 @@ const (
 	KeyColumnChangeDate    = "change_date"
 	KeyColumnResourceOwner = "resource_owner"
 	KeyColumnInstanceID    = "instance_id"
-	KeyColumnSequence      = "sequence"
 	KeyColumnAlgorithm     = "algorithm"
 	KeyColumnUse           = "use"
 
@@ -63,7 +62,6 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(KeyColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(KeyColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
 		},
@@ -142,7 +140,6 @@ func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 				handler.NewCol(KeyColumnChangeDate, e.CreationDate()),
 				handler.NewCol(KeyColumnResourceOwner, e.Aggregate().ResourceOwner),
 				handler.NewCol(KeyColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(KeyColumnSequence, e.Sequence()),
 				handler.NewCol(KeyColumnAlgorithm, e.Algorithm),
 				handler.NewCol(KeyColumnUse, e.Usage),
 			},

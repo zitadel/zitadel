@@ -31,14 +31,11 @@ type PasswordComplexityPolicyView struct {
 	HasSymbol    bool   `json:"hasSymbol" gorm:"column:has_symbol"`
 	HasNumber    bool   `json:"hasNumber" gorm:"column:has_number"`
 	Default      bool   `json:"-" gorm:"-"`
-
-	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
 func PasswordComplexityViewToModel(policy *query.PasswordComplexityPolicy) *model.PasswordComplexityPolicyView {
 	return &model.PasswordComplexityPolicyView{
 		AggregateID:  policy.ID,
-		Sequence:     policy.Sequence,
 		CreationDate: policy.CreationDate,
 		ChangeDate:   policy.ChangeDate,
 		MinLength:    policy.MinLength,
@@ -51,7 +48,6 @@ func PasswordComplexityViewToModel(policy *query.PasswordComplexityPolicy) *mode
 }
 
 func (i *PasswordComplexityPolicyView) AppendEvent(event *models.Event) (err error) {
-	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch eventstore.EventType(event.Type) {
 	case instance.PasswordComplexityPolicyAddedEventType,

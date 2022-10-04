@@ -19,20 +19,20 @@ const (
 )
 
 func (h *StatementHandler) handleFailedStmt(tx *sql.Tx, stmt *handler.Statement, execErr error) (shouldContinue bool) {
-	failureCount, err := h.failureCount(tx, stmt.Sequence, stmt.InstanceID)
+	failureCount, err := h.failureCount(tx, stmt.EventID, stmt.InstanceID)
 	if err != nil {
-		logging.WithFields("projection", h.ProjectionName, "sequence", stmt.Sequence).WithError(err).Warn("unable to get failure count")
+		logging.WithFields("projection", h.ProjectionName, "eventId", stmt.EventID).WithError(err).Warn("unable to get failure count")
 		return false
 	}
 	failureCount += 1
-	err = h.setFailureCount(tx, stmt.Sequence, failureCount, execErr, stmt.InstanceID)
-	logging.WithFields("projection", h.ProjectionName, "sequence", stmt.Sequence).OnError(err).Warn("unable to update failure count")
+	err = h.setFailureCount(tx, stmt.EventID, failureCount, execErr, stmt.InstanceID)
+	logging.WithFields("projection", h.ProjectionName, "eventId", stmt.EventID).OnError(err).Warn("unable to update failure count")
 
 	return failureCount >= h.maxFailureCount
 }
 
-func (h *StatementHandler) failureCount(tx *sql.Tx, seq uint64, instanceID string) (count uint, err error) {
-	row := tx.QueryRow(h.failureCountStmt, h.ProjectionName, seq, instanceID)
+func (h *StatementHandler) failureCount(tx *sql.Tx, eventID, instanceID string) (count uint, err error) {
+	row := tx.QueryRow(h.failureCountStmt, h.ProjectionName, eventID, instanceID)
 	if err = row.Err(); err != nil {
 		return 0, errors.ThrowInternal(err, "CRDB-Unnex", "unable to update failure count")
 	}
@@ -42,8 +42,8 @@ func (h *StatementHandler) failureCount(tx *sql.Tx, seq uint64, instanceID strin
 	return count, nil
 }
 
-func (h *StatementHandler) setFailureCount(tx *sql.Tx, seq uint64, count uint, err error, instanceID string) error {
-	_, dbErr := tx.Exec(h.setFailureCountStmt, h.ProjectionName, seq, count, err.Error(), instanceID)
+func (h *StatementHandler) setFailureCount(tx *sql.Tx, eventID string, count uint, err error, instanceID string) error {
+	_, dbErr := tx.Exec(h.setFailureCountStmt, h.ProjectionName, eventID, count, err.Error(), instanceID)
 	if dbErr != nil {
 		return errors.ThrowInternal(dbErr, "CRDB-4Ht4x", "set failure count failed")
 	}

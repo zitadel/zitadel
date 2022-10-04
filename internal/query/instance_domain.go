@@ -15,7 +15,6 @@ import (
 type InstanceDomain struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
-	Sequence     uint64
 	Domain       string
 	InstanceID   string
 	IsGenerated  bool
@@ -96,7 +95,6 @@ func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance
 	return sq.Select(
 			InstanceDomainCreationDateCol.identifier(),
 			InstanceDomainChangeDateCol.identifier(),
-			InstanceDomainSequenceCol.identifier(),
 			InstanceDomainDomainCol.identifier(),
 			InstanceDomainInstanceIDCol.identifier(),
 			InstanceDomainIsGeneratedCol.identifier(),
@@ -111,7 +109,6 @@ func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance
 				err := rows.Scan(
 					&domain.CreationDate,
 					&domain.ChangeDate,
-					&domain.Sequence,
 					&domain.Domain,
 					&domain.InstanceID,
 					&domain.IsGenerated,
@@ -148,10 +145,6 @@ var (
 	}
 	InstanceDomainChangeDateCol = Column{
 		name:  projection.InstanceDomainChangeDateCol,
-		table: instanceDomainsTable,
-	}
-	InstanceDomainSequenceCol = Column{
-		name:  projection.InstanceDomainSequenceCol,
 		table: instanceDomainsTable,
 	}
 	InstanceDomainDomainCol = Column{

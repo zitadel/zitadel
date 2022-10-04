@@ -19,7 +19,6 @@ type DebugNotificationProvider struct {
 	AggregateID   string
 	CreationDate  time.Time
 	ChangeDate    time.Time
-	Sequence      uint64
 	ResourceOwner string
 	State         domain.NotificationProviderState
 	Type          domain.NotificationProviderType
@@ -40,10 +39,6 @@ var (
 	}
 	NotificationProviderColumnChangeDate = Column{
 		name:  projection.DebugNotificationProviderChangeDateCol,
-		table: notificationProviderTable,
-	}
-	NotificationProviderColumnSequence = Column{
-		name:  projection.DebugNotificationProviderSequenceCol,
 		table: notificationProviderTable,
 	}
 	NotificationProviderColumnResourceOwner = Column{
@@ -96,7 +91,6 @@ func prepareDebugNotificationProviderQuery() (sq.SelectBuilder, func(*sql.Row) (
 			NotificationProviderColumnAggID.identifier(),
 			NotificationProviderColumnCreationDate.identifier(),
 			NotificationProviderColumnChangeDate.identifier(),
-			NotificationProviderColumnSequence.identifier(),
 			NotificationProviderColumnResourceOwner.identifier(),
 			NotificationProviderColumnState.identifier(),
 			NotificationProviderColumnType.identifier(),
@@ -108,7 +102,6 @@ func prepareDebugNotificationProviderQuery() (sq.SelectBuilder, func(*sql.Row) (
 				&p.AggregateID,
 				&p.CreationDate,
 				&p.ChangeDate,
-				&p.Sequence,
 				&p.ResourceOwner,
 				&p.State,
 				&p.Type,

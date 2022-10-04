@@ -19,7 +19,6 @@ const (
 	LockoutPolicyIDCol                  = "id"
 	LockoutPolicyCreationDateCol        = "creation_date"
 	LockoutPolicyChangeDateCol          = "change_date"
-	LockoutPolicySequenceCol            = "sequence"
 	LockoutPolicyStateCol               = "state"
 	LockoutPolicyIsDefaultCol           = "is_default"
 	LockoutPolicyResourceOwnerCol       = "resource_owner"
@@ -41,7 +40,6 @@ func newLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(LockoutPolicyIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LockoutPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(LockoutPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(LockoutPolicySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(LockoutPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(LockoutPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LockoutPolicyResourceOwnerCol, crdb.ColumnTypeText),
@@ -109,7 +107,6 @@ func (p *lockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		[]handler.Column{
 			handler.NewCol(LockoutPolicyCreationDateCol, policyEvent.CreationDate()),
 			handler.NewCol(LockoutPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(LockoutPolicySequenceCol, policyEvent.Sequence()),
 			handler.NewCol(LockoutPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(LockoutPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(LockoutPolicyMaxPasswordAttemptsCol, policyEvent.MaxPasswordAttempts),
@@ -132,7 +129,6 @@ func (p *lockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	}
 	cols := []handler.Column{
 		handler.NewCol(LockoutPolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(LockoutPolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.MaxPasswordAttempts != nil {
 		cols = append(cols, handler.NewCol(LockoutPolicyMaxPasswordAttemptsCol, *policyEvent.MaxPasswordAttempts))

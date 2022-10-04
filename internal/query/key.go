@@ -20,7 +20,6 @@ type Key interface {
 	ID() string
 	Algorithm() string
 	Use() domain.KeyUsage
-	Sequence() uint64
 }
 
 type PrivateKey interface {
@@ -49,7 +48,6 @@ type key struct {
 	id            string
 	creationDate  time.Time
 	changeDate    time.Time
-	sequence      uint64
 	resourceOwner string
 	algorithm     string
 	use           domain.KeyUsage
@@ -65,10 +63,6 @@ func (k *key) Algorithm() string {
 
 func (k *key) Use() domain.KeyUsage {
 	return k.use
-}
-
-func (k *key) Sequence() uint64 {
-	return k.sequence
 }
 
 type privateKey struct {
@@ -121,10 +115,6 @@ var (
 	}
 	KeyColInstanceID = Column{
 		name:  projection.KeyColumnInstanceID,
-		table: keyTable,
-	}
-	KeyColSequence = Column{
-		name:  projection.KeyColumnSequence,
 		table: keyTable,
 	}
 	KeyColAlgorithm = Column{
@@ -245,7 +235,6 @@ func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, e
 			KeyColID.identifier(),
 			KeyColCreationDate.identifier(),
 			KeyColChangeDate.identifier(),
-			KeyColSequence.identifier(),
 			KeyColResourceOwner.identifier(),
 			KeyColAlgorithm.identifier(),
 			KeyColUse.identifier(),
@@ -265,7 +254,6 @@ func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, e
 					&k.id,
 					&k.creationDate,
 					&k.changeDate,
-					&k.sequence,
 					&k.resourceOwner,
 					&k.algorithm,
 					&k.use,
@@ -301,7 +289,6 @@ func preparePrivateKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PrivateKeys,
 			KeyColID.identifier(),
 			KeyColCreationDate.identifier(),
 			KeyColChangeDate.identifier(),
-			KeyColSequence.identifier(),
 			KeyColResourceOwner.identifier(),
 			KeyColAlgorithm.identifier(),
 			KeyColUse.identifier(),
@@ -320,7 +307,6 @@ func preparePrivateKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PrivateKeys,
 					&k.id,
 					&k.creationDate,
 					&k.changeDate,
-					&k.sequence,
 					&k.resourceOwner,
 					&k.algorithm,
 					&k.use,

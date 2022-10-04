@@ -19,7 +19,6 @@ const (
 	DebugNotificationProviderAggIDCol         = "aggregate_id"
 	DebugNotificationProviderCreationDateCol  = "creation_date"
 	DebugNotificationProviderChangeDateCol    = "change_date"
-	DebugNotificationProviderSequenceCol      = "sequence"
 	DebugNotificationProviderResourceOwnerCol = "resource_owner"
 	DebugNotificationProviderInstanceIDCol    = "instance_id"
 	DebugNotificationProviderStateCol         = "state"
@@ -40,7 +39,6 @@ func newDebugNotificationProviderProjection(ctx context.Context, config crdb.Sta
 			crdb.NewColumn(DebugNotificationProviderAggIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(DebugNotificationProviderCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(DebugNotificationProviderChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DebugNotificationProviderSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(DebugNotificationProviderResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(DebugNotificationProviderInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(DebugNotificationProviderStateCol, crdb.ColumnTypeEnum),
@@ -106,7 +104,6 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 		handler.NewCol(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 		handler.NewCol(DebugNotificationProviderCreationDateCol, providerEvent.CreationDate()),
 		handler.NewCol(DebugNotificationProviderChangeDateCol, providerEvent.CreationDate()),
-		handler.NewCol(DebugNotificationProviderSequenceCol, providerEvent.Sequence()),
 		handler.NewCol(DebugNotificationProviderResourceOwnerCol, providerEvent.Aggregate().ResourceOwner),
 		handler.NewCol(DebugNotificationProviderInstanceIDCol, providerEvent.Aggregate().InstanceID),
 		handler.NewCol(DebugNotificationProviderStateCol, domain.NotificationProviderStateActive),
@@ -131,7 +128,6 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderCha
 
 	cols := []handler.Column{
 		handler.NewCol(DebugNotificationProviderChangeDateCol, providerEvent.CreationDate()),
-		handler.NewCol(DebugNotificationProviderSequenceCol, providerEvent.Sequence()),
 	}
 	if providerEvent.Compact != nil {
 		cols = append(cols, handler.NewCol(DebugNotificationProviderCompactCol, *providerEvent.Compact))

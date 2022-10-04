@@ -17,7 +17,6 @@ type IDPConfigView struct {
 	State           IDPConfigState
 	CreationDate    time.Time
 	ChangeDate      time.Time
-	Sequence        uint64
 	IDPProviderType IDPProviderType
 
 	IsOIDC                     bool
@@ -65,7 +64,6 @@ type IDPConfigSearchResponse struct {
 	Limit       uint64
 	TotalResult uint64
 	Result      []*IDPConfigView
-	Sequence    uint64
 	Timestamp   time.Time
 }
 
@@ -77,8 +75,4 @@ func (r *IDPConfigSearchRequest) EnsureLimit(limit uint64) error {
 		r.Limit = limit
 	}
 	return nil
-}
-
-func (r *IDPConfigSearchRequest) AppendMyOrgQuery(orgID, iamID string) {
-	r.Queries = append(r.Queries, &IDPConfigSearchQuery{Key: IDPConfigSearchKeyAggregateID, Method: domain.SearchMethodIsOneOf, Value: []string{orgID, iamID}})
 }

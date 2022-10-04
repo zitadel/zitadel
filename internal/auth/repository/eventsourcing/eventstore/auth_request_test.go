@@ -101,18 +101,10 @@ func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, sequence 
 	return events, nil
 }
 
-func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
-	return nil
-}
-
 type mockEventErrUser struct{}
 
 func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
-}
-
-func (m *mockEventErrUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
-	return errors.ThrowInternal(nil, "id", "internal error")
 }
 
 type mockViewUser struct {

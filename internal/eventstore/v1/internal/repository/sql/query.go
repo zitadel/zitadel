@@ -17,8 +17,6 @@ const (
 	selectStmt = "SELECT" +
 		" creation_date" +
 		", event_type" +
-		", event_sequence" +
-		", previous_aggregate_sequence" +
 		", event_data" +
 		", editor_service" +
 		", editor_user" +
@@ -44,7 +42,7 @@ func buildQuery(queryFactory *es_models.SearchQueryFactory) (query string, limit
 	query += where
 
 	if searchQuery.Columns == es_models.Columns_Event {
-		query += " ORDER BY event_sequence"
+		query += " ORDER BY creation_date"
 		if searchQuery.Desc {
 			query += " DESC"
 		}
@@ -87,8 +85,8 @@ type scan func(dest ...interface{}) error
 
 func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interface{}) error) {
 	switch columns {
-	case es_models.Columns_Max_Sequence:
-		return "SELECT MAX(event_sequence) FROM eventstore.events", func(row scan, dest interface{}) (err error) {
+	case es_models.Columns_Max_CreationDate:
+		return "SELECT MAX(creation_date) FROM eventstore.events", func(row scan, dest interface{}) (err error) {
 			sequence, ok := dest.(*Sequence)
 			if !ok {
 				return z_errors.ThrowInvalidArgument(nil, "SQL-NBjA9", "type must be sequence")
@@ -118,14 +116,11 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 			if !ok {
 				return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
 			}
-			var previousSequence Sequence
 			data := make(Data, 0)
 
 			err = row(
 				&event.CreationDate,
 				&event.Type,
-				&event.Sequence,
-				&previousSequence,
 				&data,
 				&event.EditorService,
 				&event.EditorUser,
@@ -140,8 +135,6 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 				logging.New().WithError(err).Warn("unable to scan row")
 				return z_errors.ThrowInternal(err, "SQL-J0hFS", "unable to scan row")
 			}
-
-			event.PreviousSequence = uint64(previousSequence)
 
 			event.Data = make([]byte, len(data))
 			copy(event.Data, data)
@@ -189,8 +182,6 @@ func getField(field es_models.Field) string {
 		return "aggregate_id"
 	case es_models.Field_AggregateType:
 		return "aggregate_type"
-	case es_models.Field_LatestSequence:
-		return "event_sequence"
 	case es_models.Field_ResourceOwner:
 		return "resource_owner"
 	case es_models.Field_InstanceID:

@@ -19,7 +19,6 @@ type LoginPolicy struct {
 	OrgID                      string
 	CreationDate               time.Time
 	ChangeDate                 time.Time
-	Sequence                   uint64
 	AllowRegister              bool
 	AllowUsernamePassword      bool
 	AllowExternalIDPs          bool
@@ -67,10 +66,6 @@ var (
 	}
 	LoginPolicyColumnChangeDate = Column{
 		name:  projection.LoginPolicyChangeDateCol,
-		table: loginPolicyTable,
-	}
-	LoginPolicyColumnSequence = Column{
-		name:  projection.LoginPolicySequenceCol,
 		table: loginPolicyTable,
 	}
 	LoginPolicyColumnAllowRegister = Column{
@@ -294,7 +289,6 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnOrgID.identifier(),
 			LoginPolicyColumnCreationDate.identifier(),
 			LoginPolicyColumnChangeDate.identifier(),
-			LoginPolicyColumnSequence.identifier(),
 			LoginPolicyColumnAllowRegister.identifier(),
 			LoginPolicyColumnAllowUsernamePassword.identifier(),
 			LoginPolicyColumnAllowExternalIDPs.identifier(),
@@ -332,7 +326,6 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					&p.OrgID,
 					&p.CreationDate,
 					&p.ChangeDate,
-					&p.Sequence,
 					&p.AllowRegister,
 					&p.AllowUsernamePassword,
 					&p.AllowExternalIDPs,

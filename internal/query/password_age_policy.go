@@ -16,7 +16,6 @@ import (
 
 type PasswordAgePolicy struct {
 	ID            string
-	Sequence      uint64
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
@@ -34,10 +33,6 @@ var (
 	}
 	PasswordAgeColID = Column{
 		name:  projection.AgePolicyIDCol,
-		table: passwordAgeTable,
-	}
-	PasswordAgeColSequence = Column{
-		name:  projection.AgePolicySequenceCol,
 		table: passwordAgeTable,
 	}
 	PasswordAgeColCreationDate = Column{
@@ -126,7 +121,6 @@ func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context, shouldTriggerBul
 func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordAgePolicy, error)) {
 	return sq.Select(
 			PasswordAgeColID.identifier(),
-			PasswordAgeColSequence.identifier(),
 			PasswordAgeColCreationDate.identifier(),
 			PasswordAgeColChangeDate.identifier(),
 			PasswordAgeColResourceOwner.identifier(),
@@ -140,7 +134,6 @@ func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Passwor
 			policy := new(PasswordAgePolicy)
 			err := row.Scan(
 				&policy.ID,
-				&policy.Sequence,
 				&policy.CreationDate,
 				&policy.ChangeDate,
 				&policy.ResourceOwner,

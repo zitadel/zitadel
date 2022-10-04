@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
-//SearchQuery is deprecated. Use SearchQueryFactory
+// SearchQuery is deprecated. Use SearchQueryFactory
 type SearchQuery struct {
 	Columns Columns
 	Limit   uint64
@@ -20,7 +20,7 @@ type Query struct {
 	Filters     []*Filter
 }
 
-//NewSearchQuery is deprecated. Use SearchQueryFactory
+// NewSearchQuery is deprecated. Use SearchQueryFactory
 func NewSearchQuery() *SearchQuery {
 	return &SearchQuery{
 		Filters: make([]*Filter, 0, 4),
@@ -42,13 +42,13 @@ func (q *SearchQuery) AddQuery() *Query {
 	return query
 }
 
-//SearchQuery returns the SearchQuery of the sub query
+// SearchQuery returns the SearchQuery of the sub query
 func (q *Query) SearchQuery() *SearchQuery {
 	return q.searchQuery
 }
 func (q *Query) setFilter(filter *Filter) *Query {
 	for i, f := range q.Filters {
-		if f.field == filter.field && f.field != Field_LatestSequence {
+		if f.field == filter.field && f.field != Field_CreationDate {
 			q.Filters[i] = filter
 			return q
 		}
@@ -88,20 +88,6 @@ func (q *Query) EventTypesFilter(types ...EventType) *Query {
 	return q.setFilter(NewFilter(Field_EventType, types, Operation_In))
 }
 
-func (q *Query) LatestSequenceFilter(sequence uint64) *Query {
-	if sequence == 0 {
-		return q
-	}
-	sortOrder := Operation_Greater
-	return q.setFilter(NewFilter(Field_LatestSequence, sequence, sortOrder))
-}
-
-func (q *Query) SequenceBetween(from, to uint64) *Query {
-	q.setFilter(NewFilter(Field_LatestSequence, from, Operation_Greater))
-	q.setFilter(NewFilter(Field_LatestSequence, to, Operation_Less))
-	return q
-}
-
 func (q *Query) ResourceOwnerFilter(resourceOwner string) *Query {
 	return q.setFilter(NewFilter(Field_ResourceOwner, resourceOwner, Operation_Equals))
 }
@@ -114,13 +100,25 @@ func (q *Query) ExcludedInstanceIDsFilter(instanceIDs ...string) *Query {
 	return q.setFilter(NewFilter(Field_InstanceID, instanceIDs, Operation_NotIn))
 }
 
-func (q *Query) CreationDateNewerFilter(time time.Time) *Query {
-	return q.setFilter(NewFilter(Field_CreationDate, time, Operation_Greater))
+func (q *Query) CreationDateNewerFilter(creationDate time.Time) *Query {
+	if creationDate.IsZero() {
+		return q
+	}
+	return q.setFilter(NewFilter(Field_CreationDate, creationDate, Operation_Greater))
+}
+
+func (q *Query) CreationDateBetweenFilter(from, to time.Time) *Query {
+	if from.IsZero() || to.IsZero() {
+		return q
+	}
+	q.setFilter(NewFilter(Field_CreationDate, from, Operation_Greater))
+	q.setFilter(NewFilter(Field_CreationDate, to, Operation_Less))
+	return q
 }
 
 func (q *SearchQuery) setFilter(filter *Filter) *SearchQuery {
 	for i, f := range q.Filters {
-		if f.field == filter.field && f.field != Field_LatestSequence {
+		if f.field == filter.field && f.field != Field_CreationDate {
 			q.Filters[i] = filter
 			return q
 		}

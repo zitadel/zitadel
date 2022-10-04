@@ -22,7 +22,6 @@ type OrgMetadata struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 	Key           string
 	Value         []byte
 }
@@ -54,10 +53,6 @@ var (
 	}
 	OrgMetadataInstanceIDCol = Column{
 		name:  projection.OrgMetadataColumnInstanceID,
-		table: orgMetadataTable,
-	}
-	OrgMetadataSequenceCol = Column{
-		name:  projection.OrgMetadataColumnSequence,
 		table: orgMetadataTable,
 	}
 	OrgMetadataKeyCol = Column{
@@ -151,7 +146,6 @@ func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, 
 			OrgMetadataCreationDateCol.identifier(),
 			OrgMetadataChangeDateCol.identifier(),
 			OrgMetadataResourceOwnerCol.identifier(),
-			OrgMetadataSequenceCol.identifier(),
 			OrgMetadataKeyCol.identifier(),
 			OrgMetadataValueCol.identifier(),
 		).
@@ -163,7 +157,6 @@ func prepareOrgMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgMetadata, 
 				&m.CreationDate,
 				&m.ChangeDate,
 				&m.ResourceOwner,
-				&m.Sequence,
 				&m.Key,
 				&m.Value,
 			)
@@ -183,7 +176,6 @@ func prepareOrgMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrgMetad
 			OrgMetadataCreationDateCol.identifier(),
 			OrgMetadataChangeDateCol.identifier(),
 			OrgMetadataResourceOwnerCol.identifier(),
-			OrgMetadataSequenceCol.identifier(),
 			OrgMetadataKeyCol.identifier(),
 			OrgMetadataValueCol.identifier(),
 			countColumn.identifier()).
@@ -198,7 +190,6 @@ func prepareOrgMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*OrgMetad
 					&m.CreationDate,
 					&m.ChangeDate,
 					&m.ResourceOwner,
-					&m.Sequence,
 					&m.Key,
 					&m.Value,
 					&count,

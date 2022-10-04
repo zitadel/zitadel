@@ -18,7 +18,6 @@ const (
 	ProjectGrantColumnGrantID       = "grant_id"
 	ProjectGrantColumnCreationDate  = "creation_date"
 	ProjectGrantColumnChangeDate    = "change_date"
-	ProjectGrantColumnSequence      = "sequence"
 	ProjectGrantColumnState         = "state"
 	ProjectGrantColumnResourceOwner = "resource_owner"
 	ProjectGrantColumnInstanceID    = "instance_id"
@@ -40,7 +39,6 @@ func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(ProjectGrantColumnGrantID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(ProjectGrantColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ProjectGrantColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ProjectGrantColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(ProjectGrantColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnInstanceID, crdb.ColumnTypeText),
@@ -110,7 +108,6 @@ func (p *projectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 			handler.NewCol(ProjectGrantColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(ProjectGrantColumnState, domain.ProjectGrantStateActive),
-			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnGrantedOrgID, e.GrantedOrgID),
 			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
 		},
@@ -126,7 +123,6 @@ func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
 		},
 		[]handler.Condition{
@@ -145,7 +141,6 @@ func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnRoleKeys, database.StringArray(e.RoleKeys)),
 		},
 		[]handler.Condition{
@@ -164,7 +159,6 @@ func (p *projectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnState, domain.ProjectGrantStateInactive),
 		},
 		[]handler.Condition{
@@ -183,7 +177,6 @@ func (p *projectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnState, domain.ProjectGrantStateActive),
 		},
 		[]handler.Condition{

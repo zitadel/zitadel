@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -20,10 +21,10 @@ type querier interface {
 	conditionFormat(repository.Operation) string
 	placeholder(query string) string
 	eventQuery() string
-	maxSequenceQuery() string
+	maxCreationDateQuery() string
 	instanceIDsQuery() string
 	db() *sql.DB
-	orderByEventSequence(desc bool) string
+	orderByCreationDate(desc bool) string
 }
 
 type scan func(dest ...interface{}) error
@@ -37,7 +38,7 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 	query += where
 
 	if searchQuery.Columns == repository.ColumnsEvent {
-		query += criteria.orderByEventSequence(searchQuery.Desc)
+		query += criteria.orderByCreationDate(searchQuery.Desc)
 	}
 
 	if searchQuery.Limit > 0 {
@@ -74,8 +75,8 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 
 func prepareColumns(criteria querier, columns repository.Columns) (string, func(s scan, dest interface{}) error) {
 	switch columns {
-	case repository.ColumnsMaxSequence:
-		return criteria.maxSequenceQuery(), maxSequenceScanner
+	case repository.ColumnsMaxCreationDate:
+		return criteria.maxCreationDateQuery(), maxCreationDateScanner
 	case repository.ColumnsInstanceIDs:
 		return criteria.instanceIDsQuery(), instanceIDsScanner
 	case repository.ColumnsEvent:
@@ -85,10 +86,10 @@ func prepareColumns(criteria querier, columns repository.Columns) (string, func(
 	}
 }
 
-func maxSequenceScanner(row scan, dest interface{}) (err error) {
-	sequence, ok := dest.(*Sequence)
+func maxCreationDateScanner(row scan, dest interface{}) (err error) {
+	sequence, ok := dest.(*time.Time)
 	if !ok {
-		return z_errors.ThrowInvalidArgument(nil, "SQL-NBjA9", "type must be sequence")
+		return z_errors.ThrowInvalidArgument(nil, "SQL-NBjA9", "type must be time.Time")
 	}
 	err = row(sequence)
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
@@ -118,19 +119,12 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	if !ok {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-4GP6F", "type must be event")
 	}
-	var (
-		previousAggregateSequence     Sequence
-		previousAggregateTypeSequence Sequence
-	)
 	data := make(Data, 0)
 	event := new(repository.Event)
 
 	err = scanner(
 		&event.CreationDate,
 		&event.Type,
-		&event.Sequence,
-		&previousAggregateSequence,
-		&previousAggregateTypeSequence,
 		&data,
 		&event.EditorService,
 		&event.EditorUser,
@@ -146,8 +140,6 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 	}
 
-	event.PreviousAggregateSequence = uint64(previousAggregateSequence)
-	event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)
 

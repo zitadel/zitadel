@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -47,19 +48,18 @@ func filter(querier Querier, searchQuery *es_models.SearchQueryFactory) (events 
 	return events, nil
 }
 
-func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.SearchQueryFactory) (uint64, error) {
+func (db *SQL) LatestCreationDate(ctx context.Context, queryFactory *es_models.SearchQueryFactory) (creationDate time.Time, err error) {
 	query, _, values, rowScanner := buildQuery(queryFactory)
 	if query == "" {
-		return 0, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+		return time.Time{}, errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
+
 	row := db.client.QueryRow(query, values...)
-	sequence := new(Sequence)
-	err := rowScanner(row.Scan, sequence)
-	if err != nil {
+	if err = rowScanner(row.Scan, creationDate); err != nil {
 		logging.New().WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Info("query failed")
-		return 0, errors.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
+		return time.Time{}, errors.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
 	}
-	return uint64(*sequence), nil
+	return creationDate, nil
 }
 
 func (db *SQL) InstanceIDs(ctx context.Context, queryFactory *es_models.SearchQueryFactory) ([]string, error) {

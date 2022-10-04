@@ -26,10 +26,6 @@ var (
 		name:  projection.FlowChangeDateCol,
 		table: flowsTriggersTable,
 	}
-	FlowsTriggersColumnSequence = Column{
-		name:  projection.FlowSequenceCol,
-		table: flowsTriggersTable,
-	}
 	FlowsTriggersColumnTriggerType = Column{
 		name:  projection.FlowTriggerTypeCol,
 		table: flowsTriggersTable,
@@ -42,10 +38,6 @@ var (
 		name:  projection.FlowInstanceIDCol,
 		table: flowsTriggersTable,
 	}
-	FlowsTriggersColumnTriggerSequence = Column{
-		name:  projection.FlowActionTriggerSequenceCol,
-		table: flowsTriggersTable,
-	}
 	FlowsTriggersColumnActionID = Column{
 		name:  projection.FlowActionIDCol,
 		table: flowsTriggersTable,
@@ -55,7 +47,6 @@ var (
 type Flow struct {
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 	Type          domain.FlowType
 
 	TriggerActions map[domain.TriggerType][]*Action
@@ -152,7 +143,6 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 			ActionColumnChangeDate.identifier(),
 			ActionColumnResourceOwner.identifier(),
 			ActionColumnState.identifier(),
-			ActionColumnSequence.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
 		).
@@ -169,7 +159,6 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 					&action.ChangeDate,
 					&action.ResourceOwner,
 					&action.State,
-					&action.Sequence,
 					&action.Name,
 					&action.Script,
 				)
@@ -194,14 +183,11 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 			ActionColumnChangeDate.identifier(),
 			ActionColumnResourceOwner.identifier(),
 			ActionColumnState.identifier(),
-			ActionColumnSequence.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
 			FlowsTriggersColumnTriggerType.identifier(),
-			FlowsTriggersColumnTriggerSequence.identifier(),
 			FlowsTriggersColumnFlowType.identifier(),
 			FlowsTriggersColumnChangeDate.identifier(),
-			FlowsTriggersColumnSequence.identifier(),
 			FlowsTriggersColumnResourceOwner.identifier(),
 		).
 			From(flowsTriggersTable.name).
@@ -219,12 +205,10 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 					actionChangeDate    sql.NullTime
 					actionResourceOwner sql.NullString
 					actionState         sql.NullInt32
-					actionSequence      sql.NullInt64
 					actionName          sql.NullString
 					actionScript        sql.NullString
 
-					triggerType     domain.TriggerType
-					triggerSequence int
+					triggerType domain.TriggerType
 				)
 				err := rows.Scan(
 					&actionID,
@@ -232,14 +216,11 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 					&actionChangeDate,
 					&actionResourceOwner,
 					&actionState,
-					&actionSequence,
 					&actionName,
 					&actionScript,
 					&triggerType,
-					&triggerSequence,
 					&flow.Type,
 					&flow.ChangeDate,
-					&flow.Sequence,
 					&flow.ResourceOwner,
 				)
 				if err != nil {
@@ -254,7 +235,6 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 					ChangeDate:    actionChangeDate.Time,
 					ResourceOwner: actionResourceOwner.String,
 					State:         domain.ActionState(actionState.Int32),
-					Sequence:      uint64(actionSequence.Int64),
 					Name:          actionName.String,
 					Script:        actionScript.String,
 				})

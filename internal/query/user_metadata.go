@@ -23,7 +23,6 @@ type UserMetadata struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 	Key           string
 	Value         []byte
 }
@@ -55,10 +54,6 @@ var (
 	}
 	UserMetadataInstanceIDCol = Column{
 		name:  projection.UserMetadataColumnInstanceID,
-		table: userMetadataTable,
-	}
-	UserMetadataSequenceCol = Column{
-		name:  projection.UserMetadataColumnSequence,
 		table: userMetadataTable,
 	}
 	UserMetadataKeyCol = Column{
@@ -152,7 +147,6 @@ func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata
 			UserMetadataCreationDateCol.identifier(),
 			UserMetadataChangeDateCol.identifier(),
 			UserMetadataResourceOwnerCol.identifier(),
-			UserMetadataSequenceCol.identifier(),
 			UserMetadataKeyCol.identifier(),
 			UserMetadataValueCol.identifier(),
 		).
@@ -164,7 +158,6 @@ func prepareUserMetadataQuery() (sq.SelectBuilder, func(*sql.Row) (*UserMetadata
 				&m.CreationDate,
 				&m.ChangeDate,
 				&m.ResourceOwner,
-				&m.Sequence,
 				&m.Key,
 				&m.Value,
 			)
@@ -184,7 +177,6 @@ func prepareUserMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserMet
 			UserMetadataCreationDateCol.identifier(),
 			UserMetadataChangeDateCol.identifier(),
 			UserMetadataResourceOwnerCol.identifier(),
-			UserMetadataSequenceCol.identifier(),
 			UserMetadataKeyCol.identifier(),
 			UserMetadataValueCol.identifier(),
 			countColumn.identifier()).
@@ -199,7 +191,6 @@ func prepareUserMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserMet
 					&m.CreationDate,
 					&m.ChangeDate,
 					&m.ResourceOwner,
-					&m.Sequence,
 					&m.Key,
 					&m.Value,
 					&count,

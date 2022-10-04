@@ -13,21 +13,10 @@ import (
 
 type CurrentSequence struct {
 	ViewName                 string    `gorm:"column:view_name;primary_key"`
-	CurrentSequence          uint64    `gorm:"column:current_sequence"`
 	EventTimestamp           time.Time `gorm:"column:event_timestamp"`
 	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
 	InstanceID               string    `gorm:"column:instance_id;primary_key"`
-}
-
-type currentSequenceViewWithSequence struct {
-	ViewName                 string    `gorm:"column:view_name;primary_key"`
-	CurrentSequence          uint64    `gorm:"column:current_sequence"`
-	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
-}
-
-type currentSequenceView struct {
-	ViewName                 string    `gorm:"column:view_name;primary_key"`
-	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
+	EventID                  string    `gorm:"column:event_id;primary_key"`
 }
 
 type SequenceSearchKey int32
@@ -105,14 +94,13 @@ func CurrentSequenceToModel(sequence *CurrentSequence) *model.View {
 	return &model.View{
 		Database:                 dbView[0],
 		ViewName:                 dbView[1],
-		CurrentSequence:          sequence.CurrentSequence,
 		EventTimestamp:           sequence.EventTimestamp,
 		LastSuccessfulSpoolerRun: sequence.LastSuccessfulSpoolerRun,
 	}
 }
 
-func SaveCurrentSequence(db *gorm.DB, table, viewName, instanceID string, sequence uint64, eventTimestamp time.Time) error {
-	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, sequence, eventTimestamp, time.Now(), instanceID})
+func SaveCurrentSequence(db *gorm.DB, table, viewName, instanceID, eventID string, eventTimestamp time.Time) error {
+	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, eventTimestamp, time.Now(), instanceID, eventID})
 }
 
 func SaveCurrentSequences(db *gorm.DB, table, viewName string, sequence uint64, eventTimestamp time.Time) error {
@@ -153,7 +141,7 @@ func LatestSequence(db *gorm.DB, table, viewName, instanceID string) (*CurrentSe
 	}
 
 	// ensure highest sequence of view
-	db = db.Order("current_sequence DESC")
+	db = db.Order("event_timestamp DESC")
 
 	query := PrepareGetByQuery(table, searchQueries...)
 	sequence := new(CurrentSequence)

@@ -12,7 +12,6 @@ import (
 
 func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:      objectDetail.Sequence,
 		ResourceOwner: objectDetail.ResourceOwner,
 	}
 	if !objectDetail.EventDate.IsZero() {
@@ -23,7 +22,6 @@ func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.Obje
 
 func DomainToAddDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:      objectDetail.Sequence,
 		ResourceOwner: objectDetail.ResourceOwner,
 	}
 	if !objectDetail.EventDate.IsZero() {
@@ -33,13 +31,11 @@ func DomainToAddDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectD
 }
 
 func ToViewDetailsPb(
-	sequence uint64,
 	creationDate,
 	changeDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:      sequence,
 		ResourceOwner: resourceOwner,
 	}
 	if !creationDate.IsZero() {
@@ -52,12 +48,10 @@ func ToViewDetailsPb(
 }
 
 func ChangeToDetailsPb(
-	sequence uint64,
 	changeDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:      sequence,
 		ResourceOwner: resourceOwner,
 	}
 	if !changeDate.IsZero() {
@@ -67,12 +61,10 @@ func ChangeToDetailsPb(
 }
 
 func AddToDetailsPb(
-	sequence uint64,
 	creationDate time.Time,
 	resourceOwner string,
 ) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:      sequence,
 		ResourceOwner: resourceOwner,
 	}
 	if !creationDate.IsZero() {

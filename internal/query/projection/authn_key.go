@@ -20,7 +20,6 @@ const (
 	AuthNKeyResourceOwnerCol = "resource_owner"
 	AuthNKeyInstanceIDCol    = "instance_id"
 	AuthNKeyAggregateIDCol   = "aggregate_id"
-	AuthNKeySequenceCol      = "sequence"
 	AuthNKeyObjectIDCol      = "object_id"
 	AuthNKeyExpirationCol    = "expiration"
 	AuthNKeyIdentifierCol    = "identifier"
@@ -44,7 +43,6 @@ func newAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(AuthNKeyResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyAggregateIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(AuthNKeySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(AuthNKeyObjectIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyExpirationCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(AuthNKeyIdentifierCol, crdb.ColumnTypeText),
@@ -151,7 +149,6 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 				handler.NewCol(AuthNKeyResourceOwnerCol, authNKeyEvent.Aggregate().ResourceOwner),
 				handler.NewCol(AuthNKeyInstanceIDCol, authNKeyEvent.Aggregate().InstanceID),
 				handler.NewCol(AuthNKeyAggregateIDCol, authNKeyEvent.Aggregate().ID),
-				handler.NewCol(AuthNKeySequenceCol, authNKeyEvent.Sequence()),
 				handler.NewCol(AuthNKeyObjectIDCol, authNKeyEvent.objectID),
 				handler.NewCol(AuthNKeyExpirationCol, authNKeyEvent.expiration),
 				handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),

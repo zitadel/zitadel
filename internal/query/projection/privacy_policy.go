@@ -19,7 +19,6 @@ const (
 	PrivacyPolicyIDCol            = "id"
 	PrivacyPolicyCreationDateCol  = "creation_date"
 	PrivacyPolicyChangeDateCol    = "change_date"
-	PrivacyPolicySequenceCol      = "sequence"
 	PrivacyPolicyStateCol         = "state"
 	PrivacyPolicyIsDefaultCol     = "is_default"
 	PrivacyPolicyResourceOwnerCol = "resource_owner"
@@ -42,7 +41,6 @@ func newPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(PrivacyPolicyIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(PrivacyPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(PrivacyPolicySequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(PrivacyPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(PrivacyPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(PrivacyPolicyResourceOwnerCol, crdb.ColumnTypeText),
@@ -111,7 +109,6 @@ func (p *privacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		[]handler.Column{
 			handler.NewCol(PrivacyPolicyCreationDateCol, policyEvent.CreationDate()),
 			handler.NewCol(PrivacyPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(PrivacyPolicySequenceCol, policyEvent.Sequence()),
 			handler.NewCol(PrivacyPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(PrivacyPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(PrivacyPolicyPrivacyLinkCol, policyEvent.PrivacyLink),
@@ -135,7 +132,6 @@ func (p *privacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	}
 	cols := []handler.Column{
 		handler.NewCol(PrivacyPolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(PrivacyPolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.PrivacyLink != nil {
 		cols = append(cols, handler.NewCol(PrivacyPolicyPrivacyLinkCol, *policyEvent.PrivacyLink))

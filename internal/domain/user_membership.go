@@ -15,7 +15,6 @@ type UserMembership struct {
 	ChangeDate        time.Time
 	ResourceOwner     string
 	ResourceOwnerName string
-	Sequence          uint64
 }
 
 type MemberType int32

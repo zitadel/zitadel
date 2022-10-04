@@ -20,7 +20,6 @@ const (
 	MessageTextInstanceIDCol   = "instance_id"
 	MessageTextCreationDateCol = "creation_date"
 	MessageTextChangeDateCol   = "change_date"
-	MessageTextSequenceCol     = "sequence"
 	MessageTextStateCol        = "state"
 	MessageTextTypeCol         = "type"
 	MessageTextLanguageCol     = "language"
@@ -47,7 +46,6 @@ func newMessageTextProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(MessageTextInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MessageTextCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(MessageTextChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(MessageTextSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(MessageTextStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(MessageTextTypeCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MessageTextLanguageCol, crdb.ColumnTypeText),
@@ -124,7 +122,6 @@ func (p *messageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 		handler.NewCol(MessageTextInstanceIDCol, templateEvent.Aggregate().InstanceID),
 		handler.NewCol(MessageTextCreationDateCol, templateEvent.CreationDate()),
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
-		handler.NewCol(MessageTextSequenceCol, templateEvent.Sequence()),
 		handler.NewCol(MessageTextStateCol, domain.PolicyStateActive),
 		handler.NewCol(MessageTextTypeCol, templateEvent.Template),
 		handler.NewCol(MessageTextLanguageCol, templateEvent.Language.String()),
@@ -177,7 +174,6 @@ func (p *messageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	}
 	cols := []handler.Column{
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
-		handler.NewCol(MessageTextSequenceCol, templateEvent.Sequence()),
 	}
 	if isTitle(templateEvent.Key) {
 		cols = append(cols, handler.NewCol(MessageTextTitleCol, ""))

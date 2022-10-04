@@ -59,10 +59,6 @@ var (
 		name:  projection.ProjectColumnInstanceID,
 		table: projectsTable,
 	}
-	ProjectColumnSequence = Column{
-		name:  projection.ProjectColumnSequence,
-		table: projectsTable,
-	}
 	ProjectColumnState = Column{
 		name:  projection.ProjectColumnState,
 		table: projectsTable,
@@ -80,7 +76,6 @@ type Project struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	State         domain.ProjectState
-	Sequence      uint64
 
 	Name                   string
 	ProjectRoleAssertion   bool
@@ -186,7 +181,6 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 			ProjectColumnChangeDate.identifier(),
 			ProjectColumnResourceOwner.identifier(),
 			ProjectColumnState.identifier(),
-			ProjectColumnSequence.identifier(),
 			ProjectColumnName.identifier(),
 			ProjectColumnProjectRoleAssertion.identifier(),
 			ProjectColumnProjectRoleCheck.identifier(),
@@ -201,7 +195,6 @@ func prepareProjectQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) 
 				&p.ChangeDate,
 				&p.ResourceOwner,
 				&p.State,
-				&p.Sequence,
 				&p.Name,
 				&p.ProjectRoleAssertion,
 				&p.ProjectRoleCheck,
@@ -225,7 +218,6 @@ func prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error
 			ProjectColumnChangeDate.identifier(),
 			ProjectColumnResourceOwner.identifier(),
 			ProjectColumnState.identifier(),
-			ProjectColumnSequence.identifier(),
 			ProjectColumnName.identifier(),
 			ProjectColumnProjectRoleAssertion.identifier(),
 			ProjectColumnProjectRoleCheck.identifier(),
@@ -244,7 +236,6 @@ func prepareProjectsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Projects, error
 					&project.ChangeDate,
 					&project.ResourceOwner,
 					&project.State,
-					&project.Sequence,
 					&project.Name,
 					&project.ProjectRoleAssertion,
 					&project.ProjectRoleCheck,

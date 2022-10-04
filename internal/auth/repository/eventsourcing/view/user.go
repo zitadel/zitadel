@@ -69,12 +69,12 @@ func (v *View) userByID(instanceID string, queries ...query.SearchQuery) (*model
 		user = new(model.UserView)
 	}
 
-	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.Sequence)
+	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.ChangeDate)
 	if err != nil {
 		return nil, err
 	}
 	events, err := v.es.FilterEvents(ctx, query)
-	if err != nil && user.Sequence == 0 {
+	if err != nil && user.CreationDate.IsZero() {
 		return nil, err
 	} else if err != nil {
 		return user, nil

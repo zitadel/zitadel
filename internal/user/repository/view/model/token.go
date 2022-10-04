@@ -36,7 +36,6 @@ type TokenView struct {
 	Audience          database.StringArray `json:"audience" gorm:"column:audience"`
 	Scopes            database.StringArray `json:"scopes" gorm:"column:scopes"`
 	Expiration        time.Time            `json:"expiration" gorm:"column:expiration"`
-	Sequence          uint64               `json:"-" gorm:"column:sequence"`
 	PreferredLanguage string               `json:"preferredLanguage" gorm:"column:preferred_language"`
 	RefreshTokenID    string               `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
 	IsPAT             bool                 `json:"-" gorm:"is_pat"`
@@ -56,7 +55,6 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 		Audience:          token.Audience,
 		Scopes:            token.Scopes,
 		Expiration:        token.Expiration,
-		Sequence:          token.Sequence,
 		PreferredLanguage: token.PreferredLanguage,
 		RefreshTokenID:    token.RefreshTokenID,
 		IsPAT:             token.IsPAT,
@@ -111,7 +109,6 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 
 func (t *TokenView) AppendEvent(event *es_models.Event) error {
 	t.ChangeDate = event.CreationDate
-	t.Sequence = event.Sequence
 	switch eventstore.EventType(event.Type) {
 	case user_repo.UserTokenAddedType,
 		user_repo.PersonalAccessTokenAddedType:

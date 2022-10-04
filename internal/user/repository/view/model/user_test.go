@@ -87,7 +87,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added user event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1AddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(nil))},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1AddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(nil))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
@@ -95,7 +95,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added human event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanAddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(nil))},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanAddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(nil))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
@@ -103,7 +103,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added machine event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.MachineAddedEventType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullMachine())},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.MachineAddedEventType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullMachine())},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", MachineView: &MachineView{Description: "Description", Name: "Machine"}, State: int32(model.UserStateActive)},
@@ -111,7 +111,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added user with password event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1AddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1AddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateInitial)},
@@ -119,7 +119,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added human with password event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanAddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanAddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(&es_model.Password{Secret: &crypto.CryptoValue{}}))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateInitial)},
@@ -127,7 +127,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added user with password but change required event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1AddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1AddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateInitial)},
@@ -135,7 +135,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append added human with password but change required event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanAddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanAddedType), ResourceOwner: "GrantedOrgID", Data: mockUserData(getFullHuman(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}}))},
 				user:  &UserView{},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateInitial)},
@@ -143,7 +143,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append password change event on user",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1PasswordChangedType), ResourceOwner: "GrantedOrgID", Data: mockPasswordData(&es_model.Password{Secret: &crypto.CryptoValue{}})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1PasswordChangedType), ResourceOwner: "GrantedOrgID", Data: mockPasswordData(&es_model.Password{Secret: &crypto.CryptoValue{}})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateActive)},
@@ -151,7 +151,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append password change event on human",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanPasswordChangedType), ResourceOwner: "GrantedOrgID", Data: mockPasswordData(&es_model.Password{Secret: &crypto.CryptoValue{}})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanPasswordChangedType), ResourceOwner: "GrantedOrgID", Data: mockPasswordData(&es_model.Password{Secret: &crypto.CryptoValue{}})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true}, State: int32(model.UserStateActive)},
@@ -159,7 +159,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append password change with change required event on user",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1PasswordChangedType), ResourceOwner: "GrantedOrgID", Data: mockPasswordData(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1PasswordChangedType), ResourceOwner: "GrantedOrgID", Data: mockPasswordData(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateActive)},
@@ -167,7 +167,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append password change with change required event on human",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanPasswordChangedType), ResourceOwner: "GrantedOrgID", Data: mockPasswordData(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanPasswordChangedType), ResourceOwner: "GrantedOrgID", Data: mockPasswordData(&es_model.Password{ChangeRequired: true, Secret: &crypto.CryptoValue{}})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country", PasswordSet: true, PasswordChangeRequired: true}, State: int32(model.UserStateActive)},
@@ -175,7 +175,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append change user profile event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1ProfileChangedType), ResourceOwner: "GrantedOrgID", Data: mockProfileData(&es_model.Profile{FirstName: "FirstNameChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1ProfileChangedType), ResourceOwner: "GrantedOrgID", Data: mockProfileData(&es_model.Profile{FirstName: "FirstNameChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstNameChanged", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
@@ -183,7 +183,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append change human profile event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanProfileChangedType), ResourceOwner: "GrantedOrgID", Data: mockProfileData(&es_model.Profile{FirstName: "FirstNameChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanProfileChangedType), ResourceOwner: "GrantedOrgID", Data: mockProfileData(&es_model.Profile{FirstName: "FirstNameChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstNameChanged", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
@@ -191,7 +191,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append change user email event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1EmailChangedType), ResourceOwner: "GrantedOrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1EmailChangedType), ResourceOwner: "GrantedOrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "EmailChanged", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -199,7 +199,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append change human email event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanEmailChangedType), ResourceOwner: "GrantedOrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanEmailChangedType), ResourceOwner: "GrantedOrgID", Data: mockEmailData(&es_model.Email{EmailAddress: "EmailChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "EmailChanged", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -207,7 +207,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append verify user email event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1EmailVerifiedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1EmailVerifiedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -215,7 +215,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append verify human email event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanEmailVerifiedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanEmailVerifiedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInitial)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -223,7 +223,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append change user phone event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1PhoneChangedType), ResourceOwner: "GrantedOrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1PhoneChangedType), ResourceOwner: "GrantedOrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "PhoneChanged", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -231,7 +231,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append change human phone event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanPhoneChangedType), ResourceOwner: "GrantedOrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanPhoneChangedType), ResourceOwner: "GrantedOrgID", Data: mockPhoneData(&es_model.Phone{PhoneNumber: "PhoneChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "PhoneChanged", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -239,7 +239,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append verify user phone event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1PhoneVerifiedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1PhoneVerifiedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", IsPhoneVerified: true, Country: "Country"}, State: int32(model.UserStateActive)},
@@ -247,7 +247,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append verify human phone event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanPhoneVerifiedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanPhoneVerifiedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", IsPhoneVerified: true, Country: "Country"}, State: int32(model.UserStateActive)},
@@ -255,7 +255,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append change user address event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1AddressChangedType), ResourceOwner: "GrantedOrgID", Data: mockAddressData(&es_model.Address{Country: "CountryChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1AddressChangedType), ResourceOwner: "GrantedOrgID", Data: mockAddressData(&es_model.Address{Country: "CountryChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "CountryChanged"}, State: int32(model.UserStateActive)},
@@ -263,7 +263,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append change human address event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanAddressChangedType), ResourceOwner: "GrantedOrgID", Data: mockAddressData(&es_model.Address{Country: "CountryChanged"})},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanAddressChangedType), ResourceOwner: "GrantedOrgID", Data: mockAddressData(&es_model.Address{Country: "CountryChanged"})},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", IsEmailVerified: true, Phone: "Phone", Country: "CountryChanged"}, State: int32(model.UserStateActive)},
@@ -271,7 +271,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user deactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserDeactivatedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserDeactivatedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInactive)},
@@ -279,7 +279,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user reactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserReactivatedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserReactivatedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateInactive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -287,7 +287,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user lock event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserLockedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserLockedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateLocked)},
@@ -295,7 +295,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user unlock event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserUnlockedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserUnlockedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateLocked)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
@@ -303,7 +303,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user add otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1MFAOTPAddedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1MFAOTPAddedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateNotReady)}, State: int32(model.UserStateActive)},
@@ -311,7 +311,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append human add otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanMFAOTPAddedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanMFAOTPAddedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateNotReady)}, State: int32(model.UserStateActive)},
@@ -319,7 +319,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user verify otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1MFAOTPVerifiedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1MFAOTPVerifiedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateNotReady)}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateReady)}, State: int32(model.UserStateActive)},
@@ -327,7 +327,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append human verify otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanMFAOTPVerifiedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanMFAOTPVerifiedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateNotReady)}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateReady)}, State: int32(model.UserStateActive)},
@@ -335,7 +335,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user remove otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.UserV1MFAOTPRemovedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.UserV1MFAOTPRemovedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateReady)}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateUnspecified)}, State: int32(model.UserStateActive)},
@@ -343,7 +343,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append human remove otp event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(user.HumanMFAOTPRemovedType), ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{AggregateID: "AggregateID" /*Sequence: 1,*/, Type: es_models.EventType(user.HumanMFAOTPRemovedType), ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateReady)}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", OTPState: int32(model.MFAStateUnspecified)}, State: int32(model.UserStateActive)},
@@ -351,7 +351,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append user mfa init skipped event",
 			args: args{
-				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_models.EventType(user.UserV1MFAInitSkippedType), AggregateID: "AggregateID", ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{ /*Sequence: 1,*/ CreationDate: time.Now().UTC(), Type: es_models.EventType(user.UserV1MFAInitSkippedType), AggregateID: "AggregateID", ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MFAInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},
@@ -359,7 +359,7 @@ func TestUserAppendEvent(t *testing.T) {
 		{
 			name: "append human mfa init skipped event",
 			args: args{
-				event: &es_models.Event{Sequence: 1, CreationDate: time.Now().UTC(), Type: es_models.EventType(user.HumanMFAInitSkippedType), AggregateID: "AggregateID", ResourceOwner: "GrantedOrgID"},
+				event: &es_models.Event{ /*Sequence: 1,*/ CreationDate: time.Now().UTC(), Type: es_models.EventType(user.HumanMFAInitSkippedType), AggregateID: "AggregateID", ResourceOwner: "GrantedOrgID"},
 				user:  &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country"}, State: int32(model.UserStateActive)},
 			},
 			result: &UserView{ID: "AggregateID", ResourceOwner: "GrantedOrgID", UserName: "UserName", HumanView: &HumanView{FirstName: "FirstName", LastName: "LastName", Email: "Email", Phone: "Phone", Country: "Country", MFAInitSkipped: time.Now().UTC()}, State: int32(model.UserStateActive)},

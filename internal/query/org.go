@@ -42,10 +42,6 @@ var (
 		name:  projection.OrgColumnState,
 		table: orgsTable,
 	}
-	OrgColumnSequence = Column{
-		name:  projection.OrgColumnSequence,
-		table: orgsTable,
-	}
 	OrgColumnName = Column{
 		name:  projection.OrgColumnName,
 		table: orgsTable,
@@ -67,7 +63,6 @@ type Org struct {
 	ChangeDate    time.Time
 	ResourceOwner string
 	State         domain.OrgState
-	Sequence      uint64
 
 	Name   string
 	Domain string
@@ -194,7 +189,6 @@ func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 			OrgColumnChangeDate.identifier(),
 			OrgColumnResourceOwner.identifier(),
 			OrgColumnState.identifier(),
-			OrgColumnSequence.identifier(),
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
 			countColumn.identifier()).
@@ -210,7 +204,6 @@ func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 					&org.ChangeDate,
 					&org.ResourceOwner,
 					&org.State,
-					&org.Sequence,
 					&org.Name,
 					&org.Domain,
 					&count,
@@ -241,7 +234,6 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 			OrgColumnChangeDate.identifier(),
 			OrgColumnResourceOwner.identifier(),
 			OrgColumnState.identifier(),
-			OrgColumnSequence.identifier(),
 			OrgColumnName.identifier(),
 			OrgColumnDomain.identifier(),
 		).
@@ -254,7 +246,6 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 				&o.ChangeDate,
 				&o.ResourceOwner,
 				&o.State,
-				&o.Sequence,
 				&o.Name,
 				&o.Domain,
 			)

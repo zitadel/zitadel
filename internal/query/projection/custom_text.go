@@ -19,7 +19,6 @@ const (
 	CustomTextInstanceIDCol   = "instance_id"
 	CustomTextCreationDateCol = "creation_date"
 	CustomTextChangeDateCol   = "change_date"
-	CustomTextSequenceCol     = "sequence"
 	CustomTextIsDefaultCol    = "is_default"
 	CustomTextTemplateCol     = "template"
 	CustomTextLanguageCol     = "language"
@@ -41,7 +40,6 @@ func newCustomTextProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(CustomTextInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(CustomTextCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(CustomTextChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(CustomTextSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(CustomTextIsDefaultCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(CustomTextTemplateCol, crdb.ColumnTypeText),
 			crdb.NewColumn(CustomTextLanguageCol, crdb.ColumnTypeText),
@@ -121,7 +119,6 @@ func (p *customTextProjection) reduceSet(event eventstore.Event) (*handler.State
 			handler.NewCol(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 			handler.NewCol(CustomTextCreationDateCol, customTextEvent.CreationDate()),
 			handler.NewCol(CustomTextChangeDateCol, customTextEvent.CreationDate()),
-			handler.NewCol(CustomTextSequenceCol, customTextEvent.Sequence()),
 			handler.NewCol(CustomTextIsDefaultCol, isDefault),
 			handler.NewCol(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCol(CustomTextLanguageCol, customTextEvent.Language.String()),

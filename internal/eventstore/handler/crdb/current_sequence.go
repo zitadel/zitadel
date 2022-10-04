@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -12,19 +13,20 @@ import (
 )
 
 const (
-	currentSequenceStmtFormat          = `SELECT current_sequence, aggregate_type, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
-	updateCurrentSequencesStmtFormat   = `INSERT INTO %s (projection_name, aggregate_type, current_sequence, instance_id, timestamp) VALUES `
-	updateCurrentSequencesConflictStmt = ` ON CONFLICT (projection_name, aggregate_type, instance_id) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`
+	latestEventStmtFormat     = `SELECT id, creation_date, aggregate_type, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
+	updateEventIDStmtFormat   = `INSERT INTO %s (projection_name, aggregate_type, event_id, instance_id, timestamp) VALUES `
+	updateEventIDConflictStmt = ` ON CONFLICT (projection_name, aggregate_type, instance_id) DO UPDATE SET event_id = EXCLUDED.event_id, timestamp = EXCLUDED.timestamp`
 )
 
-type currentSequences map[eventstore.AggregateType][]*instanceSequence
+type events map[eventstore.AggregateType][]*instanceEvents
 
-type instanceSequence struct {
-	instanceID string
-	sequence   uint64
+type instanceEvents struct {
+	instanceID   string
+	eventID      string
+	creationDate time.Time
 }
 
-func (h *StatementHandler) currentSequences(ctx context.Context, query func(context.Context, string, ...interface{}) (*sql.Rows, error), instanceIDs database.StringArray) (currentSequences, error) {
+func (h *StatementHandler) currentSequences(ctx context.Context, query func(context.Context, string, ...interface{}) (*sql.Rows, error), instanceIDs database.StringArray) (events, error) {
 	rows, err := query(ctx, h.currentSequenceStmt, h.ProjectionName, instanceIDs)
 	if err != nil {
 		return nil, err
@@ -32,22 +34,24 @@ func (h *StatementHandler) currentSequences(ctx context.Context, query func(cont
 
 	defer rows.Close()
 
-	sequences := make(currentSequences, len(h.aggregates))
+	ids := make(events, len(h.aggregates))
 	for rows.Next() {
 		var (
 			aggregateType eventstore.AggregateType
-			sequence      uint64
+			eventID       string
 			instanceID    string
+			creationDate  sql.NullTime
 		)
 
-		err = rows.Scan(&sequence, &aggregateType, &instanceID)
+		err = rows.Scan(&eventID, &creationDate, &aggregateType, &instanceID)
 		if err != nil {
 			return nil, errors.ThrowInternal(err, "CRDB-dbatK", "scan failed")
 		}
 
-		sequences[aggregateType] = append(sequences[aggregateType], &instanceSequence{
-			sequence:   sequence,
-			instanceID: instanceID,
+		ids[aggregateType] = append(ids[aggregateType], &instanceEvents{
+			eventID:      eventID,
+			instanceID:   instanceID,
+			creationDate: creationDate.Time,
 		})
 	}
 
@@ -59,22 +63,22 @@ func (h *StatementHandler) currentSequences(ctx context.Context, query func(cont
 		return nil, errors.ThrowInternal(err, "CRDB-O8zig", "errors in scanning rows")
 	}
 
-	return sequences, nil
+	return ids, nil
 }
 
-func (h *StatementHandler) updateCurrentSequences(tx *sql.Tx, sequences currentSequences) error {
-	valueQueries := make([]string, 0, len(sequences))
+func (h *StatementHandler) updateCurrentSequences(tx *sql.Tx, ids events) error {
+	valueQueries := make([]string, 0, len(ids))
 	valueCounter := 0
-	values := make([]interface{}, 0, len(sequences)*3)
-	for aggregate, instanceSequence := range sequences {
-		for _, sequence := range instanceSequence {
+	values := make([]interface{}, 0, len(ids)*3)
+	for aggregate, eventID := range ids {
+		for _, sequence := range eventID {
 			valueQueries = append(valueQueries, "($"+strconv.Itoa(valueCounter+1)+", $"+strconv.Itoa(valueCounter+2)+", $"+strconv.Itoa(valueCounter+3)+", $"+strconv.Itoa(valueCounter+4)+", NOW())")
 			valueCounter += 4
-			values = append(values, h.ProjectionName, aggregate, sequence.sequence, sequence.instanceID)
+			values = append(values, h.ProjectionName, aggregate, sequence.eventID, sequence.instanceID)
 		}
 	}
 
-	res, err := tx.Exec(h.updateSequencesBaseStmt+strings.Join(valueQueries, ", ")+updateCurrentSequencesConflictStmt, values...)
+	res, err := tx.Exec(h.updateSequencesBaseStmt+strings.Join(valueQueries, ", ")+updateEventIDConflictStmt, values...)
 	if err != nil {
 		return errors.ThrowInternal(err, "CRDB-TrH2Z", "unable to exec update sequence")
 	}

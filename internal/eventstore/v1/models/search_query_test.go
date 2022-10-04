@@ -31,12 +31,12 @@ func testAddQuery(queryFuncs ...func(*query) *query) func(*SearchQueryFactory) *
 	}
 }
 
-func testSetSequence(sequence uint64) func(*query) *query {
-	return func(q *query) *query {
-		q.SequenceGreater(sequence)
-		return q
-	}
-}
+// func testSetSequence(sequence uint64) func(*query) *query {
+// 	return func(q *query) *query {
+// 		q.SequenceGreater(sequence)
+// 		return q
+// 	}
+// }
 
 func testSetAggregateIDs(aggregateIDs ...string) func(*query) *query {
 	return func(q *query) *query {
@@ -107,11 +107,11 @@ func assertQuery(t *testing.T, i int, want, got *query) {
 	if !reflect.DeepEqual(got.aggregateTypes, want.aggregateTypes) {
 		t.Errorf("wrong aggregateTypes in query %d : got: %v want: %v", i, got.aggregateTypes, want.aggregateTypes)
 	}
-	if got.sequenceFrom != want.sequenceFrom {
-		t.Errorf("wrong sequenceFrom in query %d : got: %v want: %v", i, got.sequenceFrom, want.sequenceFrom)
+	if !got.creationDateFrom.Equal(want.creationDateFrom) {
+		t.Errorf("wrong creationDateFrom in query %v : got: %v want: %v", i, got.creationDateFrom, want.creationDateFrom)
 	}
-	if got.sequenceTo != want.sequenceTo {
-		t.Errorf("wrong sequenceTo in query %d : got: %v want: %v", i, got.sequenceTo, want.sequenceTo)
+	if !got.creationDateTo.Equal(want.creationDateTo) {
+		t.Errorf("wrong creationDateTo in query %v : got: %v want: %v", i, got.creationDateTo, want.creationDateTo)
 	}
 	if !reflect.DeepEqual(got.eventTypes, want.eventTypes) {
 		t.Errorf("wrong eventTypes in query %d : got: %v want: %v", i, got.eventTypes, want.eventTypes)
@@ -137,10 +137,10 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 		{
 			name: "set columns",
 			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetColumns(Columns_Max_Sequence)},
+				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testSetColumns(Columns_Max_CreationDate)},
 			},
 			res: &SearchQueryFactory{
-				columns: Columns_Max_Sequence,
+				columns: Columns_Max_CreationDate,
 			},
 		},
 		{
@@ -152,19 +152,19 @@ func TestSearchQueryFactorySetters(t *testing.T) {
 				limit: 100,
 			},
 		},
-		{
-			name: "set sequence",
-			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{testAddQuery(testSetSequence(90))},
-			},
-			res: &SearchQueryFactory{
-				queries: []*query{
-					{
-						sequenceFrom: 90,
-					},
-				},
-			},
-		},
+		// {
+		// 	name: "set sequence",
+		// 	args: args{
+		// 		setters: []func(*SearchQueryFactory) *SearchQueryFactory{testAddQuery(testSetSequence(90))},
+		// 	},
+		// 	res: &SearchQueryFactory{
+		// 		queries: []*query{
+		// 			{
+		// 				sequenceFrom: 90,
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			name: "set aggregateTypes",
 			args: args{
@@ -333,88 +333,88 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "filter aggregate type, limit, desc",
-			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
-					testSetLimit(5),
-					testSetSortOrder(false),
-					testAddQuery(
-						testSetAggregateTypes("user"),
-						testSetSequence(100),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &searchQuery{
-					Columns: 0,
-					Desc:    true,
-					Limit:   5,
-					Filters: [][]*Filter{
-						{
-							NewFilter(Field_AggregateType, AggregateType("user"), Operation_Equals),
-							NewFilter(Field_LatestSequence, uint64(100), Operation_Less),
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "filter aggregate type, limit, asc",
-			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
-					testSetLimit(5),
-					testSetSortOrder(true),
-					testAddQuery(
-						testSetSequence(100),
-						testSetAggregateTypes("user"),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &searchQuery{
-					Columns: 0,
-					Desc:    false,
-					Limit:   5,
-					Filters: [][]*Filter{
-						{
-							NewFilter(Field_AggregateType, AggregateType("user"), Operation_Equals),
-							NewFilter(Field_LatestSequence, uint64(100), Operation_Greater),
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "filter aggregate type, limit, desc, max event sequence cols",
-			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
-					testSetLimit(5),
-					testSetSortOrder(false),
-					testSetColumns(Columns_Max_Sequence),
-					testAddQuery(
-						testSetSequence(100),
-						testSetAggregateTypes("user"),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &searchQuery{
-					Columns: Columns_Max_Sequence,
-					Desc:    true,
-					Limit:   5,
-					Filters: [][]*Filter{
-						{
-							NewFilter(Field_AggregateType, AggregateType("user"), Operation_Equals),
-							NewFilter(Field_LatestSequence, uint64(100), Operation_Less),
-						},
-					},
-				},
-			},
-		},
+		// {
+		// 	name: "filter aggregate type, limit, desc",
+		// 	args: args{
+		// 		setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+		// 			testSetLimit(5),
+		// 			testSetSortOrder(false),
+		// 			testAddQuery(
+		// 				testSetAggregateTypes("user"),
+		// 				testSetSequence(100),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &searchQuery{
+		// 			Columns: 0,
+		// 			Desc:    true,
+		// 			Limit:   5,
+		// 			Filters: [][]*Filter{
+		// 				{
+		// 					NewFilter(Field_AggregateType, AggregateType("user"), Operation_Equals),
+		// 					NewFilter(Field_LatestSequence, uint64(100), Operation_Less),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "filter aggregate type, limit, asc",
+		// 	args: args{
+		// 		setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+		// 			testSetLimit(5),
+		// 			testSetSortOrder(true),
+		// 			testAddQuery(
+		// 				testSetSequence(100),
+		// 				testSetAggregateTypes("user"),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &searchQuery{
+		// 			Columns: 0,
+		// 			Desc:    false,
+		// 			Limit:   5,
+		// 			Filters: [][]*Filter{
+		// 				{
+		// 					NewFilter(Field_AggregateType, AggregateType("user"), Operation_Equals),
+		// 					NewFilter(Field_LatestSequence, uint64(100), Operation_Greater),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "filter aggregate type, limit, desc, max event sequence cols",
+		// 	args: args{
+		// 		setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+		// 			testSetLimit(5),
+		// 			testSetSortOrder(false),
+		// 			testSetColumns(Columns_Max_CreationDate),
+		// 			testAddQuery(
+		// 				testSetSequence(100),
+		// 				testSetAggregateTypes("user"),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &searchQuery{
+		// 			Columns: Columns_Max_CreationDate,
+		// 			Desc:    true,
+		// 			Limit:   5,
+		// 			Filters: [][]*Filter{
+		// 				{
+		// 					NewFilter(Field_AggregateType, AggregateType("user"), Operation_Equals),
+		// 					NewFilter(Field_LatestSequence, uint64(100), Operation_Less),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			name: "filter aggregate type and aggregate id",
 			args: args{
@@ -465,31 +465,31 @@ func TestSearchQueryFactoryBuild(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "filter aggregate type and sequence greater",
-			args: args{
-				setters: []func(*SearchQueryFactory) *SearchQueryFactory{
-					testAddQuery(
-						testSetSequence(8),
-						testSetAggregateTypes("user"),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &searchQuery{
-					Columns: 0,
-					Desc:    false,
-					Limit:   0,
-					Filters: [][]*Filter{
-						{
-							NewFilter(Field_AggregateType, AggregateType("user"), Operation_Equals),
-							NewFilter(Field_LatestSequence, uint64(8), Operation_Greater),
-						},
-					},
-				},
-			},
-		},
+		// {
+		// 	name: "filter aggregate type and sequence greater",
+		// 	args: args{
+		// 		setters: []func(*SearchQueryFactory) *SearchQueryFactory{
+		// 			testAddQuery(
+		// 				testSetSequence(8),
+		// 				testSetAggregateTypes("user"),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &searchQuery{
+		// 			Columns: 0,
+		// 			Desc:    false,
+		// 			Limit:   0,
+		// 			Filters: [][]*Filter{
+		// 				{
+		// 					NewFilter(Field_AggregateType, AggregateType("user"), Operation_Equals),
+		// 					NewFilter(Field_LatestSequence, uint64(8), Operation_Greater),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			name: "filter aggregate type and event type",
 			args: args{

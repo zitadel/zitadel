@@ -18,7 +18,6 @@ type LabelPolicy struct {
 	ID                  string
 	CreationDate        time.Time
 	ChangeDate          time.Time
-	Sequence            uint64
 	State               domain.LabelPolicyState
 	IsDefault           bool
 	ResourceOwner       string
@@ -138,9 +137,6 @@ var (
 	LabelPolicyColChangeDate = Column{
 		name: projection.LabelPolicyChangeDateCol,
 	}
-	LabelPolicyColSequence = Column{
-		name: projection.LabelPolicySequenceCol,
-	}
 	LabelPolicyColID = Column{
 		name: projection.LabelPolicyIDCol,
 	}
@@ -210,7 +206,6 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 	return sq.Select(
 			LabelPolicyColCreationDate.identifier(),
 			LabelPolicyColChangeDate.identifier(),
-			LabelPolicyColSequence.identifier(),
 			LabelPolicyColID.identifier(),
 			LabelPolicyColState.identifier(),
 			LabelPolicyColIsDefault.identifier(),
@@ -258,7 +253,6 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 			err := row.Scan(
 				&policy.CreationDate,
 				&policy.ChangeDate,
-				&policy.Sequence,
 				&policy.ID,
 				&policy.State,
 				&policy.IsDefault,

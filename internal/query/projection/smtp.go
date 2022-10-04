@@ -16,7 +16,6 @@ const (
 	SMTPConfigColumnAggregateID   = "aggregate_id"
 	SMTPConfigColumnCreationDate  = "creation_date"
 	SMTPConfigColumnChangeDate    = "change_date"
-	SMTPConfigColumnSequence      = "sequence"
 	SMTPConfigColumnResourceOwner = "resource_owner"
 	SMTPConfigColumnInstanceID    = "instance_id"
 	SMTPConfigColumnTLS           = "tls"
@@ -40,7 +39,6 @@ func newSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnAggregateID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(SMTPConfigColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(SMTPConfigColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnTLS, crdb.ColumnTypeBool),
@@ -92,7 +90,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
 			handler.NewCol(SMTPConfigColumnTLS, e.TLS),
 			handler.NewCol(SMTPConfigColumnSenderAddress, e.SenderAddress),
 			handler.NewCol(SMTPConfigColumnSenderName, e.SenderName),
@@ -110,8 +107,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	}
 
 	columns := make([]handler.Column, 0, 7)
-	columns = append(columns, handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
-		handler.NewCol(SMTPConfigColumnSequence, e.Sequence()))
+	columns = append(columns, handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()))
 	if e.TLS != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnTLS, *e.TLS))
 	}
@@ -147,7 +143,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 		e,
 		[]handler.Column{
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
-			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
 			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
 		},
 		[]handler.Condition{

@@ -16,7 +16,6 @@ import (
 type Domain struct {
 	CreationDate   time.Time
 	ChangeDate     time.Time
-	Sequence       uint64
 	Domain         string
 	OrgID          string
 	IsVerified     bool
@@ -80,7 +79,6 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 	return sq.Select(
 			OrgDomainCreationDateCol.identifier(),
 			OrgDomainChangeDateCol.identifier(),
-			OrgDomainSequenceCol.identifier(),
 			OrgDomainDomainCol.identifier(),
 			OrgDomainOrgIDCol.identifier(),
 			OrgDomainIsVerifiedCol.identifier(),
@@ -96,7 +94,6 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 				err := rows.Scan(
 					&domain.CreationDate,
 					&domain.ChangeDate,
-					&domain.Sequence,
 					&domain.Domain,
 					&domain.OrgID,
 					&domain.IsVerified,
@@ -134,10 +131,6 @@ var (
 	}
 	OrgDomainChangeDateCol = Column{
 		name:  projection.OrgDomainChangeDateCol,
-		table: orgDomainsTable,
-	}
-	OrgDomainSequenceCol = Column{
-		name:  projection.OrgDomainSequenceCol,
 		table: orgDomainsTable,
 	}
 	OrgDomainDomainCol = Column{

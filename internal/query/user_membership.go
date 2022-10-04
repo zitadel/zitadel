@@ -23,7 +23,6 @@ type Membership struct {
 	Roles         database.StringArray
 	CreationDate  time.Time
 	ChangeDate    time.Time
-	Sequence      uint64
 	ResourceOwner string
 
 	Org          *OrgMembership
@@ -150,10 +149,6 @@ var (
 		name:  projection.MemberChangeDate,
 		table: membershipAlias,
 	}
-	membershipSequence = Column{
-		name:  projection.MemberSequence,
-		table: membershipAlias,
-	}
 	membershipResourceOwner = Column{
 		name:  projection.MemberResourceOwner,
 		table: membershipAlias,
@@ -200,7 +195,6 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 			membershipRoles.identifier(),
 			membershipCreationDate.identifier(),
 			membershipChangeDate.identifier(),
-			membershipSequence.identifier(),
 			membershipResourceOwner.identifier(),
 			membershipOrgID.identifier(),
 			membershipIAMID.identifier(),
@@ -236,7 +230,6 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					&membership.Roles,
 					&membership.CreationDate,
 					&membership.ChangeDate,
-					&membership.Sequence,
 					&membership.ResourceOwner,
 					&orgID,
 					&iamID,
@@ -298,7 +291,6 @@ func prepareOrgMember() string {
 		OrgMemberRoles.identifier(),
 		OrgMemberCreationDate.identifier(),
 		OrgMemberChangeDate.identifier(),
-		OrgMemberSequence.identifier(),
 		OrgMemberResourceOwner.identifier(),
 		OrgMemberInstanceID.identifier(),
 		OrgMemberOrgID.identifier(),
@@ -315,7 +307,6 @@ func prepareIAMMember() string {
 		InstanceMemberRoles.identifier(),
 		InstanceMemberCreationDate.identifier(),
 		InstanceMemberChangeDate.identifier(),
-		InstanceMemberSequence.identifier(),
 		InstanceMemberResourceOwner.identifier(),
 		InstanceMemberInstanceID.identifier(),
 		"NULL::TEXT AS "+membershipOrgID.name,
@@ -332,7 +323,6 @@ func prepareProjectMember() string {
 		ProjectMemberRoles.identifier(),
 		ProjectMemberCreationDate.identifier(),
 		ProjectMemberChangeDate.identifier(),
-		ProjectMemberSequence.identifier(),
 		ProjectMemberResourceOwner.identifier(),
 		ProjectMemberInstanceID.identifier(),
 		"NULL::TEXT AS "+membershipOrgID.name,
@@ -350,7 +340,6 @@ func prepareProjectGrantMember() string {
 		ProjectGrantMemberRoles.identifier(),
 		ProjectGrantMemberCreationDate.identifier(),
 		ProjectGrantMemberChangeDate.identifier(),
-		ProjectGrantMemberSequence.identifier(),
 		ProjectGrantMemberResourceOwner.identifier(),
 		ProjectGrantMemberInstanceID.identifier(),
 		"NULL::TEXT AS "+membershipOrgID.name,

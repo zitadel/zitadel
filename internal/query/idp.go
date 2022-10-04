@@ -20,7 +20,6 @@ import (
 type IDP struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
-	Sequence      uint64
 	ResourceOwner string
 	ID            string
 	State         domain.IDPConfigState
@@ -71,10 +70,6 @@ var (
 	}
 	IDPChangeDateCol = Column{
 		name:  projection.IDPChangeDateCol,
-		table: idpTable,
-	}
-	IDPSequenceCol = Column{
-		name:  projection.IDPSequenceCol,
 		table: idpTable,
 	}
 	IDPResourceOwnerCol = Column{
@@ -179,7 +174,7 @@ var (
 	}
 )
 
-//IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
+// IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
 func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string) (*IDP, error) {
 	if shouldTriggerBulk {
 		projection.IDPProjection.Trigger(ctx)
@@ -210,7 +205,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	return scan(row)
 }
 
-//IDPs searches idps matching the query
+// IDPs searches idps matching the query
 func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries) (idps *IDPs, err error) {
 	query, scan := prepareIDPsQuery()
 	stmt, args, err := queries.toQuery(query).
@@ -276,7 +271,6 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 			IDPResourceOwnerCol.identifier(),
 			IDPCreationDateCol.identifier(),
 			IDPChangeDateCol.identifier(),
-			IDPSequenceCol.identifier(),
 			IDPStateCol.identifier(),
 			IDPNameCol.identifier(),
 			IDPStylingTypeCol.identifier(),
@@ -324,7 +318,6 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 				&idp.ResourceOwner,
 				&idp.CreationDate,
 				&idp.ChangeDate,
-				&idp.Sequence,
 				&idp.State,
 				&idp.Name,
 				&idp.StylingType,
@@ -384,7 +377,6 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 			IDPResourceOwnerCol.identifier(),
 			IDPCreationDateCol.identifier(),
 			IDPChangeDateCol.identifier(),
-			IDPSequenceCol.identifier(),
 			IDPStateCol.identifier(),
 			IDPNameCol.identifier(),
 			IDPStylingTypeCol.identifier(),
@@ -436,7 +428,6 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 					&idp.ResourceOwner,
 					&idp.CreationDate,
 					&idp.ChangeDate,
-					&idp.Sequence,
 					&idp.State,
 					&idp.Name,
 					&idp.StylingType,

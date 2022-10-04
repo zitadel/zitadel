@@ -25,7 +25,6 @@ const (
 	UserIDCol            = "id"
 	UserCreationDateCol  = "creation_date"
 	UserChangeDateCol    = "change_date"
-	UserSequenceCol      = "sequence"
 	UserStateCol         = "state"
 	UserResourceOwnerCol = "resource_owner"
 	UserInstanceIDCol    = "instance_id"
@@ -80,7 +79,6 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(UserChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(UserSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(UserStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(UserResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserInstanceIDCol, crdb.ColumnTypeText),
@@ -292,7 +290,6 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 				handler.NewCol(UserResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCol(UserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(UserStateCol, domain.UserStateActive),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
 				handler.NewCol(UserTypeCol, domain.UserTypeHuman),
 			},
@@ -340,7 +337,6 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(UserResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCol(UserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(UserStateCol, domain.UserStateActive),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
 				handler.NewCol(UserTypeCol, domain.UserTypeHuman),
 			},
@@ -418,7 +414,6 @@ func (p *userProjection) reduceUserLocked(event eventstore.Event) (*handler.Stat
 		[]handler.Column{
 			handler.NewCol(UserChangeDateCol, e.CreationDate()),
 			handler.NewCol(UserStateCol, domain.UserStateLocked),
-			handler.NewCol(UserSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -438,7 +433,6 @@ func (p *userProjection) reduceUserUnlocked(event eventstore.Event) (*handler.St
 		[]handler.Column{
 			handler.NewCol(UserChangeDateCol, e.CreationDate()),
 			handler.NewCol(UserStateCol, domain.UserStateActive),
-			handler.NewCol(UserSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -458,7 +452,6 @@ func (p *userProjection) reduceUserDeactivated(event eventstore.Event) (*handler
 		[]handler.Column{
 			handler.NewCol(UserChangeDateCol, e.CreationDate()),
 			handler.NewCol(UserStateCol, domain.UserStateInactive),
-			handler.NewCol(UserSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -478,7 +471,6 @@ func (p *userProjection) reduceUserReactivated(event eventstore.Event) (*handler
 		[]handler.Column{
 			handler.NewCol(UserChangeDateCol, e.CreationDate()),
 			handler.NewCol(UserStateCol, domain.UserStateActive),
-			handler.NewCol(UserSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -513,7 +505,6 @@ func (p *userProjection) reduceUserNameChanged(event eventstore.Event) (*handler
 		[]handler.Column{
 			handler.NewCol(UserChangeDateCol, e.CreationDate()),
 			handler.NewCol(UserUsernameCol, e.UserName),
-			handler.NewCol(UserSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -533,7 +524,6 @@ func (p *userProjection) reduceDomainClaimed(event eventstore.Event) (*handler.S
 		[]handler.Column{
 			handler.NewCol(UserChangeDateCol, e.CreationDate()),
 			handler.NewCol(UserUsernameCol, e.UserName),
-			handler.NewCol(UserSequenceCol, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -577,7 +567,6 @@ func (p *userProjection) reduceHumanProfileChanged(event eventstore.Event) (*han
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -606,7 +595,6 @@ func (p *userProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handl
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -648,7 +636,6 @@ func (p *userProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handl
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -691,7 +678,6 @@ func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -743,7 +729,6 @@ func (p *userProjection) reduceHumanEmailChanged(event eventstore.Event) (*handl
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -785,7 +770,6 @@ func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -837,7 +821,6 @@ func (p *userProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handle
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -868,7 +851,6 @@ func (p *userProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*hand
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),
@@ -923,7 +905,6 @@ func (p *userProjection) reduceMachineAdded(event eventstore.Event) (*handler.St
 				handler.NewCol(UserResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCol(UserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(UserStateCol, domain.UserStateActive),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
 				handler.NewCol(UserTypeCol, domain.UserTypeMachine),
 			},
@@ -962,7 +943,6 @@ func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 		crdb.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserIDCol, e.Aggregate().ID),

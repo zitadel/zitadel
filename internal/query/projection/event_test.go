@@ -16,20 +16,17 @@ func testEvent(
 	data []byte,
 ) *repository.Event {
 	return &repository.Event{
-		Sequence:                      15,
-		PreviousAggregateSequence:     10,
-		PreviousAggregateTypeSequence: 10,
-		CreationDate:                  time.Now(),
-		Type:                          eventType,
-		AggregateType:                 aggregateType,
-		Data:                          data,
-		Version:                       "v1",
-		AggregateID:                   "agg-id",
-		ResourceOwner:                 sql.NullString{String: "ro-id", Valid: true},
-		InstanceID:                    "instance-id",
-		ID:                            "event-id",
-		EditorService:                 "editor-svc",
-		EditorUser:                    "editor-user",
+		CreationDate:  time.Now(),
+		Type:          eventType,
+		AggregateType: aggregateType,
+		Data:          data,
+		Version:       "v1",
+		AggregateID:   "agg-id",
+		ResourceOwner: sql.NullString{String: "ro-id", Valid: true},
+		InstanceID:    "instance-id",
+		ID:            "event-id",
+		EditorService: "editor-svc",
+		EditorUser:    "editor-user",
 	}
 }
 
@@ -69,13 +66,6 @@ func assertReduce(t *testing.T, stmt *handler.Statement, err error, want wantRed
 		t.Errorf("wrong aggregate type: want: %q got: %q", want.aggregateType, stmt.AggregateType)
 	}
 
-	if stmt.PreviousSequence != want.previousSequence {
-		t.Errorf("wrong previous sequence: want: %d got: %d", want.previousSequence, stmt.PreviousSequence)
-	}
-
-	if stmt.Sequence != want.sequence {
-		t.Errorf("wrong sequence: want: %d got: %d", want.sequence, stmt.Sequence)
-	}
 	if stmt.Execute == nil {
 		want.executer.Validate(t)
 		return

@@ -19,13 +19,12 @@ type query struct {
 	desc               bool
 	aggregateTypes     []AggregateType
 	aggregateIDs       []string
-	sequenceFrom       uint64
-	sequenceTo         uint64
 	eventTypes         []EventType
 	resourceOwner      string
 	instanceID         string
 	ignoredInstanceIDs []string
-	creationDate       time.Time
+	creationDateFrom   time.Time
+	creationDateTo     time.Time
 	factory            *SearchQueryFactory
 }
 
@@ -40,13 +39,13 @@ type Columns int32
 
 const (
 	Columns_Event = iota
-	Columns_Max_Sequence
+	Columns_Max_CreationDate
 	Columns_InstanceIDs
 	//insert new columns-types before this columnsCount because count is needed for validation
 	columnsCount
 )
 
-//FactoryFromSearchQuery is deprecated because it's for migration purposes. use NewSearchQueryFactory
+// FactoryFromSearchQuery is deprecated because it's for migration purposes. use NewSearchQueryFactory
 func FactoryFromSearchQuery(q *SearchQuery) *SearchQueryFactory {
 	factory := &SearchQueryFactory{
 		columns: q.Columns,
@@ -67,12 +66,6 @@ func FactoryFromSearchQuery(q *SearchQuery) *SearchQueryFactory {
 				} else if aggregateIDs, ok := filter.value.([]string); ok {
 					factory.queries[i] = factory.queries[i].AggregateIDs(aggregateIDs...)
 				}
-			case Field_LatestSequence:
-				if filter.operation == Operation_Greater {
-					factory.queries[i] = factory.queries[i].SequenceGreater(filter.value.(uint64))
-				} else {
-					factory.queries[i] = factory.queries[i].SequenceLess(filter.value.(uint64))
-				}
 			case Field_ResourceOwner:
 				factory.queries[i] = factory.queries[i].ResourceOwner(filter.value.(string))
 			case Field_InstanceID:
@@ -86,7 +79,12 @@ func FactoryFromSearchQuery(q *SearchQuery) *SearchQueryFactory {
 			case Field_EditorService, Field_EditorUser:
 				logging.WithFields("value", filter.value).Panic("field not converted to factory")
 			case Field_CreationDate:
-				factory.queries[i] = factory.queries[i].CreationDateNewer(filter.value.(time.Time))
+				if filter.operation == Operation_Greater {
+					factory.queries[i] = factory.queries[i].CreationDateNewer(filter.value.(time.Time))
+				} else {
+					factory.queries[i] = factory.queries[i].CreationDateOlder(filter.value.(time.Time))
+				}
+
 			}
 		}
 	}
@@ -128,16 +126,6 @@ func (q *query) Factory() *SearchQueryFactory {
 	return q.factory
 }
 
-func (q *query) SequenceGreater(sequence uint64) *query {
-	q.sequenceFrom = sequence
-	return q
-}
-
-func (q *query) SequenceLess(sequence uint64) *query {
-	q.sequenceTo = sequence
-	return q
-}
-
 func (q *query) AggregateTypes(types ...AggregateType) *query {
 	q.aggregateTypes = types
 	return q
@@ -173,8 +161,13 @@ func (q *query) IgnoredInstanceIDs(instanceIDs ...string) *query {
 	return q
 }
 
-func (q *query) CreationDateNewer(time time.Time) *query {
-	q.creationDate = time
+func (q *query) CreationDateNewer(creationDate time.Time) *query {
+	q.creationDateFrom = creationDate
+	return q
+}
+
+func (q *query) CreationDateOlder(creationDate time.Time) *query {
+	q.creationDateTo = creationDate
 	return q
 }
 
@@ -190,13 +183,12 @@ func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
 		for _, f := range []func() *Filter{
 			query.aggregateTypeFilter,
 			query.aggregateIDFilter,
-			query.sequenceFromFilter,
-			query.sequenceToFilter,
 			query.eventTypeFilter,
 			query.resourceOwnerFilter,
 			query.instanceIDFilter,
 			query.ignoredInstanceIDsFilter,
 			query.creationDateNewerFilter,
+			query.creationDateOlderFilter,
 		} {
 			if filter := f(); filter != nil {
 				filters[i] = append(filters[i], filter)
@@ -242,28 +234,6 @@ func (q *query) aggregateTypeFilter() *Filter {
 	return NewFilter(Field_AggregateType, q.aggregateTypes, Operation_In)
 }
 
-func (q *query) sequenceFromFilter() *Filter {
-	if q.sequenceFrom == 0 {
-		return nil
-	}
-	sortOrder := Operation_Greater
-	if q.factory.desc {
-		sortOrder = Operation_Less
-	}
-	return NewFilter(Field_LatestSequence, q.sequenceFrom, sortOrder)
-}
-
-func (q *query) sequenceToFilter() *Filter {
-	if q.sequenceTo == 0 {
-		return nil
-	}
-	sortOrder := Operation_Less
-	if q.factory.desc {
-		sortOrder = Operation_Greater
-	}
-	return NewFilter(Field_LatestSequence, q.sequenceTo, sortOrder)
-}
-
 func (q *query) resourceOwnerFilter() *Filter {
 	if q.resourceOwner == "" {
 		return nil
@@ -286,8 +256,15 @@ func (q *query) ignoredInstanceIDsFilter() *Filter {
 }
 
 func (q *query) creationDateNewerFilter() *Filter {
-	if q.creationDate.IsZero() {
+	if q.creationDateFrom.IsZero() {
 		return nil
 	}
-	return NewFilter(Field_CreationDate, q.creationDate, Operation_Greater)
+	return NewFilter(Field_CreationDate, q.creationDateFrom, Operation_Greater)
+}
+
+func (q *query) creationDateOlderFilter() *Filter {
+	if q.creationDateTo.IsZero() {
+		return nil
+	}
+	return NewFilter(Field_CreationDate, q.creationDateTo, Operation_Less)
 }

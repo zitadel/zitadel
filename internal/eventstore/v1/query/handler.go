@@ -26,7 +26,7 @@ type Handler interface {
 	QueryLimit() uint64
 
 	AggregateTypes() []models.AggregateType
-	CurrentSequence(instanceID string) (uint64, error)
+	CurrentCreationDate(instanceID string) (time.Time, error)
 	Eventstore() v1.Eventstore
 
 	Subscription() *v1.Subscription
@@ -41,12 +41,12 @@ func ReduceEvent(handler Handler, event *models.Event) {
 			logging.WithFields(
 				"cause", err,
 				"stack", string(debug.Stack()),
-				"sequence", event.Sequence,
-				"instnace", event.InstanceID,
+				"event", event.ID,
+				"instance", event.InstanceID,
 			).Error("reduce panicked")
 		}
 	}()
-	currentSequence, err := handler.CurrentSequence(event.InstanceID)
+	currentCreationDate, err := handler.CurrentCreationDate(event.InstanceID)
 	if err != nil {
 		logging.WithError(err).Warn("unable to get current sequence")
 		return
@@ -55,39 +55,39 @@ func ReduceEvent(handler Handler, event *models.Event) {
 	searchQuery := models.NewSearchQuery().
 		AddQuery().
 		AggregateTypeFilter(handler.AggregateTypes()...).
-		SequenceBetween(currentSequence, event.Sequence).
+		CreationDateBetweenFilter(currentCreationDate, event.CreationDate).
 		InstanceIDFilter(event.InstanceID).
 		SearchQuery().
 		SetLimit(eventLimit)
 
 	unprocessedEvents, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
 	if err != nil {
-		logging.WithFields("sequence", event.Sequence).Warn("filter failed")
+		logging.WithFields("eventId", event.ID).Warn("filter failed")
 		return
 	}
 
 	for _, unprocessedEvent := range unprocessedEvents {
-		currentSequence, err := handler.CurrentSequence(unprocessedEvent.InstanceID)
+		currentCreationDate, err := handler.CurrentCreationDate(unprocessedEvent.InstanceID)
 		if err != nil {
 			logging.WithError(err).Warn("unable to get current sequence")
 			return
 		}
-		if unprocessedEvent.Sequence < currentSequence {
+		if unprocessedEvent.CreationDate.Before(currentCreationDate) {
 			logging.WithFields(
-				"unprocessed", unprocessedEvent.Sequence,
-				"current", currentSequence,
+				"unprocessed", unprocessedEvent.ID,
+				"current", currentCreationDate,
 				"view", handler.ViewModel()).
 				Warn("sequence not matching")
 			return
 		}
 
 		err = handler.Reduce(unprocessedEvent)
-		logging.WithFields("sequence", unprocessedEvent.Sequence).OnError(err).Warn("reduce failed")
+		logging.WithFields("event", unprocessedEvent.ID).OnError(err).Warn("reduce failed")
 	}
 	if len(unprocessedEvents) == eventLimit {
-		logging.WithFields("sequence", event.Sequence).Warn("didnt process event")
+		logging.WithFields("event", event.ID).Warn("didnt process event")
 		return
 	}
 	err = handler.Reduce(event)
-	logging.WithFields("sequence", event.Sequence).OnError(err).Warn("reduce failed")
+	logging.WithFields("event", event.ID).OnError(err).Warn("reduce failed")
 }

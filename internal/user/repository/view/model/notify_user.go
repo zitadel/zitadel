@@ -40,7 +40,6 @@ type NotifyUser struct {
 	LastPhone          string               `json:"phone" gorm:"column:last_phone"`
 	VerifiedPhone      string               `json:"-" gorm:"column:verified_phone"`
 	PasswordSet        bool                 `json:"-" gorm:"column:password_set"`
-	Sequence           uint64               `json:"-" gorm:"column:sequence"`
 	State              int32                `json:"-" gorm:"-"`
 	InstanceID         string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
@@ -67,7 +66,6 @@ func (u *NotifyUser) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mo
 
 func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 	u.ChangeDate = event.CreationDate
-	u.Sequence = event.Sequence
 	switch eventstore.EventType(event.Type) {
 	case user.UserV1AddedType,
 		user.UserV1RegisteredType,

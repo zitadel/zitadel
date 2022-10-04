@@ -11,15 +11,13 @@ import (
 )
 
 const (
-	FlowTriggerTable             = "projections.flows_triggers"
-	FlowTypeCol                  = "flow_type"
-	FlowChangeDateCol            = "change_date"
-	FlowSequenceCol              = "sequence"
-	FlowTriggerTypeCol           = "trigger_type"
-	FlowResourceOwnerCol         = "resource_owner"
-	FlowInstanceIDCol            = "instance_id"
-	FlowActionTriggerSequenceCol = "trigger_sequence"
-	FlowActionIDCol              = "action_id"
+	FlowTriggerTable     = "projections.flows_triggers"
+	FlowTypeCol          = "flow_type"
+	FlowChangeDateCol    = "change_date"
+	FlowTriggerTypeCol   = "trigger_type"
+	FlowResourceOwnerCol = "resource_owner"
+	FlowInstanceIDCol    = "instance_id"
+	FlowActionIDCol      = "action_id"
 )
 
 type flowProjection struct {
@@ -34,11 +32,9 @@ func newFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(FlowTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(FlowChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(FlowSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(FlowTriggerTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(FlowResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(FlowInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(FlowActionTriggerSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(FlowActionIDCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(FlowInstanceIDCol, FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
@@ -86,10 +82,8 @@ func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 				handler.NewCol(FlowInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(FlowTypeCol, e.FlowType),
 				handler.NewCol(FlowChangeDateCol, e.CreationDate()),
-				handler.NewCol(FlowSequenceCol, e.Sequence()),
 				handler.NewCol(FlowTriggerTypeCol, e.TriggerType),
 				handler.NewCol(FlowActionIDCol, id),
-				handler.NewCol(FlowActionTriggerSequenceCol, i),
 			},
 		)
 	}

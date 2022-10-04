@@ -26,7 +26,6 @@ type User struct {
 	CreationDate       time.Time
 	ChangeDate         time.Time
 	ResourceOwner      string
-	Sequence           uint64
 	State              domain.UserState
 	Type               domain.UserType
 	Username           string
@@ -55,7 +54,6 @@ type Profile struct {
 	CreationDate      time.Time
 	ChangeDate        time.Time
 	ResourceOwner     string
-	Sequence          uint64
 	FirstName         string
 	LastName          string
 	NickName          string
@@ -70,7 +68,6 @@ type Email struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 	Email         string
 	IsVerified    bool
 }
@@ -80,7 +77,6 @@ type Phone struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 	Phone         string
 	IsVerified    bool
 }
@@ -95,7 +91,6 @@ type NotifyUser struct {
 	CreationDate       time.Time
 	ChangeDate         time.Time
 	ResourceOwner      string
-	Sequence           uint64
 	State              domain.UserState
 	Type               domain.UserType
 	Username           string
@@ -146,10 +141,6 @@ var (
 	}
 	UserStateCol = Column{
 		name:  projection.UserStateCol,
-		table: userTable,
-	}
-	UserSequenceCol = Column{
-		name:  projection.UserSequenceCol,
 		table: userTable,
 	}
 	UserUsernameCol = Column{
@@ -559,7 +550,6 @@ func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*Use
 			UserCreationDateCol.identifier(),
 			UserChangeDateCol.identifier(),
 			UserResourceOwnerCol.identifier(),
-			UserSequenceCol.identifier(),
 			UserStateCol.identifier(),
 			UserTypeCol.identifier(),
 			UserUsernameCol.identifier(),
@@ -613,7 +603,6 @@ func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*Use
 				&u.CreationDate,
 				&u.ChangeDate,
 				&u.ResourceOwner,
-				&u.Sequence,
 				&u.State,
 				&u.Type,
 				&u.Username,
@@ -675,7 +664,6 @@ func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) 
 			UserCreationDateCol.identifier(),
 			UserChangeDateCol.identifier(),
 			UserResourceOwnerCol.identifier(),
-			UserSequenceCol.identifier(),
 			HumanUserIDCol.identifier(),
 			HumanFirstNameCol.identifier(),
 			HumanLastNameCol.identifier(),
@@ -703,7 +691,6 @@ func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) 
 				&p.CreationDate,
 				&p.ChangeDate,
 				&p.ResourceOwner,
-				&p.Sequence,
 				&humanID,
 				&firstName,
 				&lastName,
@@ -741,7 +728,6 @@ func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 			UserCreationDateCol.identifier(),
 			UserChangeDateCol.identifier(),
 			UserResourceOwnerCol.identifier(),
-			UserSequenceCol.identifier(),
 			HumanUserIDCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
@@ -760,7 +746,6 @@ func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 				&e.CreationDate,
 				&e.ChangeDate,
 				&e.ResourceOwner,
-				&e.Sequence,
 				&humanID,
 				&email,
 				&isEmailVerified,
@@ -788,7 +773,6 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 			UserCreationDateCol.identifier(),
 			UserChangeDateCol.identifier(),
 			UserResourceOwnerCol.identifier(),
-			UserSequenceCol.identifier(),
 			HumanUserIDCol.identifier(),
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier()).
@@ -807,7 +791,6 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 				&e.CreationDate,
 				&e.ChangeDate,
 				&e.ResourceOwner,
-				&e.Sequence,
 				&humanID,
 				&phone,
 				&isPhoneVerified,
@@ -857,7 +840,6 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 			UserCreationDateCol.identifier(),
 			UserChangeDateCol.identifier(),
 			UserResourceOwnerCol.identifier(),
-			UserSequenceCol.identifier(),
 			UserStateCol.identifier(),
 			UserTypeCol.identifier(),
 			UserUsernameCol.identifier(),
@@ -910,7 +892,6 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 				&u.CreationDate,
 				&u.ChangeDate,
 				&u.ResourceOwner,
-				&u.Sequence,
 				&u.State,
 				&u.Type,
 				&u.Username,
@@ -1029,7 +1010,6 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			UserCreationDateCol.identifier(),
 			UserChangeDateCol.identifier(),
 			UserResourceOwnerCol.identifier(),
-			UserSequenceCol.identifier(),
 			UserStateCol.identifier(),
 			UserTypeCol.identifier(),
 			UserUsernameCol.identifier(),
@@ -1087,7 +1067,6 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&u.CreationDate,
 					&u.ChangeDate,
 					&u.ResourceOwner,
-					&u.Sequence,
 					&u.State,
 					&u.Type,
 					&u.Username,

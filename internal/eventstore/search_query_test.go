@@ -52,19 +52,19 @@ func testSetAggregateTypes(types ...AggregateType) func(*SearchQuery) *SearchQue
 	}
 }
 
-func testSetSequenceGreater(sequence uint64) func(*SearchQuery) *SearchQuery {
-	return func(query *SearchQuery) *SearchQuery {
-		query = query.SequenceGreater(sequence)
-		return query
-	}
-}
+// func testSetSequenceGreater(sequence uint64) func(*SearchQuery) *SearchQuery {
+// 	return func(query *SearchQuery) *SearchQuery {
+// 		query = query.SequenceGreater(sequence)
+// 		return query
+// 	}
+// }
 
-func testSetSequenceLess(sequence uint64) func(*SearchQuery) *SearchQuery {
-	return func(query *SearchQuery) *SearchQuery {
-		query = query.SequenceLess(sequence)
-		return query
-	}
-}
+// func testSetSequenceLess(sequence uint64) func(*SearchQuery) *SearchQuery {
+// 	return func(query *SearchQuery) *SearchQuery {
+// 		query = query.SequenceLess(sequence)
+// 		return query
+// 	}
+// }
 
 func testSetAggregateIDs(aggregateIDs ...string) func(*SearchQuery) *SearchQuery {
 	return func(query *SearchQuery) *SearchQuery {
@@ -127,10 +127,10 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 		{
 			name: "set columns",
 			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetColumns(repository.ColumnsMaxSequence)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetColumns(repository.ColumnsMaxCreationDate)},
 			},
 			res: &SearchQueryBuilder{
-				columns: repository.ColumnsMaxSequence,
+				columns: repository.ColumnsMaxCreationDate,
 			},
 		},
 		{
@@ -142,32 +142,32 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 				limit: 100,
 			},
 		},
-		{
-			name: "set sequence greater",
-			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetSequenceGreater(90))},
-			},
-			res: &SearchQueryBuilder{
-				queries: []*SearchQuery{
-					{
-						eventSequenceGreater: 90,
-					},
-				},
-			},
-		},
-		{
-			name: "set sequence less",
-			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetSequenceLess(90))},
-			},
-			res: &SearchQueryBuilder{
-				queries: []*SearchQuery{
-					{
-						eventSequenceLess: 90,
-					},
-				},
-			},
-		},
+		// {
+		// 	name: "set sequence greater",
+		// 	args: args{
+		// 		setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetSequenceGreater(90))},
+		// 	},
+		// 	res: &SearchQueryBuilder{
+		// 		queries: []*SearchQuery{
+		// 			{
+		// 				eventSequenceGreater: 90,
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "set sequence less",
+		// 	args: args{
+		// 		setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testAddQuery(testSetSequenceLess(90))},
+		// 	},
+		// 	res: &SearchQueryBuilder{
+		// 		queries: []*SearchQuery{
+		// 			{
+		// 				eventSequenceLess: 90,
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			name: "set aggregateIDs",
 			args: args{
@@ -328,91 +328,91 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "filter aggregate type, limit, desc",
-			args: args{
-				columns: ColumnsEvent,
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
-					testSetLimit(5),
-					testSetSortOrder(false),
-					testAddQuery(
-						testSetSequenceGreater(100),
-						testSetAggregateTypes("user"),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &repository.SearchQuery{
-					Columns: repository.ColumnsEvent,
-					Desc:    true,
-					Limit:   5,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationLess),
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "filter aggregate type, limit, asc",
-			args: args{
-				columns: ColumnsEvent,
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
-					testSetLimit(5),
-					testSetSortOrder(true),
-					testAddQuery(
-						testSetSequenceGreater(100),
-						testSetAggregateTypes("user"),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &repository.SearchQuery{
-					Columns: repository.ColumnsEvent,
-					Desc:    false,
-					Limit:   5,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationGreater),
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "filter aggregate type, limit, desc, max event sequence cols",
-			args: args{
-				columns: ColumnsEvent,
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
-					testSetLimit(5),
-					testSetSortOrder(false),
-					testSetColumns(repository.ColumnsMaxSequence),
-					testAddQuery(
-						testSetSequenceGreater(100),
-						testSetAggregateTypes("user"),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &repository.SearchQuery{
-					Columns: repository.ColumnsMaxSequence,
-					Desc:    true,
-					Limit:   5,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationLess),
-						},
-					},
-				},
-			},
-		},
+		// {
+		// 	name: "filter aggregate type, limit, desc",
+		// 	args: args{
+		// 		columns: ColumnsEvent,
+		// 		setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+		// 			testSetLimit(5),
+		// 			testSetSortOrder(false),
+		// 			testAddQuery(
+		// 				testSetSequenceGreater(100),
+		// 				testSetAggregateTypes("user"),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &repository.SearchQuery{
+		// 			Columns: repository.ColumnsEvent,
+		// 			Desc:    true,
+		// 			Limit:   5,
+		// 			Filters: [][]*repository.Filter{
+		// 				{
+		// 					repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+		// 					repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationLess),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "filter aggregate type, limit, asc",
+		// 	args: args{
+		// 		columns: ColumnsEvent,
+		// 		setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+		// 			testSetLimit(5),
+		// 			testSetSortOrder(true),
+		// 			testAddQuery(
+		// 				testSetSequenceGreater(100),
+		// 				testSetAggregateTypes("user"),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &repository.SearchQuery{
+		// 			Columns: repository.ColumnsEvent,
+		// 			Desc:    false,
+		// 			Limit:   5,
+		// 			Filters: [][]*repository.Filter{
+		// 				{
+		// 					repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+		// 					repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationGreater),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name: "filter aggregate type, limit, desc, max event sequence cols",
+		// 	args: args{
+		// 		columns: ColumnsEvent,
+		// 		setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+		// 			testSetLimit(5),
+		// 			testSetSortOrder(false),
+		// 			testSetColumns(repository.ColumnsMaxCreationDate),
+		// 			testAddQuery(
+		// 				testSetSequenceGreater(100),
+		// 				testSetAggregateTypes("user"),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &repository.SearchQuery{
+		// 			Columns: repository.ColumnsMaxCreationDate,
+		// 			Desc:    true,
+		// 			Limit:   5,
+		// 			Filters: [][]*repository.Filter{
+		// 				{
+		// 					repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+		// 					repository.NewFilter(repository.FieldSequence, uint64(100), repository.OperationLess),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			name: "filter aggregate type and aggregate id",
 			args: args{
@@ -499,32 +499,32 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "filter aggregate type and sequence greater",
-			args: args{
-				columns: ColumnsEvent,
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
-					testAddQuery(
-						testSetAggregateTypes("user"),
-						testSetSequenceGreater(8),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &repository.SearchQuery{
-					Columns: repository.ColumnsEvent,
-					Desc:    false,
-					Limit:   0,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldSequence, uint64(8), repository.OperationGreater),
-						},
-					},
-				},
-			},
-		},
+		// {
+		// 	name: "filter aggregate type and sequence greater",
+		// 	args: args{
+		// 		columns: ColumnsEvent,
+		// 		setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+		// 			testAddQuery(
+		// 				testSetAggregateTypes("user"),
+		// 				testSetSequenceGreater(8),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &repository.SearchQuery{
+		// 			Columns: repository.ColumnsEvent,
+		// 			Desc:    false,
+		// 			Limit:   0,
+		// 			Filters: [][]*repository.Filter{
+		// 				{
+		// 					repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+		// 					repository.NewFilter(repository.FieldSequence, uint64(8), repository.OperationGreater),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			name: "filter aggregate type and event type",
 			args: args{
@@ -603,34 +603,34 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "filter aggregate type and sequence between",
-			args: args{
-				columns: ColumnsEvent,
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
-					testAddQuery(
-						testSetAggregateTypes("user"),
-						testSetSequenceGreater(8),
-						testSetSequenceLess(16),
-					),
-				},
-			},
-			res: res{
-				isErr: nil,
-				query: &repository.SearchQuery{
-					Columns: repository.ColumnsEvent,
-					Desc:    false,
-					Limit:   0,
-					Filters: [][]*repository.Filter{
-						{
-							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldSequence, uint64(8), repository.OperationGreater),
-							repository.NewFilter(repository.FieldSequence, uint64(16), repository.OperationLess),
-						},
-					},
-				},
-			},
-		},
+		// {
+		// 	name: "filter aggregate type and sequence between",
+		// 	args: args{
+		// 		columns: ColumnsEvent,
+		// 		setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+		// 			testAddQuery(
+		// 				testSetAggregateTypes("user"),
+		// 				testSetSequenceGreater(8),
+		// 				testSetSequenceLess(16),
+		// 			),
+		// 		},
+		// 	},
+		// 	res: res{
+		// 		isErr: nil,
+		// 		query: &repository.SearchQuery{
+		// 			Columns: repository.ColumnsEvent,
+		// 			Desc:    false,
+		// 			Limit:   0,
+		// 			Filters: [][]*repository.Filter{
+		// 				{
+		// 					repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+		// 					repository.NewFilter(repository.FieldSequence, uint64(8), repository.OperationGreater),
+		// 					repository.NewFilter(repository.FieldSequence, uint64(16), repository.OperationLess),
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			name: "filter aggregate type and instanceID",
 			args: args{
@@ -757,12 +757,12 @@ func assertQuery(t *testing.T, i int, want, got *SearchQuery) {
 	if !reflect.DeepEqual(got.eventData, want.eventData) {
 		t.Errorf("wrong eventData in query %d : got: %v want: %v", i, got.eventData, want.eventData)
 	}
-	if got.eventSequenceLess != want.eventSequenceLess {
-		t.Errorf("wrong eventSequenceLess in query %d : got: %v want: %v", i, got.eventSequenceLess, want.eventSequenceLess)
-	}
-	if got.eventSequenceGreater != want.eventSequenceGreater {
-		t.Errorf("wrong eventSequenceGreater in query %d : got: %v want: %v", i, got.eventSequenceGreater, want.eventSequenceGreater)
-	}
+	// if got.eventSequenceLess != want.eventSequenceLess {
+	// 	t.Errorf("wrong eventSequenceLess in query %d : got: %v want: %v", i, got.eventSequenceLess, want.eventSequenceLess)
+	// }
+	// if got.eventSequenceGreater != want.eventSequenceGreater {
+	// 	t.Errorf("wrong eventSequenceGreater in query %d : got: %v want: %v", i, got.eventSequenceGreater, want.eventSequenceGreater)
+	// }
 	if !reflect.DeepEqual(got.eventTypes, want.eventTypes) {
 		t.Errorf("wrong eventTypes in query %d : got: %v want: %v", i, got.eventTypes, want.eventTypes)
 	}
@@ -813,235 +813,235 @@ func assertFilters(t *testing.T, i int, want, got *repository.Filter) {
 	}
 }
 
-func TestSearchQuery_matches(t *testing.T) {
-	type args struct {
-		event Event
-	}
-	tests := []struct {
-		name  string
-		query *SearchQuery
-		event Event
-		want  bool
-	}{
-		{
-			name:  "sequence too low",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().SequenceLess(10),
-			event: &BaseEvent{
-				sequence: 10,
-			},
-			want: false,
-		},
-		{
-			name:  "sequence too high",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().SequenceGreater(60),
-			event: &BaseEvent{
-				sequence: 60,
-			},
-			want: false,
-		},
-		{
-			name:  "wrong aggregate type",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateTypes("searched"),
-			event: &BaseEvent{
-				aggregate: Aggregate{
-					Type: "found",
-				},
-			},
-			want: false,
-		},
-		{
-			name:  "wrong aggregate id",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateIDs("1", "10", "100"),
-			event: &BaseEvent{
-				aggregate: Aggregate{
-					ID: "2",
-				},
-			},
-			want: false,
-		},
-		{
-			name:  "wrong event type",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().EventTypes("event.searched.type"),
-			event: &BaseEvent{
-				EventType: "event.actual.type",
-			},
-			want: false,
-		},
-		{
-			name: "matching",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().
-				SequenceLess(100).SequenceGreater(50).AggregateIDs("2").AggregateTypes("actual").EventTypes("event.actual.type"),
-			event: &BaseEvent{
-				sequence: 55,
-				aggregate: Aggregate{
-					ID:   "2",
-					Type: "actual",
-				},
-				EventType: "event.actual.type",
-			},
-			want: true,
-		},
-		{
-			name:  "matching empty query",
-			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery(),
-			event: &BaseEvent{
-				sequence: 55,
-				aggregate: Aggregate{
-					ID:   "2",
-					Type: "actual",
-				},
-				EventType: "event.actual.type",
-			},
-			want: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			query := &SearchQuery{
-				aggregateTypes:       tt.query.aggregateTypes,
-				aggregateIDs:         tt.query.aggregateIDs,
-				eventSequenceGreater: tt.query.eventSequenceGreater,
-				eventSequenceLess:    tt.query.eventSequenceLess,
-				eventTypes:           tt.query.eventTypes,
-				eventData:            tt.query.eventData,
-			}
-			if got := query.matches(tt.event); got != tt.want {
-				t.Errorf("SearchQuery.matches() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+// func TestSearchQuery_matches(t *testing.T) {
+// 	type args struct {
+// 		event Event
+// 	}
+// 	tests := []struct {
+// 		name  string
+// 		query *SearchQuery
+// 		event Event
+// 		want  bool
+// 	}{
+// {
+// 	name:  "sequence too low",
+// 	query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().SequenceLess(10),
+// 	event: &BaseEvent{
+// 		sequence: 10,
+// 	},
+// 	want: false,
+// },
+// {
+// 	name:  "sequence too high",
+// 	query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().SequenceGreater(60),
+// 	event: &BaseEvent{
+// 		sequence: 60,
+// 	},
+// 	want: false,
+// },
+// 		{
+// 			name:  "wrong aggregate type",
+// 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateTypes("searched"),
+// 			event: &BaseEvent{
+// 				aggregate: Aggregate{
+// 					Type: "found",
+// 				},
+// 			},
+// 			want: false,
+// 		},
+// 		{
+// 			name:  "wrong aggregate id",
+// 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateIDs("1", "10", "100"),
+// 			event: &BaseEvent{
+// 				aggregate: Aggregate{
+// 					ID: "2",
+// 				},
+// 			},
+// 			want: false,
+// 		},
+// 		{
+// 			name:  "wrong event type",
+// 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().EventTypes("event.searched.type"),
+// 			event: &BaseEvent{
+// 				EventType: "event.actual.type",
+// 			},
+// 			want: false,
+// 		},
+// 		{
+// 			name: "matching",
+// 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().
+// 				SequenceLess(100).SequenceGreater(50).AggregateIDs("2").AggregateTypes("actual").EventTypes("event.actual.type"),
+// 			event: &BaseEvent{
+// 				sequence: 55,
+// 				aggregate: Aggregate{
+// 					ID:   "2",
+// 					Type: "actual",
+// 				},
+// 				EventType: "event.actual.type",
+// 			},
+// 			want: true,
+// 		},
+// 		{
+// 			name:  "matching empty query",
+// 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery(),
+// 			event: &BaseEvent{
+// 				sequence: 55,
+// 				aggregate: Aggregate{
+// 					ID:   "2",
+// 					Type: "actual",
+// 				},
+// 				EventType: "event.actual.type",
+// 			},
+// 			want: true,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			query := &SearchQuery{
+// 				aggregateTypes:       tt.query.aggregateTypes,
+// 				aggregateIDs:         tt.query.aggregateIDs,
+// 				eventSequenceGreater: tt.query.eventSequenceGreater,
+// 				eventSequenceLess:    tt.query.eventSequenceLess,
+// 				eventTypes:           tt.query.eventTypes,
+// 				eventData:            tt.query.eventData,
+// 			}
+// 			if got := query.matches(tt.event); got != tt.want {
+// 				t.Errorf("SearchQuery.matches() = %v, want %v", got, tt.want)
+// 			}
+// 		})
+// 	}
+// }
 
-func TestSearchQueryBuilder_Matches(t *testing.T) {
-	type args struct {
-		event       Event
-		existingLen int
-	}
-	tests := []struct {
-		name    string
-		builder *SearchQueryBuilder
-		args    args
-		want    bool
-	}{
-		{
-			name:    "limit exeeded",
-			builder: NewSearchQueryBuilder(ColumnsEvent).Limit(100),
-			args: args{
-				event:       &BaseEvent{},
-				existingLen: 100,
-			},
-			want: false,
-		},
-		{
-			name:    "wrong resource owner",
-			builder: NewSearchQueryBuilder(ColumnsEvent).ResourceOwner("query"),
-			args: args{
-				event: &BaseEvent{
-					aggregate: Aggregate{
-						ResourceOwner: "ro",
-					},
-				},
-				existingLen: 0,
-			},
-			want: false,
-		},
-		{
-			name:    "wrong instance",
-			builder: NewSearchQueryBuilder(ColumnsEvent).InstanceID("instance"),
-			args: args{
-				event: &BaseEvent{
-					aggregate: Aggregate{
-						InstanceID: "different instance",
-					},
-				},
-				existingLen: 0,
-			},
-			want: false,
-		},
-		{
-			name: "query failed",
-			builder: NewSearchQueryBuilder(ColumnsEvent).
-				AddQuery().
-				SequenceGreater(1000).
-				Builder(),
-			args: args{
-				event: &BaseEvent{
-					sequence: 999,
-				},
-				existingLen: 0,
-			},
-			want: false,
-		},
-		{
-			name: "matching",
-			builder: NewSearchQueryBuilder(ColumnsEvent).
-				Limit(1000).
-				ResourceOwner("ro").
-				InstanceID("instance").
-				AddQuery().
-				SequenceGreater(1000).
-				Builder(),
-			args: args{
-				event: &BaseEvent{
-					aggregate: Aggregate{
-						ResourceOwner: "ro",
-						InstanceID:    "instance",
-					},
-					sequence: 1001,
-				},
-				existingLen: 999,
-			},
-			want: true,
-		},
-		{
-			name:    "matching builder resourceOwner and Instance",
-			builder: NewSearchQueryBuilder(ColumnsEvent),
-			args: args{
-				event: &BaseEvent{
-					aggregate: Aggregate{
-						ResourceOwner: "ro",
-						InstanceID:    "instance",
-					},
-					sequence: 1001,
-				},
-				existingLen: 999,
-			},
-			want: true,
-		},
-		{
-			name:    "matching builder resourceOwner only",
-			builder: NewSearchQueryBuilder(ColumnsEvent),
-			args: args{
-				event: &BaseEvent{
-					aggregate: Aggregate{
-						ResourceOwner: "ro",
-					},
-					sequence: 1001,
-				},
-				existingLen: 999,
-			},
-			want: true,
-		},
-		{
-			name:    "matching builder instanceID only",
-			builder: NewSearchQueryBuilder(ColumnsEvent),
-			args: args{
-				event: &BaseEvent{
-					aggregate: Aggregate{
-						InstanceID: "instance",
-					},
-					sequence: 1001,
-				},
-				existingLen: 999,
-			},
-			want: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.builder.Matches(tt.args.event, tt.args.existingLen); got != tt.want {
-				t.Errorf("SearchQueryBuilder.Matches() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+// func TestSearchQueryBuilder_Matches(t *testing.T) {
+// 	type args struct {
+// 		event       Event
+// 		existingLen int
+// 	}
+// 	tests := []struct {
+// 		name    string
+// 		builder *SearchQueryBuilder
+// 		args    args
+// 		want    bool
+// 	}{
+// 		{
+// 			name:    "limit exeeded",
+// 			builder: NewSearchQueryBuilder(ColumnsEvent).Limit(100),
+// 			args: args{
+// 				event:       &BaseEvent{},
+// 				existingLen: 100,
+// 			},
+// 			want: false,
+// 		},
+// 		{
+// 			name:    "wrong resource owner",
+// 			builder: NewSearchQueryBuilder(ColumnsEvent).ResourceOwner("query"),
+// 			args: args{
+// 				event: &BaseEvent{
+// 					aggregate: Aggregate{
+// 						ResourceOwner: "ro",
+// 					},
+// 				},
+// 				existingLen: 0,
+// 			},
+// 			want: false,
+// 		},
+// 		{
+// 			name:    "wrong instance",
+// 			builder: NewSearchQueryBuilder(ColumnsEvent).InstanceID("instance"),
+// 			args: args{
+// 				event: &BaseEvent{
+// 					aggregate: Aggregate{
+// 						InstanceID: "different instance",
+// 					},
+// 				},
+// 				existingLen: 0,
+// 			},
+// 			want: false,
+// 		},
+// 		{
+// 			name: "query failed",
+// 			builder: NewSearchQueryBuilder(ColumnsEvent).
+// 				AddQuery().
+// 				SequenceGreater(1000).
+// 				Builder(),
+// 			args: args{
+// 				event: &BaseEvent{
+// 					sequence: 999,
+// 				},
+// 				existingLen: 0,
+// 			},
+// 			want: false,
+// 		},
+// 		{
+// 			name: "matching",
+// 			builder: NewSearchQueryBuilder(ColumnsEvent).
+// 				Limit(1000).
+// 				ResourceOwner("ro").
+// 				InstanceID("instance").
+// 				AddQuery().
+// 				SequenceGreater(1000).
+// 				Builder(),
+// 			args: args{
+// 				event: &BaseEvent{
+// 					aggregate: Aggregate{
+// 						ResourceOwner: "ro",
+// 						InstanceID:    "instance",
+// 					},
+// 					sequence: 1001,
+// 				},
+// 				existingLen: 999,
+// 			},
+// 			want: true,
+// 		},
+// 		{
+// 			name:    "matching builder resourceOwner and Instance",
+// 			builder: NewSearchQueryBuilder(ColumnsEvent),
+// 			args: args{
+// 				event: &BaseEvent{
+// 					aggregate: Aggregate{
+// 						ResourceOwner: "ro",
+// 						InstanceID:    "instance",
+// 					},
+// 					sequence: 1001,
+// 				},
+// 				existingLen: 999,
+// 			},
+// 			want: true,
+// 		},
+// 		{
+// 			name:    "matching builder resourceOwner only",
+// 			builder: NewSearchQueryBuilder(ColumnsEvent),
+// 			args: args{
+// 				event: &BaseEvent{
+// 					aggregate: Aggregate{
+// 						ResourceOwner: "ro",
+// 					},
+// 					sequence: 1001,
+// 				},
+// 				existingLen: 999,
+// 			},
+// 			want: true,
+// 		},
+// 		{
+// 			name:    "matching builder instanceID only",
+// 			builder: NewSearchQueryBuilder(ColumnsEvent),
+// 			args: args{
+// 				event: &BaseEvent{
+// 					aggregate: Aggregate{
+// 						InstanceID: "instance",
+// 					},
+// 					sequence: 1001,
+// 				},
+// 				existingLen: 999,
+// 			},
+// 			want: true,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			if got := tt.builder.Matches(tt.args.event, tt.args.existingLen); got != tt.want {
+// 				t.Errorf("SearchQueryBuilder.Matches() = %v, want %v", got, tt.want)
+// 			}
+// 		})
+// 	}
+// }

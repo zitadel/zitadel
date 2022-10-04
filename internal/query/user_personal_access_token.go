@@ -52,10 +52,6 @@ var (
 		name:  projection.PersonalAccessTokenColumnInstanceID,
 		table: personalAccessTokensTable,
 	}
-	PersonalAccessTokenColumnSequence = Column{
-		name:  projection.PersonalAccessTokenColumnSequence,
-		table: personalAccessTokensTable,
-	}
 )
 
 type PersonalAccessTokens struct {
@@ -68,7 +64,6 @@ type PersonalAccessToken struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	Sequence      uint64
 
 	UserID     string
 	Expiration time.Time
@@ -154,7 +149,6 @@ func preparePersonalAccessTokenQuery() (sq.SelectBuilder, func(*sql.Row) (*Perso
 			PersonalAccessTokenColumnCreationDate.identifier(),
 			PersonalAccessTokenColumnChangeDate.identifier(),
 			PersonalAccessTokenColumnResourceOwner.identifier(),
-			PersonalAccessTokenColumnSequence.identifier(),
 			PersonalAccessTokenColumnUserID.identifier(),
 			PersonalAccessTokenColumnExpiration.identifier(),
 			PersonalAccessTokenColumnScopes.identifier()).
@@ -166,7 +160,6 @@ func preparePersonalAccessTokenQuery() (sq.SelectBuilder, func(*sql.Row) (*Perso
 				&p.CreationDate,
 				&p.ChangeDate,
 				&p.ResourceOwner,
-				&p.Sequence,
 				&p.UserID,
 				&p.Expiration,
 				&p.Scopes,
@@ -187,7 +180,6 @@ func preparePersonalAccessTokensQuery() (sq.SelectBuilder, func(*sql.Rows) (*Per
 			PersonalAccessTokenColumnCreationDate.identifier(),
 			PersonalAccessTokenColumnChangeDate.identifier(),
 			PersonalAccessTokenColumnResourceOwner.identifier(),
-			PersonalAccessTokenColumnSequence.identifier(),
 			PersonalAccessTokenColumnUserID.identifier(),
 			PersonalAccessTokenColumnExpiration.identifier(),
 			PersonalAccessTokenColumnScopes.identifier(),
@@ -203,7 +195,6 @@ func preparePersonalAccessTokensQuery() (sq.SelectBuilder, func(*sql.Rows) (*Per
 					&token.CreationDate,
 					&token.ChangeDate,
 					&token.ResourceOwner,
-					&token.Sequence,
 					&token.UserID,
 					&token.Expiration,
 					&token.Scopes,

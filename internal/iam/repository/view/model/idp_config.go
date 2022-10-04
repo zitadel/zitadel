@@ -49,7 +49,6 @@ type IDPConfigView struct {
 	JWTKeysEndpoint            string               `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
 	JWTHeaderName              string               `json:"headerName" gorm:"jwt_header_name"`
 
-	Sequence   uint64 `json:"-" gorm:"column:sequence"`
 	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 

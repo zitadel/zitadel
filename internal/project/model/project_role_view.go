@@ -53,9 +53,6 @@ type ProjectRoleSearchResponse struct {
 	Timestamp   time.Time
 }
 
-func (r *ProjectRoleSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: orgID})
-}
 func (r *ProjectRoleSearchRequest) AppendProjectQuery(projectID string) {
 	r.Queries = append(r.Queries, &ProjectRoleSearchQuery{Key: ProjectRoleSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: projectID})
 }

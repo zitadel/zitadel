@@ -195,14 +195,14 @@ func expectUpdateCurrentSequence(tableName, projection string, seq uint64, aggre
 	}
 }
 
-func expectUpdateThreeCurrentSequence(t *testing.T, tableName, projection string, sequences currentSequences) func(sqlmock.Sqlmock) {
+func expectUpdateThreeCurrentSequence(t *testing.T, tableName, projection string, sequences events) func(sqlmock.Sqlmock) {
 	args := make([][]interface{}, 0)
 	for aggregateType, instanceSequences := range sequences {
 		for _, sequence := range instanceSequences {
 			args = append(args, []interface{}{
 				projection,
 				aggregateType,
-				sequence.sequence,
+				sequence.eventID,
 				sequence.instanceID,
 			})
 		}
