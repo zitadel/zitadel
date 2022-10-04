@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
+import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -16,7 +17,7 @@ import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
+import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 
@@ -41,7 +42,9 @@ export class UserDetailComponent implements OnInit {
   public languages: string[] = ['de', 'en', 'it', 'fr'];
 
   public ChangeType: any = ChangeType;
+
   public loading: boolean = true;
+  public loadingMetadata: boolean = true;
 
   public UserState: any = UserState;
   public copied: string = '';
@@ -112,6 +115,7 @@ export class UserDetailComponent implements OnInit {
       this.mgmtUserService
         .getUserByID(id)
         .then((resp) => {
+          this.loadMetadata(id);
           this.loading = false;
           if (resp.user) {
             this.user = resp.user;
@@ -127,17 +131,6 @@ export class UserDetailComponent implements OnInit {
           this.error = err.message ?? '';
           this.loading = false;
           this.toast.showError(err);
-        });
-
-      this.mgmtUserService
-        .listUserMetadata(id, 0, 100, [])
-        .then((resp) => {
-          if (resp.resultList) {
-            this.metadata = resp.resultList;
-          }
-        })
-        .catch((err) => {
-          console.error(err);
         });
     });
   }
@@ -448,6 +441,45 @@ export class UserDetailComponent implements OnInit {
           }
         });
         break;
+    }
+  }
+
+  public loadMetadata(id: string): Promise<any> | void {
+    this.loadingMetadata = true;
+    return this.mgmtUserService
+      .listUserMetadata(id)
+      .then((resp) => {
+        this.loadingMetadata = false;
+        this.metadata = resp.resultList.map((md) => {
+          return {
+            key: md.key,
+            value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+          };
+        });
+      })
+      .catch((error) => {
+        this.loadingMetadata = false;
+        this.toast.showError(error);
+      });
+  }
+
+  public editMetadata(): void {
+    if (this.user) {
+      const setFcn = (key: string, value: string): Promise<any> =>
+        this.mgmtUserService.setUserMetadata(key, Buffer.from(value).toString('base64'), this.user.id);
+      const removeFcn = (key: string): Promise<any> => this.mgmtUserService.removeUserMetadata(key, this.user.id);
+
+      const dialogRef = this.dialog.open(MetadataDialogComponent, {
+        data: {
+          metadata: this.metadata,
+          setFcn: setFcn,
+          removeFcn: removeFcn,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.loadMetadata(this.user.id);
+      });
     }
   }
 }

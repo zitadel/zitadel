@@ -293,7 +293,7 @@
       "TITLE": "Passwortlose Authentifizierungsmethoden",
       "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
-      "U2F": "Authentifikator hinzufügen",
+      "U2F": "Methode hinzufügen",
       "U2F_DIALOG_TITLE": "Authentifikator hinzufügen",
       "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
       "U2F_SUCCESS": "Passwortlos erfolgreich erstellt!",
@@ -325,17 +325,6 @@
         "NEW": "Hinzufügen"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadata",
-      "DESCRIPTION": "",
-      "KEY": "Schlüssel",
-      "VALUE": "Wert",
-      "ADD": "Neues Element",
-      "SAVE": "Speichern",
-      "EMPTY": "Keine Metadaten",
-      "SETSUCCESS": "Element erfolgreich gespeichert",
-      "REMOVESUCCESS": "Element erfolgreich gelöscht"
-    },
     "MFA": {
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
@@ -345,7 +334,7 @@
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "ADD": "Faktor hinzufügen",
-      "OTP": "OTP (One-Time Password)",
+      "OTP": "Authentikator App für OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
       "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
       "U2F": "Fingerabdruck, Security Key, Face ID oder andere",
@@ -639,6 +628,17 @@
       },
       "DELETED": "Personal Access Token gelöscht."
     }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "DESCRIPTION": "",
+    "KEY": "Schlüssel",
+    "VALUE": "Wert",
+    "ADD": "Neues Element",
+    "SAVE": "Speichern",
+    "EMPTY": "Keine Metadaten",
+    "SETSUCCESS": "Element erfolgreich gespeichert",
+    "REMOVESUCCESS": "Element erfolgreich gelöscht"
   },
   "FLOWS": {
     "TITLE": "Aktionen und Abläufe",
