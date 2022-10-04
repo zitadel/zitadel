@@ -2,7 +2,15 @@
   <mat-spinner card-actions class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
 
   <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refresh.emit()" [dataSize]="dataSource.data.length">
-    <button actions [disabled]="disabled" mat-raised-button color="primary" class="edit" (click)="editClicked.emit()">
+    <button
+      data-e2e="edit-metadata-button"
+      actions
+      [disabled]="disabled"
+      mat-raised-button
+      color="primary"
+      class="edit"
+      (click)="editClicked.emit()"
+    >
       {{ 'ACTIONS.EDIT' | translate }}
     </button>
 

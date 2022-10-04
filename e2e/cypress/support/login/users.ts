@@ -108,7 +108,7 @@ export function loginname(withoutDomain: string, org?: string): string {
   return `${withoutDomain}@${org}.${host(Cypress.config('baseUrl'))}`;
 }
 
-function credentials(user: User, pw?: string) {
+export function credentials(user: User, pw?: string) {
   // TODO: ugly
   const woDomain = user == User.IAMAdminUser ? User.IAMAdminUser : `${user}_user_name`;
   const org = Cypress.env('ORGANIZATION') ? Cypress.env('ORGANIZATION') : 'zitadel';

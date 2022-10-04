@@ -10,14 +10,20 @@
     <div class="content">
       <cnsl-form-field #key id="key{{ i }}" class="formfield">
         <cnsl-label>{{ 'METADATA.KEY' | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="md.key" [ngModelOptions]="{ standalone: true }" />
+        <input [attr.data-e2e]="'key-input-' + i" cnslInput [(ngModel)]="md.key" [ngModelOptions]="{ standalone: true }" />
       </cnsl-form-field>
       <cnsl-form-field #value id="value{{ i }}" class="formfield">
         <cnsl-label>{{ 'METADATA.VALUE' | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="md.value" [ngModelOptions]="{ standalone: true }" />
+        <input
+          [attr.data-e2e]="'value-input-' + i"
+          cnslInput
+          [(ngModel)]="md.value"
+          [ngModelOptions]="{ standalone: true }"
+        />
       </cnsl-form-field>
 
       <button
+        [attr.data-e2e]="'metadata-save-button-' + md.key"
         mat-icon-button
         [disabled]="!(md.key && md.value)"
         class="set-button"
@@ -28,6 +34,7 @@
         <i class="las la-save"></i>
       </button>
       <button
+        [attr.data-e2e]="'metadata-remove-button-' + md.key"
         mat-icon-button
         (click)="removeEntry(i)"
         [disabled]="metadata.length < 2 && i === 0 && !md.key"
@@ -40,7 +47,7 @@
       </button>
     </div>
   </form>
-  <button (click)="addEntry()" mat-stroked-button class="continue-button" type="button">
+  <button data-e2e="add-key-value" (click)="addEntry()" mat-stroked-button class="continue-button" type="button">
     <mat-icon>add</mat-icon>
     {{ 'ACTIONS.ADD' | translate }}
   </button>

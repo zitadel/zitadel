@@ -46,6 +46,7 @@ export function ensureSomethingIsSet(
   find: (entity: any) => SearchResult,
   createPath: string,
   body: any,
+  createMethod: string = 'PUT',
 ): Cypress.Chainable<number> {
   return getSomething(api, path, find)
     .then((sRes) => {
@@ -57,7 +58,7 @@ export function ensureSomethingIsSet(
       }
       return cy
         .request({
-          method: 'PUT',
+          method: createMethod,
           url: createPath,
           headers: {
             Authorization: api.authHeader,
@@ -77,6 +78,47 @@ export function ensureSomethingIsSet(
     .then((data) => {
       awaitDesiredById(90, (entity) => !!entity, data.initialSequence, api, path, find);
       return cy.wrap<number>(data.id);
+    });
+}
+
+export function ensureKeyIsSet(
+  api: apiCallProperties,
+  path: string,
+  find: (entity: any) => SearchResult,
+  createPath: string,
+  body: any,
+  createMethod: string = 'PUT',
+): Cypress.Chainable<number> {
+  return getSomething(api, path, find)
+    .then((sRes) => {
+      if (sRes.entity) {
+        return cy.wrap({
+          key: sRes.entity.key,
+          initialSequence: 0,
+        });
+      }
+      return cy
+        .request({
+          method: createMethod,
+          url: createPath,
+          headers: {
+            Authorization: api.authHeader,
+          },
+          body: body,
+          failOnStatusCode: false,
+          followRedirect: false,
+        })
+        .then((cRes) => {
+          expect(cRes.status).to.equal(200);
+          return {
+            key: cRes.body.key,
+            initialSequence: sRes.sequence,
+          };
+        });
+    })
+    .then((data) => {
+      awaitDesiredByKey(90, (entity) => !!entity, data.initialSequence, api, path, find);
+      return cy.wrap<number>(data.key);
     });
 }
 
@@ -137,11 +179,11 @@ function searchSomething(
     });
 }
 
-function getSomething(
+export function getSomething(
   api: apiCallProperties,
   searchPath: string,
-  find: (entity: any) => SearchResult,
-): Cypress.Chainable<SearchResult> {
+  find: (entity: any) => any,
+): Cypress.Chainable<any> {
   return cy
     .request({
       method: 'GET',
@@ -188,6 +230,25 @@ function awaitDesiredById(
     const foundExpectedSequence = resp.sequence > initialSequence;
 
     if (!foundExpectedEntity || !foundExpectedSequence) {
+      expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
+      cy.wait(1000);
+      awaitDesiredById(trials - 1, expectEntity, initialSequence, api, path, find);
+    }
+  });
+}
+
+function awaitDesiredByKey(
+  trials: number,
+  expectEntity: (entity: any) => boolean,
+  initialSequence: number,
+  api: apiCallProperties,
+  path: string,
+  find: (entity: any) => SearchResult,
+) {
+  getSomething(api, path, find).then((resp) => {
+    const foundExpectedKey = expectEntity(resp);
+
+    if (!foundExpectedKey) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
       cy.wait(1000);
       awaitDesiredById(trials - 1, expectEntity, initialSequence, api, path, find);

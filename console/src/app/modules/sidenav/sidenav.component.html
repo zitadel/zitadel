@@ -27,6 +27,7 @@
           >
 
           <button
+            [attr.data-e2e]="'sidenav-' + setting.id"
             (click)="value = setting.id"
             *ngIf="
               !setting.requiredRoles ||

@@ -1,5 +1,5 @@
 import { apiCallProperties } from './apiauth';
-import { ensureSomethingDoesntExist, ensureSomethingExists } from './ensure';
+import { ensureSomethingDoesntExist, ensureSomethingExists, getSomething } from './ensure';
 
 export function ensureHumanUserExists(api: apiCallProperties, username: string): Cypress.Chainable<number> {
   return ensureSomethingExists(api, 'users/_search', (user: any) => user.userName === username, 'users/human', {
@@ -32,4 +32,20 @@ export function ensureUserDoesntExist(api: apiCallProperties, username: string):
     (user: any) => user.userName === username,
     (user) => `users/${user.id}`,
   );
+}
+
+export function ensureUserMetadataExists(api: apiCallProperties, userId: string, key: string): Cypress.Chainable<number> {
+  return getSomething(api, `users/${userId}/metadata/${key}`, (metadata: any) => metadata.key === key).then((sRes) => {
+    if (sRes.entity) {
+      return;
+    }
+  });
+}
+
+export function ensureUserMetadataDoesntExist(api: apiCallProperties, userId: string, key: string): Cypress.Chainable<null> {
+  return getSomething(api, `users/${userId}/metadata/${key}`, (metadata: any) => metadata.key === key).then((sRes) => {
+    if (sRes.entity) {
+      return;
+    }
+  });
 }
