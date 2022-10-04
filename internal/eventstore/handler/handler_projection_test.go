@@ -337,6 +337,7 @@ func TestProjectionHandler_Process(t *testing.T) {
 				nil,
 				nil,
 				nil,
+				nil,
 			)
 
 			index, err := h.Process(tt.args.ctx, tt.args.events...)

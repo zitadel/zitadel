@@ -130,7 +130,13 @@
       </ng-container>
 
       <ng-container *ngIf="currentSetting === 'metadata'">
-        <cnsl-metadata *ngIf="user && user.id" [userId]="user.id"></cnsl-metadata>
+        <cnsl-metadata
+          [metadata]="metadata"
+          [disabled]="(['user.write:' + user.id, 'user.write'] | hasRole | async) === false"
+          *ngIf="user && user.id"
+          (editClicked)="editMetadata()"
+          (refresh)="loadMetadata()"
+        ></cnsl-metadata>
       </ng-container>
     </cnsl-sidenav>
 

@@ -95,16 +95,16 @@ InitMFAOTP:
   CancelButtonText: Annuler
 
 InitMFAU2F:
-  Title: Configuration de 2-Factor U2F / WebAuthN
-  Description: Ajoutez votre appareil dépendant de 2-facteurs comme FaceID, Windows Hello ou Fingerprint en fournissant un nom (par exemple MyPhone, MacBook) et en cliquant sur le bouton "Enregistrer 2-facteurs" ci-dessous.
-  TokenNameLabel: Nom du dispositif à 2 facteurs
+  Title: Ajouter une clé de sécurité
+  Description: Une clé de sécurité est une méthode de vérification qui peut être intégrée à votre téléphone, utiliser Bluetooth ou se brancher directement sur le port USB de votre ordinateur.
+  TokenNameLabel: Nom de la clé de sécurité / de l'appareil
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
   RegisterTokenButtonText: Enregistrez 2-facteurs
   ErrorRetry: Réessayez, créez un nouveau défi ou choisissez une autre méthode.
 
 InitMFADone:
-  Title: Configuration de 2 facteurs faite
-  Description: Génial! Vous venez de configurer avec succès votre facteur 2 et de rendre votre compte beaucoup plus sûr. Le second facteur doit être saisi à chaque connexion.
+  Title: Clé de sécurité ajoutée
+  Description: Génial! Vous venez de configurer avec succès votre facteur 2 et de rendre votre compte beaucoup plus sûr. Le facteur doit être saisi à chaque connexion.
   NextButtonText: Suivant
   CancelButtonText: Annuler
 

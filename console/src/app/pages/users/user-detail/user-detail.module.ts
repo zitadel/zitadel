@@ -52,12 +52,11 @@ import { ContactComponent } from './contact/contact.component';
 import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { ExternalIdpsComponent } from './external-idps/external-idps.component';
-import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
-import { MetadataComponent } from './metadata/metadata.component';
 import { PasswordComponent } from './password/password.component';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
+import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
 
 @NgModule({
   declarations: [
@@ -76,8 +75,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     DialogU2FComponent,
     DialogPasswordlessComponent,
     AuthFactorDialogComponent,
-    MetadataDialogComponent,
-    MetadataComponent,
   ],
   imports: [
     ChangesModule,
@@ -95,6 +92,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     ShowTokenDialogModule,
     MetaLayoutModule,
     MatCheckboxModule,
+    MetadataModule,
     TopViewModule,
     HasRolePipeModule,
     UserGrantsModule,
