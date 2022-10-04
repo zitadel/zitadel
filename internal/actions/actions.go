@@ -56,8 +56,12 @@ func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields,
 		t.Stop()
 	}()
 
-	ctxParam(config.ctxParam)
-	apiParam(config.apiParam)
+	if ctxParam != nil {
+		ctxParam(config.ctxParam)
+	}
+	if apiParam != nil {
+		apiParam(config.apiParam)
+	}
 
 	registry := new(require.Registry)
 	registry.Enable(config.vm)

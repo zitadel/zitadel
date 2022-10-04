@@ -65,7 +65,6 @@ export class ActionsComponent implements OnDestroy {
         if (!this.flow && resp.resultList[0]) {
           const type = resp.resultList[0];
           this.typeControl.setValue(type);
-          //   this.loadFlow(type.id);
         }
       })
       .catch((error: any) => {

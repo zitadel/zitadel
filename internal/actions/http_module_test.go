@@ -2,6 +2,8 @@ package actions
 
 import (
 	"bytes"
+	"context"
+	"io"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -212,7 +214,9 @@ func TestHTTP_fetchConfigFromArg(t *testing.T) {
 				runtime: runtime,
 				client:  http.DefaultClient,
 			}
-			gotConfig, err := c.fetchConfigFromArg(tt.args.arg)
+			gotConfig := new(fetchConfig)
+
+			err := c.fetchConfigFromArg(tt.args.arg, gotConfig)
 			if !tt.wantErr(err) {
 				t.Errorf("HTTP.fetchConfigFromArg() error = %v", err)
 				return
@@ -231,11 +235,8 @@ func TestHTTP_fetchConfigFromArg(t *testing.T) {
 				return
 			}
 
-			gotBody := make([]byte, gotConfig.Body.(*bytes.Reader).Len())
-			wantBody := make([]byte, tt.wantConfig.Body.(*bytes.Reader).Len())
-
-			gotConfig.Body.Read(gotBody)
-			tt.wantConfig.Body.Read(wantBody)
+			gotBody, _ := io.ReadAll(gotConfig.Body)
+			wantBody, _ := io.ReadAll(tt.wantConfig.Body)
 
 			if !reflect.DeepEqual(gotBody, wantBody) {
 				t.Errorf("config.Body got = %s, want %s", gotBody, wantBody)
@@ -244,89 +245,189 @@ func TestHTTP_fetchConfigFromArg(t *testing.T) {
 	}
 }
 
-// func TestHTTP_buildHTTPRequest(t *testing.T) {
-// 	runtime := goja.New()
-// 	type args struct {
-// 		args []goja.Value
-// 	}
-// 	tests := []struct {
-// 		name    string
-// 		args    args
-// 		wantReq *http.Request
-// 	}{
-// 		{
-// 			name: "only url",
-// 			args: args{
-// 				args: []goja.Value{
-// 					runtime.ToValue("http://my-url.ch"),
-// 				},
-// 			},
-// 			wantReq: &http.Request{
-// 				Method: http.MethodGet,
-// 				URL:    mustNewURL(t, "http://localhost:8080"),
-// 				Header: defaultFetchConfig.Headers,
-// 				Body:   nil,
-// 			},
-// 		},
-// 		// {
-// 		// 	name: "no params",
-// 		// 	args: args{
-// 		// 		args: []goja.Value{},
-// 		// 	},
-// 		// 	wantReq: &http.Request{
-// 		// 		Method: http.MethodGet,
-// 		// 		URL:    mustNewURL(t, "http://localhost:8080"),
-// 		// 		Header: http.Header{},
-// 		// 		Body:   nil,
-// 		// 	},
-// 		// },
-// 		// {
-// 		// 	name: "only url",
-// 		// 	args: args{
-// 		// 		args: []goja.Value{},
-// 		// 	},
-// 		// 	wantReq: &http.Request{
-// 		// 		Method: http.MethodGet,
-// 		// 		URL:    mustNewURL(t, "http://localhost:8080"),
-// 		// 		Header: http.Header{},
-// 		// 		Body:   nil,
-// 		// 	},
-// 		// },
-// 		// {
-// 		// 	name: "overwrite headers",
-// 		// 	args: args{
-// 		// 		args: []goja.Value{},
-// 		// 	},
-// 		// 	wantReq: &http.Request{
-// 		// 		Method: http.MethodGet,
-// 		// 		URL:    mustNewURL(t, "http://localhost:8080"),
-// 		// 		Header: http.Header{},
-// 		// 		Body:   nil,
-// 		// 	},
-// 		// },
-// 		// {
-// 		// 	name: "post with body",
-// 		// 	args: args{
-// 		// 		args: []goja.Value{},
-// 		// 	},
-// 		// 	wantReq: &http.Request{
-// 		// 		Method: http.MethodGet,
-// 		// 		URL:    mustNewURL(t, "http://localhost:8080"),
-// 		// 		Header: http.Header{},
-// 		// 		Body:   nil,
-// 		// 	},
-// 		// },
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			c := &HTTP{
-// 				runtime: runtime,
-// 			}
-// 			gotReq := c.buildHTTPRequest(context.Background(), tt.args.args)
+func TestHTTP_buildHTTPRequest(t *testing.T) {
+	runtime := goja.New()
+	runtime.SetFieldNameMapper(goja.UncapFieldNameMapper())
 
-// 			if !reflect.DeepEqual(gotReq, tt.wantReq) {
-// 				t.Errorf("HTTP.buildHTTPRequest() = %#v, want %#v", gotReq, tt.wantReq)
-// 			}
-// 		})
-// 	}
-// }
+	type args struct {
+		args []goja.Value
+	}
+	tests := []struct {
+		name        string
+		args        args
+		wantReq     *http.Request
+		shouldPanic bool
+	}{
+		{
+			name: "only url",
+			args: args{
+				args: []goja.Value{
+					runtime.ToValue("http://my-url.ch"),
+				},
+			},
+			wantReq: &http.Request{
+				Method: http.MethodGet,
+				URL:    mustNewURL(t, "http://my-url.ch"),
+				Header: defaultFetchConfig.Headers,
+				Body:   nil,
+			},
+		},
+		{
+			name: "no params",
+			args: args{
+				args: []goja.Value{
+					runtime.ToValue("http://my-url.ch"),
+					runtime.ToValue(&struct{}{}),
+				},
+			},
+			wantReq: &http.Request{
+				Method: http.MethodGet,
+				URL:    mustNewURL(t, "http://my-url.ch"),
+				Header: defaultFetchConfig.Headers,
+				Body:   nil,
+			},
+		},
+		{
+			name: "overwrite headers",
+			args: args{
+				args: []goja.Value{
+					runtime.ToValue("http://my-url.ch"),
+					runtime.ToValue(struct {
+						Headers map[string][]interface{}
+					}{
+						Headers: map[string][]interface{}{"Authorization": {"some token"}},
+					}),
+				},
+			},
+			wantReq: &http.Request{
+				Method: http.MethodGet,
+				URL:    mustNewURL(t, "http://my-url.ch"),
+				Header: http.Header{
+					"Authorization": []string{"some token"},
+				},
+				Body: nil,
+			},
+		},
+		{
+			name: "post with body",
+			args: args{
+				args: []goja.Value{
+					runtime.ToValue("http://my-url.ch"),
+					runtime.ToValue(struct {
+						Body struct{ MyData string }
+					}{
+						Body: struct{ MyData string }{MyData: "hello world"},
+					}),
+				},
+			},
+			wantReq: &http.Request{
+				Method: http.MethodGet,
+				URL:    mustNewURL(t, "http://my-url.ch"),
+				Header: defaultFetchConfig.Headers,
+				Body:   io.NopCloser(bytes.NewReader([]byte(`{"myData":"hello world"}`))),
+			},
+		},
+		{
+			name: "too many args",
+			args: args{
+				args: []goja.Value{
+					runtime.ToValue("http://my-url.ch"),
+					runtime.ToValue("http://my-url.ch"),
+					runtime.ToValue("http://my-url.ch"),
+				},
+			},
+			wantReq:     nil,
+			shouldPanic: true,
+		},
+		{
+			name: "no args",
+			args: args{
+				args: []goja.Value{},
+			},
+			wantReq:     nil,
+			shouldPanic: true,
+		},
+		{
+			name: "invalid config",
+			args: args{
+				args: []goja.Value{
+					runtime.ToValue("http://my-url.ch"),
+					runtime.ToValue(struct {
+						Invalid bool
+					}{
+						Invalid: true,
+					}),
+				},
+			},
+			wantReq:     nil,
+			shouldPanic: true,
+		},
+		{
+			name: "invalid method",
+			args: args{
+				args: []goja.Value{
+					runtime.ToValue("http://my-url.ch"),
+					runtime.ToValue(struct {
+						Method string
+					}{
+						Method: " asdf asdf",
+					}),
+				},
+			},
+			wantReq:     nil,
+			shouldPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			panicked := false
+			if tt.shouldPanic {
+				defer func() {
+					if panicked != tt.shouldPanic {
+						t.Errorf("wanted panic: %v got %v", tt.shouldPanic, panicked)
+					}
+				}()
+				defer func() {
+					recover()
+					panicked = true
+				}()
+			}
+
+			c := &HTTP{
+				runtime: runtime,
+			}
+
+			gotReq := c.buildHTTPRequest(context.Background(), tt.args.args)
+
+			if tt.shouldPanic {
+				return
+			}
+
+			if gotReq.URL.String() != tt.wantReq.URL.String() {
+				t.Errorf("url = %s, want %s", gotReq.URL, tt.wantReq.URL)
+			}
+
+			if !reflect.DeepEqual(gotReq.Header, tt.wantReq.Header) {
+				t.Errorf("headers = %v, want %v", gotReq.Header, tt.wantReq.Header)
+			}
+
+			if gotReq.Method != tt.wantReq.Method {
+				t.Errorf("method = %s, want %s", gotReq.Method, tt.wantReq.Method)
+			}
+
+			if tt.wantReq.Body == nil {
+				if gotReq.Body != nil {
+					t.Errorf("didn't expect a body")
+				}
+				return
+			}
+
+			gotBody, _ := io.ReadAll(gotReq.Body)
+			wantBody, _ := io.ReadAll(tt.wantReq.Body)
+
+			if !reflect.DeepEqual(gotBody, wantBody) {
+				t.Errorf("config.Body got = %s, want %s", gotBody, wantBody)
+			}
+		})
+	}
+}
