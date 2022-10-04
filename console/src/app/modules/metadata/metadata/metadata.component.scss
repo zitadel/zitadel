@@ -1,14 +1,17 @@
 .metadata-details {
   padding-bottom: 1rem;
 
-  .metadata-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+  .refresh {
+    margin-left: 0.5rem;
+    font-size: 1.2rem;
 
-    .edit {
-      font-size: 14px;
+    i {
+      font-size: 1.2rem;
     }
+  }
+
+  .edit {
+    font-size: 14px;
   }
 
   .meta-row {

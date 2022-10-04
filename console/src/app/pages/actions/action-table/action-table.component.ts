@@ -84,7 +84,8 @@ export class ActionTableComponent implements OnInit {
           .deleteAction(action.id)
           .then(() => {
             this.toast.showInfo('FLOWS.DIALOG.DELETEACTION.DELETE_SUCCESS', true);
-            this.getData(20, 0);
+
+            this.refreshPage();
           })
           .catch((error: any) => {
             this.toast.showError(error);
@@ -152,7 +153,9 @@ export class ActionTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    setTimeout(() => {
+      this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    }, 1000);
   }
 
   public deactivateSelection(): Promise<void> {

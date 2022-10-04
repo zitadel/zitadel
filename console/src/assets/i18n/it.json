@@ -294,7 +294,7 @@
       "TITLE": "Autenticazione passwordless",
       "DESCRIPTION": "Aggiungi i metodi di autenticazione basati su WebAuthn per accedere a ZITADEL senza password.",
       "MANAGE_DESCRIPTION": "Gestisci i metodi del secondo fattore dei vostri utenti.",
-      "U2F": "Aggiungi autenticatore",
+      "U2F": "Aggiungi metodo",
       "U2F_DIALOG_TITLE": "Verifica autenticatore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo authenticatore o dispositivo usato.",
       "U2F_SUCCESS": "Autorizzazione passwordless creata con successo!",
@@ -326,17 +326,6 @@
         "NEW": "Aggiungi nuovo"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadati",
-      "DESCRIPTION": "",
-      "KEY": "Chiave",
-      "VALUE": "Valore",
-      "ADD": "Nuova voce",
-      "SAVE": "Salva",
-      "EMPTY": "Nessun metadato",
-      "SETSUCCESS": "Salvato con successo",
-      "REMOVESUCCESS": "Rimosso con successo"
-    },
     "MFA": {
       "TABLETYPE": "Tipo",
       "TABLESTATE": "Stato",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
       "ADD": "Aggiungi fattore",
-      "OTP": "OTP (One-Time Password)",
+      "OTP": "App di autenticazione per OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Aggiungi OTP",
       "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
       "U2F": "Impronta digitale, chiave di sicurezza, Face ID e altri",
@@ -638,6 +627,17 @@
       },
       "DELETED": "Token eliminato con successo."
     }
+  },
+  "METADATA": {
+    "TITLE": "Metadati",
+    "DESCRIPTION": "",
+    "KEY": "Chiave",
+    "VALUE": "Valore",
+    "ADD": "Nuova voce",
+    "SAVE": "Salva",
+    "EMPTY": "Nessun metadato",
+    "SETSUCCESS": "Salvato con successo",
+    "REMOVESUCCESS": "Rimosso con successo"
   },
   "FLOWS": {
     "TITLE": "Azioni e Processi",
