@@ -31,6 +31,7 @@ title: zitadel/object.proto
 | offset |  uint64 | - |  |
 | limit |  uint32 | - |  |
 | asc |  bool | - |  |
+| with_owner_removed |  bool | - |  |
 
 
 

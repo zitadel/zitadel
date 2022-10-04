@@ -2,7 +2,6 @@ package management
 
 import (
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -32,8 +31,8 @@ func updateActionRequestToDomain(req *mgmt_pb.UpdateActionRequest) *domain.Actio
 }
 
 func listActionsToQuery(orgID string, req *mgmt_pb.ListActionsRequest) (_ *query.ActionSearchQueries, err error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := make([]query.SearchQuery, len(req.Queries)+1)
+	// set queries in same order as requested and append optional ownerRemoved
+	queries := make([]query.SearchQuery, len(req.Queries)+2)
 	queries[0], err = query.NewActionResourceOwnerQuery(orgID)
 	if err != nil {
 		return nil, err
@@ -44,11 +43,15 @@ func listActionsToQuery(orgID string, req *mgmt_pb.ListActionsRequest) (_ *query
 			return nil, err
 		}
 	}
+
+	if req.GetQuery().GetWithOwnerRemoved() {
+		queries = append(queries)
+	}
 	return &query.ActionSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Offset: offset,
-			Limit:  limit,
-			Asc:    asc,
+			Offset: req.Query.GetOffset(),
+			Limit:  uint64(req.GetQuery().GetLimit()),
+			Asc:    req.GetQuery().GetAsc(),
 		},
 		Queries: queries,
 	}, nil

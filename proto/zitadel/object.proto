@@ -60,6 +60,11 @@ message ListQuery {
             description: "default is descending"
         }
     ];
+    bool with_owner_removed = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if true also object of removed resource owners are returned"
+        }
+    ];
 }
 
 message ListDetails {

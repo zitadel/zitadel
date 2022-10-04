@@ -63,6 +63,10 @@ var (
 		name:  projection.ActionAllowedToFailCol,
 		table: actionTable,
 	}
+	ActionColumnOwnerRemoved = Column{
+		name:  projection.ActionOwnerRemovedCol,
+		table: actionTable,
+	}
 )
 
 type Actions struct {
@@ -77,6 +81,7 @@ type Action struct {
 	ResourceOwner string
 	State         domain.ActionState
 	Sequence      uint64
+	OwnerRemoved  bool
 
 	Name          string
 	Script        string
@@ -140,6 +145,10 @@ func NewActionResourceOwnerQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ActionColumnResourceOwner, id, TextEquals)
 }
 
+func NewActionOwnerRemovedQuery() (SearchQuery, error) {
+	return NewBoolQuery(ActionColumnOwnerRemoved, true)
+}
+
 func NewActionNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(ActionColumnName, value, method)
 }
@@ -164,6 +173,7 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 			ActionColumnScript.identifier(),
 			ActionColumnTimeout.identifier(),
 			ActionColumnAllowedToFail.identifier(),
+			ActionColumnOwnerRemoved.identifier(),
 			countColumn.identifier(),
 		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Actions, error) {
@@ -182,6 +192,7 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 					&action.Script,
 					&action.Timeout,
 					&action.AllowedToFail,
+					&action.OwnerRemoved,
 					&count,
 				)
 				if err != nil {
@@ -215,6 +226,7 @@ func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)
 			ActionColumnScript.identifier(),
 			ActionColumnTimeout.identifier(),
 			ActionColumnAllowedToFail.identifier(),
+			ActionColumnOwnerRemoved.identifier(),
 		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Action, error) {
 			action := new(Action)
@@ -229,6 +241,7 @@ func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)
 				&action.Script,
 				&action.Timeout,
 				&action.AllowedToFail,
+				&action.OwnerRemoved,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

@@ -39,10 +39,12 @@ func ToViewDetailsPb(
 	creationDate,
 	changeDate time.Time,
 	resourceOwner string,
+	ownerRemoved bool,
 ) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:      sequence,
-		ResourceOwner: resourceOwner,
+		Sequence:             sequence,
+		ResourceOwner:        resourceOwner,
+		ResourceOwnerRemoved: ownerRemoved,
 	}
 	if !creationDate.IsZero() {
 		details.CreationDate = timestamppb.New(creationDate)
@@ -145,9 +147,9 @@ func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
 	}
 }
 
-func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc bool) {
-	if query == nil {
-		return 0, 0, false
-	}
-	return query.Offset, uint64(query.Limit), query.Asc
-}
+// func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc, ownerRemoved bool) {
+// 	if query == nil {
+// 		return 0, 0, false, false
+// 	}
+// 	return query.Offset, uint64(query.Limit), query.Asc, query.WithOwnerRemoved
+// }
