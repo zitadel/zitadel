@@ -38,3 +38,18 @@ This can be especially useful if you add service users for one of your projects 
 
 You can add users of your organization or from external organizations. When adding users from other organizations you have to enter their username.
 If you don't remember it navigate to the users page and copy the username from the detail page.
+
+## Configure roles
+
+If you run a self hosted ZITADEL istance you can define your custom roles by overwriting the defaults.yaml
+In the InternalAuthZ section you will find all the roles and which permissions the have.
+
+Example:
+```bash
+InternalAuthZ:
+  RolePermissionMappings:
+    - Role: "IAM_OWNER"
+      Permissions:
+        - "iam.read"
+        - "iam.write"
+```
