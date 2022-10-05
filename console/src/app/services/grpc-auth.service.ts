@@ -141,11 +141,13 @@ export class GrpcAuthService {
   public labelpolicy: BehaviorSubject<LabelPolicy.AsObject | undefined> = new BehaviorSubject<
     LabelPolicy.AsObject | undefined
   >(undefined);
+  labelPolicyLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private cachedOrgs: Org.AsObject[] = [];
+  private cachedLabelPolicies: { [orgId: string]: LabelPolicy.AsObject } = {};
 
   constructor(
     private readonly grpcService: GrpcService,
@@ -157,14 +159,17 @@ export class GrpcAuthService {
 
     this.labelpolicy$ = this.activeOrgChanged.pipe(
       filter((org) => !!org),
-      switchMap((org) => from(this.getMyLabelPolicy())),
-      filter((policy) => !!policy.policy),
-      map((policy) => policy.policy as LabelPolicy.AsObject),
+      switchMap((org) => {
+        this.labelPolicyLoading$.next(true);
+        return from(this.getMyLabelPolicy(org.id));
+      }),
+      filter((policy) => !!policy),
     );
 
     this.labelpolicy$.subscribe((policy) => {
       themeService.applyLabelPolicy(policy);
       this.labelpolicy.next(policy);
+      this.labelPolicyLoading$.next(false);
     });
 
     this.user = merge(
@@ -629,8 +634,24 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserChanges(req, null).then((resp) => resp.toObject());
   }
 
-  public getMyLabelPolicy(): Promise<GetMyLabelPolicyResponse.AsObject> {
-    return this.grpcService.auth.getMyLabelPolicy(new GetMyLabelPolicyRequest(), null).then((resp) => resp.toObject());
+  public getMyLabelPolicy(orgIdForCache?: string): Promise<LabelPolicy.AsObject> {
+    if (orgIdForCache && this.cachedLabelPolicies[orgIdForCache]) {
+      return Promise.resolve(this.cachedLabelPolicies[orgIdForCache]);
+    } else {
+      return this.grpcService.auth
+        .getMyLabelPolicy(new GetMyLabelPolicyRequest(), null)
+        .then((resp) => resp.toObject())
+        .then((resp) => {
+          if (resp.policy) {
+            if (orgIdForCache) {
+              this.cachedLabelPolicies[orgIdForCache] = resp.policy;
+            }
+            return Promise.resolve(resp.policy);
+          } else {
+            return Promise.reject();
+          }
+        });
+    }
   }
 
   public getMyPrivacyPolicy(): Promise<GetMyPrivacyPolicyResponse.AsObject> {
