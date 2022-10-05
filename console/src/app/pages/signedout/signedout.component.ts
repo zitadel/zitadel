@@ -27,7 +27,10 @@ export class SignedoutComponent {
           this.labelpolicy = parsed;
           themeService.applyLabelPolicy(parsed);
           authService.labelpolicy.next(parsed);
+          authService.labelPolicyLoading$.next(false);
         }
+      } else {
+        authService.labelPolicyLoading$.next(false);
       }
     });
   }
