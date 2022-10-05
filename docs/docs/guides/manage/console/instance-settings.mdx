@@ -34,15 +34,15 @@ We recommend setting your Branding and SMTP settings initially as it will comfor
 
 ![Private Labeling](/img/console_private_labeling.png)
 
-In the Branding settings, you can upload you Logo for the login interface, set your own colors for buttons, background, links, modify UI components in their size, border-radius and choose between multiple behavours. For example you can choose if social logins are shown before the username field or vice versa. You don't need to be an expert as those settings can all be set without any knowledge of CSS.
+In the Branding settings, you can upload you Logo for the login interface, set your own colors for buttons, background, links, and choose between multiple behavours. You don't need to be an expert as those settings can all be set without any knowledge of CSS.
 
-| Setting               | Description                                                                                                          |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Logo                  | Upload your logo for the light and the dark design.                                                                  |
-| Colors                | You can set four different colors to design your login page and email. (Background-, Primary-, Warn- and Font Color) |
-| Font                  | Upload your custom font                                                                                              |
-| Hide Loginname suffix | If enabled, your loginname suffix (Domain) will not be shown in the login page                                       |
-| Disable Watermark     | If you disable the watermark you will not see the "Powered by ZITADEL" in the login page                             |
+| Setting            | Description                                                                                                                                                                                                                |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Logo               | Upload your logo for the light and the dark design. This is used mainly in the login interface.                                                                                                                            |
+| Icon               | Upload your icon for the light and the dark design. Icons are used for smaller components. For example in console on the top left as the home button.                                                                      |
+| Colors             | You can set four different colors to design your login page and email. (Background-, Primary-, Warn- and Font Color)                                                                                                       |
+| Font               | Upload your custom font                                                                                                                                                                                                    |
+| Advanced Behaviour | **Hide Loginname suffix**: If enabled, your loginname suffix (Domain) will not be shown in the login page. **Disable Watermark**: If you disable the watermark you will not see the "Powered by ZITADEL" in the login page |
 
 Make sure you click the "Apply configuration" button after you finish your configuration. This will ensure your design is visible for your customers.
 
@@ -58,6 +58,7 @@ On each instance we configure our default SMTP provider. To make sure, that you 
 Go to the ZITADEL [customer portal](https://zitadel.cloud) to configure a custom domain.
 
 To configure your custom SMTP please fill the following fields:
+
 - Sender email address
 - Sender name
 - Enable or Disable Transport Layer Security (TLS)
@@ -77,13 +78,13 @@ No default provider is configured to send some SMS to your users. If you like to
 
 The Login Policy defines how the login process should look like and which authentication options a user has to authenticate.
 
-| Setting                   | Description                                                                        |
-| ------------------------- | ---------------------------------------------------------------------------------- |
-| Register allowed          | Enable self register possibility in the login ui, this enables username password registration as well as registration with configured external identity providers                                   |
-| Username Password allowed | Possibility to login with username and password. If this is disabled only login with external identity providers will be allowed                                |
+| Setting                   | Description                                                                                                                                                         |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Register allowed          | Enable self register possibility in the login ui, this enables username password registration as well as registration with configured external identity providers   |
+| Username Password allowed | Possibility to login with username and password. If this is disabled only login with external identity providers will be allowed                                    |
 | External IDP allowed      | Possibility to login with an external identity (e.g Google, Microsoft, Apple, etc), If you like to allow external Identity providers add them to the providers list |
-| Force MFA                 | Force a user to register and use a multifactor authentication, Ensure that you have added the MFA methods you want to allow.                       |
-| Passwordless              | Choose if passwordless login is allowed or not                                     |
+| Force MFA                 | Force a user to register and use a multifactor authentication, Ensure that you have added the MFA methods you want to allow.                                        |
+| Passwordless              | Choose if passwordless login is allowed or not                                                                                                                      |
 
 <img
   src="/img/guides/console/loginpolicy.png"
@@ -162,7 +163,6 @@ This means that all your users will not be suffixed with the domain of your orga
 All usernames will then be globally unique within your instance.
 
 You can either set this attribute on your whole ZITADEL instance or just on some specific orgnizations.
-
 
 ## Privacy Policy and TOS
 
