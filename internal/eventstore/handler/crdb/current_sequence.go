@@ -13,16 +13,15 @@ import (
 )
 
 const (
-	latestEventStmtFormat     = `SELECT id, creation_date, aggregate_type, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
-	updateEventIDStmtFormat   = `INSERT INTO %s (projection_name, aggregate_type, event_id, instance_id, timestamp) VALUES `
-	updateEventIDConflictStmt = ` ON CONFLICT (projection_name, aggregate_type, instance_id) DO UPDATE SET event_id = EXCLUDED.event_id, timestamp = EXCLUDED.timestamp`
+	latestEventStmtFormat     = `SELECT aggregate_type, instance_id, event_creation_date FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
+	updateEventIDStmtFormat   = `INSERT INTO %s (projection_name, aggregate_type, instance_id, event_creation_date) VALUES `
+	updateEventIDConflictStmt = ` ON CONFLICT (projection_name, aggregate_type, instance_id) DO UPDATE SET (processed_at, event_creation_date) = (now(), EXCLUDED.event_creation_date)`
 )
 
 type events map[eventstore.AggregateType][]*instanceEvents
 
 type instanceEvents struct {
 	instanceID   string
-	eventID      string
 	creationDate time.Time
 }
 
@@ -37,21 +36,19 @@ func (h *StatementHandler) currentSequences(ctx context.Context, query func(cont
 	ids := make(events, len(h.aggregates))
 	for rows.Next() {
 		var (
-			aggregateType eventstore.AggregateType
-			eventID       string
-			instanceID    string
-			creationDate  sql.NullTime
+			aggregateType  eventstore.AggregateType
+			instanceID     string
+			eventCreatedAt sql.NullTime
 		)
 
-		err = rows.Scan(&eventID, &creationDate, &aggregateType, &instanceID)
+		err = rows.Scan(&aggregateType, &instanceID, &eventCreatedAt)
 		if err != nil {
 			return nil, errors.ThrowInternal(err, "CRDB-dbatK", "scan failed")
 		}
 
 		ids[aggregateType] = append(ids[aggregateType], &instanceEvents{
-			eventID:      eventID,
 			instanceID:   instanceID,
-			creationDate: creationDate.Time,
+			creationDate: eventCreatedAt.Time,
 		})
 	}
 
@@ -70,11 +67,11 @@ func (h *StatementHandler) updateCurrentSequences(tx *sql.Tx, ids events) error 
 	valueQueries := make([]string, 0, len(ids))
 	valueCounter := 0
 	values := make([]interface{}, 0, len(ids)*3)
-	for aggregate, eventID := range ids {
-		for _, sequence := range eventID {
-			valueQueries = append(valueQueries, "($"+strconv.Itoa(valueCounter+1)+", $"+strconv.Itoa(valueCounter+2)+", $"+strconv.Itoa(valueCounter+3)+", $"+strconv.Itoa(valueCounter+4)+", NOW())")
+	for aggregate, event := range ids {
+		for _, sequence := range event {
+			valueQueries = append(valueQueries, "($"+strconv.Itoa(valueCounter+1)+", $"+strconv.Itoa(valueCounter+2)+", $"+strconv.Itoa(valueCounter+3)+", $"+strconv.Itoa(valueCounter+4)+")")
 			valueCounter += 4
-			values = append(values, h.ProjectionName, aggregate, sequence.eventID, sequence.instanceID)
+			values = append(values, h.ProjectionName, aggregate, sequence.instanceID, sequence.creationDate)
 		}
 	}
 

@@ -7,22 +7,22 @@ CREATE TABLE projections.locks (
     PRIMARY KEY (projection_name, instance_id)
 );
 
-CREATE TABLE projections.current_sequences (
+CREATE TABLE projections.last_processed_event (
     projection_name TEXT,
     aggregate_type TEXT,
-    current_sequence BIGINT,
     instance_id TEXT NOT NULL,
-    timestamp TIMESTAMPTZ,
+    processed_at TIMESTAMPTZ DEFAULT now(),
+    event_creation_date TIMESTAMPTZ,
 
     PRIMARY KEY (projection_name, aggregate_type, instance_id)
 );
 
 CREATE TABLE projections.failed_events (
     projection_name TEXT,
-    failed_sequence BIGINT,
+    failed_id UUID,
     failure_count SMALLINT,
     error TEXT,
     instance_id TEXT NOT NULL,
 
-    PRIMARY KEY (projection_name, failed_sequence, instance_id)
+    PRIMARY KEY (projection_name, failed_id, instance_id)
 );

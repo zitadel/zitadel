@@ -138,8 +138,8 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	//checks for events between create statement and current sequence
 	// because there could be events between current sequence and a creation event
 	// and we cannot check via stmt.PreviousSequence
-	if stmts[0].PreviousSequence == 0 {
-		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].Sequence, stmts[0].InstanceID, sequences, reduce)
+	if stmts[0].PreviousEventDate.IsZero() {
+		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].PreviousEventDate, stmts[0].InstanceID, sequences, reduce)
 		if err != nil {
 			tx.Rollback()
 			return -1, err
@@ -168,20 +168,21 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	return lastSuccessfulIdx, nil
 }
 
-func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, stmtSeq uint64, instanceID string, sequences events, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
+func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, stmtDate time.Time, instanceID string, sequences events, reduce handler.Reduce) (previousStmts []*handler.Statement, err error) {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).SetTx(tx)
 	queriesAdded := false
 	for _, aggregateType := range h.aggregates {
 		for _, sequence := range sequences[aggregateType] {
-			if stmtSeq <= sequence.eventID && instanceID == sequence.instanceID {
+			if sequence.creationDate.After(stmtDate) && instanceID == sequence.instanceID {
+				// if stmtSeq. <= sequence.eventID && instanceID == sequence.instanceID {
 				continue
 			}
 
 			query.
 				AddQuery().
 				AggregateTypes(aggregateType).
-				SequenceGreater(sequence.eventID).
-				SequenceLess(stmtSeq).
+				CreationDateAfter(sequence.creationDate).
+				CreationDateBefore(stmtDate).
 				InstanceID(sequence.instanceID)
 
 			queriesAdded = true
@@ -218,7 +219,8 @@ stmts:
 	for i := 0; i < len(*stmts); i++ {
 		stmt := (*stmts)[i]
 		for _, sequence := range sequences[stmt.AggregateType] {
-			if stmt.Sequence <= sequence.eventID && stmt.InstanceID == sequence.instanceID {
+			if sequence.creationDate.After(stmt.CreationDate) && stmt.InstanceID == sequence.instanceID {
+				// if stmt.Sequence <= sequence.eventID && stmt.InstanceID == sequence.instanceID {
 				logging.WithFields("statement", stmt, "currentSequence", sequence).Debug("statement dropped")
 				if i < len(*stmts)-1 {
 					copy((*stmts)[i:], (*stmts)[i+1:])
@@ -227,8 +229,9 @@ stmts:
 				i--
 				continue stmts
 			}
-			if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequence.eventID && stmt.InstanceID == sequence.instanceID {
-				logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "sequence", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequence.eventID).Warn("sequences do not match")
+			if !stmt.PreviousEventDate.IsZero() && !stmt.PreviousEventDate.Equal(sequence.creationDate) && stmt.InstanceID == sequence.instanceID {
+				// if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequence.eventID && stmt.InstanceID == sequence.instanceID {
+				logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "creationDate", stmt.CreationDate.String(), "prevCreationDate", stmt.PreviousEventDate, "creationDate", sequence.creationDate).Warn("sequences do not match")
 				break stmts
 			}
 		}
@@ -279,13 +282,13 @@ func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt *handler.Statement) erro
 func updateSequences(sequences events, stmt *handler.Statement) {
 	for _, sequence := range sequences[stmt.AggregateType] {
 		if sequence.instanceID == stmt.InstanceID {
-			sequence.eventID = stmt.Sequence
+			sequence.creationDate = stmt.CreationDate
 			return
 		}
 	}
 	sequences[stmt.AggregateType] = append(sequences[stmt.AggregateType], &instanceEvents{
-		instanceID: stmt.InstanceID,
-		eventID:    stmt.Sequence,
+		instanceID:   stmt.InstanceID,
+		creationDate: stmt.CreationDate,
 	})
 }
 

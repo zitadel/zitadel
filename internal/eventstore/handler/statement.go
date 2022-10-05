@@ -27,10 +27,11 @@ func (stmts Statements) Less(i, j int) bool {
 }
 
 type Statement struct {
-	AggregateType eventstore.AggregateType
-	CreationDate  time.Time
-	InstanceID    string
-	EventID       string
+	AggregateType     eventstore.AggregateType
+	CreationDate      time.Time
+	InstanceID        string
+	EventID           string
+	PreviousEventDate time.Time
 
 	Execute func(ex Executer, projectionName string) error
 }

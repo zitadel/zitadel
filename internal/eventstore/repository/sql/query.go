@@ -91,7 +91,9 @@ func maxCreationDateScanner(row scan, dest interface{}) (err error) {
 	if !ok {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-NBjA9", "type must be time.Time")
 	}
-	err = row(sequence)
+	var creationDate sql.NullTime
+	err = row(&creationDate)
+	*sequence = creationDate.Time
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
 		return nil
 	}

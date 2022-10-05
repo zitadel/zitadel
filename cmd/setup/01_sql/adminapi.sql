@@ -9,10 +9,9 @@ CREATE TABLE adminapi.locks (
     PRIMARY KEY (view_name, instance_id)
 );
 
-CREATE TABLE adminapi.current_sequences (
+CREATE TABLE adminapi.last_processed_event (
     view_name TEXT,
-    current_sequence BIGINT,
-    event_timestamp TIMESTAMPTZ,
+    event_creation_date TIMESTAMPTZ,
     last_successful_spooler_run TIMESTAMPTZ,
     instance_id TEXT NOT NULL,
 
@@ -21,12 +20,12 @@ CREATE TABLE adminapi.current_sequences (
 
 CREATE TABLE adminapi.failed_events (
     view_name TEXT,
-    failed_sequence BIGINT,
+    failed_id UUID,
     failure_count SMALLINT,
     err_msg TEXT,
     instance_id TEXT NOT NULL,
 
-    PRIMARY KEY (view_name, failed_sequence, instance_id)
+    PRIMARY KEY (view_name, failed_id, instance_id)
 );
 
 CREATE TABLE adminapi.styling (
@@ -34,7 +33,7 @@ CREATE TABLE adminapi.styling (
     creation_date TIMESTAMPTZ NULL,
     change_date TIMESTAMPTZ NULL,
     label_policy_state INT2 NOT NULL DEFAULT 0::INT2,
-    sequence INT8 NULL,
+    -- sequence INT8 NULL,
     primary_color TEXT NULL,
     background_color TEXT NULL,
     warn_color TEXT NULL,

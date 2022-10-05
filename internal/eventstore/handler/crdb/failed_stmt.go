@@ -11,10 +11,10 @@ import (
 
 const (
 	setFailureCountStmtFormat = "INSERT INTO %s" +
-		" (projection_name, failed_sequence, failure_count, error, instance_id)" +
-		" VALUES ($1, $2, $3, $4, $5) ON CONFLICT (projection_name, failed_sequence, instance_id)" +
+		" (projection_name, failed_id, failure_count, error, instance_id)" +
+		" VALUES ($1, $2, $3, $4, $5) ON CONFLICT (projection_name, failed_id, instance_id)" +
 		" DO UPDATE SET failure_count = EXCLUDED.failure_count, error = EXCLUDED.error"
-	failureCountStmtFormat = "WITH failures AS (SELECT failure_count FROM %s WHERE projection_name = $1 AND failed_sequence = $2 AND instance_id = $3)" +
+	failureCountStmtFormat = "WITH failures AS (SELECT failure_count FROM %s WHERE projection_name = $1 AND failed_id = $2 AND instance_id = $3)" +
 		" SELECT COALESCE((SELECT failure_count FROM failures), 0) AS failure_count"
 )
 

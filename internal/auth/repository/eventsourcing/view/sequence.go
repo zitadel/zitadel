@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	sequencesTable = "auth.current_sequences"
+	sequencesTable = "auth.last_processed_event"
 )
 
 func (v *View) saveCurrentSequence(viewName string, event *models.Event) error {

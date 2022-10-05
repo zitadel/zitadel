@@ -533,7 +533,7 @@ func (p *notificationsProjection) checkIfAlreadyHandled(ctx context.Context, eve
 			AddQuery().
 			AggregateTypes(user.AggregateType).
 			AggregateIDs(event.Aggregate().ID).
-			SequenceGreater(event.Sequence()).
+			CreationDateAfter(event.CreationDate()).
 			EventTypes(eventTypes...).
 			EventData(data).
 			Builder(),

@@ -25,7 +25,7 @@ type BaseEvent struct {
 	Data    []byte `json:"-"`
 }
 
-func (e *BaseEvent) ID() string {
+func (e *BaseEvent) EventID() string {
 	return e.Id
 }
 

@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	CurrentSeqTable   = "projections.current_sequences"
+	CurrentSeqTable   = "projections.last_processed_event"
 	LocksTable        = "projections.locks"
 	FailedEventsTable = "projections.failed_events"
 )

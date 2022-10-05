@@ -202,7 +202,7 @@ func expectUpdateThreeCurrentSequence(t *testing.T, tableName, projection string
 			args = append(args, []interface{}{
 				projection,
 				aggregateType,
-				sequence.eventID,
+				sequence.creationDate,
 				sequence.instanceID,
 			})
 		}

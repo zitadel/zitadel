@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	sequencesTable = "adminapi.current_sequences"
+	sequencesTable = "adminapi.last_processed_event"
 )
 
 func (v *View) saveCurrentSequence(viewName string, event *models.Event) error {
@@ -24,7 +24,7 @@ func (v *View) latestSequences(viewName string, instanceIDs ...string) ([]*repos
 }
 
 func (v *View) AllCurrentSequences(db string) ([]*repository.CurrentSequence, error) {
-	return repository.AllCurrentSequences(v.Db, db+".current_sequences")
+	return repository.AllCurrentSequences(v.Db, db+".last_processed_event")
 }
 
 func (v *View) updateSpoolerRunSequence(viewName string) error {
@@ -42,13 +42,13 @@ func (v *View) updateSpoolerRunSequence(viewName string) error {
 }
 
 func (v *View) GetCurrentSequence(db, viewName string) ([]*repository.CurrentSequence, error) {
-	sequenceTable := db + ".current_sequences"
+	sequenceTable := db + ".last_processed_event"
 	fullView := db + "." + viewName
 	return repository.LatestSequences(v.Db, sequenceTable, fullView)
 }
 
 func (v *View) ClearView(db, viewName string) error {
 	truncateView := db + "." + viewName
-	sequenceTable := db + ".current_sequences"
+	sequenceTable := db + ".last_processed_event"
 	return repository.ClearView(v.Db, truncateView, sequenceTable)
 }

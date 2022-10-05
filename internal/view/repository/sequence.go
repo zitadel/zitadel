@@ -13,10 +13,9 @@ import (
 
 type CurrentSequence struct {
 	ViewName                 string    `gorm:"column:view_name;primary_key"`
-	EventTimestamp           time.Time `gorm:"column:event_timestamp"`
+	EventTimestamp           time.Time `gorm:"column:event_creation_date"`
 	LastSuccessfulSpoolerRun time.Time `gorm:"column:last_successful_spooler_run"`
 	InstanceID               string    `gorm:"column:instance_id;primary_key"`
-	EventID                  string    `gorm:"column:event_id;primary_key"`
 }
 
 type SequenceSearchKey int32
@@ -100,12 +99,12 @@ func CurrentSequenceToModel(sequence *CurrentSequence) *model.View {
 }
 
 func SaveCurrentSequence(db *gorm.DB, table, viewName, instanceID, eventID string, eventTimestamp time.Time) error {
-	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, eventTimestamp, time.Now(), instanceID, eventID})
+	return UpdateCurrentSequence(db, table, &CurrentSequence{viewName, eventTimestamp, time.Now(), instanceID})
 }
 
 func SaveCurrentSequences(db *gorm.DB, table, viewName string, sequence uint64, eventTimestamp time.Time) error {
 	err := db.Table(table).Where("view_name = ?", viewName).
-		Updates(map[string]interface{}{"current_sequence": sequence, "event_timestamp": eventTimestamp, "last_successful_spooler_run": time.Now()}).Error
+		Updates(map[string]interface{}{"current_sequence": sequence, "event_creation_date": eventTimestamp, "last_successful_spooler_run": time.Now()}).Error
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "VIEW-Sfdqs", "unable to updated processed sequence")
 	}
@@ -141,7 +140,7 @@ func LatestSequence(db *gorm.DB, table, viewName, instanceID string) (*CurrentSe
 	}
 
 	// ensure highest sequence of view
-	db = db.Order("event_timestamp DESC")
+	db = db.Order("event_creation_date DESC")
 
 	query := PrepareGetByQuery(table, searchQueries...)
 	sequence := new(CurrentSequence)
@@ -169,7 +168,7 @@ func LatestSequences(db *gorm.DB, table, viewName string, instanceIDs ...string)
 	}
 
 	// ensure highest sequence of view
-	db = db.Order("current_sequence DESC")
+	db = db.Order("event_creation_date DESC")
 
 	sequences := make([]*CurrentSequence, 0)
 	query := PrepareSearchQuery(table, searchRequest)

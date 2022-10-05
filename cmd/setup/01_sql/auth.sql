@@ -9,10 +9,9 @@ CREATE TABLE auth.locks (
     PRIMARY KEY (view_name, instance_id)
 );
 
-CREATE TABLE auth.current_sequences (
+CREATE TABLE auth.last_processed_event (
     view_name TEXT,
-    current_sequence BIGINT,
-    event_timestamp TIMESTAMPTZ,
+    event_creation_date TIMESTAMPTZ,
     last_successful_spooler_run TIMESTAMPTZ,
     instance_id TEXT NOT NULL,
 
@@ -21,12 +20,12 @@ CREATE TABLE auth.current_sequences (
 
 CREATE TABLE auth.failed_events (
     view_name TEXT,
-    failed_sequence BIGINT,
+    failed_id UUID,
     failure_count SMALLINT,
     err_msg TEXT,
     instance_id TEXT NOT NULL,
 
-    PRIMARY KEY (view_name, failed_sequence, instance_id)
+    PRIMARY KEY (view_name, failed_id, instance_id)
 );
 
 CREATE TABLE auth.users (
@@ -60,7 +59,7 @@ CREATE TABLE auth.users (
     otp_state INT2 NULL,
     mfa_max_set_up INT2 NULL,
     mfa_init_skipped TIMESTAMPTZ NULL,
-    sequence INT8 NULL,
+    -- sequence INT8 NULL,
     init_required BOOL NULL,
     username_change_required BOOL NULL,
     machine_name TEXT NULL,
@@ -87,7 +86,7 @@ CREATE TABLE auth.user_sessions (
     password_verification TIMESTAMPTZ NULL,
     second_factor_verification TIMESTAMPTZ NULL,
     multi_factor_verification TIMESTAMPTZ NULL,
-    sequence INT8 NULL,
+    -- sequence INT8 NULL,
     second_factor_verification_type INT2 NULL,
     multi_factor_verification_type INT2 NULL,
     user_display_name TEXT NULL,
@@ -109,7 +108,7 @@ CREATE TABLE auth.user_external_idps (
     user_display_name TEXT NULL,
     creation_date TIMESTAMPTZ NULL,
     change_date TIMESTAMPTZ NULL,
-    sequence INT8 NULL,
+    -- sequence INT8 NULL,
     resource_owner TEXT NULL,
     instance_id TEXT NOT NULL,
 
@@ -125,7 +124,7 @@ CREATE TABLE auth.tokens (
     user_agent_id TEXT NULL,
     user_id TEXT NULL,
     expiration TIMESTAMPTZ NULL,
-    sequence INT8 NULL,
+    -- sequence INT8 NULL,
     scopes TEXT[] NULL,
     audience TEXT[] NULL,
     preferred_language TEXT NULL,
@@ -150,7 +149,7 @@ CREATE TABLE auth.refresh_tokens (
     auth_time TIMESTAMPTZ NULL,
     idle_expiration TIMESTAMPTZ NULL,
     expiration TIMESTAMPTZ NULL,
-    sequence INT8 NULL,
+    -- sequence INT8 NULL,
     scopes TEXT[] NULL,
     audience TEXT[] NULL,
     amr TEXT[] NULL,
@@ -175,7 +174,7 @@ CREATE TABLE auth.idp_providers (
     idp_config_id TEXT NOT NULL,
     creation_date TIMESTAMPTZ NULL,
     change_date TIMESTAMPTZ NULL,
-    sequence INT8 NULL,
+    -- sequence INT8 NULL,
     name TEXT NULL,
     idp_config_type INT2 NULL,
     idp_provider_type INT2 NULL,
@@ -190,7 +189,7 @@ CREATE TABLE auth.idp_configs (
     idp_config_id TEXT NOT NULL,
     creation_date TIMESTAMPTZ NULL,
     change_date TIMESTAMPTZ NULL,
-    sequence INT8 NULL,
+    -- sequence INT8 NULL,
     aggregate_id TEXT NULL,
     name TEXT NULL,
     idp_state INT2 NULL,

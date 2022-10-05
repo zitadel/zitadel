@@ -46,6 +46,9 @@ type Event struct {
 	//InstanceID is the instance where this event belongs to
 	// use the ID of the instance
 	InstanceID string
+
+	//PreviousEventDate links the event of the aggregate created before this event
+	PreviousEventDate time.Time
 }
 
 // EventType is the description of the change

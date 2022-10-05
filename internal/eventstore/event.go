@@ -27,7 +27,7 @@ type Command interface {
 
 // Event is a stored activity
 type Event interface {
-	ID() string
+	EventID() string
 	// EditorService is the service who pushed the event
 	EditorService() string
 	//EditorUser is the user who pushed the event

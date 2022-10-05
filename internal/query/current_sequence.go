@@ -109,7 +109,7 @@ func (q *Queries) checkAndLock(ctx context.Context, projectionName string) error
 		From("[show tables from projections]").
 		Where(
 			sq.And{
-				sq.NotEq{"table_name": []string{"locks", "current_sequences", "failed_events"}},
+				sq.NotEq{"table_name": []string{"locks", "last_processed_event", "failed_events"}},
 				sq.Eq{"concat('projections.', table_name)": projectionName},
 			}).
 		PlaceholderFormat(sq.Dollar).
@@ -145,7 +145,7 @@ func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) ([]s
 		Where(
 			sq.And{
 				sq.Eq{"type": "table"},
-				sq.NotEq{"table_name": []string{"locks", "current_sequences", "failed_events"}},
+				sq.NotEq{"table_name": []string{"locks", "last_processed_event", "failed_events"}},
 				sq.Like{"concat('projections.', table_name)": projectionName + "%"},
 			}).
 		PlaceholderFormat(sq.Dollar).
@@ -193,12 +193,13 @@ func reset(tx *sql.Tx, tables []string, projectionName string) error {
 func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
 	return sq.Select(
 			CurrentSequenceColCurrentSequence.identifier(),
-			CurrentSequenceColTimestamp.identifier()).
+			// CurrentSequenceColTimestamp.identifier(),
+		).
 			From(currentSequencesTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LatestSequence, error) {
 			seq := new(LatestSequence)
 			err := row.Scan(
-				&seq.Sequence,
+				// &seq.Sequence,
 				&seq.Timestamp,
 			)
 			if err != nil && !errs.Is(err, sql.ErrNoRows) {
@@ -256,11 +257,11 @@ var (
 		table: currentSequencesTable,
 	}
 	CurrentSequenceColCurrentSequence = Column{
-		name:  "current_sequence",
+		name:  "event_creation_date",
 		table: currentSequencesTable,
 	}
 	CurrentSequenceColTimestamp = Column{
-		name:  "timestamp",
+		name:  "processed_at",
 		table: currentSequencesTable,
 	}
 	CurrentSequenceColProjectionName = Column{

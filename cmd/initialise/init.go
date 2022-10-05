@@ -136,12 +136,7 @@ func ReadStmts(typ string) (err error) {
 		return err
 	}
 
-	createSystemSequenceStmt, err = readStmt(typ, "09_system_sequence")
-	if err != nil {
-		return err
-	}
-
-	createUniqueConstraints, err = readStmt(typ, "10_unique_constraints_table")
+	createUniqueConstraints, err = readStmt(typ, "09_unique_constraints_table")
 	if err != nil {
 		return err
 	}

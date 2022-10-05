@@ -25,56 +25,54 @@ const (
 	//
 	//previous_data selects the needed data of the latest event of the aggregate
 	// and buffers it (crdb inmemory)
-	crdbInsert = "WITH previous_data (resource_owner) AS (" +
-		"SELECT agg.ro FROM " +
-		"(" +
-		//max sequence of requested aggregate type
-		" SELECT MAX(creation_date) seq, 1 join_me" +
-		" FROM eventstore.events" +
-		" WHERE aggregate_type = $2" +
-		" AND (CASE WHEN $9::TEXT IS NULL THEN instance_id is null else instance_id = $9::TEXT END)" +
-		") AS agg_type " +
-		// combined with
-		"LEFT JOIN " +
-		"(" +
-		// max sequence and resource owner of aggregate root
-		" SELECT event_sequence seq, resource_owner ro, 1 join_me" +
+	crdbInsert = "WITH previous_data (creation_date, resource_owner) AS (" +
+		// resource owner of previous event from aggregate
+		" SELECT creation_date, resource_owner" +
 		" FROM eventstore.events" +
 		" WHERE aggregate_type = $2 AND aggregate_id = $3" +
 		" AND (CASE WHEN $9::TEXT IS NULL THEN instance_id is null else instance_id = $9::TEXT END)" +
-		" ORDER BY event_sequence DESC" +
-		" LIMIT 1" +
-		") AS agg USING(join_me)" +
+		" ORDER BY creation_date DESC LIMIT 1" +
 		") " +
 		"INSERT INTO eventstore.events (" +
 		" event_type," +
 		" aggregate_type," +
 		" aggregate_id," +
 		" aggregate_version," +
-		" creation_date," +
 		" event_data," +
 		" editor_user," +
 		" editor_service," +
 		" resource_owner," +
 		" instance_id," +
-		" event_sequence," +
-		" previous_aggregate_sequence," +
-		" previous_aggregate_type_sequence" +
+		" previous_event_date" +
+		") VALUES (" +
+		// event_type
+		" $1::VARCHAR," +
+		// aggregate_type
+		" $2::VARCHAR," +
+		// aggregate_id
+		" $3::VARCHAR," +
+		// aggregate_version
+		" $4::VARCHAR," +
+		// event_data
+		" $5::JSONB," +
+		// editor_user
+		" $6::VARCHAR," +
+		// editor_service
+		" $7::VARCHAR," +
+		// resource_owner
+		" CASE WHEN EXISTS (SELECT * FROM previous_data)" +
+		" THEN (SELECT resource_owner FROM previous_data)" +
+		" ELSE $8::VARCHAR" +
+		" END," +
+		// instance_id
+		" $9::VARCHAR," +
+		// previous_event_date
+		" CASE WHEN EXISTS (SELECT * FROM previous_data)" +
+		" THEN (SELECT creation_date FROM previous_data)" +
+		" ELSE NULL::TIMESTAMPTZ" +
+		" END " +
 		") " +
-		// defines the data to be inserted
-		"SELECT" +
-		" $1::VARCHAR AS event_type," +
-		" $2::VARCHAR AS aggregate_type," +
-		" $3::VARCHAR AS aggregate_id," +
-		" $4::VARCHAR AS aggregate_version," +
-		" statement_timestamp() AS creation_date," +
-		" $5::JSONB AS event_data," +
-		" $6::VARCHAR AS editor_user," +
-		" $7::VARCHAR AS editor_service," +
-		" COALESCE((resource_owner), $8::VARCHAR) AS resource_owner," +
-		" $9::VARCHAR AS instance_id" +
-		"FROM previous_data " +
-		"RETURNING id, creation_date, resource_owner, instance_id"
+		"RETURNING id, creation_date, resource_owner, instance_id, previous_event_date"
 
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
@@ -108,6 +106,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 
 		for _, event := range events {
+			var previousEvent sql.NullTime
 			err := tx.QueryRowContext(ctx, crdbInsert,
 				event.Type,
 				event.AggregateType,
@@ -118,7 +117,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorService,
 				event.ResourceOwner,
 				event.InstanceID,
-			).Scan(&event.ID, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
+			).Scan(&event.ID, &event.CreationDate, &event.ResourceOwner, &event.InstanceID, &previousEvent)
 
 			if err != nil {
 				logging.WithFields(
@@ -130,6 +129,8 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
+
+			event.PreviousEventDate = previousEvent.Time
 		}
 
 		err := db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
