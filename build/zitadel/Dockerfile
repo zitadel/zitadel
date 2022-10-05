@@ -96,11 +96,15 @@ RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v22.1.0.linux-amd64.tgz
 RUN rm -r cockroach-v22.1.0.linux-amd64
 
 # Migrations for cockroach-secure
-RUN go install github.com/rakyll/statik \
-    && go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
+RUN go install github.com/rakyll/statik
+
+# # Migrations for cockroach-secure
+# RUN go install github.com/rakyll/statik \
+#     && go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
 
 #######################
 ## Go test results
 #######################
 FROM scratch as go-codecov
+RUN touch /go/src/github.com/zitadel/zitadel/profile.cov
 COPY --from=go-test /go/src/github.com/zitadel/zitadel/profile.cov profile.cov
