@@ -708,20 +708,9 @@ func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
-		crdb.AddCopyStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyLastPhoneCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyVerifiedPhoneCol, nil),
+				crdb.NewCopyCol(NotifyVerifiedPhoneCol, NotifyLastPhoneCol),
 			},
 			[]handler.Condition{
 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
@@ -802,20 +791,9 @@ func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
-		crdb.AddCopyStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyLastEmailCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyVerifiedEmailCol, nil),
+				crdb.NewCopyCol(NotifyVerifiedEmailCol, NotifyLastEmailCol),
 			},
 			[]handler.Condition{
 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
