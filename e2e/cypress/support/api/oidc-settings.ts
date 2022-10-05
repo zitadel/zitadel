@@ -1,30 +1,31 @@
-import { apiCallProperties } from './apiauth';
-import { ensureSomethingIsSet } from './ensure';
+import { ensureSetting } from './ensure';
+import { API } from './types';
 
 export function ensureOIDCSettingsSet(
-  api: apiCallProperties,
+  api: API,
   accessTokenLifetime: number,
   idTokenLifetime: number,
   refreshTokenExpiration: number,
   refreshTokenIdleExpiration: number,
 ): Cypress.Chainable<number> {
-  return ensureSomethingIsSet(
+  return ensureSetting(
     api,
     `${api.adminBaseURL}settings/oidc`,
-    (settings: any) => {
-      let entity = null;
-      if (
-        settings.settings?.accessTokenLifetime === hoursToDuration(accessTokenLifetime) &&
-        settings.settings?.idTokenLifetime === hoursToDuration(idTokenLifetime) &&
-        settings.settings?.refreshTokenExpiration === daysToDuration(refreshTokenExpiration) &&
-        settings.settings?.refreshTokenIdleExpiration === daysToDuration(refreshTokenIdleExpiration)
-      ) {
-        entity = settings.settings;
-      }
-      return {
-        entity: entity,
-        sequence: settings.settings?.details?.sequence,
+    (body: any) => {
+      const result = {
+        entity: body.settings,
+        sequence: body.settings?.details?.sequence,
       };
+
+      if (
+        body.settings?.accessTokenLifetime != hoursToDuration(accessTokenLifetime) ||
+        body.settings?.idTokenLifetime != hoursToDuration(idTokenLifetime) ||
+        body.settings?.refreshTokenExpiration != daysToDuration(refreshTokenExpiration) ||
+        body.settings?.refreshTokenIdleExpiration != daysToDuration(refreshTokenIdleExpiration)
+      ) {
+        result.entity = null;
+      }
+      return result;
     },
     `${api.adminBaseURL}settings/oidc`,
     {

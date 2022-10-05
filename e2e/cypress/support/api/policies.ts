@@ -1,10 +1,10 @@
-import { apiCallProperties } from './apiauth';
+import { API } from './types';
 
 export enum Policy {
   Label = 'label',
 }
 
-export function resetPolicy(api: apiCallProperties, policy: Policy) {
+export function resetPolicy(api: API, policy: Policy) {
   cy.request({
     method: 'DELETE',
     url: `${api.mgntBaseURL}/policies/${policy}`,

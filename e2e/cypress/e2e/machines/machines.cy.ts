@@ -17,7 +17,7 @@ describe('machines', () => {
       cy.visit(machinesPath);
     });
 
-    it.only('should add a machine', () => {
+    it('should add a machine', () => {
       cy.get('[data-e2e="create-user-button"]').click();
       cy.url().should('contain', 'users/create-machine');
       //force needed due to the prefilled username prefix
@@ -26,9 +26,8 @@ describe('machines', () => {
       cy.get('[formcontrolname="description"]').type('e2emachinedescription');
       cy.get('[data-e2e="create-button"]').click();
       cy.get('.data-e2e-success');
-      const loginName = loginname(testMachineUserNameAdd, Cypress.env('ORGANIZATION'));
-      cy.contains('[data-e2e="copy-loginname"]', loginName).click();
-      cy.clipboardMatches(loginName);
+      cy.contains('[data-e2e="copy-loginname"]', testMachineUserNameAdd).click();
+      cy.clipboardMatches(testMachineUserNameAdd);
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
   });
@@ -47,8 +46,8 @@ describe('machines', () => {
       cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testMachineUserNameRemove);
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get('.data-e2e-success');
-      cy.get('$machineUserRow').shouldNotExist();
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
+      cy.get('@machineUserRow').shouldNotExist({ timeout: 2000 });
     });
 
     it('should create a personal access token');

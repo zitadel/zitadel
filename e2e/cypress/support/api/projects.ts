@@ -1,18 +1,25 @@
-import { apiCallProperties } from './apiauth';
-import { ensureSomethingDoesntExist, ensureSomethingExists } from './ensure';
+import { ensureItemDoesntExist, ensureItemExists } from './ensure';
+import { API } from './types';
 
-export function ensureProjectExists(api: apiCallProperties, projectName: string): Cypress.Chainable<number> {
-  return ensureSomethingExists(api, `projects/_search`, (project: any) => project.name === projectName, 'projects', {
-    name: projectName,
-  });
+export function ensureProjectExists(api: API, projectName: string, orgId?: number): Cypress.Chainable<number> {
+  return ensureItemExists(
+    api,
+    `${api.mgntBaseURL}projects/_search`,
+    (project: any) => project.name === projectName,
+    `${api.mgntBaseURL}projects`,
+    {
+      name: projectName,
+    },
+    orgId,
+  );
 }
 
-export function ensureProjectDoesntExist(api: apiCallProperties, projectName: string): Cypress.Chainable<null> {
-  return ensureSomethingDoesntExist(
+export function ensureProjectDoesntExist(api: API, projectName: string): Cypress.Chainable<null> {
+  return ensureItemDoesntExist(
     api,
-    `projects/_search`,
+    `${api.mgntBaseURL}projects/_search`,
     (project: any) => project.name === projectName,
-    (project) => `projects/${project.id}`,
+    (project) => `${api.mgntBaseURL}projects/${project.id}`,
   );
 }
 
@@ -25,33 +32,31 @@ export const Roles = new ResourceType('roles', 'key', 'key');
 //export const Grants = new ResourceType('apps', 'name')
 
 export function ensureProjectResourceDoesntExist(
-  api: apiCallProperties,
+  api: API,
   projectId: number,
   resourceType: ResourceType,
   resourceName: string,
 ): Cypress.Chainable<null> {
-  return ensureSomethingDoesntExist(
+  return ensureItemDoesntExist(
     api,
-    `projects/${projectId}/${resourceType.resourcePath}/_search`,
+    `${api.mgntBaseURL}projects/${projectId}/${resourceType.resourcePath}/_search`,
     (resource: any) => {
       return resource[resourceType.compareProperty] === resourceName;
     },
     (resource) => {
-      return `projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`;
+      return `${api.mgntBaseURL}projects/${projectId}/${resourceType.resourcePath}/${
+        resource[resourceType.identifierProperty]
+      }`;
     },
   );
 }
 
-export function ensureApplicationExists(
-  api: apiCallProperties,
-  projectId: number,
-  appName: string,
-): Cypress.Chainable<number> {
-  return ensureSomethingExists(
+export function ensureApplicationExists(api: API, projectId: number, appName: string): Cypress.Chainable<number> {
+  return ensureItemExists(
     api,
-    `projects/${projectId}/${Apps.resourcePath}/_search`,
+    `${api.mgntBaseURL}projects/${projectId}/${Apps.resourcePath}/_search`,
     (resource: any) => resource.name === appName,
-    `projects/${projectId}/${Apps.resourcePath}/oidc`,
+    `${api.mgntBaseURL}projects/${projectId}/${Apps.resourcePath}/oidc`,
     {
       name: appName,
       redirectUris: ['https://e2eredirecturl.org'],

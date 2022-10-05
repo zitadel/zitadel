@@ -79,7 +79,9 @@ Cypress.Commands.add(
   (subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions) => {
     return cy.waitUntil(
       () => {
-        return Cypress.$(options?.selector || subject?.selector).length === 0;
+        const noSubject = !subject || !Cypress.dom.isAttached(subject);
+        const noSelector = Cypress.$(options?.selector).length === 0;
+        return noSubject && noSelector;
       },
       { timeout: typeof options?.timeout === 'number' ? options.timeout : 500 },
     );

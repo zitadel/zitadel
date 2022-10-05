@@ -1,28 +1,30 @@
-import { apiCallProperties } from './apiauth';
-import { ensureSomethingDoesntExist, ensureSomethingExists, searchSomething } from './ensure';
+import { ensureItemDoesntExist, ensureItemExists } from './ensure';
+import { findFromList, searchSomething } from './search';
+import { API } from './types';
 
-export function ensureHumanIsNotOrgMember(api: apiCallProperties, username: string): Cypress.Chainable<number> {
-  return ensureSomethingDoesntExist(
+export function ensureHumanIsNotOrgMember(api: API, username: string): Cypress.Chainable<number> {
+  return ensureItemDoesntExist(
     api,
-    'orgs/me/members/_search',
+    `${api.mgntBaseURL}orgs/me/members/_search`,
     (member: any) => (<string>member.preferredLoginName).startsWith(username),
-    (member) => `orgs/me/members/${member.userId}`,
+    (member) => `${api.mgntBaseURL}orgs/me/members/${member.userId}`,
   );
 }
 
-export function ensureHumanIsOrgMember(
-  api: apiCallProperties,
-  username: string,
-  roles: string[],
-): Cypress.Chainable<number> {
-  return searchSomething(api, 'users/_search', (user) => {
-    return user.userName == username;
-  }).then((user) => {
-    return ensureSomethingExists(
+export function ensureHumanIsOrgMember(api: API, username: string, roles: string[]): Cypress.Chainable<number> {
+  return searchSomething(
+    api,
+    `${api.mgntBaseURL}users/_search`,
+    'POST',
+    findFromList((user) => {
+      return user.userName == username;
+    }),
+  ).then((user) => {
+    return ensureItemExists(
       api,
-      'orgs/me/members/_search',
+      `${api.mgntBaseURL}orgs/me/members/_search`,
       (member: any) => member.userId == user.entity.id,
-      'orgs/me/members',
+      `${api.mgntBaseURL}orgs/me/members`,
       {
         userId: user.entity.id,
         roles: roles,
@@ -31,33 +33,34 @@ export function ensureHumanIsOrgMember(
   });
 }
 
-export function ensureHumanIsNotProjectMember(
-  api: apiCallProperties,
-  projectId: string,
-  username: string,
-): Cypress.Chainable<number> {
-  return ensureSomethingDoesntExist(
+export function ensureHumanIsNotProjectMember(api: API, projectId: string, username: string): Cypress.Chainable<number> {
+  return ensureItemDoesntExist(
     api,
-    `projects/${projectId}/members/_search`,
+    `${api.mgntBaseURL}projects/${projectId}/members/_search`,
     (member: any) => (<string>member.preferredLoginName).startsWith(username),
-    (member) => `projects/${projectId}/members/${member.userId}`,
+    (member) => `${api.mgntBaseURL}projects/${projectId}/members/${member.userId}`,
   );
 }
 
 export function ensureHumanIsProjectMember(
-  api: apiCallProperties,
+  api: API,
   projectId: string,
   username: string,
   roles: string[],
 ): Cypress.Chainable<number> {
-  return searchSomething(api, 'users/_search', (user) => {
-    return user.userName == username;
-  }).then((user) => {
-    return ensureSomethingExists(
+  return searchSomething(
+    api,
+    `${api.mgntBaseURL}users/_search`,
+    'POST',
+    findFromList((user) => {
+      return user.userName == username;
+    }),
+  ).then((user) => {
+    return ensureItemExists(
       api,
-      `projects/${projectId}/members/_search`,
+      `${api.mgntBaseURL}projects/${projectId}/members/_search`,
       (member: any) => member.userId == user.entity.id,
-      `projects/${projectId}/members`,
+      `${api.mgntBaseURL}projects/${projectId}/members`,
       {
         userId: user.entity.id,
         roles: roles,

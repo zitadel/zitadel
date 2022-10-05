@@ -1,14 +1,9 @@
 import { login, User } from 'support/login/users';
+import { API } from './types';
 
-export interface apiCallProperties {
-  authHeader: string;
-  mgntBaseURL: string;
-  adminBaseURL: string;
-}
-
-export function apiAuth(): Cypress.Chainable<apiCallProperties> {
+export function apiAuth(): Cypress.Chainable<API> {
   return login(User.IAMAdminUser, 'Password1!', false, true).then((token) => {
-    return <apiCallProperties>{
+    return <API>{
       authHeader: `Bearer ${token}`,
       mgntBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1/`,
       adminBaseURL: `${Cypress.env('BACKEND_URL')}/admin/v1/`,

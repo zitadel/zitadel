@@ -13,11 +13,11 @@ describe('humans', () => {
 
   describe('add', () => {
     beforeEach(`ensure it doesn't exist already`, function () {
-      ensureUserDoesntExist(this.api, testHumanUserNameAdd);
+      ensureUserDoesntExist(this.api, loginname(testHumanUserNameAdd, Cypress.env('ORGANIZATION')));
       cy.visit(humansPath);
     });
 
-    it.only('should add a user', () => {
+    it('should add a user', () => {
       cy.get('[data-e2e="create-user-button"]').click();
       cy.url().should('contain', 'users/create');
       cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
@@ -37,7 +37,7 @@ describe('humans', () => {
 
   describe('remove', () => {
     beforeEach('ensure it exists', function () {
-      ensureHumanUserExists(this.api, testHumanUserNameRemove);
+      ensureHumanUserExists(this.api, loginname(testHumanUserNameRemove, Cypress.env('ORGANIZATION')));
       cy.visit(humansPath);
     });
 
@@ -51,8 +51,8 @@ describe('humans', () => {
         .type(loginname(testHumanUserNameRemove, Cypress.env('ORGANIZATION')));
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get('.data-e2e-success');
-      cy.get('$humanUserRow').shouldNotExist();
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
+      cy.get('@humanUserRow').shouldNotExist({ timeout: 2000 });
     });
   });
 });
