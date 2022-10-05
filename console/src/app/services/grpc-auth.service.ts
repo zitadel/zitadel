@@ -103,9 +103,11 @@ import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { LabelPolicy } from '../proto/generated/zitadel/policy_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
+import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root',
@@ -132,6 +134,8 @@ export class GrpcAuthService {
       ),
     ),
   );
+
+  public labelpolicy$!: Observable<LabelPolicy.AsObject>;
   public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -141,8 +145,20 @@ export class GrpcAuthService {
     private readonly grpcService: GrpcService,
     private oauthService: OAuthService,
     private storage: StorageService,
+    themeService: ThemeService,
   ) {
     this.zitadelPermissions$.subscribe(this.zitadelPermissions);
+
+    this.labelpolicy$ = this.activeOrgChanged.pipe(
+      filter((org) => !!org),
+      switchMap((org) => from(this.getMyLabelPolicy())),
+      filter((policy) => !!policy.policy),
+      map((policy) => policy.policy as LabelPolicy.AsObject),
+    );
+
+    this.labelpolicy$.subscribe((labelpolicy) => {
+      themeService.applyLabelPolicy(labelpolicy);
+    });
 
     this.user = merge(
       of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
@@ -225,7 +241,8 @@ export class GrpcAuthService {
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
       if (org && orgs.find((tmp) => tmp.id === org.id)) {
         this.storage.setItem(StorageKey.organization, org, StorageLocation.session);
-        return org;
+        this.setActiveOrg(org);
+        return Promise.resolve(org);
       }
 
       if (orgs.length === 0) {

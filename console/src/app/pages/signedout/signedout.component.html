@@ -1,10 +1,28 @@
 <div class="signed-out-wrap">
   <div class="block">
     <div class="signed-out-header">
-      <img alt="zitadel logo" *ngIf="dark; else lighttheme" src="./assets/images/zitadel-logo-light.svg" />
-      <ng-template #lighttheme>
-        <img alt="zitadel logo" src="./assets/images/zitadel-logo-dark.svg" />
+      <ng-container *ngIf="themeService.labelpolicy; else zitadelLogo">
+        <img
+          alt="logo"
+          *ngIf="dark && themeService.labelpolicy.logoUrlDark; else lighttheme"
+          [src]="themeService.labelpolicy.logoUrlDark"
+        />
+        <ng-template #lighttheme>
+          <img
+            *ngIf="themeService.labelpolicy.logoUrl; else zitadelLogo"
+            alt="logo"
+            [src]="themeService.labelpolicy.logoUrl"
+          />
+        </ng-template>
+      </ng-container>
+
+      <ng-template #zitadelLogo>
+        <img alt="zitadel logo" *ngIf="dark; else zitadellighttheme" src="./assets/images/zitadel-logo-light.svg" />
+        <ng-template #zitadellighttheme>
+          <img alt="zitadel logo" src="./assets/images/zitadel-logo-dark.svg" />
+        </ng-template>
       </ng-template>
+
       <p class="cnsl-secondary-text">{{ 'USER.SIGNEDOUT' | translate }}</p>
 
       <button

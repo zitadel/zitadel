@@ -9,9 +9,7 @@ import { ThemeService } from 'src/app/services/theme.service';
 export class SignedoutComponent {
   public dark: boolean = true;
 
-  constructor(themeService: ThemeService) {
-    themeService.loadPrivateLabelling();
-
+  constructor(public themeService: ThemeService) {
     const theme = localStorage.getItem('theme');
     this.dark = theme === 'dark-theme' ? true : theme === 'light-theme' ? false : true;
   }

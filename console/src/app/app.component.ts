@@ -69,7 +69,7 @@ export class AppComponent implements OnDestroy {
     private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
   ) {
-    this.themeService.loadPrivateLabelling(true);
+    // this.themeService.loadPrivateLabelling(true);
     console.log(
       '%cWait!',
       'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px',
@@ -197,10 +197,7 @@ export class AppComponent implements OnDestroy {
           .getActiveOrg()
           .then(async (org) => {
             this.org = org;
-            const policy = await this.themeService.loadPrivateLabelling();
-            if (policy) {
-              this.labelpolicy = policy;
-            }
+
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })
@@ -252,7 +249,6 @@ export class AppComponent implements OnDestroy {
   }
 
   public changedOrg(org: Org.AsObject): void {
-    this.themeService.loadPrivateLabelling();
     this.router.navigate(['/org']);
   }
 

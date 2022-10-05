@@ -1,10 +1,6 @@
 <mat-toolbar class="header-wrapper">
   <div class="header-content">
-    <a
-      class="title custom"
-      [routerLink]="['/']"
-      *ngIf="org && labelpolicy && labelpolicy.disableWatermark; else defaultHome"
-    >
+    <a class="title custom" [routerLink]="['/']" *ngIf="labelpolicy; else defaultHome">
       <img
         class="logo"
         alt="home logo"
