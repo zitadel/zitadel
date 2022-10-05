@@ -80,7 +80,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			user.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", user.Metadatas),
+		actions.SetFields("metadata", &user.Metadatas),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", func(call goja.FunctionCall) goja.Value {
@@ -238,7 +238,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.To
 	actionUserGrants := make([]actions.UserGrant, 0)
 
 	apiFields := actions.WithAPIFields(
-		actions.SetFields("userGrants", actionUserGrants),
+		actions.SetFields("userGrants", &actionUserGrants),
 		actions.SetFields("v1",
 			actions.SetFields("appendUserGrant", func(c *actions.FieldConfig) interface{} {
 				return func(call *goja.FunctionCall) goja.Value {
