@@ -60,7 +60,7 @@ describe('permissions', () => {
           cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
         });
 
-        it('should remove a managers authorization', () => {
+        it.only('should remove a managers authorization', () => {
           cy.get('@managerRow').find('[data-e2e="role"]').should('have.length', roles.length);
           cy.get('@managerRow')
             .contains('[data-e2e="role"]', roles[0])
@@ -88,6 +88,7 @@ describe('permissions', () => {
           ensureHumanIsNotOrgMember(this.api, testManagerName);
         },
         function () {
+          ensureHumanIsNotOrgMember(this.api, testManagerName);
           ensureHumanIsOrgMember(
             this.api,
             testManagerName,
@@ -123,6 +124,7 @@ describe('permissions', () => {
               ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerName);
             },
             function () {
+              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerName);
               ensureHumanIsProjectMember(
                 this.api,
                 this.projectId,

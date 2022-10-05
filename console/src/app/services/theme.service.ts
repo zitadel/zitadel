@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { LabelPolicy } from '../proto/generated/zitadel/policy_pb';
 
 import { GrpcAuthService } from './grpc-auth.service';
 
@@ -140,14 +141,15 @@ export class ThemeService {
     this.saveTextColor(lightText, false);
   };
 
-  public loadPrivateLabelling(forceDefault: boolean = false): void {
+  public loadPrivateLabelling(forceDefault: boolean = false): Promise<LabelPolicy.AsObject | undefined> {
     if (forceDefault) {
       this.setDefaultColors();
+      return Promise.resolve(undefined);
     } else {
       const isDark = (color: string) => this.isDark(color);
       const isLight = (color: string) => this.isLight(color);
 
-      this.authService
+      return this.authService
         .getMyLabelPolicy()
         .then((lpresp) => {
           const labelpolicy = lpresp.policy;
@@ -201,10 +203,17 @@ export class ThemeService {
             lightText = '#000000';
           }
           this.saveTextColor(lightText || '#000000', false);
+
+          if (labelpolicy) {
+            return labelpolicy;
+          } else {
+            return Promise.reject();
+          }
         })
         .catch((error) => {
           console.error('could not load private labelling policy!', error);
           this.setDefaultColors();
+          return Promise.reject();
         });
     }
   }

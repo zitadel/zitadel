@@ -79,5 +79,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(IDPJWTConfigChangedEventType, IDPJWTConfigChangedEventMapper).
 		RegisterFilterEventMapper(TriggerActionsSetEventType, TriggerActionsSetEventMapper).
 		RegisterFilterEventMapper(TriggerActionsCascadeRemovedEventType, TriggerActionsCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(FlowClearedEventType, FlowClearedEventMapper)
+		RegisterFilterEventMapper(FlowClearedEventType, FlowClearedEventMapper).
+		RegisterFilterEventMapper(MetadataSetType, MetadataSetEventMapper).
+		RegisterFilterEventMapper(MetadataRemovedType, MetadataRemovedEventMapper).
+		RegisterFilterEventMapper(MetadataRemovedAllType, MetadataRemovedAllEventMapper)
 }

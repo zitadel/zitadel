@@ -183,10 +183,10 @@ func (l *Login) checkPasswordlessRegistration(w http.ResponseWriter, r *http.Req
 		l.renderPasswordlessRegistration(w, r, authReq, formData.UserID, formData.OrgID, formData.CodeID, formData.Code, formData.RequestPlatformType, err)
 		return
 	}
-	l.renderPasswordlessRegistrationDone(w, r, authReq, nil)
+	l.renderPasswordlessRegistrationDone(w, r, authReq, formData.OrgID, nil)
 }
 
-func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
+func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -195,5 +195,9 @@ func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *htt
 		userData:       l.getUserData(r, authReq, "Passwordless Registration Done", errID, errMessage),
 		HideNextButton: authReq == nil,
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplPasswordlessRegistrationDone], data, nil)
+	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		l.customTexts(r.Context(), translator, orgID)
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPasswordlessRegistrationDone], data, nil)
 }

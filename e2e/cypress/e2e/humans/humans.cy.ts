@@ -22,7 +22,7 @@ describe('humans', () => {
       cy.url().should('contain', 'users/create');
       cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
       //force needed due to the prefilled username prefix
-      cy.get('[formcontrolname="userName"]').type(testHumanUserNameAdd);
+      cy.get('[formcontrolname="userName"]').type(loginname(testHumanUserNameAdd, Cypress.env('ORGANIZATION')));
       cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
       cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
       cy.get('[formcontrolname="phone"]').type('+41 123456789');

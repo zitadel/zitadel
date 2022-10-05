@@ -402,6 +402,18 @@ service AdminService {
         };
     }
 
+    // Add oidc settings (e.g token lifetimes, etc)
+    rpc AddOIDCSettings(AddOIDCSettingsRequest) returns (AddOIDCSettingsResponse) {
+        option (google.api.http) = {
+            post: "/settings/oidc";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
     // Update oidc settings (e.g token lifetimes, etc)
     rpc UpdateOIDCSettings(UpdateOIDCSettingsRequest) returns (UpdateOIDCSettingsResponse) {
         option (google.api.http) = {
@@ -2893,6 +2905,17 @@ message GetOIDCSettingsRequest {}
 
 message GetOIDCSettingsResponse {
     zitadel.settings.v1.OIDCSettings settings = 1;
+}
+
+message AddOIDCSettingsRequest {
+    google.protobuf.Duration  access_token_lifetime   = 1;
+    google.protobuf.Duration  id_token_lifetime   = 2;
+    google.protobuf.Duration  refresh_token_idle_expiration   = 3;
+    google.protobuf.Duration  refresh_token_expiration   = 4;
+}
+
+message AddOIDCSettingsResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message UpdateOIDCSettingsRequest {

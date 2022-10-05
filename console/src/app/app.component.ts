@@ -47,7 +47,7 @@ export class AppComponent implements OnDestroy {
   public showProjectSection: boolean = false;
 
   private destroy$: Subject<void> = new Subject();
-  public labelpolicy!: LabelPolicy.AsObject;
+  public labelpolicy: LabelPolicy.AsObject | undefined = undefined;
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
@@ -195,10 +195,12 @@ export class AppComponent implements OnDestroy {
       if (authenticated) {
         this.authService
           .getActiveOrg()
-          .then((org) => {
+          .then(async (org) => {
             this.org = org;
-            this.themeService.loadPrivateLabelling();
-
+            const policy = await this.themeService.loadPrivateLabelling();
+            if (policy) {
+              this.labelpolicy = policy;
+            }
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })

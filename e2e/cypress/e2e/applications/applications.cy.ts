@@ -15,12 +15,7 @@ describe('applications', () => {
 
   describe('add app', function () {
     beforeEach(`ensure it doesn't exist already`, function () {
-      /*      ensureProjectResourceDoesntExist(
-        this.api,
-        this.projectId,
-        Apps,
-        testAppName
-      )*/
+      ensureProjectResourceDoesntExist(this.api, this.projectId, Apps, testAppName);
       cy.visit(`/projects/${this.projectId}`);
     });
 

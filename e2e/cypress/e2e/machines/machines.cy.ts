@@ -44,9 +44,7 @@ describe('machines', () => {
         .as('machineUserRow')
         .find('[data-e2e="enabled-delete-button"]')
         .click({ force: true });
-      cy.get('[data-e2e="confirm-dialog-input"]')
-        .focus()
-        .type(loginname(testMachineUserNameRemove, Cypress.env('ORGANIZATION')));
+      cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testMachineUserNameRemove);
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get('.data-e2e-success');
       cy.get('$machineUserRow').shouldNotExist();

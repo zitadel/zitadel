@@ -284,6 +284,18 @@ Get OIDC settings (e.g token lifetimes, etc.)
     GET: /settings/oidc
 
 
+### AddOIDCSettings
+
+> **rpc** AddOIDCSettings([AddOIDCSettingsRequest](#addoidcsettingsrequest))
+[AddOIDCSettingsResponse](#addoidcsettingsresponse)
+
+Add oidc settings (e.g token lifetimes, etc)
+
+
+
+    POST: /settings/oidc
+
+
 ### UpdateOIDCSettings
 
 > **rpc** UpdateOIDCSettings([UpdateOIDCSettingsRequest](#updateoidcsettingsrequest))
@@ -1735,6 +1747,31 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | idp_id |  string | - |  |
+
+
+
+
+### AddOIDCSettingsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| access_token_lifetime |  google.protobuf.Duration | - |  |
+| id_token_lifetime |  google.protobuf.Duration | - |  |
+| refresh_token_idle_expiration |  google.protobuf.Duration | - |  |
+| refresh_token_expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### AddOIDCSettingsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 

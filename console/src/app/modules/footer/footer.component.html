@@ -1,11 +1,11 @@
 <div class="footer-wrapper">
   <div class="footer-row">
     <div class="footer-links">
-      <a target="_blank" *ngIf="policy?.tosLink" rel="noreferrer" [href]="policy.tosLink" external>
+      <a target="_blank" *ngIf="policy?.tosLink" rel="noreferrer" [href]="policy?.tosLink" external>
         <span>{{ 'FOOTER.LINKS.TOS' | translate }}</span>
         <i class="las la-external-link-alt"></i>
       </a>
-      <a target="_blank" *ngIf="policy?.privacyLink" rel="noreferrer" [href]="policy.privacyLink" external>
+      <a target="_blank" *ngIf="policy?.privacyLink" rel="noreferrer" [href]="policy?.privacyLink" external>
         <span>{{ 'FOOTER.LINKS.PP' | translate }}</span>
         <i class="las la-external-link-alt"></i>
       </a>
