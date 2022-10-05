@@ -43,6 +43,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "username"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -62,7 +63,9 @@ func TestCommandSide_AddMachine(t *testing.T) {
 					t,
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
 				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "username"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -81,6 +84,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							org.NewDomainPolicyAddedEvent(context.Background(),
@@ -126,7 +130,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 					Username:    "username",
 					Name:        "name",
 					Description: "description",
-					State:       domain.UserStateActive,
+					State:       domain.UserStateUnspecified,
 				},
 			},
 		},
@@ -171,7 +175,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "user invalid, invalid argument error",
+			name: "user invalid, invalid argument error name",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -182,6 +186,24 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 				orgID: "org1",
 				machine: &domain.Machine{
 					Username: "username",
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user invalid, invalid argument error username",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				machine: &domain.Machine{
+					Name: "name",
 				},
 			},
 			res: res{
@@ -227,6 +249,16 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
 				),
 			},
 			args: args{
@@ -236,6 +268,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
+					Username:    "username",
 					Name:        "name",
 					Description: "description",
 				},
@@ -260,6 +293,16 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -274,8 +317,10 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 				orgID: "org1",
 				machine: &domain.Machine{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "user1",
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
 					},
+					Username:    "username",
 					Description: "description1",
 					Name:        "name1",
 				},
@@ -289,7 +334,7 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 					Username:    "username",
 					Name:        "name1",
 					Description: "description1",
-					State:       domain.UserStateActive,
+					State:       domain.UserStateUnspecified,
 				},
 			},
 		},

@@ -88,7 +88,7 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		mig.instanceSetup.Org.Human.Email.Address = "admin@" + mig.instanceSetup.CustomDomain
 	}
 
-	_, _, err = cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	_, _, _, _, err = cmd.SetUpInstance(ctx, &mig.instanceSetup)
 	return err
 }
 

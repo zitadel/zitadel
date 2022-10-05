@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -17,7 +18,8 @@ import (
 type OrgSetup struct {
 	Name         string
 	CustomDomain string
-	Human        AddHuman
+	Human        *AddHuman
+	Machine      *AddMachine
 	Roles        []string
 }
 
@@ -30,10 +32,11 @@ func (c *Commands) SetUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 		return "", nil, errors.ThrowPreconditionFailed(nil, "COMMAND-poaj2", "Errors.Org.AlreadyExisting")
 	}
 
-	return c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+	userID, _, _, details, err := c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+	return userID, details, err
 }
 
-func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, *domain.ObjectDetails, error) {
+func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, string, []byte, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
@@ -44,23 +47,55 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 
 	validations := []preparation.Validation{
 		AddOrgCommand(ctx, orgAgg, o.Name, userIDs...),
-		AddHumanCommand(userAgg, &o.Human, c.userPasswordAlg, c.userEncryption),
-		c.AddOrgMemberCommand(orgAgg, userID, roles...),
 	}
+
+	if o.Human != nil {
+		validations = append(validations, AddHumanCommand(userAgg, o.Human, c.userPasswordAlg, c.userEncryption))
+	} else if o.Machine != nil {
+		validations = append(validations, AddMachineCommand(userAgg, o.Machine.Machine))
+	}
+	validations = append(validations, c.AddOrgMemberCommand(orgAgg, userID, roles...))
+
 	if o.CustomDomain != "" {
 		validations = append(validations, c.prepareAddOrgDomain(orgAgg, o.CustomDomain, userIDs))
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
-	return userID, &domain.ObjectDetails{
+
+	pat := ""
+	machineKey := make([]byte, 0)
+	if o.Machine != nil {
+		if o.Machine.Pat {
+			_, token, err := c.AddPersonalAccessToken(ctx, userID, orgID, o.Machine.PatExpirationDate, o.Machine.PatScopes, domain.UserTypeMachine)
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			pat = token
+		}
+		if o.Machine.MachineKey {
+			key, err := c.AddUserMachineKey(ctx, &domain.MachineKey{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID: userID,
+				},
+				ExpirationDate: o.Machine.MachineKeyExpirationDate,
+				Type:           o.Machine.MachineKeyType,
+			}, orgID)
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			machineKey = key.PrivateKey
+		}
+	}
+
+	return userID, pat, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
@@ -78,10 +113,11 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string)
 		return "", nil, err
 	}
 
-	return c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+	userID, _, _, details, err := c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+	return userID, details, err
 }
 
-//AddOrgCommand defines the commands to create a new org,
+// AddOrgCommand defines the commands to create a new org,
 // this includes the verified default domain
 func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string, userIDs ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {

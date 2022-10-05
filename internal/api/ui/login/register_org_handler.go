@@ -144,7 +144,7 @@ func (d registerOrgFormData) toCommandOrg() *command.OrgSetup {
 	}
 	return &command.OrgSetup{
 		Name: d.RegisterOrgName,
-		Human: command.AddHuman{
+		Human: &command.AddHuman{
 			Username:  d.Username,
 			FirstName: d.Firstname,
 			LastName:  d.Lastname,

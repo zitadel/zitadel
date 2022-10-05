@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -142,30 +143,30 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return nil
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, []byte, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	if err = c.eventstore.NewInstance(ctx, instanceID); err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	userID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	if err = setup.generateIDs(c.idGenerator); err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 	ctx = authz.WithConsole(ctx, setup.zitadel.projectID, setup.zitadel.consoleAppID)
 
@@ -273,10 +274,21 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
-		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+	)
+	//only a human or a machine user should be created as owner
+	if setup.Org.Human != nil {
+		validations = append(validations,
+			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+		)
+	} else if setup.Org.Machine != nil {
+		validations = append(validations,
+			AddMachineCommand(userAgg, setup.Org.Machine.Machine),
+		)
+	}
+
+	validations = append(validations,
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 		c.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
-
 		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
@@ -322,7 +334,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	addGeneratedDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 	validations = append(validations, addGeneratedDomain...)
 	if setup.CustomDomain != "" {
@@ -348,14 +360,40 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
-	return instanceID, &domain.ObjectDetails{
+
+	pat := ""
+	machineKey := make([]byte, 0)
+	if setup.Org.Machine != nil {
+		if setup.Org.Machine.Pat {
+			_, token, err := c.AddPersonalAccessToken(ctx, userID, orgID, setup.Org.Machine.PatExpirationDate, setup.Org.Machine.PatScopes, domain.UserTypeMachine)
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			pat = token
+		}
+		if setup.Org.Machine.MachineKey {
+			key, err := c.AddUserMachineKey(ctx, &domain.MachineKey{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID: userID,
+				},
+				ExpirationDate: setup.Org.Machine.MachineKeyExpirationDate,
+				Type:           setup.Org.Machine.MachineKeyType,
+			}, orgID)
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			machineKey = key.PrivateKey
+		}
+	}
+
+	return instanceID, pat, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
@@ -444,7 +482,7 @@ func prepareAddInstance(a *instance.Aggregate, instanceName string, defaultLangu
 	}
 }
 
-//SetIAMProject defines the command to set the id of the IAM project onto the instance
+// SetIAMProject defines the command to set the id of the IAM project onto the instance
 func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -455,7 +493,7 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 	}
 }
 
-//SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+// SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
 func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

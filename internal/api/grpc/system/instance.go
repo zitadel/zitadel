@@ -41,11 +41,24 @@ func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequ
 }
 
 func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequest) (*system_pb.AddInstanceResponse, error) {
-	id, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.DefaultInstance))
+	id, _, _, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.DefaultInstance))
 	if err != nil {
 		return nil, err
 	}
 	return &system_pb.AddInstanceResponse{
+		InstanceId: id,
+		Details:    object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
+func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstanceRequest) (*system_pb.CreateInstanceResponse, error) {
+	id, pat, key, details, err := s.command.SetUpInstance(ctx, CreateInstancePbToSetupInstance(req, s.DefaultInstance))
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.CreateInstanceResponse{
+		Pat:        pat,
+		MachineKey: key,
 		InstanceId: id,
 		Details:    object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
