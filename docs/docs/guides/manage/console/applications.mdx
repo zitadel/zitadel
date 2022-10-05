@@ -9,7 +9,7 @@ import RedirectURIs from "../../integrate/application/redirect-uris.mdx";
 import GenerateKey from "../../integrate/application/generate-key.mdx";
 import ReviewConfig from "../../integrate/application/review-config.mdx";
 
-## What is an application?
+# What is an application?
 
 Applications are the entry point to your project.
 Users either login into one of your clients and interact with them directly or use one of your APIs.
@@ -107,6 +107,56 @@ In order to **develop locally** and due to the fact that any ZITADEL configurati
 
 <ReviewConfig authType="code" />
 
-## Generate key for private key JWT
+## Application settings
 
-<GenerateKey appType="api" />
+After creating the application, you can still change its configuration if you for example need a offline_access support (Refresh token).
+You can easily change your authentication method via the colored toggle on top or directly change configuration via the input and dropdown fields.
+
+> Note: Changing application type is not possible. In this case you have to create a new application.
+
+<img
+  alt="Redirect URIs"
+  src="/img/guides/console/application.png"
+  width="800px"
+/>
+
+On the top of the page you can check if your application is OIDC compliant.
+Tasks for completion are shown in the field.
+
+<img
+  alt="OIDC Compliance"
+  src="/img/guides/console/oidc-compliance.png"
+  width="600px"
+/>
+
+### Token settings
+
+In the token settings you can change the type from **Bearer Token** to **JWT**, and check some settings whether you need user roles and user information in the ID Token or not.
+On the bottom you can optionally set a **ClockSkew** time which is added to the expiration time of the issued token.
+
+<img
+  alt="Token settings"
+  src="/img/guides/console/app-token-settings.png"
+  width="600px"
+/>
+
+### Redirect settings
+
+Like on creation, you can modify you redirect settings here.
+Note that for local development you most likely have to enable development mode, as redirects to http:// are otherwise blocked.
+
+<img
+  alt="Redirect URIs"
+  src="/img/guides/console/redirect-uris.png"
+  width="500px"
+/>
+
+### Additional origins
+
+If you need to allow additional origins which should **NOT** be used as redirect you can specify them in the **Additional origins** section.
+
+<img
+  alt="Additional origins"
+  src="/img/guides/console/additional-origins.png"
+  width="500px"
+/>

@@ -55,7 +55,9 @@ Organizations can then create authorizations for their users on their own. The p
 3. Select some roles you would like to grant to the organization and confirm.
 4. You should now see the granted organization in the section **grants**.
 
-## Branding
+## Project Settings
+
+### Branding
 
 If you have different designs for your organizations or probably and use project grants, you can define the login behaviour on the project detail page.
 
@@ -67,22 +69,36 @@ If you have different designs for your organizations or probably and use project
 
 You can choose from
 
-- **Unspecified**: As soon as the user is identified, the branding of the organization of the identified user will be shown, before the system default is shown.
-- **Use project setting**: The branding of the organization which owns the project will be shown
-- **Use organization setting**: The branding of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown.
-
-In a B2B use case, you would typically use the organization setting. If you want to omit organization detection, you can preselect an organization with the primary domain [scope](/docs/apis/openidoauth/scopes#reserved-scopes) (ex. `urn:zitadel:iam:org:domain:primary:{domainname}`).
-
-## Project Settings
-
-On default the login screen will be shown in the private labeling settings of the system.
-With the [primary domain scope](../../../apis/openidoauth/scopes#reserves-scopes) it is possible to trigger the setting of the given organization.
-But this will also restrict, the login to user of the given organization.
-
-With the private labeling setting it is possible to choose which settings should trigger.
-
 | Setting                                | Description                                                                                                                                                                                                                                                  |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Unspecified                            | If nothing is specified the default will trigger. (System settings)                                                                                                                                                                                          |
 | Enforce project resource owner policy  | This setting will enforce the private labeling of the organization (resource owner) of the project through the whole login process.                                                                                                                          |
 | Allow Login User resource owner policy | With this setting first the private labeling of the organization (resource owner) of the project will trigger. As soon as the user and its organization (resource owner) is identified by ZITADEL, the settings will change to the organization of the user. |
+
+In a B2B use case, you would typically use the organization setting. If you want to omit organization detection, you can preselect an organization with the [primary domain scope](/docs/apis/openidoauth/scopes#reserved-scopes) (ex. `urn:zitadel:iam:org:domain:primary:{domainname}`).
+
+### Role settings
+
+Below the branding settings, you can check different checkboxes to get even more custom behaviour on authentication.
+
+- **Assert Roles on Authentication**:
+  Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.
+- **Check authorization on Authentication**: If set, users are only allowed to authenticate if any role is assigned to their account.
+- **Check for Project on Authentication**:
+  It is checked whether the user's organization has this project. If not, the user cannot be authenticated.
+
+<img
+  src="/img/guides/console/rolesettings.png"
+  width="700px"
+  alt="Role settings"
+/>
+
+If you want to have roles in your token, this has to be set in your applications as this is dependent on your application type. Navigate to your application and check this setting if you want so.
+
+<img
+  src="/img/guides/console/tokenroles.png"
+  width="700px"
+  alt="Roles in token"
+/>
+
+You can learn more about [Application and Token settings](./applications#token-settings) in the next section.

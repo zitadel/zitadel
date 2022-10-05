@@ -48,26 +48,6 @@ Type your username, hit continue, select the roles you want your user to have an
   alt="Authorization"
 />
 
-Now you can retrieve those roles in your application. ZITADEL has multiple settings for you to access them more easily. Navigate the **General** section of your project and check your needed ones.
-
-- **Assert Roles on Authentication**:
-  Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.
-- **Check authorization on Authentication**: If set, users are only allowed to authenticate if any role is assigned to their account.
-- **Check for Project on Authentication**:
-  It is checked whether the user's organization has this project. If not, the user cannot be authenticated.
-
-<img
-  src="/img/guides/console/rolesettings.png"
-  width="700px"
-  alt="Role settings"
-/>
-
-If you want to have roles in your token, this has to be set in your applications as this is dependent on your application type. Navigate to your application and check this setting if you want so.
-
-<img
-  src="/img/guides/console/tokenroles.png"
-  width="700px"
-  alt="Roles in token"
-/>
+Now you can retrieve those roles in your application. ZITADEL has [multiple settings](./projects#project-settings) for you to access them more easily. Navigate to the **General** section of your project and check your needed ones.
 
 > Note: We did set up our authorizations from projects, but this can be achieved from multiple locations in console. You can view and add authorizations from your organization, your projects, or from your users page.
