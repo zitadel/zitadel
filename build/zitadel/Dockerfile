@@ -106,5 +106,6 @@ RUN go install github.com/rakyll/statik
 ## Go test results
 #######################
 FROM scratch as go-codecov
-RUN touch /go/src/github.com/zitadel/zitadel/profile.cov
+RUN mkdir -p /go/src/github.com/zitadel/zitadel \
+    && touch /go/src/github.com/zitadel/zitadel/profile.cov
 COPY --from=go-test /go/src/github.com/zitadel/zitadel/profile.cov profile.cov
