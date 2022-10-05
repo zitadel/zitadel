@@ -61,7 +61,6 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 		return "", nil, err
 	}
 	return userID, &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
 	}, nil
@@ -81,7 +80,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string)
 	return c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
 }
 
-//AddOrgCommand defines the commands to create a new org,
+// AddOrgCommand defines the commands to create a new org,
 // this includes the verified default domain
 func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string, userIDs ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {

@@ -56,8 +56,8 @@ func (v *View) UpdateOrgProjectMappingSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(orgPrgojectMappingTable)
 }
 
-func (v *View) GetLatestOrgProjectMappingFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(orgPrgojectMappingTable, instanceID, sequence)
+func (v *View) GetLatestOrgProjectMappingFailedEvent(instanceID, eventID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(orgPrgojectMappingTable, instanceID, eventID)
 }
 
 func (v *View) ProcessedOrgProjectMappingFailedEvent(failedEvent *repository.FailedEvent) error {

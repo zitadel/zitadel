@@ -154,10 +154,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", nil, err
 	}
 
-	if err = c.eventstore.NewInstance(ctx, instanceID); err != nil {
-		return "", nil, err
-	}
-
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := c.idGenerator.Next()
@@ -374,7 +370,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", nil, err
 	}
 	return instanceID, &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
 	}, nil
@@ -392,7 +387,6 @@ func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.Obj
 		return nil, err
 	}
 	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
@@ -410,7 +404,6 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 		return nil, err
 	}
 	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
@@ -428,7 +421,6 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, err
 	}
 	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil

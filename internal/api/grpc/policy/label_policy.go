@@ -27,7 +27,6 @@ func ModelLabelPolicyToPb(policy *query.LabelPolicy, assetPrefix string) *policy
 		DisableWatermark:    policy.WatermarkDisabled,
 		HideLoginNameSuffix: policy.HideLoginNameSuffix,
 		Details: object.ToViewDetailsPb(
-			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
 			policy.ResourceOwner,

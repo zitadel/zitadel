@@ -23,7 +23,6 @@ func KeyToPb(key *query.AuthNKey) *authn.Key {
 		Type:           KeyTypeToPb(key.Type),
 		ExpirationDate: timestamppb.New(key.Expiration),
 		Details: object.ToViewDetailsPb(
-			key.Sequence,
 			key.CreationDate,
 			key.CreationDate,
 			key.ResourceOwner,

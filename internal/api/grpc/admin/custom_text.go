@@ -39,7 +39,6 @@ func (s *Server) SetDefaultInitMessageText(ctx context.Context, req *admin_pb.Se
 	}
 	return &admin_pb.SetDefaultInitMessageTextResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -53,7 +52,6 @@ func (s *Server) ResetCustomInitMessageTextToDefault(ctx context.Context, req *a
 	}
 	return &admin_pb.ResetCustomInitMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -87,7 +85,6 @@ func (s *Server) SetDefaultPasswordResetMessageText(ctx context.Context, req *ad
 	}
 	return &admin_pb.SetDefaultPasswordResetMessageTextResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -101,7 +98,6 @@ func (s *Server) ResetCustomPasswordResetMessageTextToDefault(ctx context.Contex
 	}
 	return &admin_pb.ResetCustomPasswordResetMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -135,7 +131,6 @@ func (s *Server) SetDefaultVerifyEmailMessageText(ctx context.Context, req *admi
 	}
 	return &admin_pb.SetDefaultVerifyEmailMessageTextResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -149,7 +144,6 @@ func (s *Server) ResetCustomVerifyEmailMessageTextToDefault(ctx context.Context,
 	}
 	return &admin_pb.ResetCustomVerifyEmailMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -183,7 +177,6 @@ func (s *Server) SetDefaultVerifyPhoneMessageText(ctx context.Context, req *admi
 	}
 	return &admin_pb.SetDefaultVerifyPhoneMessageTextResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -197,7 +190,6 @@ func (s *Server) ResetCustomVerifyPhoneMessageTextToDefault(ctx context.Context,
 	}
 	return &admin_pb.ResetCustomVerifyPhoneMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -231,7 +223,6 @@ func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *ad
 	}
 	return &admin_pb.SetDefaultDomainClaimedMessageTextResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -245,7 +236,6 @@ func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Contex
 	}
 	return &admin_pb.ResetCustomDomainClaimedMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -279,7 +269,6 @@ func (s *Server) SetDefaultPasswordlessRegistrationMessageText(ctx context.Conte
 	}
 	return &admin_pb.SetDefaultPasswordlessRegistrationMessageTextResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -293,7 +282,6 @@ func (s *Server) ResetCustomPasswordlessRegistrationMessageTextToDefault(ctx con
 	}
 	return &admin_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -326,7 +314,6 @@ func (s *Server) SetCustomLoginText(ctx context.Context, req *admin_pb.SetCustom
 	}
 	return &admin_pb.SetCustomLoginTextsResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),
@@ -340,7 +327,6 @@ func (s *Server) ResetCustomLoginTextToDefault(ctx context.Context, req *admin_p
 	}
 	return &admin_pb.ResetCustomLoginTextsToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.EventDate,
 			result.ResourceOwner,
 		),

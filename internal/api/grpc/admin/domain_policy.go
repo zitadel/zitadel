@@ -33,7 +33,6 @@ func (s *Server) AddCustomDomainPolicy(ctx context.Context, req *admin_pb.AddCus
 	}
 	return &admin_pb.AddCustomDomainPolicyResponse{
 		Details: object.AddToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
@@ -47,7 +46,6 @@ func (s *Server) UpdateDomainPolicy(ctx context.Context, req *admin_pb.UpdateDom
 	}
 	return &admin_pb.UpdateDomainPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -61,7 +59,6 @@ func (s *Server) UpdateCustomDomainPolicy(ctx context.Context, req *admin_pb.Upd
 	}
 	return &admin_pb.UpdateCustomDomainPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -110,7 +107,6 @@ func (s *Server) AddCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.AddCus
 	}
 	return &admin_pb.AddCustomOrgIAMPolicyResponse{
 		Details: object.AddToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
@@ -124,7 +120,6 @@ func (s *Server) UpdateOrgIAMPolicy(ctx context.Context, req *admin_pb.UpdateOrg
 	}
 	return &admin_pb.UpdateOrgIAMPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -138,7 +133,6 @@ func (s *Server) UpdateCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.Upd
 	}
 	return &admin_pb.UpdateCustomOrgIAMPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),

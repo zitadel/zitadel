@@ -32,7 +32,6 @@ func (s *Server) AddCustomPrivacyPolicy(ctx context.Context, req *mgmt_pb.AddCus
 	}
 	return &mgmt_pb.AddCustomPrivacyPolicyResponse{
 		Details: object.AddToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),
@@ -46,7 +45,6 @@ func (s *Server) UpdateCustomPrivacyPolicy(ctx context.Context, req *mgmt_pb.Upd
 	}
 	return &mgmt_pb.UpdateCustomPrivacyPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),

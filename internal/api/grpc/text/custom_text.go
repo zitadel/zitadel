@@ -17,7 +17,6 @@ func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomTe
 		ButtonText: msg.ButtonText,
 		FooterText: msg.Footer,
 		Details: object.ToViewDetailsPb(
-			msg.Sequence,
 			msg.CreationDate,
 			msg.ChangeDate,
 			msg.AggregateID,
@@ -29,7 +28,6 @@ func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomTe
 func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText {
 	return &text_pb.LoginCustomText{
 		Details: object.ToViewDetailsPb(
-			text.Sequence,
 			text.CreationDate,
 			text.ChangeDate,
 			text.AggregateID,

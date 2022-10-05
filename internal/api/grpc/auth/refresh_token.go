@@ -17,7 +17,7 @@ func (s *Server) ListMyRefreshTokens(ctx context.Context, req *auth.ListMyRefres
 	}
 	return &auth.ListMyRefreshTokensResponse{
 		Result:  user_grpc.RefreshTokensToPb(res.Result),
-		Details: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.TotalResult, res.Timestamp),
 	}, nil
 }
 

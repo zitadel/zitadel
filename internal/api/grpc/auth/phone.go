@@ -18,7 +18,6 @@ func (s *Server) GetMyPhone(ctx context.Context, _ *auth_pb.GetMyPhoneRequest) (
 	return &auth_pb.GetMyPhoneResponse{
 		Phone: user.ModelPhoneToPb(phone),
 		Details: object.ToViewDetailsPb(
-			phone.Sequence,
 			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
@@ -37,7 +36,6 @@ func (s *Server) SetMyPhone(ctx context.Context, req *auth_pb.SetMyPhoneRequest)
 	}
 	return &auth_pb.SetMyPhoneResponse{
 		Details: object.ChangeToDetailsPb(
-			phone.Sequence,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),

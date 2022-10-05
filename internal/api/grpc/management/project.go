@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
@@ -51,13 +52,13 @@ func (s *Server) ListProjects(ctx context.Context, req *mgmt_pb.ListProjectsRequ
 	}
 	return &mgmt_pb.ListProjectsResponse{
 		Result:  project_grpc.ProjectViewsToPb(projects.Projects),
-		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.Timestamp),
+		Details: object_grpc.ToListDetails(projects.Count, projects.Timestamp),
 	}, nil
 }
 
 func (s *Server) ListProjectGrantChanges(ctx context.Context, req *mgmt_pb.ListProjectGrantChangesRequest) (*mgmt_pb.ListProjectGrantChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	res, err := s.query.ProjectGrantChanges(ctx, req.ProjectId, req.GrantId, sequence, limit, asc, s.auditLogRetention)
+	_, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	res, err := s.query.ProjectGrantChanges(ctx, req.ProjectId, req.GrantId, time.Now(), limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	}
 	return &mgmt_pb.ListGrantedProjectsResponse{
 		Result:  project_grpc.GrantedProjectViewsToPb(projects.ProjectGrants),
-		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.Timestamp),
+		Details: object_grpc.ToListDetails(projects.Count, projects.Timestamp),
 	}, nil
 }
 
@@ -104,13 +105,13 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 	}
 	return &mgmt_pb.ListGrantedProjectRolesResponse{
 		Result:  project_grpc.RoleViewsToPb(roles.ProjectRoles),
-		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.Timestamp),
+		Details: object_grpc.ToListDetails(roles.Count, roles.Timestamp),
 	}, nil
 }
 
 func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjectChangesRequest) (*mgmt_pb.ListProjectChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	res, err := s.query.ProjectChanges(ctx, req.ProjectId, sequence, limit, asc, s.auditLogRetention)
+	_, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	res, err := s.query.ProjectChanges(ctx, req.ProjectId, time.Now(), limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +128,7 @@ func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest)
 	}
 	return &mgmt_pb.AddProjectResponse{
 		Id:      project.AggregateID,
-		Details: object_grpc.AddToDetailsPb(project.Sequence, project.ChangeDate, project.ResourceOwner),
+		Details: object_grpc.AddToDetailsPb(project.ChangeDate, project.ResourceOwner),
 	}, nil
 }
 
@@ -138,7 +139,6 @@ func (s *Server) UpdateProject(ctx context.Context, req *mgmt_pb.UpdateProjectRe
 	}
 	return &mgmt_pb.UpdateProjectResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			project.Sequence,
 			project.ChangeDate,
 			project.ResourceOwner,
 		),
@@ -204,7 +204,7 @@ func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectR
 	}
 	return &mgmt_pb.ListProjectRolesResponse{
 		Result:  project_grpc.RoleViewsToPb(roles.ProjectRoles),
-		Details: object_grpc.ToListDetails(roles.Count, roles.Sequence, roles.Timestamp),
+		Details: object_grpc.ToListDetails(roles.Count, roles.Timestamp),
 	}, nil
 }
 
@@ -215,7 +215,6 @@ func (s *Server) AddProjectRole(ctx context.Context, req *mgmt_pb.AddProjectRole
 	}
 	return &mgmt_pb.AddProjectRoleResponse{
 		Details: object_grpc.AddToDetailsPb(
-			role.Sequence,
 			role.ChangeDate,
 			role.ResourceOwner,
 		),
@@ -239,7 +238,6 @@ func (s *Server) UpdateProjectRole(ctx context.Context, req *mgmt_pb.UpdateProje
 	}
 	return &mgmt_pb.UpdateProjectRoleResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			role.Sequence,
 			role.ChangeDate,
 			role.ResourceOwner,
 		),
@@ -294,7 +292,7 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
 		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
-		Details: object_grpc.ToListDetails(members.Count, members.Sequence, members.Timestamp),
+		Details: object_grpc.ToListDetails(members.Count, members.Timestamp),
 	}, nil
 }
 
@@ -304,7 +302,7 @@ func (s *Server) AddProjectMember(ctx context.Context, req *mgmt_pb.AddProjectMe
 		return nil, err
 	}
 	return &mgmt_pb.AddProjectMemberResponse{
-		Details: object_grpc.AddToDetailsPb(member.Sequence, member.ChangeDate, member.ResourceOwner),
+		Details: object_grpc.AddToDetailsPb(member.ChangeDate, member.ResourceOwner),
 	}, nil
 }
 
@@ -315,7 +313,6 @@ func (s *Server) UpdateProjectMember(ctx context.Context, req *mgmt_pb.UpdatePro
 	}
 	return &mgmt_pb.UpdateProjectMemberResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
 		),

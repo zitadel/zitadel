@@ -83,7 +83,6 @@ func (c *Commands) addHumanWithID(ctx context.Context, resourceOwner string, use
 	return &domain.HumanDetails{
 		ID: userID,
 		ObjectDetails: domain.ObjectDetails{
-			Sequence:      events[len(events)-1].Sequence(),
 			EventDate:     events[len(events)-1].CreationDate(),
 			ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 		},
@@ -272,12 +271,12 @@ func (h *AddHuman) ensureDisplayName() {
 	h.DisplayName = h.FirstName + " " + h.LastName
 }
 
-//shouldAddInitCode returns true for all added Humans which:
+// shouldAddInitCode returns true for all added Humans which:
 // - were not added from an external IDP
 // - and either:
-//    - have no verified email
-// 			and / or
-//    -  have no authentication method (password / passwordless)
+//   - have no verified email
+//     and / or
+//   - have no authentication method (password / passwordless)
 func (h *AddHuman) shouldAddInitCode() bool {
 	return !h.ExternalIDP &&
 		!h.Email.Verified ||
@@ -527,7 +526,7 @@ func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner s
 	return err
 }
 
-///TODO: adlerhurst maybe we can simplify createAddHumanEvent and createRegisterHumanEvent
+// /TODO: adlerhurst maybe we can simplify createAddHumanEvent and createRegisterHumanEvent
 func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, human *domain.Human, userLoginMustBeDomain bool) *user.HumanAddedEvent {
 	addEvent := user.NewHumanAddedEvent(
 		ctx,

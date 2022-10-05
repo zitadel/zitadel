@@ -353,7 +353,6 @@ func UserMembershipViewsToDomain(memberships []*user_model.UserMembershipView) [
 			ChangeDate:        membership.ChangeDate,
 			ResourceOwner:     membership.ResourceOwner,
 			ResourceOwnerName: membership.ResourceOwnerName,
-			Sequence:          membership.Sequence,
 		}
 	}
 	return result

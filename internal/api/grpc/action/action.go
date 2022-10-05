@@ -34,7 +34,7 @@ func TriggerTypeToDomain(triggerType action_pb.TriggerType) domain.TriggerType {
 func FlowToPb(flow *query.Flow) *action_pb.Flow {
 	return &action_pb.Flow{
 		Type:           FlowTypeToPb(flow.Type),
-		Details:        object_grpc.ChangeToDetailsPb(flow.Sequence, flow.ChangeDate, flow.ResourceOwner),
+		Details:        object_grpc.ChangeToDetailsPb(flow.ChangeDate, flow.ResourceOwner),
 		State:          action_pb.FlowState_FLOW_STATE_ACTIVE, //TODO: state in next release
 		TriggerActions: TriggerActionsToPb(flow.TriggerActions),
 	}
@@ -88,7 +88,7 @@ func ActionsToPb(actions []*query.Action) []*action_pb.Action {
 func ActionToPb(action *query.Action) *action_pb.Action {
 	return &action_pb.Action{
 		Id:            action.ID,
-		Details:       object_grpc.ChangeToDetailsPb(action.Sequence, action.ChangeDate, action.ResourceOwner),
+		Details:       object_grpc.ChangeToDetailsPb(action.ChangeDate, action.ResourceOwner),
 		State:         ActionStateToPb(action.State),
 		Name:          action.Name,
 		Script:        action.Script,

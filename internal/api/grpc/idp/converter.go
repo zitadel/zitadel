@@ -26,7 +26,6 @@ func ModelIDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 		Owner:        ModelIDPProviderTypeToPb(idp.OwnerType),
 		Config:       ModelIDPViewToConfigPb(idp),
 		Details: obj_grpc.ToViewDetailsPb(
-			idp.Sequence,
 			idp.CreationDate,
 			idp.ChangeDate,
 			idp.ResourceOwner,
@@ -43,7 +42,7 @@ func IDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 		StylingType:  IDPStylingTypeToPb(idp.StylingType),
 		AutoRegister: idp.AutoRegister,
 		Config:       IDPViewToConfigPb(idp),
-		Details:      obj_grpc.ToViewDetailsPb(idp.Sequence, idp.CreationDate, idp.ChangeDate, idp.ID),
+		Details:      obj_grpc.ToViewDetailsPb(idp.CreationDate, idp.ChangeDate, idp.ID),
 	}
 	return mapped
 }

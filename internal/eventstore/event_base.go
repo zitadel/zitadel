@@ -12,6 +12,7 @@ import (
 // BaseEvent represents the minimum metadata of an event
 type BaseEvent struct {
 	EventType EventType `json:"-"`
+	Id        string    `json:"-"`
 
 	aggregate Aggregate
 
@@ -22,6 +23,10 @@ type BaseEvent struct {
 	//Service which created the event
 	Service string `json:"-"`
 	Data    []byte `json:"-"`
+}
+
+func (e *BaseEvent) ID() string {
+	return e.Id
 }
 
 // EditorService implements Command

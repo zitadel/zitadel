@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
@@ -35,8 +36,8 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 }
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	response, err := s.query.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, s.auditLogRetention)
+	_, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	response, err := s.query.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, time.Now(), limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,6 @@ func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_
 	return &mgmt_pb.AddOrgResponse{
 		Id: org.AggregateID,
 		Details: object.AddToDetailsPb(
-			org.Sequence,
 			org.ChangeDate,
 			org.ResourceOwner,
 		),
@@ -73,7 +73,6 @@ func (s *Server) UpdateOrg(ctx context.Context, req *mgmt_pb.UpdateOrgRequest) (
 	}
 	return &mgmt_pb.UpdateOrgResponse{
 		Details: object.AddToDetailsPb(
-			org.Sequence,
 			org.EventDate,
 			org.ResourceOwner,
 		),
@@ -137,7 +136,7 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
 		Result:  org_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.Timestamp),
+		Details: object.ToListDetails(domains.Count, domains.Timestamp),
 	}, nil
 }
 
@@ -233,7 +232,7 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
 		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
-		Details: object.ToListDetails(members.Count, members.Sequence, members.Timestamp),
+		Details: object.ToListDetails(members.Count, members.Timestamp),
 	}, nil
 }
 
@@ -244,7 +243,6 @@ func (s *Server) AddOrgMember(ctx context.Context, req *mgmt_pb.AddOrgMemberRequ
 	}
 	return &mgmt_pb.AddOrgMemberResponse{
 		Details: object.AddToDetailsPb(
-			addedMember.Sequence,
 			addedMember.ChangeDate,
 			addedMember.ResourceOwner,
 		),
@@ -258,7 +256,6 @@ func (s *Server) UpdateOrgMember(ctx context.Context, req *mgmt_pb.UpdateOrgMemb
 	}
 	return &mgmt_pb.UpdateOrgMemberResponse{
 		Details: object.ChangeToDetailsPb(
-			changedMember.Sequence,
 			changedMember.ChangeDate,
 			changedMember.ResourceOwner,
 		),
@@ -311,7 +308,7 @@ func (s *Server) ListOrgMetadata(ctx context.Context, req *mgmt_pb.ListOrgMetada
 	}
 	return &mgmt_pb.ListOrgMetadataResponse{
 		Result:  metadata.OrgMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Timestamp),
 	}, nil
 }
 
@@ -332,7 +329,6 @@ func (s *Server) SetOrgMetadata(ctx context.Context, req *mgmt_pb.SetOrgMetadata
 	}
 	return &mgmt_pb.SetOrgMetadataResponse{
 		Details: obj_grpc.AddToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),

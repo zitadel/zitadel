@@ -70,7 +70,7 @@ func SecretGeneratorToPb(generator *query.SecretGenerator) *settings_pb.SecretGe
 		IncludeLowerLetters: generator.IncludeLowerLetters,
 		IncludeDigits:       generator.IncludeDigits,
 		IncludeSymbols:      generator.IncludeSymbols,
-		Details:             obj_grpc.ToViewDetailsPb(generator.Sequence, generator.CreationDate, generator.ChangeDate, generator.AggregateID),
+		Details:             obj_grpc.ToViewDetailsPb(generator.CreationDate, generator.ChangeDate, generator.AggregateID),
 	}
 	return mapped
 }
@@ -145,7 +145,7 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 		SenderName:    smtp.SenderName,
 		Host:          smtp.Host,
 		User:          smtp.User,
-		Details:       obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
+		Details:       obj_grpc.ToViewDetailsPb(smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
 	}
 	return mapped
 }

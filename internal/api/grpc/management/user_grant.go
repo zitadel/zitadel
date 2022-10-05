@@ -39,7 +39,7 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 	}
 	return &mgmt_pb.ListUserGrantResponse{
 		Result:  user.UserGrantsToPb(s.assetAPIPrefix(ctx), res.UserGrants),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Timestamp),
 	}, nil
 }
 
@@ -55,7 +55,6 @@ func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequ
 	return &mgmt_pb.AddUserGrantResponse{
 		UserGrantId: grant.AggregateID,
 		Details: obj_grpc.AddToDetailsPb(
-			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
 		),
@@ -69,7 +68,6 @@ func (s *Server) UpdateUserGrant(ctx context.Context, req *mgmt_pb.UpdateUserGra
 	}
 	return &mgmt_pb.UpdateUserGrantResponse{
 		Details: obj_grpc.ChangeToDetailsPb(
-			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
 		),

@@ -100,16 +100,15 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 			var creationDate time.Time
 			for _, sequence := range sequences[aggregateType] {
 				if sequence.instanceID == instanceID {
-					eventID = sequence.eventID
+					creationDate = sequence.creationDate
 					break
 				}
 			}
 			queryBuilder.
 				AddQuery().
 				AggregateTypes(aggregateType).
-				CreationDateAfter(creationDate)
-			// SequenceGreater(eventID).
-			InstanceID(instanceID)
+				CreationDateAfter(creationDate).
+				InstanceID(instanceID)
 		}
 	}
 

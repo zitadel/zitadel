@@ -37,7 +37,6 @@ func (s *Server) AddCustomPasswordAgePolicy(ctx context.Context, req *mgmt_pb.Ad
 	}
 	return &mgmt_pb.AddCustomPasswordAgePolicyResponse{
 		Details: object.AddToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),
@@ -51,7 +50,6 @@ func (s *Server) UpdateCustomPasswordAgePolicy(ctx context.Context, req *mgmt_pb
 	}
 	return &mgmt_pb.UpdateCustomPasswordAgePolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),

@@ -72,8 +72,8 @@ func (v *View) UpdateUserSessionSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(userSessionTable)
 }
 
-func (v *View) GetLatestUserSessionFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(userSessionTable, instanceID, sequence)
+func (v *View) GetLatestUserSessionFailedEvent(instanceID, eventID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(userSessionTable, instanceID, eventID)
 }
 
 func (v *View) ProcessedUserSessionFailedEvent(failedEvent *repository.FailedEvent) error {

@@ -31,7 +31,6 @@ func (c *Commands) AddInstanceDomain(ctx context.Context, instanceDomain string)
 		return nil, err
 	}
 	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
@@ -49,7 +48,6 @@ func (c *Commands) SetPrimaryInstanceDomain(ctx context.Context, instanceDomain 
 		return nil, err
 	}
 	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
@@ -67,7 +65,6 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 		return nil, err
 	}
 	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
@@ -154,8 +151,8 @@ func (c *Commands) updateConsoleRedirectURIs(ctx context.Context, filter prepara
 	)
 }
 
-//checkUpdateConsoleRedirectURIs validates if the required console uri is present in the redirect_uris and post_logout_redirect_uris
-//it will return true only if present in both list, otherwise false
+// checkUpdateConsoleRedirectURIs validates if the required console uri is present in the redirect_uris and post_logout_redirect_uris
+// it will return true only if present in both list, otherwise false
 func (c *Commands) checkUpdateConsoleRedirectURIs(instanceDomain string, redirectURIs, postLogoutRedirectURIs []string) bool {
 	redirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + consoleRedirectPath
 	if !containsURI(redirectURIs, redirectURI) {

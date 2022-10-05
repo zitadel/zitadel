@@ -44,7 +44,6 @@ type LabelPolicyView struct {
 	DisableWatermark    bool   `json:"disableWatermark" gorm:"column:disable_watermark"`
 	Default             bool   `json:"-" gorm:"-"`
 
-	Sequence   uint64 `json:"-" gorm:"column:sequence"`
 	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
@@ -58,7 +57,6 @@ func (p *LabelPolicyView) ToDomain() *domain.LabelPolicy {
 			AggregateID:  p.AggregateID,
 			CreationDate: p.CreationDate,
 			ChangeDate:   p.ChangeDate,
-			Sequence:     p.Sequence,
 		},
 		Default:         p.Default,
 		PrimaryColor:    p.PrimaryColor,
@@ -84,7 +82,6 @@ func (p *LabelPolicyView) ToDomain() *domain.LabelPolicy {
 
 func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
 	asset := &AssetView{}
-	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch eventstore.EventType(event.Type) {
 	case instance.LabelPolicyAddedEventType,

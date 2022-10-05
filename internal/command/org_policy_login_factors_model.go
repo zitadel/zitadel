@@ -212,14 +212,12 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilde
 
 func (wm *OrgAuthFactorsAllowedWriteModel) ToSecondFactorWriteModel(factor domain.SecondFactorType) *OrgSecondFactorWriteModel {
 	orgSecondFactorWriteModel := NewOrgSecondFactorWriteModel(wm.AggregateID, factor)
-	orgSecondFactorWriteModel.ProcessedSequence = wm.ProcessedSequence
 	orgSecondFactorWriteModel.State = wm.SecondFactors[factor].Org
 	return orgSecondFactorWriteModel
 }
 
 func (wm *OrgAuthFactorsAllowedWriteModel) ToMultiFactorWriteModel(factor domain.MultiFactorType) *OrgMultiFactorWriteModel {
 	orgMultiFactorWriteModel := NewOrgMultiFactorWriteModel(wm.AggregateID, factor)
-	orgMultiFactorWriteModel.ProcessedSequence = wm.ProcessedSequence
 	orgMultiFactorWriteModel.State = wm.MultiFactors[factor].Org
 	return orgMultiFactorWriteModel
 }

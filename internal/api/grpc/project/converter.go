@@ -27,7 +27,6 @@ func ProjectViewToPb(project *query.Project) *proj_pb.Project {
 		ProjectRoleAssertion:   project.ProjectRoleAssertion,
 		ProjectRoleCheck:       project.ProjectRoleCheck,
 		Details: object.ToViewDetailsPb(
-			project.Sequence,
 			project.CreationDate,
 			project.ChangeDate,
 			project.ResourceOwner,
@@ -47,7 +46,7 @@ func GrantedProjectViewToPb(project *query.ProjectGrant) *proj_pb.GrantedProject
 	return &proj_pb.GrantedProject{
 		ProjectId:        project.ProjectID,
 		GrantId:          project.GrantID,
-		Details:          object.ToViewDetailsPb(project.Sequence, project.CreationDate, project.ChangeDate, project.ResourceOwner),
+		Details:          object.ToViewDetailsPb(project.CreationDate, project.ChangeDate, project.ResourceOwner),
 		ProjectName:      project.ProjectName,
 		State:            projectGrantStateToPb(project.State),
 		ProjectOwnerId:   project.ResourceOwner,
@@ -187,8 +186,6 @@ func RoleViewToPb(role *query.ProjectRole) *proj_pb.Role {
 		DisplayName: role.DisplayName,
 		Group:       role.Group,
 		Details: object.ToViewDetailsPb(
-
-			role.Sequence,
 			role.CreationDate,
 			role.ChangeDate,
 			role.ResourceOwner,

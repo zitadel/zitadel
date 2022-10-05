@@ -60,7 +60,6 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 		Name:                       idp.Name,
 		StylingType:                model.IDPStylingType(idp.StylingType),
 		AutoRegister:               idp.AutoRegister,
-		Sequence:                   idp.Sequence,
 		CreationDate:               idp.CreationDate,
 		ChangeDate:                 idp.ChangeDate,
 		IDPProviderType:            model.IDPProviderType(idp.IDPProviderType),
@@ -85,7 +84,6 @@ func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
 }
 
 func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *models.Event) (err error) {
-	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch eventstore.EventType(event.Type) {
 	case instance.IDPConfigAddedEventType, org.IDPConfigAddedEventType:

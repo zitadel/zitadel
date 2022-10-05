@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -64,12 +65,12 @@ func (_ *UserSession) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{user.AggregateType, org.AggregateType}
 }
 
-func (u *UserSession) CurrentSequence(instanceID string) (uint64, error) {
+func (u *UserSession) CurrentCreationDate(instanceID string) (time.Time, error) {
 	sequence, err := u.view.GetLatestUserSessionSequence(instanceID)
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
-	return sequence.CurrentSequence, nil
+	return sequence.EventTimestamp, nil
 }
 
 func (u *UserSession) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
@@ -226,7 +227,7 @@ func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, in
 }
 
 func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
-	query, err := view.OrgByIDQuery(orgID, instanceID, 0)
+	query, err := view.OrgByIDQuery(orgID, instanceID, time.Time{})
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +241,7 @@ func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) 
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
-	if esOrg.Sequence == 0 {
+	if esOrg.CreationDate.IsZero() {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
 	}
 

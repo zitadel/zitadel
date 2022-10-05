@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/gamut"
@@ -65,12 +66,12 @@ func (_ *Styling) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{org.AggregateType, instance.AggregateType}
 }
 
-func (m *Styling) CurrentSequence(instanceID string) (uint64, error) {
+func (m *Styling) CurrentCreationDate(instanceID string) (time.Time, error) {
 	sequence, err := m.view.GetLatestStylingSequence(instanceID)
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
-	return sequence.CurrentSequence, nil
+	return sequence.EventTimestamp, nil
 }
 
 func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
@@ -80,16 +81,16 @@ func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error)
 	}
 	searchQuery := models.NewSearchQuery()
 	for _, sequence := range sequences {
-		var seq uint64
+		var seq time.Time
 		for _, instanceID := range instanceIDs {
 			if sequence.InstanceID == instanceID {
-				seq = sequence.CurrentSequence
+				seq = sequence.EventTimestamp
 				break
 			}
 		}
 		searchQuery.AddQuery().
 			AggregateTypeFilter(m.AggregateTypes()...).
-			LatestSequenceFilter(seq).
+			CreationDateNewerFilter(seq).
 			InstanceIDFilter(sequence.InstanceID)
 	}
 	return searchQuery, nil

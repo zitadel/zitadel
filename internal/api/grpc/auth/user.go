@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/change"
@@ -56,8 +57,9 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 }
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
-	sequence, limit, asc := change.ChangeQueryToQuery(req.Query)
-	changes, err := s.query.UserChanges(ctx, authz.GetCtxData(ctx).UserID, sequence, limit, asc, s.auditLogRetention)
+	_, limit, asc := change.ChangeQueryToQuery(req.Query)
+	//TODO:
+	changes, err := s.query.UserChanges(ctx, authz.GetCtxData(ctx).UserID, time.Now(), limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +79,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 	}
 	return &auth_pb.ListMyMetadataResponse{
 		Result:  metadata.UserMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Timestamp),
 	}, nil
 }
 
@@ -131,7 +133,7 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
 		Result:  UserGrantsToPb(res.UserGrants),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Timestamp),
 	}, nil
 }
 
@@ -198,7 +200,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 		return nil, err
 	}
 	return &auth_pb.ListMyProjectOrgsResponse{
-		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
+		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Timestamp),
 		Result:  org.OrgsToPb(orgs.Orgs),
 	}, nil
 }
@@ -263,7 +265,6 @@ func membershipToDomain(memberships []*query.Membership) []*domain.UserMembershi
 			ResourceOwner: membership.ResourceOwner,
 			//TODO: implement
 			// ResourceOwnerName: membership.ResourceOwnerName,
-			Sequence: membership.Sequence,
 		}
 	}
 	return result

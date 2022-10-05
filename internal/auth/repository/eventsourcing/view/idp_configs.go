@@ -57,8 +57,8 @@ func (v *View) UpdateIDPConfigSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(idpConfigTable)
 }
 
-func (v *View) GetLatestIDPConfigFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {
-	return v.latestFailedEvent(idpConfigTable, instanceID, sequence)
+func (v *View) GetLatestIDPConfigFailedEvent(instanceID, eventID string) (*global_view.FailedEvent, error) {
+	return v.latestFailedEvent(idpConfigTable, instanceID, eventID)
 }
 
 func (v *View) ProcessedIDPConfigFailedEvent(failedEvent *global_view.FailedEvent) error {

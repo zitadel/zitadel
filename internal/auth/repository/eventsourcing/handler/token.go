@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -64,12 +65,12 @@ func (_ *Token) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
 }
 
-func (p *Token) CurrentSequence(instanceID string) (uint64, error) {
+func (p *Token) CurrentCreationDate(instanceID string) (time.Time, error) {
 	sequence, err := p.view.GetLatestTokenSequence(instanceID)
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
-	return sequence.CurrentSequence, nil
+	return sequence.EventTimestamp, nil
 }
 
 func (t *Token) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
@@ -195,7 +196,7 @@ func (t *Token) OnSuccess() error {
 }
 
 func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (*proj_model.Project, error) {
-	query, err := proj_view.ProjectByIDQuery(projID, instanceID, 0)
+	query, err := proj_view.ProjectByIDQuery(projID, instanceID, time.Time{})
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +209,7 @@ func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return nil, err
 	}
-	if esProject.Sequence == 0 {
+	if esProject.CreationDate.IsZero() {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Dsdw2", "Errors.Project.NotFound")
 	}
 

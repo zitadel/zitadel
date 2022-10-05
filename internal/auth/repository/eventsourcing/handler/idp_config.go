@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -54,12 +56,12 @@ func (_ *IDPConfig) AggregateTypes() []models.AggregateType {
 	return []models.AggregateType{org.AggregateType, instance.AggregateType}
 }
 
-func (i *IDPConfig) CurrentSequence(instanceID string) (uint64, error) {
+func (i *IDPConfig) CurrentCreationDate(instanceID string) (time.Time, error) {
 	sequence, err := i.view.GetLatestIDPConfigSequence(instanceID)
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
-	return sequence.CurrentSequence, nil
+	return sequence.EventTimestamp, nil
 }
 
 func (i *IDPConfig) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {

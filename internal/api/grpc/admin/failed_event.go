@@ -27,7 +27,8 @@ func (s *Server) RemoveFailedEvent(ctx context.Context, req *admin_pb.RemoveFail
 	if req.Database != s.database {
 		err = s.administrator.RemoveFailedEvent(ctx, RemoveFailedEventRequestToModel(req))
 	} else {
-		err = s.query.RemoveFailedEvent(ctx, req.ViewName, req.FailedSequence)
+		//TODO:
+		err = s.query.RemoveFailedEvent(ctx, req.ViewName, "")
 	}
 	if err != nil {
 		return nil, err

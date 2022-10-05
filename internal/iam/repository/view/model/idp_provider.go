@@ -34,14 +34,12 @@ type IDPProviderView struct {
 	IDPProviderType int32  `json:"idpProviderType" gorm:"column:idp_provider_type"`
 	IDPState        int32  `json:"-" gorm:"column:idp_state"`
 
-	Sequence   uint64 `json:"-" gorm:"column:sequence"`
 	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
 func IDPProviderViewToModel(provider *IDPProviderView) *model.IDPProviderView {
 	return &model.IDPProviderView{
 		AggregateID:     provider.AggregateID,
-		Sequence:        provider.Sequence,
 		CreationDate:    provider.CreationDate,
 		ChangeDate:      provider.ChangeDate,
 		Name:            provider.Name,
@@ -62,7 +60,6 @@ func IDPProviderViewsToModel(providers []*IDPProviderView) []*model.IDPProviderV
 }
 
 func (i *IDPProviderView) AppendEvent(event *models.Event) (err error) {
-	i.Sequence = event.Sequence
 	i.ChangeDate = event.CreationDate
 	switch eventstore.EventType(event.Type) {
 	case instance.LoginPolicyIDPProviderAddedEventType,

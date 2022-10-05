@@ -19,7 +19,7 @@ func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsReques
 		return nil, err
 	}
 	return &mgmt_pb.ListActionsResponse{
-		Details: obj_grpc.ToListDetails(actions.Count, actions.Sequence, actions.Timestamp),
+		Details: obj_grpc.ToListDetails(actions.Count, actions.Timestamp),
 		Result:  action_grpc.ActionsToPb(actions.Actions),
 	}, nil
 }
@@ -42,7 +42,6 @@ func (s *Server) CreateAction(ctx context.Context, req *mgmt_pb.CreateActionRequ
 	return &mgmt_pb.CreateActionResponse{
 		Id: id,
 		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner,
 		),
@@ -56,7 +55,6 @@ func (s *Server) UpdateAction(ctx context.Context, req *mgmt_pb.UpdateActionRequ
 	}
 	return &mgmt_pb.UpdateActionResponse{
 		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner,
 		),
@@ -67,7 +65,6 @@ func (s *Server) DeactivateAction(ctx context.Context, req *mgmt_pb.DeactivateAc
 	details, err := s.command.DeactivateAction(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	return &mgmt_pb.DeactivateActionResponse{
 		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner,
 		),
@@ -81,7 +78,6 @@ func (s *Server) ReactivateAction(ctx context.Context, req *mgmt_pb.ReactivateAc
 	}
 	return &mgmt_pb.ReactivateActionResponse{
 		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner,
 		),

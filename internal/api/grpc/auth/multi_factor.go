@@ -45,7 +45,6 @@ func (s *Server) AddMyAuthFactorOTP(ctx context.Context, _ *auth_pb.AddMyAuthFac
 		Url:    otp.Url,
 		Secret: otp.SecretString,
 		Details: object.AddToDetailsPb(
-			otp.Sequence,
 			otp.ChangeDate,
 			otp.ResourceOwner,
 		),
@@ -85,7 +84,6 @@ func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFac
 			PublicKey: u2f.CredentialCreationData,
 		},
 		Details: object.AddToDetailsPb(
-			u2f.Sequence,
 			u2f.ChangeDate,
 			u2f.ResourceOwner,
 		),

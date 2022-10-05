@@ -18,7 +18,7 @@ func (s *Server) ListSecretGenerators(ctx context.Context, req *admin_pb.ListSec
 		return nil, err
 	}
 	return &admin_pb.ListSecretGeneratorsResponse{
-		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: object.ToListDetails(result.Count, result.Timestamp),
 	}, nil
 }
 
@@ -39,7 +39,6 @@ func (s *Server) UpdateSecretGenerator(ctx context.Context, req *admin_pb.Update
 	}
 	return &admin_pb.UpdateSecretGeneratorResponse{
 		Details: object.ChangeToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner),
 	}, nil
@@ -62,7 +61,6 @@ func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigR
 	}
 	return &admin_pb.AddSMTPConfigResponse{
 		Details: object.ChangeToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner),
 	}, nil
@@ -75,7 +73,6 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 	}
 	return &admin_pb.UpdateSMTPConfigResponse{
 		Details: object.ChangeToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner),
 	}, nil
@@ -88,7 +85,6 @@ func (s *Server) RemoveSMTPConfig(ctx context.Context, _ *admin_pb.RemoveSMTPCon
 	}
 	return &admin_pb.RemoveSMTPConfigResponse{
 		Details: object.ChangeToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner),
 	}, nil
@@ -101,7 +97,6 @@ func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.Upd
 	}
 	return &admin_pb.UpdateSMTPConfigPasswordResponse{
 		Details: object.ChangeToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner),
 	}, nil

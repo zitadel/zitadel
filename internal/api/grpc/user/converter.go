@@ -24,7 +24,6 @@ func UserToPb(user *query.User, assetPrefix string) *user_pb.User {
 		PreferredLoginName: user.PreferredLoginName,
 		Type:               UserTypeToPb(user, assetPrefix),
 		Details: object.ToViewDetailsPb(
-			user.Sequence,
 			user.CreationDate,
 			user.ChangeDate,
 			user.ResourceOwner,

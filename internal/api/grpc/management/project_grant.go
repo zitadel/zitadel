@@ -37,7 +37,7 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 	}
 	return &mgmt_pb.ListProjectGrantsResponse{
 		Result:  proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
-		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.Timestamp),
+		Details: object_grpc.ToListDetails(grants.Count, grants.Timestamp),
 	}, nil
 }
 
@@ -60,7 +60,7 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 	}
 	return &mgmt_pb.ListAllProjectGrantsResponse{
 		Result:  proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
-		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.Timestamp),
+		Details: object_grpc.ToListDetails(grants.Count, grants.Timestamp),
 	}, nil
 }
 
@@ -72,7 +72,6 @@ func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGra
 	return &mgmt_pb.AddProjectGrantResponse{
 		GrantId: grant.GrantID,
 		Details: object_grpc.AddToDetailsPb(
-			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
 		),
@@ -100,7 +99,6 @@ func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProj
 	}
 	return &mgmt_pb.UpdateProjectGrantResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			grant.Sequence,
 			grant.ChangeDate,
 			grant.ResourceOwner,
 		),
@@ -155,7 +153,7 @@ func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.L
 	roles := s.query.GetProjectGrantMemberRoles()
 	return &mgmt_pb.ListProjectGrantMemberRolesResponse{
 		Result:  roles,
-		Details: object_grpc.ToListDetails(uint64(len(roles)), 0, time.Now()),
+		Details: object_grpc.ToListDetails(uint64(len(roles)), time.Now()),
 	}, nil
 }
 
@@ -170,7 +168,7 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 	}
 	return &mgmt_pb.ListProjectGrantMembersResponse{
 		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), response.Members),
-		Details: object_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
+		Details: object_grpc.ToListDetails(response.Count, response.Timestamp),
 	}, nil
 }
 
@@ -181,7 +179,6 @@ func (s *Server) AddProjectGrantMember(ctx context.Context, req *mgmt_pb.AddProj
 	}
 	return &mgmt_pb.AddProjectGrantMemberResponse{
 		Details: object_grpc.AddToDetailsPb(
-			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
 		),
@@ -195,7 +192,6 @@ func (s *Server) UpdateProjectGrantMember(ctx context.Context, req *mgmt_pb.Upda
 	}
 	return &mgmt_pb.UpdateProjectGrantMemberResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
 		),

@@ -47,7 +47,7 @@ func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequ
 	}
 	return &system_pb.AddInstanceResponse{
 		InstanceId: id,
-		Details:    object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		Details:    object.AddToDetailsPb(details.EventDate, details.ResourceOwner),
 	}, nil
 }
 
@@ -58,7 +58,7 @@ func (s *Server) UpdateInstance(ctx context.Context, req *system_pb.UpdateInstan
 		return nil, err
 	}
 	return &system_pb.UpdateInstanceResponse{
-		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		Details: object.AddToDetailsPb(details.EventDate, details.ResourceOwner),
 	}, nil
 }
 
@@ -100,7 +100,7 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 	}
 	return &system_pb.ListDomainsResponse{
 		Result:  instance_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.Timestamp),
+		Details: object.ToListDetails(domains.Count, domains.Timestamp),
 	}, nil
 }
 
@@ -118,7 +118,7 @@ func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest)
 		return nil, err
 	}
 	return &system_pb.AddDomainResponse{
-		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		Details: object.AddToDetailsPb(details.EventDate, details.ResourceOwner),
 	}, nil
 }
 
@@ -129,7 +129,7 @@ func (s *Server) RemoveDomain(ctx context.Context, req *system_pb.RemoveDomainRe
 		return nil, err
 	}
 	return &system_pb.RemoveDomainResponse{
-		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		Details: object.ChangeToDetailsPb(details.EventDate, details.ResourceOwner),
 	}, nil
 }
 
@@ -140,6 +140,6 @@ func (s *Server) SetPrimaryDomain(ctx context.Context, req *system_pb.SetPrimary
 		return nil, err
 	}
 	return &system_pb.SetPrimaryDomainResponse{
-		Details: object.ChangeToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+		Details: object.ChangeToDetailsPb(details.EventDate, details.ResourceOwner),
 	}, nil
 }

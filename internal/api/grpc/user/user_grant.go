@@ -39,7 +39,6 @@ func UserGrantToPb(assetPrefix string, grant *query.UserGrant) *user_pb.UserGran
 		AvatarUrl:          domain.AvatarURL(assetPrefix, grant.UserResourceOwner, grant.AvatarURL),
 		PreferredLoginName: grant.PreferredLoginName,
 		Details: object.ToViewDetailsPb(
-			grant.Sequence,
 			grant.CreationDate,
 			grant.ChangeDate,
 			grant.ResourceOwner,

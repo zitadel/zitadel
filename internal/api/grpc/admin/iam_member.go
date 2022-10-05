@@ -13,7 +13,7 @@ func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMe
 	roles := s.query.GetIAMMemberRoles()
 	return &admin_pb.ListIAMMemberRolesResponse{
 		Roles:   roles,
-		Details: object.ToListDetails(uint64(len(roles)), 0, time.Now()),
+		Details: object.ToListDetails(uint64(len(roles)), time.Now()),
 	}, nil
 }
 
@@ -27,7 +27,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 		return nil, err
 	}
 	return &admin_pb.ListIAMMembersResponse{
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Timestamp),
 		//TODO: resource owner of user of the member instead of the membership resource owner
 		Result: member.MembersToPb("", res.Members),
 	}, nil
@@ -40,7 +40,6 @@ func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberReq
 	}
 	return &admin_pb.AddIAMMemberResponse{
 		Details: object.AddToDetailsPb(
-			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
 		),
@@ -54,7 +53,6 @@ func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMem
 	}
 	return &admin_pb.UpdateIAMMemberResponse{
 		Details: object.ChangeToDetailsPb(
-			member.Sequence,
 			member.ChangeDate,
 			member.ResourceOwner,
 		),

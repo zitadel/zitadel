@@ -32,7 +32,6 @@ func (s *Server) AddCustomLockoutPolicy(ctx context.Context, req *mgmt_pb.AddCus
 	}
 	return &mgmt_pb.AddCustomLockoutPolicyResponse{
 		Details: object.AddToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
@@ -46,7 +45,6 @@ func (s *Server) UpdateCustomLockoutPolicy(ctx context.Context, req *mgmt_pb.Upd
 	}
 	return &mgmt_pb.UpdateCustomLockoutPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),

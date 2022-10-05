@@ -84,7 +84,7 @@ type idpProviderViewProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*es_models.Event, error)
+	UserEventsByID(ctx context.Context, id string, creationDate time.Time) ([]*es_models.Event, error)
 }
 
 type userCommandProvider interface {
@@ -333,7 +333,6 @@ func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
 	return &domain.LockoutPolicy{
 		ObjectRoot: es_models.ObjectRoot{
 			AggregateID:   policy.ID,
-			Sequence:      policy.Sequence,
 			ResourceOwner: policy.ResourceOwner,
 			CreationDate:  policy.CreationDate,
 			ChangeDate:    policy.ChangeDate,
@@ -693,7 +692,6 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
 		ObjectRoot: es_models.ObjectRoot{
 			AggregateID:   policy.OrgID,
-			Sequence:      policy.Sequence,
 			ResourceOwner: policy.OrgID,
 			CreationDate:  policy.CreationDate,
 			ChangeDate:    policy.ChangeDate,
@@ -986,7 +984,6 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
 		ObjectRoot: es_models.ObjectRoot{
 			AggregateID:   p.ID,
-			Sequence:      p.Sequence,
 			ResourceOwner: p.ResourceOwner,
 			CreationDate:  p.CreationDate,
 			ChangeDate:    p.ChangeDate,
@@ -1019,7 +1016,6 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
 		ObjectRoot: es_models.ObjectRoot{
 			AggregateID:   p.ID,
-			Sequence:      p.Sequence,
 			ResourceOwner: p.ResourceOwner,
 			CreationDate:  p.CreationDate,
 			ChangeDate:    p.ChangeDate,
@@ -1142,7 +1138,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 		}
 		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.ChangeDate)
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
@@ -1223,7 +1219,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
-	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence)
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.ChangeDate)
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil

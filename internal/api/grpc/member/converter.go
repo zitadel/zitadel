@@ -34,7 +34,6 @@ func MemberToPb(assetAPIPrefix string, m *query.Member) *member_pb.Member {
 		DisplayName:        m.DisplayName,
 		AvatarUrl:          domain.AvatarURL(assetAPIPrefix, m.ResourceOwner, m.AvatarURL),
 		Details: object.ToViewDetailsPb(
-			m.Sequence,
 			m.CreationDate,
 			m.ChangeDate,
 			m.ResourceOwner,

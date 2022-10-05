@@ -12,7 +12,6 @@ func ModelPasswordAgePolicyToPb(policy *query.PasswordAgePolicy) *policy_pb.Pass
 		MaxAgeDays:     policy.MaxAgeDays,
 		ExpireWarnDays: policy.ExpireWarnDays,
 		Details: object.ToViewDetailsPb(
-			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
 			policy.ResourceOwner,

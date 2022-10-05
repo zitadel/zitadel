@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -46,11 +47,11 @@ func newUser(
 	return h
 }
 
-func (k *User) subscribe() {
-	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+func (u *User) subscribe() {
+	u.subscription = u.es.Subscribe(u.AggregateTypes()...)
 	go func() {
-		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+		for event := range u.subscription.Events {
+			query.ReduceEvent(u, event)
 		}
 	}()
 }
@@ -66,12 +67,12 @@ func (_ *User) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user_repo.AggregateType, org.AggregateType}
 }
 
-func (u *User) CurrentSequence(instanceID string) (uint64, error) {
+func (u *User) CurrentCreationDate(instanceID string) (time.Time, error) {
 	sequence, err := u.view.GetLatestUserSequence(instanceID)
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
-	return sequence.CurrentSequence, nil
+	return sequence.EventTimestamp, nil
 }
 
 func (u *User) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
@@ -150,7 +151,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 			if !errors.IsNotFound(err) {
 				return err
 			}
-			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, time.Time{})
 			if err != nil {
 				return err
 			}
@@ -173,7 +174,7 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 			if !errors.IsNotFound(err) {
 				return err
 			}
-			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, 0)
+			query, err := usr_view.UserByIDQuery(event.AggregateID, event.InstanceID, time.Time{})
 			if err != nil {
 				return err
 			}
@@ -272,7 +273,7 @@ func (u *User) OnSuccess() error {
 }
 
 func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
-	query, err := view.OrgByIDQuery(orgID, instanceID, 0)
+	query, err := view.OrgByIDQuery(orgID, instanceID, time.Time{})
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +287,7 @@ func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_m
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
-	if esOrg.Sequence == 0 {
+	if esOrg.CreationDate.IsZero() {
 		return nil, errors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
 	}
 

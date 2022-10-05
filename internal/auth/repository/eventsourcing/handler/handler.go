@@ -81,16 +81,16 @@ func withInstanceID(ctx context.Context, instanceID string) context.Context {
 func newSearchQuery(sequences []*repository.CurrentSequence, aggregateTypes []models.AggregateType, instanceIDs []string) *models.SearchQuery {
 	searchQuery := models.NewSearchQuery()
 	for _, sequence := range sequences {
-		var seq uint64
+		var creationDate time.Time
 		for _, instanceID := range instanceIDs {
 			if sequence.InstanceID == instanceID {
-				seq = sequence.CurrentSequence
+				creationDate = sequence.EventTimestamp
 				break
 			}
 		}
 		searchQuery.AddQuery().
 			AggregateTypeFilter(aggregateTypes...).
-			LatestSequenceFilter(seq).
+			CreationDateNewerFilter(creationDate).
 			InstanceIDFilter(sequence.InstanceID)
 	}
 	return searchQuery

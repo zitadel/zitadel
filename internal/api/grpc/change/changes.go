@@ -29,7 +29,6 @@ func ChangeToPb(change *query.Change, assetAPIPrefix string) *change_pb.Change {
 	return &change_pb.Change{
 		ChangeDate:               timestamppb.New(change.ChangeDate),
 		EventType:                message.NewLocalizedEventType(change.EventType),
-		Sequence:                 change.Sequence,
 		EditorId:                 change.ModifierId,
 		EditorDisplayName:        change.ModifierName,
 		EditorPreferredLoginName: change.ModifierLoginName,

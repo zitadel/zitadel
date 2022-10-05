@@ -77,8 +77,8 @@ func (v *View) UpdateIDPProviderSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(idpProviderTable)
 }
 
-func (v *View) GetLatestIDPProviderFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {
-	return v.latestFailedEvent(idpProviderTable, instanceID, sequence)
+func (v *View) GetLatestIDPProviderFailedEvent(instanceID, eventID string) (*global_view.FailedEvent, error) {
+	return v.latestFailedEvent(idpProviderTable, instanceID, eventID)
 }
 
 func (v *View) ProcessedIDPProviderFailedEvent(failedEvent *global_view.FailedEvent) error {

@@ -23,7 +23,6 @@ func (s *Server) UpdatePrivacyPolicy(ctx context.Context, req *admin_pb.UpdatePr
 	}
 	return &admin_pb.UpdatePrivacyPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),

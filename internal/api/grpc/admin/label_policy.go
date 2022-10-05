@@ -31,7 +31,6 @@ func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabe
 	}
 	return &admin_pb.UpdateLabelPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
@@ -45,7 +44,6 @@ func (s *Server) ActivateLabelPolicy(ctx context.Context, req *admin_pb.Activate
 	}
 	return &admin_pb.ActivateLabelPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -59,7 +57,6 @@ func (s *Server) RemoveLabelPolicyLogo(ctx context.Context, req *admin_pb.Remove
 	}
 	return &admin_pb.RemoveLabelPolicyLogoResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -73,7 +70,6 @@ func (s *Server) RemoveLabelPolicyLogoDark(ctx context.Context, req *admin_pb.Re
 	}
 	return &admin_pb.RemoveLabelPolicyLogoDarkResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -87,7 +83,6 @@ func (s *Server) RemoveLabelPolicyIcon(ctx context.Context, req *admin_pb.Remove
 	}
 	return &admin_pb.RemoveLabelPolicyIconResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -101,7 +96,6 @@ func (s *Server) RemoveLabelPolicyIconDark(ctx context.Context, req *admin_pb.Re
 	}
 	return &admin_pb.RemoveLabelPolicyIconDarkResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -115,7 +109,6 @@ func (s *Server) RemoveLabelPolicyFont(ctx context.Context, req *admin_pb.Remove
 	}
 	return &admin_pb.RemoveLabelPolicyFontResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),

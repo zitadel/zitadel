@@ -16,11 +16,11 @@ func FailedEventsViewToPb(failedEvents []*model.FailedEvent) []*system_pb.Failed
 
 func FailedEventViewToPb(failedEvent *model.FailedEvent) *system_pb.FailedEvent {
 	return &system_pb.FailedEvent{
-		Database:       failedEvent.Database,
-		ViewName:       failedEvent.ViewName,
-		FailedSequence: failedEvent.FailedSequence,
-		FailureCount:   failedEvent.FailureCount,
-		ErrorMessage:   failedEvent.ErrMsg,
+		Database:     failedEvent.Database,
+		ViewName:     failedEvent.ViewName,
+		FailureCount: failedEvent.FailureCount,
+		ErrorMessage: failedEvent.ErrMsg,
+		// TODO: eventid
 	}
 }
 
@@ -34,18 +34,18 @@ func FailedEventsToPb(database string, failedEvents *query.FailedEvents) []*syst
 
 func FailedEventToPb(database string, failedEvent *query.FailedEvent) *system_pb.FailedEvent {
 	return &system_pb.FailedEvent{
-		Database:       database,
-		ViewName:       failedEvent.ProjectionName,
-		FailedSequence: failedEvent.FailedSequence,
-		FailureCount:   failedEvent.FailureCount,
-		ErrorMessage:   failedEvent.Error,
+		Database:     database,
+		ViewName:     failedEvent.ProjectionName,
+		FailureCount: failedEvent.FailureCount,
+		ErrorMessage: failedEvent.Error,
+		// TODO: eventid
 	}
 }
 
 func RemoveFailedEventRequestToModel(req *system_pb.RemoveFailedEventRequest) *model.FailedEvent {
 	return &model.FailedEvent{
-		Database:       req.Database,
-		ViewName:       req.ViewName,
-		FailedSequence: req.FailedSequence,
+		Database: req.Database,
+		ViewName: req.ViewName,
+		// TODO: eventid
 	}
 }

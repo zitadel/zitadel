@@ -12,7 +12,7 @@ import (
 
 func OIDCSettingsToPb(config *query.OIDCSettings) *settings_pb.OIDCSettings {
 	return &settings_pb.OIDCSettings{
-		Details:                    obj_grpc.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.AggregateID),
+		Details:                    obj_grpc.ToViewDetailsPb(config.CreationDate, config.ChangeDate, config.AggregateID),
 		AccessTokenLifetime:        durationpb.New(config.AccessTokenLifetime),
 		IdTokenLifetime:            durationpb.New(config.IdTokenLifetime),
 		RefreshTokenIdleExpiration: durationpb.New(config.RefreshTokenIdleExpiration),

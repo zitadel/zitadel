@@ -81,8 +81,8 @@ func (v *View) UpdateRefreshTokenSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(refreshTokenTable)
 }
 
-func (v *View) GetLatestRefreshTokenFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(refreshTokenTable, instanceID, sequence)
+func (v *View) GetLatestRefreshTokenFailedEvent(instanceID, eventID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(refreshTokenTable, instanceID, eventID)
 }
 
 func (v *View) ProcessedRefreshTokenFailedEvent(failedEvent *repository.FailedEvent) error {

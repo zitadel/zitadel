@@ -93,7 +93,6 @@ func (c *Commands) AddOIDCSettings(ctx context.Context, settings *domain.OIDCSet
 		return nil, err
 	}
 	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil
@@ -111,7 +110,6 @@ func (c *Commands) ChangeOIDCSettings(ctx context.Context, settings *domain.OIDC
 		return nil, err
 	}
 	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
 	}, nil

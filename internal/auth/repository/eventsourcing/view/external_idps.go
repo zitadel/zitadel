@@ -72,8 +72,8 @@ func (v *View) UpdateExternalIDPSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(externalIDPTable)
 }
 
-func (v *View) GetLatestExternalIDPFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {
-	return v.latestFailedEvent(externalIDPTable, instanceID, sequence)
+func (v *View) GetLatestExternalIDPFailedEvent(instanceID, eventID string) (*global_view.FailedEvent, error) {
+	return v.latestFailedEvent(externalIDPTable, instanceID, eventID)
 }
 
 func (v *View) ProcessedExternalIDPFailedEvent(failedEvent *global_view.FailedEvent) error {

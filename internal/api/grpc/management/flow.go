@@ -42,7 +42,6 @@ func (s *Server) SetTriggerActions(ctx context.Context, req *mgmt_pb.SetTriggerA
 	}
 	return &mgmt_pb.SetTriggerActionsResponse{
 		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner,
 		),

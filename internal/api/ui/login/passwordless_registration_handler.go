@@ -131,7 +131,6 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 	return &domain.LabelPolicy{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   p.ID,
-			Sequence:      p.Sequence,
 			ResourceOwner: p.ResourceOwner,
 			CreationDate:  p.CreationDate,
 			ChangeDate:    p.ChangeDate,

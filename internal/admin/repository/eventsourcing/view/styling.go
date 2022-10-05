@@ -39,8 +39,8 @@ func (v *View) UpdateStylingSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(stylingTyble)
 }
 
-func (v *View) GetLatestStylingFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {
-	return v.latestFailedEvent(stylingTyble, instanceID, sequence)
+func (v *View) GetLatestStylingFailedEvent(instanceID, eventID string) (*global_view.FailedEvent, error) {
+	return v.latestFailedEvent(stylingTyble, instanceID, eventID)
 }
 
 func (v *View) ProcessedStylingFailedEvent(failedEvent *global_view.FailedEvent) error {

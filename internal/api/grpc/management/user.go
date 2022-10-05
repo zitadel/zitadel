@@ -69,13 +69,13 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	}
 	return &mgmt_pb.ListUsersResponse{
 		Result:  user_grpc.UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Timestamp),
 	}, nil
 }
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	res, err := s.query.UserChanges(ctx, req.UserId, sequence, limit, asc, s.auditLogRetention)
+	_, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	res, err := s.query.UserChanges(ctx, req.UserId, time.Now(), limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 	}
 	return &mgmt_pb.ListUserMetadataResponse{
 		Result:  metadata.UserMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Timestamp),
 	}, nil
 }
 
@@ -143,7 +143,6 @@ func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetada
 	}
 	return &mgmt_pb.SetUserMetadataResponse{
 		Details: obj_grpc.AddToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),
@@ -191,7 +190,6 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 	return &mgmt_pb.AddHumanUserResponse{
 		UserId: details.ID,
 		Details: obj_grpc.AddToDetailsPb(
-			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner,
 		),
@@ -250,7 +248,6 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	resp := &mgmt_pb.ImportHumanUserResponse{
 		UserId: addedHuman.AggregateID,
 		Details: obj_grpc.AddToDetailsPb(
-			addedHuman.Sequence,
 			addedHuman.ChangeDate,
 			addedHuman.ResourceOwner,
 		),
@@ -274,7 +271,6 @@ func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUser
 	return &mgmt_pb.AddMachineUserResponse{
 		UserId: machine.AggregateID,
 		Details: obj_grpc.AddToDetailsPb(
-			machine.Sequence,
 			machine.ChangeDate,
 			machine.ResourceOwner,
 		),
@@ -373,7 +369,6 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 	return &mgmt_pb.GetHumanProfileResponse{
 		Profile: user_grpc.ProfileToPb(profile, s.assetAPIPrefix(ctx)),
 		Details: obj_grpc.ToViewDetailsPb(
-			profile.Sequence,
 			profile.CreationDate,
 			profile.ChangeDate,
 			profile.ResourceOwner,
@@ -388,7 +383,6 @@ func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHuma
 	}
 	return &mgmt_pb.UpdateHumanProfileResponse{
 		Details: obj_grpc.ChangeToDetailsPb(
-			profile.Sequence,
 			profile.ChangeDate,
 			profile.ResourceOwner,
 		),
@@ -407,7 +401,6 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 	return &mgmt_pb.GetHumanEmailResponse{
 		Email: user_grpc.EmailToPb(email),
 		Details: obj_grpc.ToViewDetailsPb(
-			email.Sequence,
 			email.CreationDate,
 			email.ChangeDate,
 			email.ResourceOwner,
@@ -426,7 +419,6 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 	}
 	return &mgmt_pb.UpdateHumanEmailResponse{
 		Details: obj_grpc.ChangeToDetailsPb(
-			email.Sequence,
 			email.ChangeDate,
 			email.ResourceOwner,
 		),
@@ -473,7 +465,6 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 	return &mgmt_pb.GetHumanPhoneResponse{
 		Phone: user_grpc.PhoneToPb(phone),
 		Details: obj_grpc.ToViewDetailsPb(
-			phone.Sequence,
 			phone.CreationDate,
 			phone.ChangeDate,
 			phone.ResourceOwner,
@@ -492,7 +483,6 @@ func (s *Server) UpdateHumanPhone(ctx context.Context, req *mgmt_pb.UpdateHumanP
 	}
 	return &mgmt_pb.UpdateHumanPhoneResponse{
 		Details: obj_grpc.ChangeToDetailsPb(
-			phone.Sequence,
 			phone.ChangeDate,
 			phone.ResourceOwner,
 		),
@@ -646,7 +636,7 @@ func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.A
 	}
 	origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
 	return &mgmt_pb.AddPasswordlessRegistrationResponse{
-		Details:    obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Details:    obj_grpc.AddToDetailsPb(initCode.ChangeDate, initCode.ResourceOwner),
 		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
@@ -663,7 +653,7 @@ func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.
 		return nil, err
 	}
 	return &mgmt_pb.SendPasswordlessRegistrationResponse{
-		Details: obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Details: obj_grpc.AddToDetailsPb(initCode.ChangeDate, initCode.ResourceOwner),
 	}, nil
 }
 
@@ -684,7 +674,6 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 	}
 	return &mgmt_pb.UpdateMachineResponse{
 		Details: obj_grpc.ChangeToDetailsPb(
-			machine.Sequence,
 			machine.ChangeDate,
 			machine.ResourceOwner,
 		),
@@ -720,7 +709,7 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
 		Result:  authn.KeysToPb(result.AuthNKeys),
-		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: obj_grpc.ToListDetails(result.Count, result.Timestamp),
 	}, nil
 }
 
@@ -737,7 +726,6 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 		KeyId:      key.KeyID,
 		KeyDetails: keyDetails,
 		Details: obj_grpc.AddToDetailsPb(
-			key.Sequence,
 			key.ChangeDate,
 			key.ResourceOwner,
 		),
@@ -783,7 +771,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 	}
 	return &mgmt_pb.ListPersonalAccessTokensResponse{
 		Result:  user_grpc.PersonalAccessTokensToPb(result.PersonalAccessTokens),
-		Details: obj_grpc.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: obj_grpc.ToListDetails(result.Count, result.Timestamp),
 	}, nil
 }
 
@@ -801,7 +789,6 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPer
 		TokenId: pat.TokenID,
 		Token:   token,
 		Details: obj_grpc.AddToDetailsPb(
-			pat.Sequence,
 			pat.ChangeDate,
 			pat.ResourceOwner,
 		),
@@ -829,7 +816,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 	}
 	return &mgmt_pb.ListHumanLinkedIDPsResponse{
 		Result:  idp_grpc.IDPUserLinksToPb(res.Links),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Timestamp),
 	}, nil
 }
 func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
@@ -853,7 +840,7 @@ func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserM
 	}
 	return &mgmt_pb.ListUserMembershipsResponse{
 		Result:  user_grpc.MembershipsToMembershipsPb(response.Memberships),
-		Details: obj_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
+		Details: obj_grpc.ToListDetails(response.Count, response.Timestamp),
 	}, nil
 }
 

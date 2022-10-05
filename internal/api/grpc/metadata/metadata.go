@@ -20,7 +20,6 @@ func UserMetadataToPb(data *query.UserMetadata) *meta_pb.Metadata {
 		Key:   data.Key,
 		Value: data.Value,
 		Details: object.ToViewDetailsPb(
-			data.Sequence,
 			data.CreationDate,
 			data.ChangeDate,
 			data.ResourceOwner,
@@ -41,7 +40,6 @@ func OrgMetadataToPb(data *query.OrgMetadata) *meta_pb.Metadata {
 		Key:   data.Key,
 		Value: data.Value,
 		Details: object.ToViewDetailsPb(
-			data.Sequence,
 			data.CreationDate,
 			data.ChangeDate,
 			data.ResourceOwner,

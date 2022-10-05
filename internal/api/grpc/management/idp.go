@@ -29,7 +29,7 @@ func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsReques
 	}
 	return &mgmt_pb.ListOrgIDPsResponse{
 		Result:  idp_grpc.IDPViewsToPb(resp.IDPs),
-		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
+		Details: object_pb.ToListDetails(resp.Count, resp.Timestamp),
 	}, nil
 }
 
@@ -41,7 +41,6 @@ func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRe
 	return &mgmt_pb.AddOrgOIDCIDPResponse{
 		IdpId: config.IDPConfigID,
 		Details: object_pb.AddToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -56,7 +55,6 @@ func (s *Server) AddOrgJWTIDP(ctx context.Context, req *mgmt_pb.AddOrgJWTIDPRequ
 	return &mgmt_pb.AddOrgJWTIDPResponse{
 		IdpId: config.IDPConfigID,
 		Details: object_pb.AddToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -108,7 +106,6 @@ func (s *Server) UpdateOrgIDP(ctx context.Context, req *mgmt_pb.UpdateOrgIDPRequ
 	}
 	return &mgmt_pb.UpdateOrgIDPResponse{
 		Details: object_pb.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -122,7 +119,6 @@ func (s *Server) UpdateOrgIDPOIDCConfig(ctx context.Context, req *mgmt_pb.Update
 	}
 	return &mgmt_pb.UpdateOrgIDPOIDCConfigResponse{
 		Details: object_pb.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -136,7 +132,6 @@ func (s *Server) UpdateOrgIDPJWTConfig(ctx context.Context, req *mgmt_pb.UpdateO
 	}
 	return &mgmt_pb.UpdateOrgIDPJWTConfigResponse{
 		Details: object_pb.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),

@@ -32,7 +32,6 @@ func (s *Server) AddCustomPasswordComplexityPolicy(ctx context.Context, req *mgm
 	}
 	return &mgmt_pb.AddCustomPasswordComplexityPolicyResponse{
 		Details: object.AddToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),
@@ -46,7 +45,6 @@ func (s *Server) UpdateCustomPasswordComplexityPolicy(ctx context.Context, req *
 	}
 	return &mgmt_pb.UpdateCustomPasswordComplexityPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),

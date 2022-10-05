@@ -12,7 +12,7 @@ const (
 )
 
 func (v *View) saveCurrentSequence(viewName string, event *models.Event) error {
-	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, event.InstanceID, event.Sequence, event.CreationDate)
+	return repository.SaveCurrentSequence(v.Db, sequencesTable, viewName, event.InstanceID, event.ID, event.CreationDate)
 }
 
 func (v *View) latestSequence(viewName, instanceID string) (*repository.CurrentSequence, error) {

@@ -25,7 +25,6 @@ func (s *Server) UpdatePasswordAgePolicy(ctx context.Context, req *admin_pb.Upda
 	}
 	return &admin_pb.UpdatePasswordAgePolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			result.Sequence,
 			result.ChangeDate,
 			result.ResourceOwner,
 		),

@@ -28,7 +28,6 @@ func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginP
 	}
 	return &admin_pb.UpdateLoginPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
@@ -42,7 +41,7 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLogi
 	}
 	return &admin_pb.ListLoginPolicyIDPsResponse{
 		Result:  idp.IDPLoginPolicyLinksToPb(res.Links),
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Timestamp),
 	}, nil
 }
 
@@ -53,7 +52,6 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPTo
 	}
 	return &admin_pb.AddIDPToLoginPolicyResponse{
 		Details: object.AddToDetailsPb(
-			idp.Sequence,
 			idp.ChangeDate,
 			idp.ResourceOwner,
 		),
@@ -88,7 +86,7 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicySecondFactorsResponse{
-		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: object.ToListDetails(result.Count, result.Timestamp),
 		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Factors),
 	}, nil
 }
@@ -119,7 +117,7 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicyMultiFactorsResponse{
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Timestamp),
 		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Factors),
 	}, nil
 }

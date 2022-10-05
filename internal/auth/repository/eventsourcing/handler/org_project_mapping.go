@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -54,12 +56,12 @@ func (_ *OrgProjectMapping) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{project.AggregateType}
 }
 
-func (p *OrgProjectMapping) CurrentSequence(instanceID string) (uint64, error) {
+func (p *OrgProjectMapping) CurrentCreationDate(instanceID string) (time.Time, error) {
 	sequence, err := p.view.GetLatestOrgProjectMappingSequence(instanceID)
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
-	return sequence.CurrentSequence, nil
+	return sequence.EventTimestamp, nil
 }
 
 func (p *OrgProjectMapping) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {

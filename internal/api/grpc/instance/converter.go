@@ -19,7 +19,6 @@ func InstancesToPb(instances []*query.Instance) []*instance_pb.Instance {
 func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 	return &instance_pb.Instance{
 		Details: object.ToViewDetailsPb(
-			instance.Sequence,
 			instance.CreationDate,
 			instance.ChangeDate,
 			instance.InstanceID(),
@@ -35,7 +34,6 @@ func InstanceToPb(instance *query.Instance) *instance_pb.Instance {
 func InstanceDetailToPb(instance *query.Instance) *instance_pb.InstanceDetail {
 	return &instance_pb.InstanceDetail{
 		Details: object.ToViewDetailsPb(
-			instance.Sequence,
 			instance.CreationDate,
 			instance.ChangeDate,
 			instance.InstanceID(),
@@ -106,7 +104,6 @@ func DomainToPb(d *query.InstanceDomain) *instance_pb.Domain {
 		Primary:   d.IsPrimary,
 		Generated: d.IsGenerated,
 		Details: object.ToViewDetailsPb(
-			d.Sequence,
 			d.CreationDate,
 			d.ChangeDate,
 			d.InstanceID,

@@ -74,13 +74,11 @@ func AddToDetailsPb(
 }
 
 func ToListDetails(
-	totalResult,
-	processedSequence uint64,
+	totalResult uint64,
 	viewTimestamp time.Time,
 ) *object_pb.ListDetails {
 	details := &object_pb.ListDetails{
-		TotalResult:       totalResult,
-		ProcessedSequence: processedSequence,
+		TotalResult: totalResult,
 	}
 	if !viewTimestamp.IsZero() {
 		details.ViewTimestamp = timestamppb.New(viewTimestamp)

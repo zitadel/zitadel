@@ -155,8 +155,8 @@ func (v *View) UpdateUserSpoolerRunTimestamp() error {
 	return v.updateSpoolerRunSequence(userTable)
 }
 
-func (v *View) GetLatestUserFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(userTable, instanceID, sequence)
+func (v *View) GetLatestUserFailedEvent(instanceID, eventID string) (*repository.FailedEvent, error) {
+	return v.latestFailedEvent(userTable, instanceID, eventID)
 }
 
 func (v *View) ProcessedUserFailedEvent(failedEvent *repository.FailedEvent) error {

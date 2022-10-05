@@ -9,7 +9,7 @@ import (
 func NotificationProviderToPb(provider *query.DebugNotificationProvider) *settings_pb.DebugNotificationProvider {
 	mapped := &settings_pb.DebugNotificationProvider{
 		Compact: provider.Compact,
-		Details: obj_pb.ToViewDetailsPb(provider.Sequence, provider.CreationDate, provider.ChangeDate, provider.AggregateID),
+		Details: obj_pb.ToViewDetailsPb(provider.CreationDate, provider.ChangeDate, provider.AggregateID),
 	}
 	return mapped
 }

@@ -12,7 +12,6 @@ func writeModelToObjectRoot(writeModel eventstore.WriteModel) models.ObjectRoot 
 		AggregateID:   writeModel.AggregateID,
 		ChangeDate:    writeModel.ChangeDate,
 		ResourceOwner: writeModel.ResourceOwner,
-		Sequence:      writeModel.ProcessedSequence,
 	}
 }
 

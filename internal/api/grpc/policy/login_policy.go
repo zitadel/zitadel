@@ -31,7 +31,6 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		MultiFactors:               ModelMultiFactorTypesToPb(policy.MultiFactors),
 		Idps:                       idp_grpc.IDPLoginPolicyLinksToPb(policy.IDPLinks),
 		Details: &object.ObjectDetails{
-			Sequence:      policy.Sequence,
 			CreationDate:  timestamppb.New(policy.CreationDate),
 			ChangeDate:    timestamppb.New(policy.ChangeDate),
 			ResourceOwner: policy.OrgID,

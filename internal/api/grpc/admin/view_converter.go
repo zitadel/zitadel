@@ -20,8 +20,8 @@ func ViewToPb(view *model.View) *admin_pb.View {
 		Database:                 view.Database,
 		ViewName:                 view.ViewName,
 		LastSuccessfulSpoolerRun: timestamppb.New(view.LastSuccessfulSpoolerRun),
-		ProcessedSequence:        view.CurrentSequence,
-		EventTimestamp:           timestamppb.New(view.EventTimestamp),
+		//TODO: ProcessedSequence:        view.CurrentSequence,
+		EventTimestamp: timestamppb.New(view.EventTimestamp),
 	}
 }
 

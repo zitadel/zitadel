@@ -76,9 +76,9 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 		return p.certificateToCertificateAndKey(selectCertificate(certs.Certificates))
 	}
 
-	var sequence uint64
+	var sequence time.Time
 	if certs.LatestSequence != nil {
-		sequence = certs.LatestSequence.Sequence
+		sequence = certs.LatestSequence.Timestamp
 	}
 
 	return nil, p.refreshCertificate(ctx, usage, sequence)
@@ -87,7 +87,7 @@ func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 func (p *Storage) refreshCertificate(
 	ctx context.Context,
 	usage domain.KeyUsage,
-	sequence uint64,
+	sequence time.Time,
 ) error {
 	ok, err := p.ensureIsLatestCertificate(ctx, sequence)
 	if err != nil {
@@ -103,15 +103,15 @@ func (p *Storage) refreshCertificate(
 	return nil
 }
 
-func (p *Storage) ensureIsLatestCertificate(ctx context.Context, sequence uint64) (bool, error) {
+func (p *Storage) ensureIsLatestCertificate(ctx context.Context, currentTimestamp time.Time) (bool, error) {
 	maxSequence, err := p.getMaxKeySequence(ctx)
 	if err != nil {
 		return false, fmt.Errorf("error retrieving new events: %w", err)
 	}
-	return sequence == maxSequence, nil
+	return currentTimestamp.Equal(maxSequence), nil
 }
 
-func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage, sequence uint64) error {
+func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage domain.KeyUsage, sequence time.Time) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	ctx = setSAMLCtx(ctx)
@@ -151,8 +151,8 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 	}
 }
 
-func (p *Storage) getMaxKeySequence(ctx context.Context) (uint64, error) {
-	return p.eventstore.LatestSequence(ctx,
+func (p *Storage) getMaxKeySequence(ctx context.Context) (time.Time, error) {
+	return p.eventstore.LatestCreationDate(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxCreationDate).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AddQuery().

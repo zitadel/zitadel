@@ -23,7 +23,6 @@ func (s *Server) UpdateLockoutPolicy(ctx context.Context, req *admin_pb.UpdateLo
 	}
 	return &admin_pb.UpdateLockoutPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),

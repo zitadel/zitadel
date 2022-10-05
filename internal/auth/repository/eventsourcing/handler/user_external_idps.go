@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -69,12 +70,12 @@ func (_ *ExternalIDP) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, instance.AggregateType, org.AggregateType}
 }
 
-func (i *ExternalIDP) CurrentSequence(instanceID string) (uint64, error) {
+func (i *ExternalIDP) CurrentCreationDate(instanceID string) (time.Time, error) {
 	sequence, err := i.view.GetLatestExternalIDPSequence(instanceID)
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
-	return sequence.CurrentSequence, nil
+	return sequence.EventTimestamp, nil
 }
 
 func (i *ExternalIDP) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {

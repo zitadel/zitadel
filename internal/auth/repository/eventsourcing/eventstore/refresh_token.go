@@ -41,7 +41,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, refreshToken st
 		tokenView.UserID = userID
 	}
 
-	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.Sequence)
+	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.ChangeDate)
 	if errors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, errors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
 	}
@@ -79,14 +79,13 @@ func (r *RefreshTokenRepo) SearchMyRefreshTokens(ctx context.Context, userID str
 		Offset:      request.Offset,
 		Limit:       request.Limit,
 		TotalResult: count,
-		Sequence:    sequence.CurrentSequence,
 		Timestamp:   sequence.LastSuccessfulSpoolerRun,
 		Result:      model.RefreshTokenViewsToModel(tokens),
 	}, nil
 }
 
-func (r *RefreshTokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64) ([]*models.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence)
+func (r *RefreshTokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, creationDate time.Time) ([]*models.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, instanceID, creationDate)
 	if err != nil {
 		return nil, err
 	}

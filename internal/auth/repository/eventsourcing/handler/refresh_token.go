@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/zitadel/logging"
 
@@ -58,12 +59,12 @@ func (t *RefreshToken) AggregateTypes() []es_models.AggregateType {
 	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
 }
 
-func (t *RefreshToken) CurrentSequence(instanceID string) (uint64, error) {
+func (t *RefreshToken) CurrentCreationDate(instanceID string) (time.Time, error) {
 	sequence, err := t.view.GetLatestRefreshTokenSequence(instanceID)
 	if err != nil {
-		return 0, err
+		return time.Time{}, err
 	}
-	return sequence.CurrentSequence, nil
+	return sequence.EventTimestamp, nil
 }
 
 func (t *RefreshToken) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {

@@ -50,7 +50,6 @@ func MembershipToMembershipPb(membership *query.Membership) *user_pb.Membership 
 		DisplayName: name,
 		Roles:       membership.Roles,
 		Details: object.ToViewDetailsPb(
-			membership.Sequence,
 			membership.CreationDate,
 			membership.ChangeDate,
 			membership.ResourceOwner,

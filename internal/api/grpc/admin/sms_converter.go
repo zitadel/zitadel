@@ -30,7 +30,7 @@ func SMSConfigsToPb(configs []*query.SMSConfig) []*settings_pb.SMSProvider {
 
 func SMSConfigToProviderPb(config *query.SMSConfig) *settings_pb.SMSProvider {
 	return &settings_pb.SMSProvider{
-		Details: object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
+		Details: object.ToViewDetailsPb(config.CreationDate, config.ChangeDate, config.ResourceOwner),
 		Id:      config.ID,
 		State:   smsStateToPb(config.State),
 		Config:  SMSConfigToPb(config),

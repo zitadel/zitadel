@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
@@ -34,13 +35,13 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	}
 	return &mgmt_pb.ListAppsResponse{
 		Result:  project_grpc.AppsToPb(apps.Apps),
-		Details: object_grpc.ToListDetails(apps.Count, apps.Sequence, apps.Timestamp),
+		Details: object_grpc.ToListDetails(apps.Count, apps.Timestamp),
 	}, nil
 }
 
 func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChangesRequest) (*mgmt_pb.ListAppChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
-	res, err := s.query.ApplicationChanges(ctx, req.ProjectId, req.AppId, sequence, limit, asc, s.auditLogRetention)
+	_, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
+	res, err := s.query.ApplicationChanges(ctx, req.ProjectId, req.AppId, time.Now(), limit, asc, s.auditLogRetention)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +61,7 @@ func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest)
 	}
 	return &mgmt_pb.AddOIDCAppResponse{
 		AppId:              app.AppID,
-		Details:            object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
+		Details:            object_grpc.AddToDetailsPb(app.ChangeDate, app.ResourceOwner),
 		ClientId:           app.ClientID,
 		ClientSecret:       app.ClientSecretString,
 		NoneCompliant:      app.Compliance.NoneCompliant,
@@ -74,7 +75,7 @@ func (s *Server) AddSAMLApp(ctx context.Context, req *mgmt_pb.AddSAMLAppRequest)
 	}
 	return &mgmt_pb.AddSAMLAppResponse{
 		AppId:   app.AppID,
-		Details: object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
+		Details: object_grpc.AddToDetailsPb(app.ChangeDate, app.ResourceOwner),
 	}, nil
 }
 
@@ -89,7 +90,7 @@ func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (
 	}
 	return &mgmt_pb.AddAPIAppResponse{
 		AppId:        app.AppID,
-		Details:      object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
+		Details:      object_grpc.AddToDetailsPb(app.ChangeDate, app.ResourceOwner),
 		ClientId:     app.ClientID,
 		ClientSecret: app.ClientSecretString,
 	}, nil
@@ -112,7 +113,6 @@ func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOID
 	}
 	return &mgmt_pb.UpdateOIDCAppConfigResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -126,7 +126,6 @@ func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAM
 	}
 	return &mgmt_pb.UpdateSAMLAppConfigResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -140,7 +139,6 @@ func (s *Server) UpdateAPIAppConfig(ctx context.Context, req *mgmt_pb.UpdateAPIA
 	}
 	return &mgmt_pb.UpdateAPIAppConfigResponse{
 		Details: object_grpc.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -189,7 +187,6 @@ func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, req *mgmt_pb.Re
 	return &mgmt_pb.RegenerateOIDCClientSecretResponse{
 		ClientSecret: config.ClientSecretString,
 		Details: object_grpc.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -208,7 +205,6 @@ func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.Reg
 	return &mgmt_pb.RegenerateAPIClientSecretResponse{
 		ClientSecret: config.ClientSecretString,
 		Details: object_grpc.ChangeToDetailsPb(
-			config.Sequence,
 			config.ChangeDate,
 			config.ResourceOwner,
 		),
@@ -248,7 +244,7 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 	}
 	return &mgmt_pb.ListAppKeysResponse{
 		Result:  authn_grpc.KeysToPb(keys.AuthNKeys),
-		Details: object_grpc.ToListDetails(keys.Count, keys.Sequence, keys.Timestamp),
+		Details: object_grpc.ToListDetails(keys.Count, keys.Timestamp),
 	}, nil
 }
 
@@ -263,7 +259,7 @@ func (s *Server) AddAppKey(ctx context.Context, req *mgmt_pb.AddAppKeyRequest) (
 	}
 	return &mgmt_pb.AddAppKeyResponse{
 		Id:         key.KeyID,
-		Details:    object_grpc.AddToDetailsPb(key.Sequence, key.ChangeDate, key.ResourceOwner),
+		Details:    object_grpc.AddToDetailsPb(key.ChangeDate, key.ResourceOwner),
 		KeyDetails: keyDetails,
 	}, nil
 }

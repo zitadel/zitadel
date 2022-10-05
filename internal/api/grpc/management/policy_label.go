@@ -40,7 +40,6 @@ func (s *Server) AddCustomLabelPolicy(ctx context.Context, req *mgmt_pb.AddCusto
 	}
 	return &mgmt_pb.AddCustomLabelPolicyResponse{
 		Details: object.AddToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
@@ -54,7 +53,6 @@ func (s *Server) UpdateCustomLabelPolicy(ctx context.Context, req *mgmt_pb.Updat
 	}
 	return &mgmt_pb.UpdateCustomLabelPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
@@ -68,7 +66,6 @@ func (s *Server) ActivateCustomLabelPolicy(ctx context.Context, req *mgmt_pb.Act
 	}
 	return &mgmt_pb.ActivateCustomLabelPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -92,7 +89,6 @@ func (s *Server) RemoveCustomLabelPolicyLogo(ctx context.Context, req *mgmt_pb.R
 	}
 	return &mgmt_pb.RemoveCustomLabelPolicyLogoResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -106,7 +102,6 @@ func (s *Server) RemoveCustomLabelPolicyLogoDark(ctx context.Context, req *mgmt_
 	}
 	return &mgmt_pb.RemoveCustomLabelPolicyLogoDarkResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -120,7 +115,6 @@ func (s *Server) RemoveCustomLabelPolicyIcon(ctx context.Context, req *mgmt_pb.R
 	}
 	return &mgmt_pb.RemoveCustomLabelPolicyIconResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -134,7 +128,6 @@ func (s *Server) RemoveCustomLabelPolicyIconDark(ctx context.Context, req *mgmt_
 	}
 	return &mgmt_pb.RemoveCustomLabelPolicyIconDarkResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
@@ -148,7 +141,6 @@ func (s *Server) RemoveCustomLabelPolicyFont(ctx context.Context, req *mgmt_pb.R
 	}
 	return &mgmt_pb.RemoveCustomLabelPolicyFontResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.Sequence,
 			policy.EventDate,
 			policy.ResourceOwner,
 		),
