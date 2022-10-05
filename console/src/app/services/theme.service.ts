@@ -29,7 +29,6 @@ const TEXT = '#000000';
 export class ThemeService {
   private _darkTheme: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   public isDarkTheme: Observable<boolean> = this._darkTheme.asObservable();
-  public labelpolicy?: LabelPolicy.AsObject;
   public loading: boolean = false;
   private primaryColorPalette: Color[] = [];
   private warnColorPalette: Color[] = [];
@@ -157,7 +156,6 @@ export class ThemeService {
       let darkText = labelpolicy?.fontColorDark ?? DARK_TEXT;
       let lightText = labelpolicy?.fontColor ?? TEXT;
 
-      console.log(labelpolicy, darkPrimary);
       this.savePrimaryColor(darkPrimary, true);
       this.savePrimaryColor(lightPrimary, false);
 

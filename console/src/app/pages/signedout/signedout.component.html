@@ -1,18 +1,10 @@
 <div class="signed-out-wrap">
   <div class="block">
     <div class="signed-out-header">
-      <ng-container *ngIf="themeService.labelpolicy; else zitadelLogo">
-        <img
-          alt="logo"
-          *ngIf="dark && themeService.labelpolicy.logoUrlDark; else lighttheme"
-          [src]="themeService.labelpolicy.logoUrlDark"
-        />
+      <ng-container *ngIf="labelpolicy; else zitadelLogo">
+        <img alt="logo" *ngIf="dark && labelpolicy.logoUrlDark; else lighttheme" [src]="labelpolicy.logoUrlDark" />
         <ng-template #lighttheme>
-          <img
-            *ngIf="themeService.labelpolicy.logoUrl; else zitadelLogo"
-            alt="logo"
-            [src]="themeService.labelpolicy.logoUrl"
-          />
+          <img *ngIf="labelpolicy.logoUrl; else zitadelLogo" alt="logo" [src]="labelpolicy.logoUrl" />
         </ng-template>
       </ng-container>
 
@@ -25,7 +17,8 @@
 
       <p class="cnsl-secondary-text">{{ 'USER.SIGNEDOUT' | translate }}</p>
 
-      <button
+      <a
+        *ngIf="!labelpolicy"
         class="cnsl-action-button"
         matTooltip="{{ 'ACTIONS.LOGIN' | translate }}"
         color="primary"
@@ -34,7 +27,19 @@
       >
         <i class="las la-sign-in-alt"></i>
         <span>{{ 'USER.SIGNEDOUT_BTN' | translate }}</span>
-      </button>
+      </a>
+
+      <a
+        *ngIf="labelpolicy"
+        class="cnsl-action-button"
+        matTooltip="{{ 'ACTIONS.LOGIN' | translate }}"
+        color="primary"
+        mat-raised-button
+        href="/users/me"
+      >
+        <i class="las la-sign-in-alt"></i>
+        <span>{{ 'USER.SIGNEDOUT_BTN' | translate }}</span>
+      </a>
     </div>
   </div>
 </div>

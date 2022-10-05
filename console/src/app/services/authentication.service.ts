@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, lastValueFrom, Observable } from 'rxjs';
+import { GrpcAuthService } from './grpc-auth.service';
 
 import { StatehandlerService } from './statehandler/statehandler.service';
 
@@ -49,8 +50,8 @@ export class AuthenticationService {
     return this.authenticated;
   }
 
-  public signout(): void {
-    this.oauthService.logOut();
+  public signout(state?: string): void {
+    this.oauthService.logOut(false, state ?? '');
     this._authenticated = false;
     this._authenticationChanged.next(false);
   }

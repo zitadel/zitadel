@@ -1,18 +1,18 @@
 <mat-toolbar class="header-wrapper">
   <div class="header-content">
-    <a class="title custom" [routerLink]="['/']" *ngIf="labelpolicy; else defaultHome">
+    <a class="title custom" [routerLink]="['/']" *ngIf="authService.labelpolicy | async as lP; else defaultHome">
       <img
         class="logo"
         alt="home logo"
         *ngIf="isDarkTheme; else customlighttheme"
-        [src]="labelpolicy.iconUrlDark ? labelpolicy.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
+        [src]="lP.iconUrlDark ? lP.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
         (error)="errorHandler($event, './assets/images/zitadel-logo-solo-light.svg')"
       />
       <ng-template #customlighttheme>
         <img
           alt="home logo"
           class="logo"
-          [src]="labelpolicy.iconUrl ? labelpolicy.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
+          [src]="lP.iconUrl ? lP.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
           (error)="errorHandler($event, './assets/images/zitadel-logo-solo-dark.svg')"
         />
       </ng-template>

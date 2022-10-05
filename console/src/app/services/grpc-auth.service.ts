@@ -9,8 +9,10 @@ import {
   finalize,
   map,
   mergeMap,
+  pairwise,
   switchMap,
   take,
+  tap,
   timeout,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -136,6 +138,10 @@ export class GrpcAuthService {
   );
 
   public labelpolicy$!: Observable<LabelPolicy.AsObject>;
+  public labelpolicy: BehaviorSubject<LabelPolicy.AsObject | undefined> = new BehaviorSubject<
+    LabelPolicy.AsObject | undefined
+  >(undefined);
+
   public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
@@ -156,8 +162,9 @@ export class GrpcAuthService {
       map((policy) => policy.policy as LabelPolicy.AsObject),
     );
 
-    this.labelpolicy$.subscribe((labelpolicy) => {
-      themeService.applyLabelPolicy(labelpolicy);
+    this.labelpolicy$.subscribe((policy) => {
+      themeService.applyLabelPolicy(policy);
+      this.labelpolicy.next(policy);
     });
 
     this.user = merge(

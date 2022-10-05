@@ -8,11 +8,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject } from 'rxjs';
-import { map, take, takeUntil } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org } from './proto/generated/zitadel/org_pb';
-import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
+import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard-shortcuts.service';
@@ -47,7 +47,6 @@ export class AppComponent implements OnDestroy {
   public showProjectSection: boolean = false;
 
   private destroy$: Subject<void> = new Subject();
-  public labelpolicy: LabelPolicy.AsObject | undefined = undefined;
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
