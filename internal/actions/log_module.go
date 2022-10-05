@@ -15,10 +15,10 @@ func (*logrus) Log(s string) {
 	logging.WithFields("message", s).Info("log from action")
 }
 func (*logrus) Warn(s string) {
-	logging.WithFields("message", s).Info("log from action")
+	logging.WithFields("message", s).Info("warn from action")
 }
 func (*logrus) Error(s string) {
-	logging.WithFields("message", s).Info("log from action")
+	logging.WithFields("message", s).Info("error from action")
 }
 
 func WithLogger(logger console.Printer) Option {

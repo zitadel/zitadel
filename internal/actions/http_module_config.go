@@ -93,5 +93,6 @@ type DomainChecker struct {
 }
 
 func (c *DomainChecker) Matches(domain string) bool {
+	//TODO: allow wild cards
 	return c.Domain == domain
 }

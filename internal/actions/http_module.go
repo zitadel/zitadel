@@ -116,6 +116,11 @@ func (c *HTTP) fetch(ctx context.Context) func(call goja.FunctionCall) goja.Valu
 	}
 }
 
+// the first argument has to be a string and is required
+// the second agrument is optional and an object with the following fields possible:
+// - `Headers`: map with string key and value of type string or string array
+// - `Body`: json body of the request
+// - `Method`: http method type
 func (c *HTTP) buildHTTPRequest(ctx context.Context, args []goja.Value) (req *http.Request) {
 	if len(args) > 2 {
 		logging.WithFields("count", len(args)).Debug("more than 2 args provided")
@@ -147,7 +152,7 @@ func parseHeaders(headers *goja.Object) http.Header {
 	h := make(http.Header, len(headers.Keys()))
 	for _, k := range headers.Keys() {
 		header := headers.Get(k).Export()
-		values := []string{}
+		var values []string
 
 		switch headerValue := header.(type) {
 		case string:

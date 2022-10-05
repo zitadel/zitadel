@@ -40,10 +40,8 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 	defer func() {
 		t.Stop()
 	}()
-	errCh := make(chan error)
-	defer close(errCh)
 
-	return executeFn(ctx, config, fn)
+	return executeFn(config, fn)
 }
 
 func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields, script string, opts []Option) (config *runConfig, err error) {
@@ -82,7 +80,7 @@ func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields,
 	return config, err
 }
 
-func executeFn(ctx context.Context, config *runConfig, fn jsAction) (err error) {
+func executeFn(config *runConfig, fn jsAction) (err error) {
 	defer func() {
 		r := recover()
 		if r != nil && !config.allowedToFail {

@@ -23,21 +23,27 @@ func SetFields(name string, values ...interface{}) FieldOption {
 
 		for _, value := range values {
 			val, ok := value.(FieldOption)
-			// should be a primitive type or function
+			// is the lowest field and can be set without further checks
+
 			if !ok {
+				// {
+				//	"value": "some value"
+				// }
 				p.set(name, value)
 				continue
 			}
 
-			// another SetFields call
-			// type of current fields value must be parameter{}
 			var field fields
 			if f, ok := p.fields[name]; ok {
+				// check if the found field is an object
 				if field, ok = f.(fields); !ok {
-					logging.WithFields("sub", name).Warn("sub is not a parameter{}")
+					// panic because overwriting fields is not allowed
+					logging.WithFields("sub", name).Warn("sub is not an object")
 					panic("unable to prepare parameter")
 				}
 			} else {
+				// field does not exist so far.
+				// sub object for field can be created
 				field = fields{}
 				p.fields[name] = field
 			}

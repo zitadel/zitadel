@@ -28,7 +28,7 @@ func (s FlowType) Valid() bool {
 }
 
 func (s FlowType) HasTrigger(triggerType TriggerType) bool {
-	for _, trigger := range s.TriggerTypess() {
+	for _, trigger := range s.TriggerTypes() {
 		if trigger == triggerType {
 			return true
 		}
@@ -36,7 +36,7 @@ func (s FlowType) HasTrigger(triggerType TriggerType) bool {
 	return false
 }
 
-func (s FlowType) TriggerTypess() []TriggerType {
+func (s FlowType) TriggerTypes() []TriggerType {
 	switch s {
 	case FlowTypeExternalAuthentication:
 		return []TriggerType{

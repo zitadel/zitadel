@@ -26,7 +26,6 @@ type runConfig struct {
 	timeout,
 	prepareTimeout time.Duration
 	modules map[string]require.ModuleLoader
-	end     time.Time
 
 	vm       *goja.Runtime
 	ctxParam *ctxConfig
@@ -68,8 +67,6 @@ func newRunConfig(ctx context.Context, opts ...Option) *runConfig {
 	if config.prepareTimeout > config.timeout {
 		config.prepareTimeout = config.timeout
 	}
-
-	config.end = time.Now().Add(config.timeout)
 
 	return config
 }

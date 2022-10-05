@@ -10,6 +10,7 @@ import (
 	message_pb "github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
+// for backward compatability: old enum identifiers are mapped as well
 func FlowTypeToDomain(flowType string) domain.FlowType {
 	switch flowType {
 	case "FLOW_TYPE_EXTERNAL_AUTHENTICATION", domain.FlowTypeExternalAuthentication.ID():

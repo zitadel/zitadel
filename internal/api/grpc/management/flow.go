@@ -22,7 +22,7 @@ func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequ
 }
 
 func (s *Server) ListFlowTriggerTypes(ctx context.Context, req *mgmt_pb.ListFlowTriggerTypesRequest) (*mgmt_pb.ListFlowTriggerTypesResponse, error) {
-	triggerTypes := action_grpc.FlowTypeToDomain(req.Type).TriggerTypess()
+	triggerTypes := action_grpc.FlowTypeToDomain(req.Type).TriggerTypes()
 	if len(triggerTypes) == 0 {
 		return nil, errors.ThrowNotFound(nil, "MANAG-P2OBk", "Errors.NotFound")
 	}
