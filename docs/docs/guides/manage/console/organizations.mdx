@@ -33,22 +33,35 @@ The customer needs to fill in the form with the organization name and the contac
 
 ## How ZITADEL handles usernames
 
-As we mentioned before, each organization has its own pool of usernames, which includes human and service.
+As of October 2022, ZITADEL uses your users email as their username to login.
+This means that usernames for your whole instance are unique.
 
-This means that, for example, a user with the username `road.runner`, can only exist once in an organization called `ACME`. ZITADEL will automatically generate a "logonname" for each consisting of `{username}@{domainname}.{zitadeldomain}`, in our example `road.runner@acme.zitadel.cloud`.
+### User Loginname must contain orgdomain
 
-When you verify your domain name, then ZITADEL will generate additional logonames for each user with the verified domain. If our example organization would own the domain`acme.ch` and verify it within the organization ACME, then the resulting logonname in our example would be `road.runner@acme.ch` in addition to the already generated `road.runner@acme.zitadel.cloud`. The user can now use either logonname to authenticate with your application.
+If this behaviour is not suitable for you, ZITADEL has the option to generate loginnames for each user of an organization.
+This setting is called **User Loginname must contain orgdomain** and is part of your [Domain settings](./instance-settings#domain-settings).
 
-If you decide that email as username is a valid choice for your use case, you could disable the orgname suffix from usernames. To enable this setting, navigate to your instance or organization settings (depending on where you want this setting to take effect), select **domain settings** and then disable **User Loginname must contain orgdomain**. Now users can enter their email as username to login.
+Those loginnames consist of the format `{username}@{domainname}.{zitadeldomain}`.
+If your user had the username `john.doe`, the generated loginname would be `john.doe@acme.zitadel.cloud`.
+This also means that only one user with the username `john.doe` can exist in your organization called `ACME`.
+
+If you verify your domain name or add additional domains, ZITADEL will generate those additional logonames for you.
+If the organization would own the domain `acme.ch` and verify it, then the resulting loginname would be `john.doe@acme.ch` in addition to the already generated `john.doe@acme.zitadel.cloud`.
+The user can now use either logonname to authenticate with your application.
+
+> Note: You can set this setting on your instance as well as your organizations. All available usernames are shown on the top of the user pages.
 
 ## Domain verification and primary domain
 
-Once you have successfully registered your organization, ZITADEL will automatically generate a domain name for your organization (eg, acme.zitadel.cloud). Users that you create within your organization will be suffixed with this domain name.
+Once you have successfully registered your organization, ZITADEL will automatically generate a domain name for your organization (eg, acme.zitadel.cloud).
+Users that you create within your organization will be suffixed with this domain name.
 
-You can improve the user experience, by suffixing users with a domain name that is in your control. If the "validate org domains" settings in the [Domain Settings](./instance-settings#domain-settings) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
+You can improve the user experience, by suffixing users with a domain name that is in your control.
+If the "validate org domains" settings in the [Domain Settings](./instance-settings#domain-settings) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
 If the settings is set to false, the created domain will automatically be set to verifed.
 
-An organization can have multiple domain names, but only one domain can be primary. The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in access_tokens (`preferred_username`).
+An organization can have multiple domain names, but only one domain can be primary.
+The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in access_tokens (`preferred_username`).
 
 Please note that domain verification also removes the logonname from all users, who might have used this combination in the global organization (ie. users not belonging to a specific organization). Relating to our example with acme.ch: If a user ‘coyote’ exists in the global organization with the logonname coyote@acme.ch, then after verification of acme.ch, this logonname will be replaced with `coyote@{randomvalue.tld}`. ZITADEL will notify users affected by this change.
 
