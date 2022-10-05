@@ -142,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Le jeton de rafraîchissement n'est pas valide
       NotFound: Jeton de rafraîchissement non trouvé
+  Instance:
+    NotFound: Instance non trouvée
+    AlreadyExists: L'instance existe déjà
+    NotChanged: L'instance n'a pas changé
   Org:
     AlreadyExists: Le nom de l'organisation est déjà pris
     Invalid: L'organisation n'est pas valide

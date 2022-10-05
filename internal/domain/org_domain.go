@@ -32,7 +32,7 @@ func (domain *OrgDomain) GenerateVerificationCode(codeGenerator crypto.Generator
 }
 
 func NewIAMDomainName(orgName, iamDomain string) string {
-	return strings.ToLower(strings.ReplaceAll(orgName, " ", "-") + "." + iamDomain)
+	return strings.ToLower(strings.ReplaceAll(strings.TrimSpace(orgName), " ", "-") + "." + iamDomain)
 }
 
 type OrgDomainValidationType int32

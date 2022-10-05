@@ -142,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token is invalid
       NotFound: Refresh Token not found
+  Instance:
+    NotFound: Instance not found
+    AlreadyExists: Instance already exists
+    NotChanged: Instance not changed
   Org:
     AlreadyExists: Organisation's name already taken
     Invalid: Organisation is invalid

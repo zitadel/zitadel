@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -83,9 +84,17 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 	mig.instanceSetup.CustomDomain = mig.externalDomain
 	mig.instanceSetup.DefaultLanguage = mig.DefaultLanguage
 	mig.instanceSetup.Org = mig.Org
+	// check if username is email style or else append @<orgname>.<custom-domain>
+	//this way we have the same value as before changing `UserLoginMustBeDomain` to false
+	if !mig.instanceSetup.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(mig.instanceSetup.Org.Human.Username, "@") {
+		mig.instanceSetup.Org.Human.Username = mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+	}
 	mig.instanceSetup.Org.Human.Email.Address = strings.TrimSpace(mig.instanceSetup.Org.Human.Email.Address)
 	if mig.instanceSetup.Org.Human.Email.Address == "" {
-		mig.instanceSetup.Org.Human.Email.Address = "admin@" + mig.instanceSetup.CustomDomain
+		mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Username
+		if !strings.Contains(mig.instanceSetup.Org.Human.Email.Address, "@") {
+			mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+		}
 	}
 
 	_, _, _, _, err = cmd.SetUpInstance(ctx, &mig.instanceSetup)

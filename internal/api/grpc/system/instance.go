@@ -41,7 +41,7 @@ func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequ
 }
 
 func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequest) (*system_pb.AddInstanceResponse, error) {
-	id, _, _, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.DefaultInstance))
+	id, _, _, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
 	if err != nil {
 		return nil, err
 	}
@@ -51,8 +51,19 @@ func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequ
 	}, nil
 }
 
+func (s *Server) UpdateInstance(ctx context.Context, req *system_pb.UpdateInstanceRequest) (*system_pb.UpdateInstanceResponse, error) {
+	ctx = authz.WithInstanceID(ctx, req.InstanceId)
+	details, err := s.command.UpdateInstance(ctx, req.InstanceName)
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.UpdateInstanceResponse{
+		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
 func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstanceRequest) (*system_pb.CreateInstanceResponse, error) {
-	id, pat, key, details, err := s.command.SetUpInstance(ctx, CreateInstancePbToSetupInstance(req, s.DefaultInstance))
+	id, pat, key, details, err := s.command.SetUpInstance(ctx, CreateInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
 	if err != nil {
 		return nil, err
 	}

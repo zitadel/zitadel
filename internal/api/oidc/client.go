@@ -51,7 +51,13 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	for i, role := range projectRoles.ProjectRoles {
 		allowedScopes[i] = ScopeProjectRolePrefix + role.Key
 	}
-	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, allowedScopes)
+
+	accessTokenLifetime, idTokenLifetime, _, _, err := o.getOIDCSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return ClientFromBusiness(client, o.defaultLoginURL, accessTokenLifetime, idTokenLifetime, allowedScopes)
 }
 
 func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
@@ -90,6 +96,13 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 				orgID = org.ID
 			}
 			if orgID != user.ResourceOwner {
+				scopes[i] = scopes[len(scopes)-1]
+				scopes[len(scopes)-1] = ""
+				scopes = scopes[:len(scopes)-1]
+			}
+		}
+		if strings.HasPrefix(scope, domain.OrgIDScope) {
+			if strings.TrimPrefix(scope, domain.OrgIDScope) != user.ResourceOwner {
 				scopes[i] = scopes[len(scopes)-1]
 				scopes[len(scopes)-1] = ""
 				scopes = scopes[:len(scopes)-1]
@@ -251,6 +264,16 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 				userInfo.AppendClaims(domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 			}
+			if strings.HasPrefix(scope, domain.OrgIDScope) {
+				userInfo.AppendClaims(domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
+				resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+				if err != nil {
+					return err
+				}
+				for claim, value := range resourceOwnerClaims {
+					userInfo.AppendClaims(claim, value)
+				}
+			}
 		}
 	}
 	if len(roles) == 0 || applicationID == "" {
@@ -289,8 +312,19 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
-		} else if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+		}
+		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 			claims = appendClaim(claims, domain.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
+		}
+		if strings.HasPrefix(scope, domain.OrgIDScope) {
+			claims = appendClaim(claims, domain.OrgIDClaim, strings.TrimPrefix(scope, domain.OrgIDScope))
+			resourceOwnerClaims, err := o.assertUserResourceOwner(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			for claim, value := range resourceOwnerClaims {
+				claims = appendClaim(claims, claim, value)
+			}
 		}
 	}
 	if len(roles) == 0 || clientID == "" {

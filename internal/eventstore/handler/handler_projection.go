@@ -23,20 +23,20 @@ type ProjectionHandlerConfig struct {
 	ConcurrentInstances uint
 }
 
-//Update updates the projection with the given statements
+// Update updates the projection with the given statements
 type Update func(context.Context, []*Statement, Reduce) (index int, err error)
 
-//Reduce reduces the given event to a statement
-//which is used to update the projection
+// Reduce reduces the given event to a statement
+// which is used to update the projection
 type Reduce func(eventstore.Event) (*Statement, error)
 
-//SearchQuery generates the search query to lookup for events
+// SearchQuery generates the search query to lookup for events
 type SearchQuery func(ctx context.Context, instanceIDs []string) (query *eventstore.SearchQueryBuilder, queryLimit uint64, err error)
 
-//Lock is used for mutex handling if needed on the projection
+// Lock is used for mutex handling if needed on the projection
 type Lock func(context.Context, time.Duration, ...string) <-chan error
 
-//Unlock releases the mutex of the projection
+// Unlock releases the mutex of the projection
 type Unlock func(...string) error
 
 type ProjectionHandler struct {
@@ -62,6 +62,7 @@ func NewProjectionHandler(
 	query SearchQuery,
 	lock Lock,
 	unlock Unlock,
+	initialized <-chan bool,
 ) *ProjectionHandler {
 	concurrentInstances := int(config.ConcurrentInstances)
 	if concurrentInstances < 1 {
@@ -82,15 +83,18 @@ func NewProjectionHandler(
 		concurrentInstances: concurrentInstances,
 	}
 
-	go h.subscribe(ctx)
+	go func() {
+		<-initialized
+		go h.subscribe(ctx)
 
-	go h.schedule(ctx)
+		go h.schedule(ctx)
+	}()
 
 	return h
 }
 
-//Trigger handles all events for the provided instances (or current instance from context if non specified)
-//by calling FetchEvents and Process until the amount of events is smaller than the BulkLimit
+// Trigger handles all events for the provided instances (or current instance from context if non specified)
+// by calling FetchEvents and Process until the amount of events is smaller than the BulkLimit
 func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) error {
 	ids := []string{authz.GetInstance(ctx).InstanceID()}
 	if len(instances) > 0 {
@@ -114,7 +118,7 @@ func (h *ProjectionHandler) Trigger(ctx context.Context, instances ...string) er
 	}
 }
 
-//Process handles multiple events by reducing them to statements and updating the projection
+// Process handles multiple events by reducing them to statements and updating the projection
 func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Event) (index int, err error) {
 	if len(events) == 0 {
 		return 0, nil
@@ -140,7 +144,7 @@ func (h *ProjectionHandler) Process(ctx context.Context, events ...eventstore.Ev
 	return index, err
 }
 
-//FetchEvents checks the current sequences and filters for newer events
+// FetchEvents checks the current sequences and filters for newer events
 func (h *ProjectionHandler) FetchEvents(ctx context.Context, instances ...string) ([]eventstore.Event, bool, error) {
 	eventQuery, eventsLimit, err := h.searchQuery(ctx, instances)
 	if err != nil {

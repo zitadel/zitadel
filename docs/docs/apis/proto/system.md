@@ -57,6 +57,18 @@ This might take some time
     POST: /instances
 
 
+### UpdateInstance
+
+> **rpc** UpdateInstance([UpdateInstanceRequest](#updateinstancerequest))
+[UpdateInstanceResponse](#updateinstanceresponse)
+
+Updates name of an existing instance
+
+
+
+    PUT: /instances/{instance_id}
+
+
 ### CreateInstance
 
 > **rpc** CreateInstance([CreateInstanceRequest](#createinstancerequest))
@@ -719,6 +731,29 @@ This is an empty response
 
 
 ### SetPrimaryDomainResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateInstanceRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_id |  string | - |  |
+| instance_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateInstanceResponse
 
 
 

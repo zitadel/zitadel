@@ -1,6 +1,8 @@
 package system
 
 import (
+	"strings"
+
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
@@ -15,7 +17,7 @@ import (
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
-func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defaultInstance command.InstanceSetup) *command.InstanceSetup {
+func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {
 	if req.InstanceName != "" {
 		defaultInstance.InstanceName = req.InstanceName
 		defaultInstance.Org.Name = req.InstanceName
@@ -72,6 +74,11 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 				}
 			}
 		}
+		// check if default username is email style or else append @<orgname>.<custom-domain>
+		// this way we have the same value as before changing `UserLoginMustBeDomain` to false
+		if !defaultInstance.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(defaultInstance.Org.Human.Username, "@") {
+			defaultInstance.Org.Human.Username = defaultInstance.Org.Human.Username + "@" + domain.NewIAMDomainName(defaultInstance.Org.Name, externalDomain)
+		}
 		if user.UserName != "" {
 			defaultInstance.Org.Human.Username = user.UserName
 		}
@@ -89,7 +96,7 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 	return &defaultInstance
 }
 
-func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup) *command.InstanceSetup {
+func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {
 	if req.InstanceName != "" {
 		defaultInstance.InstanceName = req.InstanceName
 		defaultInstance.Org.Name = req.InstanceName
@@ -117,6 +124,11 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 				defaultInstance.Org.Human.PreferredLanguage = lang
 			}
 		}
+	}
+	// check if default username is email style or else append @<orgname>.<custom-domain>
+	// this way we have the same value as before changing `UserLoginMustBeDomain` to false
+	if !defaultInstance.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(defaultInstance.Org.Human.Username, "@") {
+		defaultInstance.Org.Human.Username = defaultInstance.Org.Human.Username + "@" + domain.NewIAMDomainName(defaultInstance.Org.Name, externalDomain)
 	}
 	if req.OwnerUserName != "" {
 		defaultInstance.Org.Human.Username = req.OwnerUserName

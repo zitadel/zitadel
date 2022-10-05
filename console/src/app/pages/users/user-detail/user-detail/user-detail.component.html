@@ -1,7 +1,7 @@
 <cnsl-top-view
   *ngIf="user"
   title="{{ user.human ? user.human.profile?.displayName : user.machine?.name }}"
-  docLink="https://docs.zitadel.com/docs/guides/basics/projects"
+  docLink="https://docs.zitadel.com/docs/guides/manage/console/projects"
   sub="{{ user.preferredLoginName }}"
   [isActive]="user.state === UserState.USER_STATE_ACTIVE"
   [isInactive]="user.state === UserState.USER_STATE_INACTIVE"
@@ -206,7 +206,13 @@
         </ng-container>
 
         <ng-container *ngIf="currentSetting && currentSetting === 'metadata'">
-          <cnsl-metadata *ngIf="user" [userId]="user.id"></cnsl-metadata>
+          <cnsl-metadata
+            [metadata]="metadata"
+            [disabled]="(['user.write:' + user.id, 'user.write'] | hasRole | async) === false"
+            *ngIf="user && user.id"
+            (editClicked)="editMetadata()"
+            (refresh)="loadMetadata(user.id)"
+          ></cnsl-metadata>
         </ng-container>
       </div>
     </cnsl-sidenav>
