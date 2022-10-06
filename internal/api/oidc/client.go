@@ -91,7 +91,7 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 		scope := scopes[i]
 		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 			var orgID string
-			org, err := o.query.OrgByDomainGlobal(ctx, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
+			org, err := o.query.OrgByPrimaryDomain(ctx, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 			if err == nil {
 				orgID = org.ID
 			}
