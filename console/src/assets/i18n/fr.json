@@ -482,7 +482,7 @@
     "EMAILVERIFIED": "Courriel vérifié",
     "NOTVERIFIED": "non vérifié",
     "PREFERRED_LOGINNAME": "Nom de connexion préféré",
-    "ISINITIAL": "Cet utilisateur n'a pas encore été vérifié. Cliquez sur le bouton pour déclencher un nouveau mail d'initialisation.",
+    "ISINITIAL": "Cet utilisateur n'a pas encore été vérifié. Cliquez sur le bouton pour envoyer un nouveau mail d'initialisation.",
     "LOGINMETHODS": {
       "TITLE": "Informations sur le contact",
       "DESCRIPTION": "Les informations fournies sont utilisées pour vous envoyer des informations importantes, comme des e-mails de réinitialisation de mot de passe.",
