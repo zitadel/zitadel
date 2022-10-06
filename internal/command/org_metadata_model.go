@@ -47,6 +47,10 @@ func (wm *OrgMetadataWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
+func (wm *OrgMetadataWriteModel) Reduce() error {
+	return wm.MetadataWriteModel.Reduce()
+}
+
 type OrgMetadataListWriteModel struct {
 	MetadataListWriteModel
 }
