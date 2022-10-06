@@ -125,7 +125,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 		aggregateCreationDates := map[string]*sql.NullTime{}
 		for _, event := range events {
-			creationDateKey := string(event.AggregateType) + ":" + event.AggregateID
+			creationDateKey := string(event.AggregateType)
 			if _, ok := aggregateCreationDates[creationDateKey]; !ok {
 				aggregateCreationDates[creationDateKey] = new(sql.NullTime)
 			}
