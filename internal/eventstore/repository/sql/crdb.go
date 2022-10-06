@@ -123,9 +123,13 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 // This call is transaction save. The transaction will be rolled back if one event fails
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
-
-		var creationDate sql.NullTime
+		aggregateCreationDates := map[string]*sql.NullTime{}
 		for _, event := range events {
+			creationDateKey := string(event.AggregateType) + ":" + event.AggregateID
+			if _, ok := aggregateCreationDates[creationDateKey]; !ok {
+				aggregateCreationDates[creationDateKey] = new(sql.NullTime)
+			}
+
 			var previousEvent sql.NullTime
 			err := tx.QueryRowContext(ctx, crdbInsert,
 				event.Type,
@@ -137,7 +141,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorService,
 				event.ResourceOwner,
 				event.InstanceID,
-				creationDate,
+				aggregateCreationDates[creationDateKey],
 			).Scan(&event.ID, &event.CreationDate, &event.ResourceOwner, &event.InstanceID, &previousEvent)
 
 			if err != nil {
@@ -152,8 +156,8 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 			}
 
 			event.PreviousEventDate = previousEvent.Time
-			creationDate.Time = event.CreationDate
-			creationDate.Valid = true
+			aggregateCreationDates[creationDateKey].Time = event.CreationDate
+			aggregateCreationDates[creationDateKey].Valid = true
 		}
 
 		err := db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
