@@ -14,10 +14,10 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
-	github.com/dop251/goja v0.0.0-20211129110639-4739a1d10a51
-	github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d
+	github.com/dop251/goja v0.0.0-20220815083517-0c74f9139fd6
+	github.com/dop251/goja_nodejs v0.0.0-20220905124449-678b33ca5009
 	github.com/duo-labs/webauthn v0.0.0-20211216225436-9a12cd078b8a
-	github.com/envoyproxy/protoc-gen-validate v0.6.2
+	github.com/envoyproxy/protoc-gen-validate v0.6.7
 	github.com/golang/glog v1.0.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
@@ -27,7 +27,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.1
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/jackc/pgconn v1.12.1
 	github.com/jackc/pgtype v1.11.0
@@ -66,14 +66,14 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.25.0
 	go.opentelemetry.io/otel/trace v1.2.0
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
-	golang.org/x/net v0.0.0-20220121210141-e204ce36a2ba
-	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.11
-	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
-	google.golang.org/grpc v1.43.0
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd
+	google.golang.org/grpc v1.46.2
+	google.golang.org/protobuf v1.28.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 	sigs.k8s.io/yaml v1.3.0
 )
@@ -94,7 +94,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
-	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
+	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/drone/envsubst v1.0.3
 	github.com/dsoprea/go-exif v0.0.0-20210131231135-d154f10435cc // indirect
 	github.com/dsoprea/go-exif/v2 v2.0.0-20200604193436-ca8584a0e1c4 // indirect
@@ -105,7 +105,7 @@ require (
 	github.com/dsoprea/go-png-image-structure v0.0.0-20200807080309-a98d4e94ac82 // indirect
 	github.com/dsoprea/go-utility v0.0.0-20200512094054-1abbbc781176 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
+	github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.2.0 // indirect

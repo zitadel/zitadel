@@ -655,15 +655,6 @@
       "1": "inattivo",
       "2": "attivo"
     },
-    "TYPES": {
-      "0": "Non specifico",
-      "1": "Autenticazione esterna"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post autenticazione",
-      "2": "Pre creazione",
-      "3": "Post creazione"
-    },
     "ADDTRIGGER": "Aggiungi trigger",
     "FLOWCHANGED": "Il processo è stato modificato con successo.",
     "FLOWCLEARED": "Il processo è stato eliminato con successo.",
@@ -690,6 +681,10 @@
       "CLEAR": {
         "TITLE": "Elimina processo",
         "DESCRIPTION": "Stai per eliminare un processo. Questa azione non può essere annullata. Vuoi continuare?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Elimina le azioni selezionate?",
+        "DESCRIPTION": "Sei sicuro di voler eliminare le azioni selezionate dal processo?"
       }
     },
     "TOAST": {
@@ -1177,6 +1172,8 @@
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
       "IGNOREUNKNOWNUSERNAMES": "Ignora un nome utente sconosciuto",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione \u00e8 selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
+      "ALLOWDOMAINDISCOVERY": "Scoperta del dominio consentita",
+      "ALLOWDOMAINDISCOVERY_DESC": "Se l'opzione è selezionata, il suffisso (@domain.com) di un nome utente sconosciuto inserito nel login verrà confrontato con i domini organizzazione e, in caso di successo, verrà reindirizzato alla registrazione di tale organizzazione",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",

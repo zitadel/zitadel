@@ -10,11 +10,10 @@ import (
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
-	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
