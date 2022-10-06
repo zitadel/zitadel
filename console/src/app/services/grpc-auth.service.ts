@@ -166,10 +166,16 @@ export class GrpcAuthService {
       filter((policy) => !!policy),
     );
 
-    this.labelpolicy$.subscribe((policy) => {
-      themeService.applyLabelPolicy(policy);
-      this.labelpolicy.next(policy);
-      this.labelPolicyLoading$.next(false);
+    this.labelpolicy$.subscribe({
+      next: (policy) => {
+        themeService.applyLabelPolicy(policy);
+        this.labelpolicy.next(policy);
+        this.labelPolicyLoading$.next(false);
+      },
+      error: (error) => {
+        console.error(error);
+        this.labelPolicyLoading$.next(false);
+      },
     });
 
     this.user = merge(
