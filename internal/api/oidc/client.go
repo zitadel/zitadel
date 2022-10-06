@@ -31,7 +31,7 @@ const (
 	ClaimUserMetaData      = ScopeUserMetaData
 	ScopeResourceOwner     = "urn:zitadel:iam:user:resourceowner"
 	ClaimResourceOwner     = ScopeResourceOwner + ":"
-	ClaimActionLogFormat   = "urn:zitadel:action:%s:log"
+	ClaimActionLogFormat   = "urn:zitadel:iam:action:%s:log"
 
 	oidcCtx = "oidc"
 )
