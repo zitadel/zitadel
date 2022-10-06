@@ -271,6 +271,7 @@ export class IdpTableComponent implements OnInit {
       .setNanos(this.loginPolicy.multiFactorCheckLifetime?.nanos ?? 0);
     mgmtreq.setMultiFactorCheckLifetime(mficl);
 
+    mgmtreq.setAllowDomainDiscovery(this.loginPolicy.allowDomainDiscovery);
     mgmtreq.setIgnoreUnknownUsernames(this.loginPolicy.ignoreUnknownUsernames);
     mgmtreq.setDefaultRedirectUri(this.loginPolicy.defaultRedirectUri);
 

@@ -59,11 +59,15 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	l.handleExternalRegisterByConfigID(w, r, authReq, data.IDPConfigID)
+}
+
+func (l *Login) handleExternalRegisterByConfigID(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, configID string) {
 	if authReq == nil {
 		l.defaultRedirect(w, r)
 		return
 	}
-	idpConfig, err := l.getIDPConfigByID(r, data.IDPConfigID)
+	idpConfig, err := l.getIDPConfigByID(r, configID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

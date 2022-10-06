@@ -3115,7 +3115,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | primary_color |  string | - | string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set |  |
 | warn_color |  string | - | string.max_len: 50<br />  |
 | background_color |  string | - | string.max_len: 50<br />  |
 | font_color |  string | - | string.max_len: 50<br />  |
@@ -3183,6 +3183,7 @@ This is an empty request
 | second_factors | repeated zitadel.policy.v1.SecondFactorType | - |  |
 | multi_factors | repeated zitadel.policy.v1.MultiFactorType | - |  |
 | idps | repeated AddCustomLoginPolicyRequest.IDP | - |  |
+| allow_domain_discovery |  bool | If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success. |  |
 
 
 
@@ -8169,6 +8170,7 @@ This is an empty request
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| allow_domain_discovery |  bool | If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success. |  |
 
 
 

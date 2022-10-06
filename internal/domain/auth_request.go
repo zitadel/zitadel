@@ -140,6 +140,13 @@ func (a *AuthRequest) SetUserInfo(userID, userName, loginName, displayName, avat
 	a.UserOrgID = userOrgID
 }
 
+func (a *AuthRequest) SetOrgInformation(id, name, primaryDomain string, requestedByDomain bool) {
+	a.RequestedOrgID = id
+	a.RequestedOrgName = name
+	a.RequestedPrimaryDomain = primaryDomain
+	a.RequestedOrgDomain = requestedByDomain
+}
+
 func (a *AuthRequest) MFALevel() MFALevel {
 	return -1
 	//PLANNED: check a.PossibleLOAs (and Prompt Login?)
