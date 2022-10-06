@@ -309,7 +309,7 @@ SystemDefaults:
 
 Actions:
   HTTP:
-    # sub domains are currently unsupported
+    # wildcard sub domains are currently unsupported
     DenyList:
       - localhost
       - '127.0.0.1'
