@@ -123,6 +123,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	}
 	data := make(Data, 0)
 	event := new(repository.Event)
+	var previousDate sql.NullTime
 
 	err = scanner(
 		&event.CreationDate,
@@ -135,6 +136,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		&event.AggregateType,
 		&event.AggregateID,
 		&event.Version,
+		&previousDate,
 	)
 
 	if err != nil {
@@ -144,6 +146,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)
+	event.PreviousEventDate = previousDate.Time
 
 	*events = append(*events, event)
 

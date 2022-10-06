@@ -139,7 +139,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	// because there could be events between current sequence and a creation event
 	// and we cannot check via stmt.PreviousSequence
 	if stmts[0].PreviousEventDate.IsZero() {
-		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].PreviousEventDate, stmts[0].InstanceID, sequences, reduce)
+		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].CreationDate, stmts[0].InstanceID, sequences, reduce)
 		if err != nil {
 			tx.Rollback()
 			return -1, err
@@ -221,7 +221,7 @@ stmts:
 		for _, sequence := range sequences[stmt.AggregateType] {
 			if sequence.creationDate.After(stmt.CreationDate) && stmt.InstanceID == sequence.instanceID {
 				// if stmt.Sequence <= sequence.eventID && stmt.InstanceID == sequence.instanceID {
-				logging.WithFields("statement", stmt, "currentSequence", sequence).Debug("statement dropped")
+				logging.WithFields("currentSequence", sequence).Debug("statement dropped")
 				if i < len(*stmts)-1 {
 					copy((*stmts)[i:], (*stmts)[i+1:])
 				}

@@ -15,10 +15,15 @@ CREATE TABLE IF NOT EXISTS eventstore.events (
 	, previous_event_date TIMESTAMPTZ
 
 	, PRIMARY KEY (creation_date DESC, instance_id) USING HASH WITH BUCKET_COUNT = 10
-	, INDEX agg_type_agg_id (aggregate_type, aggregate_id, instance_id)
-	, INDEX agg_type (aggregate_type, instance_id)
-	, INDEX agg_type_creation_date (aggregate_type, creation_date DESC, instance_id)
-		STORING (id, event_type, aggregate_id, aggregate_version, event_data, editor_user, editor_service, resource_owner)
-	, INDEX max_creation_date (aggregate_type, aggregate_id, creation_date DESC, instance_id)
-	, CONSTRAINT previous_event_unique UNIQUE (previous_event_date DESC, instance_id)
+	, INDEX push_ro (aggregate_type, aggregate_id, instance_id) STORING (resource_owner)
+	-- TODO: could be hashed for better sharding, focus on events returned
+	-- , INDEX scheduled (creation_date, instance_id, aggregate_type) 
+    -- 	STORING (id, event_type, aggregate_id, aggregate_version, event_data, editor_user, editor_service, resource_owner, previous_event_date)
+	-- TODO: easier to shard by default, less focus on amount of event returned
+	, INDEX scheduled4 (aggregate_type, instance_id, creation_date DESC) 
+    	STORING (id, event_type, aggregate_id, aggregate_version, event_data, editor_user, editor_service, resource_owner, previous_event_date)
+
+
+
+	, CONSTRAINT previous_event_unique UNIQUE (previous_event_date DESC, aggregate_type, aggregate_id, instance_id)
 );

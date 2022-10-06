@@ -38,6 +38,7 @@ type Event interface {
 	Aggregate() Aggregate
 
 	CreationDate() time.Time
+	PreviousAggregateDate() time.Time
 	//DataAsBytes returns the payload of the event. It represent the changed fields by the event
 	DataAsBytes() []byte
 }

@@ -25,54 +25,68 @@ const (
 	//
 	//previous_data selects the needed data of the latest event of the aggregate
 	// and buffers it (crdb inmemory)
-	crdbInsert = "WITH previous_data (creation_date, resource_owner) AS (" +
-		// resource owner of previous event from aggregate
-		" SELECT creation_date, resource_owner" +
-		" FROM eventstore.events" +
-		" WHERE aggregate_type = $2 AND aggregate_id = $3" +
-		" AND (CASE WHEN $9::TEXT IS NULL THEN instance_id is null else instance_id = $9::TEXT END)" +
-		" ORDER BY creation_date DESC LIMIT 1" +
-		") " +
-		"INSERT INTO eventstore.events (" +
-		" event_type," +
-		" aggregate_type," +
-		" aggregate_id," +
-		" aggregate_version," +
-		" event_data," +
-		" editor_user," +
-		" editor_service," +
-		" resource_owner," +
-		" instance_id," +
-		" previous_event_date" +
-		") VALUES (" +
-		// event_type
-		" $1::VARCHAR," +
-		// aggregate_type
-		" $2::VARCHAR," +
-		// aggregate_id
-		" $3::VARCHAR," +
-		// aggregate_version
-		" $4::VARCHAR," +
-		// event_data
-		" $5::JSONB," +
-		// editor_user
-		" $6::VARCHAR," +
-		// editor_service
-		" $7::VARCHAR," +
-		// resource_owner
-		" CASE WHEN EXISTS (SELECT * FROM previous_data)" +
-		" THEN (SELECT resource_owner FROM previous_data)" +
-		" ELSE $8::VARCHAR" +
-		" END," +
-		// instance_id
-		" $9::VARCHAR," +
-		// previous_event_date
-		" CASE WHEN EXISTS (SELECT * FROM previous_data)" +
-		" THEN (SELECT creation_date FROM previous_data)" +
-		" ELSE NULL::TIMESTAMPTZ" +
-		" END " +
-		") " +
-		"RETURNING id, creation_date, resource_owner, instance_id, previous_event_date"
+	crdbInsert = `WITH previous_data (aggregate_type_cd, resource_owner) AS (
+	SELECT agg_type.cd, agg.ro FROM (
+		SELECT 
+			creation_date cd
+			, 1 join_me 
+		FROM 
+			eventstore.events 
+		WHERE 
+			aggregate_type = $2 
+			AND (CASE WHEN $9::TEXT IS NULL THEN instance_id IS NULL ELSE instance_id = $9::TEXT END) 
+		ORDER BY
+			creation_date DESC
+		LIMIT 1
+	) AS agg_type
+	LEFT JOIN (
+		SELECT 
+			resource_owner ro
+			, 1 join_me 
+		FROM 
+			eventstore.events 
+		WHERE 
+			aggregate_type = $2
+			AND aggregate_id = $3 
+			AND (CASE WHEN $9::TEXT IS NULL THEN instance_id IS NULL ELSE instance_id = $9::TEXT END) 
+		LIMIT 1
+	) AS agg USING(join_me)
+)
+INSERT INTO eventstore.events (
+	event_type,
+	aggregate_type,
+	aggregate_id,
+	aggregate_version,
+	event_data,
+	editor_user,
+	editor_service,
+	resource_owner,
+	instance_id,
+	previous_event_date
+) VALUES (
+	$1::VARCHAR,
+	$2::VARCHAR,
+	$3::VARCHAR,
+	$4::VARCHAR,
+	$5::JSONB,
+	$6::VARCHAR,
+	$7::VARCHAR,
+	CASE WHEN EXISTS(SELECT * FROM previous_data)
+		THEN (SELECT COALESCE(resource_owner, $8) FROM previous_data)
+		ELSE $8
+	END,
+	$9::VARCHAR,
+	CASE WHEN EXISTS(SELECT * FROM previous_data)
+		THEN (SELECT aggregate_type_cd FROM previous_data)
+		ELSE NULL
+	END
+)
+RETURNING id, creation_date, resource_owner, instance_id, previous_event_date`
+
+	// " CASE WHEN EXISTS (SELECT * FROM previous_data)" +
+	// " THEN (SELECT resource_owner FROM previous_data)" +
+	// " ELSE $8::VARCHAR" +
+	// " END," +
 
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
@@ -145,8 +159,6 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 
 	return err
 }
-
-var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
 
 // handleUniqueConstraints adds or removes unique constraints
 func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueConstraints ...*repository.UniqueConstraint) (err error) {
@@ -234,7 +246,8 @@ func (db *CRDB) eventQuery() string {
 		", aggregate_type" +
 		", aggregate_id" +
 		", aggregate_version" +
-		" FROM eventstore.events"
+		", previous_event_date" +
+		" FROM eventstore.events" //AS OF SYSTEM TIME '-1ms'::INTERVAL"
 }
 
 func (db *CRDB) maxCreationDateQuery() string {
@@ -242,7 +255,7 @@ func (db *CRDB) maxCreationDateQuery() string {
 }
 
 func (db *CRDB) instanceIDsQuery() string {
-	return "SELECT DISTINCT instance_id FROM eventstore.events"
+	return "SELECT DISTINCT instance_id FROM eventstore.events AS OF SYSTEM TIME follower_read_timestamp()"
 }
 
 func (db *CRDB) columnName(col repository.Field) string {
