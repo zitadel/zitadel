@@ -241,7 +241,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.To
 		actions.SetFields("userGrants", &actionUserGrants),
 		actions.SetFields("v1",
 			actions.SetFields("appendUserGrant", func(c *actions.FieldConfig) interface{} {
-				return func(call *goja.FunctionCall) goja.Value {
+				return func(call goja.FunctionCall) goja.Value {
 					if len(call.Arguments) != 1 {
 						panic("exactly one argument expected")
 					}
