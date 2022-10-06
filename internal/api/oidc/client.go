@@ -383,8 +383,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 			apiFields,
 			action.Script,
 			action.Name,
-			actions.WithHTTP(actionCtx),
-			actions.WithLogger(actions.ServerLog),
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
 		)
 		cancel()
 		if err != nil {
@@ -539,8 +538,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 			apiFields,
 			action.Script,
 			action.Name,
-			actions.WithHTTP(actionCtx),
-			actions.WithLogger(actions.ServerLog),
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
 		)
 		cancel()
 		if err != nil {
