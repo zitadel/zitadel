@@ -294,7 +294,7 @@
       "TITLE": "无密码身份验证",
       "DESCRIPTION": "添加基于 WebAuthn 的身份验证方法以无密码登录 ZITADEL。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素认证方式。",
-      "U2F": "添加验证器",
+      "U2F": "添加方法",
       "U2F_DIALOG_TITLE": "身份验证器",
       "U2F_DIALOG_DESCRIPTION": "输入您使用的无密码登录名",
       "U2F_SUCCESS": "无密码验证创建成功！",
@@ -326,17 +326,6 @@
         "NEW": "添加"
       }
     },
-    "METADATA": {
-      "TITLE": "元数据",
-      "DESCRIPTION": "",
-      "KEY": "键",
-      "VALUE": "值",
-      "ADD": "新条目",
-      "SAVE": "保存",
-      "EMPTY": "暂无元数据",
-      "SETSUCCESS": "键值对保存成功",
-      "REMOVESUCCESS": "键值对删除成功"
-    },
     "MFA": {
       "TABLETYPE": "类型",
       "TABLESTATE": "状态",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "添加第二个因素以确保您帐户的最佳安全性。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素身份认证方式。",
       "ADD": "添加因子",
-      "OTP": "一次性密码 (OTP)",
+      "OTP": "用于 OTP 的身份验证器应用程序",
       "OTP_DIALOG_TITLE": "添加 OTP",
       "OTP_DIALOG_DESCRIPTION": "使用验证器应用程序扫描二维码并输入下面的代码以验证并激活 OTP 方法。",
       "U2F": "指纹、安全密钥、Face ID 等",
@@ -638,6 +627,17 @@
       },
       "DELETED": "成功删除令牌。"
     }
+  },
+  "METADATA": {
+    "TITLE": "元数据",
+    "DESCRIPTION": "",
+    "KEY": "键",
+    "VALUE": "值",
+    "ADD": "新条目",
+    "SAVE": "保存",
+    "EMPTY": "暂无元数据",
+    "SETSUCCESS": "键值对保存成功",
+    "REMOVESUCCESS": "键值对删除成功"
   },
   "FLOWS": {
     "TITLE": "动作和流程",

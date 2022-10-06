@@ -223,6 +223,8 @@ import {
   ListOrgMemberRolesResponse,
   ListOrgMembersRequest,
   ListOrgMembersResponse,
+  ListOrgMetadataRequest,
+  ListOrgMetadataResponse,
   ListPersonalAccessTokensRequest,
   ListPersonalAccessTokensResponse,
   ListProjectChangesRequest,
@@ -307,6 +309,8 @@ import {
   RemoveOrgIDPResponse,
   RemoveOrgMemberRequest,
   RemoveOrgMemberResponse,
+  RemoveOrgMetadataRequest,
+  RemoveOrgMetadataResponse,
   RemovePersonalAccessTokenRequest,
   RemovePersonalAccessTokenResponse,
   RemoveProjectGrantMemberRequest,
@@ -375,6 +379,8 @@ import {
   SetCustomVerifyPhoneMessageTextRequest,
   SetCustomVerifyPhoneMessageTextResponse,
   SetHumanInitialPasswordRequest,
+  SetOrgMetadataRequest,
+  SetOrgMetadataResponse,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
   SetTriggerActionsRequest,
@@ -1389,6 +1395,26 @@ export class ManagementService {
     return this.grpcService.mgmt.listUserMetadata(req, null).then((resp) => resp.toObject());
   }
 
+  public listOrgMetadata(
+    offset?: number,
+    limit?: number,
+    queryList?: MetadataQuery[],
+  ): Promise<ListOrgMetadataResponse.AsObject> {
+    const req = new ListOrgMetadataRequest();
+
+    const metadata = new ListQuery();
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    return this.grpcService.mgmt.listOrgMetadata(req, null).then((resp) => resp.toObject());
+  }
+
   public getUserMetadata(userId: string, key: string): Promise<GetUserMetadataResponse.AsObject> {
     const req = new GetUserMetadataRequest();
     req.setId(userId);
@@ -1402,6 +1428,13 @@ export class ManagementService {
     req.setValue(value);
     req.setId(userId);
     return this.grpcService.mgmt.setUserMetadata(req, null).then((resp) => resp.toObject());
+  }
+
+  public setOrgMetadata(key: string, value: string): Promise<SetOrgMetadataResponse.AsObject> {
+    const req = new SetOrgMetadataRequest();
+    req.setKey(key);
+    req.setValue(value);
+    return this.grpcService.mgmt.setOrgMetadata(req, null).then((resp) => resp.toObject());
   }
 
   public bulkSetUserMetadata(
@@ -1419,6 +1452,12 @@ export class ManagementService {
     req.setKey(key);
     req.setId(userId);
     return this.grpcService.mgmt.removeUserMetadata(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeOrgMetadata(key: string): Promise<RemoveOrgMetadataResponse.AsObject> {
+    const req = new RemoveOrgMetadataRequest();
+    req.setKey(key);
+    return this.grpcService.mgmt.removeOrgMetadata(req, null).then((resp) => resp.toObject());
   }
 
   public removeUser(id: string): Promise<RemoveUserResponse.AsObject> {
