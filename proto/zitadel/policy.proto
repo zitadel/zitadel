@@ -46,7 +46,6 @@ message DomainPolicy {
             description: "defines if the smtp sender address domain should match an existing domain on the instance"
         }
     ];
-
 }
 
 message LabelPolicy {

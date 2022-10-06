@@ -294,7 +294,7 @@
       "TITLE": "Authentification sans mot de passe",
       "DESCRIPTION": "Ajoutez des méthodes d'authentification basées sur WebAuthn pour vous connecter à ZITADEL sans mot de passe.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
-      "U2F": "Ajouter un authentifiant",
+      "U2F": "Ajouter une méthode",
       "U2F_DIALOG_TITLE": "Vérifier l'authentifiant",
       "U2F_DIALOG_DESCRIPTION": "Entrez un nom pour votre connexion sans mot de passe utilisée",
       "U2F_SUCCESS": "Auth sans mot de passe créé avec succès !",
@@ -326,17 +326,6 @@
         "NEW": "Ajouter un nouveau"
       }
     },
-    "METADATA": {
-      "TITLE": "Métadonnées",
-      "DESCRIPTION": "",
-      "KEY": "Clé",
-      "VALUE": "Valeur",
-      "ADD": "Nouvelle entrée",
-      "SAVE": "Enregistrer",
-      "EMPTY": "Pas de métadonnées",
-      "SETSUCCESS": "Élément sauvegardé avec succès",
-      "REMOVESUCCESS": "Élément supprimé avec succès"
-    },
     "MFA": {
       "TABLETYPE": "Type",
       "TABLESTATE": "Statut",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "Ajoutez un second facteur pour garantir une sécurité optimale de votre compte.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "ADD": "Ajouter un facteur",
-      "OTP": "OTP (mot de passe à usage unique)",
+      "OTP": "Application d'authentification pour OTP (One-time password)",
       "OTP_DIALOG_TITLE": "Ajouter un OTP",
       "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
       "U2F": "Empreinte digitale, clés de sécurité, Face ID et autres",
@@ -639,6 +628,17 @@
       "DELETED": "Jeton supprimé avec succès."
     }
   },
+  "METADATA": {
+    "TITLE": "Métadonnées",
+    "DESCRIPTION": "",
+    "KEY": "Clé",
+    "VALUE": "Valeur",
+    "ADD": "Nouvelle entrée",
+    "SAVE": "Enregistrer",
+    "EMPTY": "Pas de métadonnées",
+    "SETSUCCESS": "Élément sauvegardé avec succès",
+    "REMOVESUCCESS": "Élément supprimé avec succès"
+  },
   "FLOWS": {
     "TITLE": "Actions et flux",
     "DESCRIPTION": "Définissez des scripts à exécuter lors d'un certain événement.",
@@ -892,7 +892,8 @@
       "de": "Deutsch",
       "en": "English",
       "it": "Italiano",
-      "fr": "Français"
+      "fr": "Français",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1072,7 +1073,8 @@
         "de": "Deutsch",
         "en": "English",
         "it": "Italiano",
-        "fr": "Français"
+        "fr": "Français",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1363,6 +1365,7 @@
       "GRANTEDORGDOMAIN": "Domaine",
       "RESOURCEOWNER": "Propriétaire de la ressource",
       "GRANTEDORGNAME": "Nom de l'organisation",
+      "GRANTID": "Grant Id",
       "CREATIONDATE": "Date de création",
       "CHANGEDATE": "Dernière modification",
       "DATES": "Dates",
@@ -1817,7 +1820,8 @@
     "de": "Deutsch",
     "en": "English",
     "it": "Italiano",
-    "fr": "Français"
+    "fr": "Français",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

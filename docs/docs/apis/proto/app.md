@@ -33,6 +33,7 @@ title: zitadel/app.proto
 | name |  string | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oidc_config |  OIDCConfig | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.api_config |  APIConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.saml_config |  SAMLConfig | - |  |
 
 
 
@@ -84,6 +85,18 @@ title: zitadel/app.proto
 | clock_skew |  google.protobuf.Duration | - |  |
 | additional_origins | repeated string | - |  |
 | allowed_origins | repeated string | - |  |
+
+
+
+
+### SAMLConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - |  |
 
 
 

@@ -22,11 +22,10 @@ export class LocalizedDatePipe implements PipeTransform {
         return moment(value).format(`${format}, HH:mm`);
       }
     } else {
-      const lang = this.translateService.currentLang === ('de' || 'it' || 'en') ? this.translateService.currentLang : 'en';
-      const datePipe: DatePipe = new DatePipe(
-        lang,
-        // ['de', 'it', 'en'].includes(this.translateService.currentLang) ? this.translateService.currentLang : 'en',
-      );
+      const lang = ['de', 'en', 'fr', 'it', 'zh'].includes(this.translateService.currentLang)
+        ? this.translateService.currentLang
+        : 'en';
+      const datePipe: DatePipe = new DatePipe(lang);
       return datePipe.transform(value, pattern ?? 'mediumDate');
     }
   }

@@ -107,6 +107,13 @@ module.exports = {
             "guides/manage/customize/behavior",
             "guides/manage/customize/user-metadata",
           ]
+        },
+        {
+          type: 'category',
+          label: 'Terraform',
+          items: [
+            "guides/manage/terraform/basics",
+          ]
         }
       ],
     },
@@ -115,17 +122,43 @@ module.exports = {
       label: "Integrate",
       collapsed: false,
       items: [
-        "guides/integrate/identity-brokering",
-        "guides/integrate/access-zitadel-apis",
-        "guides/integrate/access-zitadel-system-api",
-        "guides/integrate/authenticated-mongodb-charts",
-        "guides/integrate/auth0",
-        "guides/integrate/azuread",
-        "guides/integrate/gitlab-self-hosted",
         "guides/integrate/login-users",
-        "guides/integrate/serviceusers",
-        "guides/integrate/oauth-recommended-flows",
-        "guides/integrate/export-and-import"
+        "guides/integrate/identity-brokering",
+        {
+          type: "category",
+          label: "Access ZITADEL APIs",
+          collapsed: false,
+          items: [
+            "guides/integrate/serviceusers",
+            "guides/integrate/access-zitadel-apis",
+            "guides/integrate/access-zitadel-system-api",
+            "guides/integrate/export-and-import",
+          ],
+        },
+        {
+          type: "category",
+          label: "OpenID Connect 1.0 Clients",
+          collapsed: false,
+          items: [
+            "guides/integrate/oauth-recommended-flows",
+            "guides/integrate/auth0-oidc",
+            "guides/integrate/azuread-oidc",
+            "guides/integrate/authenticated-mongodb-charts",
+            "guides/integrate/gitlab-self-hosted",
+          ],
+        },
+        {
+          type: "category",
+          label: "SAML 2.0 Clients",
+          collapsed: false,
+          items: [
+            "guides/integrate/auth0-saml",
+            "guides/integrate/aws-saml",
+            "guides/integrate/pingidentity-saml",
+            "guides/integrate/atlassian-saml",
+            "guides/integrate/gitlab-saml",
+          ],
+        },
       ],
     },
     {
@@ -207,6 +240,23 @@ module.exports = {
     },
     {
       type: "category",
+      label: "SAML",
+      collapsed: false,
+      items: [
+        "apis/saml/endpoints",
+      ],
+    },
+    {
+      type: "category",
+      label: "Observability",
+      collapsed: false,
+      items: [
+        "apis/observability/metrics",
+        "apis/observability/health",
+      ],
+    },
+    {
+      type: "category",
       label: "Rate Limits",
       collapsed: false,
       items: [
@@ -251,6 +301,7 @@ module.exports = {
         "concepts/structure/granted_projects",
         "concepts/structure/users",
         "concepts/structure/managers",
+        "concepts/structure/jwt_idp",
       ],
     },
     {
@@ -263,7 +314,10 @@ module.exports = {
       type: "category",
       label: "Features",
       collapsed: false,
-      items: ["concepts/features/actions"],
+      items: [
+        "concepts/features/actions",
+        "concepts/features/selfservice"
+      ],
     },
   ],
   manuals: [

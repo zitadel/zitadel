@@ -97,12 +97,12 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(context.Context, string) (*query.Project, error)
 	UserGrantsByProjectAndUserID(context.Context, string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
-	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(context.Context, string) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*project_view_model.OrgProjectMapping, error)
 }
 
@@ -122,7 +122,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		return nil, err
 	}
 	request.ID = reqID
-	project, err := repo.ProjectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
+	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -632,8 +632,14 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	loginName = strings.TrimSpace(loginName)
 	preferredLoginName := loginName
 	if request.RequestedOrgID != "" {
-		if request.RequestedOrgID != "" {
-			preferredLoginName += "@" + request.RequestedPrimaryDomain
+		if request.RequestedOrgDomain {
+			domainPolicy, err := repo.getDomainPolicy(ctx, request.RequestedOrgID)
+			if err != nil {
+				return err
+			}
+			if domainPolicy.UserLoginMustBeDomain {
+				preferredLoginName += "@" + request.RequestedPrimaryDomain
+			}
 		}
 		user, err = repo.View.UserByLoginNameAndResourceOwner(preferredLoginName, request.RequestedOrgID, request.InstanceID)
 	} else {
@@ -1048,6 +1054,9 @@ func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID stri
 }
 
 func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *domain.AuthRequest, provider applicationProvider) (bool, error) {
+	if _, ok := request.Request.(*domain.AuthRequestOIDC); !ok {
+		return false, nil
+	}
 	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return false, err
@@ -1055,7 +1064,23 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
 }
 
+func (repo *AuthRequestRepo) getDomainPolicy(ctx context.Context, orgID string) (*query.DomainPolicy, error) {
+	return repo.Query.DomainPolicyByOrg(ctx, false, orgID)
+}
+
 func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
+	orgID := request.GetScopeOrgID()
+	if orgID != "" {
+		org, err := orgViewProvider.OrgByID(ctx, false, orgID)
+		if err != nil {
+			return err
+		}
+		request.RequestedOrgID = org.ID
+		request.RequestedOrgName = org.Name
+		request.RequestedPrimaryDomain = org.Domain
+		return nil
+	}
+
 	primaryDomain := request.GetScopeOrgPrimaryDomain()
 	if primaryDomain == "" {
 		return nil
@@ -1068,6 +1093,7 @@ func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *dom
 	request.RequestedOrgID = org.ID
 	request.RequestedOrgName = org.Name
 	request.RequestedPrimaryDomain = primaryDomain
+	request.RequestedOrgDomain = true
 	return nil
 }
 
@@ -1257,8 +1283,8 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, 
 func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
-	case domain.AuthRequestTypeOIDC:
-		project, err = userGrantProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
+	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
+		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
@@ -1278,8 +1304,8 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (_ bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
-	case domain.AuthRequestTypeOIDC:
-		project, err = projectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
+	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
+		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}

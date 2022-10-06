@@ -30,15 +30,14 @@ type registerFormData struct {
 type registerData struct {
 	baseData
 	registerFormData
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
-	ShowUsername              bool
-	ShowUsernameSuffix        bool
-	OrgRegister               bool
+	MinLength          uint64
+	HasUppercase       string
+	HasLowercase       string
+	HasNumber          string
+	HasSymbol          string
+	ShowUsername       bool
+	ShowUsernameSuffix bool
+	OrgRegister        bool
 }
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -124,9 +123,8 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		registerFormData: *formData,
 	}
 
-	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, resourceOwner)
+	pwPolicy := l.getPasswordComplexityPolicy(r, resourceOwner)
 	if pwPolicy != nil {
-		data.PasswordPolicyDescription = description
 		data.MinLength = pwPolicy.MinLength
 		if pwPolicy.HasUppercase {
 			data.HasUppercase = UpperCaseRegex
@@ -170,6 +168,9 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 			}
 			return formData.Gender == g
 		},
+	}
+	if authRequest == nil {
+		l.customTexts(r.Context(), translator, resourceOwner)
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegister], data, funcs)
 }

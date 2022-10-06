@@ -294,7 +294,7 @@
       "TITLE": "Passwordless Authentication",
       "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-      "U2F": "Add authenticator",
+      "U2F": "Add method",
       "U2F_DIALOG_TITLE": "Verify authenticator",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
       "U2F_SUCCESS": "Passwordless Auth created successfully!",
@@ -326,17 +326,6 @@
         "NEW": "Add New"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadata",
-      "DESCRIPTION": "",
-      "KEY": "Key",
-      "VALUE": "Value",
-      "ADD": "New Entry",
-      "SAVE": "Save",
-      "EMPTY": "No metadata",
-      "SETSUCCESS": "Element saved successfully",
-      "REMOVESUCCESS": "Element deleted successfully"
-    },
     "MFA": {
       "TABLETYPE": "Type",
       "TABLESTATE": "Status",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "OTP (One-Time Password)",
+      "OTP": "Authenticator App for OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
       "U2F": "Fingerprint, Security Keys, Face ID and other",
@@ -639,6 +628,17 @@
       "DELETED": "Token deleted with success."
     }
   },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "DESCRIPTION": "",
+    "KEY": "Key",
+    "VALUE": "Value",
+    "ADD": "New Entry",
+    "SAVE": "Save",
+    "EMPTY": "No metadata",
+    "SETSUCCESS": "Element saved successfully",
+    "REMOVESUCCESS": "Element deleted successfully"
+  },
   "FLOWS": {
     "TITLE": "Actions and Flows",
     "DESCRIPTION": "Define scripts to execute on a certain event.",
@@ -892,7 +892,8 @@
       "de": "Deutsch",
       "it": "Italiano",
       "en": "English",
-      "fr": "Français"
+      "fr": "Français",
+      "zh": "简体中文"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1072,7 +1073,8 @@
         "de": "Deutsch",
         "en": "English",
         "it": "Italiano",
-        "fr": "Français"
+        "fr": "Français",
+        "zh": "简体中文"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1363,6 +1365,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Resource Owner",
       "GRANTEDORGNAME": "Organization Name",
+      "GRANTID": "Grant Id",
       "CREATIONDATE": "Creation Date",
       "CHANGEDATE": "Last modified",
       "DATES": "Dates",
@@ -1520,9 +1523,9 @@
     "DEACTIVATE": "Deactivate",
     "ACTIVATE": "Activate",
     "DELETE": "Delete",
-    "DELETE_TITLE": "Delete Idp",
+    "DELETE_TITLE": "Delete IDP",
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
-    "DELETE_SELECTION_TITLE": "Delete Idp",
+    "DELETE_SELECTION_TITLE": "Delete IDP",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "EMPTY": "No IDP available",
     "OIDC": {
@@ -1607,9 +1610,9 @@
       "TITLE": "Application",
       "ID": "ID",
       "DESCRIPTION": "Here you can edit your application data and it's configuration.",
-      "CREATE_OIDC": "OIDC Application",
-      "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
-      "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
+      "CREATE": "Create application",
+      "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
+      "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
       "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
@@ -1662,6 +1665,10 @@
     "ADDITIONALORIGINSDESC": "If you want to add additional Origins to your app which is not used as a redirect you can do that here.",
     "ORIGINS": "Origins",
     "NOTANORIGIN": "The entered value is not an origin",
+    "PROSWITCH": "I'm a pro. Skip this wizard.",
+    "NAMEANDTYPESECTION": "Name and Type",
+    "TITLEFIRST": "Name of the application",
+    "TYPETITLE": "Type of application",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1670,10 +1677,6 @@
       "CURRENT": "Current Config",
       "TOKENSECTIONTITLE": "AuthToken Options",
       "REDIRECTSECTIONTITLE": "Redirect Settings",
-      "PROSWITCH": "I'm a pro. Skip this wizard.",
-      "NAMEANDTYPESECTION": "Name and Type",
-      "TITLEFIRST": "Insert a name first.",
-      "TYPETITLE": "What type of application do you want to create?",
       "REDIRECTTITLE": "Specify the URIs where the login will redirect to.",
       "POSTREDIRECTTITLE": "This is the redirect URI after logout.",
       "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
@@ -1765,6 +1768,18 @@
         "1": "Private Key JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML Applications"
+      },
+      "CONFIGSECTION": "SAML Configuration",
+      "URL": "Url where Metadata file is located",
+      "OR": "or",
+      "XML": "Upload Metadata XML",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata from File"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
@@ -1817,7 +1832,8 @@
     "de": "Deutsch",
     "en": "English",
     "it": "Italiano",
-    "fr": "Français"
+    "fr": "Français",
+    "zh": "简体中文"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

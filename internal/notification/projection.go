@@ -178,7 +178,7 @@ func (p *notificationsProjection) reduceInitCodeAdded(event eventstore.Event) (*
 		return nil, err
 	}
 
-	origin, err := p.origin(ctx)
+	ctx, origin, err := p.origin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +241,7 @@ func (p *notificationsProjection) reduceEmailCodeAdded(event eventstore.Event) (
 		return nil, err
 	}
 
-	origin, err := p.origin(ctx)
+	ctx, origin, err := p.origin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -304,7 +304,7 @@ func (p *notificationsProjection) reducePasswordCodeAdded(event eventstore.Event
 		return nil, err
 	}
 
-	origin, err := p.origin(ctx)
+	ctx, origin, err := p.origin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -375,7 +375,7 @@ func (p *notificationsProjection) reduceDomainClaimed(event eventstore.Event) (*
 		return nil, err
 	}
 
-	origin, err := p.origin(ctx)
+	ctx, origin, err := p.origin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -436,7 +436,7 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 		return nil, err
 	}
 
-	origin, err := p.origin(ctx)
+	ctx, origin, err := p.origin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -494,7 +494,7 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 		return nil, err
 	}
 
-	origin, err := p.origin(ctx)
+	ctx, origin, err := p.origin(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -640,21 +640,22 @@ func (p *notificationsProjection) getTranslatorWithOrgTexts(ctx context.Context,
 	return translator, nil
 }
 
-func (p *notificationsProjection) origin(ctx context.Context) (string, error) {
+func (p *notificationsProjection) origin(ctx context.Context) (context.Context, string, error) {
 	primary, err := query.NewInstanceDomainPrimarySearchQuery(true)
 	if err != nil {
-		return "", err
+		return ctx, "", err
 	}
 	domains, err := p.queries.SearchInstanceDomains(ctx, &query.InstanceDomainSearchQueries{
 		Queries: []query.SearchQuery{primary},
 	})
 	if err != nil {
-		return "", err
+		return ctx, "", err
 	}
 	if len(domains.Domains) < 1 {
-		return "", errors.ThrowInternal(nil, "NOTIF-Ef3r1", "Errors.Notification.NoDomain")
+		return ctx, "", errors.ThrowInternal(nil, "NOTIF-Ef3r1", "Errors.Notification.NoDomain")
 	}
-	return http_utils.BuildHTTP(domains.Domains[0].Domain, p.externalPort, p.externalSecure), nil
+	ctx = authz.WithRequestedDomain(ctx, domains.Domains[0].Domain)
+	return ctx, http_utils.BuildHTTP(domains.Domains[0].Domain, p.externalPort, p.externalSecure), nil
 }
 
 func setNotificationContext(event eventstore.Aggregate) context.Context {

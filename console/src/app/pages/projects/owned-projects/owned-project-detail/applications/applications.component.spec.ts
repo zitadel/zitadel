@@ -9,14 +9,12 @@ describe('ProjectApplicationsComponent', () => {
   let component: ApplicationsComponent;
   let fixture: ComponentFixture<ApplicationsComponent>;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [ApplicationsComponent],
-        imports: [NoopAnimationsModule, MatSortModule, MatTableModule],
-      }).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [ApplicationsComponent],
+      imports: [NoopAnimationsModule, MatSortModule, MatTableModule],
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ApplicationsComponent);

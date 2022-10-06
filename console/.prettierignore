@@ -1,0 +1,7 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# grpc output
+/src/app/proto
+
+# dev environment
+src/assets/environment.json

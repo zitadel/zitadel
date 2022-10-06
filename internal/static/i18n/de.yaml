@@ -144,6 +144,8 @@ Errors:
       NotFound: Refresh Token nicht gefunden
   Instance:
     NotFound: Instanz konnte nicht gefunden werden
+    AlreadyExists: Instanz exisitiert bereits
+    NotChanged: Instanz wurde nicht verändert
   Org:
     AlreadyExists: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
@@ -249,9 +251,14 @@ Errors:
       NotExisting: Applikation existiert nicht
       IsNotOIDC: Applikation ist nicht vom Typ OIDC
       IsNotAPI: Applikation ist nicht vom Typ API
+      IsNotSAML: Applikation ist nicht vom Typ SAML
       NotActive: Applikation ist nicht aktiv
       NotInactive: Applikation ist nickt inaktiv
       OIDCConfigInvalid: OIDC Konfiguration ist ungültig
+      SAMLConfigInvalid: SAML Konfiguration ist ungültig
+      SAMLMetadataMissing: SAML Metadata ist nicht vorhanden
+      SAMLMetadataFormat: SAML Metadata Formatfehler
+      SAMLEntityIDAlreadyExisting: SAML EntityID existiert bereits
       APIConfigInvalid: API Konfiguration ist ungültig
       OIDCAuthMethodNoSecret: Gewählte OIDC Auth Method benötigt kein Secret
       APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
@@ -391,7 +398,7 @@ Errors:
     ReadError: Übersetzungsdatei konnte nicht gelesen werden
     MergeError: Übersetzungsdatei konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
     NotFound: Übersetzungsdatei existiert nicht
-  MetaData:
+  Metadata:
     NotFound: Meta Daten konnten nicht gefunden werden
     NoData: Meta Daten Liste ist leer
     Invalid: Meta Daten sind ungültig
@@ -753,6 +760,9 @@ EventTypes:
           added: Applikations Schlüssel hinzugefügt
           removed: Applikations Schlüssel entfernt
       config:
+        saml:
+          added: SAML Konfiguration hinzugefügt
+          changed: SAML Konfiguration geändert
         oidc:
           added: OIDC Konfiguration hinzugefügt
           changed: OIDC Konfiguration geändert

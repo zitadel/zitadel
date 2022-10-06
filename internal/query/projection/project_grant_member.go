@@ -97,7 +97,7 @@ func (p *projectGrantMemberProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
-					Reduce: reduceInstanceRemovedHelper(ProjectGrantColumnInstanceID),
+					Reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 				},
 			},
 		},
@@ -158,6 +158,14 @@ func (p *projectGrantMemberProjection) reduceUserRemoved(event eventstore.Event)
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-rufJr", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
+}
+
+func (p *projectGrantMemberProjection) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.InstanceRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Z2p6o", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+	}
+	return reduceMemberRemoved(e, withMemberCond(MemberInstanceID, e.Aggregate().ID))
 }
 
 func (p *projectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {

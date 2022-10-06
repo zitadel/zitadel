@@ -14,9 +14,10 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps2"
+	AppProjectionTable = "projections.apps3"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
+	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
 
 	AppColumnID            = "id"
 	AppColumnName          = "name"
@@ -54,6 +55,13 @@ const (
 	AppOIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
 	AppOIDCConfigColumnClockSkew                = "clock_skew"
 	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
+
+	appSAMLTableSuffix             = "saml_configs"
+	AppSAMLConfigColumnAppID       = "app_id"
+	AppSAMLConfigColumnInstanceID  = "instance_id"
+	AppSAMLConfigColumnEntityID    = "entity_id"
+	AppSAMLConfigColumnMetadata    = "metadata"
+	AppSAMLConfigColumnMetadataURL = "metadata_url"
 )
 
 type appProjection struct {
@@ -77,8 +85,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
 		},
 			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
-			crdb.WithIndex(crdb.NewIndex("app_project_id_idx", []string{AppColumnProjectID})),
-			crdb.WithConstraint(crdb.NewConstraint("app_id_unique", []string{AppColumnID})),
+			crdb.WithIndex(crdb.NewIndex("app3_project_id_idx", []string{AppColumnProjectID})),
+			crdb.WithConstraint(crdb.NewConstraint("app3_id_unique", []string{AppColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText),
@@ -89,8 +97,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
 			appAPITableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_api_ref_apps")),
-			crdb.WithIndex(crdb.NewIndex("api_client_id_idx", []string{AppAPIConfigColumnClientID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_api_ref_apps3")),
+			crdb.WithIndex(crdb.NewIndex("api_client_id3_idx", []string{AppAPIConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText),
@@ -114,8 +122,20 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_apps")),
-			crdb.WithIndex(crdb.NewIndex("oidc_client_id_idx", []string{AppOIDCConfigColumnClientID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_apps3")),
+			crdb.WithIndex(crdb.NewIndex("oidc_client_id_idx3", []string{AppOIDCConfigColumnClientID})),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppSAMLConfigColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppSAMLConfigColumnEntityID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppSAMLConfigColumnMetadata, crdb.ColumnTypeBytes),
+			crdb.NewColumn(AppSAMLConfigColumnMetadataURL, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(AppSAMLConfigColumnInstanceID, AppSAMLConfigColumnAppID),
+			appSAMLTableSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_saml_ref_apps3")),
+			crdb.WithIndex(crdb.NewIndex("saml_entity_id_idx3", []string{AppSAMLConfigColumnEntityID})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -174,6 +194,14 @@ func (p *appProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.OIDCConfigSecretChangedType,
 					Reduce: p.reduceOIDCConfigSecretChanged,
+				},
+				{
+					Event:  project.SAMLConfigAddedType,
+					Reduce: p.reduceSAMLConfigAdded,
+				},
+				{
+					Event:  project.SAMLConfigChangedType,
+					Reduce: p.reduceSAMLConfigChanged,
 				},
 			},
 		},
@@ -532,6 +560,80 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 				handler.NewCond(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+				handler.NewCol(AppColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.SAMLConfigAddedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU1", "reduce.wrong.event.type")
+	}
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(AppSAMLConfigColumnAppID, e.AppID),
+				handler.NewCol(AppSAMLConfigColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCol(AppSAMLConfigColumnEntityID, e.EntityID),
+				handler.NewCol(AppSAMLConfigColumnMetadata, e.Metadata),
+				handler.NewCol(AppSAMLConfigColumnMetadataURL, e.MetadataURL),
+			},
+			crdb.WithTableSuffix(appSAMLTableSuffix),
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+				handler.NewCol(AppColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.SAMLConfigChangedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU2", "reduce.wrong.event.type")
+	}
+
+	cols := make([]handler.Column, 0, 3)
+	if e.Metadata != nil {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadata, e.Metadata))
+	}
+	if e.MetadataURL != nil {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadataURL, *e.MetadataURL))
+	}
+	if e.EntityID != "" {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnEntityID, e.EntityID))
+	}
+
+	if len(cols) == 0 {
+		return crdb.NewNoOpStatement(e), nil
+	}
+
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddUpdateStatement(
+			cols,
+			[]handler.Condition{
+				handler.NewCond(AppSAMLConfigColumnAppID, e.AppID),
+				handler.NewCond(AppSAMLConfigColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(appSAMLTableSuffix),
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
