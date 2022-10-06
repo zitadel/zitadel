@@ -27,17 +27,22 @@ const (
 	// and buffers it (crdb inmemory)
 	crdbInsert = `WITH previous_data (aggregate_type_cd, resource_owner) AS (
 	SELECT agg_type.cd, agg.ro FROM (
-		SELECT 
-			creation_date cd
-			, 1 join_me 
-		FROM 
-			eventstore.events 
-		WHERE 
-			aggregate_type = $2 
-			AND (CASE WHEN $9::TEXT IS NULL THEN instance_id IS NULL ELSE instance_id = $9::TEXT END) 
-		ORDER BY
-			creation_date DESC
-		LIMIT 1
+		SELECT
+			CASE WHEN $10::TIMESTAMPTZ IS NOT NULL
+			THEN $10::TIMESTAMPTZ
+			ELSE (
+				SELECT 
+					creation_date cd
+				FROM 
+					eventstore.events 
+				WHERE 
+					aggregate_type = $2 
+					AND (CASE WHEN $9::TEXT IS NULL THEN instance_id IS NULL ELSE instance_id = $9::TEXT END) 
+				ORDER BY
+					creation_date DESC
+				LIMIT 1)
+			END AS cd
+			, 1 join_me
 	) AS agg_type
 	LEFT JOIN (
 		SELECT 
@@ -119,6 +124,7 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 
+		var creationDate sql.NullTime
 		for _, event := range events {
 			var previousEvent sql.NullTime
 			err := tx.QueryRowContext(ctx, crdbInsert,
@@ -131,6 +137,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorService,
 				event.ResourceOwner,
 				event.InstanceID,
+				creationDate,
 			).Scan(&event.ID, &event.CreationDate, &event.ResourceOwner, &event.InstanceID, &previousEvent)
 
 			if err != nil {
@@ -145,6 +152,8 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 			}
 
 			event.PreviousEventDate = previousEvent.Time
+			creationDate.Time = event.CreationDate
+			creationDate.Valid = true
 		}
 
 		err := db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
