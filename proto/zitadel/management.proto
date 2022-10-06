@@ -2938,6 +2938,26 @@ service ManagementService {
         };
     }
 
+    rpc ListFlowTypes(ListFlowTypesRequest) returns (ListFlowTypesResponse) {
+        option (google.api.http) = {
+            post: "/flows/types/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.read"
+        };
+    }
+
+    rpc ListFlowTriggerTypes(ListFlowTriggerTypesRequest) returns (ListFlowTriggerTypesResponse) {
+        option (google.api.http) = {
+            post: "/flows/{type}/triggers/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.read"
+        };
+    }
+
     rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
         option (google.api.http) = {
             get: "/flows/{type}"
@@ -5725,6 +5745,20 @@ message DeleteActionRequest {
 
 message DeleteActionResponse {}
 
+message ListFlowTypesRequest {}
+
+message ListFlowTypesResponse {
+    repeated zitadel.action.v1.FlowType result = 1;
+}
+
+message ListFlowTriggerTypesRequest {
+    string type = 1;
+}
+
+message ListFlowTriggerTypesResponse {
+    repeated zitadel.action.v1.TriggerType result = 1;
+}
+
 message DeactivateActionRequest {
     string id = 1;
 }
@@ -5742,7 +5776,8 @@ message ReactivateActionResponse {
 }
 
 message GetFlowRequest {
-    zitadel.action.v1.FlowType type = 1;
+    // id of the flow
+    string type = 1;
 }
 
 message GetFlowResponse {
@@ -5750,7 +5785,8 @@ message GetFlowResponse {
 }
 
 message ClearFlowRequest {
-    zitadel.action.v1.FlowType type = 1;
+    // id of the flow
+    string type = 1;
 }
 
 message ClearFlowResponse {
@@ -5758,8 +5794,10 @@ message ClearFlowResponse {
 }
 
 message SetTriggerActionsRequest {
-    zitadel.action.v1.FlowType flow_type = 1;
-    zitadel.action.v1.TriggerType trigger_type = 2;
+    // id of the flow type
+    string flow_type = 1;
+    // id of the trigger type
+    string trigger_type = 2;
     repeated string action_ids = 3;
 }
 

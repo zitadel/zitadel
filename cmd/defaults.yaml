@@ -307,6 +307,13 @@ SystemDefaults:
     PublicKeyLifetime: 30h
     CertificateLifetime: 8766h
 
+Actions:
+  HTTP:
+    # wildcard sub domains are currently unsupported
+    DenyList:
+      - localhost
+      - '127.0.0.1'
+
 DefaultInstance:
   InstanceName:
   DefaultLanguage: en

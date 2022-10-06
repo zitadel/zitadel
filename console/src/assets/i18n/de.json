@@ -654,15 +654,6 @@
       "1": "inaktiv",
       "2": "aktiv"
     },
-    "TYPES": {
-      "0": "Unspezifisch",
-      "1": "Externe Authentifizierung"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post Authentication",
-      "2": "Pre Creation",
-      "3": "Post Creation"
-    },
     "ADDTRIGGER": "Trigger hinzufügen",
     "FLOWCHANGED": "Der Ablauf wurde geändert",
     "FLOWCLEARED": "Der Ablauf wurde zurückgesetzt",
@@ -689,6 +680,10 @@
       "CLEAR": {
         "TITLE": "Flow zurücksetzen?",
         "DESCRIPTION": "Sie sind im Begriff den Flow mitsamt seinen Triggern und Aktionen zurückzusetzen. Diese Änderung kann nicht wiederhergestellt werden."
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Ausgewählte Aktionen löschen?",
+        "DESCRIPTION": "Wollen Sie die gewählten Aktionen wirklich löschen?"
       }
     },
     "TOAST": {
