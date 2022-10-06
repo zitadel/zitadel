@@ -101,7 +101,7 @@
   <div *ngIf="previewData && data" class="lab-policy-content">
     <mat-accordion class="settings">
       <mat-expansion-panel class="expansion">
-        <mat-expansion-panel-header [attr.data-e2e]="'policy-category'">
+        <mat-expansion-panel-header data-e2e="policy-category">
           <mat-panel-title>
             <div class="panel-title">
               <i class="icon las la-image"></i>
@@ -127,7 +127,7 @@
             {{ 'POLICY.PRIVATELABELING.EMAILNOSVG' | translate }}
           </cnsl-info-section>
 
-          <div class="logo-view" [attr.data-e2e]="'image-part-logo'">
+          <div class="logo-view" data-e2e="image-part-logo">
             <span class="label cnsl-secondary-text">Logo</span>
             <div class="img-wrapper">
               <ng-container
@@ -162,7 +162,7 @@
                   "
                   matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
                 >
-                  <i class="las la-ban"></i>
+                  <i class="las la-trash"></i>
                 </button>
               </ng-container>
               <ng-template #addLogoButton>
@@ -198,7 +198,7 @@
             </div>
           </div>
 
-          <div class="logo-view" [attr.data-e2e]="'image-part-icon'">
+          <div class="logo-view" data-e2e="image-part-icon">
             <span class="label cnsl-secondary-text">Icon</span>
             <div class="img-wrapper icon">
               <ng-container
@@ -233,7 +233,7 @@
                   "
                   matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
                 >
-                  <i class="las la-ban"></i>
+                  <i class="las la-trash"></i>
                 </button>
               </ng-container>
               <ng-template #addIconButton>
@@ -478,7 +478,7 @@
       </mat-expansion-panel>
 
       <mat-expansion-panel class="expansion">
-        <mat-expansion-panel-header class="header" [attr.data-e2e]="'policy-category'">
+        <mat-expansion-panel-header class="header" data-e2e="policy-category">
           <mat-panel-title>
             <div class="panel-title">
               <i class="icon las la-font"></i>
@@ -514,7 +514,7 @@
               (click)="deleteFont()"
               matTooltip="{{ 'ACTIONS.DELETE' | translate }}"
             >
-              <i class="las la-ban"></i>
+              <i class="las la-trash"></i>
             </button>
           </div>
 
@@ -568,7 +568,7 @@
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>
-        <div class="adv-container" *ngIf="previewData">
+        <div class="adv-container">
           <mat-slide-toggle
             class="toggle"
             color="primary"

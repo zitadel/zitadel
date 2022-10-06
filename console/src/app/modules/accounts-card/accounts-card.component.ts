@@ -11,7 +11,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
   styleUrls: ['./accounts-card.component.scss'],
 })
 export class AccountsCardComponent implements OnInit {
-  @Input() public user!: User.AsObject;
+  @Input() public user?: User.AsObject;
   @Input() public iamuser: boolean | null = false;
 
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
@@ -22,12 +22,7 @@ export class AccountsCardComponent implements OnInit {
     this.userService
       .listMyUserSessions()
       .then((sessions) => {
-        this.sessions = sessions.resultList;
-        const index = this.sessions.findIndex((user) => user.loginName === this.user.preferredLoginName);
-        if (index > -1) {
-          this.sessions.splice(index, 1);
-        }
-
+        this.sessions = sessions.resultList.filter((user) => user.loginName !== this.user?.preferredLoginName);
         this.loadingUsers = false;
       })
       .catch(() => {
@@ -56,7 +51,6 @@ export class AccountsCardComponent implements OnInit {
         login_hint: loginHint,
       },
     };
-    (configWithPrompt as any).customQueryParams['login_hint'] = loginHint;
     this.authService.authenticate(configWithPrompt);
   }
 

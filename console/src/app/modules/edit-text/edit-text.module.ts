@@ -14,9 +14,7 @@ import { InfoSectionModule } from '../info-section/info-section.module';
 import { EditTextComponent } from './edit-text.component';
 
 @NgModule({
-  declarations: [
-    EditTextComponent,
-  ],
+  declarations: [EditTextComponent],
   imports: [
     CommonModule,
     InfoSectionModule,
@@ -32,8 +30,6 @@ import { EditTextComponent } from './edit-text.component';
     TextFieldModule,
     CopyToClipboardModule,
   ],
-  exports: [
-    EditTextComponent,
-  ],
+  exports: [EditTextComponent],
 })
-export class EditTextModule { }
+export class EditTextModule {}

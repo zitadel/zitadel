@@ -81,7 +81,7 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 		l.renderMailVerification(w, r, authReq, userID, err)
 		return
 	}
-	l.renderMailVerified(w, r, authReq)
+	l.renderMailVerified(w, r, authReq, userOrg)
 }
 
 func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, err error) {
@@ -98,14 +98,23 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 		profileData: l.getProfileData(authReq),
 	}
 	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		user, err := l.query.GetUserByID(r.Context(), false, userID)
+		if err == nil {
+			l.customTexts(r.Context(), translator, user.ResourceOwner)
+		}
+	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
-func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	data := mailVerificationData{
 		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
 		profileData: l.getProfileData(authReq),
 	}
 	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		l.customTexts(r.Context(), translator, orgID)
+	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerified], data, nil)
 }

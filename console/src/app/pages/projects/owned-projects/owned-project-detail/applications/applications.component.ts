@@ -19,7 +19,7 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
   @Input() public disabled: boolean = false;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<App.AsObject>;
-  public dataSource!: ProjectApplicationsDataSource;
+  public dataSource: ProjectApplicationsDataSource = new ProjectApplicationsDataSource(this.mgmtService);
   public selection: SelectionModel<App.AsObject> = new SelectionModel<App.AsObject>(true, []);
 
   public displayedColumns: string[] = ['name', 'type', 'state', 'creationDate', 'changeDate'];
@@ -27,7 +27,6 @@ export class ApplicationsComponent implements AfterViewInit, OnInit {
   constructor(private mgmtService: ManagementService) {}
 
   ngOnInit(): void {
-    this.dataSource = new ProjectApplicationsDataSource(this.mgmtService);
     this.dataSource.loadApps(this.projectId, 0, 25);
   }
 

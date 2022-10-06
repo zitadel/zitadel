@@ -47,7 +47,7 @@ export class AppComponent implements OnDestroy {
   public showProjectSection: boolean = false;
 
   private destroy$: Subject<void> = new Subject();
-  public labelpolicy!: LabelPolicy.AsObject;
+  public labelpolicy: LabelPolicy.AsObject | undefined = undefined;
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
@@ -184,20 +184,6 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
     );
 
-    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((route) => {
-      const { org } = route;
-      if (org) {
-        this.authService
-          .getActiveOrg(org)
-          .then((queriedOrg) => {
-            this.org = queriedOrg;
-          })
-          .catch((error) => {
-            this.router.navigate(['/users/me']);
-          });
-      }
-    });
-
     this.getProjectCount();
 
     this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
@@ -209,10 +195,12 @@ export class AppComponent implements OnDestroy {
       if (authenticated) {
         this.authService
           .getActiveOrg()
-          .then((org) => {
+          .then(async (org) => {
             this.org = org;
-            this.themeService.loadPrivateLabelling();
-
+            const policy = await this.themeService.loadPrivateLabelling();
+            if (policy) {
+              this.labelpolicy = policy;
+            }
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })
@@ -265,22 +253,19 @@ export class AppComponent implements OnDestroy {
 
   public changedOrg(org: Org.AsObject): void {
     this.themeService.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/org'], { fragment: org.id });
-    });
+    this.router.navigate(['/org']);
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['en', 'de']);
+    this.translate.addLangs(['en', 'de', 'zh']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
-        // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de|it/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/en|de|it|zh/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it|zh/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

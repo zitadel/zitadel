@@ -294,7 +294,7 @@
       "TITLE": "Passwortlose Authentifizierungsmethoden",
       "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
-      "U2F": "Authentifikator hinzufügen",
+      "U2F": "Methode hinzufügen",
       "U2F_DIALOG_TITLE": "Authentifikator hinzufügen",
       "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
       "U2F_SUCCESS": "Passwortlos erfolgreich erstellt!",
@@ -326,17 +326,6 @@
         "NEW": "Hinzufügen"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadata",
-      "DESCRIPTION": "",
-      "KEY": "Schlüssel",
-      "VALUE": "Wert",
-      "ADD": "Neues Element",
-      "SAVE": "Speichern",
-      "EMPTY": "Keine Metadaten",
-      "SETSUCCESS": "Element erfolgreich gespeichert",
-      "REMOVESUCCESS": "Element erfolgreich gelöscht"
-    },
     "MFA": {
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "ADD": "Faktor hinzufügen",
-      "OTP": "OTP (One-Time Password)",
+      "OTP": "Authentikator App für OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
       "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
       "U2F": "Fingerabdruck, Security Key, Face ID oder andere",
@@ -482,7 +471,7 @@
       "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
-      "MINLENGTHERROR": "Das Passwort muss mindestens {{value}} Zeichen lang sein.",
+      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
       "NOTEQUAL": "Die Passwörter stimmen nicht überein."
     },
     "ID": "ID",
@@ -542,10 +531,10 @@
       "REQUIRED": "Das Eingabefeld ist leer.",
       "MINLENGTH": "Das Passwort muss mindestens {{requiredLength}} Zeichen lang sein.",
       "NOEMAIL": "Benutzername darf keine E-Mail-Adresse sein.",
-      "UPPERCASEMISSING": "Passwort muss einen Grossbuchstaben beinhalten.",
-      "LOWERCASEMISSING": "Passwort muss einen Kleinbuchstaben beinhalten.",
-      "SYMBOLERROR": "Das Passwort muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Das Passwort muss eine Ziffer beinhalten."
+      "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
+      "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
+      "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
+      "NUMBERERROR": "Muss eine Ziffer beinhalten."
     },
     "STATE": {
       "0": "Unbekannt",
@@ -639,6 +628,17 @@
       "DELETED": "Personal Access Token gelöscht."
     }
   },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "DESCRIPTION": "",
+    "KEY": "Schlüssel",
+    "VALUE": "Wert",
+    "ADD": "Neues Element",
+    "SAVE": "Speichern",
+    "EMPTY": "Keine Metadaten",
+    "SETSUCCESS": "Element erfolgreich gespeichert",
+    "REMOVESUCCESS": "Element erfolgreich gelöscht"
+  },
   "FLOWS": {
     "TITLE": "Aktionen und Abläufe",
     "DESCRIPTION": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
@@ -664,6 +664,8 @@
       "3": "Post Creation"
     },
     "ADDTRIGGER": "Trigger hinzufügen",
+    "FLOWCHANGED": "Der Ablauf wurde geändert",
+    "FLOWCLEARED": "Der Ablauf wurde zurückgesetzt",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in Sekunden",
     "ALLOWEDTOFAIL": "Allowed To Fail",
@@ -890,7 +892,8 @@
       "de": "Deutsch",
       "en": "English",
       "it": "Italiano",
-      "fr": "Français"
+      "fr": "Français",
+      "zh": "Chinese"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -976,9 +979,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
       "DESCRIPTION": "Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-      "SYMBOLANDNUMBERERROR": "Das Passwort muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
-      "SYMBOLERROR": "Das Passwort muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Das Passwort muss eine Ziffer beinhalten.",
+      "SYMBOLANDNUMBERERROR": "Muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
+      "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
+      "NUMBERERROR": "Muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "PRIVATELABELING": {
@@ -1003,6 +1006,7 @@
       "MAXSIZE": "Die maximale Grösse von Uploads ist mit 524kB begrenzt",
       "EMAILNOSVG": "Das SVG Dateiformat wird nicht in emails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
       "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
+      "NOSVGSUPPORTED": "SVG werden nicht unterstützt!",
       "FONTINLOGINONLY": "Die Schriftart wird momentan nur im Login interface angezeigt.",
       "VIEWS": {
         "PREVIEW": "Vorschau",
@@ -1069,7 +1073,8 @@
         "de": "Deutsch",
         "en": "English",
         "it": "Italiano",
-        "fr": "Français"
+        "fr": "Français",
+        "zh": "Chinese"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1360,6 +1365,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Besitzer",
       "GRANTEDORGNAME": "Name der Organisation",
+      "GRANTID": "Grant Id",
       "CREATIONDATE": "Erstelldatum",
       "CHANGEDATE": "Letzte Änderung",
       "DATES": "Datum",
@@ -1604,9 +1610,9 @@
       "TITLE": "Anwendung",
       "ID": "ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
-      "CREATE_OIDC": "OIDC-Anwendung",
-      "CREATE_OIDC_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
-      "CREATE_OIDC_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert.",
+      "CREATE": "Applikation erstellen",
+      "CREATE_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
+      "CREATE_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert.",
       "STATE": "Status",
       "DATECREATED": "Erstellt",
       "DATECHANGED": "Geändert",
@@ -1659,6 +1665,10 @@
     "ADDITIONALORIGINSDESC": "Wenn sie zusätzliche Origins definieren wollen, die nicht den Redirect URIs gleichzusetzen sind, können Sie dies hier tun.",
     "ORIGINS": "Origins",
     "NOTANORIGIN": "Der Angegebene Wert ist kein Origin.",
+    "PROSWITCH": "Konfigurator überspringen",
+    "NAMEANDTYPESECTION": "Name und Typ",
+    "TITLEFIRST": "Name der Applikation.",
+    "TYPETITLE": "Art der Anwendung",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1667,10 +1677,6 @@
       "CURRENT": "Aktuelle Konfiguration",
       "TOKENSECTIONTITLE": "AuthToken Optionen",
       "REDIRECTSECTIONTITLE": "Weiterleitungseinstellungen",
-      "PROSWITCH": "Konfigurator überspringen",
-      "NAMEANDTYPESECTION": "Name und Typ",
-      "TITLEFIRST": "Gebe zuerst einen Namen ein.",
-      "TYPETITLE": "Welche Art von Anwendung möchtest Du erstellen?",
       "REDIRECTTITLE": "Wohin soll nach dem Log-in weitergeleitet werden?",
       "REDIRECTDESCRIPTIONWEB": "Die Weiterleitung muss mit https:// beginnen. http:// ist nur im Entwicklermodus zulässig.",
       "REDIRECTDESCRIPTIONNATIVE": "Die Weiterleitung muss mit einem eigenen Protokoll, http://127.0.0.1, http://[::1] oder http://localhost beginnen.",
@@ -1762,6 +1768,18 @@
         "1": "Private Key JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML Applikationen"
+      },
+      "CONFIGSECTION": "SAML Konfiguration",
+      "URL": "Url des Metadata Files",
+      "OR": "oder",
+      "XML": "Metadata XML hochladen",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata aus Datei"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
@@ -1814,7 +1832,8 @@
     "de": "Deutsch",
     "en": "English",
     "it": "Italiano",
-    "fr": "Français"
+    "fr": "Français",
+    "zh": "Chinese"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

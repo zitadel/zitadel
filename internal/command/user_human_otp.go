@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 
 	"github.com/zitadel/logging"
@@ -15,6 +16,9 @@ import (
 func (c *Commands) ImportHumanOTP(ctx context.Context, userID, userAgentID, resourceowner string, key string) error {
 	encryptedSecret, err := crypto.Encrypt([]byte(key), c.multifactors.OTP.CryptoMFA)
 	if err != nil {
+		return err
+	}
+	if err = c.checkUserExists(ctx, userID, resourceowner); err != nil {
 		return err
 	}
 

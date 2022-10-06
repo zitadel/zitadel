@@ -142,6 +142,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token is invalid
       NotFound: Refresh Token not found
+  Instance:
+    NotFound: Instance not found
+    AlreadyExists: Instance already exists
+    NotChanged: Instance not changed
   Org:
     AlreadyExists: Organisation's name already taken
     Invalid: Organisation is invalid
@@ -249,8 +253,13 @@ Errors:
       NotInactive: Application is not inactive
       OIDCConfigInvalid: OIDC configuration is invalid
       APIConfigInvalid: API configuration is invalid
-      IsNotOIDC: Application is not type oidc
+      SAMLConfigInvalid: SAML configuration is invalid
+      IsNotOIDC: Application is not type OIDC
       IsNotAPI: Application is not type API
+      IsNotSAML: Application is not type SAML
+      SAMLMetadataMissing: SAML metadata is missing
+      SAMLMetadataFormat: SAML Metadata format error
+      SAMLEntityIDAlreadyExisting: SAML EntityID already existing
       OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
       APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
       AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
@@ -265,6 +274,7 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
   IAM:
+    NotFound: Instance not found
     Member:
       RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
@@ -388,7 +398,7 @@ Errors:
     ReadError: Error in reading translation file
     MergeError: Translation file could not be merged with custom translations
     NotFound: Translation file doesn't exist
-  MetaData:
+  Metadata:
     NotFound: Metadata not found
     NoData: Metadata list is empty
     Invalid: Metadata is invalid
@@ -750,6 +760,9 @@ EventTypes:
           added: Application key added
           removed: Application key removed
       config:
+        saml:
+          added: SAML Configuration added
+          changed: SAML Configuration changed
         oidc:
           added: OIDC Configuration added
           changed: OIDC Configuration changed

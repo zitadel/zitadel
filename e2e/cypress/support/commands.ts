@@ -2,11 +2,11 @@
 namespace Cypress {
     interface Chainable {
 */
-        /**
-         * Custom command that authenticates a user.
-         *
-         * @example cy.consolelogin('hodor', 'hodor1234')
-         */
+/**
+ * Custom command that authenticates a user.
+ *
+ * @example cy.consolelogin('hodor', 'hodor1234')
+ */
 /*        consolelogin(username: string, password: string): void
     }
 }

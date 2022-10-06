@@ -1,7 +1,7 @@
 <div class="max-width-container">
   <div class="home-wrapper enlarged-container">
     <div class="header">
-      <h1 class="title">{{ 'HOME.WELCOME' | translate }}</h1>
+      <h1 class="title" data-e2e="authenticated-welcome">{{ 'HOME.WELCOME' | translate }}</h1>
     </div>
 
     <cnsl-shortcuts></cnsl-shortcuts>
@@ -18,7 +18,7 @@
       </a>
 
       <a
-        href="https://docs.zitadel.com/docs/guides/basics/get-started/"
+        href="https://docs.zitadel.com/docs/guides/start/quickstart"
         target="_blank"
         rel="noreferrer"
         class="grid-item green"
@@ -29,12 +29,7 @@
         <span>{{ 'HOME.GETSTARTED.TITLE' | translate }}</span>
       </a>
 
-      <a
-        href="https://docs.zitadel.com/docs/quickstarts/introduction"
-        target="_blank"
-        rel="noreferrer"
-        class="grid-item green"
-      >
+      <a href="https://docs.zitadel.com/docs/examples/introduction" target="_blank" rel="noreferrer" class="grid-item green">
         <div class="grid-item-avatar green">
           <i class="icon las la-play"></i>
         </div>

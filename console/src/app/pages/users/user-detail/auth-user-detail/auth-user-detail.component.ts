@@ -6,15 +6,18 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-
+import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
 @Component({
@@ -23,13 +26,14 @@ import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.c
   styleUrls: ['./auth-user-detail.component.scss'],
 })
 export class AuthUserDetailComponent implements OnDestroy {
-  public user!: User.AsObject;
+  public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'it'];
+  public languages: string[] = ['de', 'en', 'fr', 'it', 'zh'];
 
   private subscription: Subscription = new Subscription();
 
   public loading: boolean = false;
+  public loadingMetadata: boolean = false;
 
   public ChangeType: any = ChangeType;
   public userLoginMustBeDomain: boolean = false;
@@ -37,6 +41,8 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
+
+  public metadata: Metadata.AsObject[] = [];
 
   public settingsList: SidenavSetting[] = [
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
@@ -55,6 +61,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     public userService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
+    private mgmt: ManagementService,
     private breadcrumbService: BreadcrumbService,
     private mediaMatcher: MediaMatcher,
     private _location: Location,
@@ -104,6 +111,8 @@ export class AuthUserDetailComponent implements OnDestroy {
         if (resp.user) {
           this.user = resp.user;
 
+          this.loadMetadata();
+
           this.breadcrumbService.setBreadcrumb([
             new Breadcrumb({
               type: BreadcrumbType.AUTHUSER,
@@ -132,13 +141,13 @@ export class AuthUserDetailComponent implements OnDestroy {
         labelKey: 'ACTIONS.NEWVALUE',
         titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE',
         descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
-        value: this.user.userName,
+        value: this.user?.userName,
       },
       width: '400px',
     });
 
     dialogRef.afterClosed().subscribe((resp: { value: string }) => {
-      if (resp && resp.value && resp.value !== this.user.userName) {
+      if (resp && resp.value && resp.value !== this.user?.userName) {
         this.userService
           .updateMyUserName(resp.value)
           .then(() => {
@@ -153,7 +162,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public saveProfile(profileData: Profile.AsObject): void {
-    if (this.user.human) {
+    if (this.user?.human) {
       this.user.human.profile = profileData;
 
       this.userService
@@ -180,7 +189,7 @@ export class AuthUserDetailComponent implements OnDestroy {
       .setMyEmail(email)
       .then(() => {
         this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
-        if (this.user.human) {
+        if (this.user?.human) {
           const mailToSet = new Email();
           mailToSet.setEmail(email);
           this.user.human.email = mailToSet.toObject();
@@ -237,7 +246,7 @@ export class AuthUserDetailComponent implements OnDestroy {
       .removeMyPhone()
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-        if (this.user.human?.phone) {
+        if (this.user?.human?.phone) {
           const phone = new Phone();
           this.user.human.phone = phone.toObject();
           this.refreshUser();
@@ -249,12 +258,12 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public savePhone(phone: string): void {
-    if (this.user.human) {
+    if (this.user?.human) {
       this.userService
         .setMyPhone(phone)
         .then(() => {
           this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-          if (this.user.human) {
+          if (this.user?.human) {
             const phoneToSet = new Phone();
             phoneToSet.setPhone(phone);
             this.user.human.phone = phoneToSet.toObject();
@@ -277,7 +286,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             labelKey: 'USER.LOGINMETHODS.PHONE.EDITVALUE',
             titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
-            value: this.user.human?.phone?.phone,
+            value: this.user?.human?.phone?.phone,
             type: type,
           },
           width: '400px',
@@ -297,7 +306,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             labelKey: 'ACTIONS.NEWVALUE',
             titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
             descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
-            value: this.user.human?.email?.email,
+            value: this.user?.human?.email?.email,
             type: type,
           },
           width: '400px',
@@ -336,5 +345,46 @@ export class AuthUserDetailComponent implements OnDestroy {
           });
       }
     });
+  }
+
+  public loadMetadata(): Promise<any> | void {
+    if (this.user) {
+      this.loadingMetadata = true;
+      return this.mgmt
+        .listUserMetadata(this.user.id)
+        .then((resp) => {
+          this.loadingMetadata = false;
+          this.metadata = resp.resultList.map((md) => {
+            return {
+              key: md.key,
+              value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+            };
+          });
+        })
+        .catch((error) => {
+          this.loadingMetadata = false;
+          this.toast.showError(error);
+        });
+    }
+  }
+
+  public editMetadata(): void {
+    if (this.user && this.user.id) {
+      const setFcn = (key: string, value: string): Promise<any> =>
+        this.mgmt.setUserMetadata(key, Buffer.from(value).toString('base64'), this.user?.id ?? '');
+      const removeFcn = (key: string): Promise<any> => this.mgmt.removeUserMetadata(key, this.user?.id ?? '');
+
+      const dialogRef = this.dialog.open(MetadataDialogComponent, {
+        data: {
+          metadata: this.metadata,
+          setFcn: setFcn,
+          removeFcn: removeFcn,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.loadMetadata();
+      });
+    }
   }
 }

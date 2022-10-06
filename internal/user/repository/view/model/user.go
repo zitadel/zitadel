@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
@@ -42,18 +42,18 @@ const (
 )
 
 type UserView struct {
-	ID                 string         `json:"-" gorm:"column:id;primary_key"`
-	CreationDate       time.Time      `json:"-" gorm:"column:creation_date"`
-	ChangeDate         time.Time      `json:"-" gorm:"column:change_date"`
-	ResourceOwner      string         `json:"-" gorm:"column:resource_owner"`
-	State              int32          `json:"-" gorm:"column:user_state"`
-	LastLogin          time.Time      `json:"-" gorm:"column:last_login"`
-	LoginNames         pq.StringArray `json:"-" gorm:"column:login_names"`
-	PreferredLoginName string         `json:"-" gorm:"column:preferred_login_name"`
-	Sequence           uint64         `json:"-" gorm:"column:sequence"`
-	Type               userType       `json:"-" gorm:"column:user_type"`
-	UserName           string         `json:"userName" gorm:"column:user_name"`
-	InstanceID         string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	ID                 string               `json:"-" gorm:"column:id;primary_key"`
+	CreationDate       time.Time            `json:"-" gorm:"column:creation_date"`
+	ChangeDate         time.Time            `json:"-" gorm:"column:change_date"`
+	ResourceOwner      string               `json:"-" gorm:"column:resource_owner"`
+	State              int32                `json:"-" gorm:"column:user_state"`
+	LastLogin          time.Time            `json:"-" gorm:"column:last_login"`
+	LoginNames         database.StringArray `json:"-" gorm:"column:login_names"`
+	PreferredLoginName string               `json:"-" gorm:"column:preferred_login_name"`
+	Sequence           uint64               `json:"-" gorm:"column:sequence"`
+	Type               userType             `json:"-" gorm:"column:user_type"`
+	UserName           string               `json:"userName" gorm:"column:user_name"`
+	InstanceID         string               `json:"instanceID" gorm:"column:instance_id;primary_key"`
 	*MachineView
 	*HumanView
 }
@@ -220,16 +220,15 @@ func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
 }
 
 func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_model.OrgDomain) {
-	loginNames := make([]string, 0)
+	u.LoginNames = make([]string, 0, len(domains))
 	for _, d := range domains {
 		if d.Verified {
-			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
+			u.LoginNames = append(u.LoginNames, u.GenerateLoginName(d.Domain, true))
 		}
 	}
 	if !userLoginMustBeDomain {
-		loginNames = append(loginNames, u.UserName)
+		u.LoginNames = append(u.LoginNames, u.GenerateLoginName(u.UserName, true))
 	}
-	u.LoginNames = loginNames
 }
 
 func (u *UserView) AppendEvent(event *models.Event) (err error) {
@@ -310,9 +309,17 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 		u.State = int32(model.UserStateLocked)
 	case user.UserV1MFAOTPAddedType,
 		user.HumanMFAOTPAddedType:
+		if u.HumanView == nil {
+			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
+			return errors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
+		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
+		if u.HumanView == nil {
+			logging.WithFields("sequence", event.Sequence, "instance", event.InstanceID).Warn("event is ignored because human not exists")
+			return errors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
+		}
 		u.OTPState = int32(model.MFAStateReady)
 		u.MFAInitSkipped = time.Time{}
 	case user.UserV1MFAOTPRemovedType,
@@ -361,7 +368,7 @@ func (u *UserView) setRootData(event *models.Event) {
 func (u *UserView) setData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
 		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
+		return errors.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
 	return nil
 }
@@ -370,7 +377,7 @@ func (u *UserView) setPasswordData(event *models.Event) error {
 	password := new(es_model.Password)
 	if err := json.Unmarshal(event.Data, password); err != nil {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil
 	u.PasswordInitRequired = !u.PasswordSet
@@ -476,7 +483,7 @@ func webAuthNViewFromEvent(event *models.Event) (*WebAuthNView, error) {
 	token := new(WebAuthNView)
 	err := json.Unmarshal(event.Data, token)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
+		return nil, errors.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
 	}
 	return token, err
 }

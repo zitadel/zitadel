@@ -8,7 +8,7 @@ import { OIDCAppType } from 'src/app/proto/generated/zitadel/app_pb';
 })
 export class AppCardComponent {
   @Input() public outline: boolean = false;
-  @Input() public type: OIDCAppType | undefined = undefined;
+  @Input() public type: OIDCAppType | 'SAML' | undefined = undefined;
   @Input() public isApiApp: boolean = false;
   public OIDCAppType: any = OIDCAppType;
 }

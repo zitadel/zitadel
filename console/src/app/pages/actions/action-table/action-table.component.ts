@@ -10,9 +10,9 @@ import { PaginatorComponent } from 'src/app/modules/paginator/paginator.componen
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Action, ActionState } from 'src/app/proto/generated/zitadel/action_pb';
 import {
-    CreateActionRequest,
-    ListActionsResponse,
-    UpdateActionRequest,
+  CreateActionRequest,
+  ListActionsResponse,
+  UpdateActionRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -28,7 +28,7 @@ export class ActionTableComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public dataSource: MatTableDataSource<Action.AsObject> = new MatTableDataSource<Action.AsObject>();
   public selection: SelectionModel<Action.AsObject> = new SelectionModel<Action.AsObject>(true, []);
-  public actionsResult!: ListActionsResponse.AsObject;
+  public actionsResult?: ListActionsResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   @Input() public displayedColumns: string[] = ['select', 'name', 'state', 'timeout', 'allowedToFail', 'actions'];
@@ -50,7 +50,7 @@ export class ActionTableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getData(10, 0);
+    this.getData(20, 0);
   }
 
   public isAllSelected(): boolean {
@@ -84,7 +84,8 @@ export class ActionTableComponent implements OnInit {
           .deleteAction(action.id)
           .then(() => {
             this.toast.showInfo('FLOWS.DIALOG.DELETEACTION.DELETE_SUCCESS', true);
-            this.getData(10, 0);
+
+            this.refreshPage();
           })
           .catch((error: any) => {
             this.toast.showError(error);
@@ -152,7 +153,9 @@ export class ActionTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    setTimeout(() => {
+      this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    }, 1000);
   }
 
   public deactivateSelection(): Promise<void> {

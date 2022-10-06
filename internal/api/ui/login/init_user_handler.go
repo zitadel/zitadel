@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/zitadel/zitadel/internal/domain"
-
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -31,15 +30,14 @@ type initUserFormData struct {
 type initUserData struct {
 	baseData
 	profileData
-	Code                      string
-	UserID                    string
-	PasswordSet               bool
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
+	Code         string
+	UserID       string
+	PasswordSet  bool
+	MinLength    uint64
+	HasUppercase string
+	HasLowercase string
+	HasNumber    string
+	HasSymbol    string
 }
 
 func InitUserLink(origin, userID, code, orgID string, passwordSet bool) string {
@@ -88,7 +86,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
 		return
 	}
-	l.renderInitUserDone(w, r, authReq)
+	l.renderInitUserDone(w, r, authReq, userOrgID)
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, showPassword bool) {
@@ -120,9 +118,8 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 		Code:        code,
 		PasswordSet: passwordSet,
 	}
-	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, nil, userID)
+	policy := l.getPasswordComplexityPolicyByUserID(r, userID)
 	if policy != nil {
-		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
 		if policy.HasUppercase {
 			data.HasUppercase = UpperCaseRegex
@@ -138,10 +135,20 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 		}
 	}
 	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		user, err := l.query.GetUserByID(r.Context(), false, userID)
+		if err == nil {
+			l.customTexts(r.Context(), translator, user.ResourceOwner)
+		}
+	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitUser], data, nil)
 }
 
-func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	data := l.getUserData(r, authReq, "User Init Done", "", "")
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplInitUserDone], data, nil)
+	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		l.customTexts(r.Context(), translator, orgID)
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitUserDone], data, nil)
 }

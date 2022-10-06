@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
-
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -952,7 +950,7 @@ func TestTextQuery_comp(t *testing.T) {
 			want: want{
 				query: &listContains{
 					col:  testCol,
-					args: []interface{}{pq.StringArray{"Hurst"}},
+					args: []interface{}{"Hurst"},
 				},
 			},
 		},
@@ -1256,7 +1254,7 @@ func TestNumberQuery_comp(t *testing.T) {
 			want: want{
 				query: &listContains{
 					col:  testCol,
-					args: []interface{}{pq.GenericArray{42}},
+					args: []interface{}{42},
 				},
 			},
 		},

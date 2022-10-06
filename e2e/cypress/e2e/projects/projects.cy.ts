@@ -11,7 +11,7 @@ describe('projects', () => {
       apiAuth().then((api) => {
         ensureProjectDoesntExist(api, testProjectNameCreate);
       });
-      cy.visit(`/ui/console/projects`);
+      cy.visit(`/projects`);
     });
 
     it('should add a project', () => {
@@ -24,23 +24,23 @@ describe('projects', () => {
     });
   });
 
-  describe.skip('remove project', () => {
+  describe('remove project', () => {
     describe('list view', () => {
       beforeEach('ensure it exists', () => {
         apiAuth().then((api) => {
           ensureProjectExists(api, testProjectNameDeleteList);
         });
-        cy.visit(`/ui/console/projects`);
+        cy.visit(`/projects`);
       });
 
       it('removes the project', () => {
-        cy.get('[data-e2e=toggle-grid]').click();
-        cy.get('[data-e2e=timestamp]');
+        cy.get('[data-e2e="toggle-grid"]').click();
+        cy.get('[data-e2e="timestamp"]');
         cy.contains('tr', testProjectNameDeleteList, { timeout: 1000 })
-          .find('[data-e2e=delete-project-button]')
-          .click({force: true});
-        cy.get('[e2e-data="confirm-dialog-input"]').type(testProjectNameDeleteList);
-        cy.get('[e2e-data="confirm-dialog-button"]').click();
+          .find('[data-e2e="delete-project-button"]')
+          .click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDeleteList);
+        cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.get('.data-e2e-success');
         cy.wait(200);
         cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
@@ -52,16 +52,15 @@ describe('projects', () => {
         apiAuth().then((api) => {
           ensureProjectExists(api, testProjectNameDeleteGrid);
         });
-        cy.visit(`/ui/console/projects`);
+        cy.visit(`/projects`);
       });
 
       it('removes the project', () => {
-        cy.contains('[data-e2e=grid-card]', testProjectNameDeleteGrid)
-          .find('[data-e2e=delete-project-button]')
-          .trigger('mouseover')
-          .click();
-        cy.get('[e2e-data="confirm-dialog-input"]').type(testProjectNameDeleteGrid);
-        cy.get('[e2e-data="confirm-dialog-button"]').click();
+        cy.contains('[data-e2e="grid-card"]', testProjectNameDeleteGrid)
+          .find('[data-e2e="delete-project-button"]')
+          .click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDeleteGrid);
+        cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.get('.data-e2e-success');
         cy.wait(200);
         cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');

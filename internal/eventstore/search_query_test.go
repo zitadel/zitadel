@@ -4,7 +4,9 @@ import (
 	"math"
 	"reflect"
 	"testing"
+	"time"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -82,6 +84,13 @@ func testSetResourceOwner(resourceOwner string) func(*SearchQueryBuilder) *Searc
 	return func(builder *SearchQueryBuilder) *SearchQueryBuilder {
 		builder = builder.ResourceOwner(resourceOwner)
 		return builder
+	}
+}
+
+func testSetCreationDateAfter(date time.Time) func(*SearchQuery) *SearchQuery {
+	return func(query *SearchQuery) *SearchQuery {
+		query = query.CreationDateAfter(date)
+		return query
 	}
 }
 
@@ -223,6 +232,7 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 }
 
 func TestSearchQuerybuilderBuild(t *testing.T) {
+	testNow := time.Now()
 	type args struct {
 		columns    Columns
 		setters    []func(*SearchQueryBuilder) *SearchQueryBuilder
@@ -312,7 +322,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Limit:   0,
 					Filters: [][]*repository.Filter{
 						{
-							repository.NewFilter(repository.FieldAggregateType, []repository.AggregateType{"user", "org"}, repository.OperationIn),
+							repository.NewFilter(repository.FieldAggregateType, database.StringArray{"user", "org"}, repository.OperationIn),
 						},
 					},
 				},
@@ -483,7 +493,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldAggregateID, []string{"1234", "0815"}, repository.OperationIn),
+							repository.NewFilter(repository.FieldAggregateID, database.StringArray{"1234", "0815"}, repository.OperationIn),
 						},
 					},
 				},
@@ -561,7 +571,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldEventType, []repository.EventType{"user.created", "user.changed"}, repository.OperationIn),
+							repository.NewFilter(repository.FieldEventType, database.StringArray{"user.created", "user.changed"}, repository.OperationIn),
 						},
 					},
 				},
@@ -641,6 +651,34 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldInstanceID, "instanceID", repository.OperationEquals),
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "filter aggregate type, instanceID and creation date after",
+			args: args{
+				columns: ColumnsEvent,
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+					testAddQuery(
+						testSetAggregateTypes("user"),
+						testSetCreationDateAfter(testNow),
+					),
+				},
+				instanceID: "instanceID",
+			},
+			res: res{
+				isErr: nil,
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    false,
+					Limit:   0,
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldCreationDate, testNow, repository.OperationGreater),
 							repository.NewFilter(repository.FieldInstanceID, "instanceID", repository.OperationEquals),
 						},
 					},
@@ -740,10 +778,10 @@ func assertRepoQuery(t *testing.T, want, got *repository.SearchQuery) {
 	if !reflect.DeepEqual(got.Columns, want.Columns) {
 		t.Errorf("wrong columns in query: got: %v want: %v", got.Columns, want.Columns)
 	}
-	if !reflect.DeepEqual(got.Desc, want.Desc) {
+	if got.Desc != want.Desc {
 		t.Errorf("wrong desc in query: got: %v want: %v", got.Desc, want.Desc)
 	}
-	if !reflect.DeepEqual(got.Limit, want.Limit) {
+	if got.Limit != want.Limit {
 		t.Errorf("wrong limit in query: got: %v want: %v", got.Limit, want.Limit)
 	}
 

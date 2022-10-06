@@ -377,7 +377,8 @@ input:not([type=radio]):not([type=checkbox])::placeholder,
   font-style: italic;
 }
 
-select, .lgn-select {
+select,
+.lgn-select {
   display: block;
   box-sizing: border-box;
   padding-inline-start: 10px;
@@ -396,7 +397,8 @@ select, .lgn-select {
   width: 100%;
   margin: 0 0 2px 0;
 }
-select::placeholder, .lgn-select::placeholder {
+select::placeholder,
+.lgn-select::placeholder {
   font-size: 14px;
   font-style: italic;
 }
@@ -410,6 +412,9 @@ select::placeholder, .lgn-select::placeholder {
   top: 9px;
   height: inherit;
   vertical-align: middle;
+  max-width: 150px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .lgn-label {
@@ -478,6 +483,7 @@ select::placeholder, .lgn-select::placeholder {
   transform: scale(0);
 }
 .lgn-radio input[type=radio] {
+  display: block;
   opacity: 0;
   margin: 0;
   width: 0;
@@ -1126,6 +1132,45 @@ i {
 .lgn-success-label {
   border-radius: 0.5rem;
   padding: 0.5rem;
+}
+
+.lgn-mfa-options {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin: 2rem 0;
+}
+.lgn-mfa-options .mfa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 0 0.5rem;
+}
+.lgn-mfa-options .mfa input[type=radio] + label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lgn-mfa-options .mfa input[type=radio] + label span {
+  text-align: center;
+}
+.lgn-mfa-options .mfa input[type=radio] + label .mfa-img {
+  border: 1px solid var(--zitadel-color-input-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+.lgn-mfa-options .mfa input[type=radio] + label .mfa-img:hover {
+  border: 1px solid var(--zitadel-color-input-border-active);
+}
+.lgn-mfa-options .mfa input[type=radio] {
+  display: none;
+}
+.lgn-mfa-options .mfa input[type=radio]:checked + label .mfa-img {
+  border: 1px solid var(--zitadel-color-primary);
 }
 
 footer {
@@ -1300,7 +1345,8 @@ input:not([type=radio]):not([type=checkbox])::placeholder,
   font-style: italic;
 }
 
-select, .lgn-select {
+select,
+.lgn-select {
   display: block;
   box-sizing: border-box;
   padding-inline-start: 10px;
@@ -1319,7 +1365,8 @@ select, .lgn-select {
   width: 100%;
   margin: 0 0 2px 0;
 }
-select::placeholder, .lgn-select::placeholder {
+select::placeholder,
+.lgn-select::placeholder {
   font-size: 14px;
   font-style: italic;
 }
@@ -1333,6 +1380,9 @@ select::placeholder, .lgn-select::placeholder {
   top: 9px;
   height: inherit;
   vertical-align: middle;
+  max-width: 150px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .lgn-label {
@@ -1401,6 +1451,7 @@ select::placeholder, .lgn-select::placeholder {
   transform: scale(0);
 }
 .lgn-radio input[type=radio] {
+  display: block;
   opacity: 0;
   margin: 0;
   width: 0;
@@ -2049,6 +2100,45 @@ i {
 .lgn-success-label {
   border-radius: 0.5rem;
   padding: 0.5rem;
+}
+
+.lgn-mfa-options {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  margin: 2rem 0;
+}
+.lgn-mfa-options .mfa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 0 0.5rem;
+}
+.lgn-mfa-options .mfa input[type=radio] + label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lgn-mfa-options .mfa input[type=radio] + label span {
+  text-align: center;
+}
+.lgn-mfa-options .mfa input[type=radio] + label .mfa-img {
+  border: 1px solid var(--zitadel-color-input-border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+.lgn-mfa-options .mfa input[type=radio] + label .mfa-img:hover {
+  border: 1px solid var(--zitadel-color-input-border-active);
+}
+.lgn-mfa-options .mfa input[type=radio] {
+  display: none;
+}
+.lgn-mfa-options .mfa input[type=radio]:checked + label .mfa-img {
+  border: 1px solid var(--zitadel-color-primary);
 }
 
 @font-face {
@@ -2943,6 +3033,17 @@ ul li i.lgn-valid {
 .lgn-success-label {
   color: var(--zitadel-color-success);
   background-color: var(--zitadel-color-success-background);
+}
+
+.lgn-mfa-options .mfa input[type=radio] + label .mfa-img {
+  border: 1px solid var(--zitadel-color-input-border);
+  background-color: var(--zitadel-color-input-background);
+}
+.lgn-mfa-options .mfa input[type=radio] + label .mfa-img:hover {
+  border: 1px solid var(--zitadel-color-input-border-hover);
+}
+.lgn-mfa-options .mfa input[type=radio]:checked + label .mfa-img {
+  border: 1px solid var(--zitadel-color-primary);
 }
 
 /*# sourceMappingURL=zitadel.css.map */

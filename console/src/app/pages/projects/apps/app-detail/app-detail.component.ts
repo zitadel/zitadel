@@ -7,6 +7,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { Buffer } from 'buffer';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -17,21 +18,23 @@ import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.com
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
-    APIAuthMethodType,
-    APIConfig,
-    App,
-    AppState,
-    OIDCAppType,
-    OIDCAuthMethodType,
-    OIDCConfig,
-    OIDCGrantType,
-    OIDCResponseType,
-    OIDCTokenType,
+  APIAuthMethodType,
+  APIConfig,
+  App,
+  AppState,
+  OIDCAppType,
+  OIDCAuthMethodType,
+  OIDCConfig,
+  OIDCGrantType,
+  OIDCResponseType,
+  OIDCTokenType,
+  SAMLConfig,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
-    GetOIDCInformationResponse,
-    UpdateAPIAppConfigRequest,
-    UpdateOIDCAppConfigRequest,
+  GetOIDCInformationResponse,
+  UpdateAPIAppConfigRequest,
+  UpdateOIDCAppConfigRequest,
+  UpdateSAMLAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -40,17 +43,19 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
-    BASIC_AUTH_METHOD,
-    CODE_METHOD,
-    CUSTOM_METHOD,
-    getAuthMethodFromPartialConfig,
-    getPartialConfigFromAuthMethod,
-    IMPLICIT_METHOD,
-    PK_JWT_METHOD,
-    PKCE_METHOD,
-    POST_METHOD,
+  BASIC_AUTH_METHOD,
+  CODE_METHOD,
+  CUSTOM_METHOD,
+  getAuthMethodFromPartialConfig,
+  getPartialConfigFromAuthMethod,
+  IMPLICIT_METHOD,
+  PK_JWT_METHOD,
+  PKCE_METHOD,
+  POST_METHOD,
 } from '../authmethods';
 import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
+
+const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 
 @Component({
   selector: 'cnsl-app-detail',
@@ -71,7 +76,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public authMethods: RadioItemAuthType[] = [];
   private subscription?: Subscription;
   public projectId: string = '';
-  public app!: App.AsObject;
+  public app?: App.AsObject;
 
   public environmentMap: { [key: string]: string } = {};
 
@@ -104,6 +109,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public oidcForm!: UntypedFormGroup;
   public oidcTokenForm!: UntypedFormGroup;
   public apiForm!: UntypedFormGroup;
+  public samlForm!: UntypedFormGroup;
 
   public redirectUrisList: string[] = [];
   public postLogoutRedirectUrisList: string[] = [];
@@ -162,6 +168,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       authMethodType: [{ value: '', disabled: true }],
     });
 
+    this.samlForm = this.fb.group({
+      metadataUrl: [{ value: '', disabled: true }],
+      metadataXml: [{ value: '', disabled: true }],
+    });
+
     this.http.get('./assets/environment.json').subscribe((env: any) => {
       this.environmentMap = {
         issuer: env.issuer,
@@ -183,7 +194,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public openNameDialog(): void {
     const dialogRef = this.dialog.open(NameDialogComponent, {
       data: {
-        name: this.app.name,
+        name: this.app?.name,
         titleKey: 'APP.NAMEDIALOG.TITLE',
         descKey: 'APP.NAMEDIALOG.DESCRIPTION',
         labelKey: 'APP.NAMEDIALOG.NAME',
@@ -193,7 +204,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((name) => {
       if (name) {
-        this.app.name = name;
+        this.app!.name = name;
         this.saveApp();
       }
     });
@@ -290,12 +301,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 } else {
                   this.authMethods = this.authMethods.filter((element) => element !== CUSTOM_METHOD);
                 }
+              } else if (this.app.samlConfig) {
+                this.settingsList = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
               }
 
               if (allowed) {
                 this.oidcForm.enable();
                 this.oidcTokenForm.enable();
                 this.apiForm.enable();
+                this.samlForm.enable();
               }
 
               if (this.app.oidcConfig?.redirectUrisList) {
@@ -344,7 +358,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             }
           })
           .catch((error) => {
-            console.error(error);
             this.toast.showError(error);
             this.errorMessage = error.message;
           });
@@ -354,7 +367,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   private getAuthMethodOptions(type: string): void {
     if (type === 'OIDC') {
-      switch (this.app.oidcConfig?.appType) {
+      switch (this.app?.oidcConfig?.appType) {
         case OIDCAppType.OIDC_APP_TYPE_NATIVE:
           this.authMethods = [PKCE_METHOD, CUSTOM_METHOD];
           break;
@@ -371,6 +384,30 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  public onDropXML(filelist: FileList): void {
+    const file = filelist.item(0);
+    if (file) {
+      if (file.size > MAX_ALLOWED_SIZE) {
+        this.toast.showInfo('POLICY.PRIVATELABELING.MAXSIZEEXCEEDED', true);
+      } else {
+        this.metadataUrl?.setValue('');
+        const reader = new FileReader();
+        reader.onload = ((aXML) => {
+          return (e) => {
+            const xmlBase64 = e.target?.result;
+            if (xmlBase64 && typeof xmlBase64 === 'string' && this.app?.samlConfig) {
+              const samlConfig = new SAMLConfig();
+              const cropped = xmlBase64.replace('data:text/xml;base64,', '');
+              samlConfig.setMetadataXml(cropped);
+              this.app.samlConfig.metadataXml = cropped;
+            }
+          };
+        })(file);
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+
   public authMethodFromPartialConfig(config: { oidc?: OIDCConfig.AsObject; api?: APIConfig.AsObject }): string {
     const key = getAuthMethodFromPartialConfig(config);
     return key;
@@ -378,17 +415,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public setPartialConfigFromAuthMethod(authMethod: string): void {
     const partialConfig = getPartialConfigFromAuthMethod(authMethod);
-    if (partialConfig && partialConfig.oidc && this.app.oidcConfig) {
-      this.app.oidcConfig.responseTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
+    if (partialConfig && partialConfig.oidc && this.app?.oidcConfig) {
+      this.app!.oidcConfig.responseTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).responseTypesList ?? [];
 
-      this.app.oidcConfig.grantTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
+      this.app!.oidcConfig.grantTypesList = (partialConfig.oidc as Partial<OIDCConfig.AsObject>).grantTypesList ?? [];
 
-      this.app.oidcConfig.authMethodType =
+      this.app!.oidcConfig.authMethodType =
         (partialConfig.oidc as Partial<OIDCConfig.AsObject>).authMethodType ?? OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE;
 
       this.oidcForm.patchValue(this.app.oidcConfig);
       this.oidcTokenForm.patchValue(this.app.oidcConfig);
-    } else if (partialConfig && partialConfig.api && this.app.apiConfig) {
+    } else if (partialConfig && partialConfig.api && this.app?.apiConfig) {
       this.app.apiConfig.authMethodType =
         (partialConfig.api as Partial<APIConfig.AsObject>).authMethodType ?? APIAuthMethodType.API_AUTH_METHOD_TYPE_BASIC;
 
@@ -408,7 +445,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe((resp) => {
-      if (resp && this.projectId && this.app.id) {
+      if (resp && this.projectId && this.app?.id) {
         this.mgmtService
           .removeApp(this.projectId, this.app.id)
           .then(() => {
@@ -424,21 +461,21 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public changeState(state: AppState): void {
-    if (state === AppState.APP_STATE_ACTIVE) {
+    if (state === AppState.APP_STATE_ACTIVE && this.app) {
       this.mgmtService
         .reactivateApp(this.projectId, this.app.id)
         .then(() => {
-          this.app.state = state;
+          this.app!.state = state;
           this.toast.showInfo('APP.TOAST.REACTIVATED', true);
         })
         .catch((error: any) => {
           this.toast.showError(error);
         });
-    } else if (state === AppState.APP_STATE_INACTIVE) {
+    } else if (state === AppState.APP_STATE_INACTIVE && this.app) {
       this.mgmtService
         .deactivateApp(this.projectId, this.app.id)
         .then(() => {
-          this.app.state = state;
+          this.app!.state = state;
           this.toast.showInfo('APP.TOAST.DEACTIVATED', true);
         })
         .catch((error: any) => {
@@ -448,15 +485,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public saveApp(): void {
-    this.mgmtService
-      .updateApp(this.projectId, this.app.id, this.app.name)
-      .then(() => {
-        this.toast.showInfo('APP.TOAST.UPDATED', true);
-        this.editState = false;
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+    if (this.app) {
+      this.mgmtService
+        .updateApp(this.projectId, this.app.id, this.app.name)
+        .then(() => {
+          this.toast.showInfo('APP.TOAST.UPDATED', true);
+          this.editState = false;
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
   }
 
   public toggleRefreshToken(event: MatCheckboxChange): void {
@@ -481,7 +520,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public saveOIDCApp(): void {
     this.requestRedirectValuesSubject$.next();
     if (this.oidcForm.valid) {
-      if (this.app.oidcConfig) {
+      if (this.app?.oidcConfig) {
         //   configuration
         this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
         this.app.oidcConfig.grantTypesList = this.grantTypesList?.value;
@@ -532,7 +571,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.mgmtService
           .updateOIDCAppConfig(req)
           .then(() => {
-            if (this.app.oidcConfig) {
+            if (this.app?.oidcConfig) {
               const config = { oidc: this.app.oidcConfig };
               this.currentAuthMethod = this.authMethodFromPartialConfig(config);
             }
@@ -546,7 +585,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public saveAPIApp(): void {
-    if (this.apiForm.valid && this.app.apiConfig) {
+    if (this.apiForm.valid && this.app?.apiConfig) {
       this.app.apiConfig.authMethodType = this.apiAuthMethodType?.value;
 
       const req = new UpdateAPIAppConfigRequest();
@@ -557,7 +596,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       this.mgmtService
         .updateAPIAppConfig(req)
         .then(() => {
-          if (this.app.apiConfig) {
+          if (this.app?.apiConfig) {
             const config = { api: this.app.apiConfig };
             this.currentAuthMethod = this.authMethodFromPartialConfig(config);
 
@@ -580,22 +619,46 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  public regenerateOIDCClientSecret(): void {
-    this.mgmtService
-      .regenerateOIDCClientSecret(this.app.id, this.projectId)
-      .then((resp) => {
-        this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
-        this.dialog.open(AppSecretDialogComponent, {
-          data: {
-            // clientId: data.toObject() as ClientSecret.AsObject.clientId,
-            clientSecret: resp.clientSecret,
-          },
-          width: '400px',
+  public saveSAMLApp(): void {
+    if (this.samlForm.valid && this.app?.samlConfig) {
+      const req = new UpdateSAMLAppConfigRequest();
+      req.setProjectId(this.projectId);
+      req.setAppId(this.app.id);
+
+      if (this.app.samlConfig) {
+        req.setMetadataUrl(this.app.samlConfig?.metadataUrl);
+        req.setMetadataXml(this.app.samlConfig?.metadataXml);
+      }
+
+      this.mgmtService
+        .updateSAMLAppConfig(req)
+        .then(() => {
+          this.toast.showInfo('APP.TOAST.APIUPDATED', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
         });
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+    }
+  }
+
+  public regenerateOIDCClientSecret(): void {
+    if (this.app) {
+      this.mgmtService
+        .regenerateOIDCClientSecret(this.app.id, this.projectId)
+        .then((resp) => {
+          this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
+          this.dialog.open(AppSecretDialogComponent, {
+            data: {
+              // clientId: data.toObject() as ClientSecret.AsObject.clientId,
+              clientSecret: resp.clientSecret,
+            },
+            width: '400px',
+          });
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
   }
 
   public changeAuthMethod(): void {
@@ -617,20 +680,22 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public regenerateAPIClientSecret(): void {
-    this.mgmtService
-      .regenerateAPIClientSecret(this.app.id, this.projectId)
-      .then((resp) => {
-        this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
-        this.dialog.open(AppSecretDialogComponent, {
-          data: {
-            clientSecret: resp.clientSecret,
-          },
-          width: '400px',
+    if (this.app) {
+      this.mgmtService
+        .regenerateAPIClientSecret(this.app.id, this.projectId)
+        .then((resp) => {
+          this.toast.showInfo('APP.TOAST.CLIENTSECRETREGENERATED', true);
+          this.dialog.open(AppSecretDialogComponent, {
+            data: {
+              clientSecret: resp.clientSecret,
+            },
+            width: '400px',
+          });
+        })
+        .catch((error) => {
+          this.toast.showError(error);
         });
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+    }
   }
 
   public get currentRadioItemAuthType(): RadioItemAuthType | undefined {
@@ -687,5 +752,32 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get clockSkewSeconds(): AbstractControl | null {
     return this.oidcTokenForm.get('clockSkewSeconds');
+  }
+
+  public get metadataUrl(): AbstractControl | null {
+    return this.samlForm.get('metadataUrl');
+  }
+
+  get decodedBase64(): string {
+    if (
+      this.app &&
+      this.app.samlConfig &&
+      this.app.samlConfig.metadataXml &&
+      typeof this.app.samlConfig.metadataXml === 'string'
+    ) {
+      return Buffer.from(this.app?.samlConfig.metadataXml, 'base64').toString('ascii');
+    } else {
+      return '';
+    }
+  }
+
+  set decodedBase64(xmlString: string) {
+    if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
+      const base64 = Buffer.from(xmlString, 'ascii').toString('base64');
+
+      if (this.app.samlConfig) {
+        this.app.samlConfig.metadataXml = base64;
+      }
+    }
   }
 }

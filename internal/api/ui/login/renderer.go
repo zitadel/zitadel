@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/zitadel/logging"
@@ -18,6 +19,7 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/templates"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/renderer"
 	"github.com/zitadel/zitadel/internal/static"
 )
@@ -84,19 +86,13 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointResources, "themes", theme, file)
 		},
 		"hasCustomPolicy": func(policy *domain.LabelPolicy) bool {
-			if policy != nil {
-				return true
-			}
-			return false
+			return policy != nil
 		},
 		"hasWatermark": func(policy *domain.LabelPolicy) bool {
-			if policy != nil && policy.DisableWatermark {
-				return false
-			}
-			return true
+			return policy == nil || !policy.DisableWatermark
 		},
 		"variablesCssFileUrl": func(orgID string, policy *domain.LabelPolicy) string {
-			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName
+			cssFile := domain.CssPath + "/" + domain.CssVariablesFileName + "?v=" + policy.ChangeDate.Format(time.RFC3339)
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", cssFile))
 		},
 		"customLogoResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
@@ -511,7 +507,7 @@ func (l *Login) isDisplayLoginNameSuffix(authReq *domain.AuthRequest) bool {
 	if authReq == nil {
 		return false
 	}
-	if authReq.RequestedOrgID == "" {
+	if authReq.RequestedOrgID == "" || !authReq.RequestedOrgDomain {
 		return false
 	}
 	return authReq.LabelPolicy != nil && !authReq.LabelPolicy.HideLoginNameSuffix
@@ -524,8 +520,27 @@ func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []
 			Text: text.Text,
 		}
 		err := l.renderer.AddMessages(translator, text.Language, msg)
-		logging.Log("HANDLE-GD3g2").OnError(err).Warn("could no add message to translator")
+		logging.OnError(err).Warn("could no add message to translator")
 	}
+}
+
+func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, orgID string) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	instanceTexts, err := l.query.CustomTextListByTemplate(ctx, instanceID, domain.LoginCustomText)
+	if err != nil {
+		logging.WithFields("instanceID", instanceID).Warn("unable to load custom texts for instance")
+		return
+	}
+	l.addLoginTranslations(translator, query.CustomTextsToDomain(instanceTexts))
+	if orgID == "" {
+		return
+	}
+	orgTexts, err := l.query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText)
+	if err != nil {
+		logging.WithFields("instanceID", instanceID, "org", orgID).Warn("unable to load custom texts for org")
+		return
+	}
+	l.addLoginTranslations(translator, query.CustomTextsToDomain(orgTexts))
 }
 
 func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
@@ -596,12 +611,11 @@ type profileData struct {
 type passwordData struct {
 	baseData
 	profileData
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
+	MinLength    uint64
+	HasUppercase string
+	HasLowercase string
+	HasNumber    string
+	HasSymbol    string
 }
 
 type userSelectionData struct {

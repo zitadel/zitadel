@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	UserAuthMethodTable = "projections.user_auth_methods"
+	UserAuthMethodTable = "projections.user_auth_methods3"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
@@ -37,7 +37,7 @@ func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(UserAuthMethodUserIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(UserAuthMethodTokenIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserAuthMethodCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(UserAuthMethodChangeDateCol, crdb.ColumnTypeTimestamp),
@@ -48,7 +48,7 @@ func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 			crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserAuthMethodResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("auth_meth_ro_idx", []string{UserAuthMethodResourceOwnerCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -119,6 +119,12 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 
 	return crdb.NewUpsertStatement(
 		event,
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodInstanceIDCol, nil),
+			handler.NewCol(UserAuthMethodUserIDCol, nil),
+			handler.NewCol(UserAuthMethodTypeCol, nil),
+			handler.NewCol(UserAuthMethodTokenIDCol, nil),
+		},
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
 			handler.NewCol(UserAuthMethodCreationDateCol, event.CreationDate()),

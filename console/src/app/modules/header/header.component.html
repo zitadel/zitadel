@@ -9,21 +9,21 @@
         class="logo"
         alt="home logo"
         *ngIf="isDarkTheme; else customlighttheme"
-        [src]="labelpolicy?.iconUrlDark ? labelpolicy.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
+        [src]="labelpolicy.iconUrlDark ? labelpolicy.iconUrlDark : './assets/images/zitadel-logo-solo-light.svg'"
         (error)="errorHandler($event, './assets/images/zitadel-logo-solo-light.svg')"
       />
       <ng-template #customlighttheme>
         <img
           alt="home logo"
           class="logo"
-          [src]="labelpolicy?.iconUrl ? labelpolicy.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
+          [src]="labelpolicy.iconUrl ? labelpolicy.iconUrl : './assets/images/zitadel-logo-solo-dark.svg'"
           (error)="errorHandler($event, './assets/images/zitadel-logo-solo-dark.svg')"
         />
       </ng-template>
     </a>
 
     <ng-template #defaultHome>
-      <a class="title" [routerLink]="['/']">
+      <a class="title" [routerLink]="authService.zitadelPermissions.getValue().length === 0 ? ['/users', 'me'] : ['/']">
         <img
           class="logo"
           alt="zitadel logo"
@@ -78,7 +78,7 @@
 
         <div class="org-context">
           <a *ngIf="org" matRipple [matRippleUnbounded]="false" class="org-link" id="orglink" [routerLink]="['/org']">
-            {{ org?.name ? org.name : 'NO NAME' }}</a
+            {{ org.name ? org.name : 'NO NAME' }}</a
           >
 
           <div class="org-context-wrapper" *ngIf="org">
@@ -212,7 +212,7 @@
             class="avatar-toggle dontcloseonclick"
             [active]="showAccount"
             [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-            [forColor]="user?.preferredLoginName || ''"
+            [forColor]="user.preferredLoginName || ''"
             [name]="
               user.human?.profile?.displayName
                 ? user.human?.profile?.displayName ?? ''

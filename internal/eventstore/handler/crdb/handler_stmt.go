@@ -72,12 +72,14 @@ func NewStatementHandler(
 		aggregates:              aggregateTypes,
 		reduces:                 reduces,
 		bulkLimit:               config.BulkLimit,
-		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionHandlerConfig.ProjectionName),
+		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionName),
 	}
-	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock)
 
-	err := h.Init(ctx, config.InitCheck)
-	logging.OnError(err).Fatal("unable to initialize projections")
+	initialized := make(chan bool)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, initialized)
+
+	err := h.Init(ctx, initialized, config.InitCheck)
+	logging.OnError(err).WithField("projection", config.ProjectionName).Fatal("unable to initialize projections")
 
 	h.Subscribe(h.aggregates...)
 
@@ -112,7 +114,7 @@ func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string
 	return queryBuilder, h.bulkLimit, nil
 }
 
-//Update implements handler.Update
+// Update implements handler.Update
 func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (index int, err error) {
 	if len(stmts) == 0 {
 		return -1, nil
@@ -248,8 +250,8 @@ stmts:
 	return lastSuccessfulIdx
 }
 
-//executeStmt handles sql statements
-//an error is returned if the statement could not be inserted properly
+// executeStmt handles sql statements
+// an error is returned if the statement could not be inserted properly
 func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt *handler.Statement) error {
 	if stmt.IsNoop() {
 		return nil

@@ -1,5 +1,5 @@
 <cnsl-top-view
-  title="{{ user?.human ? user.human?.profile?.displayName : user?.machine?.name }}"
+  title="{{ user && user.human ? user.human.profile?.displayName : user?.machine?.name }}"
   sub="{{ user?.preferredLoginName }}"
   [isActive]="user?.state === UserState.USER_STATE_ACTIVE"
   [isInactive]="user?.state === UserState.USER_STATE_INACTIVE"
@@ -95,7 +95,7 @@
 
       <ng-container *ngIf="currentSetting === 'grants'">
         <cnsl-card
-          *ngIf="user?.id"
+          *ngIf="user && user.id"
           title="{{ 'GRANTS.USER.TITLE' | translate }}"
           description="{{ 'GRANTS.USER.DESCRIPTION' | translate }}"
         >
@@ -130,7 +130,13 @@
       </ng-container>
 
       <ng-container *ngIf="currentSetting === 'metadata'">
-        <cnsl-metadata *ngIf="user?.id" [userId]="user.id"></cnsl-metadata>
+        <cnsl-metadata
+          [metadata]="metadata"
+          [disabled]="(['user.write:' + user.id, 'user.write'] | hasRole | async) === false"
+          *ngIf="user && user.id"
+          (editClicked)="editMetadata()"
+          (refresh)="loadMetadata()"
+        ></cnsl-metadata>
       </ng-container>
     </cnsl-sidenav>
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
+	"github.com/zitadel/zitadel/internal/api/grpc/metadata"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -93,5 +94,32 @@ func ListOrgMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListOrgMembe
 			Queries: queries,
 		},
 		OrgID: ctxData.OrgID,
+	}, nil
+}
+
+func BulkSetOrgMetadataToDomain(req *mgmt_pb.BulkSetOrgMetadataRequest) []*domain.Metadata {
+	metadata := make([]*domain.Metadata, len(req.Metadata))
+	for i, data := range req.Metadata {
+		metadata[i] = &domain.Metadata{
+			Key:   data.Key,
+			Value: data.Value,
+		}
+	}
+	return metadata
+}
+
+func ListOrgMetadataToDomain(req *mgmt_pb.ListOrgMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := metadata.MetadataQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.OrgMetadataSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
 	}, nil
 }

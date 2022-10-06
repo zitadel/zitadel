@@ -272,12 +272,12 @@ func (h *AddHuman) ensureDisplayName() {
 	h.DisplayName = h.FirstName + " " + h.LastName
 }
 
-//shouldAddInitCode returns true for all added Humans which:
+// shouldAddInitCode returns true for all added Humans which:
 // - were not added from an external IDP
 // - and either:
-//    - have no verified email
-// 			and / or
-//    -  have no authentication method (password / passwordless)
+//   - have no verified email
+//     and / or
+//   - have no authentication method (password / passwordless)
 func (h *AddHuman) shouldAddInitCode() bool {
 	return !h.ExternalIDP &&
 		!h.Email.Verified ||
@@ -416,7 +416,10 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 }
 
 func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
-	if human != nil && human.Username == "" {
+	if human == nil {
+		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-JKefw", "Errors.User.Invalid")
+	}
+	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
 		human.Username = human.EmailAddress
 	}
 	if orgID == "" || !human.IsValid() || link == nil && (human.Password == nil || human.Password.SecretString == "") {
@@ -432,6 +435,8 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	if err := human.CheckDomainPolicy(domainPolicy); err != nil {
 		return nil, nil, err
 	}
+	human.Username = strings.TrimSpace(human.Username)
+	human.EmailAddress = strings.TrimSpace(human.EmailAddress)
 	if !domainPolicy.UserLoginMustBeDomain {
 		usernameSplit := strings.Split(human.Username, "@")
 		if len(usernameSplit) != 2 {
@@ -522,7 +527,7 @@ func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner s
 	return err
 }
 
-///TODO: adlerhurst maybe we can simplify createAddHumanEvent and createRegisterHumanEvent
+// /TODO: adlerhurst maybe we can simplify createAddHumanEvent and createRegisterHumanEvent
 func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, human *domain.Human, userLoginMustBeDomain bool) *user.HumanAddedEvent {
 	addEvent := user.NewHumanAddedEvent(
 		ctx,

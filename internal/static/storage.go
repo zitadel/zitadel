@@ -21,9 +21,20 @@ type Storage interface {
 type ObjectType int32
 
 const (
-	ObjectTypeUserAvatar = iota
+	ObjectTypeUserAvatar ObjectType = iota
 	ObjectTypeStyling
 )
+
+func (o ObjectType) String() string {
+	switch o {
+	case ObjectTypeUserAvatar:
+		return "0"
+	case ObjectTypeStyling:
+		return "1"
+	default:
+		return ""
+	}
+}
 
 type Asset struct {
 	InstanceID    string
@@ -34,4 +45,8 @@ type Asset struct {
 	LastModified  time.Time
 	Location      string
 	ContentType   string
+}
+
+func (a *Asset) VersionedName() string {
+	return a.Name + "?v=" + a.Hash
 }

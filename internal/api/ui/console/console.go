@@ -65,8 +65,8 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return &file{File: f}, nil
 }
 
-//file wraps the http.File and fs.FileInfo interfaces
-//to return the build.Date() as ModTime() of the file
+// file wraps the http.File and fs.FileInfo interfaces
+// to return the build.Date() as ModTime() of the file
 type file struct {
 	http.File
 	fs.FileInfo
@@ -98,22 +98,18 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 	security := middleware.SecurityHeaders(csp(), nil)
 
 	handler := mux.NewRouter()
-	handler.Use(security)
-	handler.Handle(envRequestPath, middleware.TelemetryHandler()(instanceHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		instance := authz.GetInstance(r.Context())
-		if instance.InstanceID() == "" {
-			http.Error(w, "empty instanceID", http.StatusInternalServerError)
-			return
-		}
+
+	handler.Use(security, instanceHandler)
+	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal)
+		environmentJSON, err := createEnvironmentJSON(url, issuer(r), authz.GetInstance(r.Context()).ConsoleClientID(), customerPortal)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
 		}
 		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
-	}))))
+	})))
 	handler.SkipClean(true).PathPrefix("").Handler(cache(http.FileServer(&spaHandler{http.FS(fSys)})))
 	return handler, nil
 }
@@ -147,12 +143,11 @@ func assetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMa
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			for _, file := range shortCacheFiles {
 				if r.URL.Path == file || isIndexOrSubPath(r.URL.Path) {
-					middleware.AssetsCacheInterceptor(shortMaxAge, shortSharedMaxAge, handler).ServeHTTP(w, r)
+					middleware.AssetsCacheInterceptor(shortMaxAge, shortSharedMaxAge).Handler(handler).ServeHTTP(w, r)
 					return
 				}
 			}
-			middleware.AssetsCacheInterceptor(longMaxAge, longSharedMaxAge, handler).ServeHTTP(w, r)
-			return
+			middleware.AssetsCacheInterceptor(longMaxAge, longSharedMaxAge).Handler(handler).ServeHTTP(w, r)
 		})
 	}
 }
