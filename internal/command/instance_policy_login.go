@@ -15,37 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddDefaultLoginPolicy(
-	ctx context.Context,
-	allowUsernamePassword, allowRegister, allowExternalIDP, forceMFA, hidePasswordReset, ignoreUnknownUsernames bool,
-	passwordlessType domain.PasswordlessType,
-	defaultRedirectURI string,
-	passwordCheckLifetime, externalLoginCheckLifetime, mfaInitSkipLifetime, secondFactorCheckLifetime, multiFactorCheckLifetime time.Duration,
-) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultLoginPolicy(instanceAgg, allowUsernamePassword,
-		allowRegister,
-		allowExternalIDP,
-		forceMFA,
-		hidePasswordReset,
-		ignoreUnknownUsernames,
-		passwordlessType,
-		defaultRedirectURI,
-		passwordCheckLifetime,
-		externalLoginCheckLifetime,
-		mfaInitSkipLifetime,
-		secondFactorCheckLifetime,
-		multiFactorCheckLifetime))
-	if err != nil {
-		return nil, err
-	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return pushedEventsToObjectDetails(pushedEvents), nil
-}
-
 func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	existingPolicy := NewInstanceLoginPolicyWriteModel(ctx)
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
@@ -83,6 +52,7 @@ func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, instanceAgg *ev
 		policy.ForceMFA,
 		policy.HidePasswordReset,
 		policy.IgnoreUnknownUsernames,
+		policy.AllowDomainDiscovery,
 		policy.PasswordlessType,
 		policy.DefaultRedirectURI,
 		policy.PasswordCheckLifetime,
@@ -293,6 +263,7 @@ func prepareAddDefaultLoginPolicy(
 	forceMFA bool,
 	hidePasswordReset bool,
 	ignoreUnknownUsernames bool,
+	allowDomainDiscovery bool,
 	passwordlessType domain.PasswordlessType,
 	defaultRedirectURI string,
 	passwordCheckLifetime time.Duration,
@@ -323,6 +294,7 @@ func prepareAddDefaultLoginPolicy(
 					forceMFA,
 					hidePasswordReset,
 					ignoreUnknownUsernames,
+					allowDomainDiscovery,
 					passwordlessType,
 					defaultRedirectURI,
 					passwordCheckLifetime,

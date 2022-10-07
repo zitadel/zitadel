@@ -15,4 +15,3 @@ More details on the specific objects:
 - [Applications](./applications)
 - [Granted Projects](./granted_projects)
 - [Users](./users)
-- [Managers](./managers)

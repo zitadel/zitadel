@@ -91,9 +91,9 @@ ZITADEL supports only the external authentication flow at the moment.
 
 ```ts
 {
-    ProjectID: string,
-    ProjectGrantID: string,
-    Roles: Array<string>,
+    projectID: string,
+    projectGrantID: string,
+    roles: Array<string>,
 }
 ```
 

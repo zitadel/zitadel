@@ -33,12 +33,29 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+	allowed := registrationAllowed(authReq)
+	externalAllowed := externalRegistrationAllowed(authReq)
+	if err == nil {
+		// if only external allowed with a single idp then use that
+		if !allowed && externalAllowed && len(authReq.AllowedExternalIDPs) == 1 {
+			l.handleExternalRegisterByConfigID(w, r, authReq, authReq.AllowedExternalIDPs[0].IDPConfigID)
+			return
+		}
+		// if only direct registration is allowed, show the form
+		if allowed && !externalAllowed {
+			l.renderRegister(w, r, authReq, nil, nil)
+			return
+		}
+	}
 	data := registerOptionData{
 		baseData: l.getBaseData(r, authReq, "RegisterOption", errID, errMessage),
 	}
 	funcs := map[string]interface{}{
+		"hasRegistration": func() bool {
+			return allowed
+		},
 		"hasExternalLogin": func() bool {
-			return authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
+			return externalAllowed
 		},
 	}
 	translator := l.getTranslator(r.Context(), authReq)
@@ -57,4 +74,12 @@ func (l *Login) handleRegisterOptionCheck(w http.ResponseWriter, r *http.Request
 		return
 	}
 	l.handleRegisterOption(w, r)
+}
+
+func registrationAllowed(authReq *domain.AuthRequest) bool {
+	return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowRegister
+}
+
+func externalRegistrationAllowed(authReq *domain.AuthRequest) bool {
+	return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 }
