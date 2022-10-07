@@ -15,12 +15,12 @@
     "debug": "^4.3.4",
     "jsonwebtoken": "^8.5.1",
     "mochawesome": "^7.1.3",
-    "wait-on": "^6.0.1",
-    "typescript": "^4.8.3",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.4",
+    "wait-on": "^6.0.1"
   },
   "devDependencies": {
-    "@types/node": "^18.7.13",
-    "cypress": "^10.7.0"
+    "@types/node": "^18.8.3",
+    "cypress": "^10.9.0"
   }
 }

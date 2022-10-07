@@ -43,7 +43,7 @@ services:
     network_mode: host
 
   e2e:
-    image: cypress/included:10.7.0
+    image: cypress/included:10.9.0
     depends_on:
       zitadel:
         condition: 'service_started'
