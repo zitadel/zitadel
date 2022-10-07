@@ -21,6 +21,7 @@ type LoginPolicy struct {
 	PasswordlessType           PasswordlessType
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
+	AllowDomainDiscovery       bool
 	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration

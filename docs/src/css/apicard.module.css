@@ -1,12 +1,12 @@
 .apicard {
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
   min-width: 200px;
   background: var(--card-background);
   padding: 1rem;
   text-decoration: none;
-  transition: all .2 ease-in-out;
+  transition: all 0.2 ease-in-out;
   margin: 1rem 0;
 }
 
@@ -32,7 +32,8 @@
 
 .apicard:hover {
   text-decoration: none;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* .apicard h2 {
@@ -43,7 +44,9 @@
   color: #bfc1cc;
 } */
 
-.apicard h3, h4, h5 {
+.apicard h3,
+h4,
+h5 {
   /* color: white; */
   margin: 0.5rem 0 0 0;
 }
@@ -64,7 +67,7 @@
 
 .bottomicon {
   width: 24px;
-  margin-right: .5rem;
+  margin-right: 0.5rem;
   color: var(--ifm-font-color-base);
 }
 

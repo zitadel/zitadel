@@ -68,6 +68,10 @@ h1 {
         align-items: center;
         margin-bottom: 0.5rem;
         padding-left: 7px;
+
+        .fill-space {
+          flex: 1;
+        }
       }
 
       .icon {
