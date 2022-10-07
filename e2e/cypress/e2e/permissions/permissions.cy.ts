@@ -41,26 +41,27 @@ describe('permissions', () => {
           cy.get('[data-e2e="confirm-add-member-button"]').click();
           cy.get('.data-e2e-success');
           cy.contains('[data-e2e="member-avatar"]', 'ee');
-          cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+          cy.shouldNotExist({ selector: '.data-e2e-failure' });
         });
       });
 
       describe('mutate authorization', () => {
+        const rowSelector = `tr:contains(${testManagerLoginname})`;
+
         beforeEach(beforeMutate);
         beforeEach(navigate);
 
         beforeEach(() => {
           cy.contains('[data-e2e="member-avatar"]', 'ee').click();
-          cy.contains('tr', testManagerLoginname).as('managerRow');
+          cy.get(rowSelector).as('managerRow');
         });
 
         it('should remove a manager', () => {
           cy.get('@managerRow').find('[data-e2e="remove-member-button"]').click({ force: true });
           cy.get('[data-e2e="confirm-dialog-button"]').click();
           cy.get('.data-e2e-success');
-          // https://github.com/NoriSte/cypress-wait-until/issues/75#issuecomment-572685623
-          cy.waitUntil(() => Cypress.$(`tr:contains('${testManagerLoginname}')`).length === 0);
-          cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+          cy.shouldNotExist({ selector: '.data-e2e-failure' });
+          cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
         });
 
         it('should remove a managers authorization', () => {
@@ -74,7 +75,7 @@ describe('permissions', () => {
           cy.get('@managerRow')
             .find('[data-e2e="remove-role-button"]')
             .should('have.length', roles.length - 1);
-          cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+          cy.shouldNotExist({ selector: '.data-e2e-failure' });
         });
       });
     }
@@ -157,7 +158,7 @@ describe('permissions', () => {
             cy.get('[data-e2e="save-button"]').click();
             cy.get('.data-e2e-success');
             cy.contains('tr', testRoleName);
-            cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+            cy.shouldNotExist({ selector: '.data-e2e-failure' });
           });
           it('should remove a role');
         });

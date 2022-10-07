@@ -7,8 +7,7 @@ describe('projects', () => {
   });
 
   const testProjectNameCreate = 'e2eprojectcreate';
-  const testProjectNameDeleteList = 'e2eprojectdeletelist';
-  const testProjectNameDeleteGrid = 'e2eprojectdeletegrid';
+  const testProjectNameDelete = 'e2eprojectdelete';
 
   describe('add project', () => {
     beforeEach(`ensure it doesn't exist already`, function () {
@@ -21,8 +20,7 @@ describe('projects', () => {
       cy.get('input').type(testProjectNameCreate);
       cy.get('[data-e2e="continue-button"]').click();
       cy.get('.data-e2e-success');
-      cy.wait(200);
-      cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
 
     it('should configure a project to assert roles on authentication');
@@ -30,38 +28,31 @@ describe('projects', () => {
 
   describe('edit project', () => {
     beforeEach('ensure it exists', function () {
-      ensureProjectExists(this.api, testProjectNameDeleteList);
+      ensureProjectExists(this.api, testProjectNameDelete);
       cy.visit(`/projects`);
     });
 
     describe('remove project', () => {
-      beforeEach('ensure it exists', function () {
-        ensureProjectExists(this.api, testProjectNameDeleteGrid);
-        cy.visit(`/projects`);
-      });
-
       it('removes the project from list view', () => {
+        const rowSelector = `tr:contains(${testProjectNameDelete})`;
         cy.get('[data-e2e="toggle-grid"]').click();
         cy.get('[data-e2e="timestamp"]');
-        cy.contains('tr', testProjectNameDeleteList, { timeout: 1000 })
-          .find('[data-e2e="delete-project-button"]')
-          .click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDeleteList);
+        cy.get(rowSelector).find('[data-e2e="delete-project-button"]').click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.get('.data-e2e-success');
-        cy.wait(200);
-        cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+        cy.shouldNotExist({ selector: '.data-e2e-failure' });
+        cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
       });
 
       it('removes the project from grid view', () => {
-        cy.contains('[data-e2e="grid-card"]', testProjectNameDeleteGrid)
-          .find('[data-e2e="delete-project-button"]')
-          .click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDeleteGrid);
+        const cardSelector = `[data-e2e="grid-card"]:contains(${testProjectNameDelete})`;
+        cy.get(cardSelector).find('[data-e2e="delete-project-button"]').click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.get('.data-e2e-success');
-        cy.wait(200);
-        cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+        cy.shouldNotExist({ selector: '.data-e2e-failure' });
+        cy.shouldNotExist({ selector: cardSelector, timeout: 2000 });
       });
     });
 

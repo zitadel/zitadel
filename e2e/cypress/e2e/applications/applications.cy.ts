@@ -36,7 +36,7 @@ describe('applications', () => {
       cy.get('[data-e2e="client-id-copy"]').click();
       cy.contains('[data-e2e="client-id"]', expectClientId);
       cy.clipboardMatches(expectClientId);
-      cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
   });
 

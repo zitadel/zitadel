@@ -42,11 +42,8 @@ declare global {
 
       /**
        * Custom command that waits until the selector finds zero elements.
-       * If no selector is provided, shouldNotExists tries to defer the
-       * selector from the previous JQuery subject.
        */
       shouldNotExist(options?: ShouldNotExistOptions): Cypress.Chainable<null>;
-      shouldNotExist(subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions): Cypress.Chainable<null>;
     }
   }
 }
@@ -73,17 +70,11 @@ Cypress.Commands.add('clipboardMatches', { prevSubject: false }, (pattern: RegEx
     */
 });
 
-Cypress.Commands.add(
-  'shouldNotExist',
-  { prevSubject: ['optional', 'element'] },
-  (subject?: Cypress.JQueryWithSelector, options?: ShouldNotExistOptions) => {
-    return cy.waitUntil(
-      () => {
-        const noSubject = !subject || !Cypress.dom.isAttached(subject);
-        const noSelector = Cypress.$(options?.selector).length === 0;
-        return noSubject && noSelector;
-      },
-      { timeout: typeof options?.timeout === 'number' ? options.timeout : 500 },
-    );
-  },
-);
+Cypress.Commands.add('shouldNotExist', { prevSubject: false }, (options?: ShouldNotExistOptions) => {
+  return cy.waitUntil(
+    () => {
+      return Cypress.$(options?.selector).length === 0;
+    },
+    { timeout: typeof options?.timeout === 'number' ? options.timeout : 500 },
+  );
+});

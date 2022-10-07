@@ -39,15 +39,13 @@ describe('machines', () => {
     });
 
     it('should delete a machine', () => {
-      cy.contains('tr', testMachineUserNameRemove)
-        .as('machineUserRow')
-        .find('[data-e2e="enabled-delete-button"]')
-        .click({ force: true });
+      const rowSelector = `tr:contains(${testMachineUserNameRemove})`;
+      cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
       cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testMachineUserNameRemove);
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get('.data-e2e-success');
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
-      cy.get('@machineUserRow').shouldNotExist({ timeout: 2000 });
+      cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
     });
 
     it('should create a personal access token');

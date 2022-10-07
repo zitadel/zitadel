@@ -31,7 +31,7 @@ describe('humans', () => {
       const loginName = loginname(testHumanUserNameAdd, Cypress.env('ORGANIZATION'));
       cy.contains('[data-e2e="copy-loginname"]', loginName).click();
       cy.clipboardMatches(loginName);
-      cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
   });
 
@@ -42,17 +42,15 @@ describe('humans', () => {
     });
 
     it('should delete a human user', () => {
-      cy.contains('tr', testHumanUserNameRemove)
-        .as('humanUserRow')
-        .find('[data-e2e="enabled-delete-button"]')
-        .click({ force: true });
+      const rowSelector = `tr:contains(${testHumanUserNameRemove})`;
+      cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
       cy.get('[data-e2e="confirm-dialog-input"]')
         .focus()
         .type(loginname(testHumanUserNameRemove, Cypress.env('ORGANIZATION')));
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get('.data-e2e-success');
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
-      cy.get('@humanUserRow').shouldNotExist({ timeout: 2000 });
+      cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
     });
   });
 });
