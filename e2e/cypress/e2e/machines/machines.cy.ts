@@ -44,8 +44,8 @@ describe('machines', () => {
       cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testMachineUserNameRemove);
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get('.data-e2e-success');
-      cy.shouldNotExist({ selector: '.data-e2e-failure' });
       cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
 
     it('should create a personal access token');

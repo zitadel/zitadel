@@ -41,8 +41,8 @@ describe('projects', () => {
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.get('.data-e2e-success');
-        cy.shouldNotExist({ selector: '.data-e2e-failure' });
         cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
+        cy.shouldNotExist({ selector: '.data-e2e-failure' });
       });
 
       it('removes the project from grid view', () => {
@@ -51,8 +51,8 @@ describe('projects', () => {
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.get('.data-e2e-success');
-        cy.shouldNotExist({ selector: '.data-e2e-failure' });
         cy.shouldNotExist({ selector: cardSelector, timeout: 2000 });
+        cy.shouldNotExist({ selector: '.data-e2e-failure' });
       });
     });
 
