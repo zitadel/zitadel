@@ -33,12 +33,17 @@ export function ensureHumanIsOrgMember(api: API, username: string, roles: string
   });
 }
 
-export function ensureHumanIsNotProjectMember(api: API, projectId: string, username: string): Cypress.Chainable<number> {
+export function ensureHumanIsNotProjectMember(
+  api: API,
+  projectId: string,
+  username: string,
+  grantId?: number,
+): Cypress.Chainable<number> {
   return ensureItemDoesntExist(
     api,
-    `${api.mgntBaseURL}projects/${projectId}/members/_search`,
+    `${api.mgntBaseURL}projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members/_search`,
     (member: any) => (<string>member.preferredLoginName).startsWith(username),
-    (member) => `${api.mgntBaseURL}projects/${projectId}/members/${member.userId}`,
+    (member) => `${api.mgntBaseURL}projects/${projectId}${grantId ? `grants/${grantId}/` : ''}/members/${member.userId}`,
   );
 }
 
@@ -47,6 +52,7 @@ export function ensureHumanIsProjectMember(
   projectId: string,
   username: string,
   roles: string[],
+  grantId?: number,
 ): Cypress.Chainable<number> {
   return searchSomething(
     api,
@@ -58,9 +64,9 @@ export function ensureHumanIsProjectMember(
   ).then((user) => {
     return ensureItemExists(
       api,
-      `${api.mgntBaseURL}projects/${projectId}/members/_search`,
+      `${api.mgntBaseURL}projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members/_search`,
       (member: any) => member.userId == user.entity.id,
-      `${api.mgntBaseURL}projects/${projectId}/members`,
+      `${api.mgntBaseURL}projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members`,
       {
         userId: user.entity.id,
         roles: roles,

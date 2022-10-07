@@ -8,16 +8,16 @@ export function ensureProjectGrantExists(
   foreignProjectId: number,
 ): Cypress.Chainable<number> {
   return getOrgUnderTest(api).then((orgUnderTest) => {
-    debugger;
     return ensureItemExists(
       api,
       `${api.mgntBaseURL}projectgrants/_search`,
-      (grant: any) => grant.name === name,
-      `${api.mgntBaseURL}/projects/${foreignProjectId}/grants`,
+      (grant: any) => grant.grantedOrgId == orgUnderTest && grant.projectId == foreignProjectId,
+      `${api.mgntBaseURL}projects/${foreignProjectId}/grants`,
       {
         granted_org_id: orgUnderTest,
       },
       foreignOrgId,
+      'grantId',
     );
   });
 }

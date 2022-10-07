@@ -8,6 +8,7 @@ export function ensureItemExists(
   createPath: string,
   body: Entity,
   orgId?: number,
+  idField?: string,
 ): Cypress.Chainable<number> {
   return ensureSomething(
     api,
@@ -17,6 +18,7 @@ export function ensureItemExists(
     body,
     (entity) => !!entity,
     orgId,
+    idField,
   );
 }
 
@@ -79,13 +81,13 @@ export function ensureSomething(
   body: Entity,
   expectEntity: (entity: any) => boolean,
   orgId?: number,
+  idFieldname: string = 'id',
 ): Cypress.Chainable<number> {
   return search()
     .then((sRes) => {
-      debugger;
       if (expectEntity(sRes.entity)) {
         return cy.wrap({
-          id: sRes?.entity?.id,
+          id: ensureMethod == 'DELETE' ? NaN : sRes.entity[idFieldname],
           expectSequenceFrom: sRes.sequence,
         });
       }
@@ -106,10 +108,9 @@ export function ensureSomething(
       }
 
       return cy.request(req).then((cRes) => {
-        debugger;
         expect(cRes.status).to.equal(200);
         return {
-          id: cRes.body.id,
+          id: cRes.body[idFieldname],
           expectSequenceFrom: sRes.sequence,
         };
       });

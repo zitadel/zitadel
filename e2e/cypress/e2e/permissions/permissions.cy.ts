@@ -165,60 +165,44 @@ describe('permissions', () => {
 
       describe('granted projects', () => {
         beforeEach(function () {
-          ensureOrgExists(this.api, 'e2eforeignorg').as('foreignOrgId');
-          ensureProjectExists(this.api, 'e2eprojectgrants', this.foreignOrgId).as('projectId');
-          ensureProjectGrantExists(this.api, this.foreignOrgId, this.projectId);
+          ensureOrgExists(this.api, 'e2eforeignorg')
+            .as('foreignOrgId')
+            .then((foreignOrgId) => {
+              ensureProjectExists(this.api, 'e2eprojectgrants', foreignOrgId)
+                .as('projectId')
+                .then((projectId) => {
+                  ensureProjectGrantExists(this.api, foreignOrgId, projectId).as('grantId');
+                });
+            });
         });
 
-        const visitOwnedProject: Mocha.HookFunction = function () {
-          cy.visit(`/projects/${this.projectId}`);
+        const visitGrantedProject: Mocha.HookFunction = function () {
+          cy.visit(`/granted-projects/${this.projectId}/grant/${this.grantId}`);
         };
 
-        describe.only('authorizations', () => {
+        describe('authorizations', () => {
           const roles = [
-            { internal: 'PROJECT_OWNER_GLOBAL', display: 'Project Owner Global' },
-            { internal: 'PROJECT_OWNER_VIEWER_GLOBAL', display: 'Project Owner Viewer Global' },
+            { internal: 'PROJECT_GRANT_OWNER', display: 'Project Grant Owner' },
+            { internal: 'PROJECT_GRANT_OWNER_VIEWER', display: 'Project Grant Owner Viewer' },
           ];
 
           testAuthorizations(
             roles.map((role) => role.display),
             function () {
-              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname);
+              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname, this.grantId);
             },
             function () {
-              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname);
+              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname, this.grantId);
               ensureHumanIsProjectMember(
                 this.api,
                 this.projectId,
                 testManagerLoginname,
                 roles.map((role) => role.internal),
+                this.grantId,
               );
             },
-            visitOwnedProject,
+            visitGrantedProject,
           );
-        });
-
-        describe('roles', () => {
-          const testRoleName = 'e2eroleundertestname';
-
-          beforeEach(function () {
-            ensureProjectResourceDoesntExist(this.api, this.projectId, Roles, testRoleName);
-          });
-
-          beforeEach(visitOwnedProject);
-
-          it('should add a role', () => {
-            cy.get('[data-e2e="sidenav-element-roles"]').click();
-            cy.get('[data-e2e="add-new-role"]').click();
-            cy.get('[formcontrolname="key"]').type(testRoleName);
-            cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
-            cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
-            cy.get('[data-e2e="save-button"]').click();
-            cy.get('.data-e2e-success');
-            cy.contains('tr', testRoleName);
-            cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
-          });
-          it('should remove a role');
         });
       });
     });

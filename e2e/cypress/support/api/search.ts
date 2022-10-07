@@ -22,10 +22,10 @@ export function searchSomething(
 }
 
 export function findFromList(find: (entity: Entity) => boolean): (body: any) => SearchResult {
-  return (body) => {
+  return (b) => {
     return {
-      entity: body.result?.find(find),
-      sequence: parseInt(<string>body.details.processedSequence),
+      entity: b.result?.find(find),
+      sequence: parseInt(<string>b.details.processedSequence),
     };
   };
 }
