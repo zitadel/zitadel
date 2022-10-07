@@ -26,6 +26,7 @@ type LoginPolicyAddedEvent struct {
 	ForceMFA                   bool                    `json:"forceMFA,omitempty"`
 	HidePasswordReset          bool                    `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames     bool                    `json:"ignoreUnknownUsernames,omitempty"`
+	AllowDomainDiscovery       bool                    `json:"allowDomainDiscovery,omitempty"`
 	PasswordlessType           domain.PasswordlessType `json:"passwordlessType,omitempty"`
 	DefaultRedirectURI         string                  `json:"defaultRedirectURI,omitempty"`
 	PasswordCheckLifetime      time.Duration           `json:"passwordCheckLifetime,omitempty"`
@@ -50,7 +51,8 @@ func NewLoginPolicyAddedEvent(
 	allowExternalIDP,
 	forceMFA,
 	hidePasswordReset,
-	ignoreUnknownUsernames bool,
+	ignoreUnknownUsernames,
+	allowDomainDiscovery bool,
 	passwordlessType domain.PasswordlessType,
 	defaultRedirectURI string,
 	passwordCheckLifetime,
@@ -68,6 +70,7 @@ func NewLoginPolicyAddedEvent(
 		PasswordlessType:           passwordlessType,
 		HidePasswordReset:          hidePasswordReset,
 		IgnoreUnknownUsernames:     ignoreUnknownUsernames,
+		AllowDomainDiscovery:       allowDomainDiscovery,
 		DefaultRedirectURI:         defaultRedirectURI,
 		PasswordCheckLifetime:      passwordCheckLifetime,
 		ExternalLoginCheckLifetime: externalLoginCheckLifetime,
@@ -99,6 +102,7 @@ type LoginPolicyChangedEvent struct {
 	ForceMFA                   *bool                    `json:"forceMFA,omitempty"`
 	HidePasswordReset          *bool                    `json:"hidePasswordReset,omitempty"`
 	IgnoreUnknownUsernames     *bool                    `json:"ignoreUnknownUsernames,omitempty"`
+	AllowDomainDiscovery       *bool                    `json:"allowDomainDiscovery,omitempty"`
 	PasswordlessType           *domain.PasswordlessType `json:"passwordlessType,omitempty"`
 	DefaultRedirectURI         *string                  `json:"defaultRedirectURI,omitempty"`
 	PasswordCheckLifetime      *time.Duration           `json:"passwordCheckLifetime,omitempty"`
@@ -203,6 +207,12 @@ func ChangeMultiFactorCheckLifetime(multiFactorCheckLifetime time.Duration) func
 func ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames bool) func(*LoginPolicyChangedEvent) {
 	return func(e *LoginPolicyChangedEvent) {
 		e.IgnoreUnknownUsernames = &ignoreUnknownUsernames
+	}
+}
+
+func ChangeAllowDomainDiscovery(allowDomainDiscovery bool) func(*LoginPolicyChangedEvent) {
+	return func(e *LoginPolicyChangedEvent) {
+		e.AllowDomainDiscovery = &allowDomainDiscovery
 	}
 }
 

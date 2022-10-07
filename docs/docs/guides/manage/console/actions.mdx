@@ -1,0 +1,25 @@
+---
+title: Actions
+---
+
+An Identity and Management system is a very interactive place. ZITADEL has built in functionality to react to its events. This functionality is called **Actions** and can be accessed from your organizations top navigation.
+
+<img
+  src="/img/guides/console/actionsmenu.png"
+  width="700px"
+  alt="Actions menu"
+/>
+
+Actions allow you to define scripts which are then run on certain triggers.
+To add an action, click at the **new** button and provide a script and a name.
+You can specify a timeout and whether the action is allowed to fail too.
+
+<img src="/img/guides/console/action.png" alt="Create Action" width="450px" />
+
+To run those scripts, a flow with a trigger has to be created.
+This could for example be a **External Authentication** Flow, with a **Post Authentication** trigger.
+
+<img src="/img/guides/console/flow.png" alt="Flow" width="400px" />
+
+Now whenever a user gets authenticated externally with an IDP, a action is triggered after the authentication itself.
+If you want to know more where actions can be useful, take a look at the feature [here](/docs/concepts/features/actions) or directly jump to an example of a custom behaviour [here](/docs/guides/manage/customize/behavior).
