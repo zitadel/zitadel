@@ -49,7 +49,7 @@ Returns the detail of an instance
 > **rpc** AddInstance([AddInstanceRequest](#addinstancerequest))
 [AddInstanceResponse](#addinstanceresponse)
 
-Creates a new instance with all needed setup data
+deprecated:  Creates a new instance with all needed setup data
 This might take some time
 
 
@@ -74,7 +74,8 @@ Updates name of an existing instance
 > **rpc** CreateInstance([CreateInstanceRequest](#createinstancerequest))
 [CreateInstanceResponse](#createinstanceresponse)
 
-
+Creates a new instance with all needed setup data
+This might take some time
 
 
 

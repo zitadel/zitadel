@@ -386,8 +386,8 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", "", nil, nil, err
 	}
 
-	pat := ""
-	machineKey := make([]byte, 0)
+	var pat string
+	var machineKey []byte
 	if setup.Org.Machine != nil {
 		if setup.Org.Machine.Pat {
 			_, token, err := c.AddPersonalAccessToken(ctx, userID, orgID, setup.Org.Machine.PatExpirationDate, setup.Org.Machine.PatScopes, domain.UserTypeMachine)

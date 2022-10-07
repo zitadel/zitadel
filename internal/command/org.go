@@ -70,8 +70,8 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 		return "", "", nil, nil, err
 	}
 
-	pat := ""
-	machineKey := make([]byte, 0)
+	var pat string
+	var machineKey []byte
 	if o.Machine != nil {
 		if o.Machine.Pat {
 			_, token, err := c.AddPersonalAccessToken(ctx, userID, orgID, o.Machine.PatExpirationDate, o.Machine.PatScopes, domain.UserTypeMachine)

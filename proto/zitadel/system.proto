@@ -122,7 +122,7 @@ service SystemService {
     };
   }
 
-  // Creates a new instance with all needed setup data
+  //deprecated:  Creates a new instance with all needed setup data
   // This might take some time
   rpc AddInstance(AddInstanceRequest) returns (AddInstanceResponse) {
     option (google.api.http) = {
@@ -147,6 +147,8 @@ service SystemService {
     };
   }
 
+  // Creates a new instance with all needed setup data
+  // This might take some time
   rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse) {
     option (google.api.http) = {
       post: "/instances/_create"
