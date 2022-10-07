@@ -700,6 +700,7 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 	}
 	// discovery was allowed, so set the org as requested org
 	request.SetOrgInformation(org.ID, org.Name, org.Domain, false)
+	request.LoginHint = loginName
 	request.Prompt = append(request.Prompt, domain.PromptCreate)
 	return true
 }
