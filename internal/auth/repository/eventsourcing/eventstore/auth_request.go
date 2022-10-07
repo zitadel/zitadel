@@ -655,8 +655,8 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
-	// if there's an active user, let's use it
-	if user != nil && user.State == int32(domain.UserStateActive) {
+	// if there's an active (human) user, let's use it
+	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).NotDisabled() {
 		request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", "", user.ResourceOwner)
 		return nil
 	}
@@ -674,12 +674,25 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		return nil
 	}
 	// there was no policy that allowed unknown loginnames in any case
+	// so not found errors can now be returned
+	if err != nil {
+		return err
+	}
+	// let's check if it was a machine user
+	if !user.MachineView.IsZero() {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
+	}
 	// let's once again check if the user was just inactive
 	if user != nil && user.State == int32(domain.UserStateInactive) {
 		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
 	}
-	// user was not found
-	return err
+	// or locked
+	if user != nil && user.State == int32(domain.UserStateLocked) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
+	}
+	// everything should be handled by now
+	logging.WithFields("authRequest", request.ID, "loginName", loginName).Error("unhandled state for checkLoginName")
+	return errors.ThrowInternal(nil, "AUTH-asf3df", "Errors.Internal")
 }
 
 func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) bool {
