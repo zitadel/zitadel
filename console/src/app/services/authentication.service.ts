@@ -50,8 +50,8 @@ export class AuthenticationService {
     return this.authenticated;
   }
 
-  public signout(state?: string): void {
-    this.oauthService.logOut(false, state ?? '');
+  public signout(): void {
+    this.oauthService.logOut();
     this._authenticated = false;
     this._authenticationChanged.next(false);
   }
