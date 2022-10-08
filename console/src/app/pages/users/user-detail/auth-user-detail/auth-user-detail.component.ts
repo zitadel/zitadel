@@ -354,7 +354,7 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public loadMetadata(): void {
     if (this.user) {
-      this.userService.isAllowed(['user.read', `user.read:${this.user.id}`]).subscribe((allowed) => {
+      this.userService.isAllowed(['user.read']).subscribe((allowed) => {
         if (allowed) {
           this.loadingMetadata = true;
           this.mgmt
