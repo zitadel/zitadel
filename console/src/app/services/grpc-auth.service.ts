@@ -115,7 +115,7 @@ import { ThemeService } from './theme.service';
   providedIn: 'root',
 })
 export class GrpcAuthService {
-  private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
+  private _activeOrgChanged: Subject<Org.AsObject | undefined> = new Subject();
   public user!: Observable<User.AsObject | undefined>;
   public userSubject: BehaviorSubject<User.AsObject | undefined> = new BehaviorSubject<User.AsObject | undefined>(undefined);
   private triggerPermissionsRefresh: Subject<void> = new Subject();
@@ -158,10 +158,9 @@ export class GrpcAuthService {
     this.zitadelPermissions$.subscribe(this.zitadelPermissions);
 
     this.labelpolicy$ = this.activeOrgChanged.pipe(
-      filter((org) => !!org),
       switchMap((org) => {
         this.labelPolicyLoading$.next(true);
-        return from(this.getMyLabelPolicy(org.id));
+        return from(this.getMyLabelPolicy(org ? org.id : ''));
       }),
       filter((policy) => !!policy),
     );
@@ -264,6 +263,7 @@ export class GrpcAuthService {
       }
 
       if (orgs.length === 0) {
+        this._activeOrgChanged.next(undefined);
         return Promise.reject(new Error('No organizations found!'));
       }
       const orgToSet = orgs.find((element) => element.id !== '0' && element.name !== '');
@@ -276,7 +276,7 @@ export class GrpcAuthService {
     }
   }
 
-  public get activeOrgChanged(): Observable<Org.AsObject> {
+  public get activeOrgChanged(): Observable<Org.AsObject | undefined> {
     return this._activeOrgChanged;
   }
 

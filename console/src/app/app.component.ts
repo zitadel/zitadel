@@ -185,8 +185,10 @@ export class AppComponent implements OnDestroy {
     this.getProjectCount();
 
     this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
-      this.org = org;
-      this.getProjectCount();
+      if (org) {
+        this.org = org;
+        this.getProjectCount();
+      }
     });
 
     this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
