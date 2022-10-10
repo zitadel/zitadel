@@ -482,7 +482,7 @@
     "EMAILVERIFIED": "Email verificata",
     "NOTVERIFIED": "non verificato",
     "PREFERRED_LOGINNAME": "Loginname preferito",
-    "ISINITIAL": "Questo utente non è stato ancora verificato. Premi il pulsante per mandare una nuova e-mail di inizializzazione.",
+    "ISINITIAL": "L'e-mail di questo utente non è ancora stata verificata. Premi il pulsante per mandare una nuova e-mail di inizializzazione.",
     "LOGINMETHODS": {
       "TITLE": "Informazioni di contatto",
       "DESCRIPTION": "Le informazioni fornite sono utilizzate per inviare informazioni importanti, come le e-mail di reset della password.",
