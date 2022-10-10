@@ -1,0 +1,80 @@
+---
+title: Users
+---
+
+ZITADEL differs two different types of users:
+
+- Users (Humans)
+- Service Users (Machine Accounts)
+
+<img src="/img/guides/console/usersmenu.png" width="420px" alt="User types" />
+
+A human user has an email address and a password, and can additionally save information about phone, nickname, gender, language.
+A service user only has a name and a description aside his username.
+
+A service user can be authenticated with JWT profile or Personal Access Tokens. Both methods can specify an expiry.
+A human user can authenticate itself with his password, add multiple factors for additional security, and enable passwordless authentication.
+
+Service users are primarily used to gain access for a backend service or iot device. The fact that service users can also be ZITADEL managers is used to restrict access to specific projects or organizations.
+To get an understanding on how service users are used, take a look at our NextJS B2B Demo application.
+
+## Create User
+
+To create a new user, go to Users and click on **New**. Enter the required contact details and save by clicking “Create”.
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<Tabs>
+  <TabItem value="human" label="Human User" default>
+    <img src="/img/guides/console/addhuman.png" width="680px" alt="Add Human" />
+  </TabItem>
+  <TabItem value="service" label="Service User">
+    <img
+      src="/img/guides/console/addmachine.png"
+      width="540px"
+      alt="Add Service User"
+    />
+  </TabItem>
+</Tabs>
+
+After a human user is created, by default, an initialization mail with a code is sent to the registered email. This code then has to be verified on first login.
+If you want to omit this mail, you can check the **email verified** and **set initial password** toggle.
+If no password is set initially, the initialization mail prompting the user to set his password is sent.
+
+You can prompt the user to add a second factor method too by checking the **Force MFA** toggle in [Login behaviour settings](./instance-settings#login-behaviour-and-access).
+
+When logged in, a user can then manage his profile in console himself, adding a profile picture, external IDPs and Passwordless authentication devices.
+
+<img src="/img/guides/console/myprofile.png" alt="Profile Self Manage" />
+
+## Metadata
+
+When building complex applications, having the possibility to add metadata is essential.
+ZITADEL provides a key value storage for users on the user pages.
+Just navigate to the section **Metadata** and click on **edit**.
+
+> In our [Point of Sales example](./projects#example) from the projects guide, you could add a `stripeCustomerId` as a metadata key. In your client application you could then easily fetch the customer from Stripe APIs for your payments.
+
+<img
+  width="460px"
+  src="/img/guides/console/usermetadata.png"
+  alt="User Metadata"
+/>
+
+Metadata can requested via our auth and management APIs, from userinfo endpoint or ID Token.
+To get your metadata from the userinfo endpoint, add `urn:zitadel:iam:user:metadata` to your authentication request. Take a look at our reserved scopes [here](/docs/apis/openidoauth/scopes#reserved-scopes) or take a look at our [metadata guide](../customize/user-metadata).
+
+You can then toggle **User Info inside ID Token** in your application settings, if you need this information in the ID Token too.
+
+<img
+  src="/img/guides/console/appidtokensettings.png"
+  width="650px"
+  alt="ID Token settings"
+/>
+
+## Authorizations
+
+As described in [Roles and Authorizations](./roles), authorizations are shown on user profile pages too.
+If you need user roles in the user info endpoint, check the **Assert roles on authentication** checkbox in your project as described in [Authorizations](./roles#authorizations).
+If you need them in your ID Token, toggle **User roles inside ID Token** in application settings.

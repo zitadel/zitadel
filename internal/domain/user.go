@@ -27,6 +27,10 @@ func (s UserState) Exists() bool {
 	return s != UserStateUnspecified && s != UserStateDeleted
 }
 
+func (s UserState) NotDisabled() bool {
+	return s == UserStateActive || s == UserStateInitial
+}
+
 type UserType int32
 
 const (
