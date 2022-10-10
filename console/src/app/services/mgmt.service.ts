@@ -192,6 +192,10 @@ import {
   ListAppKeysResponse,
   ListAppsRequest,
   ListAppsResponse,
+  ListFlowTriggerTypesRequest,
+  ListFlowTriggerTypesResponse,
+  ListFlowTypesRequest,
+  ListFlowTypesResponse,
   ListGrantedProjectRolesRequest,
   ListGrantedProjectRolesResponse,
   ListGrantedProjectsRequest,
@@ -982,13 +986,24 @@ export class ManagementService {
     return this.grpcService.mgmt.listActions(req, null).then((resp) => resp.toObject());
   }
 
-  public getFlow(type: FlowType): Promise<GetFlowResponse.AsObject> {
+  public listFlowTypes(): Promise<ListFlowTypesResponse.AsObject> {
+    const req = new ListFlowTypesRequest();
+    return this.grpcService.mgmt.listFlowTypes(req, null).then((resp) => resp.toObject());
+  }
+
+  public listFlowTriggerTypes(type: string): Promise<ListFlowTriggerTypesResponse.AsObject> {
+    const req = new ListFlowTriggerTypesRequest();
+    req.setType(type);
+    return this.grpcService.mgmt.listFlowTriggerTypes(req, null).then((resp) => resp.toObject());
+  }
+
+  public getFlow(type: string): Promise<GetFlowResponse.AsObject> {
     const req = new GetFlowRequest();
     req.setType(type);
     return this.grpcService.mgmt.getFlow(req, null).then((resp) => resp.toObject());
   }
 
-  public clearFlow(type: FlowType): Promise<ClearFlowResponse.AsObject> {
+  public clearFlow(type: string): Promise<ClearFlowResponse.AsObject> {
     const req = new ClearFlowRequest();
     req.setType(type);
     return this.grpcService.mgmt.clearFlow(req, null).then((resp) => resp.toObject());
@@ -996,8 +1011,8 @@ export class ManagementService {
 
   public setTriggerActions(
     actionIdsList: string[],
-    type: FlowType,
-    triggerType: TriggerType,
+    type: string,
+    triggerType: string,
   ): Promise<SetTriggerActionsResponse.AsObject> {
     const req = new SetTriggerActionsRequest();
     req.setActionIdsList(actionIdsList);

@@ -2,10 +2,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: .5rem 0;
+  padding: 0.5rem 0;
   text-decoration: none;
-  transition: all .2 ease-in-out;
-  margin: .5rem 0;
+  transition: all 0.2 ease-in-out;
+  margin: 0.5rem 0;
 }
 
 .listelement:hover {
@@ -28,7 +28,7 @@
 }
 
 .icon {
-  padding: .5rem 1rem .5rem .5rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
 }
 
 .listlabel {
@@ -41,12 +41,13 @@
   background: var(--list-background);
   border-radius: 1rem;
   padding: 1rem;
+  border: 1px solid var(--card-border);
 }
 
 .listWrapperTitle {
   color: var(--ifm-heading-color);
   font-size: 16px;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
   display: block;
 }
 
