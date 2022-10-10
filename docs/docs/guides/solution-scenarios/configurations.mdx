@@ -19,13 +19,32 @@ If a user of this organization wants to login, you don't want them to enter the 
 4. Disable "Username Password Allowed" and enable "External IDP allowed" in the Advanced Section
 
 
-Send either the organization primary domain or the organization id scope on your authentication request from your application, to identify on which organization the users should login.
-
-| Scopes                                            | Example                                                | Description                                                                                                                                                                                                                                                           |
-|:--------------------------------------------------|:-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `urn:zitadel:iam:org:id:{id}`                     | `urn:zitadel:iam:org:id:178204173316174381`            | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed. It will assert the `urn:zitadel:iam:user:resourceowner` claims.                                |
-| `urn:zitadel:iam:org:domain:primary:{domainname}` | `urn:zitadel:iam:org:domain:primary:acme.ch`           | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed                                                                                                 |
+Send either the the organization id (`urn:zitadel:iam:org:id:{id}`) or organization primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authentication request from your application, to identify on which organization the users should login.
 
 More about the [scopes](../../apis/openidoauth/scopes#reserved-scopes)
 
 
+## Custom app domains per organization
+
+I have an application that runs on different domains for each customer I have. When the user wants to login I redirect to ZITADEL and want to get back to my application after. This should still be the custom domain for my organization.
+
+Example:
+MyApplication: customer-a.app.com
+ZITADEL Login: login.app.com
+
+In the OIDC Authorization request you always have to send the redirect url to where you like to be redirected after login.
+It is possible to register multiple urls on one application, the only criteria is that the requested url has to match one of the registered urls.
+
+Read more about [applications](../manage/console/applications) and the [redirect urls](../manage/console/applications#redirect-uris)
+
+### Trigger organization in ZITADEL login
+
+It is possible to trigger the organization directly with the authorization request to ZITADEL.
+
+This will have the following impacts:
+- Trigger organization login behaviour settings
+- Trigger organization branding
+- Only allow users from selected organization to login
+
+To request the organization send either the the organization id (`urn:zitadel:iam:org:id:{id}`) or organization primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authentication request from your application.
+More about the [scopes](../../apis/openidoauth/scopes#reserved-scopes)
