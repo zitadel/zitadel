@@ -1,0 +1,31 @@
+---
+title: How to configure ??
+---
+
+Each customer does have different needs and use-cases. In ZITADEL you are able to configure your settings depending on your needs.
+In this capital we show you different use-cases we have already seen, that could interest you.
+
+
+## Automatically redirect if organization has one identity provider
+
+You have different organizations/customers in your ZITADEL instance and they have different needs on how to authenticate. One of your customers does only allow login with an external identity provider like Google, Azure AD, etc.
+If a user of this organization wants to login, you don't want them to enter the username in the ZITADEL Login UI, they should be redirected directly to the identity provider.
+
+## Settings
+
+1. Go to the "Identity Providers" Settings of your organization
+2. Configure your needed identity provider: Read this [guide](../integrate/identity-brokering.md) if you don't know how
+3. Go to the "Login Behavior and Security" settings of the organization
+4. Disable "Username Password Allowed" and enable "External IDP allowed" in the Advanced Section
+
+
+Send either the organization primary domain or the organization id scope on your authentication request from your application, to identify on which organization the users should login.
+
+| Scopes                                            | Example                                                | Description                                                                                                                                                                                                                                                           |
+|:--------------------------------------------------|:-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `urn:zitadel:iam:org:id:{id}`                     | `urn:zitadel:iam:org:id:178204173316174381`            | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed. It will assert the `urn:zitadel:iam:user:resourceowner` claims.                                |
+| `urn:zitadel:iam:org:domain:primary:{domainname}` | `urn:zitadel:iam:org:domain:primary:acme.ch`           | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed                                                                                                 |
+
+More about the [scopes](../../apis/openidoauth/scopes#reserved-scopes)
+
+
