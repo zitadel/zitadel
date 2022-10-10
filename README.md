@@ -27,13 +27,15 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
-You want auth that's quickly set up like Auth0 but open source like Keycloak? Look no further — ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
+Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak? 
 
-We provide a wide range of out of the box features like secure login, self-service, OpenID Connect, OAuth2.x, SAML2, branding, Passwordless with FIDO2, OTP, U2F, and an unlimited audit trail to improve the life of developers. Especially noteworthy is that ZITADEL supports not only B2C and B2E scenarios but also B2B. This is super useful for people who build B2B Solutions, as ZITADEL can handle all the delegated user and access management.
+Do you have project that requires a multi-tenant user management with self-service for you customers?
 
-With ZITADEL you rely on a battle tested, hardened and extensible turnkey solution to solve all of your authentication and authorization needs. With the unique way of how ZITADEL stores data it gives you an unlimited audit trail which provides a peace of mind for even the harshest audit and analytics requirements.
+Look no further — ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
 
-<!-- TODO: Insert Video here-->
+We provide you with a wide range of out of the box features to accelerate your project. Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
+
+With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs. 
 
 ---
 
@@ -41,15 +43,15 @@ With ZITADEL you rely on a battle tested, hardened and extensible turnkey soluti
 
 ## Get started
 
+### Install ZITADEL
+
+- [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
+
 ### ZITADEL Cloud (SaaS)
 
 The easiest way to get started with [ZITADEL Cloud](https://zitadel.cloud).
 
 It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
-
-### Install ZITADEL
-
-- [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
 
 ### Quickstarts - Integrate your app
 
@@ -68,7 +70,7 @@ It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-
 ## Features
 
 - Single Sign On (SSO)
-- Passwordless with FIDO2 support
+- Passwordless with FIDO2 support (Including Passkeys)
 - Username / Password
 - Multifactor authentication with OTP, U2F
 - [Identity Brokering](https://docs.zitadel.com/docs/guides/integrate/identity-brokering)
@@ -77,7 +79,7 @@ It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-
 - Role Based Access Control (RBAC)
 - [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/manage/console/projects)
 - Self-registration including verification
-- User self service
+- User and Organization self service
 - [Service Accounts](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://docs.zitadel.com/docs/apis/openidoauth/endpoints),  [OIDC Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-oidc)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://docs.zitadel.com/docs/apis/saml/endpoints), [SAML Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-saml)
@@ -87,9 +89,7 @@ Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
 ## Client libraries
 
-<!-- TODO: check other libraries -->
-
-| Language | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
+| Language / Framework | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
 |----------|--------|--------------|----------|---------|---------------------------|
 | .NET     | [zitadel-net](https://github.com/smartive/zitadel-net) | GRPC | ✔️ | ✔️ | [smartive 👑](https://github.com/smartive/) |
 | Dart     | [zitadel-dart](https://github.com/smartive/zitadel-dart) | GRPC | ✔️ | ❌ | [smartive 👑](https://github.com/smartive/) |
