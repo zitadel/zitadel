@@ -19,7 +19,7 @@ export function ensureOIDCSettingsSet(
       };
 
       if (
-        body.settings?.accessTokenLifetime != hoursToDuration(accessTokenLifetime) ||
+        body.settings?.accessTokenLifetime !== hoursToDuration(accessTokenLifetime) ||
         body.settings?.idTokenLifetime != hoursToDuration(idTokenLifetime) ||
         body.settings?.refreshTokenExpiration != daysToDuration(refreshTokenExpiration) ||
         body.settings?.refreshTokenIdleExpiration != daysToDuration(refreshTokenIdleExpiration)

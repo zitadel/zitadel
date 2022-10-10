@@ -1,6 +1,6 @@
 export interface API {
   authHeader: string;
-  mgntBaseURL: string;
+  mgmtBaseURL: string;
   adminBaseURL: string;
 }
 

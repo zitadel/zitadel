@@ -68,7 +68,7 @@ function awaitDesired(
 ) {
   search().then((resp) => {
     const foundExpectedEntity = expectEntity(resp.entity);
-    const foundExpectedSequence = resp.sequence >= initialSequence || isNaN(initialSequence);
+    const foundExpectedSequence = initialSequence && resp.sequence >= initialSequence ```
 
     if (!foundExpectedEntity || !foundExpectedSequence) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
