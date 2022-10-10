@@ -56,7 +56,7 @@ export function ensureSetting(
     'PUT',
     body,
     (entity) => !!entity,
-    (body) => body.settings.id,
+    (body) => body?.settings?.id || NaN,
   );
 }
 
