@@ -2,8 +2,22 @@
 title: Instance
 ---
 
-import InstanceDescription from './\_instance_description.mdx';
+## Instance Structure
 
-<InstanceDescription name="InstanceDescription" />
+An instance is the top node in ZITADEL's data hierarchy.
+Within an instance all the default [settings](/docs/concepts/structure/policies),
+such as branding, login policy, password policy, etc. for the system can be configured.
+One instance normally runs on one domain and has one issuer (e.g login.customer.com).
 
-More about how to configure your instance read our [instance guide](../../guides/manage/console/instance-settings).
+One instance can contain multiple [organizations](/docs/concepts/structure/organizations),
+which in turn can represent the own company (e.g. departments) or business customers.
+
+Read more about how to configure your instance in our [instance guide](/docs/guides/manage/console/instance-settings).
+
+## Multiple Virtual Instances
+
+ZITADEL also has the concept of virtual instances.
+When installing ZITADEL from scratch, one instance is always automatically created for you.
+Nevertheless, you can add more virtual instances via the [system API](/docs/apis/proto/system#addinstance).
+This is especially useful if you have business customers, which in turn have their business customers with self service and custom domain demands.
+By providing full-blown virtual ZITADEL instances, your customers have all the customization options available in ZITADEL.
