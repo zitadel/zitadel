@@ -66,7 +66,8 @@ func (wm *InstanceLoginPolicyWriteModel) NewChangedEvent(
 	allowExternalIDP,
 	forceMFA,
 	hidePasswordReset,
-	ignoreUnknownUsernames bool,
+	ignoreUnknownUsernames,
+	allowDomainDiscovery bool,
 	passwordlessType domain.PasswordlessType,
 	defaultRedirectURI string,
 	passwordCheckLifetime,
@@ -97,6 +98,9 @@ func (wm *InstanceLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.IgnoreUnknownUsernames != ignoreUnknownUsernames {
 		changes = append(changes, policy.ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames))
+	}
+	if wm.AllowDomainDiscovery != allowDomainDiscovery {
+		changes = append(changes, policy.ChangeAllowDomainDiscovery(allowDomainDiscovery))
 	}
 	if wm.DefaultRedirectURI != defaultRedirectURI {
 		changes = append(changes, policy.ChangeDefaultRedirectURI(defaultRedirectURI))

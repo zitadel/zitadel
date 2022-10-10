@@ -294,7 +294,7 @@
       "TITLE": "Autenticazione passwordless",
       "DESCRIPTION": "Aggiungi i metodi di autenticazione basati su WebAuthn per accedere a ZITADEL senza password.",
       "MANAGE_DESCRIPTION": "Gestisci i metodi del secondo fattore dei vostri utenti.",
-      "U2F": "Aggiungi autenticatore",
+      "U2F": "Aggiungi metodo",
       "U2F_DIALOG_TITLE": "Verifica autenticatore",
       "U2F_DIALOG_DESCRIPTION": "Inserisci un nome per il tuo authenticatore o dispositivo usato.",
       "U2F_SUCCESS": "Autorizzazione passwordless creata con successo!",
@@ -326,17 +326,6 @@
         "NEW": "Aggiungi nuovo"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadati",
-      "DESCRIPTION": "",
-      "KEY": "Chiave",
-      "VALUE": "Valore",
-      "ADD": "Nuova voce",
-      "SAVE": "Salva",
-      "EMPTY": "Nessun metadato",
-      "SETSUCCESS": "Salvato con successo",
-      "REMOVESUCCESS": "Rimosso con successo"
-    },
     "MFA": {
       "TABLETYPE": "Tipo",
       "TABLESTATE": "Stato",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
       "ADD": "Aggiungi fattore",
-      "OTP": "OTP (One-Time Password)",
+      "OTP": "App di autenticazione per OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Aggiungi OTP",
       "OTP_DIALOG_DESCRIPTION": "Scansiona il codice QR con un'app di autenticazione e inserisci il codice nel campo sottostante per verificare e attivare il metodo OTP.",
       "U2F": "Impronta digitale, chiave di sicurezza, Face ID e altri",
@@ -639,6 +628,17 @@
       "DELETED": "Token eliminato con successo."
     }
   },
+  "METADATA": {
+    "TITLE": "Metadati",
+    "DESCRIPTION": "",
+    "KEY": "Chiave",
+    "VALUE": "Valore",
+    "ADD": "Nuova voce",
+    "SAVE": "Salva",
+    "EMPTY": "Nessun metadato",
+    "SETSUCCESS": "Salvato con successo",
+    "REMOVESUCCESS": "Rimosso con successo"
+  },
   "FLOWS": {
     "TITLE": "Azioni e Processi",
     "DESCRIPTION": "Esegui processi su certi eventi.",
@@ -653,15 +653,6 @@
       "0": "Nessun stato",
       "1": "inattivo",
       "2": "attivo"
-    },
-    "TYPES": {
-      "0": "Non specifico",
-      "1": "Autenticazione esterna"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post autenticazione",
-      "2": "Pre creazione",
-      "3": "Post creazione"
     },
     "ADDTRIGGER": "Aggiungi trigger",
     "FLOWCHANGED": "Il processo è stato modificato con successo.",
@@ -689,6 +680,10 @@
       "CLEAR": {
         "TITLE": "Elimina processo",
         "DESCRIPTION": "Stai per eliminare un processo. Questa azione non può essere annullata. Vuoi continuare?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Elimina le azioni selezionate?",
+        "DESCRIPTION": "Sei sicuro di voler eliminare le azioni selezionate dal processo?"
       }
     },
     "TOAST": {
@@ -1176,6 +1171,8 @@
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
       "IGNOREUNKNOWNUSERNAMES": "Ignora un nome utente sconosciuto",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione \u00e8 selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
+      "ALLOWDOMAINDISCOVERY": "Scoperta del dominio consentita",
+      "ALLOWDOMAINDISCOVERY_DESC": "Se l'opzione è selezionata, il suffisso (@domain.com) di un nome utente sconosciuto inserito nel login verrà confrontato con i domini organizzazione e, in caso di successo, verrà reindirizzato alla registrazione di tale organizzazione",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",

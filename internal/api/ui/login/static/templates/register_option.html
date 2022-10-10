@@ -17,7 +17,7 @@
         </a>
     </div>
     <div class="lgn-register-options">
-        {{if .LoginPolicy.AllowUsernamePassword }}
+        {{if hasRegistration }}
         <button class="lgn-raised-button lgn-primary" name="usernamepassword" value="true"
             formnovalidate>{{t "RegisterOption.RegisterUsernamePasswordButtonText"}}</button>
         {{end}}
