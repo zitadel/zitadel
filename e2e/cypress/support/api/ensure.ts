@@ -8,17 +8,18 @@ export function ensureItemExists(
   createPath: string,
   body: Entity,
   orgId?: number,
-  idField?: string,
+  newItemIdField: string = 'id',
+  searchItemIdField?: string,
 ): Cypress.Chainable<number> {
   return ensureSomething(
     api,
-    () => searchSomething(api, searchPath, 'POST', mapFromList(findInList)),
+    () => searchSomething(api, searchPath, 'POST', mapFromList(findInList, searchItemIdField), orgId),
     () => createPath,
     'POST',
     body,
     (entity) => !!entity,
+    (body) => body[newItemIdField],
     orgId,
-    idField,
   );
 }
 
@@ -27,14 +28,16 @@ export function ensureItemDoesntExist(
   searchPath: string,
   findInList: (entity: Entity) => boolean,
   deletePath: (entity: Entity) => string,
+  orgId?: number,
 ): Cypress.Chainable<null> {
   return ensureSomething(
     api,
-    () => searchSomething(api, searchPath, 'POST', mapFromList(findInList)),
+    () => searchSomething(api, searchPath, 'POST', mapFromList(findInList), orgId),
     deletePath,
     'DELETE',
     null,
     (entity) => !entity,
+    () => NaN,
   ).then(() => null);
 }
 
@@ -44,14 +47,16 @@ export function ensureSetting(
   mapResult: (entity: any) => SearchResult,
   createPath: string,
   body: any,
+  orgId?: number,
 ): Cypress.Chainable<number> {
   return ensureSomething(
     api,
-    () => searchSomething(api, path, 'GET', mapResult),
+    () => searchSomething(api, path, 'GET', mapResult, orgId),
     () => createPath,
     'PUT',
     body,
     (entity) => !!entity,
+    (body) => body.settings.id,
   );
 }
 
@@ -63,7 +68,7 @@ function awaitDesired(
 ) {
   search().then((resp) => {
     const foundExpectedEntity = expectEntity(resp.entity);
-    const foundExpectedSequence = resp.sequence >= initialSequence;
+    const foundExpectedSequence = resp.sequence >= initialSequence || isNaN(initialSequence);
 
     if (!foundExpectedEntity || !foundExpectedSequence) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
@@ -73,23 +78,25 @@ function awaitDesired(
   });
 }
 
+interface EnsuredResult {
+  id: number;
+  sequence: number;
+}
+
 export function ensureSomething(
   api: API,
   search: () => Cypress.Chainable<SearchResult>,
   apiPath: (entity: Entity) => string,
   ensureMethod: string,
   body: Entity,
-  expectEntity: (entity: any) => boolean,
+  expectEntity: (entity: Entity) => boolean,
+  mapId: (body: any) => number,
   orgId?: number,
-  idFieldname: string = 'id',
 ): Cypress.Chainable<number> {
   return search()
-    .then((sRes) => {
+    .then<EnsuredResult>((sRes) => {
       if (expectEntity(sRes.entity)) {
-        return cy.wrap({
-          id: ensureMethod == 'DELETE' ? NaN : sRes.entity[idFieldname],
-          expectSequenceFrom: sRes.sequence,
-        });
+        return cy.wrap({ id: sRes.id, sequence: sRes.sequence });
       }
 
       const req = {
@@ -110,13 +117,13 @@ export function ensureSomething(
       return cy.request(req).then((cRes) => {
         expect(cRes.status).to.equal(200);
         return {
-          id: cRes.body[idFieldname],
-          expectSequenceFrom: sRes.sequence,
+          id: mapId(cRes.body),
+          sequence: sRes.sequence || NaN,
         };
       });
     })
     .then((data) => {
-      awaitDesired(90, expectEntity, data.expectSequenceFrom, search);
+      awaitDesired(90, expectEntity, data.sequence, search);
       return cy.wrap<number>(data.id);
     });
 }

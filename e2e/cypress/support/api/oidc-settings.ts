@@ -15,6 +15,7 @@ export function ensureOIDCSettingsSet(
       const result = {
         entity: body.settings,
         sequence: body.settings?.details?.sequence,
+        id: body.settings.id,
       };
 
       if (

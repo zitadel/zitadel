@@ -20,6 +20,8 @@ export function ensureHumanUserExists(api: API, username: string): Cypress.Chain
         phone: '+41 123456789',
       },
     },
+    undefined,
+    'userId',
   );
 }
 
@@ -34,6 +36,8 @@ export function ensureMachineUserExists(api: API, username: string): Cypress.Cha
       name: 'e2emachinename',
       description: 'e2emachinedescription',
     },
+    undefined,
+    'userId',
   );
 }
 

@@ -13,10 +13,9 @@ export function ensureProjectGrantExists(
       `${api.mgntBaseURL}projectgrants/_search`,
       (grant: any) => grant.grantedOrgId == orgUnderTest && grant.projectId == foreignProjectId,
       `${api.mgntBaseURL}projects/${foreignProjectId}/grants`,
-      {
-        granted_org_id: orgUnderTest,
-      },
+      { granted_org_id: orgUnderTest },
       foreignOrgId,
+      'grantId',
       'grantId',
     );
   });

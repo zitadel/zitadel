@@ -7,6 +7,7 @@ export interface API {
 export type SearchResult = {
   entity: Entity | null;
   sequence: number;
+  id: number;
 };
 
 // Entity is an object but not a function

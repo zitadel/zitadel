@@ -7,19 +7,18 @@ export function ensureProjectExists(api: API, projectName: string, orgId?: numbe
     `${api.mgntBaseURL}projects/_search`,
     (project: any) => project.name === projectName,
     `${api.mgntBaseURL}projects`,
-    {
-      name: projectName,
-    },
+    { name: projectName },
     orgId,
   );
 }
 
-export function ensureProjectDoesntExist(api: API, projectName: string): Cypress.Chainable<null> {
+export function ensureProjectDoesntExist(api: API, projectName: string, orgId?: number): Cypress.Chainable<null> {
   return ensureItemDoesntExist(
     api,
     `${api.mgntBaseURL}projects/_search`,
     (project: any) => project.name === projectName,
     (project) => `${api.mgntBaseURL}projects/${project.id}`,
+    orgId,
   );
 }
 
@@ -36,18 +35,15 @@ export function ensureProjectResourceDoesntExist(
   projectId: number,
   resourceType: ResourceType,
   resourceName: string,
+  orgId?: number,
 ): Cypress.Chainable<null> {
   return ensureItemDoesntExist(
     api,
     `${api.mgntBaseURL}projects/${projectId}/${resourceType.resourcePath}/_search`,
-    (resource: any) => {
-      return resource[resourceType.compareProperty] === resourceName;
-    },
-    (resource) => {
-      return `${api.mgntBaseURL}projects/${projectId}/${resourceType.resourcePath}/${
-        resource[resourceType.identifierProperty]
-      }`;
-    },
+    (resource: any) => resource[resourceType.compareProperty] === resourceName,
+    (resource) =>
+      `${api.mgntBaseURL}projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`,
+    orgId,
   );
 }
 
