@@ -10,7 +10,7 @@ export function ensureOIDCSettingsSet(
 ): Cypress.Chainable<number> {
   return ensureSetting(
     api,
-    `${api.adminBaseURL}settings/oidc`,
+    `${api.adminBaseURL}/settings/oidc`,
     (body: any) => {
       const result = {
         entity: body.settings,
@@ -20,15 +20,15 @@ export function ensureOIDCSettingsSet(
 
       if (
         body.settings?.accessTokenLifetime !== hoursToDuration(accessTokenLifetime) ||
-        body.settings?.idTokenLifetime != hoursToDuration(idTokenLifetime) ||
-        body.settings?.refreshTokenExpiration != daysToDuration(refreshTokenExpiration) ||
-        body.settings?.refreshTokenIdleExpiration != daysToDuration(refreshTokenIdleExpiration)
+        body.settings?.idTokenLifetime !== hoursToDuration(idTokenLifetime) ||
+        body.settings?.refreshTokenExpiration !== daysToDuration(refreshTokenExpiration) ||
+        body.settings?.refreshTokenIdleExpiration !== daysToDuration(refreshTokenIdleExpiration)
       ) {
         result.entity = null;
       }
       return result;
     },
-    `${api.adminBaseURL}settings/oidc`,
+    `${api.adminBaseURL}/settings/oidc`,
     {
       accessTokenLifetime: hoursToDuration(accessTokenLifetime),
       idTokenLifetime: hoursToDuration(idTokenLifetime),

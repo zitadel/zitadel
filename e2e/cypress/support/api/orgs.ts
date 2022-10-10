@@ -9,13 +9,13 @@ export function ensureOrgExists(api: API, name: string): Cypress.Chainable<numbe
     () =>
       searchSomething(
         api,
-        encodeURI(`${api.mgntBaseURL}global/orgs/_by_domain?domain=${name}.${host(Cypress.config('baseUrl'))}`),
+        encodeURI(`${api.mgmtBaseURL}/global/orgs/_by_domain?domain=${name}.${host(Cypress.config('baseUrl'))}`),
         'GET',
         (res) => {
           return { entity: res.org, id: res.org?.id, sequence: res.org?.details?.sequence };
         },
       ),
-    () => `${api.mgntBaseURL}orgs`,
+    () => `${api.mgmtBaseURL}/orgs`,
     'POST',
     { name: name },
     (org: any) => org?.name === name,
@@ -24,7 +24,7 @@ export function ensureOrgExists(api: API, name: string): Cypress.Chainable<numbe
 }
 
 export function getOrgUnderTest(api: API): Cypress.Chainable<number> {
-  return searchSomething(api, `${api.mgntBaseURL}orgs/me`, 'GET', (res) => {
+  return searchSomething(api, `${api.mgmtBaseURL}/orgs/me`, 'GET', (res) => {
     return { entity: res.org, id: res.org.id, sequence: res.org.details.sequence };
   }).then((res) => res.entity.id);
 }

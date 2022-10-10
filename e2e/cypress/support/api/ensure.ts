@@ -1,3 +1,4 @@
+import { requestHeaders } from './apiauth';
 import { findFromList as mapFromList, searchSomething } from './search';
 import { API, Entity, SearchResult } from './types';
 
@@ -37,7 +38,6 @@ export function ensureItemDoesntExist(
     'DELETE',
     null,
     (entity) => !entity,
-    () => NaN,
   ).then(() => null);
 }
 
@@ -56,24 +56,24 @@ export function ensureSetting(
     'PUT',
     body,
     (entity) => !!entity,
-    (body) => body?.settings?.id || NaN,
+    (body) => body?.settings?.id,
   );
 }
 
 function awaitDesired(
   trials: number,
   expectEntity: (entity: Entity) => boolean,
-  initialSequence: number,
   search: () => Cypress.Chainable<SearchResult>,
+  initialSequence?: number,
 ) {
   search().then((resp) => {
     const foundExpectedEntity = expectEntity(resp.entity);
-    const foundExpectedSequence = initialSequence && resp.sequence >= initialSequence ```
+    const foundExpectedSequence = !initialSequence || resp.sequence >= initialSequence;
 
     if (!foundExpectedEntity || !foundExpectedSequence) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
       cy.wait(1000);
-      awaitDesired(trials - 1, expectEntity, initialSequence, search);
+      awaitDesired(trials - 1, expectEntity, search, initialSequence);
     }
   });
 }
@@ -90,7 +90,7 @@ export function ensureSomething(
   ensureMethod: string,
   body: Entity,
   expectEntity: (entity: Entity) => boolean,
-  mapId: (body: any) => number,
+  mapId?: (body: any) => number,
   orgId?: number,
 ): Cypress.Chainable<number> {
   return search()
@@ -99,31 +99,25 @@ export function ensureSomething(
         return cy.wrap({ id: sRes.id, sequence: sRes.sequence });
       }
 
-      const req = {
-        method: ensureMethod,
-        url: apiPath(sRes.entity),
-        headers: {
-          Authorization: api.authHeader,
-        },
-        body: body,
-        failOnStatusCode: false,
-        followRedirect: false,
-      };
-
-      if (orgId) {
-        req.headers['x-zitadel-orgid'] = orgId;
-      }
-
-      return cy.request(req).then((cRes) => {
-        expect(cRes.status).to.equal(200);
-        return {
-          id: mapId(cRes.body),
-          sequence: sRes.sequence || NaN,
-        };
-      });
+      return cy
+        .request({
+          method: ensureMethod,
+          url: apiPath(sRes.entity),
+          headers: requestHeaders(api, orgId),
+          body: body,
+          failOnStatusCode: false,
+          followRedirect: false,
+        })
+        .then((cRes) => {
+          expect(cRes.status).to.equal(200);
+          return {
+            id: mapId ? mapId(cRes.body) : undefined,
+            sequence: sRes.sequence,
+          };
+        });
     })
     .then((data) => {
-      awaitDesired(90, expectEntity, data.sequence, search);
+      awaitDesired(90, expectEntity, search, data.sequence);
       return cy.wrap<number>(data.id);
     });
 }

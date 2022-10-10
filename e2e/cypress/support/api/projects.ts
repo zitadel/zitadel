@@ -4,9 +4,9 @@ import { API } from './types';
 export function ensureProjectExists(api: API, projectName: string, orgId?: number): Cypress.Chainable<number> {
   return ensureItemExists(
     api,
-    `${api.mgntBaseURL}projects/_search`,
+    `${api.mgmtBaseURL}/projects/_search`,
     (project: any) => project.name === projectName,
-    `${api.mgntBaseURL}projects`,
+    `${api.mgmtBaseURL}/projects`,
     { name: projectName },
     orgId,
   );
@@ -15,9 +15,9 @@ export function ensureProjectExists(api: API, projectName: string, orgId?: numbe
 export function ensureProjectDoesntExist(api: API, projectName: string, orgId?: number): Cypress.Chainable<null> {
   return ensureItemDoesntExist(
     api,
-    `${api.mgntBaseURL}projects/_search`,
+    `${api.mgmtBaseURL}/projects/_search`,
     (project: any) => project.name === projectName,
-    (project) => `${api.mgntBaseURL}projects/${project.id}`,
+    (project) => `${api.mgmtBaseURL}/projects/${project.id}`,
     orgId,
   );
 }
@@ -39,10 +39,10 @@ export function ensureProjectResourceDoesntExist(
 ): Cypress.Chainable<null> {
   return ensureItemDoesntExist(
     api,
-    `${api.mgntBaseURL}projects/${projectId}/${resourceType.resourcePath}/_search`,
+    `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/_search`,
     (resource: any) => resource[resourceType.compareProperty] === resourceName,
     (resource) =>
-      `${api.mgntBaseURL}projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`,
+      `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`,
     orgId,
   );
 }
@@ -50,9 +50,9 @@ export function ensureProjectResourceDoesntExist(
 export function ensureApplicationExists(api: API, projectId: number, appName: string): Cypress.Chainable<number> {
   return ensureItemExists(
     api,
-    `${api.mgntBaseURL}projects/${projectId}/${Apps.resourcePath}/_search`,
+    `${api.mgmtBaseURL}/projects/${projectId}/${Apps.resourcePath}/_search`,
     (resource: any) => resource.name === appName,
-    `${api.mgntBaseURL}projects/${projectId}/${Apps.resourcePath}/oidc`,
+    `${api.mgmtBaseURL}/projects/${projectId}/${Apps.resourcePath}/oidc`,
     {
       name: appName,
       redirectUris: ['https://e2eredirecturl.org'],

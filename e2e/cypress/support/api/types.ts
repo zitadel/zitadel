@@ -1,5 +1,5 @@
 export interface API {
-  authHeader: string;
+  token: string;
   mgmtBaseURL: string;
   adminBaseURL: string;
 }

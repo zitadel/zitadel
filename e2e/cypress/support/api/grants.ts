@@ -10,9 +10,9 @@ export function ensureProjectGrantExists(
   return getOrgUnderTest(api).then((orgUnderTest) => {
     return ensureItemExists(
       api,
-      `${api.mgntBaseURL}projectgrants/_search`,
+      `${api.mgmtBaseURL}/projectgrants/_search`,
       (grant: any) => grant.grantedOrgId == orgUnderTest && grant.projectId == foreignProjectId,
-      `${api.mgntBaseURL}projects/${foreignProjectId}/grants`,
+      `${api.mgmtBaseURL}/projects/${foreignProjectId}/grants`,
       { granted_org_id: orgUnderTest },
       foreignOrgId,
       'grantId',

@@ -4,9 +4,9 @@ import { API } from './types';
 export function ensureHumanUserExists(api: API, username: string): Cypress.Chainable<number> {
   return ensureItemExists(
     api,
-    `${api.mgntBaseURL}users/_search`,
+    `${api.mgmtBaseURL}/users/_search`,
     (user: any) => user.userName === username,
-    `${api.mgntBaseURL}users/human`,
+    `${api.mgmtBaseURL}/users/human`,
     {
       user_name: username,
       profile: {
@@ -28,9 +28,9 @@ export function ensureHumanUserExists(api: API, username: string): Cypress.Chain
 export function ensureMachineUserExists(api: API, username: string): Cypress.Chainable<number> {
   return ensureItemExists(
     api,
-    `${api.mgntBaseURL}users/_search`,
+    `${api.mgmtBaseURL}/users/_search`,
     (user: any) => user.userName === username,
-    `${api.mgntBaseURL}users/machine`,
+    `${api.mgmtBaseURL}/users/machine`,
     {
       user_name: username,
       name: 'e2emachinename',
@@ -44,8 +44,8 @@ export function ensureMachineUserExists(api: API, username: string): Cypress.Cha
 export function ensureUserDoesntExist(api: API, username: string): Cypress.Chainable<null> {
   return ensureItemDoesntExist(
     api,
-    `${api.mgntBaseURL}users/_search`,
+    `${api.mgmtBaseURL}/users/_search`,
     (user: any) => user.userName === username,
-    (user) => `${api.mgntBaseURL}users/${user.id}`,
+    (user) => `${api.mgmtBaseURL}/users/${user.id}`,
   );
 }

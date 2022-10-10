@@ -1,3 +1,4 @@
+import { requestHeaders } from './apiauth';
 import { API, Entity, SearchResult } from './types';
 
 export function searchSomething(
@@ -7,22 +8,16 @@ export function searchSomething(
   mapResult: (body: any) => SearchResult,
   orgId?: number,
 ): Cypress.Chainable<SearchResult> {
-  const req = {
-    method: method,
-    url: searchPath,
-    headers: {
-      Authorization: api.authHeader,
-    },
-    failOnStatusCode: method == 'POST',
-  };
-
-  if (orgId) {
-    req.headers['x-zitadel-orgid'] = orgId;
-  }
-
-  return cy.request(req).then((res) => {
-    return mapResult(res.body);
-  });
+  return cy
+    .request({
+      method: method,
+      url: searchPath,
+      headers: requestHeaders(api, orgId),
+      failOnStatusCode: method == 'POST',
+    })
+    .then((res) => {
+      return mapResult(res.body);
+    });
 }
 
 export function findFromList(find: (entity: Entity) => boolean, idField: string = 'id'): (body: any) => SearchResult {
