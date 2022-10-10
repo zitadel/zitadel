@@ -1427,6 +1427,22 @@ This is an empty response
 
 
 
+### DataAppKey
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| project_id |  string | - |  |
+| app_id |  string | - |  |
+| type |  zitadel.authn.v1.KeyType | - |  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+| key_details |  bytes | - |  |
+
+
+
+
 ### DataHumanUser
 
 
@@ -1447,6 +1463,21 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | idp_id |  string | - |  |
 | idp |  zitadel.management.v1.AddOrgJWTIDPRequest | - |  |
+
+
+
+
+### DataMachineKey
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key_id |  string | - |  |
+| user_id |  string | - |  |
+| type |  zitadel.authn.v1.KeyType | - |  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+| key_details |  bytes | - |  |
 
 
 
@@ -1529,6 +1560,8 @@ This is an empty response
 | idps | repeated zitadel.management.v1.AddIDPToLoginPolicyRequest | - |  |
 | user_links | repeated zitadel.idp.v1.IDPUserLink | - |  |
 | domains | repeated zitadel.org.v1.Domain | - |  |
+| app_keys | repeated DataAppKey | - |  |
+| machine_keys | repeated DataMachineKey | - |  |
 
 
 

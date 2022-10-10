@@ -10,6 +10,7 @@ import "zitadel/text.proto";
 import "zitadel/member.proto";
 import "zitadel/features.proto";
 import "zitadel/management.proto";
+import "zitadel/auth_n_key.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -4039,6 +4040,9 @@ message DataOrg {
 
     repeated zitadel.idp.v1.IDPUserLink user_links = 36;
     repeated zitadel.org.v1.Domain domains = 37;
+
+    repeated DataAppKey app_keys = 38;
+    repeated DataMachineKey machine_keys = 39;
 }
 message DataOIDCIDP{
     string idp_id = 1;
@@ -4060,6 +4064,21 @@ message DataAPIApplication {
 message DataOIDCApplication {
     string app_id = 1;
     zitadel.management.v1.AddOIDCAppRequest app = 2;
+}
+message DataAppKey {
+    string id = 1;
+    string project_id = 2;
+    string app_id = 3;
+    zitadel.authn.v1.KeyType type = 4;
+    google.protobuf.Timestamp expiration_date = 5;
+    bytes key_details = 6;
+}
+message DataMachineKey {
+    string key_id = 1;
+    string user_id = 2;
+    zitadel.authn.v1.KeyType type = 3;
+    google.protobuf.Timestamp expiration_date = 4;
+    bytes key_details = 5;
 }
 message DataHumanUser {
     string user_id = 1;

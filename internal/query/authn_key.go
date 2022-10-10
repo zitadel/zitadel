@@ -136,6 +136,27 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldRealTime bool, id s
 	return scan(row)
 }
 
+func (q *Queries) GetAuthNKeyPublicKeyByID(ctx context.Context, id string) ([]byte, error) {
+	stmt, scan := prepareAuthNKeyPublicKeyQuery()
+	query, args, err := stmt.Where(
+		sq.And{
+			sq.Eq{
+				AuthNKeyColumnID.identifier():      id,
+				AuthNKeyColumnEnabled.identifier(): true,
+			},
+			sq.Gt{
+				AuthNKeyColumnExpiration.identifier(): time.Now(),
+			},
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-Dzb32", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
 func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id string, identifier string) ([]byte, error) {
 	stmt, scan := prepareAuthNKeyPublicKeyQuery()
 	query, args, err := stmt.Where(
