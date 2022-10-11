@@ -712,9 +712,11 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 		return false
 	}
 	// discovery was allowed, so set the org as requested org
+	// and clear all potentially existing user information and only set the loginname as hint (for registration)
 	request.SetOrgInformation(org.ID, org.Name, org.Domain, false)
+	request.SetUserInfo("", "", "", "", "", org.ID)
 	request.LoginHint = loginName
-	request.Prompt = append(request.Prompt, domain.PromptCreate)
+	request.Prompt = append(request.Prompt, domain.PromptCreate) // to trigger registration
 	return true
 }
 
