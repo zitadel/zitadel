@@ -86,6 +86,7 @@ Errors:
     Machine:
       Key:
         NotFound: Machine key not found
+        AlreadyExisting: Machine key already existing
     PAT:
       NotFound: Personal Access Token not found
     NotHuman: The User must be personal
@@ -264,6 +265,9 @@ Errors:
       APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
       AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
       ClientSecretInvalid: Client Secret is invalid
+      Key:
+        AlreadyExisting: Application key already existing
+        NotFound: Application key not found
     RequiredFieldsMissing: Some required fields are missing
     Grant:
       AlreadyExists: Project grant already exists

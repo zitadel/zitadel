@@ -259,6 +259,9 @@ Errors:
       APIAuthMethodNoSecret: 选择的 API 身份验证方法不需要秘钥
       AuthMethodNoPrivateKeyJWT: 选择的身份验证方法不需要 Key
       ClientSecretInvalid: Client Secret 无效
+      Key:
+        AlreadyExisting: 已经存在的应用钥匙
+        NotFound: 未找到应用钥匙
     RequiredFieldsMissing: 缺少一些必填字段
     Grant:
       AlreadyExists: 项目授权已存在

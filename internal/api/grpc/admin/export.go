@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
+	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
@@ -156,7 +158,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Users
 		******************************************************************************************************************/
-		org.HumanUsers, org.MachineUsers, org.UserMetadata, err = s.getUsers(ctx, org.GetOrgId(), req.WithPasswords, req.WithOtp)
+		org.HumanUsers, org.MachineUsers, org.UserMetadata, org.MachineKeys, err = s.getUsers(ctx, org.GetOrgId(), req.WithPasswords, req.WithOtp)
 		if err != nil {
 			return nil, err
 		}
@@ -170,7 +172,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		/******************************************************************************************************************
 		Project and Applications
 		******************************************************************************************************************/
-		org.Projects, org.ProjectRoles, org.OidcApps, org.ApiApps, err = s.getProjectsAndApps(ctx, org.GetOrgId())
+		org.Projects, org.ProjectRoles, org.OidcApps, org.ApiApps, org.AppKeys, err = s.getProjectsAndApps(ctx, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
@@ -511,23 +513,24 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 	return nil, nil
 }
 
-func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) (_ []*v1_pb.DataHumanUser, _ []*v1_pb.DataMachineUser, _ []*management_pb.SetUserMetadataRequest, err error) {
+func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, withOTP bool) (_ []*v1_pb.DataHumanUser, _ []*v1_pb.DataMachineUser, _ []*management_pb.SetUserMetadataRequest, _ []*v1_pb.DataMachineKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	orgSearch, err := query.NewUserResourceOwnerSearchQuery(org, query.TextEquals)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}})
 	if err != nil && !caos_errors.IsNotFound(err) {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	humanUsers := make([]*v1_pb.DataHumanUser, 0)
 	machineUsers := make([]*v1_pb.DataMachineUser, 0)
 	userMetadata := make([]*management_pb.SetUserMetadataRequest, 0)
+	machineKeys := make([]*v1_pb.DataMachineKey, 0)
 	if err != nil && caos_errors.IsNotFound(err) {
-		return humanUsers, machineUsers, userMetadata, nil
+		return humanUsers, machineUsers, userMetadata, machineKeys, nil
 	}
 	for _, user := range users.Users {
 		switch user.Type {
@@ -563,7 +566,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				hashedPassword, hashAlgorithm, err := s.query.GetHumanPassword(ctx, org, user.ID)
 				pwspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
-					return nil, nil, nil, err
+					return nil, nil, nil, nil, err
 				}
 				if err == nil && hashedPassword != nil {
 					dataUser.User.HashedPassword = &management_pb.ImportHumanUserRequest_HashedPassword{
@@ -577,7 +580,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				code, err := s.query.GetHumanOTPSecret(ctx, user.ID, org)
 				otpspan.EndWithError(err)
 				if err != nil && !caos_errors.IsNotFound(err) {
-					return nil, nil, nil, err
+					return nil, nil, nil, nil, err
 				}
 				if err == nil && code != "" {
 					dataUser.User.OtpCode = code
@@ -594,17 +597,45 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 					Description: user.Machine.Description,
 				},
 			})
+			userIDQuery, err := query.NewAuthNKeyAggregateIDQuery(user.ID)
+			if err != nil {
+				return nil, nil, nil, nil, err
+			}
+			orgIDQuery, err := query.NewAuthNKeyResourceOwnerQuery(org)
+			if err != nil {
+				return nil, nil, nil, nil, err
+			}
+
+			keys, err := s.query.SearchAuthNKeys(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}})
+			if err != nil && !caos_errors.IsNotFound(err) {
+				return nil, nil, nil, nil, err
+			} else if keys != nil && len(keys.AuthNKeys) > 0 {
+				for _, key := range keys.AuthNKeys {
+					data, err := s.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, key.ID, user.ID)
+					if err != nil {
+						return nil, nil, nil, nil, err
+					}
+
+					machineKeys = append(machineKeys, &v1_pb.DataMachineKey{
+						KeyId:          key.ID,
+						UserId:         user.ID,
+						Type:           authn_grpc.KeyTypeToPb(key.Type),
+						ExpirationDate: timestamppb.New(key.Expiration),
+						KeyDetails:     data,
+					})
+				}
+			}
 		}
 
 		ctx, metaspan := tracing.NewSpan(ctx)
 		metadataOrgSearch, err := query.NewUserMetadataResourceOwnerSearchQuery(org)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}})
 		metaspan.EndWithError(err)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		for _, metadata := range metadataList.Metadata {
 			userMetadata = append(userMetadata, &management_pb.SetUserMetadataRequest{
@@ -614,7 +645,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 			})
 		}
 	}
-	return humanUsers, machineUsers, userMetadata, nil
+	return humanUsers, machineUsers, userMetadata, machineKeys, nil
 }
 
 func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) (_ []*management_pb.SetTriggerActionsRequest, err error) {
@@ -679,22 +710,23 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*v1_pb.DataActio
 	return actions, nil
 }
 
-func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.DataProject, []*management_pb.AddProjectRoleRequest, []*v1_pb.DataOIDCApplication, []*v1_pb.DataAPIApplication, error) {
+func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.DataProject, []*management_pb.AddProjectRoleRequest, []*v1_pb.DataOIDCApplication, []*v1_pb.DataAPIApplication, []*v1_pb.DataAppKey, error) {
 	projectSearch, err := query.NewProjectResourceOwnerSearchQuery(org)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}})
 	if err != nil && !caos_errors.IsNotFound(err) {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 
 	projects := make([]*v1_pb.DataProject, len(queriedProjects.Projects))
 	orgProjectRoles := make([]*management_pb.AddProjectRoleRequest, 0)
 	oidcApps := make([]*v1_pb.DataOIDCApplication, 0)
 	apiApps := make([]*v1_pb.DataAPIApplication, 0)
+	appKeys := make([]*v1_pb.DataAppKey, 0)
 	if err != nil && caos_errors.IsNotFound(err) {
-		return projects, orgProjectRoles, oidcApps, apiApps, nil
+		return projects, orgProjectRoles, oidcApps, apiApps, appKeys, nil
 	}
 	for i, queriedProject := range queriedProjects.Projects {
 		projects[i] = &v1_pb.DataProject{
@@ -710,12 +742,12 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 
 		projectRoleSearch, err := query.NewProjectRoleProjectIDSearchQuery(queriedProject.ID)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, nil, err
 		}
 
 		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
 		if err != nil && !caos_errors.IsNotFound(err) {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, nil, err
 		}
 		if queriedProjectRoles != nil {
 			for _, role := range queriedProjectRoles.ProjectRoles {
@@ -730,11 +762,11 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 
 		appSearch, err := query.NewAppProjectIDSearchQuery(queriedProject.ID)
 		if err != nil {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, nil, err
 		}
 		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}})
 		if err != nil && !caos_errors.IsNotFound(err) {
-			return nil, nil, nil, nil, err
+			return nil, nil, nil, nil, nil, err
 		}
 		if apps != nil {
 			for _, app := range apps.Apps {
@@ -781,10 +813,43 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 						},
 					})
 				}
+				appIDQuery, err := query.NewAuthNKeyObjectIDQuery(app.ID)
+				if err != nil {
+					return nil, nil, nil, nil, nil, err
+				}
+				projectIDQuery, err := query.NewAuthNKeyAggregateIDQuery(app.ProjectID)
+				if err != nil {
+					return nil, nil, nil, nil, nil, err
+				}
+				orgIDQuery, err := query.NewAuthNKeyResourceOwnerQuery(org)
+				if err != nil {
+					return nil, nil, nil, nil, nil, err
+				}
+				keys, err := s.query.SearchAuthNKeys(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}})
+				if err != nil && !caos_errors.IsNotFound(err) {
+					return nil, nil, nil, nil, nil, err
+				} else if keys != nil && len(keys.AuthNKeys) > 0 {
+					for _, key := range keys.AuthNKeys {
+						data, identifier, err := s.query.GetAuthNKeyPublicKeyAndIdentifierByID(ctx, key.ID)
+						if err != nil {
+							return nil, nil, nil, nil, nil, err
+						}
+
+						appKeys = append(appKeys, &v1_pb.DataAppKey{
+							Id:             key.ID,
+							ProjectId:      app.ProjectID,
+							AppId:          app.ID,
+							Type:           authn_grpc.KeyTypeToPb(key.Type),
+							ExpirationDate: timestamppb.New(key.Expiration),
+							ClientId:       identifier,
+							KeyDetails:     data,
+						})
+					}
+				}
 			}
 		}
 	}
-	return projects, orgProjectRoles, oidcApps, apiApps, nil
+	return projects, orgProjectRoles, oidcApps, apiApps, appKeys, nil
 }
 
 func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org string, processedProjects []string, processedGrants []string, processedUsers []string) ([]*management_pb.AddProjectGrantMemberRequest, error) {

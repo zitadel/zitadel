@@ -264,6 +264,9 @@ Errors:
       APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
       AuthMethodNoPrivateKeyJWT: Gewählte Auth Method benötigt keinen Key
       ClientSecretInvalid: Client Secret ist ungültig
+      Key:
+        AlreadyExisting: Applikationsschlüssel existiert bereits
+        NotFound: Applikationsschlüssel nicht gefunden
     RequiredFieldsMissing: Benötigte Felder fehlen
     Grant:
       AlreadyExists: Projekt Grant existiert bereits

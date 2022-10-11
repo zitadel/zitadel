@@ -40,7 +40,7 @@ type addOIDCApp struct {
 	ClientSecretPlain string
 }
 
-//AddOIDCAppCommand prepares the commands to add an oidc app. The ClientID will be set during the CreateCommands
+// AddOIDCAppCommand prepares the commands to add an oidc app. The ClientID will be set during the CreateCommands
 func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.HashAlgorithm) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if app.ID == "" {
@@ -122,7 +122,7 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, err
 	}
 	if existingApp.State != domain.AppStateUnspecified {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Application.AlreadyExisting")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Project.App.AlreadyExisting")
 	}
 
 	project, err := c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
@@ -135,7 +135,7 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 
 func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
 	if oidcApp == nil || oidcApp.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Application.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Project.App.Invalid")
 	}
 	project, err := c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
 	if err != nil {
@@ -143,7 +143,7 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 	}
 
 	if oidcApp.AppName == "" || !oidcApp.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Application.Invalid")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Project.App.Invalid")
 	}
 
 	appID, err := c.idGenerator.Next()
