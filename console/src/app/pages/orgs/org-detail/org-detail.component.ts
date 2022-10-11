@@ -59,8 +59,10 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     breadcrumbService.setBreadcrumb([bread]);
 
     auth.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
-      this.getData();
-      this.loadMetadata();
+      if (this.org && org) {
+        this.getData();
+        this.loadMetadata();
+      }
     });
   }
 
