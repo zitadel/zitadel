@@ -23,6 +23,10 @@
     >
       {{ 'ORG.PAGES.REACTIVATE' | translate }}
     </button>
+
+    <button mat-menu-item (click)="renameOrg()">
+      {{ 'ORG.PAGES.RENAME.ACTION' | translate }}
+    </button>
   </ng-template>
   <cnsl-contributors
     topContributors

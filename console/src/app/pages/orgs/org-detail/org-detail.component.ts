@@ -18,6 +18,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { Buffer } from 'buffer';
+import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 
 @Component({
   selector: 'cnsl-org-detail',
@@ -44,7 +45,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
   public InfoSectionType: any = InfoSectionType;
 
   constructor(
-    auth: GrpcAuthService,
+    private auth: GrpcAuthService,
     private dialog: MatDialog,
     public mgmtService: ManagementService,
     private toast: ToastService,
@@ -232,5 +233,47 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => {
       this.loadMetadata();
     });
+  }
+
+  public renameOrg(): void {
+    const dialogRef = this.dialog.open(NameDialogComponent, {
+      data: {
+        name: this.org?.name,
+        titleKey: 'ORG.RENAME.TITLE',
+        descKey: 'ORG.RENAME.DESCRIPTION',
+        labelKey: 'ORG.PAGES.NAME',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((name) => {
+      if (name) {
+        this.updateOrg(name);
+      }
+    });
+  }
+
+  public updateOrg(name: string): void {
+    if (this.org) {
+      this.mgmtService
+        .updateOrg(name)
+        .then(() => {
+          this.toast.showInfo('ORG.TOAST.UPDATED', true);
+          this.mgmtService
+            .getMyOrg()
+            .then((resp) => {
+              if (resp.org) {
+                this.org = resp.org;
+                this.auth.setActiveOrg(resp.org);
+              }
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
   }
 }

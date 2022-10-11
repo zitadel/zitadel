@@ -776,6 +776,12 @@
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
+      "RENAME": {
+        "ACTION": "Rinomina",
+        "TITLE": "Rinomina organizzazione",
+        "DESCRIPTION": "Inserisci il nuovo nome per la tua organizzazione",
+        "BTN": "Rinomina"
+      },
       "ORGDOMAIN": {
         "TITLE": "Verificazione della propriet\u00e0 del dominio dell'organizzazione",
         "VERIFICATION": "Verifica la propriet\u00e0 del tuo dominio. \u00c8 necessario scaricare un file di verifica e caricarlo all'URL fornito elencato di seguito, o inserire una voce DNS TXT Record per l'URL fornito. Per completare, clicca sul pulsante di verifica.",
@@ -827,6 +833,7 @@
       "DESCRIPTION": "Definisci gli utenti che possono cambiare le preferenze delle tue organizzazioni."
     },
     "TOAST": {
+      "UPDATED": "L'organizzazione es stata aggiornata.",
       "DEACTIVATED": "Organizzazione disattivata.",
       "REACTIVATED": "Organizzazione riattivata.",
       "DOMAINADDED": "Aggiunto dominio.",

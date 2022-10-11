@@ -776,6 +776,12 @@
       "ORGDETAIL_TITLE": "Gebe den Namen und die Domain für die neue Organisation ein.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Geben Sie den Namen der neuen Organisation ein.",
       "ORGDETAILUSER_TITLE": "Organisationsbesitzer hinzufügen",
+      "RENAME": {
+        "ACTION": "Umbenennen",
+        "TITLE": "Organisation umbenennen",
+        "DESCRIPTION": "Geben Sie den neuen Namen Ihrer Organisation an.",
+        "BTN": "Umbenennen"
+      },
       "ORGDOMAIN": {
         "TITLE": "Verifikation der Domain der Organisation",
         "VERIFICATION": "Überprüfe den Besitz Deiner Domain, indem Du eine Bestätigungsdatei herunterlädst und unter der angegebenen URL speicherst, oder indem Du sie mit einem DNS-Eintrag verifizierst.",
@@ -827,6 +833,7 @@
       "DESCRIPTION": "Definiere hier die Benutzer, die Operationen auf Deinen Organisationen vornehmen dürfen."
     },
     "TOAST": {
+      "UPDATED": "Organisation geupdated",
       "DEACTIVATED": "Organisation deaktiviert.",
       "REACTIVATED": "Organisation reaktiviert.",
       "DOMAINADDED": "Domain hinzugefügt.",

@@ -776,6 +776,12 @@
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
       "ORGDETAILUSER_TITLE": "Configure Organization Owner",
+      "RENAME": {
+        "ACTION": "Rename",
+        "TITLE": "Rename organization",
+        "DESCRIPTION": "Enter the new name for your organization",
+        "BTN": "Rename"
+      },
       "ORGDOMAIN": {
         "TITLE": "Organization Domain Ownership Verification",
         "VERIFICATION": "To verify the ownership of your domain, you need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
@@ -827,6 +833,7 @@
       "DESCRIPTION": "Define the users who can change your organizations preferences."
     },
     "TOAST": {
+      "UPDATED": "Organization updated successfully.",
       "DEACTIVATED": "Organization deactivated.",
       "REACTIVATED": "Organization reactivated.",
       "DOMAINADDED": "Added domain.",
