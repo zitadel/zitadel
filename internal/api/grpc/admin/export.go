@@ -996,7 +996,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) (_ []*admin
 					return nil, nil, nil, nil, nil, err
 				} else if keys != nil && len(keys.AuthNKeys) > 0 {
 					for _, key := range keys.AuthNKeys {
-						data, err := s.query.GetAuthNKeyPublicKeyByID(ctx, key.ID)
+						data, clientID, err := s.query.GetAuthNKeyPublicKeyAndIdentifierByID(ctx, key.ID)
 						if err != nil {
 							return nil, nil, nil, nil, nil, err
 						}
@@ -1007,6 +1007,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) (_ []*admin
 							AppId:          app.ID,
 							Type:           authn_grpc.KeyTypeToPb(key.Type),
 							ExpirationDate: timestamppb.New(key.Expiration),
+							ClientId:       clientID,
 							KeyDetails:     data,
 						})
 					}

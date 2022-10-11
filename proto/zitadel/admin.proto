@@ -4069,9 +4069,10 @@ message DataAppKey {
     string id = 1;
     string project_id = 2;
     string app_id = 3;
-    zitadel.authn.v1.KeyType type = 4;
-    google.protobuf.Timestamp expiration_date = 5;
-    bytes key_details = 6;
+    string client_id = 4;
+    zitadel.authn.v1.KeyType type = 5;
+    google.protobuf.Timestamp expiration_date = 6;
+    bytes key_details = 7;
 }
 message DataMachineKey {
     string key_id = 1;

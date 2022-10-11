@@ -1436,6 +1436,7 @@ This is an empty response
 | id |  string | - |  |
 | project_id |  string | - |  |
 | app_id |  string | - |  |
+| client_id |  string | - |  |
 | type |  zitadel.authn.v1.KeyType | - |  |
 | expiration_date |  google.protobuf.Timestamp | - |  |
 | key_details |  bytes | - |  |

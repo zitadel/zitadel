@@ -136,8 +136,8 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldRealTime bool, id s
 	return scan(row)
 }
 
-func (q *Queries) GetAuthNKeyPublicKeyByID(ctx context.Context, id string) ([]byte, error) {
-	stmt, scan := prepareAuthNKeyPublicKeyQuery()
+func (q *Queries) GetAuthNKeyPublicKeyAndIdentifierByID(ctx context.Context, id string) ([]byte, string, error) {
+	stmt, scan := prepareAuthNKeyPublicKeyAndIdentifierQuery()
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
@@ -150,7 +150,7 @@ func (q *Queries) GetAuthNKeyPublicKeyByID(ctx context.Context, id string) ([]by
 		},
 	).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dzb32", "Errors.Query.SQLStatement")
+		return nil, "", errors.ThrowInternal(err, "QUERY-Dzb32", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -279,5 +279,27 @@ func prepareAuthNKeyPublicKeyQuery() (sq.SelectBuilder, func(row *sql.Row) ([]by
 				return nil, errors.ThrowInternal(err, "QUERY-Bfs2a", "Errors.Internal")
 			}
 			return publicKey, nil
+		}
+}
+
+func prepareAuthNKeyPublicKeyAndIdentifierQuery() (sq.SelectBuilder, func(row *sql.Row) ([]byte, string, error)) {
+	return sq.Select(
+			AuthNKeyColumnPublicKey.identifier(),
+			AuthNKeyColumnIdentifier.identifier(),
+		).From(authNKeyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) ([]byte, string, error) {
+			var publicKey []byte
+			var identifier string
+			err := row.Scan(
+				&publicKey,
+				&identifier,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, "", errors.ThrowNotFound(err, "QUERY-SDf32", "Errors.AuthNKey.NotFound")
+				}
+				return nil, "", errors.ThrowInternal(err, "QUERY-Bfs2a", "Errors.Internal")
+			}
+			return publicKey, identifier, nil
 		}
 }
