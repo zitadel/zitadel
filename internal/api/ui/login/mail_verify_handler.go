@@ -99,7 +99,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 	}
 	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
-		user, err := l.query.GetUserByID(r.Context(), false, userID)
+		user, err := l.query.GetUserByID(r.Context(), false, userID, false)
 		if err == nil {
 			l.customTexts(r.Context(), translator, user.ResourceOwner)
 		}

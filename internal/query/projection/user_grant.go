@@ -137,9 +137,15 @@ func (p *userGrantProjection) reducers() []handler.AggregateReducer {
 		{
 			Aggregate: org.AggregateType,
 			EventRedusers: []handler.EventReducer{
+				// own resource owner
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
+				},
+				// user resource owner
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceUserOwnerRemoved,
 				},
 			},
 		},
@@ -329,6 +335,24 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 }
 
 func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-jpIvp", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserGrantOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(UserGrantResourceOwner, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *userGrantProjection) reduceUserOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-jpIvp", "reduce.wrong.event.type %s", org.OrgRemovedEventType)

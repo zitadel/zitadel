@@ -67,7 +67,7 @@ func (p *Storage) GetCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 }
 
 func (p *Storage) getCertificateAndKey(ctx context.Context, usage domain.KeyUsage) (*key.CertificateAndKey, error) {
-	certs, err := p.query.ActiveCertificates(ctx, time.Now().Add(gracefulPeriod), usage)
+	certs, err := p.query.ActiveCertificates(ctx, time.Now().Add(gracefulPeriod), usage, false)
 	if err != nil {
 		return nil, err
 	}

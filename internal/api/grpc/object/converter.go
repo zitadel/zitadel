@@ -12,9 +12,8 @@ import (
 
 func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:             objectDetail.Sequence,
-		ResourceOwner:        objectDetail.ResourceOwner,
-		ResourceOwnerRemoved: objectDetail.OwnerRemoved,
+		Sequence:      objectDetail.Sequence,
+		ResourceOwner: objectDetail.ResourceOwner,
 	}
 	if !objectDetail.EventDate.IsZero() {
 		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
@@ -24,9 +23,8 @@ func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.Obje
 
 func DomainToAddDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:             objectDetail.Sequence,
-		ResourceOwner:        objectDetail.ResourceOwner,
-		ResourceOwnerRemoved: objectDetail.OwnerRemoved,
+		Sequence:      objectDetail.Sequence,
+		ResourceOwner: objectDetail.ResourceOwner,
 	}
 	if !objectDetail.EventDate.IsZero() {
 		details.CreationDate = timestamppb.New(objectDetail.EventDate)
@@ -39,12 +37,10 @@ func ToViewDetailsPb(
 	creationDate,
 	changeDate time.Time,
 	resourceOwner string,
-	ownerRemoved bool,
 ) *object_pb.ObjectDetails {
 	details := &object_pb.ObjectDetails{
-		Sequence:             sequence,
-		ResourceOwner:        resourceOwner,
-		ResourceOwnerRemoved: ownerRemoved,
+		Sequence:      sequence,
+		ResourceOwner: resourceOwner,
 	}
 	if !creationDate.IsZero() {
 		details.CreationDate = timestamppb.New(creationDate)
@@ -147,9 +143,9 @@ func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
 	}
 }
 
-// func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc, ownerRemoved bool) {
-// 	if query == nil {
-// 		return 0, 0, false, false
-// 	}
-// 	return query.Offset, uint64(query.Limit), query.Asc, query.WithOwnerRemoved
-// }
+func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc bool) {
+	if query == nil {
+		return 0, 0, false
+	}
+	return query.Offset, uint64(query.Limit), query.Asc
+}

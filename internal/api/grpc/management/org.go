@@ -110,7 +110,7 @@ func (s *Server) RemoveOrg(ctx context.Context, req *mgmt_pb.RemoveOrgRequest) (
 }
 
 func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPolicyRequest) (*mgmt_pb.GetDomainPolicyResponse, error) {
-	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPoli
 }
 
 func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
-	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 	}
 	queries.Queries = append(queries.Queries, orgIDQuery)
 
-	domains, err := s.query.SearchOrgDomains(ctx, queries)
+	domains, err := s.query.SearchOrgDomains(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -298,7 +298,7 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, or
 		}
 		queries = append(queries, owner)
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries})
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, false)
 	if err != nil {
 		return nil, err
 	}

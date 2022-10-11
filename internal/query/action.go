@@ -81,7 +81,6 @@ type Action struct {
 	ResourceOwner string
 	State         domain.ActionState
 	Sequence      uint64
-	OwnerRemoved  bool
 
 	Name          string
 	Script        string
@@ -102,13 +101,15 @@ func (q *ActionSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries) (actions *Actions, err error) {
+func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries, withOwnerRemoved bool) (actions *Actions, err error) {
 	query, scan := prepareActionsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).
-		ToSql()
+	eq := sq.Eq{
+		ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[ActionColumnOwnerRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SDgwg", "Errors.Query.InvalidRequest")
 	}
@@ -125,14 +126,17 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	return actions, err
 }
 
-func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (*Action, error) {
+func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, withOwnerRemoved bool) (*Action, error) {
 	stmt, scan := prepareActionQuery()
-	query, args, err := stmt.Where(
-		sq.Eq{
-			ActionColumnID.identifier():            id,
-			ActionColumnResourceOwner.identifier(): orgID,
-			ActionColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		ActionColumnID.identifier():            id,
+		ActionColumnResourceOwner.identifier(): orgID,
+		ActionColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[ActionColumnOwnerRemoved.identifier()] = false
+	}
+	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
@@ -143,10 +147,6 @@ func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (*
 
 func NewActionResourceOwnerQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ActionColumnResourceOwner, id, TextEquals)
-}
-
-func NewActionOwnerRemovedQuery() (SearchQuery, error) {
-	return NewBoolQuery(ActionColumnOwnerRemoved, true)
 }
 
 func NewActionNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -173,7 +173,6 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 			ActionColumnScript.identifier(),
 			ActionColumnTimeout.identifier(),
 			ActionColumnAllowedToFail.identifier(),
-			ActionColumnOwnerRemoved.identifier(),
 			countColumn.identifier(),
 		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Actions, error) {
@@ -192,7 +191,6 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 					&action.Script,
 					&action.Timeout,
 					&action.AllowedToFail,
-					&action.OwnerRemoved,
 					&count,
 				)
 				if err != nil {
@@ -226,7 +224,6 @@ func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)
 			ActionColumnScript.identifier(),
 			ActionColumnTimeout.identifier(),
 			ActionColumnAllowedToFail.identifier(),
-			ActionColumnOwnerRemoved.identifier(),
 		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Action, error) {
 			action := new(Action)
@@ -241,7 +238,6 @@ func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)
 				&action.Script,
 				&action.Timeout,
 				&action.AllowedToFail,
-				&action.OwnerRemoved,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

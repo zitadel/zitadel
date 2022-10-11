@@ -2,6 +2,9 @@ package admin
 
 import (
 	"context"
+
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
@@ -17,7 +20,6 @@ import (
 	project_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest) (_ *admin_pb.ExportDataResponse, err error) {
@@ -244,7 +246,7 @@ func (s *Server) getDomainPolicy(ctx context.Context, orgID string) (_ *admin_pb
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedDomain, err := s.query.DomainPolicyByOrg(ctx, true, orgID)
+	queriedDomain, err := s.query.DomainPolicyByOrg(ctx, true, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +269,7 @@ func (s *Server) getDomains(ctx context.Context, orgID string) (_ []*org_pb.Doma
 	if err != nil {
 		return nil, err
 	}
-	orgDomainsQuery, err := s.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{orgDomainOrgIDQuery}})
+	orgDomainsQuery, err := s.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{orgDomainOrgIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -296,7 +298,7 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) (_ []*v1_pb.DataOIDC
 	if err != nil {
 		return nil, nil, err
 	}
-	idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{Queries: []query.SearchQuery{idpQuery, ownerType}})
+	idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{Queries: []query.SearchQuery{idpQuery, ownerType}}, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -304,7 +306,7 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) (_ []*v1_pb.DataOIDC
 	jwtIdps := make([]*v1_pb.DataJWTIDP, 0)
 	for _, idp := range idps.IDPs {
 		if idp.OIDCIDP != nil {
-			clientSecret, err := s.query.GetOIDCIDPClientSecret(ctx, false, orgID, idp.ID)
+			clientSecret, err := s.query.GetOIDCIDPClientSecret(ctx, false, orgID, idp.ID, false)
 			if err != nil && !caos_errors.IsNotFound(err) {
 				return nil, nil, err
 			}
@@ -344,7 +346,7 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (_ *managemen
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLabel, err := s.query.ActiveLabelPolicyByOrg(ctx, orgID)
+	queriedLabel, err := s.query.ActiveLabelPolicyByOrg(ctx, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +371,7 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (_ *managemen
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLogin, err := s.query.LoginPolicyByID(ctx, false, orgID)
+	queriedLogin, err := s.query.LoginPolicyByID(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +392,7 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (_ *managemen
 			multiFactors = append(multiFactors, policy_pb.MultiFactorType(factor))
 		}
 
-		idpLinksQuery, err := s.query.IDPLoginPolicyLinks(ctx, orgID, &query.IDPLoginPolicyLinksSearchQuery{})
+		idpLinksQuery, err := s.query.IDPLoginPolicyLinks(ctx, orgID, &query.IDPLoginPolicyLinksSearchQuery{}, false)
 		if err != nil && !caos_errors.IsNotFound(err) {
 			return nil, err
 		}
@@ -435,7 +437,7 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.ID
 	if err != nil {
 		return nil, err
 	}
-	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}})
+	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, false)
 	if err != nil && !caos_errors.IsNotFound(err) {
 		return nil, err
 	}
@@ -460,7 +462,7 @@ func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (_ *managem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID)
+	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -476,7 +478,7 @@ func (s *Server) getPasswordComplexityPolicy(ctx context.Context, orgID string) 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, false, orgID)
+	queriedPasswordComplexity, err := s.query.PasswordComplexityPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -496,7 +498,7 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, false, orgID)
+	queriedPrivacy, err := s.query.PrivacyPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -518,7 +520,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}})
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}}, false)
 	if err != nil && !caos_errors.IsNotFound(err) {
 		return nil, nil, nil, err
 	}
@@ -600,7 +602,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}})
+		metadataList, err := s.query.SearchUserMetadata(ctx, false, user.ID, &query.UserMetadataSearchQueries{Queries: []query.SearchQuery{metadataOrgSearch}}, false)
 		metaspan.EndWithError(err)
 		if err != nil {
 			return nil, nil, nil, err
@@ -623,7 +625,7 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
 
 	for _, flowType := range flowTypes {
-		flow, err := s.query.GetFlow(ctx, flowType, org)
+		flow, err := s.query.GetFlow(ctx, flowType, org, false)
 		if err != nil {
 			return nil, err
 		}
@@ -653,7 +655,7 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*v1_pb.DataActio
 	if err != nil {
 		return nil, err
 	}
-	queriedActions, err := s.query.SearchActions(ctx, &query.ActionSearchQueries{Queries: []query.SearchQuery{actionSearch}})
+	queriedActions, err := s.query.SearchActions(ctx, &query.ActionSearchQueries{Queries: []query.SearchQuery{actionSearch}}, false)
 	if err != nil && !caos_errors.IsNotFound(err) {
 		return nil, err
 	}
@@ -683,7 +685,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}})
+	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}}, false)
 	if err != nil && !caos_errors.IsNotFound(err) {
 		return nil, nil, nil, nil, err
 	}
@@ -712,7 +714,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 			return nil, nil, nil, nil, err
 		}
 
-		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
+		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}}, false)
 		if err != nil && !caos_errors.IsNotFound(err) {
 			return nil, nil, nil, nil, err
 		}
@@ -731,7 +733,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
-		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}})
+		apps, err := s.query.SearchApps(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{appSearch}}, false)
 		if err != nil && !caos_errors.IsNotFound(err) {
 			return nil, nil, nil, nil, err
 		}
@@ -870,7 +872,7 @@ func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string
 	if err != nil {
 		return nil, err
 	}
-	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}})
+	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1003,7 +1005,7 @@ func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages 
 func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomInitMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomInitMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.InitCodeMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.InitCodeMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1028,7 +1030,7 @@ func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, lang
 func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomPasswordResetMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomPasswordResetMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.PasswordResetMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.PasswordResetMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1053,7 +1055,7 @@ func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org str
 func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyEmailMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomVerifyEmailMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyEmailMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyEmailMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1078,7 +1080,7 @@ func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org strin
 func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomVerifyPhoneMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomVerifyPhoneMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyPhoneMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.VerifyPhoneMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1103,7 +1105,7 @@ func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org strin
 func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomDomainClaimedMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomDomainClaimedMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}
@@ -1128,7 +1130,7 @@ func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org str
 func (s *Server) getCustomPasswordlessRegistrationMessageTexts(ctx context.Context, org string, languages []string) ([]*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, error) {
 	customTexts := make([]*management_pb.SetCustomPasswordlessRegistrationMessageTextRequest, 0, len(languages))
 	for _, lang := range languages {
-		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang)
+		text, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, org, domain.DomainClaimedMessageType, lang, false)
 		if err != nil {
 			return nil, err
 		}

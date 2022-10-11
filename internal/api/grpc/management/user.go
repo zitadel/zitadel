@@ -30,7 +30,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDReques
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUserByID(ctx, true, req.Id, owner)
+	user, err := s.query.GetUserByID(ctx, true, req.Id, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetU
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUser(ctx, true, loginName)
+	user, err := s.query.GetUser(ctx, true, false, loginName)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries)
+	res, err := s.query.SearchUsers(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -86,14 +86,14 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 
 func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequest) (*mgmt_pb.IsUserUniqueResponse, error) {
 	orgID := authz.GetCtxData(ctx).OrgID
-	policy, err := s.query.DomainPolicyByOrg(ctx, true, orgID)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, orgID, false)
 	if err != nil {
 		return nil, err
 	}
 	if !policy.UserLoginMustBeDomain {
 		orgID = ""
 	}
-	unique, err := s.query.IsUserUnique(ctx, req.UserName, req.Email, orgID)
+	unique, err := s.query.IsUserUnique(ctx, req.UserName, req.Email, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries)
+	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetada
 	if err != nil {
 		return nil, err
 	}
-	data, err := s.query.GetUserMetadataByKey(ctx, true, req.Id, req.Key, owner)
+	data, err := s.query.GetUserMetadataByKey(ctx, true, req.Id, req.Key, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +366,7 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 	if err != nil {
 		return nil, err
 	}
-	profile, err := s.query.GetHumanProfile(ctx, req.UserId, owner)
+	profile, err := s.query.GetHumanProfile(ctx, req.UserId, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -400,7 +400,7 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 	if err != nil {
 		return nil, err
 	}
-	email, err := s.query.GetHumanEmail(ctx, req.UserId, owner)
+	email, err := s.query.GetHumanEmail(ctx, req.UserId, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -466,7 +466,7 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 	if err != nil {
 		return nil, err
 	}
-	phone, err := s.query.GetHumanPhone(ctx, req.UserId, owner)
+	phone, err := s.query.GetHumanPhone(ctx, req.UserId, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -582,7 +582,7 @@ func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHuma
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}
@@ -625,7 +625,7 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}
@@ -700,7 +700,7 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 	if err != nil {
 		return nil, err
 	}
-	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, resourceOwner, aggregateID)
+	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, false, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -714,7 +714,7 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, query)
+	result, err := s.query.SearchAuthNKeys(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}
@@ -763,7 +763,7 @@ func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.G
 	if err != nil {
 		return nil, err
 	}
-	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, resourceOwner, aggregateID)
+	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, false, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -777,7 +777,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchPersonalAccessTokens(ctx, queries)
+	result, err := s.query.SearchPersonalAccessTokens(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -823,7 +823,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.IDPUserLinks(ctx, queries)
+	res, err := s.query.IDPUserLinks(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}

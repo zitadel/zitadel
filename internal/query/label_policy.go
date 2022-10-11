@@ -40,22 +40,22 @@ type Theme struct {
 	IconURL         string
 }
 
-func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*LabelPolicy, error) {
+func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
+	eq := sq.Eq{
+		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
+		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[LabelPolicyOwnerRemoved.identifier()] = false
+	}
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Or{
-				sq.Eq{
-					LabelPolicyColID.identifier(): orgID,
-				},
-				sq.Eq{
-					LabelPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{LabelPolicyColID.identifier(): orgID},
+				sq.Eq{LabelPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
-			sq.Eq{
-				LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
-				LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 		}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
@@ -203,6 +203,9 @@ var (
 	}
 	LabelPolicyColDarkIconURL = Column{
 		name: projection.LabelPolicyDarkIconURLCol,
+	}
+	LabelPolicyOwnerRemoved = Column{
+		name: projection.LabelPolicyOwnerRemovedCol,
 	}
 )
 

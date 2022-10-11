@@ -78,29 +78,38 @@ var (
 		name:  projection.DomainPolicyStateCol,
 		table: domainPolicyTable,
 	}
+	DomainPolicyColOwnerRemoved = Column{
+		name:  projection.DomainPolicyOwnerRemovedCol,
+		table: domainPolicyTable,
+	}
 )
 
-func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*DomainPolicy, error) {
+func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*DomainPolicy, error) {
 	if shouldTriggerBulk {
 		projection.DomainPolicyProjection.Trigger(ctx)
 	}
-
-	stmt, scan := prepareDomainPolicyQuery()
-	query, args, err := stmt.Where(
-		sq.And{
+	eq := sq.And{
+		sq.Eq{DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+		sq.Or{
+			sq.Eq{DomainPolicyColID.identifier(): orgID},
+			sq.Eq{DomainPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID()},
+		},
+	}
+	if !withOwnerRemoved {
+		eq = sq.And{
 			sq.Eq{
-				DomainPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				DomainPolicyColInstanceID.identifier():   authz.GetInstance(ctx).InstanceID(),
+				DomainPolicyColOwnerRemoved.identifier(): false,
 			},
 			sq.Or{
-				sq.Eq{
-					DomainPolicyColID.identifier(): orgID,
-				},
-				sq.Eq{
-					DomainPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{DomainPolicyColID.identifier(): orgID},
+				sq.Eq{DomainPolicyColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
-		}).
-		OrderBy(DomainPolicyColIsDefault.identifier()).
+		}
+	}
+
+	stmt, scan := prepareDomainPolicyQuery()
+	query, args, err := stmt.Where(eq).OrderBy(DomainPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-D3CqT", "Errors.Query.SQLStatement")

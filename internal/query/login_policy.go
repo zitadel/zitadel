@@ -133,30 +133,32 @@ var (
 		name:  projection.SecondFactorCheckLifetimeCol,
 		table: loginPolicyTable,
 	}
-	LoginPolicyColumnMultiFacotrCheckLifetime = Column{
+	LoginPolicyColumnMultiFactorCheckLifetime = Column{
 		name:  projection.MultiFactorCheckLifetimeCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnOwnerRemoved = Column{
+		name:  projection.LoginPolicyOwnerRemovedCol,
 		table: loginPolicyTable,
 	}
 )
 
-func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, orgID string) (*LoginPolicy, error) {
+func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*LoginPolicy, error) {
 	if shouldTriggerBulk {
 		projection.LoginPolicyProjection.Trigger(ctx)
+	}
+	eq := sq.Eq{LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[LoginPolicyColumnOwnerRemoved.identifier()] = false
 	}
 
 	query, scan := prepareLoginPolicyQuery()
 	stmt, args, err := query.Where(
 		sq.And{
-			sq.Eq{
-				LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					LoginPolicyColumnOrgID.identifier(): orgID,
-				},
-				sq.Eq{
-					LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{LoginPolicyColumnOrgID.identifier(): orgID},
+				sq.Eq{LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
@@ -310,7 +312,7 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnExternalLoginCheckLifetime.identifier(),
 			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
 			LoginPolicyColumnSecondFactorCheckLifetime.identifier(),
-			LoginPolicyColumnMultiFacotrCheckLifetime.identifier(),
+			LoginPolicyColumnMultiFactorCheckLifetime.identifier(),
 			IDPLoginPolicyLinkIDPIDCol.identifier(),
 			IDPNameCol.identifier(),
 			IDPTypeCol.identifier(),

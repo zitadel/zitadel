@@ -43,10 +43,6 @@ func listActionsToQuery(orgID string, req *mgmt_pb.ListActionsRequest) (_ *query
 			return nil, err
 		}
 	}
-
-	if req.GetQuery().GetWithOwnerRemoved() {
-		queries = append(queries)
-	}
 	return &query.ActionSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: req.Query.GetOffset(),

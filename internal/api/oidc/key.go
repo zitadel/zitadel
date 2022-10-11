@@ -75,7 +75,7 @@ func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	err = retry(func() error {
-		publicKeys, err := o.query.ActivePublicKeys(ctx, time.Now())
+		publicKeys, err := o.query.ActivePublicKeys(ctx, time.Now(), false)
 		if err != nil {
 			return err
 		}
@@ -114,7 +114,7 @@ func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err erro
 }
 
 func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
-	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(gracefulPeriod))
+	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(gracefulPeriod), false)
 	if err != nil {
 		return nil, err
 	}

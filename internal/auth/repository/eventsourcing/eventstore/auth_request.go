@@ -56,11 +56,11 @@ type AuthRequestRepo struct {
 }
 
 type labelPolicyProvider interface {
-	ActiveLabelPolicyByOrg(context.Context, string) (*query.LabelPolicy, error)
+	ActiveLabelPolicyByOrg(context.Context, string, bool) (*query.LabelPolicy, error)
 }
 
 type privacyPolicyProvider interface {
-	PrivacyPolicyByOrg(context.Context, bool, string) (*query.PrivacyPolicy, error)
+	PrivacyPolicyByOrg(context.Context, bool, string, bool) (*query.PrivacyPolicy, error)
 }
 
 type userSessionViewProvider interface {
@@ -72,11 +72,11 @@ type userViewProvider interface {
 }
 
 type loginPolicyViewProvider interface {
-	LoginPolicyByID(context.Context, bool, string) (*query.LoginPolicy, error)
+	LoginPolicyByID(context.Context, bool, string, bool) (*query.LoginPolicy, error)
 }
 
 type lockoutPolicyViewProvider interface {
-	LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error)
+	LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error)
 }
 
 type idpProviderViewProvider interface {
@@ -97,17 +97,17 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ProjectByClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(context.Context, string, bool) (*query.Project, error)
 	UserGrantsByProjectAndUserID(context.Context, string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
-	ProjectByClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(context.Context, string, bool) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID, instanceID string) (*project_view_model.OrgProjectMapping, error)
 }
 
 type applicationProvider interface {
-	AppByOIDCClientID(context.Context, string) (*query.App, error)
+	AppByOIDCClientID(context.Context, string, bool) (*query.App, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -122,7 +122,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		return nil, err
 	}
 	request.ID = reqID
-	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID)
+	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -538,7 +538,7 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 }
 
 func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, orgID string) (*query.LoginPolicy, []*domain.IDPProvider, error) {
-	policy, err := repo.LoginPolicyViewProvider.LoginPolicyByID(ctx, false, orgID)
+	policy, err := repo.LoginPolicyViewProvider.LoginPolicyByID(ctx, false, orgID, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -972,7 +972,7 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, reques
 }
 
 func (repo *AuthRequestRepo) GetPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
-	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, false, orgID)
+	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, false, orgID, false)
 	if errors.IsNotFound(err) {
 		return new(domain.PrivacyPolicy), nil
 	}
@@ -1000,7 +1000,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 }
 
 func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
-	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID)
+	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1008,7 +1008,7 @@ func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string)
 }
 
 func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
-	policy, err := repo.LabelPolicyProvider.ActiveLabelPolicyByOrg(ctx, orgID)
+	policy, err := repo.LabelPolicyProvider.ActiveLabelPolicyByOrg(ctx, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1046,7 +1046,7 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText)
+	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText, false)
 	if err != nil {
 		return nil, err
 	}
@@ -1057,7 +1057,7 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	if _, ok := request.Request.(*domain.AuthRequestOIDC); !ok {
 		return false, nil
 	}
-	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
+	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID, false)
 	if err != nil {
 		return false, err
 	}
@@ -1065,7 +1065,7 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 }
 
 func (repo *AuthRequestRepo) getDomainPolicy(ctx context.Context, orgID string) (*query.DomainPolicy, error) {
-	return repo.Query.DomainPolicyByOrg(ctx, false, orgID)
+	return repo.Query.DomainPolicyByOrg(ctx, false, orgID, false)
 }
 
 func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
@@ -1284,7 +1284,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
-		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
+		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID, false)
 		if err != nil {
 			return false, err
 		}
@@ -1305,7 +1305,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
-		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
+		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID, false)
 		if err != nil {
 			return false, err
 		}

@@ -54,12 +54,13 @@ func NewOrgDomainVerifiedSearchQuery(verified bool) (SearchQuery, error) {
 	return NewBoolQuery(OrgDomainIsVerifiedCol, verified)
 }
 
-func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries) (domains *Domains, err error) {
+func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries, withOwnerRemoved bool) (domains *Domains, err error) {
 	query, scan := prepareDomainsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			OrgDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{OrgDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[OrgDomainOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")
 	}
@@ -162,6 +163,10 @@ var (
 	}
 	OrgDomainValidationTypeCol = Column{
 		name:  projection.OrgDomainValidationTypeCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainOwnerRemovedCol = Column{
+		name:  projection.OrgDomainOwnerRemovedCol,
 		table: orgDomainsTable,
 	}
 )

@@ -31,24 +31,21 @@ type PasswordComplexityPolicy struct {
 	IsDefault bool
 }
 
-func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*PasswordComplexityPolicy, error) {
+func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*PasswordComplexityPolicy, error) {
 	if shouldTriggerBulk {
 		projection.PasswordComplexityProjection.Trigger(ctx)
 	}
-
+	eq := sq.Eq{PasswordComplexityColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[PasswordComplexityColOwnerRemoved.identifier()] = false
+	}
 	stmt, scan := preparePasswordComplexityPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				PasswordComplexityColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					PasswordComplexityColID.identifier(): orgID,
-				},
-				sq.Eq{
-					PasswordComplexityColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{PasswordComplexityColID.identifier(): orgID},
+				sq.Eq{PasswordComplexityColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
@@ -135,6 +132,10 @@ var (
 	}
 	PasswordComplexityColState = Column{
 		name:  projection.ComplexityPolicyStateCol,
+		table: passwordComplexityTable,
+	}
+	PasswordComplexityColOwnerRemoved = Column{
+		name:  projection.ComplexityPolicyOwnerRemovedCol,
 		table: passwordComplexityTable,
 	}
 )

@@ -77,18 +77,24 @@ var (
 		name:  projection.CustomTextTextCol,
 		table: customTextTable,
 	}
+	CustomTextOwnerRemoved = Column{
+		name:  projection.CustomTextOwnerRemovedCol,
+		table: customTextTable,
+	}
 )
 
-func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, language string) (texts *CustomTexts, err error) {
+func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, language string, withOwnerRemoved bool) (texts *CustomTexts, err error) {
 	stmt, scan := prepareCustomTextsQuery()
-	query, args, err := stmt.Where(
-		sq.Eq{
-			CustomTextColAggregateID.identifier(): aggregateID,
-			CustomTextColTemplate.identifier():    template,
-			CustomTextColLanguage.identifier():    language,
-			CustomTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
-		},
-	).ToSql()
+	eq := sq.Eq{
+		CustomTextColAggregateID.identifier(): aggregateID,
+		CustomTextColTemplate.identifier():    template,
+		CustomTextColLanguage.identifier():    language,
+		CustomTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[CustomTextOwnerRemoved.identifier()] = false
+	}
+	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-M9gse", "Errors.Query.SQLStatement")
 	}
@@ -105,15 +111,17 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 	return texts, err
 }
 
-func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, template string) (texts *CustomTexts, err error) {
+func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, template string, withOwnerRemoved bool) (texts *CustomTexts, err error) {
 	stmt, scan := prepareCustomTextsQuery()
-	query, args, err := stmt.Where(
-		sq.Eq{
-			CustomTextColAggregateID.identifier(): aggregateID,
-			CustomTextColTemplate.identifier():    template,
-			CustomTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
-		},
-	).ToSql()
+	eq := sq.Eq{
+		CustomTextColAggregateID.identifier(): aggregateID,
+		CustomTextColTemplate.identifier():    template,
+		CustomTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[CustomTextOwnerRemoved.identifier()] = false
+	}
+	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-M49fs", "Errors.Query.SQLStatement")
 	}
@@ -145,7 +153,7 @@ func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (*domai
 }
 
 func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang string) (*domain.CustomLoginText, error) {
-	texts, err := q.CustomTextList(ctx, aggregateID, domain.LoginCustomText, lang)
+	texts, err := q.CustomTextList(ctx, aggregateID, domain.LoginCustomText, lang, false)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +169,7 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.Custo
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-m0Jf3", "Errors.TranslationFile.ReadError")
 	}
-	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID(), domain.LoginCustomText, lang)
+	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID(), domain.LoginCustomText, lang, false)
 	if err != nil {
 		return nil, err
 	}

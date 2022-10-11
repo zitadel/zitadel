@@ -36,11 +36,6 @@ message ObjectDetails {
             example: "\"69629023906488334\"";
         }
     ];
-    bool resource_owner_removed = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "when true, the resource owner of the object was removed";
-        }
-    ];
 }
 
 message ListQuery {
@@ -58,11 +53,6 @@ message ListQuery {
     bool asc = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "default is descending"
-        }
-    ];
-    bool with_owner_removed = 4 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "if true also object of removed resource owners are returned"
         }
     ];
 }

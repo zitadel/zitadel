@@ -161,6 +161,10 @@ var (
 		name:  projection.UserTypeCol,
 		table: userTable,
 	}
+	UserOwnerRemovedCol = Column{
+		name:  projection.UserOwnerRemovedCol,
+		table: userTable,
+	}
 
 	userLoginNamesTable         = loginNameTable.setAlias("login_names")
 	userLoginNamesUserIDCol     = LoginNameUserIDCol.setTable(userLoginNamesTable)
@@ -292,7 +296,7 @@ var (
 	}
 )
 
-func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, queries ...SearchQuery) (*User, error) {
+func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*User, error) {
 	if shouldTriggerBulk {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
@@ -303,10 +307,14 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
+	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): instanceID,
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-FBg21", "Errors.Query.SQLStatment")
 	}
@@ -315,7 +323,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	return scan(row)
 }
 
-func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (*User, error) {
+func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (*User, error) {
 	if shouldTriggerBulk {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
@@ -326,9 +334,13 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries .
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
+	eq := sq.Eq{
 		UserInstanceIDCol.identifier(): instanceID,
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
 	}
@@ -337,15 +349,19 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries .
 	return scan(row)
 }
 
-func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (*Profile, error) {
+func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*Profile, error) {
 	query, scan := prepareProfileQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
+	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
@@ -354,15 +370,19 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ..
 	return scan(row)
 }
 
-func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...SearchQuery) (*Email, error) {
+func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*Email, error) {
 	query, scan := prepareEmailQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
+	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-BHhj3", "Errors.Query.SQLStatment")
 	}
@@ -371,15 +391,19 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...S
 	return scan(row)
 }
 
-func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...SearchQuery) (*Phone, error) {
+func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*Phone, error) {
 	query, scan := preparePhoneQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
+	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
 	}
@@ -388,7 +412,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	return scan(row)
 }
 
-func (q *Queries) GeNotifyUser(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (*NotifyUser, error) {
+func (q *Queries) GeNotifyUser(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*NotifyUser, error) {
 	if shouldTriggered {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
@@ -399,10 +423,14 @@ func (q *Queries) GeNotifyUser(ctx context.Context, shouldTriggered bool, userID
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
+	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): instanceID,
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
 	}
@@ -411,12 +439,13 @@ func (q *Queries) GeNotifyUser(ctx context.Context, shouldTriggered bool, userID
 	return scan(row)
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (*Users, error) {
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, withOwnerRemoved bool) (*Users, error) {
 	query, scan := prepareUsersQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
@@ -433,7 +462,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (
 	return users, err
 }
 
-func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwner string) (bool, error) {
+func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwner string, withOwnerRemoved bool) (bool, error) {
 	query, scan := prepareUserUniqueQuery()
 	queries := make([]SearchQuery, 0, 3)
 	if username != "" {
@@ -460,9 +489,11 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[UserOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
 	}

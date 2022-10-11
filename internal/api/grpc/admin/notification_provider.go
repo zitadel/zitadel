@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) GetFileSystemNotificationProvider(ctx context.Context, req *admin_pb.GetFileSystemNotificationProviderRequest) (*admin_pb.GetFileSystemNotificationProviderResponse, error) {
-	result, err := s.query.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeFile)
+	result, err := s.query.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeFile, false)
 	if err != nil {
 		return nil, err
 
@@ -21,7 +21,7 @@ func (s *Server) GetFileSystemNotificationProvider(ctx context.Context, req *adm
 }
 
 func (s *Server) GetLogNotificationProvider(ctx context.Context, req *admin_pb.GetLogNotificationProviderRequest) (*admin_pb.GetLogNotificationProviderResponse, error) {
-	result, err := s.query.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeLog)
+	result, err := s.query.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeLog, false)
 	if err != nil {
 		return nil, err
 

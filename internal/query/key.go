@@ -135,6 +135,10 @@ var (
 		name:  projection.KeyColumnUse,
 		table: keyTable,
 	}
+	KeyColumnOwnerRemoved = Column{
+		name:  projection.KeyColumnOwnerRemoved,
+		table: keyTable,
+	}
 )
 
 var (
@@ -173,19 +177,19 @@ var (
 	}
 )
 
-func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (*PublicKeys, error) {
+func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time, withOwnerRemoved bool) (*PublicKeys, error) {
 	query, scan := preparePublicKeysQuery()
 	if t.IsZero() {
 		t = time.Now()
 	}
+	eq := sq.Eq{KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[KeyColumnOwnerRemoved.identifier()] = false
+	}
 	stmt, args, err := query.Where(
 		sq.And{
-			sq.Eq{
-				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
-			sq.Gt{
-				KeyPublicColExpiry.identifier(): t,
-			},
+			eq,
+			sq.Gt{KeyPublicColExpiry.identifier(): t},
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDFfg", "Errors.Query.SQLStatement")
@@ -206,20 +210,22 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (*PublicKey
 	return keys, nil
 }
 
-func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*PrivateKeys, error) {
+func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time, withOwnerRemoved bool) (*PrivateKeys, error) {
 	stmt, scan := preparePrivateKeysQuery()
 	if t.IsZero() {
 		t = time.Now()
 	}
+	eq := sq.Eq{
+		KeyColUse.identifier():        domain.KeyUsageSigning,
+		KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[KeyColumnOwnerRemoved.identifier()] = false
+	}
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				KeyColUse.identifier():        domain.KeyUsageSigning,
-				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
-			sq.Gt{
-				KeyPrivateColExpiry.identifier(): t,
-			},
+			eq,
+			sq.Gt{KeyPrivateColExpiry.identifier(): t},
 		}).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDff2", "Errors.Query.SQLStatement")

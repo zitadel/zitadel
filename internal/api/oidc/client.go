@@ -32,7 +32,7 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	client, err := o.query.AppByOIDCClientID(ctx, id)
+	client, err := o.query.AppByOIDCClientID(ctx, id, false)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
 	}
-	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer)
+	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer, false)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
-	user, err := o.query.GetUserByID(ctx, true, subject)
+	user, err := o.query.GetUserByID(ctx, true, subject, false)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})
-	app, err := o.query.AppByClientID(ctx, id)
+	app, err := o.query.AppByClientID(ctx, id, false)
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
-		app, err := o.query.AppByOIDCClientID(ctx, token.ApplicationID)
+		app, err := o.query.AppByOIDCClientID(ctx, token.ApplicationID, false)
 		if err != nil {
 			return err
 		}
@@ -152,7 +152,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if applicationID != "" {
-		app, err := o.query.AppByOIDCClientID(ctx, applicationID)
+		app, err := o.query.AppByOIDCClientID(ctx, applicationID, false)
 		if err != nil {
 			return err
 		}
@@ -171,7 +171,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
-	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
@@ -205,7 +205,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := o.query.GetUserByID(ctx, true, userID)
+	user, err := o.query.GetUserByID(ctx, true, userID, false)
 	if err != nil {
 		return err
 	}
@@ -341,7 +341,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
-	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +369,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
-	metaData, err := o.query.SearchUserMetadata(ctx, true, userID, &query.UserMetadataSearchQueries{})
+	metaData, err := o.query.SearchUserMetadata(ctx, true, userID, &query.UserMetadataSearchQueries{}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -382,7 +382,7 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	user, err := o.query.GetUserByID(ctx, true, userID)
+	user, err := o.query.GetUserByID(ctx, true, userID, false)
 	if err != nil {
 		return nil, err
 	}

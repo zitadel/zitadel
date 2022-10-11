@@ -57,6 +57,10 @@ var (
 		name:  projection.UserAuthMethodTypeCol,
 		table: userAuthMethodTable,
 	}
+	UserAuthMethodColumnOwnerRemoved = Column{
+		name:  projection.UserAuthMethodOwnerRemovedCol,
+		table: userAuthMethodTable,
+	}
 )
 
 type AuthMethods struct {
@@ -81,12 +85,13 @@ type UserAuthMethodSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries) (userAuthMethods *AuthMethods, err error) {
+func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, withOwnerRemoved bool) (userAuthMethods *AuthMethods, err error) {
 	query, scan := prepareUserAuthMethodsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[UserAuthMethodColumnOwnerRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
 	}

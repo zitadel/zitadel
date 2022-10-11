@@ -110,7 +110,7 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 			ModifierName:      event.EditorUser(),
 			ModifierLoginName: event.EditorUser(),
 		}
-		editor, _ := q.GetUserByID(ctx, false, change.ModifierId)
+		editor, _ := q.GetUserByID(ctx, false, change.ModifierId, false)
 		if editor != nil {
 			change.ModifierLoginName = editor.PreferredLoginName
 			change.ModifierResourceOwner = editor.ResourceOwner

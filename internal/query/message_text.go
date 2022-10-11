@@ -115,6 +115,10 @@ var (
 		name:  projection.MessageTextFooterCol,
 		table: messageTextTable,
 	}
+	MessageTextColOwnerRemoved = Column{
+		name:  projection.MessageTextOwnerRemovedCol,
+		table: messageTextTable,
+	}
 )
 
 func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) {
@@ -144,18 +148,19 @@ func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx context.
 	return messageTexts.GetMessageTextByType(messageType), nil
 }
 
-func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string) (*MessageText, error) {
+func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string, withOwnerRemoved bool) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
-	query, args, err := stmt.Where(
-		sq.Eq{
-			MessageTextColLanguage.identifier():    language,
-			MessageTextColType.identifier():        messageType,
-			MessageTextColAggregateID.identifier(): aggregateID,
-			MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
-		},
-	).
-		OrderBy(MessageTextColAggregateID.identifier()).
-		Limit(1).ToSql()
+	eq := sq.Eq{
+		MessageTextColLanguage.identifier():    language,
+		MessageTextColType.identifier():        messageType,
+		MessageTextColAggregateID.identifier(): aggregateID,
+		MessageTextColInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[MessageTextColOwnerRemoved.identifier()] = false
+	}
+
+	query, args, err := stmt.Where(eq).OrderBy(MessageTextColAggregateID.identifier()).Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-1b9mf", "Errors.Query.SQLStatement")
 	}
@@ -177,7 +182,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-ekjFF", "Errors.TranslationFile.ReadError")
 	}
-	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID(), messageType, language)
+	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID(), messageType, language, false)
 	if err != nil {
 		return nil, err
 	}

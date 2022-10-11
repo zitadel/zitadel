@@ -55,7 +55,7 @@ func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner, instanc
 func (v *View) userByID(instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
 	ctx := authz.WithInstanceID(context.Background(), instanceID)
 
-	queriedUser, err := v.query.GetUser(ctx, true, queries...)
+	queriedUser, err := v.query.GetUser(ctx, true, false, queries...)
 	if err != nil {
 		return nil, err
 	}
