@@ -25,7 +25,7 @@ export function ensureOIDCSettingsSet(
         body.settings.refreshTokenExpiration === daysToDuration(refreshTokenExpiration) &&
         body.settings.refreshTokenIdleExpiration === daysToDuration(refreshTokenIdleExpiration)
       ) {
-        return { entity: body.settings, ...result };
+        return { ...result, entity: body.settings };
       }
       return result;
     },
