@@ -13,9 +13,9 @@ export function ensureOIDCSettingsSet(
     `${api.adminBaseURL}/settings/oidc`,
     (body: any) => {
       const result = {
-        entity: body.settings,
         sequence: body.settings?.details?.sequence,
         id: body.settings.id,
+        entity: null,
       };
 
       if (
@@ -24,7 +24,7 @@ export function ensureOIDCSettingsSet(
         body.settings?.refreshTokenExpiration !== daysToDuration(refreshTokenExpiration) ||
         body.settings?.refreshTokenIdleExpiration !== daysToDuration(refreshTokenIdleExpiration)
       ) {
-        result.entity = null;
+        return { entity: body.settings, ...result };
       }
       return result;
     },
