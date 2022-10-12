@@ -11,12 +11,12 @@ We typically call human users simply "Users" and machine users "Service Users".
 ### Human users
 
 Human users typically logon with an interactive login.
-This means that an application redirects a user to a website ("login page") where the user can provide her credentials.
-ZITADEL handles the authentication and provides the application only with a token that verifies the authentication process.
+This means that an application redirects a user to a website ("login page") where the user can provide the credentials.
+ZITADEL handles the authentication and provides the application with a token that verifies the authentication process.
 
 ### Service users
 
-Service users are for machine-to-machine communication and you would typically secure backend services.
+Service users are for machine-to-machine communication and you would use those typically to access secure backend services.
 For example in ZITADEL you would require an authenticated Service User to access the Management API.
 The main difference between human and machine users is the type of credentials that can be used for authentication: Human users typically logon via an login prompt, but Machine users require a non-interactive logon process.
 
@@ -28,15 +28,15 @@ Given a manager role, a user is not only an end-user of ZITADEL but can also man
 ## Constraints
 
 Users can only exist within one [organization](/docs/concepts/structure/organizations).
-It is not possible to move users between organizations.
+It is currently not possible to move users between organizations.
 
 User accounts are uniquely identified by their `id` or `loginname` in combination of the `organization domain` (eg, `road.runner@acme.zitadel.local`).
 You can use the same email address for different user accounts.
 
 ## Where to store users
 
-Depending on your [scenario](/docs/guides/solution-scenarios/introduction), you might want to store all users in one organization (CIAM / B2C) or create a new organization for a logical group of users (B2B).
-With an project grant, you can delegate access management of an organization's project to another organization.
+Depending on your [scenario](/docs/guides/solution-scenarios/introduction), you might want to store all users in one organization (CIAM / B2C) or create a new organization for each logical group of users, e.g. each business customer (B2B).
+With a project grant, you can delegate the access management of an organization's project to another organization.
 You can also create a user grant to allow single users to access projects from another organization.
 This is also an alternative to cases where you might want to move users between organizations.
 

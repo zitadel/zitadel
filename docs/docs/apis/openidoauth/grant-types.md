@@ -14,7 +14,7 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 | JSON Web Token (JWT) Profile                          | yes                 |
 | Refresh Token                                         | yes                 |
 | Resource Owner Password Credentials                   | no                  |
-| Security Assertion Markup Language (SAML) 2.0 Profile | yes                 |
+| Security Assertion Markup Language (SAML) 2.0 Profile | no                 |
 | Token Exchange                                        | no    |
 
 ## Authorization Code
