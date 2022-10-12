@@ -1,17 +1,22 @@
+import { renameOrg } from 'support/api/orgs';
 import { apiAuth } from '../../support/api/apiauth';
 
+const orgPath = `/org`;
+const testOrgNameChange = 'e2erenametest';
+
 describe('organizations', () => {
-  beforeEach(() => {
-    apiAuth().as('api');
-  });
-
-  const orgPath = `/org`;
-  const testOrgNameChange = 'e2erenametest';
-
   describe('rename', () => {
-    beforeEach(`ensure it doesn't exist already`, function () {
-      //   ensureUserDoesntExist(this.api, testMachineUserNameAdd);
+    beforeEach(() => {
+      apiAuth().as('api');
       cy.visit(orgPath);
+    });
+
+    afterEach(() => {
+      apiAuth()
+        .as('api')
+        .then((api) => {
+          renameOrg(api, 'ZITADEL');
+        });
     });
 
     it.only('should rename the organization', () => {
