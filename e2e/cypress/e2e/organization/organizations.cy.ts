@@ -21,7 +21,7 @@ describe('organizations', () => {
 
     it.only('should rename the organization', () => {
       cy.get('[data-e2e="actions"]').click();
-      cy.get('[data-e2e="rename"]').click();
+      cy.get('[data-e2e="rename"]', { timeout: 1000 }).should('be.visible').click();
 
       cy.get('[data-e2e="name"]').focus().clear().type(testOrgNameChange);
       cy.get('[data-e2e="dialog-submit"]').click();
