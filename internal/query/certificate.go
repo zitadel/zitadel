@@ -63,31 +63,21 @@ var (
 	}
 )
 
-func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage, withOwnerRemoved bool) (*Certificates, error) {
+func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (*Certificates, error) {
 	query, scan := prepareCertificateQuery()
 	if t.IsZero() {
 		t = time.Now()
 	}
-	eq := sq.And{
-		sq.Eq{
-			KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			KeyColUse.identifier():        usage,
-		},
-		sq.Gt{CertificateColExpiry.identifier(): t},
-		sq.Gt{KeyPrivateColExpiry.identifier(): t},
-	}
-	if !withOwnerRemoved {
-		eq = sq.And{
+	stmt, args, err := query.Where(
+		sq.And{
 			sq.Eq{
-				KeyColInstanceID.identifier():      authz.GetInstance(ctx).InstanceID(),
-				KeyColUse.identifier():             usage,
-				KeyColumnOwnerRemoved.identifier(): false,
+				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				KeyColUse.identifier():        usage,
 			},
 			sq.Gt{CertificateColExpiry.identifier(): t},
 			sq.Gt{KeyPrivateColExpiry.identifier(): t},
-		}
-	}
-	stmt, args, err := query.Where(eq).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
+		},
+	).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
 	}

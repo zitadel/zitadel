@@ -41,6 +41,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(UserDeactivatedType, UserDeactivatedEventMapper).
 		RegisterFilterEventMapper(UserReactivatedType, UserReactivatedEventMapper).
 		RegisterFilterEventMapper(UserRemovedType, UserRemovedEventMapper).
+		RegisterFilterEventMapper(UserOwnerRemovedType, UserOwnerRemovedEventMapper).
 		RegisterFilterEventMapper(UserTokenAddedType, UserTokenAddedEventMapper).
 		RegisterFilterEventMapper(UserTokenRemovedType, UserTokenRemovedEventMapper).
 		RegisterFilterEventMapper(UserDomainClaimedType, DomainClaimedEventMapper).

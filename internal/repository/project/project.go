@@ -12,13 +12,14 @@ import (
 )
 
 const (
-	UniqueProjectnameType  = "project_names"
-	projectEventTypePrefix = eventstore.EventType("project.")
-	ProjectAddedType       = projectEventTypePrefix + "added"
-	ProjectChangedType     = projectEventTypePrefix + "changed"
-	ProjectDeactivatedType = projectEventTypePrefix + "deactivated"
-	ProjectReactivatedType = projectEventTypePrefix + "reactivated"
-	ProjectRemovedType     = projectEventTypePrefix + "removed"
+	UniqueProjectnameType   = "project_names"
+	projectEventTypePrefix  = eventstore.EventType("project.")
+	ProjectAddedType        = projectEventTypePrefix + "added"
+	ProjectChangedType      = projectEventTypePrefix + "changed"
+	ProjectDeactivatedType  = projectEventTypePrefix + "deactivated"
+	ProjectReactivatedType  = projectEventTypePrefix + "reactivated"
+	ProjectRemovedType      = projectEventTypePrefix + "removed"
+	ProjectOwnerRemovedType = projectEventTypePrefix + "owner.removed"
 )
 
 func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.EventUniqueConstraint {
@@ -277,6 +278,37 @@ func NewProjectRemovedEvent(
 
 func ProjectRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &ProjectRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type ProjectOwnerRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *ProjectOwnerRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *ProjectOwnerRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewProjectOwnerRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *ProjectOwnerRemovedEvent {
+	return &ProjectOwnerRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			ProjectOwnerRemovedType,
+		),
+	}
+}
+
+func ProjectOwnerRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	return &ProjectOwnerRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

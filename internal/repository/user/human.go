@@ -7,11 +7,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"golang.org/x/text/language"
 )
 
 const (

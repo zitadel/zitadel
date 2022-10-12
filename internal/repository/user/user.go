@@ -25,6 +25,7 @@ const (
 	UserDomainClaimedType     = userEventTypePrefix + "domain.claimed"
 	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
+	UserOwnerRemovedType      = userEventTypePrefix + "owner.removed"
 )
 
 func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMustBeDomain bool) *eventstore.EventUniqueConstraint {
@@ -204,6 +205,37 @@ func NewUserRemovedEvent(
 
 func UserRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type UserOwnerRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *UserOwnerRemovedEvent) Data() interface{} {
+	return nil
+}
+
+func (e *UserOwnerRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewUserOwnerRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *UserOwnerRemovedEvent {
+	return &UserOwnerRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserOwnerRemovedType,
+		),
+	}
+}
+
+func UserOwnerRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	return &UserOwnerRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

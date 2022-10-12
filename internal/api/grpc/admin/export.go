@@ -910,7 +910,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 		return nil, err
 	}
 
-	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}})
+	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}}, false)
 	if err != nil {
 		return nil, err
 	}

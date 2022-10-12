@@ -16,17 +16,18 @@ import (
 const (
 	ProjectGrantProjectionTable = "projections.project_grants2"
 
-	ProjectGrantColumnGrantID       = "grant_id"
-	ProjectGrantColumnCreationDate  = "creation_date"
-	ProjectGrantColumnChangeDate    = "change_date"
-	ProjectGrantColumnSequence      = "sequence"
-	ProjectGrantColumnState         = "state"
-	ProjectGrantColumnResourceOwner = "resource_owner"
-	ProjectGrantColumnInstanceID    = "instance_id"
-	ProjectGrantColumnProjectID     = "project_id"
-	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
-	ProjectGrantColumnRoleKeys      = "granted_role_keys"
-	ProjectGrantColumnOwnerRemoved  = "owner_removed"
+	ProjectGrantColumnGrantID           = "grant_id"
+	ProjectGrantColumnCreationDate      = "creation_date"
+	ProjectGrantColumnChangeDate        = "change_date"
+	ProjectGrantColumnSequence          = "sequence"
+	ProjectGrantColumnState             = "state"
+	ProjectGrantColumnResourceOwner     = "resource_owner"
+	ProjectGrantColumnInstanceID        = "instance_id"
+	ProjectGrantColumnProjectID         = "project_id"
+	ProjectGrantColumnGrantedOrgID      = "granted_org_id"
+	ProjectGrantColumnRoleKeys          = "granted_role_keys"
+	ProjectGrantColumnOwnerRemoved      = "owner_removed"
+	ProjectGrantColumnGrantedOrgRemoved = "granted_org_removed"
 )
 
 type projectGrantProjection struct {
@@ -50,6 +51,7 @@ func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray, crdb.Nullable()),
 			crdb.NewColumn(ProjectGrantColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(ProjectGrantColumnGrantedOrgRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
 			crdb.WithIndex(crdb.NewIndex("pg_ro_idx", []string{ProjectGrantColumnResourceOwner})),

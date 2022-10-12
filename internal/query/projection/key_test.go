@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
-	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func TestKeyProjection_reduces(t *testing.T) {
@@ -100,35 +99,6 @@ func TestKeyProjection_reduces(t *testing.T) {
 				sequence:         15,
 				previousSequence: 10,
 				executer:         &testExecuter{},
-			},
-		},
-		{
-			name:   "org.reduceOwnerRemoved",
-			reduce: (&keyProjection{}).reduceOwnerRemoved,
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
-			},
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				projection:       KeyProjectionTable,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.keys4 SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
-							expectedArgs: []interface{}{
-								true,
-								"instance-id",
-								"agg-id",
-							},
-						},
-					},
-				},
 			},
 		},
 	}

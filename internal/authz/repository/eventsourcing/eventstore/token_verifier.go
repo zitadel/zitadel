@@ -191,7 +191,7 @@ type openIDKeySet struct {
 // VerifySignature implements the oidc.KeySet interface
 // providing an implementation for the keys retrieved directly from Queries
 func (o *openIDKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) ([]byte, error) {
-	keySet, err := o.Queries.ActivePublicKeys(ctx, time.Now(), false)
+	keySet, err := o.Queries.ActivePublicKeys(ctx, time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("error fetching keys: %w", err)
 	}

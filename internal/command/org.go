@@ -10,8 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
+
+type OrgDependencies struct {
+	Users    []string
+	Projects []string
+}
 
 type OrgSetup struct {
 	Name         string
@@ -255,9 +261,19 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	return writeModelToObjectDetails(&orgWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveOrg(ctx context.Context, id string, dependencies *OrgDependencies) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveOrg(orgAgg))
+	valdiations := []preparation.Validation{
+		c.prepareRemoveOrg(orgAgg),
+	}
+	for _, user := range dependencies.Users {
+		valdiations = append(valdiations, c.prepareUserOwnerRemoved(user_repo.NewAggregate(user, id)))
+	}
+	for _, depProject := range dependencies.Projects {
+		valdiations = append(valdiations, c.prepareProjectOwnerRemoved(project.NewAggregate(depProject, id)))
+	}
+
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, valdiations...)
 	if err != nil {
 		return nil, err
 	}
@@ -266,6 +282,7 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDeta
 	if err != nil {
 		return nil, err
 	}
+
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),

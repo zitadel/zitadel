@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
-	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -75,7 +74,7 @@ func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	err = retry(func() error {
-		publicKeys, err := o.query.ActivePublicKeys(ctx, time.Now(), false)
+		publicKeys, err := o.query.ActivePublicKeys(ctx, time.Now())
 		if err != nil {
 			return err
 		}
@@ -114,7 +113,7 @@ func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err erro
 }
 
 func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
-	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(gracefulPeriod), false)
+	keys, err := o.query.ActivePrivateSigningKey(ctx, time.Now().Add(gracefulPeriod))
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +187,7 @@ func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
 			InstanceID(authz.GetInstance(ctx).InstanceID()).
 			AddQuery().
-			AggregateTypes(keypair.AggregateType, org.AggregateType).
+			AggregateTypes(keypair.AggregateType).
 			Builder(),
 	)
 }

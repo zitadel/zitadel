@@ -18,18 +18,20 @@ import (
 const (
 	UserGrantProjectionTable = "projections.user_grants3"
 
-	UserGrantID            = "id"
-	UserGrantCreationDate  = "creation_date"
-	UserGrantChangeDate    = "change_date"
-	UserGrantSequence      = "sequence"
-	UserGrantState         = "state"
-	UserGrantResourceOwner = "resource_owner"
-	UserGrantInstanceID    = "instance_id"
-	UserGrantUserID        = "user_id"
-	UserGrantProjectID     = "project_id"
-	UserGrantGrantID       = "grant_id"
-	UserGrantRoles         = "roles"
-	UserGrantOwnerRemoved  = "owner_removed"
+	UserGrantID                  = "id"
+	UserGrantCreationDate        = "creation_date"
+	UserGrantChangeDate          = "change_date"
+	UserGrantSequence            = "sequence"
+	UserGrantState               = "state"
+	UserGrantResourceOwner       = "resource_owner"
+	UserGrantInstanceID          = "instance_id"
+	UserGrantUserID              = "user_id"
+	UserGrantProjectID           = "project_id"
+	UserGrantGrantID             = "grant_id"
+	UserGrantRoles               = "roles"
+	UserGrantOwnerRemoved        = "owner_removed"
+	UserGrantUserOwnerRemoved    = "user_owner_removed"
+	UserGrantProjectOwnerRemoved = "project_owner_removed"
 )
 
 type userGrantProjection struct {
@@ -54,6 +56,8 @@ func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantGrantID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantRoles, crdb.ColumnTypeTextArray, crdb.Nullable()),
 			crdb.NewColumn(UserGrantOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(UserGrantUserOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(UserGrantProjectOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
 			crdb.WithIndex(crdb.NewIndex("user_grant3_user_idx", []string{UserGrantUserID})),
@@ -107,6 +111,10 @@ func (p *userGrantProjection) reducers() []handler.AggregateReducer {
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserRemoved,
 				},
+				{
+					Event:  user.UserOwnerRemovedType,
+					Reduce: p.reduceUserOwnerRemoved,
+				},
 			},
 		},
 		{
@@ -132,6 +140,10 @@ func (p *userGrantProjection) reducers() []handler.AggregateReducer {
 					Event:  project.GrantCascadeChangedType,
 					Reduce: p.reduceProjectGrantChanged,
 				},
+				{
+					Event:  project.ProjectOwnerRemovedType,
+					Reduce: p.reduceProjectOwnerRemoved,
+				},
 			},
 		},
 		{
@@ -141,11 +153,6 @@ func (p *userGrantProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
-				},
-				// user resource owner
-				{
-					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceUserOwnerRemoved,
 				},
 			},
 		},
@@ -343,6 +350,8 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+			handler.NewCol(UserGrantSequence, e.Sequence()),
 			handler.NewCol(UserGrantOwnerRemoved, true),
 		},
 		[]handler.Condition{
@@ -353,19 +362,41 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 }
 
 func (p *userGrantProjection) reduceUserOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*org.OrgRemovedEvent)
+	e, ok := event.(*user.UserOwnerRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-jpIvp", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-xpol2s", "reduce.wrong.event.type %s", user.UserOwnerRemovedType)
 	}
 
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(UserGrantOwnerRemoved, true),
+			handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+			handler.NewCol(UserGrantSequence, e.Sequence()),
+			handler.NewCol(UserGrantUserOwnerRemoved, true),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(UserGrantResourceOwner, e.Aggregate().ID),
+			handler.NewCond(UserGrantUserID, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *userGrantProjection) reduceProjectOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.ProjectOwnerRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-02on3", "reduce.wrong.event.type %s", project.RoleRemovedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+			handler.NewCol(UserGrantSequence, e.Sequence()),
+			handler.NewCol(UserGrantProjectOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(UserGrantProjectID, e.Aggregate().ID),
 		},
 	), nil
 }
