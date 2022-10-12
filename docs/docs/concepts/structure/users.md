@@ -25,17 +25,28 @@ The main difference between human and machine users is the type of credentials t
 Any user, human or service user, can be given a [Manager](/docs/concepts/structure/managers) role.
 Given a manager role, a user is not only an end-user of ZITADEL but can also manage certain aspects of ZITADEL itself.
 
-## Uniqueness
+## Constraints
 
-- Can only exist in one organization
-  - identified by loginname
-  - user grant
-  - moving identities
+Users can only exist within one [organization](/docs/concepts/structure/organizations).
+It is not possible to move users between organizations.
+
+User accounts are uniquely identified by their `id` or `loginname` in combination of the `organization domain` (eg, `road.runner@acme.zitadel.local`).
+You can use the same email address for different user accounts.
+
+## Where to store users
+
+Depending on your [scenario](/docs/guides/solution-scenarios/introduction), you might want to store all users in one organization (CIAM / B2C) or create a new organization for a logical group of users (B2B).
+With an project grant, you can delegate access management of an organization's project to another organization.
+You can also create a user grant to allow single users to access projects from another organization.
+This is also an alternative to cases where you might want to move users between organizations.
 
 ## Identity linking
 
-- Identity linking:
-  - add external idps to an identity
-  - auto-linking
+When using external identity providers (ie. social login, enterprise SSO), a user account will be created in ZITADEL.
+The external identity will be linked to the ZITADEL account.
+
+You can link multiple external accounts to a ZITADEl account.
+If login with "Username / Password" (ie. local account) is enabled and you have configured external IDPs, the user can decide if she wants to login with an external IDP or the local account.
+When only one external identity provider is configured and login with "Username / Password" is disabled, then the user is immediately redirected to the external identity provider.
 
 More about how to manage your users read our [users guide](../../guides/manage/console/users).
