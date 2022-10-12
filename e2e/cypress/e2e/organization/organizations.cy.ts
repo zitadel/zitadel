@@ -27,7 +27,6 @@ describe('organizations', () => {
       cy.get('[data-e2e="dialog-submit"]').click();
       cy.get('.data-e2e-success');
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
-      cy.get('[data-e2e="top-view-title"]').contains(testOrgNameChange);
     });
   });
 
