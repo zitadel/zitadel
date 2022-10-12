@@ -1,4 +1,31 @@
+import { apiAuth } from '../../support/api/apiauth';
+
 describe('organizations', () => {
+  beforeEach(() => {
+    apiAuth().as('api');
+  });
+
+  const orgPath = `/org`;
+  const testOrgNameChange = 'e2erenametest';
+
+  describe('rename', () => {
+    beforeEach(`ensure it doesn't exist already`, function () {
+      //   ensureUserDoesntExist(this.api, testMachineUserNameAdd);
+      cy.visit(orgPath);
+    });
+
+    it.only('should rename the organization', () => {
+      cy.get('[data-e2e="actions"]').click();
+      cy.get('[data-e2e="rename"]').click();
+
+      cy.get('[data-e2e="name"]').focus().clear().type(testOrgNameChange);
+      cy.get('[data-e2e="dialog-submit"]').click();
+      cy.get('.data-e2e-success');
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
+      cy.get('[data-e2e="top-view-title"]').contains(testOrgNameChange);
+    });
+  });
+
   it('should add an organization with the personal account as org owner');
   describe('changing the current organization', () => {
     it('should update displayed organization details');

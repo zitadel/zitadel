@@ -241,8 +241,8 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(NameDialogComponent, {
       data: {
         name: this.org?.name,
-        titleKey: 'ORG.RENAME.TITLE',
-        descKey: 'ORG.RENAME.DESCRIPTION',
+        titleKey: 'ORG.PAGES.RENAME.TITLE',
+        descKey: 'ORG.PAGES.RENAME.DESCRIPTION',
         labelKey: 'ORG.PAGES.NAME',
       },
       width: '400px',
@@ -261,6 +261,9 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         .updateOrg(name)
         .then(() => {
           this.toast.showInfo('ORG.TOAST.UPDATED', true);
+          if (this.org) {
+            this.org.name = name;
+          }
           this.mgmtService
             .getMyOrg()
             .then((resp) => {
