@@ -20,7 +20,13 @@ yarn install
 yarn start
 ```
 
-This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
+As an alternative you can use this docker compose command:
+
+```console
+docker compose up
+```
+
+These commands starts a local development server. Most changes are reflected live without having to restart the server.
 
 ## Build
 
