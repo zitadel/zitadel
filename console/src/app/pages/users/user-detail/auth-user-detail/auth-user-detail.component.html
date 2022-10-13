@@ -57,6 +57,7 @@
           <cnsl-contact
             *ngIf="user.human"
             [human]="user.human"
+            [username]="user.preferredLoginName"
             [state]="user.state"
             [canWrite]="true"
             (editType)="openEditDialog($event)"

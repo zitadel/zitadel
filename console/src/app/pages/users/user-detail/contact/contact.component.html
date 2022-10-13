@@ -12,6 +12,7 @@
         matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
         [disabled]="!canWrite"
         [routerLink]="['password']"
+        [queryParams]="{ username: username }"
         mat-icon-button
       >
         <i class="las la-pen"></i>
