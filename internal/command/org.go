@@ -266,11 +266,17 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string, dependencies *OrgDe
 	valdiations := []preparation.Validation{
 		c.prepareRemoveOrg(orgAgg),
 	}
-	for _, user := range dependencies.Users {
-		valdiations = append(valdiations, c.prepareUserOwnerRemoved(user_repo.NewAggregate(user, id)))
-	}
-	for _, depProject := range dependencies.Projects {
-		valdiations = append(valdiations, c.prepareProjectOwnerRemoved(project.NewAggregate(depProject, id)))
+	if dependencies != nil {
+		if dependencies.Users != nil {
+			for _, user := range dependencies.Users {
+				valdiations = append(valdiations, c.prepareUserOwnerRemoved(user_repo.NewAggregate(user, id)))
+			}
+		}
+		if dependencies.Projects != nil {
+			for _, depProject := range dependencies.Projects {
+				valdiations = append(valdiations, c.prepareProjectOwnerRemoved(project.NewAggregate(depProject, id)))
+			}
+		}
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, valdiations...)
@@ -296,6 +302,9 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			writeModel, err := c.getOrgWriteModelByID(ctx, a.ID)
 			if err != nil {
 				return nil, errors.ThrowPreconditionFailed(err, "COMMA-wG9p1", "Errors.Org.NotFound")
+			}
+			if writeModel.State == domain.OrgStateUnspecified {
+				return nil, errors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
 			}
 			if writeModel.State == domain.OrgStateRemoved {
 				return nil, errors.ThrowInvalidArgument(nil, "COMMA-pSAVZ", "Errors.NoChangesFound")

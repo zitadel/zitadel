@@ -287,7 +287,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.To
 			actions.SetFields("v1",
 				actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 					return func(call goja.FunctionCall) goja.Value {
-						user, err := l.query.GetUserByID(actionCtx, true, userID)
+						user, err := l.query.GetUserByID(actionCtx, true, userID, false)
 						if err != nil {
 							panic(err)
 						}

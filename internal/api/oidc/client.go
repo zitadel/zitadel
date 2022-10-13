@@ -299,7 +299,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 }
 
 func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userInfo oidc.UserInfoSetter) error {
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, resourceOwner)
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, resourceOwner, false)
 	if err != nil {
 		return err
 	}
@@ -319,6 +319,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 							true,
 							userInfo.GetSubject(),
 							&query.UserMetadataSearchQueries{Queries: []query.SearchQuery{resourceOwnerQuery}},
+							false,
 						)
 						if err != nil {
 							logging.WithError(err).Info("unable to get md in action")
@@ -451,11 +452,11 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 }
 
 func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claims map[string]interface{}) (map[string]interface{}, error) {
-	user, err := o.query.GetUserByID(ctx, true, userID)
+	user, err := o.query.GetUserByID(ctx, true, userID, false)
 	if err != nil {
 		return nil, err
 	}
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner)
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
@@ -475,6 +476,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 							true,
 							userID,
 							&query.UserMetadataSearchQueries{Queries: []query.SearchQuery{resourceOwnerQuery}},
+							false,
 						)
 						if err != nil {
 							logging.WithError(err).Info("unable to get md in action")

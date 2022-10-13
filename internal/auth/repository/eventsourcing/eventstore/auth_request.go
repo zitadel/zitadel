@@ -707,7 +707,7 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 		return false
 	}
 	// and if the login policy allows domain discovery
-	policy, err := repo.Query.LoginPolicyByID(ctx, true, org.ID)
+	policy, err := repo.Query.LoginPolicyByID(ctx, true, org.ID, false)
 	if err != nil || !policy.AllowDomainDiscovery {
 		return false
 	}
