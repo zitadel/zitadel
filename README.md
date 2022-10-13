@@ -45,7 +45,9 @@ With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
 
 ### Deploy ZITADEL (Self-Hosted)
 
-- [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
+Deploying ZITADEL locally does take less than 3 minutes. So go ahead and give it a try!
+
+[We provide deploy guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
 
 > If you are interested to have support for your self-hosted ZITADEL [please reach out to us](https://zitadel.com/contact)!
 
