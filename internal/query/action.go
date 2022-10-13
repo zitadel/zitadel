@@ -9,10 +9,13 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+)
+
+const (
+	maxTimeout = 20 * time.Second
 )
 
 var (
@@ -84,8 +87,15 @@ type Action struct {
 
 	Name          string
 	Script        string
-	Timeout       time.Duration
+	timeout       time.Duration
 	AllowedToFail bool
+}
+
+func (a *Action) Timeout() time.Duration {
+	if a.timeout > 0 && a.timeout < maxTimeout {
+		return a.timeout
+	}
+	return maxTimeout
 }
 
 type ActionSearchQueries struct {
@@ -189,7 +199,7 @@ func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, er
 					&action.State,
 					&action.Name,
 					&action.Script,
-					&action.Timeout,
+					&action.timeout,
 					&action.AllowedToFail,
 					&count,
 				)
@@ -236,7 +246,7 @@ func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)
 				&action.State,
 				&action.Name,
 				&action.Script,
-				&action.Timeout,
+				&action.timeout,
 				&action.AllowedToFail,
 			)
 			if err != nil {

@@ -307,6 +307,13 @@ SystemDefaults:
     PublicKeyLifetime: 30h
     CertificateLifetime: 8766h
 
+Actions:
+  HTTP:
+    # wildcard sub domains are currently unsupported
+    DenyList:
+      - localhost
+      - '127.0.0.1'
+
 DefaultInstance:
   InstanceName:
   DefaultLanguage: en
@@ -399,6 +406,7 @@ DefaultInstance:
     ForceMFA: false
     HidePasswordReset: false
     IgnoreUnknownUsernames: false
+    AllowDomainDiscovery: false
     PasswordlessType: 1 #1: allowed 0: not allowed
     DefaultRedirectURI: #empty because we use the Console UI
     PasswordCheckLifetime: 240h #10d

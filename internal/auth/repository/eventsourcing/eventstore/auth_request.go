@@ -93,7 +93,7 @@ type userCommandProvider interface {
 
 type orgViewProvider interface {
 	OrgByID(context.Context, bool, string) (*query.Org, error)
-	OrgByDomainGlobal(context.Context, string) (*query.Org, error)
+	OrgByPrimaryDomain(context.Context, string) (*query.Org, error)
 }
 
 type userGrantProvider interface {
@@ -651,23 +651,73 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 			}
 		}
 	}
-	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
-		if errors.IsNotFound(err) || (user != nil && user.State == int32(domain.UserStateInactive)) {
-			if request.LabelPolicy != nil && request.LabelPolicy.HideLoginNameSuffix {
-				preferredLoginName = loginName
-			}
-			request.SetUserInfo(unknownUserID, preferredLoginName, preferredLoginName, preferredLoginName, "", request.RequestedOrgID)
-			return nil
-		}
+	// return any error apart from not found ones directly
+	if err != nil && !errors.IsNotFound(err) {
+		return err
 	}
+	// if there's an active (human) user, let's use it
+	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).NotDisabled() {
+		request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", "", user.ResourceOwner)
+		return nil
+	}
+	// the user was either not found or not active
+	// so check if the loginname suffix matches a verified org domain
+	if repo.checkDomainDiscovery(ctx, request, loginName) {
+		return nil
+	}
+	// let's just check for if unknown usernames are ignored
+	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
+		if request.LabelPolicy != nil && request.LabelPolicy.HideLoginNameSuffix {
+			preferredLoginName = loginName
+		}
+		request.SetUserInfo(unknownUserID, preferredLoginName, preferredLoginName, preferredLoginName, "", request.RequestedOrgID)
+		return nil
+	}
+	// there was no policy that allowed unknown loginnames in any case
+	// so not found errors can now be returned
 	if err != nil {
 		return err
 	}
-	if user.State == int32(domain.UserStateInactive) {
+	// let's check if it was a machine user
+	if !user.MachineView.IsZero() {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
+	}
+	// let's once again check if the user was just inactive
+	if user != nil && user.State == int32(domain.UserStateInactive) {
 		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
 	}
-	request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", "", user.ResourceOwner)
-	return nil
+	// or locked
+	if user != nil && user.State == int32(domain.UserStateLocked) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
+	}
+	// everything should be handled by now
+	logging.WithFields("authRequest", request.ID, "loginName", loginName).Error("unhandled state for checkLoginName")
+	return errors.ThrowInternal(nil, "AUTH-asf3df", "Errors.Internal")
+}
+
+func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) bool {
+	// check if there's a suffix in the loginname
+	split := strings.Split(loginName, "@")
+	if len(split) < 2 {
+		return false
+	}
+	// check if the suffix matches a verified domain
+	org, err := repo.Query.OrgByVerifiedDomain(ctx, split[len(split)-1])
+	if err != nil {
+		return false
+	}
+	// and if the login policy allows domain discovery
+	policy, err := repo.Query.LoginPolicyByID(ctx, true, org.ID)
+	if err != nil || !policy.AllowDomainDiscovery {
+		return false
+	}
+	// discovery was allowed, so set the org as requested org
+	// and clear all potentially existing user information and only set the loginname as hint (for registration)
+	request.SetOrgInformation(org.ID, org.Name, org.Domain, false)
+	request.SetUserInfo("", "", "", "", "", org.ID)
+	request.LoginHint = loginName
+	request.Prompt = append(request.Prompt, domain.PromptCreate) // to trigger registration
+	return true
 }
 
 func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, user *user_view_model.UserView) error {
@@ -1075,9 +1125,7 @@ func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *dom
 		if err != nil {
 			return err
 		}
-		request.RequestedOrgID = org.ID
-		request.RequestedOrgName = org.Name
-		request.RequestedPrimaryDomain = org.Domain
+		request.SetOrgInformation(org.ID, org.Name, org.Domain, false)
 		return nil
 	}
 
@@ -1086,14 +1134,11 @@ func setOrgID(ctx context.Context, orgViewProvider orgViewProvider, request *dom
 		return nil
 	}
 
-	org, err := orgViewProvider.OrgByDomainGlobal(ctx, primaryDomain)
+	org, err := orgViewProvider.OrgByPrimaryDomain(ctx, primaryDomain)
 	if err != nil {
 		return err
 	}
-	request.RequestedOrgID = org.ID
-	request.RequestedOrgName = org.Name
-	request.RequestedPrimaryDomain = primaryDomain
-	request.RequestedOrgDomain = true
+	request.SetOrgInformation(org.ID, org.Name, primaryDomain, true)
 	return nil
 }
 

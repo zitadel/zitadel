@@ -294,7 +294,7 @@
       "TITLE": "Passwordless Authentication",
       "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-      "U2F": "Add authenticator",
+      "U2F": "Add method",
       "U2F_DIALOG_TITLE": "Verify authenticator",
       "U2F_DIALOG_DESCRIPTION": "Enter a name for your used passwordless Login",
       "U2F_SUCCESS": "Passwordless Auth created successfully!",
@@ -326,17 +326,6 @@
         "NEW": "Add New"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadata",
-      "DESCRIPTION": "",
-      "KEY": "Key",
-      "VALUE": "Value",
-      "ADD": "New Entry",
-      "SAVE": "Save",
-      "EMPTY": "No metadata",
-      "SETSUCCESS": "Element saved successfully",
-      "REMOVESUCCESS": "Element deleted successfully"
-    },
     "MFA": {
       "TABLETYPE": "Type",
       "TABLESTATE": "Status",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "OTP (One-Time Password)",
+      "OTP": "Authenticator App for OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
       "U2F": "Fingerprint, Security Keys, Face ID and other",
@@ -639,6 +628,17 @@
       "DELETED": "Token deleted with success."
     }
   },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "DESCRIPTION": "",
+    "KEY": "Key",
+    "VALUE": "Value",
+    "ADD": "New Entry",
+    "SAVE": "Save",
+    "EMPTY": "No metadata",
+    "SETSUCCESS": "Element saved successfully",
+    "REMOVESUCCESS": "Element deleted successfully"
+  },
   "FLOWS": {
     "TITLE": "Actions and Flows",
     "DESCRIPTION": "Define scripts to execute on a certain event.",
@@ -653,15 +653,6 @@
       "0": "no status",
       "1": "inactive",
       "2": "active"
-    },
-    "TYPES": {
-      "0": "Unspecified Type",
-      "1": "External Authentication"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post Authentication",
-      "2": "Pre Creation",
-      "3": "Post Creation"
     },
     "ADDTRIGGER": "Add trigger",
     "FLOWCHANGED": "The flow was changed successfully",
@@ -689,6 +680,10 @@
       "CLEAR": {
         "TITLE": "Clear flow?",
         "DESCRIPTION": "You are about to reset the flow along with its triggers and actions. This change cannot be restored. Are you sure?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Delete selected Actions?",
+        "DESCRIPTION": "Are you sure you want to delete the selected actions from the flow?"
       }
     },
     "TOAST": {
@@ -1177,6 +1172,8 @@
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
       "IGNOREUNKNOWNUSERNAMES": "Ignore unknown usernames",
       "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
+      "ALLOWDOMAINDISCOVERY": "Domain discovery allowed",
+      "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the organization domains and will redirect to the registration of that organisation on success.",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",

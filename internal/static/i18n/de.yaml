@@ -911,3 +911,17 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token nur in Kombination mit Authorization Code erlaubt.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Unspezifiziert
+      ExternalAuthentication:  Externe Authentifizierung
+      CustomiseToken: Token ergänzen
+  TriggerType:
+    Unspecified: Unspezifiziert
+    PostAuthentication: Nach Authentifizierung
+    PreCreation: Vor Erstellung
+    PostCreation: Nach Erstellung
+    PreUserinfoCreation: Vor Userinfo Erstellung
+    PreAccessTokenCreation: Vor Access Token Erstellung

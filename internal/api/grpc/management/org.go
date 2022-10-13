@@ -27,7 +27,7 @@ func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*m
 }
 
 func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgByDomainGlobalRequest) (*mgmt_pb.GetOrgByDomainGlobalResponse, error) {
-	org, err := s.query.OrgByDomainGlobal(ctx, req.Domain)
+	org, err := s.query.OrgByPrimaryDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err
 	}

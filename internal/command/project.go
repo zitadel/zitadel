@@ -164,7 +164,7 @@ func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOw
 		return err
 	}
 	if projectWriteModel.State == domain.ProjectStateUnspecified || projectWriteModel.State == domain.ProjectStateRemoved {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.Project.NotFound")
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-EbFMN", "Errors.Project.NotFound")
 	}
 	return nil
 }

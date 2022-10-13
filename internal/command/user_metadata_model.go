@@ -35,10 +35,6 @@ func (wm *UserMetadataWriteModel) AppendEvents(events ...eventstore.Event) {
 	}
 }
 
-func (wm *UserMetadataWriteModel) Reduce() error {
-	return wm.MetadataWriteModel.Reduce()
-}
-
 func (wm *UserMetadataWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).

@@ -174,7 +174,7 @@ func (m *mockViewOrg) OrgByID(context.Context, bool, string) (*query.Org, error)
 	}, nil
 }
 
-func (m *mockViewOrg) OrgByDomainGlobal(context.Context, string) (*query.Org, error) {
+func (m *mockViewOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, error) {
 	return &query.Org{
 		State: m.State,
 	}, nil
@@ -186,7 +186,7 @@ func (m *mockViewErrOrg) OrgByID(context.Context, bool, string) (*query.Org, err
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 
-func (m *mockViewErrOrg) OrgByDomainGlobal(context.Context, string) (*query.Org, error) {
+func (m *mockViewErrOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, error) {
 	return nil, errors.ThrowInternal(nil, "id", "internal error")
 }
 

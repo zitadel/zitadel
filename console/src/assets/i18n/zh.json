@@ -294,7 +294,7 @@
       "TITLE": "无密码身份验证",
       "DESCRIPTION": "添加基于 WebAuthn 的身份验证方法以无密码登录 ZITADEL。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素认证方式。",
-      "U2F": "添加验证器",
+      "U2F": "添加方法",
       "U2F_DIALOG_TITLE": "身份验证器",
       "U2F_DIALOG_DESCRIPTION": "输入您使用的无密码登录名",
       "U2F_SUCCESS": "无密码验证创建成功！",
@@ -326,17 +326,6 @@
         "NEW": "添加"
       }
     },
-    "METADATA": {
-      "TITLE": "元数据",
-      "DESCRIPTION": "",
-      "KEY": "键",
-      "VALUE": "值",
-      "ADD": "新条目",
-      "SAVE": "保存",
-      "EMPTY": "暂无元数据",
-      "SETSUCCESS": "键值对保存成功",
-      "REMOVESUCCESS": "键值对删除成功"
-    },
     "MFA": {
       "TABLETYPE": "类型",
       "TABLESTATE": "状态",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "添加第二个因素以确保您帐户的最佳安全性。",
       "MANAGE_DESCRIPTION": "管理用户的第二因素身份认证方式。",
       "ADD": "添加因子",
-      "OTP": "一次性密码 (OTP)",
+      "OTP": "用于 OTP 的身份验证器应用程序",
       "OTP_DIALOG_TITLE": "添加 OTP",
       "OTP_DIALOG_DESCRIPTION": "使用验证器应用程序扫描二维码并输入下面的代码以验证并激活 OTP 方法。",
       "U2F": "指纹、安全密钥、Face ID 等",
@@ -639,6 +628,17 @@
       "DELETED": "成功删除令牌。"
     }
   },
+  "METADATA": {
+    "TITLE": "元数据",
+    "DESCRIPTION": "",
+    "KEY": "键",
+    "VALUE": "值",
+    "ADD": "新条目",
+    "SAVE": "保存",
+    "EMPTY": "暂无元数据",
+    "SETSUCCESS": "键值对保存成功",
+    "REMOVESUCCESS": "键值对删除成功"
+  },
   "FLOWS": {
     "TITLE": "动作和流程",
     "DESCRIPTION": "定义要在特定事件上需要执行的脚本。",
@@ -653,15 +653,6 @@
       "0": "无状态",
       "1": "停用",
       "2": "激活"
-    },
-    "TYPES": {
-      "0": "未指定类型",
-      "1": "外部认证"
-    },
-    "TRIGGERTYPES": {
-      "1": "身份验证后",
-      "2": "创建之前",
-      "3": "创建时"
     },
     "ADDTRIGGER": "添加触发器",
     "FLOWCHANGED": "流量已成功更改",
@@ -689,6 +680,10 @@
       "CLEAR": {
         "TITLE": "清理流程？",
         "DESCRIPTION": "您即将重置流程及其触发器和动作。此更改无法恢复。你确定吗？"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "删除选定的操作？",
+        "DESCRIPTION": "您确定要从流中删除选定的操作吗？"
       }
     },
     "TOAST": {
@@ -1176,6 +1171,8 @@
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
       "IGNOREUNKNOWNUSERNAMES": "忽略未知用户名",
       "IGNOREUNKNOWNUSERNAMES_DESC": "如果选择该选项，即使未找到用户，登录过程中也会显示密码屏幕。如果用户名或密码错误，密码检查的错误不会透露。",
+      "ALLOWDOMAINDISCOVERY": "允许域名发现",
+      "ALLOWDOMAINDISCOVERY_DESC": "如果选择该选项，在登录屏幕上输入的未知用户名的后缀（@domain.com）将与组织的域名进行匹配，成功后将重定向到组织的注册。",
       "DEFAULTREDIRECTURI": "默认重定向 URI",
       "DEFAULTREDIRECTURI_DESC": "定义如果在没有应用程序上下文的情况下开始登录（例如来自邮件），用户将被重定向到哪里。",
       "ERRORMSGPOPUP": "在对话框中显示错误",

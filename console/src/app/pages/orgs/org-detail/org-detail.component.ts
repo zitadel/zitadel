@@ -1,20 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject, takeUntil } from 'rxjs';
-import { catchError, finalize, map, take } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
+import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { Buffer } from 'buffer';
 
 @Component({
   selector: 'cnsl-org-detail',
@@ -28,6 +31,9 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
   public OrgState: any = OrgState;
   public ChangeType: any = ChangeType;
 
+  public metadata: Metadata.AsObject[] = [];
+  public loadingMetadata: boolean = true;
+
   // members
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -36,6 +42,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
 
   public InfoSectionType: any = InfoSectionType;
+
   constructor(
     auth: GrpcAuthService,
     private dialog: MatDialog,
@@ -51,12 +58,16 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     breadcrumbService.setBreadcrumb([bread]);
 
     auth.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
-      this.getData();
+      if (this.org && org) {
+        this.getData();
+        this.loadMetadata();
+      }
     });
   }
 
   public ngOnInit(): void {
     this.getData();
+    this.loadMetadata();
   }
 
   public ngOnDestroy(): void {
@@ -187,5 +198,41 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
       .subscribe((members) => {
         this.membersSubject.next(members);
       });
+  }
+
+  public loadMetadata(): Promise<any> | void {
+    this.loadingMetadata = true;
+    return this.mgmtService
+      .listOrgMetadata()
+      .then((resp) => {
+        this.loadingMetadata = false;
+        this.metadata = resp.resultList.map((md) => {
+          return {
+            key: md.key,
+            value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+          };
+        });
+      })
+      .catch((error) => {
+        this.loadingMetadata = false;
+        this.toast.showError(error);
+      });
+  }
+
+  public editMetadata(): void {
+    const setFcn = (key: string, value: string): Promise<any> => this.mgmtService.setOrgMetadata(key, btoa(value));
+    const removeFcn = (key: string): Promise<any> => this.mgmtService.removeOrgMetadata(key);
+
+    const dialogRef = this.dialog.open(MetadataDialogComponent, {
+      data: {
+        metadata: this.metadata,
+        setFcn: setFcn,
+        removeFcn: removeFcn,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.loadMetadata();
+    });
   }
 }

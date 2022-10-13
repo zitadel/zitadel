@@ -294,7 +294,7 @@
       "TITLE": "Authentification sans mot de passe",
       "DESCRIPTION": "Ajoutez des méthodes d'authentification basées sur WebAuthn pour vous connecter à ZITADEL sans mot de passe.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
-      "U2F": "Ajouter un authentifiant",
+      "U2F": "Ajouter une méthode",
       "U2F_DIALOG_TITLE": "Vérifier l'authentifiant",
       "U2F_DIALOG_DESCRIPTION": "Entrez un nom pour votre connexion sans mot de passe utilisée",
       "U2F_SUCCESS": "Auth sans mot de passe créé avec succès !",
@@ -326,17 +326,6 @@
         "NEW": "Ajouter un nouveau"
       }
     },
-    "METADATA": {
-      "TITLE": "Métadonnées",
-      "DESCRIPTION": "",
-      "KEY": "Clé",
-      "VALUE": "Valeur",
-      "ADD": "Nouvelle entrée",
-      "SAVE": "Enregistrer",
-      "EMPTY": "Pas de métadonnées",
-      "SETSUCCESS": "Élément sauvegardé avec succès",
-      "REMOVESUCCESS": "Élément supprimé avec succès"
-    },
     "MFA": {
       "TABLETYPE": "Type",
       "TABLESTATE": "Statut",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "Ajoutez un second facteur pour garantir une sécurité optimale de votre compte.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "ADD": "Ajouter un facteur",
-      "OTP": "OTP (mot de passe à usage unique)",
+      "OTP": "Application d'authentification pour OTP (One-time password)",
       "OTP_DIALOG_TITLE": "Ajouter un OTP",
       "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
       "U2F": "Empreinte digitale, clés de sécurité, Face ID et autres",
@@ -639,6 +628,17 @@
       "DELETED": "Jeton supprimé avec succès."
     }
   },
+  "METADATA": {
+    "TITLE": "Métadonnées",
+    "DESCRIPTION": "",
+    "KEY": "Clé",
+    "VALUE": "Valeur",
+    "ADD": "Nouvelle entrée",
+    "SAVE": "Enregistrer",
+    "EMPTY": "Pas de métadonnées",
+    "SETSUCCESS": "Élément sauvegardé avec succès",
+    "REMOVESUCCESS": "Élément supprimé avec succès"
+  },
   "FLOWS": {
     "TITLE": "Actions et flux",
     "DESCRIPTION": "Définissez des scripts à exécuter lors d'un certain événement.",
@@ -653,15 +653,6 @@
       "0": "pas d'état",
       "1": "inactif",
       "2": "actif"
-    },
-    "TYPES": {
-      "0": "Type non spécifié",
-      "1": "Authentification externe"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post Authentification",
-      "2": "Pré création",
-      "3": "Post création"
     },
     "ADDTRIGGER": "Ajouter un déclencheur",
     "FLOWCHANGED": "Le processus a été modifié",
@@ -689,6 +680,10 @@
       "CLEAR": {
         "TITLE": "Effacer le flux ?",
         "DESCRIPTION": "Vous êtes sur le point de réinitialiser le flux ainsi que ses déclencheurs et actions. Ce changement ne peut pas être restauré. Etes-vous sûr ?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Supprimer les actions sélectionnées ?",
+        "DESCRIPTION": "Voulez-vous vraiment supprimer les actions sélectionnées du flux ?"
       }
     },
     "TOAST": {
@@ -1177,6 +1172,8 @@
       "HIDELOGINNAMESUFFIX": "Masquer le suffixe du nom de connexion",
       "IGNOREUNKNOWNUSERNAMES": "Ignorer les noms d'utilisateur inconnus",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Si l'option est sélectionnée, l'écran du mot de passe sera affiché dans le processus de connexion même si l'utilisateur n'a pas été trouvé. L'erreur sur la vérification du mot de passe ne révélera pas si le nom d'utilisateur ou le mot de passe était erroné.",
+      "ALLOWDOMAINDISCOVERY": "Découverte du domaine autorisée",
+      "ALLOWDOMAINDISCOVERY_DESC": "Si l'option est sélectionnée, le suffixe (@domain.com) d'un nom d'utilisateur inconnu saisi sur l'écran de connexion sera comparé aux domaines organisation et redirigera vers l'enregistrement de cette organisation en cas de succès.",
       "DEFAULTREDIRECTURI": "URI de redirection par défaut",
       "DEFAULTREDIRECTURI_DESC": "Définit l'endroit où l'utilisateur sera redirigé si la connexion a commencé sans contexte d'application (par exemple, à partir du courrier électronique).",
       "ERRORMSGPOPUP": "Afficher l'erreur dans la boîte de dialogue",

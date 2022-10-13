@@ -399,7 +399,7 @@ func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner st
 		return err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.User.NotFound")
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
 	}
 	return nil
 }

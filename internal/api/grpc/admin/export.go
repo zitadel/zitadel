@@ -10,7 +10,6 @@ import (
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -641,8 +640,8 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 			}
 
 			triggerActions = append(triggerActions, &management_pb.SetTriggerActionsRequest{
-				FlowType:    action_pb.FlowType(flowType),
-				TriggerType: action_pb.TriggerType(triggerType),
+				FlowType:    flowType.ID(),
+				TriggerType: triggerType.ID(),
 				ActionIds:   actions,
 			})
 		}
@@ -664,7 +663,7 @@ func (s *Server) getActions(ctx context.Context, org string) ([]*v1_pb.DataActio
 		return actions, nil
 	}
 	for i, action := range queriedActions.Actions {
-		timeout := durationpb.New(action.Timeout)
+		timeout := durationpb.New(action.Timeout())
 
 		actions[i] = &v1_pb.DataAction{
 			ActionId: action.ID,

@@ -66,7 +66,7 @@ ActionStateQuery is always equals
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| type |  FlowType | - |  |
+| type |  FlowType | id of the flow type |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | state |  FlowState | - |  |
 | trigger_actions | repeated TriggerAction | - |  |
@@ -74,24 +74,14 @@ ActionStateQuery is always equals
 
 
 
-### FlowStateQuery
-FlowStateQuery is always equals
+### FlowType
+
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| state |  FlowState | - | enum.defined_only: true<br />  |
-
-
-
-
-### FlowTypeQuery
-FlowTypeQuery is always equals
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| state |  FlowType | - | enum.defined_only: true<br />  |
+| id |  string | identifier of the type |  |
+| name |  zitadel.v1.LocalizedMessage | key and name of the type |  |
 
 
 
@@ -102,8 +92,20 @@ FlowTypeQuery is always equals
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| trigger_type |  TriggerType | - |  |
+| trigger_type |  TriggerType | id of the trigger type |  |
 | actions | repeated Action | - |  |
+
+
+
+
+### TriggerType
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | identifier of the type |  |
+| name |  zitadel.v1.LocalizedMessage | key and name of the type |  |
 
 
 
@@ -138,18 +140,6 @@ FlowTypeQuery is always equals
 
 
 
-### FlowFieldName {#flowfieldname}
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| FLOW_FIELD_NAME_UNSPECIFIED | 0 | - |
-| FLOW_FIELD_NAME_TYPE | 1 | - |
-| FLOW_FIELD_NAME_STATE | 2 | - |
-
-
-
-
 ### FlowState {#flowstate}
 
 
@@ -158,30 +148,6 @@ FlowTypeQuery is always equals
 | FLOW_STATE_UNSPECIFIED | 0 | - |
 | FLOW_STATE_INACTIVE | 1 | - |
 | FLOW_STATE_ACTIVE | 2 | - |
-
-
-
-
-### FlowType {#flowtype}
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| FLOW_TYPE_UNSPECIFIED | 0 | - |
-| FLOW_TYPE_EXTERNAL_AUTHENTICATION | 1 | - |
-
-
-
-
-### TriggerType {#triggertype}
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| TRIGGER_TYPE_UNSPECIFIED | 0 | - |
-| TRIGGER_TYPE_POST_AUTHENTICATION | 1 | - |
-| TRIGGER_TYPE_PRE_CREATION | 2 | - |
-| TRIGGER_TYPE_POST_CREATION | 3 | - |
 
 
 

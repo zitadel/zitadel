@@ -73,7 +73,9 @@ export class AuthPasswordlessComponent implements OnInit, OnDestroy {
             });
 
             dialogRef.afterClosed().subscribe((done) => {
-              this.getPasswordless();
+              setTimeout(() => {
+                this.getPasswordless();
+              }, 1000);
             });
           }
         }
