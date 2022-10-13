@@ -78,3 +78,11 @@ jobs:
         with:
           file: .artifacts/codecov/profile.cov
           name: go-codecov
+      - name: Bump Chart Version
+        uses: peter-evans/repository-dispatch@v2
+        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/main'
+        with:
+          token: ${{ secrets.CHART_REPO_ACCESS_TOKEN }}
+          repository: zitadel/zitadel-charts
+          event-type: zitadel-released
+          client-payload: '{"semanticoutput": "${{ steps.semantic.outputs }}"}'
