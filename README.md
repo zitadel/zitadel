@@ -27,7 +27,7 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
-Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak? 
+Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak?
 
 Do you have project that requires a multi-tenant user management with self-service for you customers?
 
@@ -35,7 +35,7 @@ Look no further — ZITADEL combines the ease of Auth0 and the versatility of Ke
 
 We provide you with a wide range of out of the box features to accelerate your project. Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
 
-With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs. 
+With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs.
 
 ---
 
@@ -43,15 +43,17 @@ With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
 
 ## Get started
 
-### Install ZITADEL
+### Deploy ZITADEL (Self-Hosted)
 
 - [We provide installation guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
 
-### ZITADEL Cloud (SaaS)
+> If you are interested to have support for your self-hosted ZITADEL [please reach out to us](https://zitadel.com/contact)!
 
-The easiest way to get started with [ZITADEL Cloud](https://zitadel.cloud).
+### Setup ZITADEL Cloud (SaaS)
 
-It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
+If you want to experience a hands-free ZITADEL you should use [ZITADEL Cloud](https://zitadel.cloud).
+
+It is free for up to 25'000 authenticated requests and provides you all the features that make ZITADEL great. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Quickstarts - Integrate your app
 
@@ -59,13 +61,13 @@ It's free for up to 25'000 authenticated requests. Learn more about the [pay-as-
 
 > If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
 
-## Why ZITADEL
+## Why choose ZITADEL
 
-- [API-first](https://docs.zitadel.com/docs/apis/introduction)
-- Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview)
-- [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on events with custom code
-- [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience
-- [CockroachDB](https://www.cockroachlabs.com/) or a Postgres database is the only dependency
+- [API-first approach](https://docs.zitadel.com/docs/apis/introduction)
+- Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview) as storage pattern
+- [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on events with custom code and extended ZITADEL for you needs
+- [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
+- [CockroachDB](https://www.cockroachlabs.com/) or a [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
 
 ## Features
 
@@ -94,7 +96,7 @@ Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 | .NET     | [zitadel-net](https://github.com/smartive/zitadel-net) | GRPC | ✔️ | ✔️ | [smartive 👑](https://github.com/smartive/) |
 | Dart     | [zitadel-dart](https://github.com/smartive/zitadel-dart) | GRPC | ✔️ | ❌ | [smartive 👑](https://github.com/smartive/) |
 | Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | GRPC | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
-| Go       | [zitadel-go](https://github.com/zitadel/zitadel-go) | GRPC | ✔️ | ✔️ | ZITADEL |
+| Go       | [zitadel-go](https://github.com/zitadel/zitadel-go) | GRPC | ✔️ | ✔️ | [ZITADEL](https://github.com/zitadel/) |
 | Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | ❌ | [smartive 👑](https://github.com/smartive/) |
 | JVM      | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓ | ❓ | | TBD |
 | Python   | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675) | ❓ | ❓ | | TBD |
@@ -117,8 +119,6 @@ Made with [contrib.rocks](https://contrib.rocks).
 
 ## Showcase
 
-<!-- TODO: Replace Images-->
-
 ### Passwordless Login
 
 Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
@@ -131,6 +131,8 @@ Use our login widget to allow easy and secure access to your applications and en
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 
 ### Admin Console
+
+<!-- TODO: Replace Images-->
 
 Use [Console](https://docs.zitadel.com/docs/manuals/introduction) or our [APIs](https://docs.zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 
