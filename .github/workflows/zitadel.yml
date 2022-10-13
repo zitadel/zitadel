@@ -85,4 +85,4 @@ jobs:
           token: ${{ secrets.CHART_REPO_ACCESS_TOKEN }}
           repository: zitadel/zitadel-charts
           event-type: zitadel-released
-          client-payload: '{"semanticoutput": "${{ steps.semantic.outputs }}"}'
+          client-payload: '{"semanticoutputs": "${{ steps.semantic.outputs }}"}'
