@@ -1,32 +1,35 @@
-import { apiCallProperties } from './apiauth';
-import { ensureSomethingIsSet } from './ensure';
+import { ensureSetting } from './ensure';
+import { API } from './types';
 
 export function ensureOIDCSettingsSet(
-  api: apiCallProperties,
-  accessTokenLifetime,
-  idTokenLifetime,
-  refreshTokenExpiration,
+  api: API,
+  accessTokenLifetime: number,
+  idTokenLifetime: number,
+  refreshTokenExpiration: number,
   refreshTokenIdleExpiration: number,
 ): Cypress.Chainable<number> {
-  return ensureSomethingIsSet(
+  return ensureSetting(
     api,
-    `${api.adminBaseURL}settings/oidc`,
-    (settings: any) => {
-      let entity = null;
-      if (
-        settings.settings?.accessTokenLifetime === hoursToDuration(accessTokenLifetime) &&
-        settings.settings?.idTokenLifetime === hoursToDuration(idTokenLifetime) &&
-        settings.settings?.refreshTokenExpiration === daysToDuration(refreshTokenExpiration) &&
-        settings.settings?.refreshTokenIdleExpiration === daysToDuration(refreshTokenIdleExpiration)
-      ) {
-        entity = settings.settings;
-      }
-      return {
-        entity: entity,
-        sequence: settings.settings?.details?.sequence,
+    `${api.adminBaseURL}/settings/oidc`,
+    (body: any) => {
+      const result = {
+        sequence: body.settings?.details?.sequence,
+        id: body.settings.id,
+        entity: null,
       };
+
+      if (
+        body.settings &&
+        body.settings.accessTokenLifetime === hoursToDuration(accessTokenLifetime) &&
+        body.settings.idTokenLifetime === hoursToDuration(idTokenLifetime) &&
+        body.settings.refreshTokenExpiration === daysToDuration(refreshTokenExpiration) &&
+        body.settings.refreshTokenIdleExpiration === daysToDuration(refreshTokenIdleExpiration)
+      ) {
+        return { ...result, entity: body.settings };
+      }
+      return result;
     },
-    `${api.adminBaseURL}settings/oidc`,
+    `${api.adminBaseURL}/settings/oidc`,
     {
       accessTokenLifetime: hoursToDuration(accessTokenLifetime),
       idTokenLifetime: hoursToDuration(idTokenLifetime),
