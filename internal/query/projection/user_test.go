@@ -1095,7 +1095,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users3_notifications (user_id, instance_id, verified_phone) SELECT user_id, instance_id, last_phone FROM projections.users3_notifications AS copy_table WHERE copy_table.user_id = $1 AND copy_table.instance_id = $2 ON CONFLICT (user_id, instance_id) DO UPDATE SET (user_id, instance_id, verified_phone) = (EXCLUDED.user_id, EXCLUDED.instance_id, EXCLUDED.last_phone)",
+							expectedStmt: "UPDATE projections.users3_notifications SET verified_phone = last_phone WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1140,7 +1140,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users3_notifications (user_id, instance_id, verified_phone) SELECT user_id, instance_id, last_phone FROM projections.users3_notifications AS copy_table WHERE copy_table.user_id = $1 AND copy_table.instance_id = $2 ON CONFLICT (user_id, instance_id) DO UPDATE SET (user_id, instance_id, verified_phone) = (EXCLUDED.user_id, EXCLUDED.instance_id, EXCLUDED.last_phone)",
+							expectedStmt: "UPDATE projections.users3_notifications SET verified_phone = last_phone WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1283,7 +1283,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users3_notifications (user_id, instance_id, verified_email) SELECT user_id, instance_id, last_email FROM projections.users3_notifications AS copy_table WHERE copy_table.user_id = $1 AND copy_table.instance_id = $2 ON CONFLICT (user_id, instance_id) DO UPDATE SET (user_id, instance_id, verified_email) = (EXCLUDED.user_id, EXCLUDED.instance_id, EXCLUDED.last_email)",
+							expectedStmt: "UPDATE projections.users3_notifications SET verified_email = last_email WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1328,7 +1328,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users3_notifications (user_id, instance_id, verified_email) SELECT user_id, instance_id, last_email FROM projections.users3_notifications AS copy_table WHERE copy_table.user_id = $1 AND copy_table.instance_id = $2 ON CONFLICT (user_id, instance_id) DO UPDATE SET (user_id, instance_id, verified_email) = (EXCLUDED.user_id, EXCLUDED.instance_id, EXCLUDED.last_email)",
+							expectedStmt: "UPDATE projections.users3_notifications SET verified_email = last_email WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
