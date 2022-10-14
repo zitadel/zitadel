@@ -715,38 +715,70 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 }
 
 func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
+	// always check the loginname first
 	user, err := repo.View.UserByLoginName(loginNameInput, request.InstanceID)
 	if err == nil {
+		// and take the user regardless if there would be a user with that email or phone
 		return repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
 	}
 	user, emailErr := repo.View.UserByEmail(loginNameInput, request.InstanceID)
 	if emailErr == nil {
-		return repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
+		// if there was a single user with the specified email
+		// load and check the login policy
+		user, emailErr = repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
+		if emailErr != nil {
+			return nil, emailErr
+		}
+		// and in particular if the login with email is possible
+		// if so take the user (and ignore possible phone matches)
+		if !request.LoginPolicy.DisableLoginWithEmail {
+			return user, nil
+		}
 	}
 	user, phoneErr := repo.View.UserByPhone(loginNameInput, request.InstanceID)
 	if phoneErr == nil {
-		return repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
+		// if there was a single user with the specified phone
+		// load and check the login policy
+		user, phoneErr = repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
+		if phoneErr != nil {
+			return nil, phoneErr
+		}
+		// and in particular if the login with phone is possible
+		// if so take the user
+		if !request.LoginPolicy.DisableLoginWithPhone {
+			return user, nil
+		}
 	}
+	// if we get here the user was not found by loginname
+	// and either there was no match for email or phone as well, or they have been both disabled
 	return nil, err
 }
 
 func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
+	// always check the loginname first
 	user, err := repo.View.UserByLoginNameAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
 	if err == nil {
+		// and take the user regardless if there would be a user with that email or phone
 		return user, nil
 	}
 	if request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithEmail {
+		// if login by email is allowed and there was a single user with the specified email
+		// take that user (and ignore possible phone number matches)
 		user, emailErr := repo.View.UserByEmailAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
 		if emailErr == nil {
 			return user, nil
 		}
 	}
 	if request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithPhone {
+		// if login by phone is allowed and there was a single user with the specified phone
+		// take that user
 		user, phoneErr := repo.View.UserByPhoneAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
 		if phoneErr == nil {
 			return user, nil
 		}
 	}
+	// if we get here the user was not found by loginname
+	// and either there was no match for email or phone as well or they have been both disabled
 	return nil, err
 }
 
@@ -788,11 +820,15 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		PasswordlessType:           policy.PasswordlessType,
 		HidePasswordReset:          policy.HidePasswordReset,
 		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,
+		AllowDomainDiscovery:       policy.AllowDomainDiscovery,
+		DefaultRedirectURI:         policy.DefaultRedirectURI,
 		PasswordCheckLifetime:      policy.PasswordCheckLifetime,
 		ExternalLoginCheckLifetime: policy.ExternalLoginCheckLifetime,
 		MFAInitSkipLifetime:        policy.MFAInitSkipLifetime,
 		SecondFactorCheckLifetime:  policy.SecondFactorCheckLifetime,
 		MultiFactorCheckLifetime:   policy.MultiFactorCheckLifetime,
+		DisableLoginWithEmail:      policy.DisableLoginWithEmail,
+		DisableLoginWithPhone:      policy.DisableLoginWithPhone,
 	}
 }
 
