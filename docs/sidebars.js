@@ -173,6 +173,16 @@ module.exports = {
     },
     {
       type: "category",
+      label: "End User Guide",
+      items: [
+        "manuals/user-profile",
+        "manuals/user-login",
+        "manuals/user-register",
+        "manuals/troubleshooting",
+      ],
+    },
+    {
+      type: "category",
       label: "Trainings",
       collapsed: true,
       items: [
@@ -308,12 +318,6 @@ module.exports = {
       collapsed: false,
       items: ["concepts/features/actions", "concepts/features/selfservice"],
     },
-  ],
-  manuals: [
-    "manuals/introduction",
-    "manuals/user-profile",
-    "manuals/user-login",
-    "manuals/troubleshooting",
   ],
   legal: [
     "legal/introduction",
