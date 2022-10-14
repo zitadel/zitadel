@@ -53,6 +53,8 @@ func updateLoginPolicyToCommand(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *comm
 		HidePasswordReset:          p.HidePasswordReset,
 		IgnoreUnknownUsernames:     p.IgnoreUnknownUsernames,
 		AllowDomainDiscovery:       p.AllowDomainDiscovery,
+		DisableLoginWithEmail:      p.DisableLoginWithEmail,
+		DisableLoginWithPhone:      p.DisableLoginWithPhone,
 		DefaultRedirectURI:         p.DefaultRedirectUri,
 		PasswordCheckLifetime:      p.PasswordCheckLifetime.AsDuration(),
 		ExternalLoginCheckLifetime: p.ExternalLoginCheckLifetime.AsDuration(),
