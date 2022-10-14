@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-import "zitadel/object.proto";
-import "zitadel/options.proto";
-import "zitadel/instance.proto";
+import "object.proto";
+import "options.proto";
+import "instance.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";

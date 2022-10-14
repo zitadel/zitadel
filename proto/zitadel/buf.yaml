@@ -1,0 +1,12 @@
+version: v1
+name: buf.build/zitadel/zitadel
+deps:
+ - buf.build/googleapis/googleapis
+ - buf.build/grpc-ecosystem/grpc-gateway
+ - buf.build/envoyproxy/protoc-gen-validate
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT

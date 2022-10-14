@@ -1,0 +1,24 @@
+version: v1
+managed:
+  enabled: true
+  #go_package_prefix:
+    #default: github.com/zitadel/zitadel/gen/go
+plugins:
+  - remote: buf.build/protocolbuffers/plugins/go:v1.27.1-1
+    out: gen/go
+    opt: paths=source_relative
+  - remote: buf.build/grpc/plugins/go:v1.1.0-1
+    out: gen/go
+    opt:
+      - paths=source_relative
+      - require_unimplemented_servers=false
+  - remote: buf.build/protocolbuffers/plugins/js:v3.20.1-1
+    out: gen/js
+    opt:
+      - import_style=commonjs
+      - binary
+  - remote: buf.build/grpc/plugins/web:v1.4.1-1
+    out: gen/js
+    opt:
+      - import_style=typescript
+      - mode=grpcwebtext

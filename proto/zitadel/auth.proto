@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-import "zitadel/user.proto";
-import "zitadel/org.proto";
-import "zitadel/change.proto";
-import "zitadel/object.proto";
-import "zitadel/options.proto";
-import "zitadel/policy.proto";
-import "zitadel/idp.proto";
-import "zitadel/metadata.proto";
+import "user.proto";
+import "org.proto";
+import "change.proto";
+import "object.proto";
+import "options.proto";
+import "policy.proto";
+import "idp.proto";
+import "metadata.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
