@@ -79,7 +79,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
       case PolicyComponentServiceType.MGMT:
         return this.managementService.getDomainPolicy();
       case PolicyComponentServiceType.ADMIN:
-        return this.adminService.getCustomDomainPolicy(this.org.id);
+        return this.adminService.getDomainPolicy();
       default:
         return Promise.reject();
     }
