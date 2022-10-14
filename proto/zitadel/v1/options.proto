@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package zitadel.v1;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MethodOptions {
+    AuthOption auth_option = 50000;
+}
+
+message AuthOption {
+    string permission = 1;
+    string check_field_name = 2;
+}

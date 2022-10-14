@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.v1;
+
+message ObjectDetails {
+    //sequence represents the order of events. It's always upcounting
+    //
+    // on read: the sequence of the last event reduced by the projection
+    //
+    // on manipulation: the timestamp of the event(s) added by the manipulation
+    uint64 sequence = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2\"";
+        }
+    ];
+    //creation_date is the timestamp where the first operation on the object was made
+    //
+    // on read: the timestamp of the first event of the object
+    //
+    // on create: the timestamp of the event(s) added by the manipulation
+    google.protobuf.Timestamp creation_date = 2;
+    //change_date is the timestamp when the object was changed
+    //
+    // on read: the timestamp of the last event reduced by the projection
+    //
+    // on manipulation: the
+    google.protobuf.Timestamp change_date = 3;
+    //resource_owner is the organisation an object belongs to
+    string resource_owner = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+}
+
+message ListQuery {
+    uint64 offset = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"10\"";
+        }
+    ];
+    uint32 limit = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "20";
+            description: "Maximum amount of events returned. Default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If limit exeeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
+        }
+    ];
+    bool asc = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "default is descending"
+        }
+    ];
+}
+
+message ListDetails {
+    uint64 total_result = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2\"";
+        }
+    ];
+    uint64 processed_sequence = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"267831\"";
+        }
+    ];
+    google.protobuf.Timestamp view_timestamp = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the last time the view got updated"
+        }
+    ];
+}
+
+enum TextQueryMethod {
+    TEXT_QUERY_METHOD_EQUALS = 0;
+    TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE = 1;
+    TEXT_QUERY_METHOD_STARTS_WITH = 2;
+    TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE = 3;
+    TEXT_QUERY_METHOD_CONTAINS = 4;
+    TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE = 5;
+    TEXT_QUERY_METHOD_ENDS_WITH = 6;
+    TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE = 7;
+}
+
+
+enum ListQueryMethod {
+    LIST_QUERY_METHOD_IN = 0;
+}

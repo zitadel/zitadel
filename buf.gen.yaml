@@ -1,12 +1,15 @@
 version: v1
 managed:
   enabled: true
-  #go_package_prefix:
-    #default: github.com/zitadel/zitadel/gen/go
+  go_package_prefix:
+    default: github.com/zitadel/zitadel/pkg/grpc/
+    except:
+      - buf.build/googleapis/googleapis
 plugins:
   - remote: buf.build/protocolbuffers/plugins/go:v1.27.1-1
     out: gen/go
-    opt: paths=source_relative
+    opt: 
+      - paths=source_relative
   - remote: buf.build/grpc/plugins/go:v1.1.0-1
     out: gen/go
     opt:
