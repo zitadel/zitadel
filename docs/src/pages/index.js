@@ -27,69 +27,9 @@ const features = [
         ZITADEL and on what we recommend.
       </>
     ),
-    content: (
-      <ListWrapper>
-        <Column>
-          <div>
-            <ListElement
-              link="docs/guides/start/quickstart"
-              type={ICONTYPE.START}
-              title="Get started"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/manage/cloud/overview"
-              type={ICONTYPE.LOGIN}
-              title="ZITADEL Cloud"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/integrate/login-users"
-              type={ICONTYPE.LOGIN}
-              title="Login Users"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/integrate/access-zitadel-apis"
-              type={ICONTYPE.APIS}
-              title="Access APIs"
-              description=""
-            />
-          </div>
-          <div>
-            <ListElement
-              link="docs/guides/solution-scenarios/introduction"
-              iconClasses="las la-paragraph"
-              roundClasses="rounded rounded-split"
-              label="B2C"
-              title="Solution Scenarios"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/manage/customize/branding"
-              type={ICONTYPE.PRIVATELABELING}
-              title="Customization"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/deploy/overview"
-              type={ICONTYPE.SYSTEM}
-              title="Deploy"
-              description=""
-            />
-            <ListElement
-              link="docs/guides/trainings/introduction"
-              type={ICONTYPE.STORAGE}
-              title="Trainings"
-              description=""
-            />
-          </div>
-        </Column>
-      </ListWrapper>
-    ),
   },
   {
-    title: "Quickstarts",
+    title: "Integrate",
     darkImageUrl: "img/index/Quickstarts-dark.svg",
     lightImageUrl: "img/index/Quickstarts-light.svg",
     link: "docs/examples/introduction",
@@ -99,35 +39,6 @@ const features = [
         APIs with ZITADEL
       </>
     ),
-    content: (
-      <div className={styles.quickstartcontainer}>
-        <QuickstartLink
-          link="/docs/examples/login/angular"
-          imageSource="/img/tech/angular.svg"
-          title="Angular"
-          description="Add the user login to your application and query some data from the userinfo endpoint"
-        />
-        <QuickstartLink
-          link="/docs/examples/login/react"
-          imageSource="/img/tech/react.png"
-          title="React"
-          description="Logs into your application and queries some data from the userinfo endpoint"
-        />
-        <QuickstartLink
-          link="/docs/examples/login/flutter"
-          imageSource="/img/tech/flutter.svg"
-          title="Flutter"
-          description="Mobile Application working for iOS and Android that authenticates your user."
-        />
-        <QuickstartLink
-          link="/docs/examples/login/nextjs"
-          imageSource="/img/tech/nextjslight.svg"
-          lightImageSource="/img/tech/nextjs.svg"
-          title="NextJS"
-          description="A simple application to log into your user account and query some data from User endpoint."
-        />
-      </div>
-    ),
   },
   {
     title: "APIs",
@@ -136,24 +47,6 @@ const features = [
     link: "/docs/apis/introduction",
     description: (
       <>Learn more about our APIs and how to integrate them in your apps.</>
-    ),
-    content: (
-      <div className={styles.apilinks}>
-        <ListWrapper>
-          <ListElement
-            link="./docs/apis/proto/auth"
-            type={ICONTYPE.APIS}
-            title="Proto Definitions"
-            description=""
-          />
-          <ListElement
-            link="./docs/apis/openidoauth/endpoints"
-            type={ICONTYPE.APIS}
-            title="OpenID Connect and OAuth"
-            description="Scopes, Claims, Authentication Methods, Grant Types"
-          />
-        </ListWrapper>
-      </div>
     ),
   },
   {
@@ -166,28 +59,6 @@ const features = [
         Learn more about engineering and design principles, ZITADELs
         architecture and used technologies.
       </>
-    ),
-    content: (
-      <ListWrapper>
-        <ListElement
-          link="./docs/concepts/principles"
-          type={ICONTYPE.TASKS}
-          title="Principles"
-          description="Design and engineering principles"
-        />
-        <ListElement
-          link="./docs/concepts/architecture/software"
-          type={ICONTYPE.ARCHITECTURE}
-          title="Architecture"
-          description="Sotware-, Cluster- and Multi Cluster Architecture"
-        />
-        <ListElement
-          link="./docs/concepts/structure/overview"
-          type={ICONTYPE.ARCHITECTURE}
-          title="Structure"
-          description="Object structure of ZITADEL"
-        />
-      </ListWrapper>
     ),
   },
 ];
