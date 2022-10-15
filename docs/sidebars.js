@@ -1,6 +1,6 @@
 module.exports = {
   examples: [
-    "integration/overview",
+    "integrations/overview",
     {
       type: "category",
       label: "Your application",
@@ -67,7 +67,7 @@ module.exports = {
       type: "category",
       label: "ZITADEL APIs",
       items: [
-        "integration/zitadel-api/overview",
+        "integrations/zitadel-api/overview",
         {
           type: "category",
           label: "Examples",
@@ -191,7 +191,7 @@ module.exports = {
         {
           type: "category",
           label: "Access ZITADEL API",
-          collapsed: false,
+          collapsed: true,
           items: [
             "guides/integrate/serviceusers",
             "guides/integrate/access-zitadel-apis",

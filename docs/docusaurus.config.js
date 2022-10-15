@@ -44,8 +44,8 @@ module.exports = {
         },
         {
           type: "doc",
-          label: "Integration",
-          docId: "examples/introduction",
+          label: "Integrations",
+          docId: "integrations/overview",
           position: "left",
         },
         {
