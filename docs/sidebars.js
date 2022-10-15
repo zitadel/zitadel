@@ -3,7 +3,16 @@ module.exports = {
     "examples/introduction",
     {
       type: "category",
-      label: "Integrate ZITADEL Login in your App",
+      label: "Examples",
+      items: [
+        "examples/secure-api/go", 
+        "examples/secure-api/dot-net"
+      ],
+      collapsed: false,
+    },
+    {
+      type: "category",
+      label: "Frameworks",
       items: [
         "examples/login/angular",
         "examples/login/react",
@@ -15,7 +24,10 @@ module.exports = {
     {
       type: "category",
       label: "Secure your API",
-      items: ["examples/secure-api/go", "examples/secure-api/dot-net"],
+      items: [
+        "examples/secure-api/go", 
+        "examples/secure-api/dot-net"
+      ],
       collapsed: false,
     },
     {
