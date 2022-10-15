@@ -1,44 +1,70 @@
 module.exports = {
   examples: [
-    "examples/introduction",
     {
       type: "category",
-      label: "Examples",
+      label: "Develop",
       items: [
-        "examples/secure-api/go", 
-        "examples/secure-api/dot-net"
+        "examples/introduction",
+        {
+          type: "category",
+          label: "Examples",
+          items: [
+            "examples/secure-api/go", 
+            "examples/secure-api/dot-net"
+          ],
+          collapsed: false,
+        },
+        {
+          type: "category",
+          label: "Frameworks",
+          items: [
+            "examples/login/angular",
+            "examples/login/react",
+            "examples/login/flutter",
+            "examples/login/nextjs",
+          ],
+          collapsed: false,
+        },
+        {
+          type: "category",
+          label: "Secure your API",
+          items: [
+            "examples/secure-api/go", 
+            "examples/secure-api/dot-net"
+          ],
+          collapsed: false,
+        },
       ],
       collapsed: false,
     },
     {
       type: "category",
-      label: "Frameworks",
+      label: "ZITADEL APIs",
       items: [
-        "examples/login/angular",
-        "examples/login/react",
-        "examples/login/flutter",
-        "examples/login/nextjs",
+        {
+          type: "category",
+          label: "Examples",
+          items: [
+            "examples/call-zitadel-api/go",
+            "examples/call-zitadel-api/dot-net",
+          ],
+          collapsed: false,
+        },
+        {
+          type: "category",
+          label: "Access ZITADEL APIs",
+          collapsed: false,
+          items: [
+            "guides/integrate/serviceusers",
+            "guides/integrate/access-zitadel-apis",
+            "guides/integrate/access-zitadel-system-api",
+            "guides/integrate/export-and-import",
+          ],
+        },
       ],
       collapsed: false,
     },
-    {
-      type: "category",
-      label: "Secure your API",
-      items: [
-        "examples/secure-api/go", 
-        "examples/secure-api/dot-net"
-      ],
-      collapsed: false,
-    },
-    {
-      type: "category",
-      label: "Call the ZITADEL API",
-      items: [
-        "examples/call-zitadel-api/go",
-        "examples/call-zitadel-api/dot-net",
-      ],
-      collapsed: false,
-    },
+    
     {
       type: "category",
       label: "Identity Aware Proxy",
@@ -52,17 +78,7 @@ module.exports = {
       items: [
         "guides/integrate/login-users",
         "guides/integrate/identity-brokering",
-        {
-          type: "category",
-          label: "Access ZITADEL APIs",
-          collapsed: false,
-          items: [
-            "guides/integrate/serviceusers",
-            "guides/integrate/access-zitadel-apis",
-            "guides/integrate/access-zitadel-system-api",
-            "guides/integrate/export-and-import",
-          ],
-        },
+        
         {
           type: "category",
           label: "OpenID Connect 1.0 Clients",
