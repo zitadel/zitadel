@@ -12,6 +12,7 @@ module.exports = {
           items: [
             "guides/integrate/login-users",
             "guides/integrate/identity-brokering",
+            "guides/integrate/oauth-recommended-flows",
           ],
           collapsed: true,
         },
@@ -66,25 +67,16 @@ module.exports = {
       type: "category",
       label: "ZITADEL APIs",
       items: [
+        "integration/zitadel-api/overview",
         {
           type: "category",
           label: "Examples",
           items: [
             "examples/call-zitadel-api/go",
             "examples/call-zitadel-api/dot-net",
+            "examples/call-zitadel-api/python",
           ],
-          collapsed: false,
-        },
-        {
-          type: "category",
-          label: "Access ZITADEL APIs",
-          collapsed: false,
-          items: [
-            "guides/integrate/serviceusers",
-            "guides/integrate/access-zitadel-apis",
-            "guides/integrate/access-zitadel-system-api",
-            "guides/integrate/export-and-import",
-          ],
+          collapsed: true,
         },
       ],
       collapsed: false,
@@ -106,7 +98,6 @@ module.exports = {
           label: "OpenID Connect 1.0 Clients",
           collapsed: false,
           items: [
-            "guides/integrate/oauth-recommended-flows",
             "guides/integrate/auth0-oidc",
             "guides/integrate/azuread-oidc",
             "guides/integrate/authenticated-mongodb-charts",
@@ -202,6 +193,17 @@ module.exports = {
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
             "guides/manage/customize/user-metadata",
+          ],
+        },
+        {
+          type: "category",
+          label: "Access ZITADEL API",
+          collapsed: false,
+          items: [
+            "guides/integrate/serviceusers",
+            "guides/integrate/access-zitadel-apis",
+            "guides/integrate/access-zitadel-system-api",
+            "guides/integrate/export-and-import",
           ],
         },
         {
