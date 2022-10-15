@@ -1,39 +1,64 @@
 module.exports = {
   examples: [
+    "integration/overview",
     {
       type: "category",
-      label: "Develop",
+      label: "Your application",
       items: [
         "examples/introduction",
         {
           type: "category",
-          label: "Examples",
+          label: "Federated Authentication",
           items: [
-            "examples/secure-api/go", 
-            "examples/secure-api/dot-net"
+            "guides/integrate/login-users",
+            "guides/integrate/identity-brokering",
           ],
-          collapsed: false,
+          collapsed: true,
         },
         {
           type: "category",
-          label: "Frameworks",
+          label: "Quickstarts",
           items: [
-            "examples/login/angular",
-            "examples/login/react",
-            "examples/login/flutter",
-            "examples/login/nextjs",
+            {
+              type: "category",
+              label: "Web",
+              items: [
+                "examples/login/java",
+              ],
+              collapsed: false,
+            },
+            {
+              type: "category",
+              label: "Native",
+              items: [
+                "examples/login/flutter",
+              ],
+              collapsed: false,
+            },
+            {
+              type: "category",
+              label: "User Agent (SPA)",
+              items: [
+                "examples/login/angular",
+                "examples/login/react",
+                "examples/login/nextjs",
+              ],
+              collapsed: false,
+            },
+            {
+              type: "category",
+              label: "API (Backend)",
+              items: [
+                "examples/secure-api/go", 
+                "examples/secure-api/dot-net"
+              ],
+              collapsed: false,
+            },
           ],
-          collapsed: false,
+          collapsed: true,
         },
-        {
-          type: "category",
-          label: "Secure your API",
-          items: [
-            "examples/secure-api/go", 
-            "examples/secure-api/dot-net"
-          ],
-          collapsed: false,
-        },
+        "examples/examples",
+        "examples/auth-sdks"
       ],
       collapsed: false,
     },
@@ -76,9 +101,6 @@ module.exports = {
       label: "Integrate",
       collapsed: false,
       items: [
-        "guides/integrate/login-users",
-        "guides/integrate/identity-brokering",
-        
         {
           type: "category",
           label: "OpenID Connect 1.0 Clients",
