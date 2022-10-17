@@ -63,8 +63,8 @@ Please save this for the later configuration of ZITADEL
 
 Use the values displayed on the AzureAD Application page in your ZITADEL IdP Settings.
 
-- You can find the `issuer` for ZITADEL of your AzureAD Tenant in the `Endpoints submenu`
-- The `Client ID` of ZITADEL corresponds to the `Application (client) ID`
+- You need to extract the `issuer` of your AzureAD Tenant from the OpenID configuration (`OpenID Connect metadata document`) in the `Endpoints submenu`. It should be your tenant's domain appended with `/v2.0`
+- The `Client ID` of ZITADEL corresponds to the `Application (client) ID` in the Overview page
 - The `Client Secret` was generated during the `Create Client Secret` step
 
 ![Azure Application](/img/guides/azure_app.png)

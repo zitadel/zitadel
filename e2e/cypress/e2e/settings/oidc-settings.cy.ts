@@ -8,7 +8,7 @@ describe('oidc settings', () => {
   const refreshTokenExpirationPrecondition = 7;
   const refreshTokenIdleExpirationPrecondition = 2;
 
-  before(`ensure they are set`, () => {
+  beforeEach(`ensure they are set`, () => {
     apiAuth().then((apiCallProperties) => {
       ensureOIDCSettingsSet(
         apiCallProperties,
