@@ -12,4 +12,4 @@ deps:
   - remote: buf.build
     owner: grpc-ecosystem
     repository: grpc-gateway
-    commit: ebd64b0d8a8a4974b8f1632e912a9415
+    commit: b96615cde70c403f8075c48e56178f88
