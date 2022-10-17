@@ -1439,7 +1439,7 @@ This is an empty response
 | client_id |  string | - |  |
 | type |  zitadel.authn.v1.KeyType | - |  |
 | expiration_date |  google.protobuf.Timestamp | - |  |
-| key_details |  bytes | - |  |
+| public_key |  bytes | - |  |
 
 
 
@@ -1478,7 +1478,7 @@ This is an empty response
 | user_id |  string | - |  |
 | type |  zitadel.authn.v1.KeyType | - |  |
 | expiration_date |  google.protobuf.Timestamp | - |  |
-| key_details |  bytes | - |  |
+| public_key |  bytes | - |  |
 
 
 
