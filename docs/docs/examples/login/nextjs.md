@@ -4,7 +4,7 @@ title: Next.js
 
 This is our Zitadel [Next.js](https://nextjs.org/) template. It shows how to authenticate as a user and retrieve user information from the OIDC endpoint.
 
-> The template code is part of our zitadel-example repo. Take a look [here](https://github.com/zitadel/zitadel-examples/tree/main/nextjs).
+> The template code is part of our zitadel-nextjs repo. Take a look [here](https://github.com/zitadel/zitadel-nextjs).
 
 ## Getting Started
 
@@ -38,46 +38,45 @@ then open [http://localhost:3000](http://localhost:3000) with your browser to se
 
 NextAuth.js exposes a REST API which is used by your client.
 To setup your configuration, create a file called [...nextauth].tsx in `pages/api/auth`.
+You can directly import our ZITADEL provider from [next-auth](https://next-auth.js.org/providers/zitadel).
 
 ```ts
 import NextAuth from "next-auth";
-
-export const ZITADEL = {
-  id: "zitadel",
-  name: "zitadel",
-  type: "oauth",
-  version: "2",
-  wellKnown: process.env.ZITADEL_ISSUER,
-  authorization: {
-    params: {
-      scope: "openid email profile",
-    },
-  },
-  idToken: true,
-  checks: ["pkce", "state"],
-  client: {
-    token_endpoint_auth_method: "none",
-  },
-  async profile(profile) {
-    return {
-      id: profile.sub,
-      name: profile.name,
-      firstName: profile.given_name,
-      lastName: profile.family_name,
-      email: profile.email,
-      loginName: profile.preferred_username,
-      image: profile.picture,
-    };
-  },
-  clientId: process.env.ZITADEL_CLIENT_ID,
-};
+import ZitadelProvider from "next-auth/providers/zitadel";
 
 export default NextAuth({
-  providers: [ZITADEL],
+  providers: [
+    ZitadelProvider({
+      issuer: process.env.ZITADEL_ISSUER,
+      clientId: process.env.ZITADEL_CLIENT_ID,
+      clientSecret: process.env.ZITADEL_CLIENT_SECRET,
+    }),
+  ],
 });
 ```
 
-Replace the endpoints `https:/[your-domain]-[random-string].zitadel.cloud` with your instance or if your using a ZITADEL CLOUD tier or your own endpoint if your using a self hosted ENTERPRISE tier respectively.
+You can overwrite the default callbacks too, just append them to the ZITADEL provider.
+
+```ts
+...
+ZitadelProvider({
+    issuer: process.env.ZITADEL_ISSUER,
+    clientId: process.env.ZITADEL_CLIENT_ID,
+    clientSecret: process.env.ZITADEL_CLIENT_SECRET,
+    async profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          firstName: profile.given_name,
+          lastName: profile.family_name,
+          email: profile.email,
+          loginName: profile.preferred_username,
+          image: profile.picture,
+        };
+    },
+}),
+...
+```
 
 We recommend using the Authentication Code flow secured by PKCE for the Authentication flow.
 To be able to connect to ZITADEL, navigate to your Console Projects, create or select an existing project and add your app selecting WEB, then PKCE, and then add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app.
@@ -88,15 +87,22 @@ Hit Create, then in the detail view of your application make sure to enable dev 
 
 > Note that we get a clientId but no clientSecret because it is not needed for our authentication flow.
 
+Now go to Token settings and check the checkbox for **User Info inside ID Token** to get your users name directly on authentication.
+
 ## Environment
 
 Create a file `.env` in the root of the project and add the following keys to it.
+You can find your Issuer Url on the application detail page in console.
 
 ```
 NEXTAUTH_URL=http://localhost:3000
+ZITADEL_ISSUER=[yourIssuerUrl]
 ZITADEL_CLIENT_ID=[yourClientId]
-ZITADEL_ISSUER=https:/[your-domain]-[random-string].zitadel.cloud
+ZITADEL_CLIENT_SECRET=[randomvalue]
+NEXTAUTH_SECRET=[randomvalue]
 ```
+
+next-auth requires a secret for all providers, so just define a random value here.
 
 # User interface
 
