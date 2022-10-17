@@ -52,10 +52,52 @@ func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner, instanc
 	return v.userByID(instanceID, loginNameQuery, resourceOwnerQuery)
 }
 
+func (v *View) UserByEmail(email, instanceID string) (*model.UserView, error) {
+	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	return v.userByID(instanceID, emailQuery)
+}
+
+func (v *View) UserByEmailAndResourceOwner(email, resourceOwner, instanceID string) (*model.UserView, error) {
+	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(resourceOwner, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+
+	return v.userByID(instanceID, emailQuery, resourceOwnerQuery)
+}
+
+func (v *View) UserByPhone(phone, instanceID string) (*model.UserView, error) {
+	phoneQuery, err := query.NewUserVerifiedPhoneSearchQuery(phone, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	return v.userByID(instanceID, phoneQuery)
+}
+
+func (v *View) UserByPhoneAndResourceOwner(phone, resourceOwner, instanceID string) (*model.UserView, error) {
+	phoneQuery, err := query.NewUserVerifiedPhoneSearchQuery(phone, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(resourceOwner, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+
+	return v.userByID(instanceID, phoneQuery, resourceOwnerQuery)
+}
+
 func (v *View) userByID(instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
 	ctx := authz.WithInstanceID(context.Background(), instanceID)
 
-	queriedUser, err := v.query.GetUser(ctx, true, queries...)
+	queriedUser, err := v.query.GetNotifyUser(ctx, true, queries...)
 	if err != nil {
 		return nil, err
 	}
