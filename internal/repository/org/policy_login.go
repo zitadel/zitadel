@@ -30,7 +30,9 @@ func NewLoginPolicyAddedEvent(
 	forceMFA,
 	hidePasswordReset,
 	ignoreUnknownUsernames,
-	allowDomainDiscovery bool,
+	allowDomainDiscovery,
+	disableLoginWithEmail,
+	disableLoginWithPhone bool,
 	passwordlessType domain.PasswordlessType,
 	defaultRedirectURI string,
 	passwordCheckLifetime,
@@ -52,13 +54,16 @@ func NewLoginPolicyAddedEvent(
 			hidePasswordReset,
 			ignoreUnknownUsernames,
 			allowDomainDiscovery,
+			disableLoginWithEmail,
+			disableLoginWithPhone,
 			passwordlessType,
 			defaultRedirectURI,
 			passwordCheckLifetime,
 			externalLoginCheckLifetime,
 			mfaInitSkipLifetime,
 			secondFactorCheckLifetime,
-			multiFactorCheckLifetime),
+			multiFactorCheckLifetime,
+		),
 	}
 }
 
