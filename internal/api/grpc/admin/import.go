@@ -595,7 +595,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 					KeyID:          key.KeyId,
 					Type:           authn.KeyTypeToDomain(key.Type),
 					ExpirationDate: key.ExpirationDate.AsTime(),
-					PublicKey:      key.KeyDetails,
+					PublicKey:      key.PublicKey,
 				}, org.GetOrgId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user_key", Id: key.KeyId, Message: err.Error()})
@@ -691,7 +691,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 					KeyID:          key.Id,
 					Type:           authn.KeyTypeToDomain(key.Type),
 					ExpirationDate: key.ExpirationDate.AsTime(),
-					PublicKey:      key.KeyDetails,
+					PublicKey:      key.PublicKey,
 				}, org.GetOrgId())
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "app_key", Id: key.Id, Message: err.Error()})

@@ -144,7 +144,7 @@ message DataAppKey {
   string client_id = 4;
   zitadel.authn.v1.KeyType type = 5;
   google.protobuf.Timestamp expiration_date = 6;
-  bytes key_details = 7;
+  bytes public_key = 7;
 }
 
 message DataMachineKey {
@@ -152,7 +152,7 @@ message DataMachineKey {
   string user_id = 2;
   zitadel.authn.v1.KeyType type = 3;
   google.protobuf.Timestamp expiration_date = 4;
-  bytes key_details = 5;
+  bytes public_key = 5;
 }
 
 message DataProject {
