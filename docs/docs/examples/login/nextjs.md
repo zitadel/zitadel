@@ -38,7 +38,7 @@ then open [http://localhost:3000](http://localhost:3000) with your browser to se
 
 NextAuth.js exposes a REST API which is used by your client.
 To setup your configuration, create a file called [...nextauth].tsx in `pages/api/auth`.
-You can directly import our ZITADEL provider from [next-auth](https://next-auth.js.org/providers/zitadel).
+You can directly import the ZITADEL provider from [next-auth](https://next-auth.js.org/providers/zitadel).
 
 ```ts
 import NextAuth from "next-auth";
