@@ -17,7 +17,7 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users3"
+	UserTable        = "projections.users4"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -88,9 +88,9 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(UserIDCol, UserInstanceIDCol),
-			crdb.WithIndex(crdb.NewIndex("username_idx", []string{UserUsernameCol})),
-			crdb.WithIndex(crdb.NewIndex("user_ro_idx", []string{UserResourceOwnerCol})),
-			crdb.WithConstraint(crdb.NewConstraint("user_id_unique", []string{UserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("username_idx4", []string{UserUsernameCol})),
+			crdb.WithIndex(crdb.NewIndex("user_ro_idx4", []string{UserResourceOwnerCol})),
+			crdb.WithConstraint(crdb.NewConstraint("user_id_unique4", []string{UserIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText),
@@ -109,7 +109,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(HumanUserIDCol, HumanUserInstanceIDCol),
 			UserHumanSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_human_ref_user")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_human_ref_user4")),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText),
@@ -119,7 +119,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(MachineUserIDCol, MachineUserInstanceIDCol),
 			UserMachineSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user4")),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(NotifyUserIDCol, crdb.ColumnTypeText),
@@ -132,7 +132,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(NotifyUserIDCol, NotifyInstanceIDCol),
 			UserNotifySuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user4")),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
