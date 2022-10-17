@@ -719,14 +719,13 @@ func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *d
 	user, err := repo.View.UserByLoginName(loginNameInput, request.InstanceID)
 	if err == nil {
 		// and take the user regardless if there would be a user with that email or phone
-		return repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
+		return user, repo.checkLoginPolicyWithResourceOwner(ctx, request, user.ResourceOwner)
 	}
 	user, emailErr := repo.View.UserByEmail(loginNameInput, request.InstanceID)
 	if emailErr == nil {
 		// if there was a single user with the specified email
 		// load and check the login policy
-		user, emailErr = repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
-		if emailErr != nil {
+		if emailErr = repo.checkLoginPolicyWithResourceOwner(ctx, request, user.ResourceOwner); emailErr != nil {
 			return nil, emailErr
 		}
 		// and in particular if the login with email is possible
@@ -739,8 +738,7 @@ func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *d
 	if phoneErr == nil {
 		// if there was a single user with the specified phone
 		// load and check the login policy
-		user, phoneErr = repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
-		if phoneErr != nil {
+		if phoneErr = repo.checkLoginPolicyWithResourceOwner(ctx, request, user.ResourceOwner); phoneErr != nil {
 			return nil, phoneErr
 		}
 		// and in particular if the login with phone is possible
@@ -782,23 +780,23 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(request *domain
 	return nil, err
 }
 
-func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, user *user_view_model.UserView) (*user_view_model.UserView, error) {
-	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, user.ResourceOwner)
+func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) error {
+	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if len(request.LinkingUsers) != 0 && !loginPolicy.AllowExternalIDPs {
-		return nil, errors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
+		return errors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
 	}
 	if len(request.LinkingUsers) != 0 {
 		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, idpProviders)
 		if !exists {
-			return nil, errors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
+			return errors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
 		}
 	}
 	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
 	request.AllowedExternalIDPs = idpProviders
-	return user, nil
+	return nil
 }
 
 func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
