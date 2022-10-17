@@ -2,8 +2,12 @@ package login
 
 import (
 	"net/http"
+	"strings"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
@@ -43,7 +47,8 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 		}
 		// if only direct registration is allowed, show the form
 		if allowed && !externalAllowed {
-			l.renderRegister(w, r, authReq, nil, nil)
+			data := l.passLoginHintToRegistration(r, authReq)
+			l.renderRegister(w, r, authReq, data, nil)
 			return
 		}
 	}
@@ -77,9 +82,43 @@ func (l *Login) handleRegisterOptionCheck(w http.ResponseWriter, r *http.Request
 }
 
 func registrationAllowed(authReq *domain.AuthRequest) bool {
-	return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowRegister
+	return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowRegister && authReq.LoginPolicy.AllowUsernamePassword
 }
 
 func externalRegistrationAllowed(authReq *domain.AuthRequest) bool {
 	return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
+}
+
+func (l *Login) passLoginHintToRegistration(r *http.Request, authReq *domain.AuthRequest) *registerFormData {
+	data := &registerFormData{}
+	if authReq == nil {
+		return data
+	}
+	data.Email = authReq.LoginHint
+	domainPolicy, err := l.getOrgDomainPolicy(r, authReq.RequestedOrgID)
+	if err != nil {
+		logging.WithFields("authRequest", authReq.ID, "org", authReq.RequestedOrgID).Error("unable to load domain policy for registration loginHint")
+		return data
+	}
+	data.Username = authReq.LoginHint
+	if !domainPolicy.UserLoginMustBeDomain {
+		return data
+	}
+	searchQuery, err := query.NewOrgDomainOrgIDSearchQuery(authReq.RequestedOrgID)
+	if err != nil {
+		logging.WithFields("authRequest", authReq.ID, "org", authReq.RequestedOrgID).Error("unable to search query for registration loginHint")
+		return data
+	}
+	domains, err := l.query.SearchOrgDomains(r.Context(), &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{searchQuery}})
+	if err != nil {
+		logging.WithFields("authRequest", authReq.ID, "org", authReq.RequestedOrgID).Error("unable to load domains for registration loginHint")
+		return data
+	}
+	for _, orgDomain := range domains.Domains {
+		if orgDomain.IsVerified && strings.HasSuffix(authReq.LoginHint, "@"+orgDomain.Domain) {
+			data.Username = strings.TrimSuffix(authReq.LoginHint, "@"+orgDomain.Domain)
+			return data
+		}
+	}
+	return data
 }
