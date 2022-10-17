@@ -55,7 +55,7 @@ export default NextAuth({
 });
 ```
 
-You can overwrite the default callbacks too, just append them to the ZITADEL provider.
+You can overwrite the default callbacks, just append them to the ZITADEL provider.
 
 ```ts
 ...
