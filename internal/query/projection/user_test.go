@@ -1634,7 +1634,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.users3 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.users4 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

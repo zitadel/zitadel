@@ -554,7 +554,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_policies2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_policies3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
