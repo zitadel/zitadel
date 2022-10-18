@@ -43,7 +43,7 @@ func (c *Commands) addUserMachineKey(ctx context.Context, machineKey *domain.Mac
 		return nil, err
 	}
 
-	if machineKey.PublicKey == nil || len(machineKey.PublicKey) == 0 {
+	if len(machineKey.PublicKey) == 0 {
 		if err := domain.SetNewAuthNKeyPair(machineKey, c.machineKeySize); err != nil {
 			return nil, err
 		}
@@ -66,7 +66,7 @@ func (c *Commands) addUserMachineKey(ctx context.Context, machineKey *domain.Mac
 	}
 
 	key := keyWriteModelToMachineKey(keyWriteModel)
-	if machineKey.PrivateKey != nil && len(machineKey.PrivateKey) > 0 {
+	if len(machineKey.PrivateKey) > 0 {
 		key.PrivateKey = machineKey.PrivateKey
 	}
 	return key, nil

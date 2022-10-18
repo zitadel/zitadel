@@ -62,7 +62,7 @@ func (c *Commands) addApplicationKey(ctx context.Context, key *domain.Applicatio
 		return nil, err
 	}
 
-	if key.PublicKey == nil || len(key.PublicKey) == 0 {
+	if len(key.PublicKey) == 0 {
 		err = domain.SetNewAuthNKeyPair(key, c.applicationKeySize)
 		if err != nil {
 			return nil, err
@@ -89,7 +89,7 @@ func (c *Commands) addApplicationKey(ctx context.Context, key *domain.Applicatio
 		return nil, err
 	}
 	result := applicationKeyWriteModelToKey(keyWriteModel)
-	if key.PrivateKey != nil && len(key.PrivateKey) > 0 {
+	if len(key.PrivateKey) > 0 {
 		result.PrivateKey = key.PrivateKey
 	}
 	return result, nil
