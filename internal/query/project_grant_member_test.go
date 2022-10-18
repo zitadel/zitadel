@@ -20,18 +20,18 @@ var (
 		", members.user_id" +
 		", members.roles" +
 		", projections.login_names.login_name" +
-		", projections.users3_humans.email" +
-		", projections.users3_humans.first_name" +
-		", projections.users3_humans.last_name" +
-		", projections.users3_humans.display_name" +
-		", projections.users3_machines.name" +
-		", projections.users3_humans.avatar_key" +
+		", projections.users4_humans.email" +
+		", projections.users4_humans.first_name" +
+		", projections.users4_humans.last_name" +
+		", projections.users4_humans.display_name" +
+		", projections.users4_machines.name" +
+		", projections.users4_humans.avatar_key" +
 		", COUNT(*) OVER () " +
 		"FROM projections.project_grant_members2 AS members " +
-		"LEFT JOIN projections.users3_humans " +
-		"ON members.user_id = projections.users3_humans.user_id " +
-		"LEFT JOIN projections.users3_machines " +
-		"ON members.user_id = projections.users3_machines.user_id " +
+		"LEFT JOIN projections.users4_humans " +
+		"ON members.user_id = projections.users4_humans.user_id " +
+		"LEFT JOIN projections.users4_machines " +
+		"ON members.user_id = projections.users4_machines.user_id " +
 		"LEFT JOIN projections.login_names " +
 		"ON members.user_id = projections.login_names.user_id " +
 		"LEFT JOIN projections.project_grants2 " +

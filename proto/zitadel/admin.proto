@@ -3916,6 +3916,16 @@ message UpdateLoginPolicyRequest {
             description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
         }
     ];
+    bool disable_login_with_email = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+        }
+    ];
+    bool disable_login_with_phone = 16 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+        }
+    ];
 }
 
 message UpdateLoginPolicyResponse {

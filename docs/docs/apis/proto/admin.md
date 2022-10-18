@@ -4364,6 +4364,8 @@ this is en empty request
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | allow_domain_discovery |  bool | If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success. |  |
+| disable_login_with_email |  bool | - |  |
+| disable_login_with_phone |  bool | - |  |
 
 
 

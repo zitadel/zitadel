@@ -13,7 +13,7 @@ It is important to understand that, depending on your use case, there will exist
 All self-service interfaces are available in different [languages](/docs/guides/manage/customize/texts#internationalization).
 
 :::info
-ZTIADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
+ZITADEL covers the typical "CIAM" self-service capabilities as well as delegated access management for multi-tenancy scenarios. Please refer to the section [Managers](#managers).
 :::
 
 ## Registration
@@ -31,7 +31,7 @@ Allows anonymous users and authenticated users, who are not yet in the given org
 - Mandatory profile fields
 - Set password
 - Accept terms of service and privacy policy
-- User receives an email with an one-time code for verfication purpose
+- User receives an email with an one-time code for verification purpose
 - User has to enter the one-time code to finish registration
 - User can re-request a new one-time code
 
@@ -40,7 +40,7 @@ This step can be made mandatory if MFA is enforced in the login policy.
 
 ### Existing Identity / SSO / Social Login
 
-anonymous users and authenticated users, who are not yet in the given organization, to register with an external identity provider.
+Anonymous users and authenticated users, who are not yet in the given organization, to register with an external identity provider.
 An external identity provider can be a Social Login Provider or a pre-configured identity provider.
 
 - Information from the external identity provider is used to pre-fill the profile information

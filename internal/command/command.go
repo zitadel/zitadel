@@ -1,11 +1,13 @@
 package command
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -131,4 +133,29 @@ func AppendAndReduce(object interface {
 }, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
 	return object.Reduce()
+}
+
+func queryAndReduce(ctx context.Context, filter preparation.FilterToQueryReducer, wm eventstore.QueryReducer) error {
+	events, err := filter(ctx, wm.Query())
+	if err != nil {
+		return err
+	}
+	if len(events) == 0 {
+		return nil
+	}
+	wm.AppendEvents(events...)
+	return wm.Reduce()
+}
+
+type existsWriteModel interface {
+	Exists() bool
+	eventstore.QueryReducer
+}
+
+func exists(ctx context.Context, filter preparation.FilterToQueryReducer, wm existsWriteModel) (bool, error) {
+	err := queryAndReduce(ctx, filter, wm)
+	if err != nil {
+		return false, err
+	}
+	return wm.Exists(), nil
 }

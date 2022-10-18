@@ -1172,6 +1172,8 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "如果选择该选项，即使未找到用户，登录过程中也会显示密码屏幕。如果用户名或密码错误，密码检查的错误不会透露。",
       "ALLOWDOMAINDISCOVERY": "允许域名发现",
       "ALLOWDOMAINDISCOVERY_DESC": "如果选择该选项，在登录屏幕上输入的未知用户名的后缀（@domain.com）将与组织的域名进行匹配，成功后将重定向到组织的注册。",
+      "DISABLELOGINWITHEMAIL": "禁止用电子邮件地址登录",
+      "DISABLELOGINWITHPHONE": "禁止用电话号码登录",
       "DEFAULTREDIRECTURI": "默认重定向 URI",
       "DEFAULTREDIRECTURI_DESC": "定义如果在没有应用程序上下文的情况下开始登录（例如来自邮件），用户将被重定向到哪里。",
       "ERRORMSGPOPUP": "在对话框中显示错误",

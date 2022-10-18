@@ -388,7 +388,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	return scan(row)
 }
 
-func (q *Queries) GeNotifyUser(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (*NotifyUser, error) {
+func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (*NotifyUser, error) {
 	if shouldTriggered {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
@@ -401,6 +401,28 @@ func (q *Queries) GeNotifyUser(ctx context.Context, shouldTriggered bool, userID
 	}
 	stmt, args, err := query.Where(sq.Eq{
 		UserIDCol.identifier():         userID,
+		UserInstanceIDCol.identifier(): instanceID,
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
+	}
+
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
+}
+
+func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queries ...SearchQuery) (*NotifyUser, error) {
+	if shouldTriggered {
+		projection.UserProjection.Trigger(ctx)
+		projection.LoginNameProjection.Trigger(ctx)
+	}
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	query, scan := prepareNotifyUserQuery(instanceID)
+	for _, q := range queries {
+		query = q.toQuery(query)
+	}
+	stmt, args, err := query.Where(sq.Eq{
 		UserInstanceIDCol.identifier(): instanceID,
 	}).ToSql()
 	if err != nil {
@@ -492,27 +514,39 @@ func NewUserResourceOwnerSearchQuery(value string, comparison TextComparison) (S
 }
 
 func NewUserUsernameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(Column(UserUsernameCol), value, comparison)
+	return NewTextQuery(UserUsernameCol, value, comparison)
 }
 
 func NewUserFirstNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(Column(HumanFirstNameCol), value, comparison)
+	return NewTextQuery(HumanFirstNameCol, value, comparison)
 }
 
 func NewUserLastNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(Column(HumanLastNameCol), value, comparison)
+	return NewTextQuery(HumanLastNameCol, value, comparison)
 }
 
 func NewUserNickNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(Column(HumanNickNameCol), value, comparison)
+	return NewTextQuery(HumanNickNameCol, value, comparison)
 }
 
 func NewUserDisplayNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(Column(HumanDisplayNameCol), value, comparison)
+	return NewTextQuery(HumanDisplayNameCol, value, comparison)
 }
 
 func NewUserEmailSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(Column(HumanEmailCol), value, comparison)
+	return NewTextQuery(HumanEmailCol, value, comparison)
+}
+
+func NewUserPhoneSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	return NewTextQuery(HumanPhoneCol, value, comparison)
+}
+
+func NewUserVerifiedEmailSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	return NewTextQuery(NotifyVerifiedEmailCol, value, comparison)
+}
+
+func NewUserVerifiedPhoneSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	return NewTextQuery(NotifyVerifiedPhoneCol, value, comparison)
 }
 
 func NewUserStateSearchQuery(value int32) (SearchQuery, error) {
@@ -580,6 +614,7 @@ func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*Use
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
+			countColumn.identifier(),
 		).
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
@@ -589,6 +624,7 @@ func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*Use
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*User, error) {
 			u := new(User)
+			var count int
 			preferredLoginName := sql.NullString{}
 
 			humanID := sql.NullString{}
@@ -634,10 +670,11 @@ func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*Use
 				&machineID,
 				&name,
 				&description,
+				&count,
 			)
 
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
+			if err != nil || count != 1 {
+				if errs.Is(err, sql.ErrNoRows) || count != 1 {
 					return nil, errors.ThrowNotFound(err, "QUERY-Dfbg2", "Errors.User.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Bgah2", "Errors.Internal")
@@ -877,6 +914,7 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 			NotifyPhoneCol.identifier(),
 			NotifyVerifiedPhoneCol.identifier(),
 			NotifyPasswordSetCol.identifier(),
+			countColumn.identifier(),
 		).
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
@@ -886,6 +924,7 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*NotifyUser, error) {
 			u := new(NotifyUser)
+			var count int
 			loginNames := database.StringArray{}
 			preferredLoginName := sql.NullString{}
 
@@ -930,10 +969,11 @@ func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row)
 				&notifyPhone,
 				&notifyVerifiedPhone,
 				&notifyPasswordSet,
+				&count,
 			)
 
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
+			if err != nil || count != 1 {
+				if errs.Is(err, sql.ErrNoRows) || count != 1 {
 					return nil, errors.ThrowNotFound(err, "QUERY-Dgqd2", "Errors.User.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Dbwsg", "Errors.Internal")
