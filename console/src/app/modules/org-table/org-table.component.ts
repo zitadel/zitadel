@@ -57,7 +57,6 @@ export class OrgTableComponent {
     private router: Router,
     private toast: ToastService,
     private _liveAnnouncer: LiveAnnouncer,
-    private themeService: ThemeService,
   ) {
     this.requestOrgs$.next({ limit: this.initialLimit, offset: 0, queries: this.searchQueries });
     this.authService.getActiveOrg().then((org) => (this.activeOrg = org));
@@ -137,7 +136,6 @@ export class OrgTableComponent {
 
   public setAndNavigateToOrg(org: Org.AsObject): void {
     this.authService.setActiveOrg(org);
-    this.themeService.loadPrivateLabelling();
     this.router.navigate(['/org']);
   }
 

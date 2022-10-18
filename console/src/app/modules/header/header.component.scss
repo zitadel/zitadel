@@ -181,6 +181,16 @@
         }
       }
 
+      .logo-placeholder {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        background-color: if($is-dark-theme, #00000020, #00000010);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
       .title {
         text-decoration: none;
         color: white;
