@@ -482,7 +482,7 @@
     "EMAILVERIFIED": "Email verifiziert",
     "NOTVERIFIED": "nicht verifiziert",
     "PREFERRED_LOGINNAME": "Bevorzugter Loginname",
-    "ISINITIAL": "Dieser Benutzer wurde noch nicht verifiziert. Klicke hier, um eine neue Initialisierungsmail zu senden.",
+    "ISINITIAL": "Dieser Benutzer wurde noch nicht verifiziert.",
     "LOGINMETHODS": {
       "TITLE": "Kontaktinformationen",
       "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",

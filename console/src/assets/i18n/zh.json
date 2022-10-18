@@ -482,7 +482,7 @@
     "EMAILVERIFIED": "电子邮件已验证",
     "NOTVERIFIED": "未验证",
     "PREFERRED_LOGINNAME": "首选登录名",
-    "ISINITIAL": "该用户尚未通过验证。单击按钮触发新的初始化邮件。",
+    "ISINITIAL": "此用户电子邮件尚未验证。",
     "LOGINMETHODS": {
       "TITLE": "联系信息",
       "DESCRIPTION": "提供的信息用于向您发送重要信息，例如密码重置电子邮件。",

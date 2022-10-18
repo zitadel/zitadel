@@ -482,7 +482,7 @@
     "EMAILVERIFIED": "Email verified",
     "NOTVERIFIED": "not verified",
     "PREFERRED_LOGINNAME": "Preferred Loginname",
-    "ISINITIAL": "This users email is not verified yet. Select the button to send a new initialization mail.",
+    "ISINITIAL": "This users email is not verified yet.",
     "LOGINMETHODS": {
       "TITLE": "Contact Information",
       "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
