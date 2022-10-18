@@ -85,7 +85,8 @@ Errors:
       NotChanged: Indirizzo non cambiato
     Machine:
       Key:
-        NotFound: Machine Key non trovato
+        NotFound: Chiave macchina non trovato
+        AlreadyExisting: Chiave macchina già esistente
     PAT:
       NotFound: Personal Access Token non trovato
     NotHuman: L'utente deve essere personale

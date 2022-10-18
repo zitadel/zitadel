@@ -86,6 +86,7 @@ Errors:
     Machine:
       Key:
         NotFound: 未找到机器密钥
+        AlreadyExisting: 已有的机器钥匙
     PAT:
       NotFound: 未找到个人访问令牌
     NotHuman: 用户必须是个人

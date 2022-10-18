@@ -599,22 +599,17 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				return nil, nil, nil, nil, err
 			}
 
-			keys, err := s.query.SearchAuthNKeys(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}})
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}})
 			if err != nil {
 				return nil, nil, nil, nil, err
 			}
-			for _, key := range keys.AuthNKeys {
-				data, err := s.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, key.ID, user.ID)
-				if err != nil {
-					return nil, nil, nil, nil, err
-				}
-
+			for _, key := range keys.AuthNKeysData {
 				machineKeys = append(machineKeys, &v1_pb.DataMachineKey{
 					KeyId:          key.ID,
 					UserId:         user.ID,
 					Type:           authn_grpc.KeyTypeToPb(key.Type),
 					ExpirationDate: timestamppb.New(key.Expiration),
-					PublicKey:      data,
+					PublicKey:      key.PublicKey,
 				})
 
 			}
@@ -809,23 +804,19 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 			if err != nil {
 				return nil, nil, nil, nil, nil, err
 			}
-			keys, err := s.query.SearchAuthNKeys(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}})
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}})
 			if err != nil {
 				return nil, nil, nil, nil, nil, err
 			}
-			for _, key := range keys.AuthNKeys {
-				data, identifier, err := s.query.GetAuthNKeyPublicKeyAndIdentifierByID(ctx, key.ID)
-				if err != nil {
-					return nil, nil, nil, nil, nil, err
-				}
+			for _, key := range keys.AuthNKeysData {
 				appKeys = append(appKeys, &v1_pb.DataAppKey{
 					Id:             key.ID,
 					ProjectId:      app.ProjectID,
 					AppId:          app.ID,
 					Type:           authn_grpc.KeyTypeToPb(key.Type),
 					ExpirationDate: timestamppb.New(key.Expiration),
-					ClientId:       identifier,
-					PublicKey:      data,
+					ClientId:       key.Identifier,
+					PublicKey:      key.PublicKey,
 				})
 			}
 		}
