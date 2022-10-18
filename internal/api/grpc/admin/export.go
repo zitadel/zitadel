@@ -760,22 +760,17 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				return nil, nil, nil, nil, err
 			}
 
-			keys, err := s.query.SearchAuthNKeys(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}})
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}})
 			if err != nil {
 				return nil, nil, nil, nil, err
 			}
-			for _, key := range keys.AuthNKeys {
-				data, err := s.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, key.ID, user.ID)
-				if err != nil {
-					return nil, nil, nil, nil, err
-				}
-
+			for _, key := range keys.AuthNKeysData {
 				machineKeys = append(machineKeys, &admin_pb.DataMachineKey{
 					KeyId:          key.ID,
 					UserId:         user.ID,
 					Type:           authn_grpc.KeyTypeToPb(key.Type),
 					ExpirationDate: timestamppb.New(key.Expiration),
-					PublicKey:      data,
+					PublicKey:      key.PublicKey,
 				})
 			}
 
@@ -844,10 +839,13 @@ func (s *Server) getActions(ctx context.Context, org string) (_ []*admin_pb.Data
 		return nil, err
 	}
 	queriedActions, err := s.query.SearchActions(ctx, &query.ActionSearchQueries{Queries: []query.SearchQuery{actionSearch}})
-	if err != nil {
+	if err != nil && !caos_errors.IsNotFound(err) {
 		return nil, err
 	}
 	actions := make([]*admin_pb.DataAction, len(queriedActions.Actions))
+	if err != nil && caos_errors.IsNotFound(err) {
+		return actions, nil
+	}
 	for i, action := range queriedActions.Actions {
 		timeout := durationpb.New(action.Timeout)
 
@@ -978,24 +976,19 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) (_ []*admin
 				return nil, nil, nil, nil, nil, err
 			}
 
-			keys, err := s.query.SearchAuthNKeys(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}})
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}})
 			if err != nil {
 				return nil, nil, nil, nil, nil, err
 			}
-			for _, key := range keys.AuthNKeys {
-				data, clientID, err := s.query.GetAuthNKeyPublicKeyAndIdentifierByID(ctx, key.ID)
-				if err != nil {
-					return nil, nil, nil, nil, nil, err
-				}
-
+			for _, key := range keys.AuthNKeysData {
 				appKeys = append(appKeys, &admin_pb.DataAppKey{
 					Id:             key.ID,
 					ProjectId:      app.ProjectID,
 					AppId:          app.ID,
 					Type:           authn_grpc.KeyTypeToPb(key.Type),
 					ExpirationDate: timestamppb.New(key.Expiration),
-					ClientId:       clientID,
-					PublicKey:      data,
+					ClientId:       key.Identifier,
+					PublicKey:      key.PublicKey,
 				})
 			}
 
