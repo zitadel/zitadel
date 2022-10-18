@@ -19,6 +19,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
+	"github.com/zitadel/zitadel/internal/api/grpc/authn"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -63,6 +64,8 @@ type count struct {
 	orgMemberLen            int
 	projectGrantMemberCount int
 	projectGrantMemberLen   int
+	appKeysCount            int
+	machineKeysCount        int
 }
 
 func (c *count) getProgress() string {
@@ -336,6 +339,8 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		count.projectMembersLen += len(org.GetProjectMembers())
 		count.orgMemberLen += len(org.GetOrgMembers())
 		count.projectGrantMemberLen += len(org.GetProjectGrantMembers())
+		count.machineKeysCount += len(org.GetMachineKeys())
+		count.appKeysCount += len(org.GetAppKeys())
 	}
 
 	for _, org := range orgs {
@@ -583,6 +588,31 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				successOrg.UserMetadata = append(successOrg.UserMetadata, &admin_pb.ImportDataSuccessUserMetadata{UserId: userMetadata.GetId(), Key: userMetadata.GetKey()})
 			}
 		}
+		if org.MachineKeys != nil {
+			for _, key := range org.GetMachineKeys() {
+				logging.Debugf("import machine_user_key: %s", key.KeyId)
+				_, err := s.command.AddUserMachineKeyWithID(ctx, &domain.MachineKey{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   key.UserId,
+						ResourceOwner: org.GetOrgId(),
+					},
+					KeyID:          key.KeyId,
+					Type:           authn.KeyTypeToDomain(key.Type),
+					ExpirationDate: key.ExpirationDate.AsTime(),
+					PublicKey:      key.PublicKey,
+				}, org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user_key", Id: key.KeyId, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
+					continue
+				}
+				count.machineKeysCount += 1
+				logging.Debugf("successful machine_user_key %d: %s", count.machineKeysCount, key.KeyId)
+				successOrg.MachineKeys = append(successOrg.MachineKeys, key.KeyId)
+			}
+		}
 		if org.UserLinks != nil {
 			for _, userLinks := range org.GetUserLinks() {
 				logging.Debugf("import userlink: %s", userLinks.GetUserId()+"_"+userLinks.GetIdpId()+"_"+userLinks.GetProvidedUserId()+"_"+userLinks.GetProvidedUserName())
@@ -650,6 +680,33 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				count.apiAppCount += 1
 				logging.Debugf("successful apiapplication %d: %s", count.apiAppCount, app.GetAppId())
 				successOrg.ApiAppIds = append(successOrg.ApiAppIds, app.GetAppId())
+			}
+		}
+		if org.AppKeys != nil {
+			for _, key := range org.GetAppKeys() {
+				logging.Debugf("import app_key: %s", key.Id)
+				_, err := s.command.AddApplicationKeyWithID(ctx, &domain.ApplicationKey{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   key.ProjectId,
+						ResourceOwner: org.GetOrgId(),
+					},
+					ApplicationID:  key.AppId,
+					ClientID:       key.ClientId,
+					KeyID:          key.Id,
+					Type:           authn.KeyTypeToDomain(key.Type),
+					ExpirationDate: key.ExpirationDate.AsTime(),
+					PublicKey:      key.PublicKey,
+				}, org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "app_key", Id: key.Id, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
+					continue
+				}
+				count.appKeysCount += 1
+				logging.Debugf("successful app_key %d: %s", count.appKeysCount, key.Id)
+				successOrg.AppKeys = append(successOrg.AppKeys, key.Id)
 			}
 		}
 		if org.Actions != nil {
@@ -848,6 +905,8 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			JwtIdps:                          orgV1.GetJwtIdps(),
 			UserLinks:                        orgV1.GetUserLinks(),
 			Domains:                          orgV1.GetDomains(),
+			AppKeys:                          orgV1.GetAppKeys(),
+			MachineKeys:                      orgV1.GetMachineKeys(),
 		}
 		if orgV1.IamPolicy != nil {
 			defaultDomainPolicy, err := s.query.DefaultDomainPolicy(ctx)

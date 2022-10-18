@@ -4763,6 +4763,9 @@ message DataOrg {
 
     repeated zitadel.idp.v1.IDPUserLink user_links = 33;
     repeated zitadel.org.v1.Domain domains = 34;
+
+    repeated zitadel.v1.v1.DataAppKey app_keys = 35;
+    repeated zitadel.v1.v1.DataMachineKey machine_keys = 36;
 }
 
 message ImportDataResponse{
@@ -4801,6 +4804,8 @@ message ImportDataSuccessOrg{
     repeated ImportDataSuccessUserLinks user_links = 18;
     repeated ImportDataSuccessUserMetadata user_metadata = 19;
     repeated string domains = 20;
+    repeated string app_keys = 21;
+    repeated string machine_keys = 22;
 }
 
 message ImportDataSuccessProjectGrant{
