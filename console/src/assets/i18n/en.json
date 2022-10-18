@@ -1180,6 +1180,8 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
       "ALLOWDOMAINDISCOVERY": "Domain discovery allowed",
       "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the organization domains and will redirect to the registration of that organisation on success.",
+      "DISABLELOGINWITHEMAIL": "Disable login with email address",
+      "DISABLELOGINWITHPHONE": "Disable login with phone number",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",

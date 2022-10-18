@@ -641,15 +641,9 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 				preferredLoginName += "@" + request.RequestedPrimaryDomain
 			}
 		}
-		user, err = repo.View.UserByLoginNameAndResourceOwner(preferredLoginName, request.RequestedOrgID, request.InstanceID)
+		user, err = repo.checkLoginNameInputForResourceOwner(request, preferredLoginName)
 	} else {
-		user, err = repo.View.UserByLoginName(loginName, request.InstanceID)
-		if err == nil {
-			err = repo.checkLoginPolicyWithResourceOwner(ctx, request, user)
-			if err != nil {
-				return err
-			}
-		}
+		user, err = repo.checkLoginNameInput(ctx, request, preferredLoginName)
 	}
 	// return any error apart from not found ones directly
 	if err != nil && !errors.IsNotFound(err) {
@@ -720,8 +714,74 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 	return true
 }
 
-func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, user *user_view_model.UserView) error {
-	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, user.ResourceOwner)
+func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
+	// always check the loginname first
+	user, err := repo.View.UserByLoginName(loginNameInput, request.InstanceID)
+	if err == nil {
+		// and take the user regardless if there would be a user with that email or phone
+		return user, repo.checkLoginPolicyWithResourceOwner(ctx, request, user.ResourceOwner)
+	}
+	user, emailErr := repo.View.UserByEmail(loginNameInput, request.InstanceID)
+	if emailErr == nil {
+		// if there was a single user with the specified email
+		// load and check the login policy
+		if emailErr = repo.checkLoginPolicyWithResourceOwner(ctx, request, user.ResourceOwner); emailErr != nil {
+			return nil, emailErr
+		}
+		// and in particular if the login with email is possible
+		// if so take the user (and ignore possible phone matches)
+		if !request.LoginPolicy.DisableLoginWithEmail {
+			return user, nil
+		}
+	}
+	user, phoneErr := repo.View.UserByPhone(loginNameInput, request.InstanceID)
+	if phoneErr == nil {
+		// if there was a single user with the specified phone
+		// load and check the login policy
+		if phoneErr = repo.checkLoginPolicyWithResourceOwner(ctx, request, user.ResourceOwner); phoneErr != nil {
+			return nil, phoneErr
+		}
+		// and in particular if the login with phone is possible
+		// if so take the user
+		if !request.LoginPolicy.DisableLoginWithPhone {
+			return user, nil
+		}
+	}
+	// if we get here the user was not found by loginname
+	// and either there was no match for email or phone as well, or they have been both disabled
+	return nil, err
+}
+
+func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
+	// always check the loginname first
+	user, err := repo.View.UserByLoginNameAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
+	if err == nil {
+		// and take the user regardless if there would be a user with that email or phone
+		return user, nil
+	}
+	if request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithEmail {
+		// if login by email is allowed and there was a single user with the specified email
+		// take that user (and ignore possible phone number matches)
+		user, emailErr := repo.View.UserByEmailAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
+		if emailErr == nil {
+			return user, nil
+		}
+	}
+	if request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithPhone {
+		// if login by phone is allowed and there was a single user with the specified phone
+		// take that user
+		user, phoneErr := repo.View.UserByPhoneAndResourceOwner(loginNameInput, request.RequestedOrgID, request.InstanceID)
+		if phoneErr == nil {
+			return user, nil
+		}
+	}
+	// if we get here the user was not found by loginname
+	// and either there was no match for email or phone as well or they have been both disabled
+	return nil, err
+}
+
+func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) error {
+	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -758,11 +818,15 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		PasswordlessType:           policy.PasswordlessType,
 		HidePasswordReset:          policy.HidePasswordReset,
 		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,
+		AllowDomainDiscovery:       policy.AllowDomainDiscovery,
+		DefaultRedirectURI:         policy.DefaultRedirectURI,
 		PasswordCheckLifetime:      policy.PasswordCheckLifetime,
 		ExternalLoginCheckLifetime: policy.ExternalLoginCheckLifetime,
 		MFAInitSkipLifetime:        policy.MFAInitSkipLifetime,
 		SecondFactorCheckLifetime:  policy.SecondFactorCheckLifetime,
 		MultiFactorCheckLifetime:   policy.MultiFactorCheckLifetime,
+		DisableLoginWithEmail:      policy.DisableLoginWithEmail,
+		DisableLoginWithPhone:      policy.DisableLoginWithPhone,
 	}
 }
 

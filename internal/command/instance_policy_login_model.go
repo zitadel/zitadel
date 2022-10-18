@@ -67,7 +67,9 @@ func (wm *InstanceLoginPolicyWriteModel) NewChangedEvent(
 	forceMFA,
 	hidePasswordReset,
 	ignoreUnknownUsernames,
-	allowDomainDiscovery bool,
+	allowDomainDiscovery,
+	disableLoginWithEmail,
+	disableLoginWithPhone bool,
 	passwordlessType domain.PasswordlessType,
 	defaultRedirectURI string,
 	passwordCheckLifetime,
@@ -119,6 +121,12 @@ func (wm *InstanceLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.MultiFactorCheckLifetime != multiFactorCheckLifetime {
 		changes = append(changes, policy.ChangeMultiFactorCheckLifetime(multiFactorCheckLifetime))
+	}
+	if wm.DisableLoginWithEmail != disableLoginWithEmail {
+		changes = append(changes, policy.ChangeDisableLoginWithEmail(disableLoginWithEmail))
+	}
+	if wm.DisableLoginWithPhone != disableLoginWithPhone {
+		changes = append(changes, policy.ChangeDisableLoginWithPhone(disableLoginWithPhone))
 	}
 	if len(changes) == 0 {
 		return nil, false

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, lastValueFrom, Observable } from 'rxjs';
+import { GrpcAuthService } from './grpc-auth.service';
 
 import { StatehandlerService } from './statehandler/statehandler.service';
 
