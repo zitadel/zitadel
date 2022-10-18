@@ -833,7 +833,7 @@
       "DESCRIPTION": "Definiere hier die Benutzer, die Operationen auf Deinen Organisationen vornehmen dürfen."
     },
     "TOAST": {
-      "UPDATED": "Organisation geupdated",
+      "UPDATED": "Organisation geändert",
       "DEACTIVATED": "Organisation deaktiviert.",
       "REACTIVATED": "Organisation reaktiviert.",
       "DOMAINADDED": "Domain hinzugefügt.",
