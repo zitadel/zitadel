@@ -89,7 +89,9 @@ export function login(
 
         onAuthenticated ? onAuthenticated() : null;
 
-        cy.get('[data-e2e=authenticated-welcome]');
+        cy.get('[data-e2e=authenticated-welcome]', {
+          timeout: 10_000,
+        });
       },
       {
         validate: () => {
