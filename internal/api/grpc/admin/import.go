@@ -310,6 +310,10 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 	if err != nil {
 		return nil, nil, err
 	}
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, s.userCodeAlg)
+	if err != nil {
+		return nil, nil, err
+	}
 	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
 	if err != nil {
 		return nil, nil, err
@@ -527,7 +531,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				logging.Debugf("import user: %s", user.GetUserId())
 				human, passwordless := management.ImportHumanUserRequestToDomain(user.User)
 				human.AggregateID = user.UserId
-				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 					if isCtxTimeout(ctx) {
