@@ -19,7 +19,7 @@ describe('organizations', () => {
         });
     });
 
-    it.only('should rename the organization', () => {
+    it('should rename the organization', () => {
       cy.get('[data-e2e="actions"]').click();
       cy.get('[data-e2e="rename"]', { timeout: 1000 }).should('be.visible').click();
 
