@@ -1352,6 +1352,32 @@ func Test_columnsToQuery(t *testing.T) {
 				values: []interface{}{1, 3.14},
 			},
 		},
+		{
+			name: "with copy column",
+			args: args{
+				cols: []handler.Column{
+					{
+						Name:  "col1",
+						Value: 1,
+					},
+					{
+						Name: "col2",
+						Value: handler.Column{
+							Name: "col1",
+						},
+					},
+					{
+						Name:  "col3",
+						Value: "something",
+					},
+				},
+			},
+			want: want{
+				names:  []string{"col1", "col2", "col3"},
+				params: []string{"$1", "col1", "$2"},
+				values: []interface{}{1, "something"},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

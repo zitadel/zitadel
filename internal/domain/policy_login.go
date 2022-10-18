@@ -28,6 +28,8 @@ type LoginPolicy struct {
 	MFAInitSkipLifetime        time.Duration
 	SecondFactorCheckLifetime  time.Duration
 	MultiFactorCheckLifetime   time.Duration
+	DisableLoginWithEmail      bool
+	DisableLoginWithPhone      bool
 }
 
 func ValidateDefaultRedirectURI(rawURL string) bool {
