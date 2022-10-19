@@ -47,9 +47,8 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public settingsList: SidenavSetting[] = [
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' },
+    { id: 'security', i18nKey: 'USER.SETTINGS.SECURITY' },
     { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
-    { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS' },
-    { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA' },
     { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' },
     { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' },
     {
