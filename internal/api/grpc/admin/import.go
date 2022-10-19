@@ -871,6 +871,15 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 
 	orgs := make([]*admin_pb.DataOrg, 0)
 	for _, orgV1 := range dataOrgs.Orgs {
+		triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
+		for _, action := range orgV1.GetTriggerActions() {
+			triggerActions = append(triggerActions, &management_pb.SetTriggerActionsRequest{
+				FlowType:    strconv.Itoa(int(action.GetFlowType().Number())),
+				TriggerType: strconv.Itoa(int(action.GetTriggerType().Number())),
+				ActionIds:   action.ActionIds,
+			})
+		}
+
 		org := &admin_pb.DataOrg{
 			OrgId:                            orgV1.GetOrgId(),
 			Org:                              orgV1.GetOrg(),
@@ -886,7 +895,7 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			OidcApps:                         orgV1.GetOidcApps(),
 			HumanUsers:                       orgV1.GetHumanUsers(),
 			MachineUsers:                     orgV1.GetMachineUsers(),
-			TriggerActions:                   orgV1.GetTriggerActions(),
+			TriggerActions:                   triggerActions,
 			Actions:                          orgV1.GetActions(),
 			ProjectGrants:                    orgV1.GetProjectGrants(),
 			UserGrants:                       orgV1.GetUserGrants(),
