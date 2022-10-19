@@ -1,4 +1,4 @@
-import { ensureOrgExists, renameOrg } from 'support/api/orgs';
+import { ensureOrgExists } from 'support/api/orgs';
 import { apiAuth } from '../../support/api/apiauth';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -21,7 +21,7 @@ describe('organizations', () => {
         });
     });
 
-    it.only('should rename the organization', () => {
+    it('should rename the organization', () => {
       cy.get('[data-e2e="actions"]').click();
       cy.get('[data-e2e="rename"]', { timeout: 1000 }).should('be.visible').click();
 
@@ -29,6 +29,8 @@ describe('organizations', () => {
       cy.get('[data-e2e="dialog-submit"]').click();
       cy.get('.data-e2e-success');
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
+      cy.visit(orgPath);
+      cy.get('[data-e2e="top-view-title"').should('contain', testOrgNameChange);
     });
   });
 
