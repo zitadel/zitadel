@@ -240,14 +240,25 @@ func (p *projectGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-HDgW3", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewMultiStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(ProjectGrantColumnOwnerRemoved, true),
-		},
-		[]handler.Condition{
-			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(ProjectGrantColumnResourceOwner, e.Aggregate().ID),
-		},
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(ProjectGrantColumnOwnerRemoved, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(ProjectGrantColumnResourceOwner, e.Aggregate().ID),
+			},
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(ProjectGrantColumnGrantedOrgRemoved, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(ProjectGrantColumnGrantedOrgID, e.Aggregate().ID),
+			},
+		),
 	), nil
 }

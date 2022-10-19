@@ -11,7 +11,6 @@ import (
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -102,67 +101,12 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 }
 
 func (s *Server) RemoveOrg(ctx context.Context, req *mgmt_pb.RemoveOrgRequest) (*mgmt_pb.RemoveOrgResponse, error) {
-	deps, err := s.removeOrgDependencies(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-
-	details, err := s.command.RemoveOrg(ctx, authz.GetCtxData(ctx).OrgID, deps)
+	details, err := s.command.RemoveOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &mgmt_pb.RemoveOrgResponse{Details: object.DomainToChangeDetailsPb(details)}, nil
-}
-
-func (s *Server) removeOrgDependencies(ctx context.Context, orgID string) (*command.OrgDependencies, error) {
-	deps := &command.OrgDependencies{}
-
-	userOrgQuery, err := query.NewUserResourceOwnerSearchQuery(orgID, query.TextEquals)
-	if err != nil {
-		return nil, err
-	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{userOrgQuery}}, false)
-	if err != nil {
-		return nil, err
-	}
-	deps.Users = usersToIDs(users.Users)
-
-	projectOrgQuery, err := query.NewProjectResourceOwnerSearchQuery(orgID)
-	if err != nil {
-		return nil, err
-	}
-	projects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectOrgQuery}}, false)
-	if err != nil {
-		return nil, err
-	}
-	deps.Projects = projectsToIDs(projects.Projects)
-
-	return deps, nil
-}
-
-func usersToIDs(users []*query.User) []string {
-	converted := make([]string, len(users))
-	for i, user := range users {
-		converted[i] = user.ID
-	}
-	return converted
-}
-
-func projectsToIDs(projects []*query.Project) []string {
-	converted := make([]string, len(projects))
-	for i, project := range projects {
-		converted[i] = project.ID
-	}
-	return converted
-}
-
-func projectGrantsToIDs(grants []*query.ProjectGrant) []string {
-	converted := make([]string, len(grants))
-	for i, grant := range grants {
-		converted[i] = grant.GrantID
-	}
-	return converted
 }
 
 func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPolicyRequest) (*mgmt_pb.GetDomainPolicyResponse, error) {

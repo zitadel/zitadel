@@ -14,8 +14,10 @@ import (
 )
 
 const (
-	ProjectMemberProjectionTable = "projections.project_members2"
-	ProjectMemberProjectIDCol    = "project_id"
+	ProjectMemberProjectionTable      = "projections.project_members2"
+	ProjectMemberProjectIDCol         = "project_id"
+	ProjectMemberProjectResourceOwner = "project_resource_owner"
+	ProjectMemberOwnerRemovedProject  = "owner_removed_project"
 )
 
 type projectMemberProjection struct {
@@ -30,6 +32,8 @@ func newProjectMemberProjection(ctx context.Context, config crdb.StatementHandle
 		crdb.NewTable(
 			append(memberColumns,
 				crdb.NewColumn(ProjectMemberProjectIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectMemberProjectResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectMemberOwnerRemovedProject, crdb.ColumnTypeBool, crdb.Default(false)),
 			),
 			crdb.NewPrimaryKey(MemberInstanceID, ProjectMemberProjectIDCol, MemberUserIDCol),
 			crdb.WithIndex(crdb.NewIndex("proj_memb_user_idx", []string{MemberUserIDCol})),
@@ -93,9 +97,21 @@ func (p *projectMemberProjection) reduceAdded(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-bgx5Q", "reduce.wrong.event.type %s", project.MemberAddedType)
 	}
+	ctx := setMemberContext(e.Aggregate())
+	userOwner, err := getResourceOwnerOfUser(ctx, p.Eventstore, e.Aggregate().InstanceID, e.UserID)
+	if err != nil {
+		return nil, err
+	}
+	projectOwner, err := getResourceOwnerOfProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.Aggregate().ID)
+	if err != nil {
+		return nil, err
+	}
 	return reduceMemberAdded(
 		*member.NewMemberAddedEvent(&e.BaseEvent, e.UserID, e.Roles...),
+		userOwner,
 		withMemberCol(ProjectMemberProjectIDCol, e.Aggregate().ID),
+		withMemberCol(ProjectMemberProjectResourceOwner, projectOwner),
+		withMemberCol(ProjectMemberOwnerRemovedProject, false),
 	)
 }
 
@@ -141,15 +157,25 @@ func (p *projectMemberProjection) reduceUserRemoved(event eventstore.Event) (*ha
 }
 
 func (p *projectMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
-	//TODO: as soon as org deletion is implemented:
-	// Case: The user has resource owner A and project has resource owner B
-	// if org B deleted it works
-	// if org A is deleted, the membership wouldn't be deleted
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-NGUEL", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return reduceMemberRemoved(e, withMemberCond(MemberResourceOwner, e.Aggregate().ID))
+	return crdb.NewMultiStatement(
+		e,
+		multiReduceMemberOwnerRemoved(e),
+		multiReduceMemberUserOwnerRemoved(e),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MemberChangeDate, e.CreationDate()),
+				handler.NewCol(MemberSequence, e.Sequence()),
+				handler.NewCol(ProjectMemberOwnerRemovedProject, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(ProjectMemberProjectResourceOwner, e.Aggregate().ID),
+			},
+		),
+	), nil
 }
 
 func (p *projectMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {

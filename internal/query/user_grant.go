@@ -201,6 +201,10 @@ var (
 		name:  projection.UserGrantProjectOwnerRemoved,
 		table: userGrantTable,
 	}
+	UserGrantGrantGrantedOrgRemoved = Column{
+		name:  projection.UserGrantGrantGrantedOrgRemoved,
+		table: userGrantTable,
+	}
 )
 
 func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (*UserGrant, error) {
@@ -217,6 +221,7 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 		eq[UserGrantOwnerRemoved.identifier()] = false
 		eq[UserGrantUserOwnerRemoved.identifier()] = false
 		eq[UserGrantProjectOwnerRemoved.identifier()] = false
+		eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -234,6 +239,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, wi
 		eq[UserGrantOwnerRemoved.identifier()] = false
 		eq[UserGrantUserOwnerRemoved.identifier()] = false
 		eq[UserGrantProjectOwnerRemoved.identifier()] = false
+		eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {

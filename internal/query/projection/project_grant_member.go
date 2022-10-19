@@ -14,9 +14,13 @@ import (
 )
 
 const (
-	ProjectGrantMemberProjectionTable = "projections.project_grant_members2"
-	ProjectGrantMemberProjectIDCol    = "project_id"
-	ProjectGrantMemberGrantIDCol      = "grant_id"
+	ProjectGrantMemberProjectionTable        = "projections.project_grant_members2"
+	ProjectGrantMemberProjectIDCol           = "project_id"
+	ProjectGrantMemberProjectResourceOwner   = "project_resource_owner"
+	ProjectGrantMemberOwnerRemovedProject    = "owner_removed_project"
+	ProjectGrantMemberGrantIDCol             = "grant_id"
+	ProjectGrantMemberGrantGrantedOrg        = "grant_granted_org"
+	ProjectGrantMemberGrantGrantedOrgRemoved = "granted_org_removed_grant"
 )
 
 type projectGrantMemberProjection struct {
@@ -31,7 +35,11 @@ func newProjectGrantMemberProjection(ctx context.Context, config crdb.StatementH
 		crdb.NewTable(
 			append(memberColumns,
 				crdb.NewColumn(ProjectGrantMemberProjectIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberProjectResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberOwnerRemovedProject, crdb.ColumnTypeBool, crdb.Default(false)),
 				crdb.NewColumn(ProjectGrantMemberGrantIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberGrantGrantedOrg, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberGrantGrantedOrgRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 			),
 			crdb.NewPrimaryKey(MemberInstanceID, ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
 			crdb.WithIndex(crdb.NewIndex("proj_grant_memb_user_idx", []string{MemberUserIDCol})),
@@ -99,10 +107,28 @@ func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0EBQf", "reduce.wrong.event.type %s", project.GrantMemberAddedType)
 	}
+	ctx := setMemberContext(e.Aggregate())
+	userOwner, err := getResourceOwnerOfUser(ctx, p.Eventstore, e.Aggregate().InstanceID, e.UserID)
+	if err != nil {
+		return nil, err
+	}
+	projectOwner, err := getResourceOwnerOfProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.Aggregate().ID)
+	if err != nil {
+		return nil, err
+	}
+	grantedOrg, err := getGrantedOrgOfGrantedProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.Aggregate().ID, e.GrantID)
+	if err != nil {
+		return nil, err
+	}
 	return reduceMemberAdded(
 		*member.NewMemberAddedEvent(&e.BaseEvent, e.UserID, e.Roles...),
+		userOwner,
 		withMemberCol(ProjectGrantMemberProjectIDCol, e.Aggregate().ID),
+		withMemberCol(ProjectGrantMemberProjectResourceOwner, projectOwner),
+		withMemberCol(ProjectGrantMemberOwnerRemovedProject, false),
 		withMemberCol(ProjectGrantMemberGrantIDCol, e.GrantID),
+		withMemberCol(ProjectGrantMemberGrantGrantedOrg, grantedOrg),
+		withMemberCol(ProjectGrantMemberGrantGrantedOrgRemoved, false),
 	)
 }
 
@@ -151,15 +177,35 @@ func (p *projectGrantMemberProjection) reduceUserRemoved(event eventstore.Event)
 }
 
 func (p *projectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
-	//TODO: as soon as org deletion is implemented:
-	// Case: The user has resource owner A and project has resource owner B
-	// if org B deleted it works
-	// if org A is deleted, the membership wouldn't be deleted
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Zzp6o", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
-	return reduceMemberRemoved(e, withMemberCond(MemberResourceOwner, e.Aggregate().ID))
+	return crdb.NewMultiStatement(
+		e,
+		multiReduceMemberOwnerRemoved(e),
+		multiReduceMemberUserOwnerRemoved(e),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MemberChangeDate, e.CreationDate()),
+				handler.NewCol(MemberSequence, e.Sequence()),
+				handler.NewCol(ProjectGrantMemberOwnerRemovedProject, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(ProjectGrantMemberProjectResourceOwner, e.Aggregate().ID),
+			},
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MemberChangeDate, e.CreationDate()),
+				handler.NewCol(MemberSequence, e.Sequence()),
+				handler.NewCol(ProjectGrantMemberGrantGrantedOrgRemoved, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(ProjectGrantMemberGrantGrantedOrg, e.Aggregate().ID),
+			},
+		),
+	), nil
 }
 
 func (p *projectGrantMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {

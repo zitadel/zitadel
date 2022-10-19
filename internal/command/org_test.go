@@ -17,7 +17,6 @@ import (
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/member"
 	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -1017,7 +1016,6 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 	type args struct {
 		ctx   context.Context
 		orgID string
-		deps  *OrgDependencies
 	}
 	type res struct {
 		want *domain.Org
@@ -1133,122 +1131,6 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			},
 			res: res{},
 		},
-		{
-			name: "remove org, user dependencies",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"org"),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org"),
-							),
-							eventFromEventPusher(
-								user.NewUserOwnerRemovedEvent(context.Background(), &user.NewAggregate("user1", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				deps: &OrgDependencies{
-					Users: []string{"user1"},
-				},
-			},
-			res: res{},
-		},
-		{
-			name: "remove org, project dependencies",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"org"),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org"),
-							),
-							eventFromEventPusher(
-								project.NewProjectOwnerRemovedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				deps: &OrgDependencies{
-					Projects: []string{"project1"},
-				},
-			},
-			res: res{},
-		},
-		{
-			name: "remove org, multiple dependencies",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org"),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org"),
-							),
-							eventFromEventPusher(
-								user.NewUserOwnerRemovedEvent(context.Background(), &user.NewAggregate("user1", "org1").Aggregate),
-							),
-							eventFromEventPusher(
-								user.NewUserOwnerRemovedEvent(context.Background(), &user.NewAggregate("user2", "org1").Aggregate),
-							),
-							eventFromEventPusher(
-								user.NewUserOwnerRemovedEvent(context.Background(), &user.NewAggregate("user3", "org1").Aggregate),
-							),
-							eventFromEventPusher(
-								project.NewProjectOwnerRemovedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate),
-							),
-							eventFromEventPusher(
-								project.NewProjectOwnerRemovedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate),
-							),
-							eventFromEventPusher(
-								project.NewProjectOwnerRemovedEvent(context.Background(), &project.NewAggregate("project3", "org1").Aggregate),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
-					),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				deps: &OrgDependencies{
-					Users:    []string{"user1", "user2", "user3"},
-					Projects: []string{"project1", "project2", "project3"},
-				},
-			},
-			res: res{},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1256,7 +1138,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			_, err := r.RemoveOrg(tt.args.ctx, tt.args.orgID, tt.args.deps)
+			_, err := r.RemoveOrg(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

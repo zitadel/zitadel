@@ -263,6 +263,14 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 								"agg-id",
 							},
 						},
+						{
+							expectedStmt: "UPDATE projections.project_grants2 SET granted_org_removed = $1 WHERE (instance_id = $2) AND (granted_org_id = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
 					},
 				},
 			},
