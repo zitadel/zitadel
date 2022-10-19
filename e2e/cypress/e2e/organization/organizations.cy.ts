@@ -4,8 +4,8 @@ import { apiAuth } from '../../support/api/apiauth';
 const orgListPath = `/orgs`;
 const orgPath = `/org`;
 
-const orgNameOnCreation = 'e2eneworg';
-const testOrgNameChange = 'e2erenametest';
+const orgNameOnCreation = '1';
+const testOrgNameChange = '2';
 
 describe('organizations', () => {
   describe('rename', () => {
@@ -21,6 +21,15 @@ describe('organizations', () => {
         });
     });
 
+    // afterEach(() => {
+    //   cy.visit(orgPath);
+    //   apiAuth()
+    //     .as('api')
+    //     .then((api) => {
+    //       renameOrg(api, orgNameOnCreation);
+    //     });
+    // });
+
     it('should rename the organization', () => {
       const rowSelector = `tr:contains(${orgNameOnCreation})`;
       cy.get(rowSelector).children('.mat-cell').first().click({ force: true });
@@ -32,6 +41,9 @@ describe('organizations', () => {
       cy.get('[data-e2e="dialog-submit"]').click();
       cy.get('.data-e2e-success');
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
+      apiAuth().then((api) => {
+        renameOrg(api, orgNameOnCreation);
+      });
     });
   });
 

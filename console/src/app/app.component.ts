@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
+import { map, take, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org } from './proto/generated/zitadel/org_pb';
@@ -188,6 +188,13 @@ export class AppComponent implements OnDestroy {
       if (org) {
         this.org = org;
         this.getProjectCount();
+      }
+    });
+
+    this.activatedRoute.queryParams.pipe(take(1)).subscribe((params) => {
+      const { org } = params;
+      if (org) {
+        this.authService.getActiveOrg(org);
       }
     });
 
