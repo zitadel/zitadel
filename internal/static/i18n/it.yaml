@@ -85,7 +85,8 @@ Errors:
       NotChanged: Indirizzo non cambiato
     Machine:
       Key:
-        NotFound: Machine Key non trovato
+        NotFound: Chiave macchina non trovato
+        AlreadyExisting: Chiave macchina già esistente
     PAT:
       NotFound: Personal Access Token non trovato
     NotHuman: L'utente deve essere personale
@@ -264,6 +265,9 @@ Errors:
       APIAuthMethodNoSecret: Il metodo di autorizzazione API scelto non richiede un segreto
       AuthMethodNoPrivateKeyJWT: Il metodo di autorizzazione scelto non richiede una chiave
       ClientSecretInvalid: Il segreto del cliente non è valido
+      Key:
+        AlreadyExisting: Chiave di applicazione già esistente
+        NotFound: Chiave di applicazione non trovata
     RequiredFieldsMissing: Mancano alcuni campi obbligatori
     Grant:
       AlreadyExists: Grant del progetto già esistente
