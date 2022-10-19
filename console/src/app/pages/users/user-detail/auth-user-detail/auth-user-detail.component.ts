@@ -19,6 +19,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
+import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -50,7 +51,11 @@ export class AuthUserDetailComponent implements OnDestroy {
     { id: 'idp', i18nKey: 'USER.SETTINGS.IDP' },
     { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' },
     { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS' },
-    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA' },
+    {
+      id: 'metadata',
+      i18nKey: 'USER.SETTINGS.METADATA',
+      requiredRoles: { [PolicyComponentServiceType.MGMT]: ['user.read'] },
+    },
   ];
   public currentSetting: string | undefined = this.settingsList[0].id;
 
@@ -346,24 +351,28 @@ export class AuthUserDetailComponent implements OnDestroy {
     });
   }
 
-  public loadMetadata(): Promise<any> | void {
+  public loadMetadata(): void {
     if (this.user) {
-      this.loadingMetadata = true;
-      return this.mgmt
-        .listUserMetadata(this.user.id)
-        .then((resp) => {
-          this.loadingMetadata = false;
-          this.metadata = resp.resultList.map((md) => {
-            return {
-              key: md.key,
-              value: Buffer.from(md.value as string, 'base64').toString('ascii'),
-            };
-          });
-        })
-        .catch((error) => {
-          this.loadingMetadata = false;
-          this.toast.showError(error);
-        });
+      this.userService.isAllowed(['user.read']).subscribe((allowed) => {
+        if (allowed) {
+          this.loadingMetadata = true;
+          this.mgmt
+            .listUserMetadata(this.user?.id ?? '')
+            .then((resp) => {
+              this.loadingMetadata = false;
+              this.metadata = resp.resultList.map((md) => {
+                return {
+                  key: md.key,
+                  value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+                };
+              });
+            })
+            .catch((error) => {
+              this.loadingMetadata = false;
+              this.toast.showError(error);
+            });
+        }
+      });
     }
   }
 
