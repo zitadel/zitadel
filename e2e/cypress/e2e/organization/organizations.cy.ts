@@ -16,24 +16,22 @@ describe('organizations', () => {
           ensureOrgExists(api, orgNameOnCreation)
             .as('newOrgId')
             .then((newOrgId) => {
-              cy.visit(orgListPath);
+              cy.visit(`${orgPath}?org=${newOrgId}`).as('orgsite');
             });
         });
     });
 
-    // afterEach(() => {
-    //   cy.visit(orgPath);
-    //   apiAuth()
-    //     .as('api')
-    //     .then((api) => {
-    //       renameOrg(api, orgNameOnCreation);
-    //     });
-    // });
+    afterEach(() => {
+      this.orgsite.then(() => {
+        apiAuth()
+          .as('api')
+          .then((api) => {
+            renameOrg(api, orgNameOnCreation);
+          });
+      });
+    });
 
     it('should rename the organization', () => {
-      const rowSelector = `tr:contains(${orgNameOnCreation})`;
-      cy.get(rowSelector).children('.mat-cell').first().click({ force: true });
-
       cy.get('[data-e2e="actions"]').click();
       cy.get('[data-e2e="rename"]', { timeout: 1000 }).should('be.visible').click();
 
@@ -41,9 +39,6 @@ describe('organizations', () => {
       cy.get('[data-e2e="dialog-submit"]').click();
       cy.get('.data-e2e-success');
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
-      apiAuth().then((api) => {
-        renameOrg(api, orgNameOnCreation);
-      });
     });
   });
 
