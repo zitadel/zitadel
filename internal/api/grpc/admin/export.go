@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/zitadel/logging"
@@ -74,7 +74,8 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 					return
 				}
 
-				data, err := json.Marshal(orgData)
+				jsonpb := &runtime.JSONPb{}
+				data, err := jsonpb.Marshal(orgData)
 				if err != nil {
 					ch <- err
 					return
