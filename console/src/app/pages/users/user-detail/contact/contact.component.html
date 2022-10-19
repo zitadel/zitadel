@@ -1,27 +1,6 @@
 <div class="contact-method-col" *ngIf="human">
   <div class="contact-method-row">
     <div class="left">
-      <span class="label cnsl-secondary-text">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
-      <span class="name">*********</span>
-
-      <ng-content select="[pwdAction]"></ng-content>
-    </div>
-
-    <div class="right">
-      <a
-        matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
-        [disabled]="!canWrite"
-        [routerLink]="['password']"
-        [queryParams]="{ username: username }"
-        mat-icon-button
-      >
-        <i class="las la-pen"></i>
-      </a>
-    </div>
-  </div>
-
-  <div class="contact-method-row">
-    <div class="left">
       <span class="label cnsl-secondary-text">{{ 'USER.EMAIL' | translate }}</span>
       <span class="name">{{ human.email?.email }}</span>
       <span *ngIf="human.email?.isEmailVerified" class="contact-state verified">{{ 'USER.EMAILVERIFIED' | translate }}</span>
