@@ -229,7 +229,11 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 		data = localData
 	}
 
-	jsonpb := &runtime.JSONPb{}
+	jsonpb := &runtime.JSONPb{
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	}
 	if v1Transformation {
 		dataImportV1 := new(v1_pb.ImportDataOrg)
 		if err := jsonpb.Unmarshal(data, dataImportV1); err != nil {
