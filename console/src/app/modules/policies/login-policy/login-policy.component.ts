@@ -155,6 +155,8 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
             mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
             mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
+            mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+            mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
 
             const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
             mgmtreq.setPasswordCheckLifetime(pcl);
@@ -184,6 +186,8 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setForceMfa(this.loginData.forceMfa);
             mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
             mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+            mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+            mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
 
             const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
             mgmtreq.setPasswordCheckLifetime(pcl);
@@ -214,6 +218,8 @@ export class LoginPolicyComponent implements OnInit {
           adminreq.setForceMfa(this.loginData.forceMfa);
           adminreq.setPasswordlessType(this.loginData.passwordlessType);
           adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+          adminreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+          adminreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
 
           const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
           adminreq.setPasswordCheckLifetime(admin_pcl);
