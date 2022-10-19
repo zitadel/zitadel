@@ -19,7 +19,7 @@ export function ensureOrgExists(api: API, name: string): Cypress.Chainable<numbe
     () => `${api.mgmtBaseURL}/orgs`,
     'POST',
     { name: name },
-    (org: any) => org?.name === name,
+    (org) => org?.name === name,
     (res) => res.id,
   );
 }

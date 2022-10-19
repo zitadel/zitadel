@@ -1,11 +1,11 @@
 import { ensureOrgExists, renameOrg } from 'support/api/orgs';
 import { apiAuth } from '../../support/api/apiauth';
+import { v4 as uuidv4 } from 'uuid';
 
-const orgListPath = `/orgs`;
 const orgPath = `/org`;
 
-const orgNameOnCreation = '1';
-const testOrgNameChange = '2';
+const orgNameOnCreation = 'e2eorgrename';
+const testOrgNameChange = uuidv4();
 
 describe('organizations', () => {
   describe('rename', () => {
@@ -21,17 +21,7 @@ describe('organizations', () => {
         });
     });
 
-    afterEach(() => {
-      this.orgsite.then(() => {
-        apiAuth()
-          .as('api')
-          .then((api) => {
-            renameOrg(api, orgNameOnCreation);
-          });
-      });
-    });
-
-    it('should rename the organization', () => {
+    it.only('should rename the organization', () => {
       cy.get('[data-e2e="actions"]').click();
       cy.get('[data-e2e="rename"]', { timeout: 1000 }).should('be.visible').click();
 
