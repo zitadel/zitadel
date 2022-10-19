@@ -241,13 +241,20 @@ func (s *Server) exportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		if err != nil {
 			return nil, err
 		}
+		orgIDPs := make([]string, 0)
+		for _, idp := range org.OidcIdps {
+			orgIDPs = append(orgIDPs, idp.GetIdpId())
+		}
+		for _, idp := range org.JwtIdps {
+			orgIDPs = append(orgIDPs, idp.GetIdpId())
+		}
 
 		org.LabelPolicy, err = s.getLabelPolicy(ctx, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
 
-		org.LoginPolicy, org.SecondFactors, org.MultiFactors, org.Idps, err = s.getLoginPolicy(ctx, org.GetOrgId())
+		org.LoginPolicy, org.SecondFactors, org.MultiFactors, org.Idps, err = s.getLoginPolicy(ctx, org.GetOrgId(), orgIDPs)
 		if err != nil {
 			return nil, err
 		}
@@ -523,7 +530,7 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (_ *managemen
 	return nil, nil
 }
 
-func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (
+func (s *Server) getLoginPolicy(ctx context.Context, orgID string, orgIDPs []string) (
 	_ *management_pb.AddCustomLoginPolicyRequest,
 	_ []*management_pb.AddSecondFactorToLoginPolicyRequest,
 	_ []*management_pb.AddMultiFactorToLoginPolicyRequest,
@@ -560,9 +567,22 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (
 		idpLinks := make([]*management_pb.AddIDPToLoginPolicyRequest, len(queriedIdpLinks.Links))
 		if queriedIdpLinks != nil {
 			for i, idpLink := range queriedIdpLinks.Links {
+				found := false
+				for _, orgIDP := range orgIDPs {
+					if orgIDP == idpLink.IDPID {
+						found = true
+						break
+					}
+				}
+				ownerType := idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+				if found {
+					ownerType = idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG
+				} else {
+					ownerType = idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
+				}
 				idpLinks[i] = &management_pb.AddIDPToLoginPolicyRequest{
 					IdpId:     idpLink.IDPID,
-					OwnerType: idp_pb.IDPOwnerType(idpLink.IDPType),
+					OwnerType: ownerType,
 				}
 			}
 		}
