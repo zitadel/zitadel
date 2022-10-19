@@ -84,13 +84,20 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		if err != nil {
 			return nil, err
 		}
+		orgIDPs := make([]string, 0)
+		for _, idp := range org.OidcIdps {
+			orgIDPs = append(orgIDPs, idp.GetIdpId())
+		}
+		for _, idp := range org.JwtIdps {
+			orgIDPs = append(orgIDPs, idp.GetIdpId())
+		}
 
 		org.LabelPolicy, err = s.getLabelPolicy(ctx, org.GetOrgId())
 		if err != nil {
 			return nil, err
 		}
 
-		org.LoginPolicy, err = s.getLoginPolicy(ctx, org.GetOrgId())
+		org.LoginPolicy, err = s.getLoginPolicy(ctx, org.GetOrgId(), orgIDPs)
 		if err != nil {
 			return nil, err
 		}
@@ -368,7 +375,7 @@ func (s *Server) getLabelPolicy(ctx context.Context, orgID string) (_ *managemen
 	return nil, nil
 }
 
-func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (_ *management_pb.AddCustomLoginPolicyRequest, err error) {
+func (s *Server) getLoginPolicy(ctx context.Context, orgID string, orgIDPs []string) (_ *management_pb.AddCustomLoginPolicyRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -399,9 +406,22 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string) (_ *managemen
 		}
 		idpLinks := make([]*management_pb.AddCustomLoginPolicyRequest_IDP, 0)
 		for _, idpLink := range idpLinksQuery.Links {
+			found := false
+			for _, orgIDP := range orgIDPs {
+				if orgIDP == idpLink.IDPID {
+					found = true
+					break
+				}
+			}
+			ownerType := idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+			if found {
+				ownerType = idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG
+			} else {
+				ownerType = idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
+			}
 			idpLinks = append(idpLinks, &management_pb.AddCustomLoginPolicyRequest_IDP{
 				IdpId:     idpLink.IDPID,
-				OwnerType: idp_pb.IDPOwnerType(idpLink.IDPType),
+				OwnerType: ownerType,
 			})
 		}
 
