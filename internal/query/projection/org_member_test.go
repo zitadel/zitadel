@@ -1,9 +1,13 @@
 package projection
 
 import (
+	"context"
 	"testing"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -34,7 +38,21 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				}`),
 				), org.MemberAddedEventMapper),
 			},
-			reduce: (&orgMemberProjection{}).reduceAdded,
+			reduce: (&orgMemberProjection{
+				StatementHandler: getStatementHandlerWithFilters(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
+				)(t)}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -43,15 +61,18 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_members2 (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.org_members2 (user_id, user_resource_owner, owner_removed_user, roles, creation_date, change_date, sequence, resource_owner, instance_id, owner_removed, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"user-id",
+								"org1",
+								false,
 								database.StringArray{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
 								"instance-id",
+								false,
 								"agg-id",
 							},
 						},
@@ -198,8 +219,20 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (org_id = $1)",
+							expectedStmt: "UPDATE projections.org_members2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (resource_owner = $4)",
 							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.org_members2 SET (change_date, sequence, owner_removed_user) = ($1, $2, $3) WHERE (user_resource_owner = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
 								"agg-id",
 							},
 						},

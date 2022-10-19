@@ -42,28 +42,29 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					}`),
 				), usergrant.UserGrantAddedEventMapper),
 			},
-			reduce: getProjectionWithFilters(
-				user.NewHumanAddedEvent(context.Background(),
-					&user.NewAggregate("user-id", "org1").Aggregate,
-					"username1",
-					"firstname1",
-					"lastname1",
-					"nickname1",
-					"displayname1",
-					language.German,
-					domain.GenderMale,
-					"email1",
-					true,
-				),
-				project.NewProjectAddedEvent(context.Background(),
-					&project.NewAggregate("project-id", "org2").Aggregate,
-					"project",
-					false,
-					false,
-					false,
-					domain.PrivateLabelingSettingUnspecified,
-				),
-			)(t).reduceAdded,
+			reduce: (&userGrantProjection{
+				StatementHandler: getStatementHandlerWithFilters(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
+					project.NewProjectAddedEvent(context.Background(),
+						&project.NewAggregate("project-id", "org2").Aggregate,
+						"project",
+						false,
+						false,
+						false,
+						domain.PrivateLabelingSettingUnspecified,
+					),
+				)(t)}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -108,34 +109,35 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 					}`),
 				), usergrant.UserGrantAddedEventMapper),
 			},
-			reduce: getProjectionWithFilters(
-				user.NewHumanAddedEvent(context.Background(),
-					&user.NewAggregate("user-id", "org1").Aggregate,
-					"username1",
-					"firstname1",
-					"lastname1",
-					"nickname1",
-					"displayname1",
-					language.German,
-					domain.GenderMale,
-					"email1",
-					true,
-				),
-				project.NewProjectAddedEvent(context.Background(),
-					&project.NewAggregate("project-id", "org2").Aggregate,
-					"project",
-					false,
-					false,
-					false,
-					domain.PrivateLabelingSettingUnspecified,
-				),
-				project.NewGrantAddedEvent(context.Background(),
-					&project.NewAggregate("project-id", "org2").Aggregate,
-					"grant-id",
-					"org3",
-					[]string{},
-				),
-			)(t).reduceAdded,
+			reduce: (&userGrantProjection{
+				StatementHandler: getStatementHandlerWithFilters(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
+					project.NewProjectAddedEvent(context.Background(),
+						&project.NewAggregate("project-id", "org2").Aggregate,
+						"project",
+						false,
+						false,
+						false,
+						domain.PrivateLabelingSettingUnspecified,
+					),
+					project.NewGrantAddedEvent(context.Background(),
+						&project.NewAggregate("project-id", "org2").Aggregate,
+						"grant-id",
+						"org3",
+						[]string{},
+					),
+				)(t)}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
@@ -558,7 +560,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 	}
 }
 
-func getProjectionWithFilters(events ...eventstore.Command) func(t *testing.T) *userGrantProjection {
+func getStatementHandlerWithFilters(events ...eventstore.Command) func(t *testing.T) crdb.StatementHandler {
 	filters := make([]expect, 0)
 	for _, event := range events {
 		filters = append(filters,
@@ -570,16 +572,14 @@ func getProjectionWithFilters(events ...eventstore.Command) func(t *testing.T) *
 		)
 	}
 
-	return func(t *testing.T) *userGrantProjection {
-		return &userGrantProjection{
-			StatementHandler: crdb.StatementHandler{
-				ProjectionHandler: &handler.ProjectionHandler{
-					Handler: handler.Handler{
-						Eventstore: eventstoreExpect(
-							t,
-							filters...,
-						),
-					},
+	return func(t *testing.T) crdb.StatementHandler {
+		return crdb.StatementHandler{
+			ProjectionHandler: &handler.ProjectionHandler{
+				Handler: handler.Handler{
+					Eventstore: eventstoreExpect(
+						t,
+						filters...,
+					),
 				},
 			},
 		}
