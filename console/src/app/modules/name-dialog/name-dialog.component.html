@@ -13,14 +13,7 @@
     {{ 'ACTIONS.CLOSE' | translate }}
   </button>
 
-  <button
-    data-e2e="dialog-submit"
-    [disabled]="!name"
-    cdkFocusInitial
-    color="primary"
-    mat-raised-button
-    (click)="closeDialog(name)"
-  >
+  <button data-e2e="dialog-submit" [disabled]="!name" color="primary" mat-raised-button (click)="closeDialog(name)">
     {{ 'ACTIONS.RENAME' | translate }}
   </button>
 </div>
