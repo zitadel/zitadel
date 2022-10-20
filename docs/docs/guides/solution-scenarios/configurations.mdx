@@ -18,7 +18,7 @@ If a user of this organization wants to login, you don't want them to enter thei
 3. Go to the "Login Behavior and Security" settings of the organization
 4. Disable "Username Password Allowed" and enable "External IDP allowed" in the Advanced Section
 
-Send either the the organization id (`urn:zitadel:iam:org:id:{id}`) or organization primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authentication request from your application, to identify on which organization the users should login.
+Now your application can send either the organizations id (`urn:zitadel:iam:org:id:{id}`) or organizations primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authorization request to identify on which organization the users should be logged in.
 
 More about the [scopes](../../apis/openidoauth/scopes#reserved-scopes)
 
