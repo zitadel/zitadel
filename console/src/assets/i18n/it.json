@@ -212,10 +212,9 @@
       "TITLE": "Impostazioni",
       "GENERAL": "Generale",
       "IDP": "Identity Providers",
-      "MFA": "Autenticazione a più fattori",
+      "SECURITY": "Password e sicurezza",
       "KEYS": "Chiavi",
       "PAT": "Personal Access Tokens",
-      "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Autorizzazioni",
       "MEMBERSHIPS": "Memberships",
       "METADATA": "Metadati"
@@ -461,6 +460,7 @@
     },
     "PASSWORD": {
       "TITLE": "Password",
+      "LABEL": "Una password sicura aiuta a proteggere l'account",
       "DESCRIPTION": "Inserisci la nuova password secondo i requisiti.",
       "OLD": "Password attuale",
       "NEW": "Nuova password",
@@ -482,6 +482,7 @@
     "EMAILVERIFIED": "Email verificata",
     "NOTVERIFIED": "non verificato",
     "PREFERRED_LOGINNAME": "Loginname preferito",
+    "ISINITIAL": "L'e-mail di questo utente non è ancora stata verificata.",
     "LOGINMETHODS": {
       "TITLE": "Informazioni di contatto",
       "DESCRIPTION": "Le informazioni fornite sono utilizzate per inviare informazioni importanti, come le e-mail di reset della password.",

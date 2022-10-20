@@ -212,10 +212,9 @@
       "TITLE": "Einstellungen",
       "GENERAL": "Allgemein",
       "IDP": "Identity Provider",
-      "MFA": "Multifactor Authentication",
+      "SECURITY": "Passwort und Sicherheit",
       "KEYS": "Schlüssel",
       "PAT": "Personal Access Tokens",
-      "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
       "MEMBERSHIPS": "Memberships",
       "METADATA": "Metadata"
@@ -461,6 +460,7 @@
     },
     "PASSWORD": {
       "TITLE": "Passwort",
+      "LABEL": "Ein sicheres Passwort trägt zum Schutz des Accounts bei.",
       "DESCRIPTION": "Gebe das neue Passwort unter Einhaltung der Richtlinie für die Komplexität ein.",
       "OLD": "Aktuelles Passwort",
       "NEW": "Neues Passwort",
@@ -482,9 +482,10 @@
     "EMAILVERIFIED": "Email verifiziert",
     "NOTVERIFIED": "nicht verifiziert",
     "PREFERRED_LOGINNAME": "Bevorzugter Loginname",
+    "ISINITIAL": "Dieser Benutzer wurde noch nicht verifiziert.",
     "LOGINMETHODS": {
       "TITLE": "Kontaktinformationen",
-      "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um Dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
+      "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
       "EMAIL": {
         "TITLE": "E-Mail",
         "VALID": "Validiert",

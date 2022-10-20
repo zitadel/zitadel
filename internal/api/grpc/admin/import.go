@@ -3,16 +3,17 @@ package admin
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strconv"
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"google.golang.org/api/option"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/logging"
@@ -229,9 +230,14 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 		data = localData
 	}
 
+	jsonpb := &runtime.JSONPb{
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	}
 	if v1Transformation {
 		dataImportV1 := new(v1_pb.ImportDataOrg)
-		if err := json.Unmarshal(data, dataImportV1); err != nil {
+		if err := jsonpb.Unmarshal(data, dataImportV1); err != nil {
 			return nil, err
 		}
 
@@ -242,7 +248,7 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 		dataOrgs = dataImport.Orgs
 	} else {
 		dataImport := new(admin_pb.ImportDataOrg)
-		if err := json.Unmarshal(data, dataImport); err != nil {
+		if err := jsonpb.Unmarshal(data, dataImport); err != nil {
 			return nil, err
 		}
 		dataOrgs = dataImport.Orgs
@@ -871,6 +877,15 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 
 	orgs := make([]*admin_pb.DataOrg, 0)
 	for _, orgV1 := range dataOrgs.Orgs {
+		triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
+		for _, action := range orgV1.GetTriggerActions() {
+			triggerActions = append(triggerActions, &management_pb.SetTriggerActionsRequest{
+				FlowType:    strconv.Itoa(int(action.GetFlowType().Number())),
+				TriggerType: strconv.Itoa(int(action.GetTriggerType().Number())),
+				ActionIds:   action.ActionIds,
+			})
+		}
+
 		org := &admin_pb.DataOrg{
 			OrgId:                            orgV1.GetOrgId(),
 			Org:                              orgV1.GetOrg(),
@@ -886,7 +901,7 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			OidcApps:                         orgV1.GetOidcApps(),
 			HumanUsers:                       orgV1.GetHumanUsers(),
 			MachineUsers:                     orgV1.GetMachineUsers(),
-			TriggerActions:                   orgV1.GetTriggerActions(),
+			TriggerActions:                   triggerActions,
 			Actions:                          orgV1.GetActions(),
 			ProjectGrants:                    orgV1.GetProjectGrants(),
 			UserGrants:                       orgV1.GetUserGrants(),
