@@ -777,6 +777,12 @@
       "ORGDETAIL_TITLE": "输入新组织的名称和域名。",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
+      "RENAME": {
+        "ACTION": "改名",
+        "TITLE": "重命名组织",
+        "DESCRIPTION": "输入组织的新名称",
+        "BTN": "改名"
+      },
       "ORGDOMAIN": {
         "TITLE": "组织域所有权验证",
         "VERIFICATION": "要验证您对域的所有权，您需要下载验证文件并将其上传到下面列出的提供的 URL，或者为提供的域名添加一条类型为TXT的DNS解析记录。完成后请单击按钮进行验证。",
@@ -828,6 +834,7 @@
       "DESCRIPTION": "定义可以更改组织首选项的用户。"
     },
     "TOAST": {
+      "UPDATED": "组织已更新",
       "DEACTIVATED": "组织已停用。",
       "REACTIVATED": "组织重新启用。",
       "DOMAINADDED": "域名已添加。",

@@ -426,6 +426,8 @@ import {
   UpdateOrgIDPResponse,
   UpdateOrgMemberRequest,
   UpdateOrgMemberResponse,
+  UpdateOrgRequest,
+  UpdateOrgResponse,
   UpdateProjectGrantMemberRequest,
   UpdateProjectGrantMemberResponse,
   UpdateProjectGrantRequest,
@@ -2352,6 +2354,12 @@ export class ManagementService {
     req.setName(name);
     req.setProjectId(projectId);
     return this.grpcService.mgmt.updateApp(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateOrg(name: string): Promise<UpdateOrgResponse.AsObject> {
+    const req = new UpdateOrgRequest();
+    req.setName(name);
+    return this.grpcService.mgmt.updateOrg(req, null).then((resp) => resp.toObject());
   }
 
   public updateOIDCAppConfig(req: UpdateOIDCAppConfigRequest): Promise<UpdateOIDCAppConfigResponse.AsObject> {
