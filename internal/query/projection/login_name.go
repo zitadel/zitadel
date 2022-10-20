@@ -211,6 +211,10 @@ func (p *loginNameProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.DomainPolicyChangedEventType,
 					Reduce: p.reduceDomainPolicyChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(LoginNameUserInstanceIDCol),
+				},
 			},
 		},
 	}

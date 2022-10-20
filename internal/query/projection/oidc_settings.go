@@ -68,6 +68,15 @@ func (p *oidcSettingsProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(OIDCSettingsColumnInstanceID),
+				},
+			},
+		},
 	}
 }
 

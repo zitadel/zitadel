@@ -62,6 +62,16 @@ func (s *Server) UpdateInstance(ctx context.Context, req *system_pb.UpdateInstan
 	}, nil
 }
 
+func (s *Server) RemoveInstance(ctx context.Context, req *system_pb.RemoveInstanceRequest) (*system_pb.RemoveInstanceResponse, error) {
+	details, err := s.command.RemoveInstance(ctx, req.InstanceId)
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.RemoveInstanceResponse{
+		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
 func (s *Server) ExistsDomain(ctx context.Context, req *system_pb.ExistsDomainRequest) (*system_pb.ExistsDomainResponse, error) {
 	domainQuery, err := query.NewInstanceDomainDomainSearchQuery(query.TextEqualsIgnoreCase, req.Domain)
 	if err != nil {

@@ -212,6 +212,10 @@ func (p *labelPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.LabelPolicyAssetsRemovedEventType,
 					Reduce: p.reduceAssetsRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(LabelPolicyInstanceIDCol),
+				},
 			},
 		},
 	}

@@ -212,10 +212,9 @@
       "TITLE": "Paramètres",
       "GENERAL": "Général",
       "IDP": "Fournisseurs d'identité",
-      "MFA": "Authentification multifactorielle",
+      "SECURITY": "Mot de passe et sécurité",
       "KEYS": "Clés",
       "PAT": "Jetons d'accès personnels",
-      "PASSWORDLESS": "Sans mot de passe",
       "USERGRANTS": "Autorisations",
       "MEMBERSHIPS": "Adhésions",
       "METADATA": "Métadonnées"
@@ -461,6 +460,7 @@
     },
     "PASSWORD": {
       "TITLE": "Mot de passe",
+      "LABEL": "Un mot de passe sécurisé permet de protéger le compte",
       "DESCRIPTION": "Saisissez le nouveau mot de passe conformément à la politique ci-dessous.",
       "OLD": "Mot de passe actuel",
       "NEW": "Nouveau mot de passe",
@@ -482,6 +482,7 @@
     "EMAILVERIFIED": "Courriel vérifié",
     "NOTVERIFIED": "non vérifié",
     "PREFERRED_LOGINNAME": "Nom de connexion préféré",
+    "ISINITIAL": "Le mail de cet utilisateur n'a pas encore été vérifié.",
     "LOGINMETHODS": {
       "TITLE": "Informations sur le contact",
       "DESCRIPTION": "Les informations fournies sont utilisées pour vous envoyer des informations importantes, comme des e-mails de réinitialisation de mot de passe.",
@@ -776,6 +777,12 @@
       "ORGDETAIL_TITLE": "Saisissez le nom et le domaine de votre nouvelle organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Saisissez le nom de votre nouvelle organisation.",
       "ORGDETAILUSER_TITLE": "Configurer le propriétaire de l'organisation",
+      "RENAME": {
+        "ACTION": "Renommer",
+        "TITLE": "Renommer l'organisation",
+        "DESCRIPTION": "Entrez le nouveau nom de votre organisation",
+        "BTN": "Renommer"
+      },
       "ORGDOMAIN": {
         "TITLE": "Vérification de la propriété du domaine de l'organisation",
         "VERIFICATION": "Pour vérifier la propriété de votre domaine, vous devez télécharger un fichier de vérification et le charger à l'URL indiquée ci-dessous, ou placer une entrée DNS TXT Record pour l'URL indiquée. Pour terminer, cliquez sur le bouton de vérification.",
@@ -827,6 +834,7 @@
       "DESCRIPTION": "Définissez les utilisateurs qui peuvent modifier les préférences de votre organisation."
     },
     "TOAST": {
+      "UPDATED": "L'organisation a été mise à jour",
       "DEACTIVATED": "Organisation désactivée.",
       "REACTIVATED": "Organisation réactivée.",
       "DOMAINADDED": "Domaine ajouté.",
@@ -1173,6 +1181,8 @@
       "IGNOREUNKNOWNUSERNAMES_DESC": "Si l'option est sélectionnée, l'écran du mot de passe sera affiché dans le processus de connexion même si l'utilisateur n'a pas été trouvé. L'erreur sur la vérification du mot de passe ne révélera pas si le nom d'utilisateur ou le mot de passe était erroné.",
       "ALLOWDOMAINDISCOVERY": "Découverte du domaine autorisée",
       "ALLOWDOMAINDISCOVERY_DESC": "Si l'option est sélectionnée, le suffixe (@domain.com) d'un nom d'utilisateur inconnu saisi sur l'écran de connexion sera comparé aux domaines organisation et redirigera vers l'enregistrement de cette organisation en cas de succès.",
+      "DISABLELOGINWITHEMAIL": "Désactiver la connexion avec l'adresse e-mail",
+      "DISABLELOGINWITHPHONE": "Désactiver la connexion avec le numéro de téléphone",
       "DEFAULTREDIRECTURI": "URI de redirection par défaut",
       "DEFAULTREDIRECTURI_DESC": "Définit l'endroit où l'utilisateur sera redirigé si la connexion a commencé sans contexte d'application (par exemple, à partir du courrier électronique).",
       "ERRORMSGPOPUP": "Afficher l'erreur dans la boîte de dialogue",
