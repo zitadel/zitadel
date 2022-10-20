@@ -27,15 +27,15 @@ var (
 		", projections.users4_machines.name" +
 		", projections.users4_humans.avatar_key" +
 		", COUNT(*) OVER () " +
-		"FROM projections.project_grant_members2 AS members " +
+		"FROM projections.project_grant_members3 AS members " +
 		"LEFT JOIN projections.users4_humans " +
 		"ON members.user_id = projections.users4_humans.user_id " +
 		"LEFT JOIN projections.users4_machines " +
 		"ON members.user_id = projections.users4_machines.user_id " +
 		"LEFT JOIN projections.login_names " +
 		"ON members.user_id = projections.login_names.user_id " +
-		"LEFT JOIN projections.project_grants2 " +
-		"ON members.grant_id = projections.project_grants2.grant_id " +
+		"LEFT JOIN projections.project_grants3 " +
+		"ON members.grant_id = projections.project_grants3.grant_id " +
 		"WHERE projections.login_names.is_primary = $1")
 	projectGrantMembersColumns = []string{
 		"creation_date",

@@ -103,12 +103,16 @@ func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery) (*Memberships, error) {
+func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery, withOwnerRemoved bool) (*Memberships, error) {
 	query, scan := prepareMembershipsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[membershipOwnerRemoved.identifier()] = false
+		eq[membershipOwnerRemovedUser.identifier()] = false
+		eq[membershipOwnerRemovedProject.identifier()] = false
+		eq[membershipGrantedOrgRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
@@ -180,6 +184,23 @@ var (
 	}
 	membershipGrantGrantedOrgID = Column{
 		name:  projection.ProjectGrantColumnGrantedOrgID,
+		table: membershipAlias,
+	}
+
+	membershipOwnerRemoved = Column{
+		name:  projection.MemberOwnerRemoved,
+		table: membershipAlias,
+	}
+	membershipOwnerRemovedUser = Column{
+		name:  projection.MemberOwnerRemovedUser,
+		table: membershipAlias,
+	}
+	membershipOwnerRemovedProject = Column{
+		name:  projection.ProjectMemberOwnerRemovedProject,
+		table: membershipAlias,
+	}
+	membershipGrantedOrgRemoved = Column{
+		name:  projection.ProjectGrantMemberGrantGrantedOrgRemoved,
 		table: membershipAlias,
 	}
 

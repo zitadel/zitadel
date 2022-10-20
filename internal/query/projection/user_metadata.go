@@ -153,6 +153,8 @@ func (p *userMetadataProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(UserMetadataColumnChangeDate, e.CreationDate()),
+			handler.NewCol(UserMetadataColumnSequence, e.Sequence()),
 			handler.NewCol(UserMetadataColumnOwnerRemoved, true),
 		},
 		[]handler.Condition{

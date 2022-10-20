@@ -166,6 +166,8 @@ func (p *mailTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(MailTemplateChangeDateCol, e.CreationDate()),
+			handler.NewCol(MailTemplateSequenceCol, e.Sequence()),
 			handler.NewCol(MailTemplateOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

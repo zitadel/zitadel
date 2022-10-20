@@ -553,6 +553,8 @@ func (p *idpProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Sta
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(IDPChangeDateCol, e.CreationDate()),
+			handler.NewCol(IDPSequenceCol, e.Sequence()),
 			handler.NewCol(IDPOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

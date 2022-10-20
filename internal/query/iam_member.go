@@ -48,6 +48,14 @@ var (
 		name:  projection.InstanceMemberIAMIDCol,
 		table: instanceMemberTable,
 	}
+	InstanceMemberOwnerRemoved = Column{
+		name:  projection.MemberOwnerRemoved,
+		table: instanceMemberTable,
+	}
+	InstanceMemberOwnerRemovedUser = Column{
+		name:  projection.MemberOwnerRemovedUser,
+		table: instanceMemberTable,
+	}
 )
 
 type IAMMembersQuery struct {
@@ -59,12 +67,14 @@ func (q *IAMMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		toQuery(query)
 }
 
-func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery) (*Members, error) {
+func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, withOwnerRemoved bool) (*Members, error) {
 	query, scan := prepareInstanceMembersQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[InstanceMemberOwnerRemoved.identifier()] = false
+		eq[InstanceMemberOwnerRemovedUser.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")
 	}

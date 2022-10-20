@@ -1002,6 +1002,8 @@ func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.St
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(UserChangeDateCol, e.CreationDate()),
+			handler.NewCol(UserSequenceCol, e.Sequence()),
 			handler.NewCol(UserOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

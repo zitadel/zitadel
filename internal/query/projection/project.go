@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	ProjectProjectionTable = "projections.projects2"
+	ProjectProjectionTable = "projections.projects3"
 
 	ProjectColumnID                     = "id"
 	ProjectColumnCreationDate           = "creation_date"
@@ -219,6 +219,8 @@ func (p *projectProjection) reduceOwnerRemoved(event eventstore.Event) (*handler
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
+			handler.NewCol(ProjectColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectColumnOwnerRemoved, true),
 		},
 		[]handler.Condition{

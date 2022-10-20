@@ -102,19 +102,19 @@ var (
 		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id` +
 		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id` +
 		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id`)
-	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects2.id,` +
-		` projections.projects2.creation_date,` +
-		` projections.projects2.change_date,` +
-		` projections.projects2.resource_owner,` +
-		` projections.projects2.state,` +
-		` projections.projects2.sequence,` +
-		` projections.projects2.name,` +
-		` projections.projects2.project_role_assertion,` +
-		` projections.projects2.project_role_check,` +
-		` projections.projects2.has_project_check,` +
-		` projections.projects2.private_labeling_setting` +
-		` FROM projections.projects2` +
-		` JOIN projections.apps4 ON projections.projects2.id = projections.apps4.project_id` +
+	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects3.id,` +
+		` projections.projects3.creation_date,` +
+		` projections.projects3.change_date,` +
+		` projections.projects3.resource_owner,` +
+		` projections.projects3.state,` +
+		` projections.projects3.sequence,` +
+		` projections.projects3.name,` +
+		` projections.projects3.project_role_assertion,` +
+		` projections.projects3.project_role_check,` +
+		` projections.projects3.has_project_check,` +
+		` projections.projects3.private_labeling_setting` +
+		` FROM projections.projects3` +
+		` JOIN projections.apps4 ON projections.projects3.id = projections.apps4.project_id` +
 		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id` +
 		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id` +
 		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id`)

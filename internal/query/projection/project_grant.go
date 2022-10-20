@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	ProjectGrantProjectionTable = "projections.project_grants2"
+	ProjectGrantProjectionTable = "projections.project_grants3"
 
 	ProjectGrantColumnGrantID           = "grant_id"
 	ProjectGrantColumnCreationDate      = "creation_date"
@@ -244,6 +244,8 @@ func (p *projectGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 		e,
 		crdb.AddUpdateStatement(
 			[]handler.Column{
+				handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
+				handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 				handler.NewCol(ProjectGrantColumnOwnerRemoved, true),
 			},
 			[]handler.Condition{
@@ -253,6 +255,8 @@ func (p *projectGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
+				handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
+				handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 				handler.NewCol(ProjectGrantColumnGrantedOrgRemoved, true),
 			},
 			[]handler.Condition{

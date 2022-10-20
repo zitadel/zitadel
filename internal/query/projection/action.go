@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	ActionTable            = "projections.actions2"
+	ActionTable            = "projections.actions3"
 	ActionIDCol            = "id"
 	ActionCreationDateCol  = "creation_date"
 	ActionChangeDateCol    = "change_date"
@@ -208,6 +208,8 @@ func (p *actionProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
+			handler.NewCol(ActionSequenceCol, e.Sequence()),
 			handler.NewCol(ActionOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

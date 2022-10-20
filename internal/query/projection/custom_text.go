@@ -184,6 +184,8 @@ func (p *customTextProjection) reduceOwnerRemoved(event eventstore.Event) (*hand
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(CustomTextChangeDateCol, e.CreationDate()),
+			handler.NewCol(CustomTextSequenceCol, e.Sequence()),
 			handler.NewCol(CustomTextOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

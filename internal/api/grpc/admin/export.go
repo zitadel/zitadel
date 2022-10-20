@@ -797,7 +797,7 @@ func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org 
 				return nil, err
 			}
 
-			queriedProjectMembers, err := s.query.ProjectGrantMembers(ctx, &query.ProjectGrantMembersQuery{ProjectID: projectID, OrgID: org, GrantID: grantID, MembersQuery: query.MembersQuery{Queries: []query.SearchQuery{search}}})
+			queriedProjectMembers, err := s.query.ProjectGrantMembers(ctx, &query.ProjectGrantMembersQuery{ProjectID: projectID, OrgID: org, GrantID: grantID, MembersQuery: query.MembersQuery{Queries: []query.SearchQuery{search}}}, false)
 			if err != nil {
 				return nil, err
 			}
@@ -825,7 +825,7 @@ func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processed
 	projectMembers := make([]*management_pb.AddProjectMemberRequest, 0)
 
 	for _, projectID := range processedProjects {
-		queriedProjectMembers, err := s.query.ProjectMembers(ctx, &query.ProjectMembersQuery{ProjectID: projectID})
+		queriedProjectMembers, err := s.query.ProjectMembers(ctx, &query.ProjectMembersQuery{ProjectID: projectID}, false)
 		if err != nil {
 			return nil, err
 		}
@@ -846,7 +846,7 @@ func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processed
 }
 
 func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, processedUsers []string) ([]*management_pb.AddOrgMemberRequest, error) {
-	queriedOrgMembers, err := s.query.OrgMembers(ctx, &query.OrgMembersQuery{OrgID: org})
+	queriedOrgMembers, err := s.query.OrgMembers(ctx, &query.OrgMembersQuery{OrgID: org}, false)
 	if err != nil {
 		return nil, err
 	}

@@ -36,12 +36,12 @@ var (
 			", projections.orgs.name" +
 			", projections.orgs.primary_domain" +
 			", projections.user_grants3.project_id" +
-			", projections.projects2.name" +
+			", projections.projects3.name" +
 			" FROM projections.user_grants3" +
 			" LEFT JOIN projections.users4 ON projections.user_grants3.user_id = projections.users4.id" +
 			" LEFT JOIN projections.users4_humans ON projections.user_grants3.user_id = projections.users4_humans.user_id" +
 			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id" +
-			" LEFT JOIN projections.projects2 ON projections.user_grants3.project_id = projections.projects2.id" +
+			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id" +
 			" LEFT JOIN projections.login_names ON projections.user_grants3.user_id = projections.login_names.user_id" +
 			" WHERE projections.login_names.is_primary = $1")
 	userGrantCols = []string{
@@ -90,13 +90,13 @@ var (
 			", projections.orgs.name" +
 			", projections.orgs.primary_domain" +
 			", projections.user_grants3.project_id" +
-			", projections.projects2.name" +
+			", projections.projects3.name" +
 			", COUNT(*) OVER ()" +
 			" FROM projections.user_grants3" +
 			" LEFT JOIN projections.users4 ON projections.user_grants3.user_id = projections.users4.id" +
 			" LEFT JOIN projections.users4_humans ON projections.user_grants3.user_id = projections.users4_humans.user_id" +
 			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id" +
-			" LEFT JOIN projections.projects2 ON projections.user_grants3.project_id = projections.projects2.id" +
+			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id" +
 			" LEFT JOIN projections.login_names ON projections.user_grants3.user_id = projections.login_names.user_id" +
 			" WHERE projections.login_names.is_primary = $1")
 	userGrantsCols = append(

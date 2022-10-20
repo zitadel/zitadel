@@ -125,6 +125,8 @@ func (p *flowProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.St
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(FlowChangeDateCol, e.CreationDate()),
+			handler.NewCol(FlowSequenceCol, e.Sequence()),
 			handler.NewCol(FlowOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

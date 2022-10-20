@@ -164,7 +164,7 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.query.ProjectGrantMembers(ctx, queries)
+	response, err := s.query.ProjectGrantMembers(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}

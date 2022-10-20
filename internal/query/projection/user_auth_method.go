@@ -229,6 +229,8 @@ func (p *userAuthMethodProjection) reduceOwnerRemoved(event eventstore.Event) (*
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(UserAuthMethodChangeDateCol, e.CreationDate()),
+			handler.NewCol(UserAuthMethodSequenceCol, e.Sequence()),
 			handler.NewCol(UserAuthMethodOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

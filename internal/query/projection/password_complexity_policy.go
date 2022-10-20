@@ -193,6 +193,8 @@ func (p *passwordComplexityProjection) reduceOwnerRemoved(event eventstore.Event
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(ComplexityPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(ComplexityPolicySequenceCol, e.Sequence()),
 			handler.NewCol(ComplexityPolicyOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

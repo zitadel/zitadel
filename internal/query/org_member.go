@@ -48,6 +48,14 @@ var (
 		name:  projection.OrgMemberOrgIDCol,
 		table: orgMemberTable,
 	}
+	OrgMemberOwnerRemoved = Column{
+		name:  projection.MemberOwnerRemoved,
+		table: orgMemberTable,
+	}
+	OrgMemberOwnerRemovedUser = Column{
+		name:  projection.MemberOwnerRemovedUser,
+		table: orgMemberTable,
+	}
 )
 
 type OrgMembersQuery struct {
@@ -61,12 +69,14 @@ func (q *OrgMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		Where(sq.Eq{OrgMemberOrgID.identifier(): q.OrgID})
 }
 
-func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (*Members, error) {
+func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, withOwnerRemoved bool) (*Members, error) {
 	query, scan := prepareOrgMembersQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[OrgMemberOwnerRemoved.identifier()] = false
+		eq[OrgMemberOwnerRemovedUser.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-PDAVB", "Errors.Query.InvalidRequest")
 	}

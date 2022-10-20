@@ -77,6 +77,10 @@ var (
 		name:  projection.ProjectGrantColumnOwnerRemoved,
 		table: projectsTable,
 	}
+	ProjectGrantColumnGrantGrantedOrgRemoved = Column{
+		name:  projection.ProjectGrantMemberGrantGrantedOrgRemoved,
+		table: projectsTable,
+	}
 )
 
 type ProjectGrants struct {
@@ -117,6 +121,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	}
 	if !withOwnerRemoved {
 		eq[ProjectGrantColumnOwnerRemoved.identifier()] = false
+		eq[ProjectGrantColumnGrantGrantedOrgRemoved.identifier()] = false
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
@@ -136,6 +141,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	}
 	if !withOwnerRemoved {
 		eq[ProjectGrantColumnOwnerRemoved.identifier()] = false
+		eq[ProjectGrantColumnGrantGrantedOrgRemoved.identifier()] = false
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
@@ -153,6 +159,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	}
 	if !withOwnerRemoved {
 		eq[ProjectGrantColumnOwnerRemoved.identifier()] = false
+		eq[ProjectGrantColumnGrantGrantedOrgRemoved.identifier()] = false
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {

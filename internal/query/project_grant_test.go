@@ -29,23 +29,23 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name,`+
 						` COUNT(*) OVER () `+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					nil,
 					nil,
 				),
@@ -57,23 +57,23 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.project_grants2`+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id`+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3`+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id`+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -134,23 +134,23 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name,`+
 						` COUNT(*) OVER () `+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -211,23 +211,23 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name,`+
 						` COUNT(*) OVER () `+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -288,23 +288,23 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name,`+
 						` COUNT(*) OVER () `+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -365,23 +365,23 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name,`+
 						` COUNT(*) OVER () `+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -470,23 +470,23 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name,`+
 						` COUNT(*) OVER () `+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -503,22 +503,22 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name`+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					nil,
 					nil,
 				),
@@ -536,22 +536,22 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name`+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -602,22 +602,22 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name`+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -668,22 +668,22 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name`+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -734,22 +734,22 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name`+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -800,22 +800,22 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			prepare: prepareProjectGrantQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(` SELECT projections.project_grants2.project_id,`+
-						` projections.project_grants2.grant_id,`+
-						` projections.project_grants2.creation_date,`+
-						` projections.project_grants2.change_date,`+
-						` projections.project_grants2.resource_owner,`+
-						` projections.project_grants2.state,`+
-						` projections.project_grants2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.project_grants2.granted_org_id,`+
+					regexp.QuoteMeta(` SELECT projections.project_grants3.project_id,`+
+						` projections.project_grants3.grant_id,`+
+						` projections.project_grants3.creation_date,`+
+						` projections.project_grants3.change_date,`+
+						` projections.project_grants3.resource_owner,`+
+						` projections.project_grants3.state,`+
+						` projections.project_grants3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.project_grants3.granted_org_id,`+
 						` o.name,`+
-						` projections.project_grants2.granted_role_keys,`+
+						` projections.project_grants3.granted_role_keys,`+
 						` r.name`+
-						` FROM projections.project_grants2 `+
-						` LEFT JOIN projections.projects2 ON projections.project_grants2.project_id = projections.projects2.id `+
-						` LEFT JOIN projections.orgs AS r ON projections.project_grants2.resource_owner = r.id`+
-						` LEFT JOIN projections.orgs AS o ON projections.project_grants2.granted_org_id = o.id`),
+						` FROM projections.project_grants3 `+
+						` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id `+
+						` LEFT JOIN projections.orgs AS r ON projections.project_grants3.resource_owner = r.id`+
+						` LEFT JOIN projections.orgs AS o ON projections.project_grants3.granted_org_id = o.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

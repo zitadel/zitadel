@@ -27,7 +27,7 @@ var (
 		", projections.users4_machines.name" +
 		", projections.users4_humans.avatar_key" +
 		", COUNT(*) OVER () " +
-		"FROM projections.instance_members2 AS members " +
+		"FROM projections.instance_members3 AS members " +
 		"LEFT JOIN projections.users4_humans " +
 		"ON members.user_id = projections.users4_humans.user_id " +
 		"LEFT JOIN projections.users4_machines " +

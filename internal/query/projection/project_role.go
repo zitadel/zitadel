@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	ProjectRoleProjectionTable = "projections.project_roles2"
+	ProjectRoleProjectionTable = "projections.project_roles3"
 
 	ProjectRoleColumnProjectID     = "project_id"
 	ProjectRoleColumnKey           = "role_key"
@@ -173,6 +173,8 @@ func (p *projectRoleProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
+			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectRoleColumnOwnerRemoved, true),
 		},
 		[]handler.Condition{

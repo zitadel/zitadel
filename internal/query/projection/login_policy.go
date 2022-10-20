@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "projections.login_policies2"
+	LoginPolicyTable = "projections.login_policies3"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyInstanceIDCol            = "instance_id"
@@ -375,6 +375,8 @@ func (p *loginPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(LoginPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(LoginPolicySequenceCol, e.Sequence()),
 			handler.NewCol(LoginPolicyOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

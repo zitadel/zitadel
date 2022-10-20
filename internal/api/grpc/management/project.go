@@ -288,7 +288,7 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.query.ProjectMembers(ctx, queries)
+	members, err := s.query.ProjectMembers(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}

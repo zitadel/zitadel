@@ -181,6 +181,8 @@ func (p *privacyPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*h
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(PrivacyPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(PrivacyPolicySequenceCol, e.Sequence()),
 			handler.NewCol(PrivacyPolicyOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

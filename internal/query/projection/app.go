@@ -585,6 +585,8 @@ func (p *appProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Sta
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+			handler.NewCol(AppColumnSequence, e.Sequence()),
 			handler.NewCol(AppColumnOwnerRemoved, true),
 		},
 		[]handler.Condition{

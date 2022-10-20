@@ -175,6 +175,8 @@ func (p *passwordAgeProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(AgePolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(AgePolicySequenceCol, e.Sequence()),
 			handler.NewCol(AgePolicyOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

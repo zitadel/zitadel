@@ -49,6 +49,18 @@ var (
 		name:  projection.ProjectMemberProjectIDCol,
 		table: projectMemberTable,
 	}
+	ProjectMemberOwnerRemoved = Column{
+		name:  projection.MemberOwnerRemoved,
+		table: orgMemberTable,
+	}
+	ProjectMemberOwnerRemovedUser = Column{
+		name:  projection.MemberOwnerRemovedUser,
+		table: orgMemberTable,
+	}
+	ProjectMemberOwnerRemovedProject = Column{
+		name:  projection.ProjectMemberOwnerRemovedProject,
+		table: orgMemberTable,
+	}
 )
 
 type ProjectMembersQuery struct {
@@ -62,12 +74,15 @@ func (q *ProjectMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		Where(sq.Eq{ProjectMemberProjectID.identifier(): q.ProjectID})
 }
 
-func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery) (*Members, error) {
+func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery, withOwnerRemoved bool) (*Members, error) {
 	query, scan := prepareProjectMembersQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[ProjectMemberOwnerRemoved.identifier()] = false
+		eq[ProjectMemberOwnerRemovedUser.identifier()] = false
+		eq[ProjectMemberOwnerRemovedProject.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")
 	}

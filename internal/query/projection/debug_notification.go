@@ -191,6 +191,8 @@ func (p *debugNotificationProviderProjection) reduceOwnerRemoved(event eventstor
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(DebugNotificationProviderChangeDateCol, e.CreationDate()),
+			handler.NewCol(DebugNotificationProviderSequenceCol, e.Sequence()),
 			handler.NewCol(DebugNotificationProviderOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

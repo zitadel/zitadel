@@ -181,6 +181,8 @@ func (p *domainPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*ha
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(DomainPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(DomainPolicySequenceCol, e.Sequence()),
 			handler.NewCol(DomainPolicyOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

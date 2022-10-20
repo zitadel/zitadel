@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	PersonalAccessTokenProjectionTable = "projections.personal_access_tokens2"
+	PersonalAccessTokenProjectionTable = "projections.personal_access_tokens3"
 
 	PersonalAccessTokenColumnID            = "id"
 	PersonalAccessTokenColumnCreationDate  = "creation_date"
@@ -145,6 +145,8 @@ func (p *personalAccessTokenProjection) reduceOwnerRemoved(event eventstore.Even
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(PersonalAccessTokenColumnChangeDate, e.CreationDate()),
+			handler.NewCol(PersonalAccessTokenColumnSequence, e.Sequence()),
 			handler.NewCol(PersonalAccessTokenColumnOwnerRemoved, true),
 		},
 		[]handler.Condition{

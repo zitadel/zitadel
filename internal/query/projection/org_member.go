@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	OrgMemberProjectionTable = "projections.org_members2"
+	OrgMemberProjectionTable = "projections.org_members3"
 	OrgMemberOrgIDCol        = "org_id"
 )
 

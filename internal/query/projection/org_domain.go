@@ -207,6 +207,8 @@ func (p *orgDomainProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(OrgDomainChangeDateCol, e.CreationDate()),
+			handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
 			handler.NewCol(OrgDomainOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

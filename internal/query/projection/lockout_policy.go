@@ -175,6 +175,8 @@ func (p *lockoutPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*h
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(LockoutPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(LockoutPolicySequenceCol, e.Sequence()),
 			handler.NewCol(LockoutPolicyOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

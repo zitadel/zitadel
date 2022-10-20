@@ -238,6 +238,8 @@ func (p *idpLoginPolicyLinkProjection) reduceOwnerRemoved(event eventstore.Event
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(IDPLoginPolicyLinkChangeDateCol, e.CreationDate()),
+			handler.NewCol(IDPLoginPolicyLinkSequenceCol, e.Sequence()),
 			handler.NewCol(IDPLoginPolicyLinkOwnerRemovedCol, true),
 		},
 		[]handler.Condition{
