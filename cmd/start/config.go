@@ -1,6 +1,7 @@
 package start
 
 import (
+	"github.com/zitadel/zitadel/internal/logstorage"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -60,6 +61,7 @@ type Config struct {
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
+	LogStorage        *logstorage.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {

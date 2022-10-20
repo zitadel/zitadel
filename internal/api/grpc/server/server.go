@@ -37,6 +37,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, querie
 				middleware.TranslationHandler(),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
+				middleware.AccessInterceptor(),
 			),
 		),
 	}
