@@ -212,10 +212,9 @@
       "TITLE": "Settings",
       "GENERAL": "General",
       "IDP": "Identity Providers",
-      "MFA": "Multifactor Authentication",
+      "SECURITY": "Password and Security",
       "KEYS": "Keys",
       "PAT": "Personal Access Tokens",
-      "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
       "MEMBERSHIPS": "Memberships",
       "METADATA": "Metadata"
@@ -461,6 +460,7 @@
     },
     "PASSWORD": {
       "TITLE": "Password",
+      "LABEL": "A secure password helps to protect the account",
       "DESCRIPTION": "Enter the new password according to the policy below.",
       "OLD": "Current Password",
       "NEW": "New Password",
@@ -482,6 +482,7 @@
     "EMAILVERIFIED": "Email verified",
     "NOTVERIFIED": "not verified",
     "PREFERRED_LOGINNAME": "Preferred Loginname",
+    "ISINITIAL": "This users email is not verified yet.",
     "LOGINMETHODS": {
       "TITLE": "Contact Information",
       "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -565,7 +566,7 @@
       "SAVED": "Profile saved successfully.",
       "USERNAMECHANGED": "Username changed.",
       "EMAILSAVED": "E-mail saved successfully.",
-      "INITEMAILSENT": "Initializing mail sent.",
+      "INITEMAILSENT": "Initialization mail sent.",
       "PHONESAVED": "Phone saved successfully.",
       "PHONEREMOVED": "Phone has been removed.",
       "PHONEVERIFIED": "Phone verified successfully.",
