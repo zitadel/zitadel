@@ -58,6 +58,10 @@ func (p *instanceMemberProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.MemberRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(AppColumnInstanceID),
+				},
 			},
 		},
 		{
