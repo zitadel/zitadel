@@ -40,7 +40,6 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPUserLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -78,7 +77,6 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPUserLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -110,7 +108,6 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPUserLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -139,11 +136,36 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPUserLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (resource_owner = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_user_links2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -166,7 +188,6 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPUserLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -195,7 +216,6 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPUserLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -225,7 +245,6 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPUserLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -250,7 +269,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, IDPUserLinkTable, tt.want)
 		})
 	}
 }
