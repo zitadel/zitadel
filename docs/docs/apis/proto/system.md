@@ -556,6 +556,7 @@ This is an empty request
 | database |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | view_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | failed_sequence |  uint64 | - |  |
+| instance_id |  string | - |  |
 
 
 

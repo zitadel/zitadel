@@ -73,11 +73,12 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 	return scan(rows)
 }
 
-func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName string, sequence uint64) (err error) {
+func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName, instanceID string, sequence uint64) (err error) {
 	stmt, args, err := sq.Delete(projection.FailedEventsTable).
 		Where(sq.Eq{
 			failedEventsColumnProjectionName: projectionName,
 			failedEventsColumnFailedSequence: sequence,
+			failedEventsColumnInstanceID:     instanceID,
 		}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -91,8 +92,8 @@ func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName string, 
 	return nil
 }
 
-func NewFailedEventProjectionNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(FailedEventsColumnProjectionName, value, method)
+func NewFailedEventInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
+	return NewTextQuery(FailedEventsColumnInstanceID, instanceID, TextEquals)
 }
 
 func (r *ProjectSearchQueries) AppendProjectionNameQuery(projectionName string) error {

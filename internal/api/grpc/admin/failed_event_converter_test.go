@@ -1,8 +1,10 @@
 package admin
 
 import (
+	"context"
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/test"
 	"github.com/zitadel/zitadel/internal/view/model"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -70,6 +72,7 @@ func TestFailedEventToPbFields(t *testing.T) {
 
 func TestRemoveFailedEventRequestToModelFields(t *testing.T) {
 	type args struct {
+		ctx context.Context
 		req *admin_pb.RemoveFailedEventRequest
 	}
 	tests := []struct {
@@ -79,6 +82,7 @@ func TestRemoveFailedEventRequestToModelFields(t *testing.T) {
 		{
 			"all fields",
 			args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				req: &admin_pb.RemoveFailedEventRequest{
 					Database:       "admin",
 					ViewName:       "users",
@@ -88,7 +92,7 @@ func TestRemoveFailedEventRequestToModelFields(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		converted := RemoveFailedEventRequestToModel(tt.args.req)
+		converted := RemoveFailedEventRequestToModel(tt.args.ctx, tt.args.req)
 		test.AssertFieldsMapped(t, converted, "FailureCount", "ErrMsg")
 	}
 }

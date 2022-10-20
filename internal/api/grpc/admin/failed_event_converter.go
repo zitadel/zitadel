@@ -1,6 +1,9 @@
 package admin
 
 import (
+	"context"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/view/model"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -42,10 +45,11 @@ func FailedEventToPb(database string, failedEvent *query.FailedEvent) *admin_pb.
 	}
 }
 
-func RemoveFailedEventRequestToModel(req *admin_pb.RemoveFailedEventRequest) *model.FailedEvent {
+func RemoveFailedEventRequestToModel(ctx context.Context, req *admin_pb.RemoveFailedEventRequest) *model.FailedEvent {
 	return &model.FailedEvent{
 		Database:       req.Database,
 		ViewName:       req.ViewName,
 		FailedSequence: req.FailedSequence,
+		InstanceID:     authz.GetInstance(ctx).InstanceID(),
 	}
 }

@@ -569,6 +569,11 @@ message RemoveFailedEventRequest {
       example: "\"9823758\"";
     }
   ];
+  string instance_id = 4  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"840498034930840\"";
+    }
+  ];
 }
 
 //This is an empty response

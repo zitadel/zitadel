@@ -6,4 +6,5 @@ type FailedEvent struct {
 	FailedSequence uint64
 	FailureCount   uint64
 	ErrMsg         string
+	InstanceID     string
 }

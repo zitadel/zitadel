@@ -47,5 +47,6 @@ func RemoveFailedEventRequestToModel(req *system_pb.RemoveFailedEventRequest) *m
 		Database:       req.Database,
 		ViewName:       req.ViewName,
 		FailedSequence: req.FailedSequence,
+		InstanceID:     req.InstanceId,
 	}
 }

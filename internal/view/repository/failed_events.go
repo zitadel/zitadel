@@ -11,11 +11,45 @@ import (
 )
 
 type FailedEvent struct {
-	ViewName       string `gorm:"column:view_name;primary_key"`
-	FailedSequence uint64 `gorm:"column:failed_sequence;primary_key"`
-	FailureCount   uint64 `gorm:"column:failure_count"`
-	ErrMsg         string `gorm:"column:err_msg"`
-	InstanceID     string `gorm:"column:instance_id"`
+	ViewName        string `gorm:"column:view_name;primary_key"`
+	FailedSequence  uint64 `gorm:"column:failed_sequence;primary_key"`
+	FailureCount    uint64 `gorm:"column:failure_count"`
+	ErrMsg          string `gorm:"column:err_msg"`
+	InstanceID      string `gorm:"column:instance_id"`
+	EventTimestamp  string `gorm:"column:event_timestamp"`  //TODO:?
+	FailedTimestamp string `gorm:"column:failed_timestamp"` //TODO:?
+}
+
+type failedEventSearchRequest struct {
+	Offset        uint64
+	Limit         uint64
+	SortingColumn failedEventSearchKey
+	Asc           bool
+	Queries       []*FailedEventSearchQuery
+}
+
+func (f failedEventSearchRequest) GetLimit() uint64 {
+	return f.Limit
+}
+
+func (f failedEventSearchRequest) GetOffset() uint64 {
+	return f.Offset
+}
+
+func (f failedEventSearchRequest) GetSortingColumn() ColumnKey {
+	return f.SortingColumn
+}
+
+func (f failedEventSearchRequest) GetAsc() bool {
+	return f.Asc
+}
+
+func (f failedEventSearchRequest) GetQueries() []SearchQuery {
+	result := make([]SearchQuery, len(f.Queries))
+	for i, q := range f.Queries {
+		result[i] = q
+	}
+	return result
 }
 
 type FailedEventSearchQuery struct {
@@ -65,6 +99,7 @@ func FailedEventFromModel(failedEvent *view_model.FailedEvent) *FailedEvent {
 		ViewName:       failedEvent.Database + "." + failedEvent.ViewName,
 		FailureCount:   failedEvent.FailureCount,
 		FailedSequence: failedEvent.FailedSequence,
+		InstanceID:     failedEvent.InstanceID,
 		ErrMsg:         failedEvent.ErrMsg,
 	}
 }
@@ -123,9 +158,13 @@ func LatestFailedEvent(db *gorm.DB, table, viewName, instanceID string, sequence
 
 }
 
-func AllFailedEvents(db *gorm.DB, table string) ([]*FailedEvent, error) {
+func AllFailedEvents(db *gorm.DB, table, instanceID string) ([]*FailedEvent, error) {
+	queries := make([]*FailedEventSearchQuery, 0, 1)
+	if instanceID != "" {
+		queries = append(queries, &FailedEventSearchQuery{Key: FailedEventKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID})
+	}
 	failedEvents := make([]*FailedEvent, 0)
-	query := PrepareSearchQuery(table, GeneralSearchRequest{})
+	query := PrepareSearchQuery(table, &failedEventSearchRequest{Queries: queries})
 	_, err := query(db, &failedEvents)
 	if err != nil {
 		return nil, err

@@ -84,6 +84,7 @@ func TestRemoveFailedEventRequestToModelFields(t *testing.T) {
 					Database:       "admin",
 					ViewName:       "users",
 					FailedSequence: 456,
+					InstanceId:     "instanceID",
 				},
 			},
 		},
