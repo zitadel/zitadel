@@ -63,12 +63,6 @@ If you want to experience a hands-free ZITADEL you should use [ZITADEL Cloud](ht
 
 It is free for up to 25'000 authenticated requests and provides you all the features that make ZITADEL great. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
-### Quickstarts - Integrate your app
-
-[Multiple Examples can be found here](https://docs.zitadel.com/docs/examples/introduction)
-
-> If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
-
 ## Why choose ZITADEL
 
 We built ZITADEL with a complex multi-tenancy architecture in mind and provide the best solution to handle B2B cutomers and partners.
@@ -100,7 +94,23 @@ Yet it offers everything you need for a customer identity (CIAM) use case.
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
-## Client libraries
+## Integrate your application
+
+### Quickstarts
+
+Get started with your preferred language with our [Quickstarts](https://docs.zitadel.com/docs/examples/introduction).
+
+> If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
+
+### Example applications
+
+Clone one of our [example applications](https://docs.zitadel.com/docs/examples/introduction#clone-a-sample-project) or deploy them directly to Vercel.
+
+### OpenID Connect RP Libraries
+
+Use any of the [Open ID Connect certified RP implementations](https://openid.net/developers/certified/) in your preferred language. As certified OpenID Provider, ZITADEL is compatible with any of the implementations.
+
+### Client libraries
 
 | Language / Framework | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
 |----------|--------|--------------|----------|---------|---------------------------|
