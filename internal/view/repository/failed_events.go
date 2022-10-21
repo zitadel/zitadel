@@ -37,6 +37,9 @@ func (f failedEventSearchRequest) GetOffset() uint64 {
 }
 
 func (f failedEventSearchRequest) GetSortingColumn() ColumnKey {
+	if f.SortingColumn == failedEventSearchKey(FailedEventKeyUndefined) {
+		return nil
+	}
 	return f.SortingColumn
 }
 
