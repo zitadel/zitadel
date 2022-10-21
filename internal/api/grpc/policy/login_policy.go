@@ -22,6 +22,8 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 		HidePasswordReset:          policy.HidePasswordReset,
 		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,
 		AllowDomainDiscovery:       policy.AllowDomainDiscovery,
+		DisableLoginWithEmail:      policy.DisableLoginWithEmail,
+		DisableLoginWithPhone:      policy.DisableLoginWithPhone,
 		DefaultRedirectUri:         policy.DefaultRedirectURI,
 		PasswordCheckLifetime:      durationpb.New(policy.PasswordCheckLifetime),
 		ExternalLoginCheckLifetime: durationpb.New(policy.ExternalLoginCheckLifetime),

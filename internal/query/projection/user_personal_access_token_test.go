@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -33,7 +34,6 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenAdded,
 			want: wantReduce{
-				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -68,7 +68,6 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reducePersonalAccessTokenRemoved,
 			want: wantReduce{
-				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -95,7 +94,6 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 			reduce: (&personalAccessTokenProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
@@ -103,6 +101,32 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.personal_access_tokens2 WHERE (user_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(PersonalAccessTokenColumnInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.personal_access_tokens2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -122,7 +146,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, PersonalAccessTokenProjectionTable, tt.want)
 		})
 	}
 }
