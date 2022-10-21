@@ -1,19 +1,19 @@
 package start
 
 import (
-	"github.com/zitadel/zitadel/internal/logstorage"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/logstore/access"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/api/saml"
-
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
@@ -61,7 +61,9 @@ type Config struct {
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
-	LogStorage        *logstorage.Config
+	LogStore          *struct {
+		Access *access.Config
+	}
 }
 
 func MustNewConfig(v *viper.Viper) *Config {

@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/admin/repository"
@@ -17,7 +18,8 @@ import (
 )
 
 const (
-	adminName = "Admin-API"
+	adminName         = "Admin-API"
+	GatewayPathPrefix = "/admin/v1"
 )
 
 var _ admin.AdminServiceServer = (*Server)(nil)
@@ -78,5 +80,5 @@ func (s *Server) RegisterGateway() server.GatewayFunc {
 }
 
 func (s *Server) GatewayPathPrefix() string {
-	return "/admin/v1"
+	return GatewayPathPrefix
 }

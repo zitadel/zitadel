@@ -62,6 +62,9 @@ func VerifyZitadel(db *sql.DB, config database.Config) error {
 	if err := exec(db, createUniqueConstraints, nil); err != nil {
 		return err
 	}
+	if err := exec(db, fmt.Sprintf(createLogstoreStmt, config.Username()), nil); err != nil {
+		return err
+	}
 	return nil
 }
 

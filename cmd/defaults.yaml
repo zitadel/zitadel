@@ -314,6 +314,13 @@ Actions:
       - localhost
       - '127.0.0.1'
 
+LogStore:
+  Access:
+    Enabled: true
+    Debounce:
+      MinFrequency: 2m
+      MaxBulkSize: 1000
+
 DefaultInstance:
   InstanceName:
   DefaultLanguage: en

@@ -3,6 +3,8 @@ package server
 import (
 	"crypto/tls"
 
+	"github.com/zitadel/zitadel/internal/logstore/access"
+
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -23,7 +25,14 @@ type Server interface {
 	AuthMethods() authz.MethodMapping
 }
 
-func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, queries *query.Queries, hostHeaderName string, tlsConfig *tls.Config) *grpc.Server {
+func CreateServer(
+	verifier *authz.TokenVerifier,
+	authConfig authz.Config,
+	queries *query.Queries,
+	hostHeaderName string,
+	tlsConfig *tls.Config,
+	accessSvc *access.Service,
+) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{
 		grpc.UnaryInterceptor(
@@ -37,7 +46,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, querie
 				middleware.TranslationHandler(),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
-				middleware.AccessInterceptor(),
+				middleware.AccessInterceptor(accessSvc),
 			),
 		),
 	}

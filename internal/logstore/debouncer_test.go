@@ -1,4 +1,6 @@
-package debouncer_test
+package logstore_test
+
+// TODO: Move to access package
 
 import (
 	"reflect"
@@ -12,7 +14,7 @@ type shipper struct {
 	shipped []uint
 }
 
-func (s *shipper) Ship(items []any) {
+func (s *shipper) StoreBulk(items []any) {
 	s.shipped = append(s.shipped, uint(len(items)))
 }
 
@@ -118,6 +120,6 @@ func run(t *testing.T, in given, expect []uint) {
 	}
 
 	if !reflect.DeepEqual(mock.shipped, expect) {
-		t.Errorf("Got calls to Ship() %v, want %v", mock.shipped, expect)
+		t.Errorf("Got calls to storeBulk() %v, want %v", mock.shipped, expect)
 	}
 }

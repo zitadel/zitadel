@@ -6,6 +6,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
+
+	"github.com/zitadel/zitadel/internal/logstore/access"
+
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"
@@ -21,13 +25,14 @@ import (
 )
 
 type API struct {
-	port           uint16
-	grpcServer     *grpc.Server
-	verifier       *internal_authz.TokenVerifier
-	health         health
-	router         *mux.Router
-	externalSecure bool
-	http1HostName  string
+	port              uint16
+	grpcServer        *grpc.Server
+	verifier          *internal_authz.TokenVerifier
+	health            health
+	router            *mux.Router
+	externalSecure    bool
+	http1HostName     string
+	accessInterceptor *middleware.AccessInterceptor
 }
 
 type health interface {
@@ -35,16 +40,29 @@ type health interface {
 	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
-func New(port uint16, router *mux.Router, queries *query.Queries, verifier *internal_authz.TokenVerifier, authZ internal_authz.Config, externalSecure bool, tlsConfig *tls.Config, http2HostName, http1HostName string) *API {
+func New(
+	port uint16,
+	router *mux.Router,
+	queries *query.Queries,
+	verifier *internal_authz.TokenVerifier,
+	authZ internal_authz.Config,
+	externalSecure bool,
+	tlsConfig *tls.Config,
+	http2HostName,
+	http1HostName string,
+	accessSvc *access.Service,
+) *API {
 	api := &API{
-		port:           port,
-		verifier:       verifier,
-		health:         queries,
-		router:         router,
-		externalSecure: externalSecure,
-		http1HostName:  http1HostName,
+		port:              port,
+		verifier:          verifier,
+		health:            queries,
+		router:            router,
+		externalSecure:    externalSecure,
+		http1HostName:     http1HostName,
+		accessInterceptor: middleware.NewAccessInterceptor(accessSvc),
 	}
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig)
+
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessSvc)
 	api.routeGRPC()
 
 	api.RegisterHandler("/debug", api.healthHandler())
@@ -64,6 +82,7 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) erro
 }
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
+	handler = a.accessInterceptor.Handler(handler)
 	prefix = strings.TrimSuffix(prefix, "/")
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))
