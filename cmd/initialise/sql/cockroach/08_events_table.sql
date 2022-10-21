@@ -12,18 +12,16 @@ CREATE TABLE IF NOT EXISTS eventstore.events (
 	, editor_service TEXT NOT NULL
 	, resource_owner TEXT NOT NULL
 	, instance_id TEXT NOT NULL
-	, previous_event_date TIMESTAMPTZ
 
-	, PRIMARY KEY (creation_date DESC, instance_id) USING HASH WITH BUCKET_COUNT = 10
+	, PRIMARY KEY (aggregate_type, instance_id, creation_date DESC, aggregate_id) USING HASH WITH BUCKET_COUNT = 10
+	-- , PRIMARY KEY (creation_date DESC, instance_id) USING HASH WITH BUCKET_COUNT = 10
 	, INDEX push_ro (aggregate_type, aggregate_id, instance_id) STORING (resource_owner)
+	-- TODO: with or without storing?
+	-- , INDEX instance_cd (creation_date DESC, instance_id) USING HASH WITH BUCKET_COUNT = 10
+	-- TODO: easier to shard by default, less focus on amount of event returned
+	-- , INDEX scheduled4 (aggregate_type, instance_id, creation_date DESC) 
+    -- 	STORING (id, event_type, aggregate_id, aggregate_version, event_data, editor_user, editor_service, resource_owner)
 	-- TODO: could be hashed for better sharding, focus on events returned
 	-- , INDEX scheduled (creation_date, instance_id, aggregate_type) 
-    -- 	STORING (id, event_type, aggregate_id, aggregate_version, event_data, editor_user, editor_service, resource_owner, previous_event_date)
-	-- TODO: easier to shard by default, less focus on amount of event returned
-	, INDEX scheduled4 (aggregate_type, instance_id, creation_date DESC) 
-    	STORING (id, event_type, aggregate_id, aggregate_version, event_data, editor_user, editor_service, resource_owner, previous_event_date)
-
-
-
-	, CONSTRAINT previous_event_unique UNIQUE (previous_event_date DESC, aggregate_type, aggregate_id, instance_id)
+    -- 	STORING (id, event_type, aggregate_id, aggregate_version, event_data, editor_user, editor_service, resource_owner)
 );

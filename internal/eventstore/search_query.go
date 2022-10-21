@@ -17,6 +17,7 @@ type SearchQueryBuilder struct {
 	desc          bool
 	resourceOwner string
 	instanceID    string
+	systemTime    time.Time
 	queries       []*SearchQuery
 	tx            *sql.Tx
 }
@@ -30,7 +31,7 @@ type SearchQuery struct {
 	eventTypes          []EventType
 	eventData           map[string]interface{}
 	creationDateAfter   time.Time
-	creationDateBefore  time.Time
+	// creationDateBefore  time.Time
 }
 
 // Columns defines which fields of the event are needed for the query
@@ -67,6 +68,9 @@ func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) (matche
 		return false
 	}
 	if event.Aggregate().InstanceID != "" && builder.instanceID != "" && event.Aggregate().InstanceID != builder.instanceID {
+		return false
+	}
+	if !builder.systemTime.IsZero() && builder.systemTime.Before(event.CreationDate()) {
 		return false
 	}
 
@@ -123,6 +127,11 @@ func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
 	return builder
 }
 
+func (builder *SearchQueryBuilder) SystemTime(t time.Time) *SearchQueryBuilder {
+	builder.systemTime = t
+	return builder
+}
+
 // AddQuery creates a new sub query.
 // All fields in the sub query are AND-connected in the storage request.
 // Multiple sub queries are OR-connected in the storage request.
@@ -170,11 +179,11 @@ func (query *SearchQuery) CreationDateAfter(t time.Time) *SearchQuery {
 	return query
 }
 
-// CreationDateBefore filters for events which happened before the specified time
-func (query *SearchQuery) CreationDateBefore(t time.Time) *SearchQuery {
-	query.creationDateBefore = t
-	return query
-}
+// // CreationDateBefore filters for events which happened before the specified time
+// func (query *SearchQuery) CreationDateBefore(t time.Time) *SearchQuery {
+// 	query.creationDateBefore = t
+// 	return query
+// }
 
 // EventTypes filters for events with the given event types
 func (query *SearchQuery) EventTypes(types ...EventType) *SearchQuery {
@@ -195,9 +204,9 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 }
 
 func (query *SearchQuery) matches(event Event) bool {
-	if !query.creationDateBefore.IsZero() && query.creationDateBefore.Before(event.CreationDate()) {
-		return false
-	}
+	// if !query.creationDateBefore.IsZero() && query.creationDateBefore.Before(event.CreationDate()) {
+	// 	return false
+	// }
 	if !query.creationDateAfter.IsZero() && query.creationDateAfter.After(event.CreationDate()) {
 		return false
 	}
@@ -234,7 +243,7 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 			query.instanceIDFilter,
 			query.excludedInstanceIDFilter,
 			query.creationDateAfterFilter,
-			query.creationDateBeforeFilter,
+			// query.creationDateBeforeFilter,
 			query.builder.resourceOwnerFilter,
 			query.builder.instanceIDFilter,
 		} {
@@ -249,11 +258,12 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 	}
 
 	return &repository.SearchQuery{
-		Columns: builder.columns,
-		Limit:   builder.limit,
-		Desc:    builder.desc,
-		Filters: filters,
-		Tx:      builder.tx,
+		Columns:    builder.columns,
+		Limit:      builder.limit,
+		Desc:       builder.desc,
+		Filters:    filters,
+		Tx:         builder.tx,
+		SystemTime: builder.systemTime,
 	}, nil
 }
 
@@ -337,19 +347,19 @@ func (query *SearchQuery) creationDateAfterFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldCreationDate, query.creationDateAfter, sortOrder)
 }
 
-func (query *SearchQuery) creationDateBeforeFilter() *repository.Filter {
-	if query.creationDateBefore.IsZero() {
-		return nil
-	}
+// func (query *SearchQuery) creationDateBeforeFilter() *repository.Filter {
+// 	if query.creationDateBefore.IsZero() {
+// 		return nil
+// 	}
 
-	// TODO: needeD?
-	sortOrder := repository.OperationGreater
-	if query.builder.desc {
-		sortOrder = repository.OperationLess
-	}
+// 	// TODO: needeD?
+// 	sortOrder := repository.OperationGreater
+// 	if query.builder.desc {
+// 		sortOrder = repository.OperationLess
+// 	}
 
-	return repository.NewFilter(repository.FieldCreationDate, query.creationDateBefore, sortOrder)
-}
+// 	return repository.NewFilter(repository.FieldCreationDate, query.creationDateBefore, sortOrder)
+// }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {
 	if len(query.eventData) == 0 {

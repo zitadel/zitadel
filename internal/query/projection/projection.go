@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	v3 "github.com/zitadel/zitadel/internal/eventstore/handler/v3"
 )
 
 const (
@@ -50,7 +51,7 @@ var (
 	ProjectGrantMemberProjection        *projectGrantMemberProjection
 	AuthNKeyProjection                  *authNKeyProjection
 	PersonalAccessTokenProjection       *personalAccessTokenProjection
-	UserGrantProjection                 *userGrantProjection
+	UserGrantProjection                 *v3.IDProjection
 	UserMetadataProjection              *userMetadataProjection
 	UserAuthMethodProjection            *userAuthMethodProjection
 	InstanceProjection                  *instanceProjection
@@ -81,6 +82,8 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 		MaxFailureCount:   config.MaxFailureCount,
 		BulkLimit:         config.BulkLimit,
 	}
+
+	v3Config := v3.NewConfig(sqlClient, es)
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	OrgMetadataProjection = newOrgMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_metadata"]))
@@ -113,7 +116,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	ProjectGrantMemberProjection = newProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
 	AuthNKeyProjection = newAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
 	PersonalAccessTokenProjection = newPersonalAccessTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["personal_access_tokens"]))
-	UserGrantProjection = newUserGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_grants"]))
+	UserGrantProjection = newUserGrantProjection(ctx, *v3Config)
 	UserMetadataProjection = newUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
 	UserAuthMethodProjection = newUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
 	InstanceProjection = newInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))

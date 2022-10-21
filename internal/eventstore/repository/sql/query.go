@@ -31,11 +31,17 @@ type scan func(dest ...interface{}) error
 
 func query(ctx context.Context, criteria querier, searchQuery *repository.SearchQuery, dest interface{}) error {
 	query, rowScanner := prepareColumns(criteria, searchQuery.Columns)
-	where, values := prepareCondition(criteria, searchQuery.Filters)
+	values := make([]interface{}, 0, len(searchQuery.Filters)+2)
+	if !searchQuery.SystemTime.IsZero() {
+		query += " AS OF SYSTEM TIME ?"
+		values = append(values, searchQuery.SystemTime)
+	}
+	where, conditionValues := prepareCondition(criteria, searchQuery.Filters)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
 	query += where
+	values = append(values, conditionValues...)
 
 	if searchQuery.Columns == repository.ColumnsEvent {
 		query += criteria.orderByCreationDate(searchQuery.Desc)
@@ -123,7 +129,6 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	}
 	data := make(Data, 0)
 	event := new(repository.Event)
-	var previousDate sql.NullTime
 
 	err = scanner(
 		&event.CreationDate,
@@ -136,7 +141,6 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		&event.AggregateType,
 		&event.AggregateID,
 		&event.Version,
-		&previousDate,
 	)
 
 	if err != nil {
@@ -146,7 +150,6 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 
 	event.Data = make([]byte, len(data))
 	copy(event.Data, data)
-	event.PreviousEventDate = previousDate.Time
 
 	*events = append(*events, event)
 

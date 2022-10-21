@@ -25,29 +25,9 @@ const (
 	//
 	//previous_data selects the needed data of the latest event of the aggregate
 	// and buffers it (crdb inmemory)
-	crdbInsert = `WITH previous_data (aggregate_type_cd, resource_owner) AS (
-	SELECT agg_type.cd, agg.ro FROM (
-		SELECT
-			CASE WHEN $10::TIMESTAMPTZ IS NOT NULL
-			THEN $10::TIMESTAMPTZ
-			ELSE (
-				SELECT 
-					creation_date cd
-				FROM 
-					eventstore.events 
-				WHERE 
-					aggregate_type = $2 
-					AND (CASE WHEN $9::TEXT IS NULL THEN instance_id IS NULL ELSE instance_id = $9::TEXT END) 
-				ORDER BY
-					creation_date DESC
-				LIMIT 1)
-			END AS cd
-			, 1 join_me
-	) AS agg_type
-	LEFT JOIN (
+	crdbInsert = `WITH previous_data (resource_owner) AS (
 		SELECT 
 			resource_owner ro
-			, 1 join_me 
 		FROM 
 			eventstore.events 
 		WHERE 
@@ -55,38 +35,32 @@ const (
 			AND aggregate_id = $3 
 			AND (CASE WHEN $9::TEXT IS NULL THEN instance_id IS NULL ELSE instance_id = $9::TEXT END) 
 		LIMIT 1
-	) AS agg USING(join_me)
-)
-INSERT INTO eventstore.events (
-	event_type,
-	aggregate_type,
-	aggregate_id,
-	aggregate_version,
-	event_data,
-	editor_user,
-	editor_service,
-	resource_owner,
-	instance_id,
-	previous_event_date
-) VALUES (
-	$1::VARCHAR,
-	$2::VARCHAR,
-	$3::VARCHAR,
-	$4::VARCHAR,
-	$5::JSONB,
-	$6::VARCHAR,
-	$7::VARCHAR,
-	CASE WHEN EXISTS(SELECT * FROM previous_data)
-		THEN (SELECT COALESCE(resource_owner, $8) FROM previous_data)
-		ELSE $8
-	END,
-	$9::VARCHAR,
-	CASE WHEN EXISTS(SELECT * FROM previous_data)
-		THEN (SELECT aggregate_type_cd FROM previous_data)
-		ELSE NULL
-	END
-)
-RETURNING id, creation_date, resource_owner, instance_id, previous_event_date`
+	)
+	INSERT INTO eventstore.events (
+		event_type
+		, aggregate_type
+		, aggregate_id
+		, aggregate_version
+		, event_data
+		, editor_user
+		, editor_service
+		, resource_owner
+		, instance_id
+	) VALUES (
+		$1::VARCHAR
+		, $2::VARCHAR
+		, $3::VARCHAR
+		, $4::VARCHAR
+		, $5::JSONB
+		, $6::VARCHAR
+		, $7::VARCHAR
+		, CASE WHEN EXISTS(SELECT * FROM previous_data)
+			THEN (SELECT COALESCE(resource_owner, $8) FROM previous_data)
+			ELSE $8
+		END
+		, $9::VARCHAR
+	)
+	RETURNING id, creation_date, resource_owner, instance_id`
 
 	// " CASE WHEN EXISTS (SELECT * FROM previous_data)" +
 	// " THEN (SELECT resource_owner FROM previous_data)" +
@@ -123,14 +97,7 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 // This call is transaction save. The transaction will be rolled back if one event fails
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
-		aggregateCreationDates := map[string]*sql.NullTime{}
 		for _, event := range events {
-			creationDateKey := string(event.AggregateType)
-			if _, ok := aggregateCreationDates[creationDateKey]; !ok {
-				aggregateCreationDates[creationDateKey] = new(sql.NullTime)
-			}
-
-			var previousEvent sql.NullTime
 			err := tx.QueryRowContext(ctx, crdbInsert,
 				event.Type,
 				event.AggregateType,
@@ -141,8 +108,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorService,
 				event.ResourceOwner,
 				event.InstanceID,
-				aggregateCreationDates[creationDateKey],
-			).Scan(&event.ID, &event.CreationDate, &event.ResourceOwner, &event.InstanceID, &previousEvent)
+			).Scan(&event.ID, &event.CreationDate, &event.ResourceOwner, &event.InstanceID)
 
 			if err != nil {
 				logging.WithFields(
@@ -154,10 +120,6 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
-
-			event.PreviousEventDate = previousEvent.Time
-			aggregateCreationDates[creationDateKey].Time = event.CreationDate
-			aggregateCreationDates[creationDateKey].Valid = true
 		}
 
 		err := db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
@@ -259,7 +221,6 @@ func (db *CRDB) eventQuery() string {
 		", aggregate_type" +
 		", aggregate_id" +
 		", aggregate_version" +
-		", previous_event_date" +
 		" FROM eventstore.events" //AS OF SYSTEM TIME '-1ms'::INTERVAL"
 }
 

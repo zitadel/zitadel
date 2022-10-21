@@ -62,7 +62,7 @@ func (u *UserSession) Subscription() *v1.Subscription {
 }
 
 func (_ *UserSession) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{user.AggregateType, org.AggregateType}
+	return []models.AggregateType{models.AggregateType(user.AggregateType), org.AggregateType}
 }
 
 func (u *UserSession) CurrentCreationDate(instanceID string) (time.Time, error) {

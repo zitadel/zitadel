@@ -67,7 +67,7 @@ func (i *ExternalIDP) Subscription() *v1.Subscription {
 }
 
 func (_ *ExternalIDP) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{user.AggregateType, instance.AggregateType, org.AggregateType}
+	return []es_models.AggregateType{es_models.AggregateType(user.AggregateType), instance.AggregateType, org.AggregateType}
 }
 
 func (i *ExternalIDP) CurrentCreationDate(instanceID string) (time.Time, error) {
@@ -88,7 +88,7 @@ func (i *ExternalIDP) EventQuery(instanceIDs ...string) (*es_models.SearchQuery,
 
 func (i *ExternalIDP) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
-	case user.AggregateType:
+	case es_models.AggregateType(user.AggregateType):
 		err = i.processUser(event)
 	case instance.AggregateType, org.AggregateType:
 		err = i.processIdpConfig(event)

@@ -15,7 +15,7 @@ func ProjectByIDQuery(id, instanceID string, latestTimestamp time.Time) (*es_mod
 	return es_models.NewSearchQuery().
 		AddQuery().
 		AggregateIDFilter(id).
-		AggregateTypeFilter(project.AggregateType).
+		AggregateTypeFilter(es_models.AggregateType(project.AggregateType)).
 		CreationDateNewerFilter(latestTimestamp).
 		InstanceIDFilter(instanceID).
 		SearchQuery(), nil

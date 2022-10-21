@@ -53,7 +53,7 @@ func (p *OrgProjectMapping) Subscription() *v1.Subscription {
 }
 
 func (_ *OrgProjectMapping) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{project.AggregateType}
+	return []es_models.AggregateType{es_models.AggregateType(project.AggregateType)}
 }
 
 func (p *OrgProjectMapping) CurrentCreationDate(instanceID string) (time.Time, error) {

@@ -14,7 +14,7 @@ func UserByIDQuery(id, instanceID string, creationDate time.Time) (*es_models.Se
 	}
 	return es_models.NewSearchQuery().
 		AddQuery().
-		AggregateTypeFilter(user.AggregateType).
+		AggregateTypeFilter(es_models.AggregateType(user.AggregateType)).
 		AggregateIDFilter(id).
 		CreationDateNewerFilter(creationDate).
 		InstanceIDFilter(instanceID).

@@ -56,7 +56,7 @@ func (t *RefreshToken) Subscription() *v1.Subscription {
 }
 
 func (t *RefreshToken) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{user.AggregateType, project.AggregateType}
+	return []es_models.AggregateType{es_models.AggregateType(user.AggregateType), es_models.AggregateType(project.AggregateType)}
 }
 
 func (t *RefreshToken) CurrentCreationDate(instanceID string) (time.Time, error) {

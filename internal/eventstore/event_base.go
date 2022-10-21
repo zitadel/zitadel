@@ -17,7 +17,6 @@ type BaseEvent struct {
 	aggregate Aggregate
 
 	creationDate time.Time
-	previousDate time.Time
 
 	//User who created the event
 	User string `json:"-"`
@@ -50,10 +49,6 @@ func (e *BaseEvent) CreationDate() time.Time {
 	return e.creationDate
 }
 
-func (e *BaseEvent) PreviousAggregateDate() time.Time {
-	return e.previousDate
-}
-
 // Aggregate represents the metadata of the event's aggregate
 func (e *BaseEvent) Aggregate() Aggregate {
 	return e.aggregate
@@ -76,7 +71,6 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 		},
 		EventType:    EventType(event.Type),
 		creationDate: event.CreationDate,
-		previousDate: event.PreviousEventDate,
 		Service:      event.EditorService,
 		User:         event.EditorUser,
 		Data:         event.Data,

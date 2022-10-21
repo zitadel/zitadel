@@ -42,12 +42,11 @@ func NewCreateStatement(event eventstore.Event, values []handler.Column, opts ..
 	}
 
 	return &handler.Statement{
-		AggregateType:     event.Aggregate().Type,
-		InstanceID:        event.Aggregate().InstanceID,
-		Execute:           exec(config, q, opts),
-		EventID:           event.EventID(),
-		CreationDate:      event.CreationDate(),
-		PreviousEventDate: event.PreviousAggregateDate(),
+		AggregateType: event.Aggregate().Type,
+		InstanceID:    event.Aggregate().InstanceID,
+		Execute:       exec(config, q, opts),
+		EventID:       event.EventID(),
+		CreationDate:  event.CreationDate(),
 	}
 }
 
@@ -87,12 +86,11 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []handler.Column, v
 	}
 
 	return &handler.Statement{
-		AggregateType:     event.Aggregate().Type,
-		EventID:           event.EventID(),
-		CreationDate:      event.CreationDate(),
-		PreviousEventDate: event.PreviousAggregateDate(),
-		InstanceID:        event.Aggregate().InstanceID,
-		Execute:           exec(config, q, opts),
+		AggregateType: event.Aggregate().Type,
+		EventID:       event.EventID(),
+		CreationDate:  event.CreationDate(),
+		InstanceID:    event.Aggregate().InstanceID,
+		Execute:       exec(config, q, opts),
 	}
 }
 
@@ -151,12 +149,11 @@ func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditi
 	}
 
 	return &handler.Statement{
-		AggregateType:     event.Aggregate().Type,
-		EventID:           event.EventID(),
-		CreationDate:      event.CreationDate(),
-		PreviousEventDate: event.PreviousAggregateDate(),
-		InstanceID:        event.Aggregate().InstanceID,
-		Execute:           exec(config, q, opts),
+		AggregateType: event.Aggregate().Type,
+		EventID:       event.EventID(),
+		CreationDate:  event.CreationDate(),
+		InstanceID:    event.Aggregate().InstanceID,
+		Execute:       exec(config, q, opts),
 	}
 }
 
@@ -178,22 +175,20 @@ func NewDeleteStatement(event eventstore.Event, conditions []handler.Condition, 
 	}
 
 	return &handler.Statement{
-		AggregateType:     event.Aggregate().Type,
-		EventID:           event.EventID(),
-		CreationDate:      event.CreationDate(),
-		PreviousEventDate: event.PreviousAggregateDate(),
-		InstanceID:        event.Aggregate().InstanceID,
-		Execute:           exec(config, q, opts),
+		AggregateType: event.Aggregate().Type,
+		EventID:       event.EventID(),
+		CreationDate:  event.CreationDate(),
+		InstanceID:    event.Aggregate().InstanceID,
+		Execute:       exec(config, q, opts),
 	}
 }
 
 func NewNoOpStatement(event eventstore.Event) *handler.Statement {
 	return &handler.Statement{
-		AggregateType:     event.Aggregate().Type,
-		EventID:           event.EventID(),
-		CreationDate:      event.CreationDate(),
-		PreviousEventDate: event.PreviousAggregateDate(),
-		InstanceID:        event.Aggregate().InstanceID,
+		AggregateType: event.Aggregate().Type,
+		EventID:       event.EventID(),
+		CreationDate:  event.CreationDate(),
+		InstanceID:    event.Aggregate().InstanceID,
 	}
 }
 
@@ -206,12 +201,11 @@ func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Ex
 		execs[i] = opt(event)
 	}
 	return &handler.Statement{
-		AggregateType:     event.Aggregate().Type,
-		EventID:           event.EventID(),
-		CreationDate:      event.CreationDate(),
-		PreviousEventDate: event.PreviousAggregateDate(),
-		InstanceID:        event.Aggregate().InstanceID,
-		Execute:           multiExec(execs),
+		AggregateType: event.Aggregate().Type,
+		EventID:       event.EventID(),
+		CreationDate:  event.CreationDate(),
+		InstanceID:    event.Aggregate().InstanceID,
+		Execute:       multiExec(execs),
 	}
 }
 
@@ -353,12 +347,11 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []handler.C
 	}
 
 	return &handler.Statement{
-		AggregateType:     event.Aggregate().Type,
-		EventID:           event.EventID(),
-		CreationDate:      event.CreationDate(),
-		PreviousEventDate: event.PreviousAggregateDate(),
-		InstanceID:        event.Aggregate().InstanceID,
-		Execute:           exec(config, q, opts),
+		AggregateType: event.Aggregate().Type,
+		EventID:       event.EventID(),
+		CreationDate:  event.CreationDate(),
+		InstanceID:    event.Aggregate().InstanceID,
+		Execute:       exec(config, q, opts),
 	}
 }
 

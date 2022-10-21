@@ -2,10 +2,13 @@ package projection
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
@@ -28,6 +31,17 @@ const (
 
 type projectGrantProjection struct {
 	crdb.StatementHandler
+}
+
+func (p *projectGrantProjection) changeDate(ctx context.Context, event *eventstore.Event) (time.Time, error) {
+	row := p.Client.QueryRowContext(ctx, "SELECT "+ProjectGrantColumnChangeDate+" FROM "+ProjectGrantProjectionTable)
+	changeDate := new(sql.NullTime)
+	err := row.Scan(changeDate)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return changeDate.Time, err
+	}
+
+	return changeDate.Time, nil
 }
 
 func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectGrantProjection {
@@ -96,8 +110,11 @@ func (p *projectGrantProjection) reducers() []handler.AggregateReducer {
 func (p *projectGrantProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.GrantAddedType)
+		return nil, errs.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.GrantAddedType)
 	}
+
+	//
+
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
@@ -117,7 +134,7 @@ func (p *projectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g0fg4", "reduce.wrong.event.type %s", project.GrantChangedType)
+		return nil, errs.ThrowInvalidArgumentf(nil, "HANDL-g0fg4", "reduce.wrong.event.type %s", project.GrantChangedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -135,7 +152,7 @@ func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantCascadeChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ll9Ts", "reduce.wrong.event.type %s", project.GrantCascadeChangedType)
+		return nil, errs.ThrowInvalidArgumentf(nil, "HANDL-ll9Ts", "reduce.wrong.event.type %s", project.GrantCascadeChangedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -153,7 +170,7 @@ func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 func (p *projectGrantProjection) reduceProjectGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantDeactivateEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0fj2f", "reduce.wrong.event.type %s", project.GrantDeactivatedType)
+		return nil, errs.ThrowInvalidArgumentf(nil, "HANDL-0fj2f", "reduce.wrong.event.type %s", project.GrantDeactivatedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -171,7 +188,7 @@ func (p *projectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 func (p *projectGrantProjection) reduceProjectGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantReactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2M0ve", "reduce.wrong.event.type %s", project.GrantReactivatedType)
+		return nil, errs.ThrowInvalidArgumentf(nil, "HANDL-2M0ve", "reduce.wrong.event.type %s", project.GrantReactivatedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -189,7 +206,7 @@ func (p *projectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 func (p *projectGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o0w4f", "reduce.wrong.event.type %s", project.GrantRemovedType)
+		return nil, errs.ThrowInvalidArgumentf(nil, "HANDL-o0w4f", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -203,7 +220,7 @@ func (p *projectGrantProjection) reduceProjectGrantRemoved(event eventstore.Even
 func (p *projectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-gn9rw", "reduce.wrong.event.type %s", project.ProjectRemovedType)
+		return nil, errs.ThrowInvalidArgumentf(nil, "HANDL-gn9rw", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

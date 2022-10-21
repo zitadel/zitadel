@@ -2,6 +2,8 @@ package projection
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -9,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	v3 "github.com/zitadel/zitadel/internal/eventstore/handler/v3"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -29,15 +32,12 @@ const (
 	UserGrantRoles         = "roles"
 )
 
-type userGrantProjection struct {
-	crdb.StatementHandler
-}
+type userGrantProjection struct{}
 
-func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userGrantProjection {
+func newUserGrantProjection(ctx context.Context, config v3.Config) *v3.IDProjection {
 	p := new(userGrantProjection)
-	config.ProjectionName = UserGrantProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
+
+	config.Check = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(UserGrantID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantCreationDate, crdb.ColumnTypeTimestamp),
@@ -55,81 +55,80 @@ func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.WithIndex(crdb.NewIndex("user_grant_ro_idx", []string{UserGrantResourceOwner})),
 		),
 	)
-
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
-}
-
-func (p *userGrantProjection) reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: usergrant.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  usergrant.UserGrantAddedType,
-					Reduce: p.reduceAdded,
-				},
-				{
-					Event:  usergrant.UserGrantChangedType,
-					Reduce: p.reduceChanged,
-				},
-				{
-					Event:  usergrant.UserGrantCascadeChangedType,
-					Reduce: p.reduceChanged,
-				},
-				{
-					Event:  usergrant.UserGrantRemovedType,
-					Reduce: p.reduceRemoved,
-				},
-				{
-					Event:  usergrant.UserGrantCascadeRemovedType,
-					Reduce: p.reduceRemoved,
-				},
-				{
-					Event:  usergrant.UserGrantDeactivatedType,
-					Reduce: p.reduceDeactivated,
-				},
-				{
-					Event:  usergrant.UserGrantReactivatedType,
-					Reduce: p.reduceReactivated,
-				},
+	config.Reduces = map[eventstore.AggregateType][]v3.Reducer{
+		usergrant.AggregateType: {
+			{
+				Event:  usergrant.UserGrantAddedType,
+				Reduce: p.reduceAdded,
+			},
+			{
+				Event:          usergrant.UserGrantChangedType,
+				Reduce:         p.reduceChanged,
+				PreviousEvents: p.previousEventsChanged,
+			},
+			{
+				Event:          usergrant.UserGrantCascadeChangedType,
+				Reduce:         p.reduceChanged,
+				PreviousEvents: p.previousEventsChanged,
+			},
+			{
+				Event:          usergrant.UserGrantRemovedType,
+				Reduce:         p.reduceRemoved,
+				PreviousEvents: p.previousEventsRemoved,
+			},
+			{
+				Event:          usergrant.UserGrantCascadeRemovedType,
+				Reduce:         p.reduceRemoved,
+				PreviousEvents: p.previousEventsRemoved,
+			},
+			{
+				Event:          usergrant.UserGrantDeactivatedType,
+				Reduce:         p.reduceDeactivated,
+				PreviousEvents: p.previousEventsDeactivated,
+			},
+			{
+				Event:          usergrant.UserGrantReactivatedType,
+				Reduce:         p.reduceReactivated,
+				PreviousEvents: p.previousEventsReactivated,
 			},
 		},
-		{
-			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserRemoved,
-				},
+		user.AggregateType: {
+			{
+				Event:          user.UserRemovedType,
+				Reduce:         p.reduceUserRemoved,
+				PreviousEvents: p.previousEventsUser,
 			},
 		},
-		{
-			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  project.ProjectRemovedType,
-					Reduce: p.reduceProjectRemoved,
-				},
-				{
-					Event:  project.GrantRemovedType,
-					Reduce: p.reduceProjectGrantRemoved,
-				},
-				{
-					Event:  project.RoleRemovedType,
-					Reduce: p.reduceRoleRemoved,
-				},
-				{
-					Event:  project.GrantChangedType,
-					Reduce: p.reduceProjectGrantChanged,
-				},
-				{
-					Event:  project.GrantCascadeChangedType,
-					Reduce: p.reduceProjectGrantChanged,
-				},
+		project.AggregateType: {
+			{
+				Event:          project.ProjectRemovedType,
+				Reduce:         p.reduceProjectRemoved,
+				PreviousEvents: p.previousEventsProject,
+			},
+			{
+				Event:          project.GrantRemovedType,
+				Reduce:         p.reduceProjectGrantRemoved,
+				PreviousEvents: p.previousEventsProject,
+			},
+			{
+				Event:          project.RoleRemovedType,
+				Reduce:         p.reduceRoleRemoved,
+				PreviousEvents: p.previousEventsProject,
+			},
+			{
+				Event:          project.GrantChangedType,
+				Reduce:         p.reduceProjectGrantChanged,
+				PreviousEvents: p.previousEventsProject,
+			},
+			{
+				Event:          project.GrantCascadeChangedType,
+				Reduce:         p.reduceProjectGrantChanged,
+				PreviousEvents: p.previousEventsProject,
 			},
 		},
 	}
+
+	return v3.StartSubscriptionIDProjection(ctx, UserGrantProjectionTable, config)
 }
 
 func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -178,6 +177,21 @@ func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.St
 	), nil
 }
 
+func (p *userGrantProjection) previousEventsChanged(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	var grantID string
+
+	switch e := event.(type) {
+	case *usergrant.UserGrantChangedEvent:
+		grantID = e.Aggregate().ID
+	case *usergrant.UserGrantCascadeChangedEvent:
+		grantID = e.Aggregate().ID
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-RePmo", "previous.events.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType})
+	}
+
+	return p.previousEvents(grantID, event.Aggregate().InstanceID, tx)
+}
+
 func (p *userGrantProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
 	case *usergrant.UserGrantRemovedEvent, *usergrant.UserGrantCascadeRemovedEvent:
@@ -192,6 +206,21 @@ func (p *userGrantProjection) reduceRemoved(event eventstore.Event) (*handler.St
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
 		},
 	), nil
+}
+
+func (p *userGrantProjection) previousEventsRemoved(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	var grantID string
+
+	switch e := event.(type) {
+	case *usergrant.UserGrantRemovedEvent:
+		grantID = e.Aggregate().ID
+	case *usergrant.UserGrantCascadeRemovedEvent:
+		grantID = e.Aggregate().ID
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-RePmo", "previous.events.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType})
+	}
+
+	return p.previousEvents(grantID, event.Aggregate().InstanceID, tx)
 }
 
 func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handler.Statement, error) {
@@ -211,6 +240,15 @@ func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 	), nil
 }
 
+func (p *userGrantProjection) previousEventsDeactivated(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	e, ok := event.(*usergrant.UserGrantDeactivatedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-oP7Gm", "reduce.wrong.event.type %s", usergrant.UserGrantDeactivatedType)
+	}
+
+	return p.previousEvents(e.Aggregate().ID, event.Aggregate().InstanceID, tx)
+}
+
 func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DGsKh", "reduce.wrong.event.type %s", usergrant.UserGrantReactivatedType)
@@ -226,6 +264,15 @@ func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
 		},
 	), nil
+}
+
+func (p *userGrantProjection) previousEventsReactivated(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	e, ok := event.(*usergrant.UserGrantReactivatedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-WEpat", "reduce.wrong.event.type %s", usergrant.UserGrantDeactivatedType)
+	}
+
+	return p.previousEvents(e.Aggregate().ID, event.Aggregate().InstanceID, tx)
 }
 
 func (p *userGrantProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
@@ -253,7 +300,6 @@ func (p *userGrantProjection) reduceProjectRemoved(event eventstore.Event) (*han
 		},
 	), nil
 }
-
 func (p *userGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
@@ -308,4 +354,47 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 			handler.NewCond(UserGrantGrantID, grantID),
 		},
 	), nil
+}
+
+// previousEventsUserRemoved locks the rows of the user
+func (p *userGrantProjection) previousEventsUser(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	_, err := tx.Exec("SELECT FOR UPDATE 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantUserID+" = $1 AND "+UserGrantInstanceID+" = $2", event.Aggregate().ID, event.Aggregate().InstanceID)
+	return nil, err
+}
+
+// previousEventsUserRemoved locks the rows of the project
+func (p *userGrantProjection) previousEventsProject(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	_, err := tx.Exec("SELECT FOR UPDATE 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantProjectID+" = $1 AND "+UserGrantInstanceID+" = $2", event.Aggregate().ID, event.Aggregate().InstanceID)
+	return nil, err
+}
+
+// previousEventsUserRemoved locks the rows of the grant
+func (p *userGrantProjection) previousEventsProjectGrant(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	e, ok := event.(*project.GrantRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-jTfdc", "reduce.wrong.event.type %s", project.GrantRemovedType)
+	}
+
+	_, err := tx.Exec("SELECT FOR UPDATE 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantGrantID+" = $1 AND "+UserGrantInstanceID+" = $2", e.GrantID, e.Aggregate().InstanceID)
+	return nil, err
+}
+
+func (p *userGrantProjection) previousEvents(grantID, instanceID string, tx *sql.Tx) (*eventstore.SearchQueryBuilder, error) {
+	row := tx.QueryRow("SELECT FOR UPDATE "+UserGrantChangeDate+" FROM "+UserGrantProjectionTable+" WHERE "+UserGrantID+" = $1 AND "+UserGrantInstanceID+" = $2", grantID, instanceID)
+
+	var changeDate time.Time
+
+	if err := row.Scan(changeDate); err != nil {
+		return nil, err
+	}
+
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		SetTx(tx).
+		InstanceID(instanceID).
+		SystemTime(changeDate).
+		AddQuery().
+		AggregateTypes(usergrant.AggregateType).
+		AggregateIDs(grantID).
+		CreationDateAfter(changeDate).
+		Builder(), nil
 }

@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	AggregateType    = "user"
-	AggregateVersion = "v2"
+	AggregateType    = eventstore.AggregateType("user")
+	AggregateVersion = eventstore.Version("v2")
 )
 
 type Aggregate struct {

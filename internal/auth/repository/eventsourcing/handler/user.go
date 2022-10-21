@@ -64,7 +64,7 @@ func (u *User) Subscription() *v1.Subscription {
 	return u.subscription
 }
 func (_ *User) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{user_repo.AggregateType, org.AggregateType}
+	return []es_models.AggregateType{es_models.AggregateType(user_repo.AggregateType), org.AggregateType}
 }
 
 func (u *User) CurrentCreationDate(instanceID string) (time.Time, error) {
@@ -85,7 +85,7 @@ func (u *User) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error)
 
 func (u *User) Reduce(event *es_models.Event) (err error) {
 	switch event.AggregateType {
-	case user_repo.AggregateType:
+	case es_models.AggregateType(user_repo.AggregateType):
 		return u.ProcessUser(event)
 	case org.AggregateType:
 		return u.ProcessOrg(event)
