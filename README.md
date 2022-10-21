@@ -86,9 +86,8 @@ Yet it offers everything you need for a customer identity (CIAM) use case.
 - Personal Access Tokens (PAT)
 - Role Based Access Control (RBAC)
 - [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/manage/console/projects)
-- Self-registration including verification
-- User and Organization self service
-- [Service Accounts](https://docs.zitadel.com/docs/guides/integrate/serviceusers)
+- [Self-registration](https://docs.zitadel.com/docs/concepts/features/selfservice#registration) including verification
+- [Self-service](https://docs.zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://docs.zitadel.com/docs/apis/openidoauth/endpoints),  [OIDC Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-oidc)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://docs.zitadel.com/docs/apis/saml/endpoints), [SAML Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-saml)
 - [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres) (version >= 14) or [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach) (version >= 22.0)
