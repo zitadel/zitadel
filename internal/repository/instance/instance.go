@@ -92,35 +92,38 @@ func InstanceChangedEventMapper(event *repository.Event) (eventstore.Event, erro
 type InstanceRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	name                 string
+	domains              []string
 }
 
 func (e *InstanceRemovedEvent) Data() interface{} {
-	return e
-}
-
-func (e *InstanceRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewInstanceRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *InstanceRemovedEvent {
+func (e *InstanceRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	if len(e.domains) == 0 {
+		return nil
+	}
+	constraints := make([]*eventstore.EventUniqueConstraint, len(e.domains))
+	for i, domain := range e.domains {
+		constraints[i] = NewRemoveInstanceDomainUniqueConstraint(domain)
+	}
+	return constraints
+}
+
+func NewInstanceRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, domains []string) *InstanceRemovedEvent {
 	return &InstanceRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			InstanceRemovedEventType,
 		),
-		name: name,
+		name:    name,
+		domains: domains,
 	}
 }
 
 func InstanceRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	instanceRemoved := &InstanceRemovedEvent{
+	return &InstanceRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, instanceRemoved)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "INSTANCE-39jlW", "unable to unmarshal instance removed")
-	}
-
-	return instanceRemoved, nil
+	}, nil
 }
