@@ -30,28 +30,28 @@ func (s *Server) GetDefaultLoginPolicy(ctx context.Context, req *mgmt_pb.GetDefa
 }
 
 func (s *Server) AddCustomLoginPolicy(ctx context.Context, req *mgmt_pb.AddCustomLoginPolicyRequest) (*mgmt_pb.AddCustomLoginPolicyResponse, error) {
-	policy, err := s.command.AddLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, AddLoginPolicyToDomain(req))
+	policy, err := s.command.AddLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, AddLoginPolicyToCommand(req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddCustomLoginPolicyResponse{
 		Details: object.AddToDetailsPb(
 			policy.Sequence,
-			policy.ChangeDate,
+			policy.EventDate,
 			policy.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) UpdateCustomLoginPolicy(ctx context.Context, req *mgmt_pb.UpdateCustomLoginPolicyRequest) (*mgmt_pb.UpdateCustomLoginPolicyResponse, error) {
-	policy, err := s.command.ChangeLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, updateLoginPolicyToDomain(req))
+	policy, err := s.command.ChangeLoginPolicy(ctx, authz.GetCtxData(ctx).OrgID, updateLoginPolicyToCommand(req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateCustomLoginPolicyResponse{
 		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
-			policy.ChangeDate,
+			policy.EventDate,
 			policy.ResourceOwner,
 		),
 	}, nil

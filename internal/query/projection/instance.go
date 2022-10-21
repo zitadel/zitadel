@@ -67,6 +67,10 @@ func (p *instanceProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceInstanceChanged,
 				},
 				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(InstanceColumnID),
+				},
+				{
 					Event:  instance.DefaultOrgSetEventType,
 					Reduce: p.reduceDefaultOrgSet,
 				},
@@ -102,6 +106,21 @@ func (p *instanceProjection) reduceInstanceAdded(event eventstore.Event) (*handl
 			handler.NewCol(InstanceColumnName, e.Name),
 		},
 	), nil
+}
+
+func reduceInstanceRemovedHelper(instanceIDCol string) func(event eventstore.Event) (*handler.Statement, error) {
+	return func(event eventstore.Event) (*handler.Statement, error) {
+		e, ok := event.(*instance.InstanceRemovedEvent)
+		if !ok {
+			return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-22nlS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+		}
+		return crdb.NewDeleteStatement(
+			e,
+			[]handler.Condition{
+				handler.NewCond(instanceIDCol, e.Aggregate().ID),
+			},
+		), nil
+	}
 }
 
 func (p *instanceProjection) reduceInstanceChanged(event eventstore.Event) (*handler.Statement, error) {

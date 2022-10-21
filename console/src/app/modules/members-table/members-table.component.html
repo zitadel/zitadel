@@ -93,6 +93,7 @@
               (click)="$event.stopPropagation(); triggerDeleteMember(member)"
               mat-icon-button
               [disabled]="canDelete === false"
+              data-e2e="remove-member-button"
             >
               <i class="las la-trash"></i>
             </button>
@@ -114,10 +115,11 @@
               [removable]="canWrite"
               [selectable]="false"
               (removed)="removeRole(member, role)"
+              data-e2e="role"
             >
               <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
               <span>{{ role | roletransform }}</span>
-              <button *ngIf="canWrite" matChipRemove>
+              <button *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
                 <mat-icon>cancel</mat-icon>
               </button>
             </mat-chip>

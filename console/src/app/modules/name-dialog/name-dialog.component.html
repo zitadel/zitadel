@@ -5,7 +5,7 @@
 <div mat-dialog-content>
   <cnsl-form-field class="formfield">
     <cnsl-label>{{ data.labelKey | translate }}</cnsl-label>
-    <input cnslInput [(ngModel)]="name" />
+    <input data-e2e="name" cnslInput [(ngModel)]="name" />
   </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
@@ -13,7 +13,7 @@
     {{ 'ACTIONS.CLOSE' | translate }}
   </button>
 
-  <button [disabled]="!name" cdkFocusInitial color="primary" mat-raised-button (click)="closeDialog(name)">
+  <button data-e2e="dialog-submit" [disabled]="!name" color="primary" mat-raised-button (click)="closeDialog(name)">
     {{ 'ACTIONS.RENAME' | translate }}
   </button>
 </div>

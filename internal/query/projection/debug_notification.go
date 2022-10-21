@@ -83,6 +83,10 @@ func (p *debugNotificationProviderProjection) reducers() []handler.AggregateRedu
 					Event:  instance.DebugNotificationProviderLogRemovedEventType,
 					Reduce: p.reduceDebugNotificationProviderRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(DebugNotificationProviderInstanceIDCol),
+				},
 			},
 		},
 	}

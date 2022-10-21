@@ -86,6 +86,10 @@ func (p *lockoutPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.LockoutPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(LockoutPolicyInstanceIDCol),
+				},
 			},
 		},
 	}

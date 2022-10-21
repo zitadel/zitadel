@@ -73,7 +73,7 @@ func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*La
 	stmt, args, err := query.
 		Where(or).
 		Where(sq.Eq{CurrentSequenceColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).
-		OrderBy(CurrentSequenceColCurrentSequence.identifier()).
+		OrderBy(CurrentSequenceColCurrentSequence.identifier() + " DESC").
 		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
