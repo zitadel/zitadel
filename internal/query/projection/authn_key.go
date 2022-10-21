@@ -18,6 +18,7 @@ const (
 	AuthNKeyTable            = "projections.authn_keys2"
 	AuthNKeyIDCol            = "id"
 	AuthNKeyCreationDateCol  = "creation_date"
+	AuthNKeyChangeDateCol    = "change_date"
 	AuthNKeyResourceOwnerCol = "resource_owner"
 	AuthNKeyInstanceIDCol    = "instance_id"
 	AuthNKeyAggregateIDCol   = "aggregate_id"
@@ -43,6 +44,7 @@ func newAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(AuthNKeyIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AuthNKeyChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(AuthNKeyResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AuthNKeyAggregateIDCol, crdb.ColumnTypeText),
@@ -160,6 +162,7 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 			[]handler.Column{
 				handler.NewCol(AuthNKeyIDCol, authNKeyEvent.keyID),
 				handler.NewCol(AuthNKeyCreationDateCol, authNKeyEvent.CreationDate()),
+				handler.NewCol(AuthNKeyChangeDateCol, authNKeyEvent.CreationDate()),
 				handler.NewCol(AuthNKeyResourceOwnerCol, authNKeyEvent.Aggregate().ResourceOwner),
 				handler.NewCol(AuthNKeyInstanceIDCol, authNKeyEvent.Aggregate().InstanceID),
 				handler.NewCol(AuthNKeyAggregateIDCol, authNKeyEvent.Aggregate().ID),
@@ -177,6 +180,8 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 func (p *authNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event) (*handler.Statement, error) {
 	var appID string
 	var enabled bool
+	var changeDate time.Time
+	var sequence uint64
 	switch e := event.(type) {
 	case *project.APIConfigChangedEvent:
 		if e.AuthMethodType == nil {
@@ -184,18 +189,26 @@ func (p *authNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 		}
 		appID = e.AppID
 		enabled = *e.AuthMethodType == domain.APIAuthMethodTypePrivateKeyJWT
+		changeDate = e.CreationDate()
+		sequence = e.Sequence()
 	case *project.OIDCConfigChangedEvent:
 		if e.AuthMethodType == nil {
 			return crdb.NewNoOpStatement(event), nil
 		}
 		appID = e.AppID
 		enabled = *e.AuthMethodType == domain.OIDCAuthMethodTypePrivateKeyJWT
+		changeDate = e.CreationDate()
+		sequence = e.Sequence()
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dbrt1", "reduce.wrong.event.type %v", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType})
 	}
 	return crdb.NewUpdateStatement(
 		event,
-		[]handler.Column{handler.NewCol(AuthNKeyEnabledCol, enabled)},
+		[]handler.Column{
+			handler.NewCol(AuthNKeyChangeDateCol, changeDate),
+			handler.NewCol(AuthNKeySequenceCol, sequence),
+			handler.NewCol(AuthNKeyEnabledCol, enabled),
+		},
 		[]handler.Condition{handler.NewCond(AuthNKeyObjectIDCol, appID)},
 	), nil
 }
@@ -231,6 +244,8 @@ func (p *authNKeyProjection) reduceOwnerRemoved(event eventstore.Event) (*handle
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(AuthNKeyChangeDateCol, e.CreationDate()),
+			handler.NewCol(AuthNKeySequenceCol, e.Sequence()),
 			handler.NewCol(AuthNKeyOwnerRemovedCol, true),
 		},
 		[]handler.Condition{

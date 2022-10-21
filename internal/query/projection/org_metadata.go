@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	OrgMetadataProjectionTable = "projections.org_metadata"
+	OrgMetadataProjectionTable = "projections.org_metadata2"
 
 	OrgMetadataColumnOrgID         = "org_id"
 	OrgMetadataColumnCreationDate  = "creation_date"
@@ -21,6 +21,7 @@ const (
 	OrgMetadataColumnInstanceID    = "instance_id"
 	OrgMetadataColumnKey           = "key"
 	OrgMetadataColumnValue         = "value"
+	OrgMetadataColumnOwnerRemoved  = "owner_removed"
 )
 
 type orgMetadataProjection struct {
@@ -41,6 +42,7 @@ func newOrgMetadataProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(OrgMetadataColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgMetadataColumnKey, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
+			crdb.NewColumn(OrgMetadataColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(OrgMetadataColumnInstanceID, OrgMetadataColumnOrgID, OrgMetadataColumnKey),
 		),
@@ -69,7 +71,7 @@ func (p *orgMetadataProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceMetadataRemovedAll,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -127,6 +129,26 @@ func (p *orgMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event)
 		event,
 		[]handler.Condition{
 			handler.NewCond(OrgMetadataColumnOrgID, event.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *orgMetadataProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hkd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(OrgMetadataColumnChangeDate, e.CreationDate()),
+			handler.NewCol(OrgMetadataColumnSequence, e.Sequence()),
+			handler.NewCol(OrgMetadataColumnOwnerRemoved, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(OrgMetadataColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(OrgMetadataColumnResourceOwner, e.Aggregate().ID),
 		},
 	), nil
 }
