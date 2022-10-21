@@ -65,10 +65,14 @@ It is free for up to 25'000 authenticated requests and provides you all the feat
 
 ## Why choose ZITADEL
 
+We built ZITADEL with a complex multi-tenancy architecture in mind and provide the best solution to handle B2B cutomers and partners.
+Yet it offers everything you need for a customer identity (CIAM) use case.
+
 - [API-first approach](https://docs.zitadel.com/docs/apis/introduction)
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview) as storage pattern
 - [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on events with custom code and extended ZITADEL for you needs
 - [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
+- [Self-service](https://docs.zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
 - [CockroachDB](https://www.cockroachlabs.com/) or a [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
 
 ## Features
