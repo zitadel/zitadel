@@ -47,9 +47,15 @@ With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
 
 Deploying ZITADEL locally does take less than 3 minutes. So go ahead and give it a try!
 
-[We provide deploy guides for multiple platforms here](https://docs.zitadel.com/docs/guides/deploy/overview)
+* [Linux](https://docs.zitadel.com/docs/guides/deploy/linux)
+* [MacOS](https://docs.zitadel.com/docs/guides/deploy/macos)
+* [Docker compose](https://docs.zitadel.com/docs/guides/deploy/compose)
+* [Knative](https://docs.zitadel.com/docs/guides/deploy/knative)
+* [Kubernetes](https://docs.zitadel.com/docs/guides/deploy/kubernetes)
 
-> If you are interested to have support for your self-hosted ZITADEL [please reach out to us](https://zitadel.com/contact)!
+See all guides [here](https://docs.zitadel.com/docs/guides/deploy/overview)
+
+> If you are interested to get professional support for your self-hosted ZITADEL [please reach out to us](https://zitadel.com/contact)!
 
 ### Setup ZITADEL Cloud (SaaS)
 
