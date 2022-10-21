@@ -65,7 +65,7 @@ It is free for up to 25'000 authenticated requests and provides you all the feat
 
 ## Why choose ZITADEL
 
-We built ZITADEL with a complex multi-tenancy architecture in mind and provide the best solution to handle B2B cutomers and partners.
+We built ZITADEL with a complex multi-tenancy architecture in mind and provide the best solution to handle B2B customers and partners.
 Yet it offers everything you need for a customer identity (CIAM) use case.
 
 - [API-first approach](https://docs.zitadel.com/docs/apis/introduction)
