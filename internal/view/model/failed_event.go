@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type FailedEvent struct {
 	Database       string
 	ViewName       string
@@ -7,4 +9,5 @@ type FailedEvent struct {
 	FailureCount   uint64
 	ErrMsg         string
 	InstanceID     string
+	LastFailed     time.Time
 }

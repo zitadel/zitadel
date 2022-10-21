@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/test"
@@ -27,6 +28,7 @@ func TestFailedEventsToPbFields(t *testing.T) {
 						ViewName:       "users",
 						FailedSequence: 456,
 						FailureCount:   5,
+						LastFailed:     time.Now(),
 						ErrMsg:         "some error",
 					},
 				},
@@ -59,6 +61,7 @@ func TestFailedEventToPbFields(t *testing.T) {
 					ViewName:       "users",
 					FailedSequence: 456,
 					FailureCount:   5,
+					LastFailed:     time.Now(),
 					ErrMsg:         "some error",
 				},
 			},
@@ -93,6 +96,6 @@ func TestRemoveFailedEventRequestToModelFields(t *testing.T) {
 	}
 	for _, tt := range tests {
 		converted := RemoveFailedEventRequestToModel(tt.args.ctx, tt.args.req)
-		test.AssertFieldsMapped(t, converted, "FailureCount", "ErrMsg")
+		test.AssertFieldsMapped(t, converted, "FailureCount", "LastFailed", "ErrMsg")
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -15,6 +16,7 @@ const (
 	failedEventsColumnProjectionName = "projection_name"
 	failedEventsColumnFailedSequence = "failed_sequence"
 	failedEventsColumnFailureCount   = "failure_count"
+	failedEventsColumnLastFailed     = "last_failed"
 	failedEventsColumnError          = "error"
 	failedEventsColumnInstanceID     = "instance_id"
 )
@@ -36,6 +38,10 @@ var (
 		name:  failedEventsColumnFailureCount,
 		table: failedEventsTable,
 	}
+	FailedEventsColumnLastFailed = Column{
+		name:  failedEventsColumnLastFailed,
+		table: failedEventsTable,
+	}
 	FailedEventsColumnError = Column{
 		name:  failedEventsColumnError,
 		table: failedEventsTable,
@@ -52,6 +58,7 @@ type FailedEvent struct {
 	FailedSequence uint64
 	FailureCount   uint64
 	Error          string
+	LastFailed     time.Time
 }
 
 type FailedEventSearchQueries struct {
@@ -143,6 +150,7 @@ func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvent
 			FailedEventsColumnProjectionName.identifier(),
 			FailedEventsColumnFailedSequence.identifier(),
 			FailedEventsColumnFailureCount.identifier(),
+			FailedEventsColumnLastFailed.identifier(),
 			FailedEventsColumnError.identifier(),
 			countColumn.identifier()).
 			From(failedEventsTable.identifier()).PlaceholderFormat(sq.Dollar),
@@ -151,15 +159,20 @@ func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvent
 			var count uint64
 			for rows.Next() {
 				failedEvent := new(FailedEvent)
+				var lastFailed sql.NullTime
 				err := rows.Scan(
 					&failedEvent.ProjectionName,
 					&failedEvent.FailedSequence,
 					&failedEvent.FailureCount,
+					&lastFailed,
 					&failedEvent.Error,
 					&count,
 				)
 				if err != nil {
 					return nil, err
+				}
+				if lastFailed.Valid {
+					failedEvent.LastFailed = lastFailed.Time
 				}
 				failedEvents = append(failedEvents, failedEvent)
 			}

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 
@@ -11,13 +12,12 @@ import (
 )
 
 type FailedEvent struct {
-	ViewName        string `gorm:"column:view_name;primary_key"`
-	FailedSequence  uint64 `gorm:"column:failed_sequence;primary_key"`
-	FailureCount    uint64 `gorm:"column:failure_count"`
-	ErrMsg          string `gorm:"column:err_msg"`
-	InstanceID      string `gorm:"column:instance_id"`
-	EventTimestamp  string `gorm:"column:event_timestamp"`  //TODO:?
-	FailedTimestamp string `gorm:"column:failed_timestamp"` //TODO:?
+	ViewName       string    `gorm:"column:view_name;primary_key"`
+	FailedSequence uint64    `gorm:"column:failed_sequence;primary_key"`
+	FailureCount   uint64    `gorm:"column:failure_count"`
+	ErrMsg         string    `gorm:"column:err_msg"`
+	InstanceID     string    `gorm:"column:instance_id"`
+	LastFailed     time.Time `gorm:"column:last_failed"`
 }
 
 type failedEventSearchRequest struct {
@@ -80,6 +80,7 @@ const (
 	FailedEventKeyViewName
 	FailedEventKeyFailedSequence
 	FailedEventKeyInstanceID
+	FailedEventKeyLastFailed
 )
 
 type failedEventSearchKey FailedEventSearchKey
@@ -92,6 +93,8 @@ func (key failedEventSearchKey) ToColumnName() string {
 		return "failed_sequence"
 	case FailedEventKeyInstanceID:
 		return "instance_id"
+	case FailedEventKeyLastFailed:
+		return "last_failed"
 	default:
 		return ""
 	}
@@ -114,6 +117,7 @@ func FailedEventToModel(failedEvent *FailedEvent) *view_model.FailedEvent {
 		FailureCount:   failedEvent.FailureCount,
 		FailedSequence: failedEvent.FailedSequence,
 		ErrMsg:         failedEvent.ErrMsg,
+		LastFailed:     failedEvent.LastFailed,
 	}
 }
 
@@ -167,7 +171,7 @@ func AllFailedEvents(db *gorm.DB, table, instanceID string) ([]*FailedEvent, err
 		queries = append(queries, &FailedEventSearchQuery{Key: FailedEventKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID})
 	}
 	failedEvents := make([]*FailedEvent, 0)
-	query := PrepareSearchQuery(table, &failedEventSearchRequest{Queries: queries})
+	query := PrepareSearchQuery(table, &failedEventSearchRequest{SortingColumn: failedEventSearchKey(FailedEventKeyLastFailed), Queries: queries})
 	_, err := query(db, &failedEvents)
 	if err != nil {
 		return nil, err
