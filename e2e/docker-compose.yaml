@@ -8,7 +8,7 @@ services:
     environment:
       ZITADEL_EXTERNALSECURE: false
       ZITADEL_DATABASE_COCKROACH_HOST: db
-
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
     depends_on:
       db:
         condition: 'service_healthy'
