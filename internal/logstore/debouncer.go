@@ -9,7 +9,6 @@ import (
 )
 
 type BulkSink interface {
-	// TODO: Is it possible to use a more restricted type than any?
 	SendBulk(ctx context.Context, bulk []any) error
 }
 
