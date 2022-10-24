@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -376,6 +375,27 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
+	var pat *PersonalAccessToken
+	var machineKey *MachineKey
+	if setup.Org.Machine != nil {
+		if setup.Org.Machine.Pat {
+			pat = NewPersonalAccessToken(orgID, userID, setup.Org.Machine.PatExpirationDate, setup.Org.Machine.PatScopes, domain.UserTypeMachine)
+			pat.TokenID, err = c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareAddPersonalAccessToken(pat, c.keyAlgorithm))
+		}
+		if setup.Org.Machine.MachineKey {
+			machineKey = NewMachineKey(orgID, userID, setup.Org.Machine.MachineKeyExpirationDate, setup.Org.Machine.MachineKeyType)
+			machineKey.KeyID, err = c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
+		}
+	}
+
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return "", "", nil, nil, err
@@ -386,32 +406,18 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		return "", "", nil, nil, err
 	}
 
-	var pat string
-	var machineKey []byte
+	var token string
+	var key []byte
 	if setup.Org.Machine != nil {
 		if setup.Org.Machine.Pat {
-			_, token, err := c.AddPersonalAccessToken(ctx, userID, orgID, setup.Org.Machine.PatExpirationDate, setup.Org.Machine.PatScopes, domain.UserTypeMachine)
-			if err != nil {
-				return "", "", nil, nil, err
-			}
-			pat = token
+			token = pat.Token
 		}
 		if setup.Org.Machine.MachineKey {
-			key, err := c.AddUserMachineKey(ctx, &domain.MachineKey{
-				ObjectRoot: models.ObjectRoot{
-					AggregateID: userID,
-				},
-				ExpirationDate: setup.Org.Machine.MachineKeyExpirationDate,
-				Type:           setup.Org.Machine.MachineKeyType,
-			}, orgID)
-			if err != nil {
-				return "", "", nil, nil, err
-			}
-			machineKey = key.PrivateKey
+			key = machineKey.PrivateKey
 		}
 	}
 
-	return instanceID, pat, machineKey, &domain.ObjectDetails{
+	return instanceID, token, key, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
