@@ -98,7 +98,12 @@
               </div>
 
               <div class="right">
-                <a matTooltip="{{ 'USER.PASSWORD.SET' | translate }}" [routerLink]="['password']" mat-icon-button>
+                <a
+                  matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
+                  [routerLink]="['password']"
+                  [queryParams]="{ username: user.preferredLoginName }"
+                  mat-icon-button
+                >
                   <i class="las la-pen"></i>
                 </a>
               </div>
