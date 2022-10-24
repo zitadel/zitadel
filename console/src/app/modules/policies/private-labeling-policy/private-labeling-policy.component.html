@@ -569,49 +569,57 @@
           </mat-panel-title>
         </mat-expansion-panel-header>
         <div class="adv-container">
-          <mat-slide-toggle
-            class="toggle"
-            color="primary"
-            ngDefaultControl
-            [disabled]="
-              view === View.CURRENT ||
-              ([
-                serviceType === PolicyComponentServiceType.ADMIN
-                  ? 'iam.policy.write'
-                  : serviceType === PolicyComponentServiceType.MGMT
-                  ? 'policy.write'
-                  : ''
-              ]
-                | hasRole
-                | async) === false
-            "
-            [(ngModel)]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
-            (change)="savePolicy()"
-          >
-            {{ 'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate }}
-          </mat-slide-toggle>
+          <cnsl-info-section>
+            <div class="checkbox-info-section">
+              <mat-checkbox
+                class="toggle"
+                color="primary"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
+                [(ngModel)]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
+                (change)="savePolicy()"
+              >
+                {{ 'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate }}
+              </mat-checkbox>
+              <span class="label">{{ 'POLICY.DATA.HIDELOGINNAMESUFFIX_DESC' | translate }}</span>
+            </div>
+          </cnsl-info-section>
 
-          <mat-slide-toggle
-            class="toggle"
-            color="primary"
-            ngDefaultControl
-            [(ngModel)]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
-            (change)="savePolicy()"
-            [disabled]="
-              view === View.CURRENT ||
-              ([
-                serviceType === PolicyComponentServiceType.ADMIN
-                  ? 'iam.policy.write'
-                  : serviceType === PolicyComponentServiceType.MGMT
-                  ? 'policy.write'
-                  : ''
-              ]
-                | hasRole
-                | async) === false
-            "
-          >
-            {{ 'POLICY.DATA.DISABLEWATERMARK' | translate }}
-          </mat-slide-toggle>
+          <cnsl-info-section>
+            <div class="checkbox-info-section">
+              <mat-checkbox
+                class="toggle"
+                color="primary"
+                [(ngModel)]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
+                (change)="savePolicy()"
+                [disabled]="
+                  view === View.CURRENT ||
+                  ([
+                    serviceType === PolicyComponentServiceType.ADMIN
+                      ? 'iam.policy.write'
+                      : serviceType === PolicyComponentServiceType.MGMT
+                      ? 'policy.write'
+                      : ''
+                  ]
+                    | hasRole
+                    | async) === false
+                "
+              >
+                {{ 'POLICY.DATA.DISABLEWATERMARK' | translate }}
+              </mat-checkbox>
+              <span class="label">{{ 'POLICY.DATA.DISABLEWATERMARK_DESC' | translate }}</span>
+            </div>
+          </cnsl-info-section>
         </div>
       </mat-expansion-panel>
     </mat-accordion>
