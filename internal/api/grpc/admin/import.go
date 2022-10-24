@@ -565,7 +565,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		if org.MachineUsers != nil {
 			for _, user := range org.GetMachineUsers() {
 				logging.Debugf("import user: %s", user.GetUserId())
-				_, err := s.command.AddMachineWithID(ctx, org.GetOrgId(), user.GetUserId(), management.AddMachineUserRequestToDomain(user.GetUser()))
+				_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()))
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
 					if isCtxTimeout(ctx) {
