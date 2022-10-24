@@ -101,6 +101,9 @@ func prepareAddPersonalAccessToken(pat *PersonalAccessToken, algorithm crypto.En
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
+			if err := pat.checkAggregate(ctx, filter); err != nil {
+				return nil, err
+			}
 			writeModel, err := getPersonalAccessTokenWriteModelByID(ctx, filter, pat.AggregateID, pat.TokenID, pat.ResourceOwner)
 			if err != nil {
 				return nil, err

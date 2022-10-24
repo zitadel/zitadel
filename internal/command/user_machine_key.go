@@ -130,9 +130,9 @@ func prepareAddUserMachineKey(machineKey *MachineKey, keySize int) preparation.V
 				user.NewMachineKeyAddedEvent(
 					ctx,
 					UserAggregateFromWriteModel(&writeModel.WriteModel),
-					writeModel.KeyID,
-					writeModel.KeyType,
-					writeModel.ExpirationDate,
+					machineKey.KeyID,
+					machineKey.Type,
+					machineKey.ExpirationDate,
 					machineKey.PublicKey,
 				),
 			}, nil
@@ -174,7 +174,7 @@ func prepareRemoveUserMachineKey(machineKey *MachineKey) preparation.Validation 
 				user.NewMachineKeyRemovedEvent(
 					ctx,
 					UserAggregateFromWriteModel(&writeModel.WriteModel),
-					writeModel.KeyID,
+					machineKey.KeyID,
 				),
 			}, nil
 		}, nil
