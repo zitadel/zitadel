@@ -1,0 +1,53 @@
+---
+title: Roles and Authorizations
+---
+
+If you would build out the [POS use case example](./projects#example) you would probably need an application for administration.
+In this application you would probably have somebody accessing as an accountant and somebody as an administrator, who is somebody with enhanced rights.
+To build this out, you would have to add this distinction as roles.
+To add roles, jump to the section **Roles** and create those new roles with the following values
+
+- Key: admin
+- Display Name: Administrator
+- Group: Administration
+
+and
+
+- Key: account
+- Display Name: Accountant
+- Group: Administration
+
+<img src="/img/guides/console/addrole.png" alt="Add roles" />
+
+The **Key** is used for coding (can then for example be requested in the ID Token).
+
+The **Display Name** is just for you remembering its use case
+
+The **Group** is for making multiple roles selectable more easy.
+
+<img src="/img/guides/console/roles.png" width="750px" alt="Roles" />
+
+> The role client is for an other application of the project `POS`, as all possible roles from your POS applications are defined in your project.
+
+## Authorizations
+
+Now to make use of this roles, add an authorization.
+An authorization combines a user of your organization with one or multiple roles.
+
+> You can also add users of other organizations, if you want to do so click on the hint below the username field.
+
+<img src="/img/guides/console/authusers.png" width="500px" alt="Auth users" />
+
+If your wanted to test your application with your own user, navigate to the **Authorizations** section under your project and click on **new**.
+
+Type your username, hit continue, select the roles you want your user to have and save. If you want to add all roles of the Administration group, you can click on the group to select all.
+
+<img
+  src="/img/guides/console/authorization.png"
+  width="750px"
+  alt="Authorization"
+/>
+
+Now you can retrieve those roles in your application. ZITADEL has [multiple settings](./projects#project-settings) for you to access them more easily. Navigate to the **General** section of your project and check your needed ones.
+
+> Note: We did set up our authorizations from projects, but this can be achieved from multiple locations in console. You can view and add authorizations from your organization, your projects, or from your users page.

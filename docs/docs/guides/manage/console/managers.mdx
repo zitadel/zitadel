@@ -1,0 +1,55 @@
+---
+title: Managers
+---
+
+import ManagerDescription from "../../../concepts/structure/_manager_description.mdx";
+
+<ManagerDescription name="ManagerDescription" />
+
+To configure managers in ZITADEL go to the resource where you like to add it (e.g Instance, Organization, Project, GrantedProject).
+In the right part of the console you can finde **MANAGERS** in the details part. Here you have a list of the current managers and can add a new one.
+
+<img alt="Managers" src="/img/guides/console/managers.png" width="200px" />
+
+When adding a new manager, you can select multiple roles some of which are only allowed to read data.
+This can be especially useful if you add service users for one of your projects where you only need read access.
+
+Per default you will only search for users within the selected organization. If you like to give a role to a user outside the organization you need to switch to the global search and type the exact loginname of the users. This will prevent allowing users to guess users from other organizations.
+
+<img alt="Managers" src="/img/guides/console/addmanager.png" width="390px" />
+
+## Roles
+
+| Name                          | Role                          | Description                                                                                                  |
+| ----------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| IAM Owner                     | IAM_OWNER                     | Manage the IAM, manage all organizations with their content                                                  |
+| IAM Owner Viewer              | IAM_OWNER_VIEWER              | View the IAM and view all organizations with their content                                                   |
+| IAM Org Manager               | IAM_ORG_MANAGER               | Manage all organizations including their policies, projects and users                                        |
+| IAM User Manager              | IAM_USER_MANAGER              | Manage all users and their authorizations over all organizations                                             |
+| Org Owner                     | ORG_OWNER                     | Manage everything within an organization                                                                     |
+| Org Owner Viewer              | ORG_OWNER_VIEWER              | View everything within an organization                                                                       |
+| Org User Manager              | ORG_USER_MANAGER              | Manage users and their authorizations within an organization                                                 |
+| Org User Permission Editor    | ORG_USER_PERMISSION_EDITOR    | Manage user grants and view everything needed for this                                                       |
+| Org Project Permission Editor | ORG_PROJECT_PERMISSION_EDITOR | Grant Projects to other organizations and view everything needed for this                                    |
+| Org Project Creator           | ORG_PROJECT_CREATOR           | This role is used for users in the global organization. They are allowed to create projects and manage them. |
+| Project Owner                 | PROJECT_OWNER                 | Manage everything within a project. This includes to grant users for the project.                            |
+| Project Owner Viewer          | PROJECT_OWNER_VIEWER          | View everything within a project.                                                                            |
+| Project Owner Global          | PROJECT_OWNER_GLOBAL          | Same as PROJECT_OWNER, but in the global organization.                                                       |
+| Project Owner Viewer Global   | PROJECT_OWNER_VIEWER_GLOBAL   | Same as PROJECT_OWNER_VIEWER, but in the global organization.                                                |
+| Project Grant Owner           | PROJECT_GRANT_OWNER           | Same as PROJECT_OWNER but for a granted proejct.                                                             |
+
+
+## Configure roles
+
+If you run a self hosted ZITADEL istance you can define your custom roles by overwriting the defaults.yaml
+In the InternalAuthZ section you will find all the roles and which permissions the have.
+
+Example:
+```bash
+InternalAuthZ:
+  RolePermissionMappings:
+    - Role: "IAM_OWNER"
+      Permissions:
+        - "iam.read"
+        - "iam.write"
+```

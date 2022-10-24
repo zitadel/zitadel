@@ -62,10 +62,10 @@ message LabelPolicy {
             description: "defines if the organisation's admin changed the policy"
         }
     ];
-    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set
     bool hide_login_name_suffix = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
         }
     ];
     // hex value for secondary color
@@ -173,6 +173,22 @@ message LoginPolicy {
     repeated SecondFactorType second_factors = 16;
     repeated MultiFactorType multi_factors = 17;
     repeated zitadel.idp.v1.IDPLoginPolicyLink idps = 18;
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    bool allow_domain_discovery = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+        }
+    ];
+    bool disable_login_with_email = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+        }
+    ];
+    bool disable_login_with_phone = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+        }
+    ];
 }
 
 enum SecondFactorType {

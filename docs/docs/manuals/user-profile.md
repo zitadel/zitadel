@@ -3,7 +3,7 @@ title: User Profile
 ---
 
 To get to your user profile you have to login to your ZITADEL Console {your-domain}-{randomstring}.zitadel.cloud or {your-custom-domain}.
-If you have no special permissions in the ZITADEL Console, you will get directly to your profile page. 
+If you have no special permissions in the ZITADEL Console, you will get directly to your profile page.
 Otherwise click on your user avatar in the top right of the console. A menu will open, with the "Edit Account" button you will be redirected to your profile page.
 
 ## Loginname
@@ -15,6 +15,7 @@ You are able to login with some different login names. The login name consists o
 
 In the general section you can find your profile data and contact information.
 In the profile data you can change the following data:
+
 - Avatar
 - Username
 - Firstname
@@ -27,6 +28,7 @@ In the profile data you can change the following data:
 In the contact information you can change your password, email and phone number. The Email and Phone number need to be verified.
 
 ![Profile](/img/manuals/console_profile.png)
+
 ### Change Password
 
 Change your password by entering your old, new and new confirmation password.
@@ -36,17 +38,17 @@ Change your password by entering your old, new and new confirmation password.
 ### Change Email
 
 Click on the edit button next to the email to change your email address.
-You will now get an email to verify that this is your account. This can take a moment. 
+You will now get an email to verify that this is your account. This can take a moment.
 Click on the button in the mail to verify the address. If you now reload your profile page the email address should be shown as verified.
 
-If you wait to long to verify the email, your code will probably be expired. 
+If you wait to long to verify the email, your code will probably be expired.
 The get a new verification mail click on "resend code" next to the "not verified" label.
 
 The email doesn't need to be unique within the whole system.
 
 ### Change Phone number
 
-The phone number is not mandatory withing ZITADEL. If you like to add it, you have to verify it. 
+The phone number is not mandatory withing ZITADEL. If you like to add it, you have to verify it.
 
 1. Click "edit button" and add your number
 2. Get an SMS with a verification code to the added number
@@ -67,14 +69,15 @@ ZITADEL provides some different authentication methods, passwordless is one of t
 Passwordless has two different types, system based or system independent.
 
 If you use system based methods make sure to register all the different devices you need to login. (e.g. Notebook, Mobile Phone, etc)
- 
+
 Examples for passwordless authentication methods are: Fingerprint, Windows Hello, Face Recognition, etc.
 For device independent authentication you can use some hardware tokens. e.g. Yubikey, Solokey, etc.
 
 There are different options how to add a passwordless autehntication.
+
 1. Add directly on the current device
 2. Send a registration link to your email. You can open this email and use the link on any device you like to register
-3. Generate a qr code with a registration link and scann the QR Code with the device where you like to register 
+3. Generate a qr code with a registration link and scann the QR Code with the device where you like to register
 
 Make sure to add at least to different devices or a device independent method
 
@@ -111,8 +114,6 @@ For One time password (OTP) you will need an Authenticator app of your choice th
 
 You will now be able to use otp as a second factor during the login process
 
-
-
 ## Authorization
 
 In the authorization section you can see all the permissions and roles you have to some different applications.
@@ -121,12 +122,13 @@ In the authorization section you can see all the permissions and roles you have 
 
 Membership is the role model ZITADEL provides for itself. If you have any permissions to manage something within ZITADEL you will have a membership.
 This memeberships are hierarchical and have the following layers:
+
 - System
 - Organization
 - Project
 - Granted Project
 
-To read more about the different roles withing ZITADEL click [here](../concepts/structure/managers.md).
+To read more about the different roles withing ZITADEL click [here](../guides/manage/console/managers.mdx).
 
 ## Metadata
 

@@ -181,6 +181,18 @@
         }
       }
 
+      .logo-placeholder {
+        height: 40px;
+        width: 40px;
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        object-fit: cover;
+        object-position: center;
+      }
+
       .title {
         text-decoration: none;
         color: white;
@@ -192,17 +204,18 @@
           height: 40px;
           width: 40px;
           box-sizing: border-box;
+          object-fit: cover;
+          object-position: center;
         }
 
         &.custom {
-          border-radius: 50%;
+          border-radius: 2px;
           height: 40px;
           width: 40px;
           box-sizing: border-box;
-          background-color: if($is-dark-theme, #00000020, #00000010);
 
           .logo {
-            border-radius: 50%;
+            border-radius: 2px;
           }
         }
       }

@@ -8,11 +8,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject } from 'rxjs';
-import { map, take, takeUntil } from 'rxjs/operators';
+import { filter, map, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org } from './proto/generated/zitadel/org_pb';
-import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
+import { PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard-shortcuts.service';
@@ -47,7 +47,6 @@ export class AppComponent implements OnDestroy {
   public showProjectSection: boolean = false;
 
   private destroy$: Subject<void> = new Subject();
-  public labelpolicy: LabelPolicy.AsObject | undefined = undefined;
 
   public language: string = 'en';
   public privacyPolicy!: PrivacyPolicy.AsObject;
@@ -69,7 +68,6 @@ export class AppComponent implements OnDestroy {
     private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
   ) {
-    this.themeService.loadPrivateLabelling(true);
     console.log(
       '%cWait!',
       'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px',
@@ -187,8 +185,15 @@ export class AppComponent implements OnDestroy {
     this.getProjectCount();
 
     this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
-      this.org = org;
-      this.getProjectCount();
+      if (org) {
+        this.org = org;
+        this.getProjectCount();
+      }
+    });
+
+    this.activatedRoute.queryParams.pipe(filter((params) => !!params.org)).subscribe((params) => {
+      const { org } = params;
+      this.authService.getActiveOrg(org);
     });
 
     this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
@@ -197,10 +202,7 @@ export class AppComponent implements OnDestroy {
           .getActiveOrg()
           .then(async (org) => {
             this.org = org;
-            const policy = await this.themeService.loadPrivateLabelling();
-            if (policy) {
-              this.labelpolicy = policy;
-            }
+
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })
@@ -252,7 +254,6 @@ export class AppComponent implements OnDestroy {
   }
 
   public changedOrg(org: Org.AsObject): void {
-    this.themeService.loadPrivateLabelling();
     this.router.navigate(['/org']);
   }
 

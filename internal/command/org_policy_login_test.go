@@ -33,10 +33,10 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 	type args struct {
 		ctx    context.Context
 		orgID  string
-		policy *domain.LoginPolicy
+		policy *AddLoginPolicy
 	}
 	type res struct {
-		want *domain.LoginPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -45,25 +45,6 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 		args   args
 		res    res
 	}{
-		{
-			name: "org id missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				policy: &domain.LoginPolicy{
-					AllowRegister:         true,
-					AllowUsernamePassword: true,
-					PasswordlessType:      domain.PasswordlessTypeAllowed,
-				},
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
 		{
 			name: "loginpolicy already existing, already exists error",
 			fields: fields{
@@ -79,6 +60,9 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
+								false,
+								false,
 								domain.PasswordlessTypeAllowed,
 								"https://example.com/redirect",
 								time.Hour*1,
@@ -94,12 +78,13 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &AddLoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
 					AllowExternalIDP:           true,
 					ForceMFA:                   true,
 					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
 					PasswordlessType:           domain.PasswordlessTypeAllowed,
 					DefaultRedirectURI:         "https://example.com/redirect",
 					PasswordCheckLifetime:      time.Hour * 1,
@@ -130,6 +115,9 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 									true,
 									true,
 									true,
+									true,
+									true,
+									true,
 									domain.PasswordlessTypeAllowed,
 									"https://example.com/redirect",
 									time.Hour*1,
@@ -146,13 +134,16 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &AddLoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
 					AllowExternalIDP:           true,
 					ForceMFA:                   true,
 					HidePasswordReset:          true,
 					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
 					PasswordlessType:           domain.PasswordlessTypeAllowed,
 					DefaultRedirectURI:         "https://example.com/redirect",
 					PasswordCheckLifetime:      time.Hour * 1,
@@ -163,24 +154,8 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.LoginPolicy{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					AllowRegister:              true,
-					AllowUsernamePassword:      true,
-					AllowExternalIDP:           true,
-					ForceMFA:                   true,
-					HidePasswordReset:          true,
-					IgnoreUnknownUsernames:     true,
-					PasswordlessType:           domain.PasswordlessTypeAllowed,
-					DefaultRedirectURI:         "https://example.com/redirect",
-					PasswordCheckLifetime:      time.Hour * 1,
-					ExternalLoginCheckLifetime: time.Hour * 2,
-					MFAInitSkipLifetime:        time.Hour * 3,
-					SecondFactorCheckLifetime:  time.Hour * 4,
-					MultiFactorCheckLifetime:   time.Hour * 5,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -189,19 +164,21 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(),
 				),
 			},
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &AddLoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
 					AllowExternalIDP:           true,
 					ForceMFA:                   true,
 					HidePasswordReset:          true,
 					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
 					PasswordlessType:           domain.PasswordlessTypeAllowed,
 					DefaultRedirectURI:         "https://example.com/redirect",
 					PasswordCheckLifetime:      time.Hour * 1,
@@ -227,6 +204,9 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 							eventFromEventPusher(
 								org.NewLoginPolicyAddedEvent(context.Background(),
 									&org.NewAggregate("org1").Aggregate,
+									true,
+									true,
+									true,
 									true,
 									true,
 									true,
@@ -261,13 +241,16 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &AddLoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
 					AllowExternalIDP:           true,
 					ForceMFA:                   true,
 					HidePasswordReset:          true,
 					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
 					PasswordlessType:           domain.PasswordlessTypeAllowed,
 					DefaultRedirectURI:         "https://example.com/redirect",
 					PasswordCheckLifetime:      time.Hour * 1,
@@ -280,24 +263,8 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.LoginPolicy{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					AllowRegister:              true,
-					AllowUsernamePassword:      true,
-					AllowExternalIDP:           true,
-					ForceMFA:                   true,
-					HidePasswordReset:          true,
-					IgnoreUnknownUsernames:     true,
-					PasswordlessType:           domain.PasswordlessTypeAllowed,
-					DefaultRedirectURI:         "https://example.com/redirect",
-					PasswordCheckLifetime:      time.Hour * 1,
-					ExternalLoginCheckLifetime: time.Hour * 2,
-					MFAInitSkipLifetime:        time.Hour * 3,
-					SecondFactorCheckLifetime:  time.Hour * 4,
-					MultiFactorCheckLifetime:   time.Hour * 5,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -313,13 +280,16 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &AddLoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
 					AllowExternalIDP:           true,
 					ForceMFA:                   true,
 					HidePasswordReset:          true,
 					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
 					PasswordlessType:           domain.PasswordlessTypeAllowed,
 					DefaultRedirectURI:         "https://example.com/redirect",
 					PasswordCheckLifetime:      time.Hour * 1,
@@ -327,10 +297,10 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					MFAInitSkipLifetime:        time.Hour * 3,
 					SecondFactorCheckLifetime:  time.Hour * 4,
 					MultiFactorCheckLifetime:   time.Hour * 5,
-					IDPProviders: []*domain.IDPProvider{
+					IDPProviders: []*AddLoginPolicyIDP{
 						{
-							Type:        domain.IdentityProviderTypeSystem,
-							IDPConfigID: "invalid",
+							Type:     domain.IdentityProviderTypeSystem,
+							ConfigID: "invalid",
 						},
 					},
 				},
@@ -368,6 +338,9 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 									true,
 									true,
 									true,
+									true,
+									true,
+									true,
 									domain.PasswordlessTypeAllowed,
 									"https://example.com/redirect",
 									time.Hour*1,
@@ -391,13 +364,16 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &AddLoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
 					AllowExternalIDP:           true,
 					ForceMFA:                   true,
 					HidePasswordReset:          true,
 					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
 					PasswordlessType:           domain.PasswordlessTypeAllowed,
 					DefaultRedirectURI:         "https://example.com/redirect",
 					PasswordCheckLifetime:      time.Hour * 1,
@@ -405,33 +381,17 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					MFAInitSkipLifetime:        time.Hour * 3,
 					SecondFactorCheckLifetime:  time.Hour * 4,
 					MultiFactorCheckLifetime:   time.Hour * 5,
-					IDPProviders: []*domain.IDPProvider{
+					IDPProviders: []*AddLoginPolicyIDP{
 						{
-							Type:        domain.IdentityProviderTypeSystem,
-							IDPConfigID: "config1",
+							Type:     domain.IdentityProviderTypeSystem,
+							ConfigID: "config1",
 						},
 					},
 				},
 			},
 			res: res{
-				want: &domain.LoginPolicy{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					AllowRegister:              true,
-					AllowUsernamePassword:      true,
-					AllowExternalIDP:           true,
-					ForceMFA:                   true,
-					HidePasswordReset:          true,
-					IgnoreUnknownUsernames:     true,
-					PasswordlessType:           domain.PasswordlessTypeAllowed,
-					DefaultRedirectURI:         "https://example.com/redirect",
-					PasswordCheckLifetime:      time.Hour * 1,
-					ExternalLoginCheckLifetime: time.Hour * 2,
-					MFAInitSkipLifetime:        time.Hour * 3,
-					SecondFactorCheckLifetime:  time.Hour * 4,
-					MultiFactorCheckLifetime:   time.Hour * 5,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -462,10 +422,10 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 	type args struct {
 		ctx    context.Context
 		orgID  string
-		policy *domain.LoginPolicy
+		policy *ChangeLoginPolicy
 	}
 	type res struct {
-		want *domain.LoginPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -474,29 +434,6 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 		args   args
 		res    res
 	}{
-		{
-			name: "org id missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				policy: &domain.LoginPolicy{
-					AllowRegister:          true,
-					AllowUsernamePassword:  true,
-					AllowExternalIDP:       true,
-					ForceMFA:               true,
-					IgnoreUnknownUsernames: true,
-					PasswordlessType:       domain.PasswordlessTypeAllowed,
-					DefaultRedirectURI:     "https://example.com/redirect",
-				},
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
 		{
 			name: "loginpolicy not existing, not found error",
 			fields: fields{
@@ -508,12 +445,15 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &ChangeLoginPolicy{
 					AllowRegister:          true,
 					AllowUsernamePassword:  true,
 					AllowExternalIDP:       true,
 					ForceMFA:               true,
 					IgnoreUnknownUsernames: true,
+					AllowDomainDiscovery:   true,
+					DisableLoginWithEmail:  true,
+					DisableLoginWithPhone:  true,
 					PasswordlessType:       domain.PasswordlessTypeAllowed,
 					DefaultRedirectURI:     "https://example.com/redirect",
 				},
@@ -537,6 +477,9 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
+								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"https://example.com/redirect",
 								time.Hour*1,
@@ -552,13 +495,16 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &ChangeLoginPolicy{
 					AllowRegister:              true,
 					AllowUsernamePassword:      true,
 					AllowExternalIDP:           true,
 					ForceMFA:                   true,
 					HidePasswordReset:          true,
 					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
 					PasswordlessType:           domain.PasswordlessTypeAllowed,
 					DefaultRedirectURI:         "https://example.com/redirect",
 					PasswordCheckLifetime:      time.Hour * 1,
@@ -587,6 +533,9 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
+								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"https://example.com/redirect",
 								time.Hour*1,
@@ -602,6 +551,9 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 							eventFromEventPusher(
 								newLoginPolicyChangedEvent(context.Background(),
 									"org1",
+									false,
+									false,
+									false,
 									false,
 									false,
 									false,
@@ -624,12 +576,15 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.LoginPolicy{
+				policy: &ChangeLoginPolicy{
 					AllowRegister:              false,
 					AllowUsernamePassword:      false,
 					AllowExternalIDP:           false,
 					ForceMFA:                   false,
 					IgnoreUnknownUsernames:     false,
+					AllowDomainDiscovery:       false,
+					DisableLoginWithEmail:      false,
+					DisableLoginWithPhone:      false,
 					PasswordlessType:           domain.PasswordlessTypeNotAllowed,
 					DefaultRedirectURI:         "",
 					PasswordCheckLifetime:      time.Hour * 10,
@@ -640,24 +595,8 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.LoginPolicy{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					AllowRegister:              false,
-					AllowUsernamePassword:      false,
-					AllowExternalIDP:           false,
-					ForceMFA:                   false,
-					HidePasswordReset:          false,
-					IgnoreUnknownUsernames:     false,
-					PasswordlessType:           domain.PasswordlessTypeNotAllowed,
-					DefaultRedirectURI:         "",
-					PasswordCheckLifetime:      time.Hour * 10,
-					ExternalLoginCheckLifetime: time.Hour * 20,
-					MFAInitSkipLifetime:        time.Hour * 30,
-					SecondFactorCheckLifetime:  time.Hour * 40,
-					MultiFactorCheckLifetime:   time.Hour * 50,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -738,6 +677,9 @@ func TestCommandSide_RemoveLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
 								true,
 								true,
 								true,
@@ -884,6 +826,9 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
+								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"",
 								time.Hour*1,
@@ -919,6 +864,9 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
 								true,
 								true,
 								true,
@@ -980,6 +928,9 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
 								true,
 								true,
 								true,
@@ -1150,6 +1101,9 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								true,
+								true,
+								true,
 								domain.PasswordlessTypeAllowed,
 								"",
 								time.Hour*1,
@@ -1185,6 +1139,9 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
 								true,
 								true,
 								true,
@@ -1238,6 +1195,9 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
 								true,
 								true,
 								true,
@@ -1298,6 +1258,9 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
 								true,
 								true,
 								true,
@@ -1366,6 +1329,9 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
 								true,
 								true,
 								true,
@@ -1990,7 +1956,8 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 	}
 }
 
-func newLoginPolicyChangedEvent(ctx context.Context, orgID string, usernamePassword, register, externalIDP, mfa, passwordReset, ignoreUnknownUsernames bool,
+func newLoginPolicyChangedEvent(ctx context.Context, orgID string,
+	usernamePassword, register, externalIDP, mfa, passwordReset, ignoreUnknownUsernames, allowDomainDiscovery, disableLoginWithEmail, disableLoginWithPhone bool,
 	passwordlessType domain.PasswordlessType,
 	redirectURI string,
 	passwordLifetime, externalLoginLifetime, mfaInitSkipLifetime, secondFactorLifetime, multiFactorLifetime *time.Duration) *org.LoginPolicyChangedEvent {
@@ -2001,8 +1968,11 @@ func newLoginPolicyChangedEvent(ctx context.Context, orgID string, usernamePassw
 		policy.ChangeForceMFA(mfa),
 		policy.ChangeHidePasswordReset(passwordReset),
 		policy.ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames),
+		policy.ChangeAllowDomainDiscovery(allowDomainDiscovery),
 		policy.ChangePasswordlessType(passwordlessType),
 		policy.ChangeDefaultRedirectURI(redirectURI),
+		policy.ChangeDisableLoginWithEmail(disableLoginWithEmail),
+		policy.ChangeDisableLoginWithPhone(disableLoginWithPhone),
 	}
 	if passwordLifetime != nil {
 		changes = append(changes, policy.ChangePasswordCheckLifetime(*passwordLifetime))

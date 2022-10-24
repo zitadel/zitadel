@@ -11,6 +11,7 @@ import {
 import {
   AddCustomLoginPolicyRequest,
   GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
+  UpdateCustomLoginPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LoginPolicy, PasswordlessType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -144,37 +145,69 @@ export class LoginPolicyComponent implements OnInit {
     if (this.loginData) {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
-          const mgmtreq = new AddCustomLoginPolicyRequest();
-          mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
-          mgmtreq.setAllowRegister(this.loginData.allowRegister);
-          mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-          mgmtreq.setForceMfa(this.loginData.forceMfa);
-          mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
-          mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
-          mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
-          mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
-
-          const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
-          mgmtreq.setPasswordCheckLifetime(pcl);
-
-          const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
-          mgmtreq.setExternalLoginCheckLifetime(elcl);
-
-          const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
-          mgmtreq.setMfaInitSkipLifetime(misl);
-
-          const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
-          mgmtreq.setSecondFactorCheckLifetime(sfcl);
-
-          const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
-          mgmtreq.setMultiFactorCheckLifetime(mficl);
-
-          mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
-          mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
-
           if (this.isDefault) {
+            const mgmtreq = new AddCustomLoginPolicyRequest();
+            mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
+            mgmtreq.setAllowRegister(this.loginData.allowRegister);
+            mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+            mgmtreq.setForceMfa(this.loginData.forceMfa);
+            mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
+            mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+            mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
+            mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
+            mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+            mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
+
+            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+            mgmtreq.setPasswordCheckLifetime(pcl);
+
+            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+            mgmtreq.setExternalLoginCheckLifetime(elcl);
+
+            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+            mgmtreq.setMfaInitSkipLifetime(misl);
+
+            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+            mgmtreq.setSecondFactorCheckLifetime(sfcl);
+
+            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+            mgmtreq.setMultiFactorCheckLifetime(mficl);
+
+            mgmtreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
+            mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+            mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
             return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
           } else {
+            const mgmtreq = new UpdateCustomLoginPolicyRequest();
+            mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
+            mgmtreq.setAllowRegister(this.loginData.allowRegister);
+            mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
+            mgmtreq.setForceMfa(this.loginData.forceMfa);
+            mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
+            mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+            mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+            mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
+
+            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+            mgmtreq.setPasswordCheckLifetime(pcl);
+
+            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+            mgmtreq.setExternalLoginCheckLifetime(elcl);
+
+            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+            mgmtreq.setMfaInitSkipLifetime(misl);
+
+            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+            mgmtreq.setSecondFactorCheckLifetime(sfcl);
+
+            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+            mgmtreq.setMultiFactorCheckLifetime(mficl);
+
+            mgmtreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
+            mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
+            mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+
             return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
           }
         case PolicyComponentServiceType.ADMIN:
@@ -185,6 +218,8 @@ export class LoginPolicyComponent implements OnInit {
           adminreq.setForceMfa(this.loginData.forceMfa);
           adminreq.setPasswordlessType(this.loginData.passwordlessType);
           adminreq.setHidePasswordReset(this.loginData.hidePasswordReset);
+          adminreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
+          adminreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
 
           const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
           adminreq.setPasswordCheckLifetime(admin_pcl);
@@ -200,6 +235,7 @@ export class LoginPolicyComponent implements OnInit {
 
           const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
           adminreq.setMultiFactorCheckLifetime(admin_mficl);
+          adminreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
           adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 

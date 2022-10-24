@@ -1460,7 +1460,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
+			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1679,6 +1679,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
+								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -1745,6 +1748,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
+								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -1807,6 +1813,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								false,
 								true,
+								false,
+								false,
+								false,
 								false,
 								false,
 								false,
@@ -1890,6 +1899,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								false,
 								true,
+								false,
+								false,
+								false,
 								false,
 								false,
 								false,
@@ -2035,6 +2047,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
+								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2144,6 +2159,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
+								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2243,6 +2261,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								&org.NewAggregate("org1").Aggregate,
 								false,
 								true,
+								false,
+								false,
+								false,
 								false,
 								false,
 								false,
@@ -2372,6 +2393,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+								false,
+								false,
+								false,
 								domain.PasswordlessTypeNotAllowed,
 								"",
 								time.Hour*1,
@@ -2463,7 +2487,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator)
+			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

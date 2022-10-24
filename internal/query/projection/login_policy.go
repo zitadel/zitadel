@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "projections.login_policies"
+	LoginPolicyTable = "projections.login_policies3"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyInstanceIDCol            = "instance_id"
@@ -30,6 +30,9 @@ const (
 	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
 	LoginPolicyHidePWResetCol           = "hide_password_reset"
 	IgnoreUnknownUsernames              = "ignore_unknown_usernames"
+	AllowDomainDiscovery                = "allow_domain_discovery"
+	DisableLoginWithEmail               = "disable_login_with_email"
+	DisableLoginWithPhone               = "disable_login_with_phone"
 	DefaultRedirectURI                  = "default_redirect_uri"
 	PasswordCheckLifetimeCol            = "password_check_lifetime"
 	ExternalLoginCheckLifetimeCol       = "external_login_check_lifetime"
@@ -63,6 +66,9 @@ func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LoginPolicyPasswordlessTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(LoginPolicyHidePWResetCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(IgnoreUnknownUsernames, crdb.ColumnTypeBool),
+			crdb.NewColumn(AllowDomainDiscovery, crdb.ColumnTypeBool),
+			crdb.NewColumn(DisableLoginWithEmail, crdb.ColumnTypeBool),
+			crdb.NewColumn(DisableLoginWithPhone, crdb.ColumnTypeBool),
 			crdb.NewColumn(DefaultRedirectURI, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(PasswordCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
@@ -139,6 +145,10 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.LoginPolicySecondFactorRemovedEventType,
 					Reduce: p.reduce2FARemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(LoginPolicyInstanceIDCol),
+				},
 			},
 		},
 	}
@@ -172,6 +182,9 @@ func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyIsDefaultCol, isDefault),
 		handler.NewCol(LoginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
 		handler.NewCol(IgnoreUnknownUsernames, policyEvent.IgnoreUnknownUsernames),
+		handler.NewCol(AllowDomainDiscovery, policyEvent.AllowDomainDiscovery),
+		handler.NewCol(DisableLoginWithEmail, policyEvent.DisableLoginWithEmail),
+		handler.NewCol(DisableLoginWithPhone, policyEvent.DisableLoginWithPhone),
 		handler.NewCol(DefaultRedirectURI, policyEvent.DefaultRedirectURI),
 		handler.NewCol(PasswordCheckLifetimeCol, policyEvent.PasswordCheckLifetime),
 		handler.NewCol(ExternalLoginCheckLifetimeCol, policyEvent.ExternalLoginCheckLifetime),
@@ -216,6 +229,15 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	}
 	if policyEvent.IgnoreUnknownUsernames != nil {
 		cols = append(cols, handler.NewCol(IgnoreUnknownUsernames, *policyEvent.IgnoreUnknownUsernames))
+	}
+	if policyEvent.AllowDomainDiscovery != nil {
+		cols = append(cols, handler.NewCol(AllowDomainDiscovery, *policyEvent.AllowDomainDiscovery))
+	}
+	if policyEvent.DisableLoginWithEmail != nil {
+		cols = append(cols, handler.NewCol(DisableLoginWithEmail, *policyEvent.DisableLoginWithEmail))
+	}
+	if policyEvent.DisableLoginWithPhone != nil {
+		cols = append(cols, handler.NewCol(DisableLoginWithPhone, *policyEvent.DisableLoginWithPhone))
 	}
 	if policyEvent.DefaultRedirectURI != nil {
 		cols = append(cols, handler.NewCol(DefaultRedirectURI, *policyEvent.DefaultRedirectURI))
