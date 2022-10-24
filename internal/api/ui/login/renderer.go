@@ -292,7 +292,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.MFAPromptStep:
 		l.renderMFAPrompt(w, r, authReq, step, err)
 	case *domain.InitUserStep:
-		l.renderInitUser(w, r, authReq, "", "", step.PasswordSet, nil)
+		l.renderInitUser(w, r, authReq, "", "", "", step.PasswordSet, nil)
 	case *domain.ChangeUsernameStep:
 		l.renderChangeUsername(w, r, authReq, nil)
 	case *domain.LinkUsersStep:
