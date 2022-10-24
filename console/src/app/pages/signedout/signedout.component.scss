@@ -22,7 +22,9 @@
     }
 
     img {
-      height: 100px;
+      height: 140px;
+      object-fit: contain;
+      object-position: center;
       max-width: 170px;
     }
   }
