@@ -100,13 +100,11 @@ func (e *InstanceRemovedEvent) Data() interface{} {
 }
 
 func (e *InstanceRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	if len(e.domains) == 0 {
-		return nil
-	}
-	constraints := make([]*eventstore.EventUniqueConstraint, len(e.domains))
+	constraints := make([]*eventstore.EventUniqueConstraint, len(e.domains)+1)
 	for i, domain := range e.domains {
 		constraints[i] = NewRemoveInstanceDomainUniqueConstraint(domain)
 	}
+	constraints[len(e.domains)] = eventstore.NewRemoveInstanceUniqueConstraints()
 	return constraints
 }
 

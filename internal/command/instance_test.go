@@ -286,6 +286,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 						},
 						uniqueConstraintsFromEventConstraint(instance.NewRemoveInstanceDomainUniqueConstraint("instance.domain")),
 						uniqueConstraintsFromEventConstraint(instance.NewRemoveInstanceDomainUniqueConstraint("custom.domain")),
+						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", eventstore.NewRemoveInstanceUniqueConstraints()),
 					),
 				),
 			},
