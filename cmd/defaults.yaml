@@ -543,6 +543,116 @@ DefaultInstance:
       Greeting: Hello {{.FirstName}} {{.LastName}},
       Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
       ButtonText: Login
+  Quotas:
+#    DetailsPath: "/ui/quotas"
+#
+#    AuthenticatedRequests:
+#      # Start Time for the quota periods
+#      # Format is RFC3339
+#      From: "2022-10-24T00:00:00Z01:00"
+#      Interval: 30d
+#      Amount: 25000
+#      Actions:
+#        Block:
+#          Message: "quota for authenticated requests exceeded"
+#          HTTPStatus: 429
+#          GRPCStatus: 8
+#        CookieValue: "authenticated_requests_exceeded"
+#        Redirect:
+#          URL: "/ui/quotas"
+#      Notifications:
+#        - Percent: 100
+#          Message: "All 25'000 free authenticated requests for your ZITADEL instance are used up. Further requests are blocked. See more details at {{.QuotasURL}}."
+#          Recipients:
+#            - "urn:zitadel:instance:resource_owner"
+#            - "urn:zitadel:quota:resource_owner"
+#            - "urn:zitadel:role:IAM_OWNER"
+#            - "urn:zitadel:role:IAM_OWNER_VIEWER"
+#          Channels:
+#            - email
+#            - sms
+#            # - stdout
+#            # - file
+#        - Percent: 95
+#          Message: "95% of included authenticated requests are used up for your ZITADEL instance. See more details at {{.QuotasURL}}."
+#          Recipients:
+#            - "urn:zitadel:instance:resource_owner"
+#            - "urn:zitadel:quota:resource_owner"
+#            - "urn:zitadel:role:IAM_OWNER"
+#            - "urn:zitadel:role:IAM_OWNER_VIEWER"
+#          Channels:
+#            - email
+#            - sms
+#            # - stdout
+#            # - file
+#        - Percent: 50
+#          Message: "50% of included authenticated requests are used up for your ZITADEL instance. See more details at {{.QuotasURL}}."
+#          Recipients:
+#            - "urn:zitadel:instance:resource_owner"
+#            - "urn:zitadel:quota:resource_owner"
+#            - "urn:zitadel:role:IAM_OWNER"
+#            - "urn:zitadel:role:IAM_OWNER_VIEWER"
+#          Channels:
+#            - email
+#            - sms
+#            # - stdout
+#            # - file
+#
+#    ActionSeconds:
+#      Enabled: false
+#      # Start Time for the quota periods
+#      # Format is RFC3339
+#      From: "2022-10-24T00:00:00Z01:00"
+#      Interval: 30d
+#      Amount: 3600
+#      Actions:
+#        Block:
+#          Message: "quota for action seconds exceeded"
+#          HTTPStatus: 429
+#          GRPCStatus: 8
+#        CookieValue: "action_seconds_exceeded"
+#        Redirect:
+#          URL: "/ui/quotas"
+#      Notifications:
+#        - Percent: 100
+#          Message: "All 60 free action minutes for your ZITADEL instance are used up. Actions are not executed anymore. See more details at {{.QuotasURL}}."
+#          Recipients:
+#            - "urn:zitadel:instance:resource_owner"
+#            - "urn:zitadel:quota:resource_owner"
+#            - "urn:zitadel:action:resource_owner"
+#            - "urn:zitadel:role:IAM_OWNER"
+#            - "urn:zitadel:role:IAM_OWNER_VIEWER"
+#          Channels:
+#            - email
+#            - sms
+#            # - stdout
+#            # - file
+#        - Percent: 95
+#          Message: "95% of included action minutes are used up for your ZITADEL instance. See more details at {{.QuotasURL}}."
+#          Recipients:
+#            - "urn:zitadel:instance:resource_owner"
+#            - "urn:zitadel:quota:resource_owner"
+#            - "urn:zitadel:action:resource_owner"
+#            - "urn:zitadel:role:IAM_OWNER"
+#            - "urn:zitadel:role:IAM_OWNER_VIEWER"
+#          Channels:
+#            - email
+#            - sms
+#            # - stdout
+#            # - file
+#        - Percent: 50
+#          Message: "50% of included action minutes are used up for your ZITADEL instance. See more details at {{.QuotasURL}}."
+#          Recipients:
+#            - "urn:zitadel:instance:resource_owner"
+#            - "urn:zitadel:quota:resource_owner"
+#            - "urn:zitadel:action:resource_owner"
+#            - "urn:zitadel:role:IAM_OWNER"
+#            - "urn:zitadel:role:IAM_OWNER_VIEWER"
+#          Channels:
+#            - email
+#            - sms
+#            # - stdout
+#            # - file
 
 InternalAuthZ:
   RolePermissionMappings:
