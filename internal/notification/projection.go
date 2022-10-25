@@ -169,7 +169,7 @@ func (p *notificationsProjection) reduceInitCodeAdded(event eventstore.Event) (*
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID, false)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +232,7 @@ func (p *notificationsProjection) reduceEmailCodeAdded(event eventstore.Event) (
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID, false)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +295,7 @@ func (p *notificationsProjection) reducePasswordCodeAdded(event eventstore.Event
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID, false)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +366,7 @@ func (p *notificationsProjection) reduceDomainClaimed(event eventstore.Event) (*
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID, false)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -427,7 +427,7 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID, false)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -485,7 +485,7 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID, false)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}

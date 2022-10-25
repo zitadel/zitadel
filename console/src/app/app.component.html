@@ -5,7 +5,6 @@
       [org]="org"
       [user]="$any(user)"
       [isDarkTheme]="componentCssClass === 'dark-theme'"
-      [labelpolicy]="labelpolicy"
       (changedActiveOrg)="changedOrg($event)"
     ></cnsl-header>
 
@@ -17,7 +16,6 @@
       [org]="org"
       [user]="$any(user)"
       [isDarkTheme]="componentCssClass === 'dark-theme'"
-      [labelpolicy]="labelpolicy"
     ></cnsl-nav>
   </ng-container>
 
@@ -27,5 +25,5 @@
     </div>
   </div>
   <span class="fill-space"></span>
-  <cnsl-footer [privateLabelPolicy]="labelpolicy"></cnsl-footer>
+  <cnsl-footer></cnsl-footer>
 </div>

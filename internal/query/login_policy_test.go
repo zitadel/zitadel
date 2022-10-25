@@ -45,6 +45,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies3.hide_password_reset,`+
 						` projections.login_policies3.ignore_unknown_usernames,`+
 						` projections.login_policies3.allow_domain_discovery,`+
+						` projections.login_policies3.disable_login_with_email,`+
+						` projections.login_policies3.disable_login_with_phone,`+
 						` projections.login_policies3.default_redirect_uri,`+
 						` projections.login_policies3.password_check_lifetime,`+
 						` projections.login_policies3.external_login_check_lifetime,`+
@@ -91,6 +93,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies3.hide_password_reset,`+
 						` projections.login_policies3.ignore_unknown_usernames,`+
 						` projections.login_policies3.allow_domain_discovery,`+
+						` projections.login_policies3.disable_login_with_email,`+
+						` projections.login_policies3.disable_login_with_phone,`+
 						` projections.login_policies3.default_redirect_uri,`+
 						` projections.login_policies3.password_check_lifetime,`+
 						` projections.login_policies3.external_login_check_lifetime,`+
@@ -121,6 +125,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"hide_password_reset",
 						"ignore_unknown_usernames",
 						"allow_domain_discovery",
+						"disable_login_with_email",
+						"disable_login_with_phone",
 						"default_redirect_uri",
 						"password_check_lifetime",
 						"external_login_check_lifetime",
@@ -143,6 +149,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						database.EnumArray[domain.SecondFactorType]{domain.SecondFactorTypeOTP},
 						database.EnumArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
 						domain.PasswordlessTypeAllowed,
+						true,
+						true,
 						true,
 						true,
 						true,
@@ -175,6 +183,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				HidePasswordReset:          true,
 				IgnoreUnknownUsernames:     true,
 				AllowDomainDiscovery:       true,
+				DisableLoginWithEmail:      true,
+				DisableLoginWithPhone:      true,
 				DefaultRedirectURI:         "https://example.com/redirect",
 				PasswordCheckLifetime:      time.Hour * 2,
 				ExternalLoginCheckLifetime: time.Hour * 2,
@@ -210,6 +220,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` projections.login_policies3.hide_password_reset,`+
 						` projections.login_policies3.ignore_unknown_usernames,`+
 						` projections.login_policies3.allow_domain_discovery,`+
+						` projections.login_policies3.disable_login_with_email,`+
+						` projections.login_policies3.disable_login_with_phone,`+
 						` projections.login_policies3.default_redirect_uri,`+
 						` projections.login_policies3.password_check_lifetime,`+
 						` projections.login_policies3.external_login_check_lifetime,`+

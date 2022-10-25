@@ -72,6 +72,8 @@ type InstanceSetup struct {
 		HidePasswordReset          bool
 		IgnoreUnknownUsername      bool
 		AllowDomainDiscovery       bool
+		DisableLoginWithEmail      bool
+		DisableLoginWithPhone      bool
 		PasswordlessType           domain.PasswordlessType
 		DefaultRedirectURI         string
 		PasswordCheckLifetime      time.Duration
@@ -219,6 +221,8 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.HidePasswordReset,
 			setup.LoginPolicy.IgnoreUnknownUsername,
 			setup.LoginPolicy.AllowDomainDiscovery,
+			setup.LoginPolicy.DisableLoginWithEmail,
+			setup.LoginPolicy.DisableLoginWithPhone,
 			setup.LoginPolicy.PasswordlessType,
 			setup.LoginPolicy.DefaultRedirectURI,
 			setup.LoginPolicy.PasswordCheckLifetime,
@@ -589,4 +593,52 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
 	return writeModel, err
+}
+
+func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := c.getInstanceWriteModelByID(ctx, a.ID)
+			if err != nil {
+				return nil, errors.ThrowPreconditionFailed(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
+			}
+			events := []eventstore.Command{instance.NewInstanceRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}
+
+			domainsWriteModel, err := c.getInstanceDomainsWriteModel(ctx, a.ID)
+			if err == nil {
+				for _, domainName := range domainsWriteModel.Domains {
+					events = append(events, instance.NewDomainRemovedEvent(ctx, &a.Aggregate, domainName))
+				}
+			}
+			return events, nil
+		}, nil
+	}
+}
+
+func (c *Commands) getInstanceWriteModelByID(ctx context.Context, orgID string) (*InstanceWriteModel, error) {
+	instanceWriteModel := NewInstanceWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, instanceWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return instanceWriteModel, nil
 }

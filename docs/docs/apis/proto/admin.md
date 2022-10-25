@@ -1889,6 +1889,8 @@ This is an empty request
 | jwt_idps | repeated zitadel.v1.v1.DataJWTIDP | - |  |
 | user_links | repeated zitadel.idp.v1.IDPUserLink | - |  |
 | domains | repeated zitadel.org.v1.Domain | - |  |
+| app_keys | repeated zitadel.v1.v1.DataAppKey | - |  |
+| machine_keys | repeated zitadel.v1.v1.DataMachineKey | - |  |
 
 
 
@@ -2909,6 +2911,8 @@ This is an empty response
 | user_links | repeated ImportDataSuccessUserLinks | - |  |
 | user_metadata | repeated ImportDataSuccessUserMetadata | - |  |
 | domains | repeated string | - |  |
+| app_keys | repeated string | - |  |
+| machine_keys | repeated string | - |  |
 
 
 
@@ -4360,6 +4364,8 @@ this is en empty request
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | allow_domain_discovery |  bool | If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success. |  |
+| disable_login_with_email |  bool | - |  |
+| disable_login_with_phone |  bool | - |  |
 
 
 

@@ -86,6 +86,7 @@ Errors:
     Machine:
       Key:
         NotFound: Clé de la machine non trouvée
+        AlreadyExisting: Clé de la machine déjà existante
     PAT:
       NotFound: Token d'accès personnel non trouvé
     NotHuman: L'utilisateur doit être personnel
@@ -264,6 +265,9 @@ Errors:
       APIAuthMethodNoSecret: La méthode d'authentification API choisie ne nécessite pas de secret.
       AuthMethodNoPrivateKeyJWT: La méthode d'authentification choisie ne nécessite pas de clé.
       ClientSecretInvalid: Le secret du client n'est pas valide
+      Key:
+        AlreadyExisting: Clé d'application déjà existante
+        NotFound: Clé d'application non trouvée
     RequiredFieldsMissing: Certains champs obligatoires sont manquants
     Grant:
       AlreadyExists: La subvention du projet existe déjà

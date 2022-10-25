@@ -41,7 +41,8 @@ var (
 		` projections.users4_humans.is_phone_verified,` +
 		` projections.users4_machines.user_id,` +
 		` projections.users4_machines.name,` +
-		` projections.users4_machines.description` +
+		` projections.users4_machines.description,` +
+		` COUNT(*) OVER ()` +
 		` FROM projections.users4` +
 		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id` +
 		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id` +
@@ -82,6 +83,7 @@ var (
 		"user_id",
 		"name",
 		"description",
+		"count",
 	}
 	profileQuery = `SELECT projections.users4.id,` +
 		` projections.users4.creation_date,` +
@@ -192,7 +194,8 @@ var (
 		` projections.users4_notifications.verified_email,` +
 		` projections.users4_notifications.last_phone,` +
 		` projections.users4_notifications.verified_phone,` +
-		` projections.users4_notifications.password_set` +
+		` projections.users4_notifications.password_set,` +
+		` COUNT(*) OVER ()` +
 		` FROM projections.users4` +
 		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id` +
 		` LEFT JOIN projections.users4_notifications ON projections.users4.id = projections.users4_notifications.user_id` +
@@ -232,6 +235,7 @@ var (
 		"last_phone",
 		"verified_phone",
 		"password_set",
+		"count",
 	}
 	usersQuery = `SELECT projections.users4.id,` +
 		` projections.users4.creation_date,` +
@@ -370,6 +374,7 @@ func Test_UserPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						1,
 					},
 				),
 			},
@@ -436,6 +441,7 @@ func Test_UserPrepares(t *testing.T) {
 						"id",
 						"name",
 						"description",
+						1,
 					},
 				),
 			},
@@ -879,6 +885,7 @@ func Test_UserPrepares(t *testing.T) {
 						"lastPhone",
 						"verifiedPhone",
 						true,
+						1,
 					},
 				),
 			},
@@ -942,6 +949,7 @@ func Test_UserPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						1,
 					},
 				),
 				err: func(err error) (error, bool) {

@@ -94,6 +94,10 @@ func (p *privacyPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.PrivacyPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(PrivacyPolicyInstanceIDCol),
+				},
 			},
 		},
 	}

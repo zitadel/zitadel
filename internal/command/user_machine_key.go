@@ -9,34 +9,51 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *domain.MachineKey, resourceOwner string) (*domain.MachineKey, error) {
-	err := c.checkUserExists(ctx, machineKey.AggregateID, resourceOwner)
+func (c *Commands) AddUserMachineKeyWithID(ctx context.Context, machineKey *domain.MachineKey, resourceOwner string) (*domain.MachineKey, error) {
+	writeModel, err := c.machineKeyWriteModelByID(ctx, machineKey.AggregateID, machineKey.KeyID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
+	if writeModel.State != domain.MachineKeyStateUnspecified {
+		return nil, errors.ThrowNotFound(nil, "COMMAND-p22101", "Errors.User.Machine.Key.AlreadyExisting")
+	}
+	return c.addUserMachineKey(ctx, machineKey, resourceOwner)
+}
+
+func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *domain.MachineKey, resourceOwner string) (*domain.MachineKey, error) {
 	keyID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
-	keyWriteModel := NewMachineKeyWriteModel(machineKey.AggregateID, keyID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)
+	machineKey.KeyID = keyID
+	return c.addUserMachineKey(ctx, machineKey, resourceOwner)
+}
+
+func (c *Commands) addUserMachineKey(ctx context.Context, machineKey *domain.MachineKey, resourceOwner string) (*domain.MachineKey, error) {
+	err := c.checkUserExists(ctx, machineKey.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-
-	if err = domain.EnsureValidExpirationDate(machineKey); err != nil {
+	keyWriteModel := NewMachineKeyWriteModel(machineKey.AggregateID, machineKey.KeyID, resourceOwner)
+	if err := c.eventstore.FilterToQueryReducer(ctx, keyWriteModel); err != nil {
 		return nil, err
 	}
 
-	if err = domain.SetNewAuthNKeyPair(machineKey, c.machineKeySize); err != nil {
+	if err := domain.EnsureValidExpirationDate(machineKey); err != nil {
 		return nil, err
+	}
+
+	if len(machineKey.PublicKey) == 0 {
+		if err := domain.SetNewAuthNKeyPair(machineKey, c.machineKeySize); err != nil {
+			return nil, err
+		}
 	}
 
 	events, err := c.eventstore.Push(ctx,
 		user.NewMachineKeyAddedEvent(
 			ctx,
 			UserAggregateFromWriteModel(&keyWriteModel.WriteModel),
-			keyID,
+			machineKey.KeyID,
 			machineKey.Type,
 			machineKey.ExpirationDate,
 			machineKey.PublicKey))
@@ -49,7 +66,9 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *domain.Mac
 	}
 
 	key := keyWriteModelToMachineKey(keyWriteModel)
-	key.PrivateKey = machineKey.PrivateKey
+	if len(machineKey.PrivateKey) > 0 {
+		key.PrivateKey = machineKey.PrivateKey
+	}
 	return key, nil
 }
 

@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -63,7 +64,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -105,7 +105,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -138,7 +137,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -168,7 +166,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -196,7 +193,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -223,11 +219,36 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.project_members3 WHERE (project_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.project_members3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -250,7 +271,6 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -295,7 +315,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ProjectMemberProjectionTable, tt.want)
 		})
 	}
 }

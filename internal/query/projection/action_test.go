@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -34,7 +35,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionAdded,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -71,7 +71,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionChanged,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -102,7 +101,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionDeactivated,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -132,7 +130,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionReactivated,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -162,7 +159,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceActionRemoved,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("action"),
 				sequence:         15,
 				previousSequence: 10,
@@ -189,7 +185,6 @@ func TestActionProjection_reduces(t *testing.T) {
 			},
 			reduce: (&actionProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
-				projection:       ActionTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -209,6 +204,32 @@ func TestActionProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(ActionInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.actions3 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -220,7 +241,7 @@ func TestActionProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ActionTable, tt.want)
 		})
 	}
 }

@@ -94,6 +94,10 @@ func (p *domainPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.DomainPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(DomainPolicyInstanceIDCol),
+				},
 			},
 		},
 	}

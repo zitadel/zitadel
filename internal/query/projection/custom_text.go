@@ -95,6 +95,10 @@ func (p *customTextProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.CustomTextTemplateRemovedEventType,
 					Reduce: p.reduceTemplateRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(CustomTextInstanceIDCol),
+				},
 			},
 		},
 	}

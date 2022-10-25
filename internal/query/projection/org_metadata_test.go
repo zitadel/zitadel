@@ -37,7 +37,6 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -73,7 +72,6 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -101,7 +99,6 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -128,7 +125,6 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -156,7 +152,7 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, OrgMetadataProjectionTable, tt.want)
 		})
 	}
 }

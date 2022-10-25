@@ -157,6 +157,10 @@ func (p *idpProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.IDPJWTConfigChangedEventType,
 					Reduce: p.reduceJWTConfigChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(IDPInstanceIDCol),
+				},
 			},
 		},
 		{

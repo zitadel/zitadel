@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -32,7 +33,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -67,7 +67,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainVerificationAdded,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -99,7 +98,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainVerified,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -131,7 +129,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reducePrimaryDomainSet,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -174,7 +171,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
-				projection:       OrgDomainTable,
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
@@ -206,7 +202,6 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgDomainTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -216,6 +211,32 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 								uint64(15),
 								true,
 								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(OrgDomainInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.org_domains2 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},
@@ -234,7 +255,7 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, OrgDomainTable, tt.want)
 		})
 	}
 }

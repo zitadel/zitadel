@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/member"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -99,6 +100,15 @@ func (p *projectGrantMemberProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(MemberInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -174,6 +184,14 @@ func (p *projectGrantMemberProjection) reduceUserRemoved(event eventstore.Event)
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-rufJr", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
+}
+
+func (p *projectGrantMemberProjection) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.InstanceRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Z2p6o", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+	}
+	return reduceMemberRemoved(e, withMemberCond(MemberInstanceID, e.Aggregate().ID))
 }
 
 func (p *projectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {

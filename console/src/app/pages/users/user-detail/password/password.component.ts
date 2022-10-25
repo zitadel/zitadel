@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription, take } from 'rxjs';
+import { Subject, Subscription, take, takeUntil } from 'rxjs';
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from 'src/app/pages/validators';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -31,11 +31,13 @@ function passwordConfirmValidator(c: AbstractControl): any {
 })
 export class PasswordComponent implements OnDestroy {
   userId: string = '';
+  public username: string = '';
 
   public policy!: PasswordComplexityPolicy.AsObject;
   public passwordForm!: UntypedFormGroup;
 
   private formSub: Subscription = new Subscription();
+  private destroy$: Subject<void> = new Subject();
 
   constructor(
     activatedRoute: ActivatedRoute,
@@ -45,11 +47,14 @@ export class PasswordComponent implements OnDestroy {
     private toast: ToastService,
     private breadcrumbService: BreadcrumbService,
   ) {
-    activatedRoute.params.subscribe((data) => {
+    activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+      const { username } = data;
+      this.username = username;
+    });
+    activatedRoute.params.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       const { id } = data;
       if (id) {
         this.userId = id;
-
         breadcrumbService.setBreadcrumb([
           new Breadcrumb({
             type: BreadcrumbType.ORG,
@@ -59,6 +64,7 @@ export class PasswordComponent implements OnDestroy {
       } else {
         this.authService.user.pipe(take(1)).subscribe((user) => {
           if (user) {
+            this.username = user.preferredLoginName;
             this.breadcrumbService.setBreadcrumb([
               new Breadcrumb({
                 type: BreadcrumbType.AUTHUSER,
@@ -102,6 +108,8 @@ export class PasswordComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.formSub.unsubscribe();
   }
 

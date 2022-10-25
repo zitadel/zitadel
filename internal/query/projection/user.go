@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -91,9 +92,9 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserIDCol, UserInstanceIDCol),
-			crdb.WithIndex(crdb.NewIndex("username4_idx", []string{UserUsernameCol})),
-			crdb.WithIndex(crdb.NewIndex("user4_ro_idx", []string{UserResourceOwnerCol})),
-			crdb.WithConstraint(crdb.NewConstraint("user4_id_unique", []string{UserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("username_idx4", []string{UserUsernameCol})),
+			crdb.WithIndex(crdb.NewIndex("user_ro_idx4", []string{UserResourceOwnerCol})),
+			crdb.WithConstraint(crdb.NewConstraint("user_id_unique4", []string{UserIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText),
@@ -283,6 +284,15 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(UserInstanceIDCol),
 				},
 			},
 		},
@@ -720,20 +730,9 @@ func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
-		crdb.AddCopyStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyLastPhoneCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyVerifiedPhoneCol, nil),
+				crdb.NewCopyCol(NotifyVerifiedPhoneCol, NotifyLastPhoneCol),
 			},
 			[]handler.Condition{
 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
@@ -814,20 +813,9 @@ func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
-		crdb.AddCopyStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyLastEmailCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyVerifiedEmailCol, nil),
+				crdb.NewCopyCol(NotifyVerifiedEmailCol, NotifyLastEmailCol),
 			},
 			[]handler.Condition{
 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),

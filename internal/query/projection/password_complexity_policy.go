@@ -98,6 +98,10 @@ func (p *passwordComplexityProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.PasswordComplexityPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(ComplexityPolicyInstanceIDCol),
+				},
 			},
 		},
 	}

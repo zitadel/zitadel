@@ -64,6 +64,9 @@ export class AccountsCardComponent implements OnInit {
   }
 
   public logout(): void {
+    const lP = JSON.stringify(this.userService.labelpolicy.getValue());
+    localStorage.setItem('labelPolicyOnSignout', lP);
+
     this.authService.signout();
     this.closedCard.emit();
   }

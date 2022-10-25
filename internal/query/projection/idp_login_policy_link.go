@@ -109,6 +109,10 @@ func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
+				},
 			},
 		},
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -123,6 +124,15 @@ func (p *authNKeyProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(AuthNKeyInstanceIDCol),
+				},
+			},
+		},
 	}
 }
 
@@ -156,24 +166,22 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 	default:
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
-	return crdb.NewMultiStatement(
+	return crdb.NewCreateStatement(
 		&authNKeyEvent,
-		crdb.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(AuthNKeyIDCol, authNKeyEvent.keyID),
-				handler.NewCol(AuthNKeyCreationDateCol, authNKeyEvent.CreationDate()),
-				handler.NewCol(AuthNKeyChangeDateCol, authNKeyEvent.CreationDate()),
-				handler.NewCol(AuthNKeyResourceOwnerCol, authNKeyEvent.Aggregate().ResourceOwner),
-				handler.NewCol(AuthNKeyInstanceIDCol, authNKeyEvent.Aggregate().InstanceID),
-				handler.NewCol(AuthNKeyAggregateIDCol, authNKeyEvent.Aggregate().ID),
-				handler.NewCol(AuthNKeySequenceCol, authNKeyEvent.Sequence()),
-				handler.NewCol(AuthNKeyObjectIDCol, authNKeyEvent.objectID),
-				handler.NewCol(AuthNKeyExpirationCol, authNKeyEvent.expiration),
-				handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),
-				handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
-				handler.NewCol(AuthNKeyTypeCol, authNKeyEvent.keyType),
-			},
-		),
+		[]handler.Column{
+			handler.NewCol(AuthNKeyIDCol, authNKeyEvent.keyID),
+			handler.NewCol(AuthNKeyCreationDateCol, authNKeyEvent.CreationDate()),
+			handler.NewCol(AuthNKeyChangeDateCol, authNKeyEvent.CreationDate()),
+			handler.NewCol(AuthNKeyResourceOwnerCol, authNKeyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(AuthNKeyInstanceIDCol, authNKeyEvent.Aggregate().InstanceID),
+			handler.NewCol(AuthNKeyAggregateIDCol, authNKeyEvent.Aggregate().ID),
+			handler.NewCol(AuthNKeySequenceCol, authNKeyEvent.Sequence()),
+			handler.NewCol(AuthNKeyObjectIDCol, authNKeyEvent.objectID),
+			handler.NewCol(AuthNKeyExpirationCol, authNKeyEvent.expiration),
+			handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),
+			handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
+			handler.NewCol(AuthNKeyTypeCol, authNKeyEvent.keyType),
+		},
 	), nil
 }
 

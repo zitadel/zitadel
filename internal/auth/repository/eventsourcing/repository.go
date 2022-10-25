@@ -80,6 +80,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 			UserCommandProvider:       command,
 			UserEventProvider:         &userRepo,
 			IDPProviderViewProvider:   view,
+			IDPUserLinksProvider:      queries,
 			LockoutPolicyViewProvider: queries,
 			LoginPolicyViewProvider:   queries,
 			UserGrantProvider:         queryView,
