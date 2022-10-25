@@ -30,12 +30,16 @@ var (
 		"FROM projections.project_grant_members2 AS members " +
 		"LEFT JOIN projections.users4_humans " +
 		"ON members.user_id = projections.users4_humans.user_id " +
+		"AND members.instance_id = projections.users4_humans.instance_id " +
 		"LEFT JOIN projections.users4_machines " +
 		"ON members.user_id = projections.users4_machines.user_id " +
+		"AND members.instance_id = projections.users4_machines.instance_id " +
 		"LEFT JOIN projections.login_names " +
 		"ON members.user_id = projections.login_names.user_id " +
+		"AND members.instance_id = projections.login_names.instance_id " +
 		"LEFT JOIN projections.project_grants2 " +
 		"ON members.grant_id = projections.project_grants2.grant_id " +
+		"AND members.instance_id = projections.project_grants2.instance_id " +
 		"WHERE projections.login_names.is_primary = $1")
 	projectGrantMembersColumns = []string{
 		"creation_date",

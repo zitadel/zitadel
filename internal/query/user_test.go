@@ -44,8 +44,8 @@ var (
 		` projections.users4_machines.description,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id` +
-		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id` +
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id` +
+		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id AND projections.users4.instance_id = projections.users4_machines.instance_id` +
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames` +
 		` FROM projections.login_names AS login_names` +
@@ -99,7 +99,7 @@ var (
 		` projections.users4_humans.gender,` +
 		` projections.users4_humans.avatar_key` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id`
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id`
 	profileCols = []string{
 		"id",
 		"creation_date",
@@ -124,7 +124,7 @@ var (
 		` projections.users4_humans.email,` +
 		` projections.users4_humans.is_email_verified` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id`
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id`
 	emailCols = []string{
 		"id",
 		"creation_date",
@@ -144,7 +144,7 @@ var (
 		` projections.users4_humans.phone,` +
 		` projections.users4_humans.is_phone_verified` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id`
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id`
 	phoneCols = []string{
 		"id",
 		"creation_date",
@@ -162,7 +162,7 @@ var (
 		` projections.users4_humans.email,` +
 		` projections.users4_humans.is_email_verified` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id`
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id`
 	userUniqueCols = []string{
 		"id",
 		"state",
@@ -197,8 +197,8 @@ var (
 		` projections.users4_notifications.password_set,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id` +
-		` LEFT JOIN projections.users4_notifications ON projections.users4.id = projections.users4_notifications.user_id` +
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id` +
+		` LEFT JOIN projections.users4_notifications ON projections.users4.id = projections.users4_notifications.user_id AND projections.users4.instance_id = projections.users4_notifications.instance_id` +
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames` +
 		` FROM projections.login_names AS login_names` +
@@ -264,8 +264,8 @@ var (
 		` projections.users4_machines.description,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id` +
-		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id` +
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id` +
+		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id AND projections.users4.instance_id = projections.users4_machines.instance_id` +
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames` +
 		` FROM projections.login_names AS login_names` +
