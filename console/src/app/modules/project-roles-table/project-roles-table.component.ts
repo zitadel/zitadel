@@ -36,7 +36,6 @@ export class ProjectRolesTableComponent implements OnInit {
     private toast: ToastService,
     private dialog: MatDialog,
     private router: Router,
-    private cdk: ChangeDetectorRef,
   ) {}
 
   public gotoRouterLink(rL: any) {
@@ -66,7 +65,6 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   public changePage(): void {
-    this.cdk.detectChanges();
     this.loadRolesPage();
   }
 
