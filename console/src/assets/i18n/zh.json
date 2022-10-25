@@ -777,6 +777,12 @@
       "ORGDETAIL_TITLE": "输入新组织的名称和域名。",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
+      "RENAME": {
+        "ACTION": "改名",
+        "TITLE": "重命名组织",
+        "DESCRIPTION": "输入组织的新名称",
+        "BTN": "改名"
+      },
       "ORGDOMAIN": {
         "TITLE": "组织域所有权验证",
         "VERIFICATION": "要验证您对域的所有权，您需要下载验证文件并将其上传到下面列出的提供的 URL，或者为提供的域名添加一条类型为TXT的DNS解析记录。完成后请单击按钮进行验证。",
@@ -828,6 +834,7 @@
       "DESCRIPTION": "定义可以更改组织首选项的用户。"
     },
     "TOAST": {
+      "UPDATED": "组织已更新",
       "DEACTIVATED": "组织已停用。",
       "REACTIVATED": "组织重新启用。",
       "DOMAINADDED": "域名已添加。",
@@ -1169,6 +1176,7 @@
       "HIDEPASSWORDRESET": "隐藏密码重置按钮",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
+      "HIDELOGINNAMESUFFIX_DESC": "在登录界面隐藏登录名后缀",
       "IGNOREUNKNOWNUSERNAMES": "忽略未知用户名",
       "IGNOREUNKNOWNUSERNAMES_DESC": "如果选择该选项，即使未找到用户，登录过程中也会显示密码屏幕。如果用户名或密码错误，密码检查的错误不会透露。",
       "ALLOWDOMAINDISCOVERY": "允许域名发现",
@@ -1179,6 +1187,7 @@
       "DEFAULTREDIRECTURI_DESC": "定义如果在没有应用程序上下文的情况下开始登录（例如来自邮件），用户将被重定向到哪里。",
       "ERRORMSGPOPUP": "在对话框中显示错误",
       "DISABLEWATERMARK": "隐藏水印",
+      "DISABLEWATERMARK_DESC": "登录界面隐藏 Powered by ZITADEL 水印",
       "PASSWORDCHECKLIFETIME": "密码登录状态有效期",
       "EXTERNALLOGINCHECKLIFETIME": "外部身份提供者登录状态有效期",
       "MFAINITSKIPLIFETIME": "多因素身份认证初始化有效期",

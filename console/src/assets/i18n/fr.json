@@ -777,6 +777,12 @@
       "ORGDETAIL_TITLE": "Saisissez le nom et le domaine de votre nouvelle organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Saisissez le nom de votre nouvelle organisation.",
       "ORGDETAILUSER_TITLE": "Configurer le propriétaire de l'organisation",
+      "RENAME": {
+        "ACTION": "Renommer",
+        "TITLE": "Renommer l'organisation",
+        "DESCRIPTION": "Entrez le nouveau nom de votre organisation",
+        "BTN": "Renommer"
+      },
       "ORGDOMAIN": {
         "TITLE": "Vérification de la propriété du domaine de l'organisation",
         "VERIFICATION": "Pour vérifier la propriété de votre domaine, vous devez télécharger un fichier de vérification et le charger à l'URL indiquée ci-dessous, ou placer une entrée DNS TXT Record pour l'URL indiquée. Pour terminer, cliquez sur le bouton de vérification.",
@@ -828,6 +834,7 @@
       "DESCRIPTION": "Définissez les utilisateurs qui peuvent modifier les préférences de votre organisation."
     },
     "TOAST": {
+      "UPDATED": "L'organisation a été mise à jour",
       "DEACTIVATED": "Organisation désactivée.",
       "REACTIVATED": "Organisation réactivée.",
       "DOMAINADDED": "Domaine ajouté.",
@@ -1170,6 +1177,7 @@
       "HIDEPASSWORDRESET": "Masquer la réinitialisation du mot de passe",
       "HIDEPASSWORDRESET_DESC": "Si l'option est sélectionnée, l'utilisateur ne peut pas réinitialiser son mot de passe lors du processus de connexion.",
       "HIDELOGINNAMESUFFIX": "Masquer le suffixe du nom de connexion",
+      "HIDELOGINNAMESUFFIX_DESC": "Masque le suffixe du nom de connexion dans l'interface de connexion",
       "IGNOREUNKNOWNUSERNAMES": "Ignorer les noms d'utilisateur inconnus",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Si l'option est sélectionnée, l'écran du mot de passe sera affiché dans le processus de connexion même si l'utilisateur n'a pas été trouvé. L'erreur sur la vérification du mot de passe ne révélera pas si le nom d'utilisateur ou le mot de passe était erroné.",
       "ALLOWDOMAINDISCOVERY": "Découverte du domaine autorisée",
@@ -1180,6 +1188,7 @@
       "DEFAULTREDIRECTURI_DESC": "Définit l'endroit où l'utilisateur sera redirigé si la connexion a commencé sans contexte d'application (par exemple, à partir du courrier électronique).",
       "ERRORMSGPOPUP": "Afficher l'erreur dans la boîte de dialogue",
       "DISABLEWATERMARK": "Cacher le filigrane",
+      "DISABLEWATERMARK_DESC": "Masquer le filigrane Powered by ZITADEL dans l'interface de connexion",
       "PASSWORDCHECKLIFETIME": "Durée de vie de la vérification du mot de passe",
       "EXTERNALLOGINCHECKLIFETIME": "Durée de vie de la vérification de la connexion externe",
       "MFAINITSKIPLIFETIME": "Durée de vie de l'initialisation multifactorielle",

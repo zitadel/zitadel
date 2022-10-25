@@ -777,6 +777,12 @@
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
+      "RENAME": {
+        "ACTION": "Rinomina",
+        "TITLE": "Rinomina organizzazione",
+        "DESCRIPTION": "Inserisci il nuovo nome per la tua organizzazione",
+        "BTN": "Rinomina"
+      },
       "ORGDOMAIN": {
         "TITLE": "Verificazione della propriet\u00e0 del dominio dell'organizzazione",
         "VERIFICATION": "Verifica la propriet\u00e0 del tuo dominio. \u00c8 necessario scaricare un file di verifica e caricarlo all'URL fornito elencato di seguito, o inserire una voce DNS TXT Record per l'URL fornito. Per completare, clicca sul pulsante di verifica.",
@@ -828,6 +834,7 @@
       "DESCRIPTION": "Definisci gli utenti che possono cambiare le preferenze delle tue organizzazioni."
     },
     "TOAST": {
+      "UPDATED": "L'organizzazione es stata aggiornata.",
       "DEACTIVATED": "Organizzazione disattivata.",
       "REACTIVATED": "Organizzazione riattivata.",
       "DOMAINADDED": "Aggiunto dominio.",
@@ -1170,6 +1177,7 @@
       "HIDEPASSWORDRESET": "Nascondi ripristino della password",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione \u00e8 selezionata, l'utente non pu\u00f2 resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
+      "HIDELOGINNAMESUFFIX_DESC": "Nasconde il suffisso del nome di accesso nell'interfaccia di accesso",
       "IGNOREUNKNOWNUSERNAMES": "Ignora un nome utente sconosciuto",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione \u00e8 selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
       "ALLOWDOMAINDISCOVERY": "Scoperta del dominio consentita",
@@ -1180,6 +1188,7 @@
       "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
       "DISABLEWATERMARK": "Nascondi la filigrana",
+      "DISABLEWATERMARK_DESC": "Nascondi filigrana Powered by ZITADEL nell'interfaccia di accesso",
       "PASSWORDCHECKLIFETIME": "Lifetime verificazione password",
       "EXTERNALLOGINCHECKLIFETIME": "Lifetime verificazione login esterno",
       "MFAINITSKIPLIFETIME": "Lifetime Initalizzazione Multifattore",
