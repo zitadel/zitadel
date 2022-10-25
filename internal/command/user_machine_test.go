@@ -37,7 +37,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "user invalid, invalid argument error",
+			name: "user invalid, invalid argument error name",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -61,6 +61,37 @@ func TestCommandSide_AddMachine(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					Username: "username",
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user invalid, invalid argument error username",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name: "name",
 				},
 			},
 			res: res{

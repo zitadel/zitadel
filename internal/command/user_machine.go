@@ -26,13 +26,6 @@ func (m *Machine) content() error {
 	if m.AggregateID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-p0p2mi", "Errors.User.UserIDMissing")
 	}
-	/* not necessary for change
-	if m.Username == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
-	}*/
-	if m.Name == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-bs9Ds", "Errors.User.Invalid")
-	}
 	return nil
 }
 
@@ -69,6 +62,12 @@ func prepareAddUserMachine(machine *Machine, domainPolicy *domain.DomainPolicy) 
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := machine.content(); err != nil {
 			return nil, err
+		}
+		if machine.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bs9Ds", "Errors.User.Invalid")
+		}
+		if machine.Username == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := getMachineWriteModelByID(ctx, filter, machine.AggregateID, machine.ResourceOwner)
