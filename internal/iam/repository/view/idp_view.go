@@ -63,6 +63,10 @@ func DeleteIDP(db *gorm.DB, table, idpID, instanceID string) error {
 		repository.Key{model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyIdpConfigID), idpID},
 		repository.Key{model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyInstanceID), instanceID},
 	)
+	return delete(db)
+}
 
+func DeleteInstanceIDPs(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyInstanceID), instanceID)
 	return delete(db)
 }

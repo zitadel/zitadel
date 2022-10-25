@@ -23,6 +23,14 @@ func (v *View) PutStyling(policy *model.LabelPolicyView, event *models.Event) er
 	return v.ProcessedStylingSequence(event)
 }
 
+func (v *View) DeleteInstanceStyling(event *models.Event) error {
+	err := view.DeleteInstanceStyling(v.Db, stylingTyble, event.InstanceID)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedStylingSequence(event)
+}
+
 func (v *View) GetLatestStylingSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(stylingTyble, instanceID)
 }
