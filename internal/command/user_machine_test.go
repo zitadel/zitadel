@@ -223,7 +223,6 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 				machine: &Machine{
 					ObjectRoot: models.ObjectRoot{
 						ResourceOwner: "org1",
-						AggregateID:   "user1",
 					},
 					Username: "username",
 				},
