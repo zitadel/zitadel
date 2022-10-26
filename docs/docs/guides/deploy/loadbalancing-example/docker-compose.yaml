@@ -18,7 +18,7 @@ services:
     image: 'ghcr.io/zitadel/zitadel:stable'
     command: 'start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}" --tlsMode external'
     depends_on:
-      chown:
+      certs:
         condition: 'service_completed_successfully'
 
     volumes:
@@ -27,10 +27,10 @@ services:
       - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
       - 'zitadel-certs:/crdb-certs:ro'
 
-  chown:
+  certs:
     image: 'cockroachdb/cockroach:v22.1.0'
     entrypoint: [ '/bin/bash', '-c' ]
-    command: [ 'cp /certs/ca.crt /zitadel-certs/ && cp /certs/client.root.crt /zitadel-certs/ && cp /certs/client.root.key /zitadel-certs/ && chown 1000:1000 /zitadel-certs/* && chmod 0400 /zitadel-certs/*' ]
+    command: [ 'cp /certs/* /zitadel-certs/ && cockroach cert create-client --certs-dir /zitadel-certs/ --ca-key /zitadel-certs/ca.key zitadel_user && chown 1000:1000 /zitadel-certs/*' ]
     volumes:
       - 'certs:/certs:ro'
       - 'zitadel-certs:/zitadel-certs:rw'
