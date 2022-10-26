@@ -315,7 +315,7 @@ type SubSelect struct {
 }
 
 func NewSubSelect(c Column, queries []SearchQuery) (*SubSelect, error) {
-	if queries == nil || len(queries) == 0 {
+	if len(queries) == 0 {
 		return nil, ErrNothingSelected
 	}
 	if c.isZero() {
@@ -333,7 +333,7 @@ func (q *SubSelect) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *SubSelect) comp() sq.Sqlizer {
-	selectQuery := sq.Select(q.Column.identifier()).From(q.Column.table.name)
+	selectQuery := sq.Select(q.Column.identifier()).From(q.Column.table.identifier())
 	for _, query := range q.Queries {
 		selectQuery = query.toQuery(selectQuery)
 	}
@@ -373,13 +373,8 @@ func (s *ListQuery) comp() sq.Sqlizer {
 				return nil
 			}
 			return sq.Expr(s.Column.identifier()+" IN ( "+subSelect+" )", args...)
-		} else if list, ok := s.Data.([]interface{}); ok {
-			return sq.Eq{s.Column.identifier(): list}
-		} else if list, ok := s.Data.([]string); ok {
-			return sq.Eq{s.Column.identifier(): list}
-		} else if list, ok := s.Data.([]int); ok {
-			return sq.Eq{s.Column.identifier(): list}
 		}
+		return sq.Eq{s.Column.identifier(): s.Data}
 	}
 	return nil
 }
