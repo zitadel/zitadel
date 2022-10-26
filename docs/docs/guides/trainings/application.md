@@ -14,7 +14,6 @@ In this session your second level support and operations team will gain an under
 - Event types
 - Database schemas and compute models
 - Accessing database
-- Validation of tokens
 - Observability (Logs, Errors, Metrics, Tracing)
 - Operations best practices (Deployment, Backup, Networking etc.)
 - Q&A
@@ -32,5 +31,6 @@ In this hands-on training your employees will get a complete overview of the sys
 - Walk-though all features
 - Users / Manuals
 - APIs
+- Validation of tokens
 - Client integration best-practices
 - Q&A
