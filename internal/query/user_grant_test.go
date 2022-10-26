@@ -31,7 +31,7 @@ var (
 			", projections.users4_humans.email" +
 			", projections.users4_humans.display_name" +
 			", projections.users4_humans.avatar_key" +
-			", projections.login_names.login_name" +
+			", projections.login_names2.login_name" +
 			", projections.user_grants3.resource_owner" +
 			", projections.orgs.name" +
 			", projections.orgs.primary_domain" +
@@ -42,8 +42,8 @@ var (
 			" LEFT JOIN projections.users4_humans ON projections.user_grants3.user_id = projections.users4_humans.user_id" +
 			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id" +
 			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id" +
-			" LEFT JOIN projections.login_names ON projections.user_grants3.user_id = projections.login_names.user_id" +
-			" WHERE projections.login_names.is_primary = $1")
+			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id" +
+			" WHERE projections.login_names2.is_primary = $1")
 	userGrantCols = []string{
 		"id",
 		"creation_date",
@@ -85,7 +85,7 @@ var (
 			", projections.users4_humans.email" +
 			", projections.users4_humans.display_name" +
 			", projections.users4_humans.avatar_key" +
-			", projections.login_names.login_name" +
+			", projections.login_names2.login_name" +
 			", projections.user_grants3.resource_owner" +
 			", projections.orgs.name" +
 			", projections.orgs.primary_domain" +
@@ -97,8 +97,8 @@ var (
 			" LEFT JOIN projections.users4_humans ON projections.user_grants3.user_id = projections.users4_humans.user_id" +
 			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id" +
 			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id" +
-			" LEFT JOIN projections.login_names ON projections.user_grants3.user_id = projections.login_names.user_id" +
-			" WHERE projections.login_names.is_primary = $1")
+			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id" +
+			" WHERE projections.login_names2.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,
 		"count",

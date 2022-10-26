@@ -99,6 +99,7 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 		eq[ProjectGrantMemberOwnerRemovedUser.identifier()] = false
 		eq[ProjectGrantMemberOwnerRemovedProject.identifier()] = false
 		eq[ProjectGrantMemberGrantGrantedOrg.identifier()] = false
+		addLoginNameWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {

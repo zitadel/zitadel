@@ -207,6 +207,14 @@ var (
 	}
 )
 
+func addUserGrantWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[UserGrantOwnerRemoved.identifier()] = false
+	eq[UserGrantUserOwnerRemoved.identifier()] = false
+	eq[UserGrantProjectOwnerRemoved.identifier()] = false
+	eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
+	addLoginNameWithoutOwnerRemoved(eq)
+}
+
 func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (*UserGrant, error) {
 	if shouldTriggerBulk {
 		projection.UserGrantProjection.Trigger(ctx)
@@ -218,10 +226,7 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 	}
 	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		eq[UserGrantOwnerRemoved.identifier()] = false
-		eq[UserGrantUserOwnerRemoved.identifier()] = false
-		eq[UserGrantProjectOwnerRemoved.identifier()] = false
-		eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
+		addUserGrantWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -236,10 +241,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, wi
 	query, scan := prepareUserGrantsQuery()
 	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		eq[UserGrantOwnerRemoved.identifier()] = false
-		eq[UserGrantUserOwnerRemoved.identifier()] = false
-		eq[UserGrantProjectOwnerRemoved.identifier()] = false
-		eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
+		addUserGrantWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {

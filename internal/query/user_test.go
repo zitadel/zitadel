@@ -48,12 +48,12 @@ var (
 		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id` +
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames` +
-		` FROM projections.login_names AS login_names` +
+		` FROM projections.login_names2 AS login_names` +
 		` WHERE login_names.instance_id = $1` +
 		` GROUP BY login_names.user_id) AS login_names` +
 		` ON login_names.user_id = projections.users4.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names AS preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) AS preferred_login_name` +
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names2 AS preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) AS preferred_login_name` +
 		` ON preferred_login_name.user_id = projections.users4.id`
 	userCols = []string{
 		"id",
@@ -201,12 +201,12 @@ var (
 		` LEFT JOIN projections.users4_notifications ON projections.users4.id = projections.users4_notifications.user_id` +
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames` +
-		` FROM projections.login_names AS login_names` +
+		` FROM projections.login_names2 AS login_names` +
 		` WHERE login_names.instance_id = $1` +
 		` GROUP BY login_names.user_id) AS login_names` +
 		` ON login_names.user_id = projections.users4.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names AS preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) AS preferred_login_name` +
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names2 AS preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) AS preferred_login_name` +
 		` ON preferred_login_name.user_id = projections.users4.id`
 	notifyUserCols = []string{
 		"id",
@@ -268,11 +268,11 @@ var (
 		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id` +
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames` +
-		` FROM projections.login_names AS login_names` +
+		` FROM projections.login_names2 AS login_names` +
 		` GROUP BY login_names.user_id) AS login_names` +
 		` ON login_names.user_id = projections.users4.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names AS preferred_login_name WHERE preferred_login_name.is_primary = $1) AS preferred_login_name` +
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names2 AS preferred_login_name WHERE preferred_login_name.is_primary = $1) AS preferred_login_name` +
 		` ON preferred_login_name.user_id = projections.users4.id`
 	usersCols = []string{
 		"id",

@@ -73,6 +73,7 @@ func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, with
 	if !withOwnerRemoved {
 		eq[InstanceMemberOwnerRemoved.identifier()] = false
 		eq[InstanceMemberOwnerRemovedUser.identifier()] = false
+		addLoginNameWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {

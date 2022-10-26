@@ -166,19 +166,25 @@ var (
 		table: userTable,
 	}
 
-	userLoginNamesTable         = loginNameTable.setAlias("login_names")
-	userLoginNamesUserIDCol     = LoginNameUserIDCol.setTable(userLoginNamesTable)
-	userLoginNamesNameCol       = LoginNameNameCol.setTable(userLoginNamesTable)
-	userLoginNamesInstanceIDCol = LoginNameInstanceIDCol.setTable(userLoginNamesTable)
-	userLoginNamesListCol       = Column{
+	userLoginNamesTable                 = loginNameTable.setAlias("login_names")
+	userLoginNamesUserIDCol             = LoginNameUserIDCol.setTable(userLoginNamesTable)
+	userLoginNamesNameCol               = LoginNameNameCol.setTable(userLoginNamesTable)
+	userLoginNamesInstanceIDCol         = LoginNameInstanceIDCol.setTable(userLoginNamesTable)
+	userLoginNamesOwnerRemovedUserCol   = LoginNameOwnerRemovedUserCol.setTable(userLoginNamesTable)
+	userLoginNamesOwnerRemovedPolicyCol = LoginNameOwnerRemovedPolicyCol.setTable(userLoginNamesTable)
+	userLoginNamesOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userLoginNamesTable)
+	userLoginNamesListCol               = Column{
 		name:  "loginnames",
 		table: userLoginNamesTable,
 	}
-	userPreferredLoginNameTable         = loginNameTable.setAlias("preferred_login_name")
-	userPreferredLoginNameUserIDCol     = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameCol           = LoginNameNameCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameIsPrimaryCol  = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameInstanceIDCol = LoginNameInstanceIDCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameTable                 = loginNameTable.setAlias("preferred_login_name")
+	userPreferredLoginNameUserIDCol             = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameCol                   = LoginNameNameCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameIsPrimaryCol          = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameInstanceIDCol         = LoginNameInstanceIDCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameOwnerRemovedUserCol   = LoginNameOwnerRemovedUserCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameOwnerRemovedPolicyCol = LoginNameOwnerRemovedPolicyCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userPreferredLoginNameTable)
 )
 
 var (
@@ -296,6 +302,16 @@ var (
 	}
 )
 
+func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[UserOwnerRemovedCol.identifier()] = false
+	eq[userLoginNamesOwnerRemovedUserCol.identifier()] = false
+	eq[userLoginNamesOwnerRemovedPolicyCol.identifier()] = false
+	eq[userLoginNamesOwnerRemovedDomainCol.identifier()] = false
+	eq[userPreferredLoginNameOwnerRemovedUserCol.identifier()] = false
+	eq[userPreferredLoginNameOwnerRemovedPolicyCol.identifier()] = false
+	eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
+}
+
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*User, error) {
 	if shouldTriggerBulk {
 		projection.UserProjection.Trigger(ctx)
@@ -312,7 +328,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		UserInstanceIDCol.identifier(): instanceID,
 	}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -338,7 +354,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 		UserInstanceIDCol.identifier(): instanceID,
 	}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -359,7 +375,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerR
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -380,7 +396,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRem
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -401,7 +417,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRem
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -428,7 +444,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 		UserInstanceIDCol.identifier(): instanceID,
 	}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -454,7 +470,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 		UserInstanceIDCol.identifier(): instanceID,
 	}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -469,7 +485,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, w
 	query, scan := prepareUsersQuery()
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -517,7 +533,7 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	}
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
+		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {

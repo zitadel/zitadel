@@ -19,7 +19,7 @@ var (
 		", members.resource_owner" +
 		", members.user_id" +
 		", members.roles" +
-		", projections.login_names.login_name" +
+		", projections.login_names2.login_name" +
 		", projections.users4_humans.email" +
 		", projections.users4_humans.first_name" +
 		", projections.users4_humans.last_name" +
@@ -32,9 +32,9 @@ var (
 		"ON members.user_id = projections.users4_humans.user_id " +
 		"LEFT JOIN projections.users4_machines " +
 		"ON members.user_id = projections.users4_machines.user_id " +
-		"LEFT JOIN projections.login_names " +
-		"ON members.user_id = projections.login_names.user_id " +
-		"WHERE projections.login_names.is_primary = $1")
+		"LEFT JOIN projections.login_names2 " +
+		"ON members.user_id = projections.login_names2.user_id " +
+		"WHERE projections.login_names2.is_primary = $1")
 	instanceMembersColumns = []string{
 		"creation_date",
 		"change_date",

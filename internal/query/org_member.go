@@ -75,6 +75,7 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, with
 	if !withOwnerRemoved {
 		eq[OrgMemberOwnerRemoved.identifier()] = false
 		eq[OrgMemberOwnerRemovedUser.identifier()] = false
+		addLoginNameWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
