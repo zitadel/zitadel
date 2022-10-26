@@ -97,3 +97,8 @@ func DeleteApplicationTokens(db *gorm.DB, table, instanceID string, appIDs []str
 	)
 	return delete(db)
 }
+
+func DeleteInstanceTokens(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID)
+	return delete(db)
+}

@@ -379,24 +379,28 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				}},
 		},
 		{
-			name: "push 1 event and add asset",
+			name: "push 1 event and remove instance unique constraints",
 			args: args{
 				ctx: context.Background(),
 				events: []*repository.Event{
 					generateEvent(t, "12"),
 				},
+				uniqueConstraints:    generateRemoveInstanceUniqueConstraints(t, "instanceID"),
+				uniqueDataType:       "usernames",
+				uniqueDataField:      "testremove",
+				uniqueDataInstanceID: "instanceID",
 			},
 			res: res{
 				wantErr: false,
 				eventsRes: eventsRes{
 					pushedEventsCount: 1,
-					assetCount:        1,
+					uniqueCount:       0,
 					aggID:             []string{"12"},
 					aggType:           repository.AggregateType(t.Name()),
 				}},
 		},
 		{
-			name: "push 1 event and remove asset",
+			name: "push 1 event and add asset",
 			args: args{
 				ctx: context.Background(),
 				events: []*repository.Event{
@@ -407,8 +411,25 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				wantErr: false,
 				eventsRes: eventsRes{
 					pushedEventsCount: 1,
-					assetCount:        0,
+					assetCount:        1,
 					aggID:             []string{"13"},
+					aggType:           repository.AggregateType(t.Name()),
+				}},
+		},
+		{
+			name: "push 1 event and remove asset",
+			args: args{
+				ctx: context.Background(),
+				events: []*repository.Event{
+					generateEvent(t, "14"),
+				},
+			},
+			res: res{
+				wantErr: false,
+				eventsRes: eventsRes{
+					pushedEventsCount: 1,
+					assetCount:        0,
+					aggID:             []string{"14"},
 					aggType:           repository.AggregateType(t.Name()),
 				}},
 		},
@@ -1197,6 +1218,16 @@ func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *re
 		UniqueField: uniqueField,
 		InstanceID:  "",
 		Action:      repository.UniqueConstraintRemoved,
+	}
+
+	return e
+}
+
+func generateRemoveInstanceUniqueConstraints(t *testing.T, instanceID string) *repository.UniqueConstraint {
+	t.Helper()
+	e := &repository.UniqueConstraint{
+		InstanceID: instanceID,
+		Action:     repository.UniqueConstraintInstanceRemoved,
 	}
 
 	return e
