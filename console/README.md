@@ -20,7 +20,7 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 ## Running end-to-end tests
 
-Please refer to [guides](../guides/quickstart.md#developing-zitadel)
+Please refer to the [contributing guide](../CONTRIBUTING.md#console)
 
 ## Further help
 
