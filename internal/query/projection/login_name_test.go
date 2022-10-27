@@ -486,10 +486,10 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
 					instance.AggregateType,
-					[]byte(`{"name": "Name"}`),
+					nil,
 				), instance.InstanceRemovedEventMapper),
 			},
-			reduce: reduceInstanceRemovedHelper(LoginNameUserInstanceIDCol),
+			reduce: (&loginNameProjection{}).reduceInstanceRemoved,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -497,7 +497,19 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names_domains WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.login_names_policies WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.login_names_users WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
