@@ -16,7 +16,8 @@ import (
 
 var (
 	orgsTable = table{
-		name: projection.OrgProjectionTable,
+		name:          projection.OrgProjectionTable,
+		instanceIDCol: projection.OrgColumnInstanceID,
 	}
 	OrgColumnID = Column{
 		name:  projection.OrgColumnID,

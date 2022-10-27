@@ -54,7 +54,8 @@ type MultiFactors struct {
 
 var (
 	loginPolicyTable = table{
-		name: projection.LoginPolicyTable,
+		name:          projection.LoginPolicyTable,
+		instanceIDCol: projection.LoginPolicyInstanceIDCol,
 	}
 	LoginPolicyColumnOrgID = Column{
 		name:  projection.LoginPolicyIDCol,

@@ -213,7 +213,7 @@ func (p *loginNameProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  instance.InstanceRemovedEventType,
-					Reduce: reduceInstanceRemovedHelper(LoginNameUserInstanceIDCol),
+					Reduce: p.reduceInstanceRemoved,
 				},
 			},
 		},
@@ -430,5 +430,34 @@ func (p *loginNameProjection) reduceDomainRemoved(event eventstore.Event) (*hand
 			handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
 		},
 		crdb.WithTableSuffix(loginNameDomainSuffix),
+	), nil
+}
+
+func (p *loginNameProjection) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.InstanceRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASeg3", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+	}
+
+	return crdb.NewMultiStatement(
+		event,
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNameDomainSuffix),
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNamePolicySuffix),
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNameUserSuffix),
+		),
 	), nil
 }

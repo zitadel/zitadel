@@ -112,3 +112,8 @@ func DeleteIDPProvidersByAggregateID(db *gorm.DB, table, aggregateID, instanceID
 	)
 	return delete(db)
 }
+
+func DeleteInstanceIDPProviders(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID), instanceID)
+	return delete(db)
+}

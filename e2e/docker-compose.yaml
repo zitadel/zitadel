@@ -6,9 +6,9 @@ services:
     image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
-      ZITADEL_EXTERNALSECURE: false
       ZITADEL_DATABASE_COCKROACH_HOST: db
-
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
+      ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MFAINITSKIPLIFETIME: 0
     depends_on:
       db:
         condition: 'service_healthy'

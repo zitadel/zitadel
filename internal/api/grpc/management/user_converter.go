@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -156,8 +157,11 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 	return human, req.RequestPasswordlessRegistration
 }
 
-func AddMachineUserRequestToDomain(req *mgmt_pb.AddMachineUserRequest) *domain.Machine {
-	return &domain.Machine{
+func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resourceowner string) *command.Machine {
+	return &command.Machine{
+		ObjectRoot: models.ObjectRoot{
+			ResourceOwner: resourceowner,
+		},
 		Username:    req.UserName,
 		Name:        req.Name,
 		Description: req.Description,
@@ -208,11 +212,11 @@ func notifyTypeToDomain(state mgmt_pb.SendHumanResetPasswordNotificationRequest_
 	}
 }
 
-func UpdateMachineRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateMachineRequest) *domain.Machine {
-	return &domain.Machine{
+func UpdateMachineRequestToCommand(req *mgmt_pb.UpdateMachineRequest, orgID string) *command.Machine {
+	return &command.Machine{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   req.UserId,
-			ResourceOwner: authz.GetCtxData(ctx).OrgID,
+			ResourceOwner: orgID,
 		},
 		Name:        req.Name,
 		Description: req.Description,

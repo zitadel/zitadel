@@ -29,11 +29,11 @@ var (
 		", COUNT(*) OVER () " +
 		"FROM projections.instance_members2 AS members " +
 		"LEFT JOIN projections.users4_humans " +
-		"ON members.user_id = projections.users4_humans.user_id " +
+		"ON members.user_id = projections.users4_humans.user_id AND members.instance_id = projections.users4_humans.instance_id " +
 		"LEFT JOIN projections.users4_machines " +
-		"ON members.user_id = projections.users4_machines.user_id " +
+		"ON members.user_id = projections.users4_machines.user_id AND members.instance_id = projections.users4_machines.instance_id " +
 		"LEFT JOIN projections.login_names " +
-		"ON members.user_id = projections.login_names.user_id " +
+		"ON members.user_id = projections.login_names.user_id AND members.instance_id = projections.login_names.instance_id " +
 		"WHERE projections.login_names.is_primary = $1")
 	instanceMembersColumns = []string{
 		"creation_date",

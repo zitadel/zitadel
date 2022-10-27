@@ -30,7 +30,8 @@ type PasswordAgePolicy struct {
 
 var (
 	passwordAgeTable = table{
-		name: projection.PasswordAgeTable,
+		name:          projection.PasswordAgeTable,
+		instanceIDCol: projection.AgePolicyInstanceIDCol,
 	}
 	PasswordAgeColID = Column{
 		name:  projection.AgePolicyIDCol,

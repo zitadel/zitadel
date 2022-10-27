@@ -61,6 +61,14 @@ func (v *View) DeleteIDPProvidersByAggregateID(aggregateID, instanceID string, e
 	return v.ProcessedIDPProviderSequence(event)
 }
 
+func (v *View) DeleteInstanceIDPProviders(event *models.Event) error {
+	err := view.DeleteInstanceIDPProviders(v.Db, idpProviderTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedIDPProviderSequence(event)
+}
+
 func (v *View) GetLatestIDPProviderSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(idpProviderTable, instanceID)
 }
