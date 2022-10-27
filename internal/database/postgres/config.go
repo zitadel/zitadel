@@ -126,7 +126,7 @@ func ensureFile(pathConfig, valueConfig, createFileForValue string) string {
 		return ""
 	}
 
-	file, err := os.Create(createFileForValue)
+	file, err := os.OpenFile(createFileForValue, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0400)
 	logging.OnError(err).Fatalf("creating file %s for certificate failed", createFileForValue)
 
 	_, err = io.Copy(file, strings.NewReader(valueConfig))
