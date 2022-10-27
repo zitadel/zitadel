@@ -159,7 +159,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
 					instance.AggregateType,
-					[]byte(`{"name": "Name"}`),
+					nil,
 				), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),

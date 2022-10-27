@@ -271,17 +271,14 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 }
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
-	machine, err := s.command.AddMachine(ctx, authz.GetCtxData(ctx).OrgID, AddMachineUserRequestToDomain(req))
+	machine := AddMachineUserRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.AddMachine(ctx, machine)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddMachineUserResponse{
-		UserId: machine.AggregateID,
-		Details: obj_grpc.AddToDetailsPb(
-			machine.Sequence,
-			machine.ChangeDate,
-			machine.ResourceOwner,
-		),
+		UserId:  machine.AggregateID,
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -682,16 +679,13 @@ func (s *Server) RemoveHumanPasswordless(ctx context.Context, req *mgmt_pb.Remov
 }
 
 func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRequest) (*mgmt_pb.UpdateMachineResponse, error) {
-	machine, err := s.command.ChangeMachine(ctx, UpdateMachineRequestToDomain(ctx, req))
+	machine := UpdateMachineRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.ChangeMachine(ctx, machine)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateMachineResponse{
-		Details: obj_grpc.ChangeToDetailsPb(
-			machine.Sequence,
-			machine.ChangeDate,
-			machine.ResourceOwner,
-		),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 

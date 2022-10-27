@@ -45,11 +45,11 @@ export class LoginPolicyComponent implements OnInit {
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
   public lifetimeForm: UntypedFormGroup = this.fb.group({
-    passwordCheckLifetime: [{ disabled: true, value: 240 }, [Validators.required]],
-    externalLoginCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
-    mfaInitSkipLifetime: [{ disabled: true, value: 720 }, [Validators.required]],
-    secondFactorCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
-    multiFactorCheckLifetime: [{ disabled: true, value: 12 }, [Validators.required]],
+    passwordCheckLifetime: [{ disabled: true }, [Validators.required]],
+    externalLoginCheckLifetime: [{ disabled: true }, [Validators.required]],
+    mfaInitSkipLifetime: [{ disabled: true }, [Validators.required]],
+    secondFactorCheckLifetime: [{ disabled: true }, [Validators.required]],
+    multiFactorCheckLifetime: [{ disabled: true }, [Validators.required]],
   });
   constructor(
     private toast: ToastService,
@@ -67,29 +67,29 @@ export class LoginPolicyComponent implements OnInit {
           this.loading = false;
 
           this.passwordCheckLifetime?.setValue(
-            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 240,
+            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 0,
           );
 
           this.externalLoginCheckLifetime?.setValue(
             this.loginData.externalLoginCheckLifetime?.seconds
               ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
-              : 12,
+              : 0,
           );
 
           this.mfaInitSkipLifetime?.setValue(
-            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 720,
+            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 0,
           );
 
           this.secondFactorCheckLifetime?.setValue(
             this.loginData.secondFactorCheckLifetime?.seconds
               ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
-              : 12,
+              : 0,
           );
 
           this.multiFactorCheckLifetime?.setValue(
             this.loginData.multiFactorCheckLifetime?.seconds
               ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60
-              : 12,
+              : 0,
           );
         }
       })
@@ -158,19 +158,19 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
             mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
 
-            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setPasswordCheckLifetime(pcl);
 
-            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setExternalLoginCheckLifetime(elcl);
 
-            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setMfaInitSkipLifetime(misl);
 
-            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setSecondFactorCheckLifetime(sfcl);
 
-            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setMultiFactorCheckLifetime(mficl);
 
             mgmtreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
@@ -189,19 +189,19 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
             mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
 
-            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setPasswordCheckLifetime(pcl);
 
-            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setExternalLoginCheckLifetime(elcl);
 
-            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setMfaInitSkipLifetime(misl);
 
-            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setSecondFactorCheckLifetime(sfcl);
 
-            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 0) * 60 * 60);
             mgmtreq.setMultiFactorCheckLifetime(mficl);
 
             mgmtreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
@@ -221,19 +221,19 @@ export class LoginPolicyComponent implements OnInit {
           adminreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
           adminreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
 
-          const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 240) * 60 * 60);
+          const admin_pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setPasswordCheckLifetime(admin_pcl);
 
-          const admin_elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 12) * 60 * 60);
+          const admin_elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setExternalLoginCheckLifetime(admin_elcl);
 
-          const admin_misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 720) * 60 * 60);
+          const admin_misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 0) * 60 * 60);
           adminreq.setMfaInitSkipLifetime(admin_misl);
 
-          const admin_sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 12) * 60 * 60);
+          const admin_sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setSecondFactorCheckLifetime(admin_sfcl);
 
-          const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 12) * 60 * 60);
+          const admin_mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 0) * 60 * 60);
           adminreq.setMultiFactorCheckLifetime(admin_mficl);
           adminreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);

@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
 	view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -51,7 +52,7 @@ func (p *OrgProjectMapping) Subscription() *v1.Subscription {
 }
 
 func (_ *OrgProjectMapping) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{project.AggregateType}
+	return []es_models.AggregateType{project.AggregateType, instance.AggregateType}
 }
 
 func (p *OrgProjectMapping) CurrentSequence(instanceID string) (uint64, error) {
@@ -96,6 +97,8 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 		if err == nil {
 			return p.view.ProcessedOrgProjectMappingSequence(event)
 		}
+	case instance.InstanceRemovedEventType:
+		return p.view.DeleteInstanceOrgProjectMappings(event)
 	default:
 		return p.view.ProcessedOrgProjectMappingSequence(event)
 	}

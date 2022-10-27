@@ -14,6 +14,10 @@ const (
 	instanceStateCount
 )
 
-func (f InstanceState) Valid() bool {
-	return f >= 0 && f < instanceStateCount
+func (s InstanceState) Valid() bool {
+	return s >= 0 && s < instanceStateCount
+}
+
+func (s InstanceState) Exists() bool {
+	return s != InstanceStateUnspecified && s != InstanceStateRemoved
 }

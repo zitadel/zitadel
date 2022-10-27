@@ -76,11 +76,6 @@ export function login(
           }
 
           cy.contains('button', 'skip').click();
-          cy.get('#change-old-password').type(creds.password);
-          cy.get('#change-new-password').type(creds.password);
-          cy.get('#change-password-confirmation').type(creds.password);
-          cy.contains('button', 'next').click();
-          cy.contains('button', 'next').click();
         });
 
         cy.wait('@token').then(() => {
