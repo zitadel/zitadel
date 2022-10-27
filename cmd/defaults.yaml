@@ -92,16 +92,22 @@ Database:
       SSL:
         Mode:
         RootCert:
+        RootCertValue:
         Cert:
+        CertValue:
         Key:
+        KeyValue:
     Admin:
       Username:
       Password:
       SSL:
         Mode:
         RootCert:
+        RootCertValue:
         Cert:
+        CertValue:
         Key:
+        KeyValue:
 
 Machine:
   # Cloud hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
