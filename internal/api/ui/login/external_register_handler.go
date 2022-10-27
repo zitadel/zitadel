@@ -266,9 +266,9 @@ func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.DomainPol
 	}
 
 	if orgIamPolicy.UserLoginMustBeDomain {
-		splittedUsername := strings.Split(username, "@")
-		if len(splittedUsername) > 1 {
-			username = splittedUsername[0]
+		index := strings.LastIndex(username, "@")
+		if index > 1 {
+			username = username[:index]
 		}
 	}
 

@@ -700,12 +700,12 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 
 func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) bool {
 	// check if there's a suffix in the loginname
-	split := strings.Split(loginName, "@")
-	if len(split) < 2 {
+	index := strings.LastIndex(loginName, "@")
+	if index < 0 {
 		return false
 	}
 	// check if the suffix matches a verified domain
-	org, err := repo.Query.OrgByVerifiedDomain(ctx, split[len(split)-1])
+	org, err := repo.Query.OrgByVerifiedDomain(ctx, loginName[index+1:])
 	if err != nil {
 		return false
 	}
