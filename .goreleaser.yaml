@@ -63,7 +63,7 @@ docker_manifests:
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-amd64
   - ghcr.io/zitadel/zitadel:{{ .Tag }}-arm64
   # Skips can and shall be set for individual manifests same as in dockers
-  skip_push: auto
+  skip_push: true
 - id: zitadel-Tag
   name_template: ghcr.io/zitadel/zitadel:{{ .Tag }}
   image_templates:
@@ -120,7 +120,7 @@ brews:
     # If set to auto, the release will not be uploaded to the homebrew tap
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Default is false.
-    skip_upload: auto
+    skip_upload: true
 
 announce:
   discord:
