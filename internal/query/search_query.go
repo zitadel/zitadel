@@ -365,8 +365,9 @@ var (
 )
 
 type table struct {
-	name  string
-	alias string
+	name          string
+	alias         string
+	instanceIDCol string
 }
 
 func (t table) setAlias(a string) table {
@@ -383,6 +384,13 @@ func (t table) identifier() string {
 
 func (t table) isZero() bool {
 	return t.name == ""
+}
+
+func (t table) InstanceIDIdentifier() string {
+	if t.alias != "" {
+		return t.alias + "." + t.instanceIDCol
+	}
+	return t.name + "." + t.instanceIDCol
 }
 
 type Column struct {
@@ -418,7 +426,7 @@ func (c Column) isZero() bool {
 }
 
 func join(join, from Column) string {
-	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier()
+	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier() + " AND " + from.table.InstanceIDIdentifier() + " = " + join.table.InstanceIDIdentifier()
 }
 
 type listContains struct {

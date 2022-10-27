@@ -17,7 +17,8 @@ import (
 
 var (
 	authNKeyTable = table{
-		name: projection.AuthNKeyTable,
+		name:          projection.AuthNKeyTable,
+		instanceIDCol: projection.AuthNKeyInstanceIDCol,
 	}
 	AuthNKeyColumnID = Column{
 		name:  projection.AuthNKeyIDCol,

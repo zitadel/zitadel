@@ -28,7 +28,8 @@ type DebugNotificationProvider struct {
 
 var (
 	notificationProviderTable = table{
-		name: projection.DebugNotificationProviderTable,
+		name:          projection.DebugNotificationProviderTable,
+		instanceIDCol: projection.DebugNotificationProviderInstanceIDCol,
 	}
 	NotificationProviderColumnAggID = Column{
 		name:  projection.DebugNotificationProviderAggIDCol,

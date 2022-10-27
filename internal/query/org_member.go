@@ -13,8 +13,9 @@ import (
 
 var (
 	orgMemberTable = table{
-		name:  projection.OrgMemberProjectionTable,
-		alias: "members",
+		name:          projection.OrgMemberProjectionTable,
+		alias:         "members",
+		instanceIDCol: projection.MemberInstanceID,
 	}
 	OrgMemberUserID = Column{
 		name:  projection.MemberUserIDCol,

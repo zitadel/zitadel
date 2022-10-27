@@ -35,7 +35,8 @@ type UserMetadataSearchQueries struct {
 
 var (
 	userMetadataTable = table{
-		name: projection.UserMetadataProjectionTable,
+		name:          projection.UserMetadataProjectionTable,
+		instanceIDCol: projection.UserMetadataColumnInstanceID,
 	}
 	UserMetadataUserIDCol = Column{
 		name:  projection.UserMetadataColumnUserID,
