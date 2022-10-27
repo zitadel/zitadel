@@ -75,7 +75,7 @@ var (
 		),
 		alias(col(usersAlias, LoginNameUserOwnerRemovedCol),
 			LoginNameOwnerRemovedUserCol),
-		alias(col(policyCustomAlias, LoginNamePoliciesOwnerRemovedCol),
+		alias(coalesce(col(policyCustomAlias, LoginNamePoliciesOwnerRemovedCol), "false"),
 			LoginNameOwnerRemovedPolicyCol),
 	).From(alias(LoginNameUserProjectionTable, usersAlias)).
 		LeftJoin(
@@ -103,7 +103,7 @@ var (
 		col(domainsAlias, LoginNameDomainIsPrimaryCol),
 		col(policyUsersAlias, LoginNameOwnerRemovedUserCol),
 		col(policyUsersAlias, LoginNameOwnerRemovedPolicyCol),
-		alias(col(domainsAlias, LoginNameDomainOwnerRemovedCol),
+		alias(coalesce(col(domainsAlias, LoginNameDomainOwnerRemovedCol), "false"),
 			LoginNameOwnerRemovedDomainCol),
 	).FromSelect(policyUsers, policyUsersAlias).
 		LeftJoin(
@@ -139,8 +139,16 @@ func alias(col, alias string) string {
 	return col + " AS " + alias
 }
 
-func coalesce(first, second string) string {
-	return "COALESCE(" + first + ", " + second + ")"
+func coalesce(values ...string) string {
+	str := "COALESCE("
+	for i, value := range values {
+		if i > 0 {
+			str += ", "
+		}
+		str += value
+	}
+	str += ")"
+	return str
 }
 
 func eq(first, second string) string {

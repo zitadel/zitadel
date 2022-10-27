@@ -91,14 +91,18 @@ func (q *ProjectGrantMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuil
 		})
 }
 
+func addProjectGrantMemberWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[ProjectGrantMemberOwnerRemoved.identifier()] = false
+	eq[ProjectGrantMemberOwnerRemovedUser.identifier()] = false
+	eq[ProjectGrantMemberOwnerRemovedProject.identifier()] = false
+	eq[ProjectGrantMemberGrantGrantedOrg.identifier()] = false
+}
+
 func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrantMembersQuery, withOwnerRemoved bool) (*Members, error) {
 	query, scan := prepareProjectGrantMembersQuery()
 	eq := sq.Eq{ProjectGrantMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		eq[ProjectGrantMemberOwnerRemoved.identifier()] = false
-		eq[ProjectGrantMemberOwnerRemovedUser.identifier()] = false
-		eq[ProjectGrantMemberOwnerRemovedProject.identifier()] = false
-		eq[ProjectGrantMemberGrantGrantedOrg.identifier()] = false
+		addProjectGrantMemberWithoutOwnerRemoved(eq)
 		addLoginNameWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()

@@ -304,12 +304,6 @@ var (
 
 func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[UserOwnerRemovedCol.identifier()] = false
-	eq[userLoginNamesOwnerRemovedUserCol.identifier()] = false
-	eq[userLoginNamesOwnerRemovedPolicyCol.identifier()] = false
-	eq[userLoginNamesOwnerRemovedDomainCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedUserCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedPolicyCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*User, error) {
@@ -319,7 +313,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareUserQuery(instanceID)
+	query, scan := prepareUserQuery(instanceID, withOwnerRemoved)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -346,7 +340,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareUserQuery(instanceID)
+	query, scan := prepareUserQuery(instanceID, withOwnerRemoved)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -435,7 +429,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareNotifyUserQuery(instanceID)
+	query, scan := prepareNotifyUserQuery(instanceID, withOwnerRemoved)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -462,7 +456,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	}
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareNotifyUserQuery(instanceID)
+	query, scan := prepareNotifyUserQuery(instanceID, withOwnerRemoved)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -482,8 +476,9 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 }
 
 func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, withOwnerRemoved bool) (*Users, error) {
-	query, scan := prepareUsersQuery()
-	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	query, scan := prepareUsersQuery(instanceID, withOwnerRemoved)
+	eq := sq.Eq{UserInstanceIDCol.identifier(): instanceID}
 	if !withOwnerRemoved {
 		addUserWithoutOwnerRemoved(eq)
 	}
@@ -616,26 +611,47 @@ func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(userLoginNamesListCol, value, TextListContains)
 }
 
-func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-	loginNamesQuery, loginNamesArgs, err := sq.Select(
+func prepareLoginNamesQuery(instanceID string, withOwnerRemoved bool) (string, []interface{}, error) {
+	eq := sq.Eq{
+		userLoginNamesInstanceIDCol.identifier(): instanceID,
+	}
+	if !withOwnerRemoved {
+		eq[userLoginNamesOwnerRemovedUserCol.identifier()] = false
+		eq[userLoginNamesOwnerRemovedPolicyCol.identifier()] = false
+		eq[userLoginNamesOwnerRemovedDomainCol.identifier()] = false
+	}
+	return sq.Select(
 		userLoginNamesUserIDCol.identifier(),
 		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name).
 		From(userLoginNamesTable.identifier()).
 		GroupBy(userLoginNamesUserIDCol.identifier()).
-		Where(sq.Eq{
-			userLoginNamesInstanceIDCol.identifier(): instanceID,
-		}).ToSql()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
+		Where(eq).ToSql()
+}
+
+func preparePreferredLoginNamesQuery(instanceID string, withOwnerRemoved bool) (string, []interface{}, error) {
+	eq := sq.Eq{
+		userPreferredLoginNameIsPrimaryCol.identifier():  true,
+		userPreferredLoginNameInstanceIDCol.identifier(): instanceID,
 	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := sq.Select(
+	if !withOwnerRemoved {
+		eq[userPreferredLoginNameOwnerRemovedUserCol.identifier()] = false
+		eq[userPreferredLoginNameOwnerRemovedPolicyCol.identifier()] = false
+		eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
+	}
+
+	return sq.Select(
 		userPreferredLoginNameUserIDCol.identifier(),
 		userPreferredLoginNameCol.identifier()).
 		From(userPreferredLoginNameTable.identifier()).
-		Where(sq.Eq{
-			userPreferredLoginNameIsPrimaryCol.identifier():  true,
-			userPreferredLoginNameInstanceIDCol.identifier(): instanceID,
-		}).ToSql()
+		Where(eq).ToSql()
+}
+
+func prepareUserQuery(instanceID string, withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
+	if err != nil {
+		return sq.SelectBuilder{}, nil
+	}
+	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -917,26 +933,12 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 		}
 }
 
-func prepareNotifyUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-	loginNamesQuery, loginNamesArgs, err := sq.Select(
-		userLoginNamesUserIDCol.identifier(),
-		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+") AS "+userLoginNamesListCol.name).
-		From(userLoginNamesTable.identifier()).
-		GroupBy(userLoginNamesUserIDCol.identifier()).
-		Where(sq.Eq{
-			userLoginNamesInstanceIDCol.identifier(): instanceID,
-		}).ToSql()
+func prepareNotifyUserQuery(instanceID string, withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
+	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := sq.Select(
-		userPreferredLoginNameUserIDCol.identifier(),
-		userPreferredLoginNameCol.identifier()).
-		From(userPreferredLoginNameTable.identifier()).
-		Where(sq.Eq{
-			userPreferredLoginNameIsPrimaryCol.identifier():  true,
-			userPreferredLoginNameInstanceIDCol.identifier(): instanceID,
-		}).ToSql()
+	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -1094,27 +1096,16 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-	loginNamesQuery, _, err := sq.Select(
-		userLoginNamesUserIDCol.identifier(),
-		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+") AS "+userLoginNamesListCol.name).
-		From(userLoginNamesTable.identifier()).
-		GroupBy(userLoginNamesUserIDCol.identifier()).
-		ToSql()
+func prepareUsersQuery(instanceID string, withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := sq.Select(
-		userPreferredLoginNameUserIDCol.identifier(),
-		userPreferredLoginNameCol.identifier()).
-		From(userPreferredLoginNameTable.identifier()).
-		Where(
-			sq.Eq{
-				userPreferredLoginNameIsPrimaryCol.identifier(): true,
-			}).ToSql()
+	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
+
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1145,7 +1136,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()).
+			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier(), loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier(), preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {

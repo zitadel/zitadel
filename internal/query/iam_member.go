@@ -67,12 +67,16 @@ func (q *IAMMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		toQuery(query)
 }
 
+func addIamMemberWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[InstanceMemberOwnerRemoved.identifier()] = false
+	eq[InstanceMemberOwnerRemovedUser.identifier()] = false
+}
+
 func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, withOwnerRemoved bool) (*Members, error) {
 	query, scan := prepareInstanceMembersQuery()
 	eq := sq.Eq{InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		eq[InstanceMemberOwnerRemoved.identifier()] = false
-		eq[InstanceMemberOwnerRemovedUser.identifier()] = false
+		addIamMemberWithoutOwnerRemoved(eq)
 		addLoginNameWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()

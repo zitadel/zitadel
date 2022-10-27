@@ -75,11 +75,11 @@ var (
 	}
 	ProjectGrantColumnOwnerRemoved = Column{
 		name:  projection.ProjectGrantColumnOwnerRemoved,
-		table: projectsTable,
+		table: projectGrantsTable,
 	}
 	ProjectGrantColumnGrantGrantedOrgRemoved = Column{
-		name:  projection.ProjectGrantMemberGrantGrantedOrgRemoved,
-		table: projectsTable,
+		name:  projection.ProjectGrantColumnGrantedOrgRemoved,
+		table: projectGrantsTable,
 	}
 )
 

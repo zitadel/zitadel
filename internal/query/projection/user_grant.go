@@ -209,7 +209,7 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantProjectID, e.ProjectID),
 			handler.NewCol(UserGrantResourceOwnerProject, projectOwner),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
-			handler.NewCol(UserGrantGrantGrantedOrgRemoved, grantOwner),
+			handler.NewCol(UserGrantGrantGrantedOrg, grantOwner),
 			handler.NewCol(UserGrantRoles, database.StringArray(e.RoleKeys)),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},

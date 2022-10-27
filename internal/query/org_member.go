@@ -69,12 +69,16 @@ func (q *OrgMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		Where(sq.Eq{OrgMemberOrgID.identifier(): q.OrgID})
 }
 
+func addOrgMemberWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[OrgMemberOwnerRemoved.identifier()] = false
+	eq[OrgMemberOwnerRemovedUser.identifier()] = false
+}
+
 func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery, withOwnerRemoved bool) (*Members, error) {
 	query, scan := prepareOrgMembersQuery()
 	eq := sq.Eq{OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		eq[OrgMemberOwnerRemoved.identifier()] = false
-		eq[OrgMemberOwnerRemovedUser.identifier()] = false
+		addOrgMemberWithoutOwnerRemoved(eq)
 		addLoginNameWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
