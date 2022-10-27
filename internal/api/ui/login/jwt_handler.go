@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/oauth2"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -74,7 +75,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	tokens := &oidc.Tokens{IDToken: token, IDTokenClaims: tokenClaims}
+	tokens := &oidc.Tokens{IDToken: token, IDTokenClaims: tokenClaims, Token: &oauth2.Token{}}
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
 	externalUser, err = l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
 	if err != nil {
