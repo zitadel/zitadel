@@ -138,6 +138,8 @@ func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 		return i.view.PutIDPProviders(event, providers...)
 	case org.LoginPolicyRemovedEventType:
 		return i.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event.InstanceID, event)
+	case instance.InstanceRemovedEventType:
+		return i.view.DeleteInstanceIDPs(event)
 	default:
 		return i.view.ProcessedIDPProviderSequence(event)
 	}

@@ -39,7 +39,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -76,7 +75,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -107,7 +105,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -138,7 +135,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -175,13 +171,38 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},
@@ -206,7 +227,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -234,7 +254,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -261,7 +280,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -290,7 +308,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -320,7 +337,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IDPLoginPolicyLinkTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -345,7 +361,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, IDPLoginPolicyLinkTable, tt.want)
 		})
 	}
 }

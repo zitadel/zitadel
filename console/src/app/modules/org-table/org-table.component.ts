@@ -7,7 +7,6 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { Org, OrgFieldName, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PaginatorComponent } from '../paginator/paginator.component';
@@ -95,7 +94,7 @@ export class OrgTableComponent {
 
   public refresh(): void {
     this.requestOrgs$.next({
-      limit: this.paginator.length,
+      limit: this.paginator.pageSize,
       offset: this.paginator.pageSize * this.paginator.pageIndex,
       queries: this.searchQueries,
     });

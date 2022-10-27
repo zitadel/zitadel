@@ -83,7 +83,8 @@ func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldTri
 
 var (
 	passwordComplexityTable = table{
-		name: projection.PasswordComplexityTable,
+		name:          projection.PasswordComplexityTable,
+		instanceIDCol: projection.ComplexityPolicyInstanceIDCol,
 	}
 	PasswordComplexityColID = Column{
 		name:  projection.ComplexityPolicyIDCol,

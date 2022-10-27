@@ -5,6 +5,7 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
 import { FlowType, TriggerType } from '../proto/generated/zitadel/action_pb';
+import { RemoveLabelPolicyLogoDarkRequest } from '../proto/generated/zitadel/admin_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
@@ -425,6 +426,8 @@ import {
   UpdateOrgIDPResponse,
   UpdateOrgMemberRequest,
   UpdateOrgMemberResponse,
+  UpdateOrgRequest,
+  UpdateOrgResponse,
   UpdateProjectGrantMemberRequest,
   UpdateProjectGrantMemberResponse,
   UpdateProjectGrantRequest,
@@ -2351,6 +2354,12 @@ export class ManagementService {
     req.setName(name);
     req.setProjectId(projectId);
     return this.grpcService.mgmt.updateApp(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateOrg(name: string): Promise<UpdateOrgResponse.AsObject> {
+    const req = new UpdateOrgRequest();
+    req.setName(name);
+    return this.grpcService.mgmt.updateOrg(req, null).then((resp) => resp.toObject());
   }
 
   public updateOIDCAppConfig(req: UpdateOIDCAppConfigRequest): Promise<UpdateOIDCAppConfigResponse.AsObject> {

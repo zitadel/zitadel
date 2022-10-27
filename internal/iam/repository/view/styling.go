@@ -28,8 +28,7 @@ func PutStyling(db *gorm.DB, table string, policy *model.LabelPolicyView) error 
 	return save(db, policy)
 }
 
-func DeleteStyling(db *gorm.DB, table, aggregateID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyAggregateID), aggregateID)
-
+func DeleteInstanceStyling(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyInstanceID), instanceID)
 	return delete(db)
 }

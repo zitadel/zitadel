@@ -76,11 +76,6 @@ export function login(
           }
 
           cy.contains('button', 'skip').click();
-          cy.get('#change-old-password').type(creds.password);
-          cy.get('#change-new-password').type(creds.password);
-          cy.get('#change-password-confirmation').type(creds.password);
-          cy.contains('button', 'next').click();
-          cy.contains('button', 'next').click();
         });
 
         cy.wait('@token').then(() => {
@@ -89,7 +84,9 @@ export function login(
 
         onAuthenticated ? onAuthenticated() : null;
 
-        cy.get('[data-e2e=authenticated-welcome]');
+        cy.get('[data-e2e=authenticated-welcome]', {
+          timeout: 10_000,
+        });
       },
       {
         validate: () => {

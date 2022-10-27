@@ -19,37 +19,63 @@ func TestInstanceProjection_reduces(t *testing.T) {
 		args   args
 		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
-	}{{
-		name: "reduceInstanceAdded",
-		args: args{
-			event: getEvent(testEvent(
-				repository.EventType(instance.InstanceAddedEventType),
-				instance.AggregateType,
-				[]byte(`{"name": "Name"}`),
-			), instance.InstanceAddedEventMapper),
-		},
-		reduce: (&instanceProjection{}).reduceInstanceAdded,
-		want: wantReduce{
-			projection:       InstanceProjectionTable,
-			aggregateType:    eventstore.AggregateType("instance"),
-			sequence:         15,
-			previousSequence: 10,
-			executer: &testExecuter{
-				executions: []execution{
-					{
-						expectedStmt: "INSERT INTO projections.instances (id, creation_date, change_date, sequence, name) VALUES ($1, $2, $3, $4, $5)",
-						expectedArgs: []interface{}{
-							"instance-id",
-							anyArg{},
-							anyArg{},
-							uint64(15),
-							"Name",
+	}{
+		{
+			name: "reduceInstanceAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceAddedEventType),
+					instance.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), instance.InstanceAddedEventMapper),
+			},
+			reduce: (&instanceProjection{}).reduceInstanceAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.instances (id, creation_date, change_date, sequence, name) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"Name",
+							},
 						},
 					},
 				},
 			},
 		},
-	},
+		{
+			name: "reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(InstanceColumnID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.instances WHERE (id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
 		{
 			name: "reduceDefaultOrgSet",
 			args: args{
@@ -61,7 +87,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceDefaultOrgSet,
 			want: wantReduce{
-				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -91,7 +116,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
-				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -121,7 +145,6 @@ func TestInstanceProjection_reduces(t *testing.T) {
 			},
 			reduce: (&instanceProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
-				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -151,7 +174,7 @@ func TestInstanceProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, InstanceProjectionTable, tt.want)
 		})
 	}
 }

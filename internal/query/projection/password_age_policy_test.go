@@ -39,7 +39,6 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -78,7 +77,6 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -109,11 +107,36 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.password_age_policies WHERE (id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(AgePolicyInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.password_age_policies WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -139,7 +162,6 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -178,7 +200,6 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PasswordAgeTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -206,7 +227,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, PasswordAgeTable, tt.want)
 		})
 	}
 }

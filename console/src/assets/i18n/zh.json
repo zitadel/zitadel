@@ -212,10 +212,9 @@
       "TITLE": "设置",
       "GENERAL": "通用",
       "IDP": "身份提供者",
-      "MFA": "多因素认证",
+      "SECURITY": "密码和安全",
       "KEYS": "秘钥",
       "PAT": "个人访问令牌",
-      "PASSWORDLESS": "无密码认证",
       "USERGRANTS": "授权",
       "MEMBERSHIPS": "成员身份",
       "METADATA": "元数据"
@@ -461,6 +460,7 @@
     },
     "PASSWORD": {
       "TITLE": "密码",
+      "LABEL": "安全密码有助于保护帐户",
       "DESCRIPTION": "根据以下策略输入新密码。",
       "OLD": "当前密码",
       "NEW": "新密码",
@@ -482,6 +482,7 @@
     "EMAILVERIFIED": "电子邮件已验证",
     "NOTVERIFIED": "未验证",
     "PREFERRED_LOGINNAME": "首选登录名",
+    "ISINITIAL": "此用户电子邮件尚未验证。",
     "LOGINMETHODS": {
       "TITLE": "联系信息",
       "DESCRIPTION": "提供的信息用于向您发送重要信息，例如密码重置电子邮件。",
@@ -776,6 +777,12 @@
       "ORGDETAIL_TITLE": "输入新组织的名称和域名。",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
+      "RENAME": {
+        "ACTION": "改名",
+        "TITLE": "重命名组织",
+        "DESCRIPTION": "输入组织的新名称",
+        "BTN": "改名"
+      },
       "ORGDOMAIN": {
         "TITLE": "组织域所有权验证",
         "VERIFICATION": "要验证您对域的所有权，您需要下载验证文件并将其上传到下面列出的提供的 URL，或者为提供的域名添加一条类型为TXT的DNS解析记录。完成后请单击按钮进行验证。",
@@ -827,6 +834,7 @@
       "DESCRIPTION": "定义可以更改组织首选项的用户。"
     },
     "TOAST": {
+      "UPDATED": "组织已更新",
       "DEACTIVATED": "组织已停用。",
       "REACTIVATED": "组织重新启用。",
       "DOMAINADDED": "域名已添加。",
@@ -1168,6 +1176,7 @@
       "HIDEPASSWORDRESET": "隐藏密码重置按钮",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
+      "HIDELOGINNAMESUFFIX_DESC": "在登录界面隐藏登录名后缀",
       "IGNOREUNKNOWNUSERNAMES": "忽略未知用户名",
       "IGNOREUNKNOWNUSERNAMES_DESC": "如果选择该选项，即使未找到用户，登录过程中也会显示密码屏幕。如果用户名或密码错误，密码检查的错误不会透露。",
       "ALLOWDOMAINDISCOVERY": "允许域名发现",
@@ -1178,6 +1187,7 @@
       "DEFAULTREDIRECTURI_DESC": "定义如果在没有应用程序上下文的情况下开始登录（例如来自邮件），用户将被重定向到哪里。",
       "ERRORMSGPOPUP": "在对话框中显示错误",
       "DISABLEWATERMARK": "隐藏水印",
+      "DISABLEWATERMARK_DESC": "登录界面隐藏 Powered by ZITADEL 水印",
       "PASSWORDCHECKLIFETIME": "密码登录状态有效期",
       "EXTERNALLOGINCHECKLIFETIME": "外部身份提供者登录状态有效期",
       "MFAINITSKIPLIFETIME": "多因素身份认证初始化有效期",

@@ -122,7 +122,8 @@ type UserSearchQueries struct {
 
 var (
 	userTable = table{
-		name: projection.UserTable,
+		name:          projection.UserTable,
+		instanceIDCol: projection.UserInstanceIDCol,
 	}
 	UserIDCol = Column{
 		name:  projection.UserIDCol,
@@ -179,7 +180,8 @@ var (
 
 var (
 	humanTable = table{
-		name: projection.UserHumanTable,
+		name:          projection.UserHumanTable,
+		instanceIDCol: projection.HumanUserInstanceIDCol,
 	}
 	// profile
 	HumanUserIDCol = Column{
@@ -243,7 +245,8 @@ var (
 
 var (
 	machineTable = table{
-		name: projection.UserMachineTable,
+		name:          projection.UserMachineTable,
+		instanceIDCol: projection.MachineUserInstanceIDCol,
 	}
 	MachineUserIDCol = Column{
 		name:  projection.MachineUserIDCol,
@@ -262,7 +265,8 @@ var (
 
 var (
 	notifyTable = table{
-		name: projection.UserNotifyTable,
+		name:          projection.UserNotifyTable,
+		instanceIDCol: projection.NotifyInstanceIDCol,
 	}
 	NotifyUserIDCol = Column{
 		name:  projection.NotifyUserIDCol,

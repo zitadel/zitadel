@@ -14,8 +14,9 @@ import (
 
 var (
 	instanceMemberTable = table{
-		name:  projection.InstanceMemberProjectionTable,
-		alias: "members",
+		name:          projection.InstanceMemberProjectionTable,
+		alias:         "members",
+		instanceIDCol: projection.MemberInstanceID,
 	}
 	InstanceMemberUserID = Column{
 		name:  projection.MemberUserIDCol,
