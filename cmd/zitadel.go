@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"errors"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -41,6 +42,10 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	viper.SetConfigType("yaml")
 	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
 	logging.OnError(err).Fatal("unable to read default config")
+	err = viper.MergeConfig(bytes.NewBuffer([]byte(os.Getenv("ZITADEL_CONFIG"))))
+	logging.OnError(err).Fatal("unable to read config from variable ZITADEL_CONFIG")
+	err = viper.MergeConfig(bytes.NewBuffer([]byte(os.Getenv("ZITADEL_SECRETS"))))
+	logging.OnError(err).Fatal("unable to read config from variable ZITADEL_SECRETS")
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
