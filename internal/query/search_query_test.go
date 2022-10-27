@@ -13,7 +13,11 @@ import (
 var (
 	testTable = table{
 		name:          "test_table",
-		alias:         "test_table",
+		instanceIDCol: "instance_id",
+	}
+	testTableAlias = table{
+		name:          "test_table",
+		alias:         "test_alias",
 		instanceIDCol: "instance_id",
 	}
 	testTable2 = table{
@@ -23,6 +27,10 @@ var (
 	testCol = Column{
 		name:  "test_col",
 		table: testTable,
+	}
+	testColAlias = Column{
+		name:  "test_col",
+		table: testTableAlias,
 	}
 	testCol2 = Column{
 		name:  "test_col2",
@@ -270,7 +278,17 @@ func TestSubSelect_comp(t *testing.T) {
 				Queries: []SearchQuery{&TextQuery{testCol, "horst", TextEquals}},
 			},
 			want: want{
-				query: sq.Select("test_table.test_col").From("test_table").Where(sq.Eq{"test_table.test_col": "horst"}),
+				query: sq.Select("test_table.test_col").From("test_table").Where(sq.Eq{"test_table.test_col": interface{}("horst")}),
+			},
+		},
+		{
+			name: "queries 1 with alias",
+			fields: fields{
+				Column:  testColAlias,
+				Queries: []SearchQuery{&TextQuery{testColAlias, "horst", TextEquals}},
+			},
+			want: want{
+				query: sq.Select("test_alias.test_col").From("test_table AS test_alias").Where(sq.Eq{"test_alias.test_col": interface{}("horst")}),
 			},
 		},
 		{
