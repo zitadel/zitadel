@@ -29,11 +29,12 @@
 
 Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak?
 
-Do you have project that requires a multi-tenant user management with self-service for you customers?
+Do you have project that requires a multi-tenant user management with self-service for your customers?
 
-Look no further — ZITADEL combines the ease of Auth0 and the versatility of Keycloak.
+Look no further — ZITADEL combines the ease of Auth0 with the versatility of Keycloak.
 
-We provide you with a wide range of out of the box features to accelerate your project. Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
+We provide you with a wide range of out of the box features to accelerate your project.
+Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
 
 With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs.
 
@@ -45,7 +46,7 @@ With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
 
 ### Deploy ZITADEL (Self-Hosted)
 
-Deploying ZITADEL locally does take less than 3 minutes. So go ahead and give it a try!
+Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a try!
 
 * [Linux](https://docs.zitadel.com/docs/guides/deploy/linux)
 * [MacOS](https://docs.zitadel.com/docs/guides/deploy/macos)
@@ -59,9 +60,10 @@ See all guides [here](https://docs.zitadel.com/docs/guides/deploy/overview)
 
 ### Setup ZITADEL Cloud (SaaS)
 
-If you want to experience a hands-free ZITADEL you should use [ZITADEL Cloud](https://zitadel.cloud).
+If you want to experience a hands-free ZITADEL, you should use [ZITADEL Cloud](https://zitadel.cloud).
 
-It is free for up to 25'000 authenticated requests and provides you all the features that make ZITADEL great. Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
+It is free for up to 25'000 authenticated requests and provides you all the features that make ZITADEL great.
+Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ## Why choose ZITADEL
 
@@ -108,7 +110,8 @@ Clone one of our [example applications](https://docs.zitadel.com/docs/examples/i
 
 ### OpenID Connect RP Libraries
 
-Use any of the [Open ID Connect certified RP implementations](https://openid.net/developers/certified/) in your preferred language. As certified OpenID Provider, ZITADEL is compatible with any of the implementations.
+Use any of the [Open ID Connect certified RP implementations](https://openid.net/developers/certified/) in your preferred language.
+As certified OpenID Provider, ZITADEL is compatible with any of the implementations.
 
 ### Client libraries
 
@@ -165,4 +168,5 @@ See the policy [here](./SECURITY.md)
 
 See the exact licensing terms [here](./LICENSE)
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and limitations under the License.

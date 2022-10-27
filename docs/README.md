@@ -26,7 +26,8 @@ As an alternative you can use this docker compose command:
 docker compose up
 ```
 
-These commands starts a local development server. Most changes are reflected live without having to restart the server.
+These commands start a local development server.
+Most changes are reflected live without having to restart the server.
 
 ## Build
 
