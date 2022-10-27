@@ -2,6 +2,8 @@ package cockroach
 
 import (
 	"database/sql"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -102,6 +104,33 @@ type SSL struct {
 	Cert string
 	// Key Path to the client private key
 	Key string
+	// RootCertValue is the CA certificate in plain text
+	RootCertValue     string
+	rootCertValueFile string
+	// CertValue is the client certificate in plain text
+	CertValue     string
+	certValueFile string
+	// KeyValue is the client private key in plain text
+	KeyValue     string
+	keyValueFile string
+}
+
+func (s *SSL) ensureFiles() {
+	s.rootCertValueFile = ensureFile(s.RootCert, s.RootCertValue, "./zitadel-generated-from-config-root.crt")
+	s.certValueFile = ensureFile(s.Cert, s.CertValue, "./zitadel-generated-from-config.crt")
+	s.keyValueFile = ensureFile(s.Key, s.KeyValue, "./zitadel-generated-from-config.key")
+}
+
+func ensureFile(pathConfig, valueConfig, createFileForValue string) string {
+	if pathConfig != "" {
+		return ""
+	}
+	file, err := os.Create(createFileForValue)
+	logging.OnError(err).Fatalf("creating file %s for certificate failed", createFileForValue)
+
+	_, err = io.Copy(file, strings.NewReader(valueConfig))
+	logging.OnError(err).Fatalf("copying certificate to file %s failed", file.Name())
+	return file.Name()
 }
 
 func (c *Config) checkSSL(user User) {
@@ -111,9 +140,12 @@ func (c *Config) checkSSL(user User) {
 	}
 	if user.SSL.RootCert == "" {
 		logging.WithFields(
-			"cert set", user.SSL.Cert != "",
-			"key set", user.SSL.Key != "",
-			"rootCert set", user.SSL.RootCert != "",
+			"cert path set", user.SSL.Cert != "",
+			"cert value set", user.SSL.CertValue != "",
+			"key path set", user.SSL.Key != "",
+			"key value set", user.SSL.KeyValue != "",
+			"rootCert path set", user.SSL.RootCert != "",
+			"rootCert value set", user.SSL.RootCertValue != "",
 		).Fatal("at least ssl root cert has to be set")
 	}
 }
@@ -142,12 +174,24 @@ func (c Config) String(useAdmin bool) string {
 		fields = append(fields, "password="+user.Password)
 	}
 	if user.SSL.Mode != sslDisabledMode {
-		fields = append(fields, "sslrootcert="+user.SSL.RootCert)
+		rootCertPath := user.SSL.rootCertValueFile
+		if rootCertPath == "" {
+			rootCertPath = user.SSL.RootCert
+		}
+		fields = append(fields, "sslrootcert="+rootCertPath)
+		certPath := user.SSL.certValueFile
+		if certPath == "" {
+			certPath = user.SSL.Cert
+		}
 		if user.SSL.Cert != "" {
-			fields = append(fields, "sslcert="+user.SSL.Cert)
+			fields = append(fields, "sslcert="+certPath)
+		}
+		keyPath := user.SSL.keyValueFile
+		if keyPath == "" {
+			keyPath = user.SSL.Key
 		}
 		if user.SSL.Key != "" {
-			fields = append(fields, "sslkey="+user.SSL.Key)
+			fields = append(fields, "sslkey="+keyPath)
 		}
 	}
 
