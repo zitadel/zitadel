@@ -60,16 +60,22 @@ Database:
       SSL:
         Mode: disable
         RootCert: ""
+        RootCertValue: ""
         Cert: ""
+        CertValue: ""
         Key: ""
+        KeyValue: ""
     Admin:
       Username: root
       Password: ""
       SSL:
         Mode: disable
         RootCert: ""
+        RootCertValue: ""
         Cert: ""
+        CertValue: ""
         Key: ""
+        KeyValue: ""
   # Postgres is used as soon as a value is set
   # The values describe the possible fields to set values
   postgres:
