@@ -67,7 +67,7 @@
     "@typescript-eslint/eslint-plugin": "5.39.0",
     "@typescript-eslint/parser": "5.39.0",
     "codelyzer": "^6.0.0",
-    "eslint": "^8.24.0",
+    "eslint": "^8.26.0",
     "jasmine-core": "~4.4.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "~6.4.1",
