@@ -138,7 +138,7 @@ func (c *Config) checkSSL(user User) {
 		user.SSL = SSL{Mode: sslDisabledMode}
 		return
 	}
-	if user.SSL.RootCert == "" {
+	if user.SSL.RootCert == "" && user.SSL.RootCertValue == "" {
 		logging.WithFields(
 			"cert path set", user.SSL.Cert != "",
 			"cert value set", user.SSL.CertValue != "",
