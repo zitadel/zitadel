@@ -41,6 +41,14 @@ func (v *View) DeleteIDPConfig(idpID string, event *models.Event) error {
 	return v.ProcessedIDPConfigSequence(event)
 }
 
+func (v *View) DeleteInstanceIDPs(event *models.Event) error {
+	err := view.DeleteInstanceIDPs(v.Db, idpConfigTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedIDPConfigSequence(event)
+}
+
 func (v *View) GetLatestIDPConfigSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(idpConfigTable, instanceID)
 }

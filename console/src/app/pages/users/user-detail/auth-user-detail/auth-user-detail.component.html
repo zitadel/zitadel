@@ -57,6 +57,7 @@
           <cnsl-contact
             *ngIf="user.human"
             [human]="user.human"
+            [username]="user.preferredLoginName"
             [state]="user.state"
             [canWrite]="true"
             (editType)="openEditDialog($event)"
@@ -85,11 +86,33 @@
         <cnsl-external-idps *ngIf="user && user.id" [userId]="user.id" [service]="userService"></cnsl-external-idps>
       </ng-container>
 
-      <ng-container *ngIf="currentSetting === 'passwordless'">
-        <cnsl-auth-passwordless *ngIf="user" #mfaComponent></cnsl-auth-passwordless>
-      </ng-container>
+      <ng-container *ngIf="currentSetting === 'security'">
+        <cnsl-card *ngIf="user && user.human" title="{{ 'USER.PASSWORD.TITLE' | translate }}">
+          <div class="contact-method-col">
+            <div class="contact-method-row">
+              <div class="left">
+                <span class="label cnsl-secondary-text">{{ 'USER.PASSWORD.LABEL' | translate }}</span>
+                <span>*********</span>
 
-      <ng-container *ngIf="currentSetting === 'mfa'">
+                <ng-content select="[pwdAction]"></ng-content>
+              </div>
+
+              <div class="right">
+                <a
+                  matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
+                  [routerLink]="['password']"
+                  [queryParams]="{ username: user.preferredLoginName }"
+                  mat-icon-button
+                >
+                  <i class="las la-pen"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </cnsl-card>
+
+        <cnsl-auth-passwordless *ngIf="user" #mfaComponent></cnsl-auth-passwordless>
+
         <cnsl-auth-user-mfa *ngIf="user" #mfaComponent></cnsl-auth-user-mfa>
       </ng-container>
 

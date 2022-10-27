@@ -154,8 +154,8 @@ func (c *Commands) updateConsoleRedirectURIs(ctx context.Context, filter prepara
 	)
 }
 
-//checkUpdateConsoleRedirectURIs validates if the required console uri is present in the redirect_uris and post_logout_redirect_uris
-//it will return true only if present in both list, otherwise false
+// checkUpdateConsoleRedirectURIs validates if the required console uri is present in the redirect_uris and post_logout_redirect_uris
+// it will return true only if present in both list, otherwise false
 func (c *Commands) checkUpdateConsoleRedirectURIs(instanceDomain string, redirectURIs, postLogoutRedirectURIs []string) bool {
 	redirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + consoleRedirectPath
 	if !containsURI(redirectURIs, redirectURI) {
@@ -225,4 +225,13 @@ func containsURI(uris []string, uri string) bool {
 		}
 	}
 	return false
+}
+
+func (c *Commands) getInstanceDomainsWriteModel(ctx context.Context, instanceID string) (*InstanceDomainsWriteModel, error) {
+	domainsWriteModel := NewInstanceDomainsWriteModel(instanceID)
+	err := c.eventstore.FilterToQueryReducer(ctx, domainsWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return domainsWriteModel, nil
 }

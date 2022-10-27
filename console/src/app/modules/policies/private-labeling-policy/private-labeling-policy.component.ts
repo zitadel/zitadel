@@ -238,17 +238,38 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         }
         break;
       case PolicyComponentServiceType.MGMT:
-        if (type === AssetType.LOGO) {
-          if (theme === Theme.DARK) {
-            return previewHandler(this.service.removeLabelPolicyLogoDark());
-          } else if (theme === Theme.LIGHT) {
-            return previewHandler(this.service.removeLabelPolicyLogo());
-          }
-        } else if (type === AssetType.ICON) {
-          if (theme === Theme.DARK) {
-            return previewHandler(this.service.removeLabelPolicyIconDark());
-          } else if (theme === Theme.LIGHT) {
-            return previewHandler(this.service.removeLabelPolicyIcon());
+        if ((this.previewData as LabelPolicy.AsObject).isDefault) {
+          const req0 = new AddCustomLabelPolicyRequest();
+          this.overwriteValues(req0);
+
+          return (this.service as ManagementService)
+            .addCustomLabelPolicy(req0)
+            .then(() => {
+              if (this.previewData) {
+                this.previewData.isDefault = false;
+              }
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+
+              setTimeout(() => {
+                this.fetchData();
+              }, 1000);
+            })
+            .catch((error: HttpErrorResponse) => {
+              this.toast.showError(error);
+            });
+        } else {
+          if (type === AssetType.LOGO) {
+            if (theme === Theme.DARK) {
+              return previewHandler(this.service.removeLabelPolicyLogoDark());
+            } else if (theme === Theme.LIGHT) {
+              return previewHandler(this.service.removeLabelPolicyLogo());
+            }
+          } else if (type === AssetType.ICON) {
+            if (theme === Theme.DARK) {
+              return previewHandler(this.service.removeLabelPolicyIconDark());
+            } else if (theme === Theme.LIGHT) {
+              return previewHandler(this.service.removeLabelPolicyIcon());
+            }
           }
         }
         break;

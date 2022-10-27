@@ -64,8 +64,9 @@ type Member struct {
 
 var (
 	memberTableAlias = table{
-		name:  "members",
-		alias: "members",
+		name:          "members",
+		alias:         "members",
+		instanceIDCol: projection.MemberInstanceID,
 	}
 	memberUserID = Column{
 		name:  projection.MemberUserIDCol,

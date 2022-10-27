@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -37,7 +38,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -73,7 +73,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -101,7 +100,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -128,11 +126,36 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserMetadataProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (user_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(UserMetadataColumnInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_metadata3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -152,7 +175,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, UserMetadataProjectionTable, tt.want)
 		})
 	}
 }

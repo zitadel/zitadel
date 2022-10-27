@@ -31,6 +31,8 @@ type LoginPolicy struct {
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
 	AllowDomainDiscovery       bool
+	DisableLoginWithEmail      bool
+	DisableLoginWithPhone      bool
 	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
@@ -52,7 +54,8 @@ type MultiFactors struct {
 
 var (
 	loginPolicyTable = table{
-		name: projection.LoginPolicyTable,
+		name:          projection.LoginPolicyTable,
+		instanceIDCol: projection.LoginPolicyInstanceIDCol,
 	}
 	LoginPolicyColumnOrgID = Column{
 		name:  projection.LoginPolicyIDCol,
@@ -116,6 +119,14 @@ var (
 	}
 	LoginPolicyColumnAllowDomainDiscovery = Column{
 		name:  projection.AllowDomainDiscovery,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnDisableLoginWithEmail = Column{
+		name:  projection.DisableLoginWithEmail,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnDisableLoginWithPhone = Column{
+		name:  projection.DisableLoginWithPhone,
 		table: loginPolicyTable,
 	}
 	LoginPolicyColumnDefaultRedirectURI = Column{
@@ -311,6 +322,8 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnHidePasswordReset.identifier(),
 			LoginPolicyColumnIgnoreUnknownUsernames.identifier(),
 			LoginPolicyColumnAllowDomainDiscovery.identifier(),
+			LoginPolicyColumnDisableLoginWithEmail.identifier(),
+			LoginPolicyColumnDisableLoginWithPhone.identifier(),
 			LoginPolicyColumnDefaultRedirectURI.identifier(),
 			LoginPolicyColumnPasswordCheckLifetime.identifier(),
 			LoginPolicyColumnExternalLoginCheckLifetime.identifier(),
@@ -350,6 +363,8 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					&p.HidePasswordReset,
 					&p.IgnoreUnknownUsernames,
 					&p.AllowDomainDiscovery,
+					&p.DisableLoginWithEmail,
+					&p.DisableLoginWithPhone,
 					&defaultRedirectURI,
 					&p.PasswordCheckLifetime,
 					&p.ExternalLoginCheckLifetime,

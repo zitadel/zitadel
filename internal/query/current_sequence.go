@@ -73,7 +73,7 @@ func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*La
 	stmt, args, err := query.
 		Where(or).
 		Where(sq.Eq{CurrentSequenceColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).
-		OrderBy(CurrentSequenceColCurrentSequence.identifier()).
+		OrderBy(CurrentSequenceColCurrentSequence.identifier() + " DESC").
 		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
@@ -249,7 +249,8 @@ func prepareCurrentSequencesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Current
 
 var (
 	currentSequencesTable = table{
-		name: projection.CurrentSeqTable,
+		name:          projection.CurrentSeqTable,
+		instanceIDCol: "instance_id",
 	}
 	CurrentSequenceColAggregateType = Column{
 		name:  "aggregate_type",
@@ -275,7 +276,8 @@ var (
 
 var (
 	locksTable = table{
-		name: projection.LocksTable,
+		name:          projection.LocksTable,
+		instanceIDCol: "instance_id",
 	}
 	LocksColLockerID = Column{
 		name:  "locker_id",

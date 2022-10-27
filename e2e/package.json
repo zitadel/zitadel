@@ -17,6 +17,7 @@
     "mochawesome": "^7.1.3",
     "prettier": "^2.7.1",
     "typescript": "^4.8.4",
+    "uuid": "^9.0.0",
     "wait-on": "^6.0.1"
   },
   "devDependencies": {

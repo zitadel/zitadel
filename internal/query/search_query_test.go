@@ -6,13 +6,15 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
 var (
 	testTable = table{
-		name:  "test_table",
-		alias: "test_table",
+		name:          "test_table",
+		alias:         "test_table",
+		instanceIDCol: "instance_id",
 	}
 	testTable2 = table{
 		name:  "test_table2",

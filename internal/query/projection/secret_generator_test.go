@@ -33,7 +33,6 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorRemoved,
 			want: wantReduce{
-				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -61,7 +60,6 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorChanged,
 			want: wantReduce{
-				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -97,7 +95,6 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 			reduce: (&secretGeneratorProjection{}).reduceSecretGeneratorAdded,
 			want: wantReduce{
-				projection:       SecretGeneratorProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
@@ -125,6 +122,32 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.secret_generators2 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -136,7 +159,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, SecretGeneratorProjectionTable, tt.want)
 		})
 	}
 }

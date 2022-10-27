@@ -38,7 +38,6 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       MailTemplateTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -74,7 +73,6 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       MailTemplateTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -104,11 +102,36 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       MailTemplateTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "DELETE FROM projections.mail_templates WHERE (aggregate_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MailTemplateInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.mail_templates WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -133,7 +156,6 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       MailTemplateTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -169,7 +191,6 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       MailTemplateTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -196,7 +217,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, MailTemplateTable, tt.want)
 		})
 	}
 }
