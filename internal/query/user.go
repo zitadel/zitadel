@@ -438,10 +438,11 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 }
 
 func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (*Users, error) {
-	query, scan := prepareUsersQuery()
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	query, scan := prepareUsersQuery(instanceID)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+			UserInstanceIDCol.identifier(): instanceID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
@@ -1047,12 +1048,15 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-	loginNamesQuery, _, err := sq.Select(
+func prepareUsersQuery(instanceID string) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+	loginNamesQuery, loginNamesArgs, err := sq.Select(
 		userLoginNamesUserIDCol.identifier(),
 		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+") AS "+userLoginNamesListCol.name).
 		From(userLoginNamesTable.identifier()).
 		GroupBy(userLoginNamesUserIDCol.identifier()).
+		Where(sq.Eq{
+			userLoginNamesInstanceIDCol.identifier(): instanceID,
+		}).
 		ToSql()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -1063,7 +1067,8 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 		From(userPreferredLoginNameTable.identifier()).
 		Where(
 			sq.Eq{
-				userPreferredLoginNameIsPrimaryCol.identifier(): true,
+				userPreferredLoginNameIsPrimaryCol.identifier():  true,
+				userPreferredLoginNameInstanceIDCol.identifier(): instanceID,
 			}).ToSql()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
@@ -1098,7 +1103,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()).
+			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier(), loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier(), preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {
