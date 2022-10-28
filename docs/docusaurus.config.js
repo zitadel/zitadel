@@ -166,6 +166,11 @@ module.exports = {
     prism: {
       additionalLanguages: ["csharp", "dart", "groovy", "regex"],
     },
+    colorMode: {
+      defaultMode: "dark",
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
+    },
   },
   presets: [
     [
