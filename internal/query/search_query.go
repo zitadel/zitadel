@@ -426,6 +426,9 @@ func (c Column) isZero() bool {
 }
 
 func join(join, from Column) string {
+	if join.identifier() == join.table.InstanceIDIdentifier() {
+		return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier()
+	}
 	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier() + " AND " + from.table.InstanceIDIdentifier() + " = " + join.table.InstanceIDIdentifier()
 }
 
