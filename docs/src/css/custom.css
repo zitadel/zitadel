@@ -131,6 +131,10 @@
   --ifm-pagination-nav-color-hover: #000000;
 }
 
+.hidelink div a {
+  display: none;
+}
+
 pre code {
   font-size: 14px !important;
 }
