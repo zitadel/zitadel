@@ -20,13 +20,13 @@ module.exports = {
   ],
   themeConfig: {
     zoom: {
-      selector: '.markdown :not(em) > img',
+      selector: ".markdown :not(em) > img",
       background: {
-        light: 'rgb(243, 244, 246)',
-        dark: 'rgb(55, 59, 82)'
+        light: "rgb(243, 244, 246)",
+        dark: "rgb(55, 59, 82)",
       },
       // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
-      config: {}
+      config: {},
     },
     navbar: {
       // title: 'ZITADEL',
@@ -119,7 +119,6 @@ module.exports = {
         {
           title: "Legal",
           items: [
-
             {
               label: "Terms and Conditions",
               href: "/docs/legal/terms-of-service",
@@ -152,19 +151,18 @@ module.exports = {
             {
               label: "Docs v1 (deprecated)",
               href: "https://docs-v1.zitadel.com/",
-            }
+            },
           ],
         },
-
       ],
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     algolia: {
       appId: "8H6ZKXENLO",
       apiKey: "124fe1c102a184bc6fc70c75dc84f96f",
-      indexName: 'zitadel',
-      selector: 'div#'
-  },
+      indexName: "zitadel",
+      selector: "div#",
+    },
     prism: {
       additionalLanguages: ["csharp", "dart", "groovy", "regex"],
     },
@@ -187,4 +185,5 @@ module.exports = {
     ],
   ],
   plugins: [require.resolve("docusaurus-plugin-image-zoom")],
+  themes: ["@saucelabs/theme-github-codeblock"],
 };
