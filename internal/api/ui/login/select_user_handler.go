@@ -25,10 +25,8 @@ func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, auth
 	if linking {
 		titleI18nKey = "SelectAccount.TitleLinking"
 	}
-	title :=  translator.LocalizeWithoutArgs(titleI18nKey)
-
 	data := userSelectionData{
-		baseData: l.getBaseData(r, authReq, title, "", ""),
+		baseData: l.getBaseData(r, authReq, titleI18nKey, "", ""),
 		Users:    selectionData.Users,
 		Linking:  linking,
 	}
