@@ -37,7 +37,7 @@ Tracing:
 
 ## Database
 
-Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the Database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database).
+Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database).
 
 ```yaml
 Database:
