@@ -3,8 +3,6 @@ title: Overview
 ---
 
 Choose your platform and run ZITADEL with the most minimal configuration possible.
-For an easy self-hosted production setup, we recommend running ZITADEL on [Kubernetes](https://kubernetes.io/docs/home/), using our official [Helm](https://helm.sh/docs/) chart.
-By default, it runs a highly available ZITADEL instance along with a secure and highly available [CockroachDB](https://www.cockroachlabs.com/docs/stable/) instance.
 
 - [Linux](./linux)
 - [MacOS](./macos)
@@ -12,12 +10,10 @@ By default, it runs a highly available ZITADEL instance along with a secure and 
 - [Knative](./knative)
 - [Kubernetes](./kubernetes)
 
-## Prerequisits
+## Prerequisites
 
-- ZITADEL does not need many resources, 1 CPU and 512MB memory are more than enough. (With more CPU, the password hashing might be faster)
+- When run as a proof of concept, ZITADEL does not need many resources, 1 CPU and 512MB memory are more than enough. (With more CPU, the password hashing might be faster)
 - A cockroachDB or Postgresql (currently in beta) as only needed storage
-- If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support [HTTP/2](../manage/self-hosted/http2)
-
 
 ## Releases
 
@@ -26,3 +22,12 @@ The easiest way to use ZITADEL is to run one of our container releases
 - ZITADEL does provide latest and stable [container images](https://github.com/zitadel/zitadel/pkgs/container/zitadel)
 - **stable** is the current **production** release of ZITADEL.
 - **latest** is the **last created** release from our pipelines that gets updated on a high frequency.
+
+# Production Setup
+
+As soon as you successfully created your first proof of concept using one of the deployment guides in this section,
+you might want to configure ZITADEL for production and embed it into your system landscape.
+To do so, jump straight to the [production setup guide](../manage/self-hosted/production).
+
+For achieving high availablility, we recommend to use [Kubernetes](https://kubernetes.io/docs/home/).
+We have an official [Helm chart](https://artifacthub.io/packages/helm/zitadel/zitadel) for easy deployment and maintenance.
