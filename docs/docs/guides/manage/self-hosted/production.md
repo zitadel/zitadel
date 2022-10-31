@@ -15,7 +15,7 @@ Read [on the configure page](/docs/guides/manage/self-hosted/configure) about th
 
 ## Networking
 
-- For enabling access via **HTTPS** and restricting access to **HTTPS**, head to [the description of your TLS options](/docs/guides/manage/self-hosted/tls_modes).
+- To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/docs/guides/manage/self-hosted/tls_modes).
 - If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/docs/guides/manage/self-hosted/http2)**.
 - You can also refer to some **[example reverse proxy configurations](/docs/guides/manage/self-hosted/reverseproxy/reverse_proxy)**.
 
