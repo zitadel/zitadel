@@ -179,8 +179,11 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 
+	translator := l.getTranslator(r.Context(), authReq)
+	title :=  translator.LocalizeWithoutArgs("ExternalRegistrationUserOverview.Title")
+
 	data := externalRegisterData{
-		baseData: l.getBaseData(r, authReq, "ExternalRegisterOverview", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, title, errID, errMessage),
 		externalRegisterFormData: externalRegisterFormData{
 			Email:     human.EmailAddress,
 			Username:  human.Username,
@@ -203,7 +206,6 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, nil)
 }
 

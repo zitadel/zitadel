@@ -329,7 +329,10 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, errType, errMessage string) userData {
+	translator := l.getTranslator(r.Context(), authReq)
+	title :=  translator.LocalizeWithoutArgs(titleI18nKey)
+
 	userData := userData{
 		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
 		profileData: l.getProfileData(authReq),
@@ -340,8 +343,10 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
-	lang, _ := l.renderer.ReqLang(l.getTranslator(r.Context(), authReq), r).Base()
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, errType, errMessage string) baseData {
+	translator := l.getTranslator(r.Context(), authReq)
+	title :=  translator.LocalizeWithoutArgs(titleI18nKey)
+	lang, _ := l.renderer.ReqLang(translator, r).Base()
 	baseData := baseData{
 		errorData: errorData{
 			ErrID:      errType,

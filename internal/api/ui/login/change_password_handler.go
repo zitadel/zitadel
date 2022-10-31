@@ -41,7 +41,7 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), authReq)
-	title :=  translator.Localize("PasswordChange.Title", map[string]interface{}{})
+	title :=  translator.LocalizeWithoutArgs("PasswordChange.Title")
 	data := passwordData{
 		baseData:    l.getBaseData(r, authReq, title , errID, errMessage),
 		profileData: l.getProfileData(authReq),
@@ -67,6 +67,8 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 
 func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	var errType, errMessage string
-	data := l.getUserData(r, authReq, "Password Change Done", errType, errMessage)
+	translator := l.getTranslator(r.Context(), authReq)
+	title :=  translator.LocalizeWithoutArgs("PasswordChange.Title")
+	data := l.getUserData(r, authReq, title, errType, errMessage)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplChangePasswordDone], data, nil)
 }

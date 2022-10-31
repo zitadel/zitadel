@@ -124,7 +124,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
+		baseData:         l.getBaseData(r, authRequest, "RegistrationUser.Title", errID, errMessage),
 		registerFormData: *formData,
 	}
 

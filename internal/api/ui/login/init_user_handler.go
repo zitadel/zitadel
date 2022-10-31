@@ -115,8 +115,12 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userID = authReq.UserID
 	}
+
+	translator := l.getTranslator(r.Context(), authReq)
+	title :=  translator.LocalizeWithoutArgs("InitUser.Title")
+
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, "Init User", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, title, errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		LoginName:   loginName,
@@ -139,7 +143,6 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 			data.HasNumber = NumberRegex
 		}
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
 		user, err := l.query.GetUserByID(r.Context(), false, userID)
 		if err == nil {
