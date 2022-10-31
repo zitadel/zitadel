@@ -9,7 +9,7 @@ type EventReducer struct {
 	Reduce Reduce
 }
 
-// EventReducer represents the required data
+// AggregateReducer represents the required data
 // to work with aggregates
 type AggregateReducer struct {
 	Aggregate     eventstore.AggregateType

@@ -138,14 +138,14 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statemen
 	//checks for events between create statement and current sequence
 	// because there could be events between current sequence and a creation event
 	// and we cannot check via stmt.PreviousSequence
-	if stmts[0].PreviousEventDate.IsZero() {
-		previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].CreationDate, stmts[0].InstanceID, sequences, reduce)
-		if err != nil {
-			tx.Rollback()
-			return -1, err
-		}
-		stmts = append(previousStmts, stmts...)
+	// if stmts[0].PreviousEventDate.IsZero() {
+	previousStmts, err := h.fetchPreviousStmts(ctx, tx, stmts[0].CreationDate, stmts[0].InstanceID, sequences, reduce)
+	if err != nil {
+		tx.Rollback()
+		return -1, err
 	}
+	stmts = append(previousStmts, stmts...)
+	// }
 
 	lastSuccessfulIdx := h.executeStmts(tx, &stmts, sequences)
 
@@ -182,7 +182,7 @@ func (h *StatementHandler) fetchPreviousStmts(ctx context.Context, tx *sql.Tx, s
 				AddQuery().
 				AggregateTypes(aggregateType).
 				CreationDateAfter(sequence.creationDate).
-				CreationDateBefore(stmtDate).
+				// CreationDateBefore(stmtDate).
 				InstanceID(sequence.instanceID)
 
 			queriesAdded = true
@@ -229,11 +229,11 @@ stmts:
 				i--
 				continue stmts
 			}
-			if !stmt.PreviousEventDate.IsZero() && !stmt.PreviousEventDate.Equal(sequence.creationDate) && stmt.InstanceID == sequence.instanceID {
-				// if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequence.eventID && stmt.InstanceID == sequence.instanceID {
-				logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "creationDate", stmt.CreationDate.String(), "prevCreationDate", stmt.PreviousEventDate, "creationDate", sequence.creationDate).Warn("sequences do not match")
-				break stmts
-			}
+			// if !stmt.PreviousEventDate.IsZero() && !stmt.PreviousEventDate.Equal(sequence.creationDate) && stmt.InstanceID == sequence.instanceID {
+			// 	// if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequence.eventID && stmt.InstanceID == sequence.instanceID {
+			// 	logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "creationDate", stmt.CreationDate.String(), "prevCreationDate", stmt.PreviousEventDate, "creationDate", sequence.creationDate).Warn("sequences do not match")
+			// 	break stmts
+			// }
 		}
 		err := h.executeStmt(tx, stmt)
 		if err == nil {

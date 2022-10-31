@@ -2,9 +2,6 @@ package projection
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -31,17 +28,6 @@ const (
 
 type projectGrantProjection struct {
 	crdb.StatementHandler
-}
-
-func (p *projectGrantProjection) changeDate(ctx context.Context, event *eventstore.Event) (time.Time, error) {
-	row := p.Client.QueryRowContext(ctx, "SELECT "+ProjectGrantColumnChangeDate+" FROM "+ProjectGrantProjectionTable)
-	changeDate := new(sql.NullTime)
-	err := row.Scan(changeDate)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return changeDate.Time, err
-	}
-
-	return changeDate.Time, nil
 }
 
 func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectGrantProjection {

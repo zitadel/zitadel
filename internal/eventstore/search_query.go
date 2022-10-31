@@ -128,7 +128,9 @@ func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
 }
 
 func (builder *SearchQueryBuilder) SystemTime(t time.Time) *SearchQueryBuilder {
-	builder.systemTime = t
+	if builder.tx == nil {
+		builder.systemTime = t
+	}
 	return builder
 }
 
@@ -178,12 +180,6 @@ func (query *SearchQuery) CreationDateAfter(t time.Time) *SearchQuery {
 	query.creationDateAfter = t
 	return query
 }
-
-// // CreationDateBefore filters for events which happened before the specified time
-// func (query *SearchQuery) CreationDateBefore(t time.Time) *SearchQuery {
-// 	query.creationDateBefore = t
-// 	return query
-// }
 
 // EventTypes filters for events with the given event types
 func (query *SearchQuery) EventTypes(types ...EventType) *SearchQuery {
@@ -346,20 +342,6 @@ func (query *SearchQuery) creationDateAfterFilter() *repository.Filter {
 
 	return repository.NewFilter(repository.FieldCreationDate, query.creationDateAfter, sortOrder)
 }
-
-// func (query *SearchQuery) creationDateBeforeFilter() *repository.Filter {
-// 	if query.creationDateBefore.IsZero() {
-// 		return nil
-// 	}
-
-// 	// TODO: needeD?
-// 	sortOrder := repository.OperationGreater
-// 	if query.builder.desc {
-// 		sortOrder = repository.OperationLess
-// 	}
-
-// 	return repository.NewFilter(repository.FieldCreationDate, query.creationDateBefore, sortOrder)
-// }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {
 	if len(query.eventData) == 0 {

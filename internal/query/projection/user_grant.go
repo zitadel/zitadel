@@ -358,13 +358,13 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 
 // previousEventsUserRemoved locks the rows of the user
 func (p *userGrantProjection) previousEventsUser(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
-	_, err := tx.Exec("SELECT FOR UPDATE 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantUserID+" = $1 AND "+UserGrantInstanceID+" = $2", event.Aggregate().ID, event.Aggregate().InstanceID)
+	_, err := tx.Exec("SELECT 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantUserID+" = $1 AND "+UserGrantInstanceID+" = $2 FOR UPDATE", event.Aggregate().ID, event.Aggregate().InstanceID)
 	return nil, err
 }
 
 // previousEventsUserRemoved locks the rows of the project
 func (p *userGrantProjection) previousEventsProject(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
-	_, err := tx.Exec("SELECT FOR UPDATE 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantProjectID+" = $1 AND "+UserGrantInstanceID+" = $2", event.Aggregate().ID, event.Aggregate().InstanceID)
+	_, err := tx.Exec("SELECT 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantProjectID+" = $1 AND "+UserGrantInstanceID+" = $2 FOR UPDATE", event.Aggregate().ID, event.Aggregate().InstanceID)
 	return nil, err
 }
 
@@ -375,16 +375,16 @@ func (p *userGrantProjection) previousEventsProjectGrant(tx *sql.Tx, event event
 		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-jTfdc", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
 
-	_, err := tx.Exec("SELECT FOR UPDATE 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantGrantID+" = $1 AND "+UserGrantInstanceID+" = $2", e.GrantID, e.Aggregate().InstanceID)
+	_, err := tx.Exec("SELECT 1 FROM "+UserGrantProjectionTable+" WHERE "+UserGrantGrantID+" = $1 AND "+UserGrantInstanceID+" = $2 FOR UPDATE", e.GrantID, e.Aggregate().InstanceID)
 	return nil, err
 }
 
 func (p *userGrantProjection) previousEvents(grantID, instanceID string, tx *sql.Tx) (*eventstore.SearchQueryBuilder, error) {
-	row := tx.QueryRow("SELECT FOR UPDATE "+UserGrantChangeDate+" FROM "+UserGrantProjectionTable+" WHERE "+UserGrantID+" = $1 AND "+UserGrantInstanceID+" = $2", grantID, instanceID)
+	row := tx.QueryRow("SELECT "+UserGrantChangeDate+" FROM "+UserGrantProjectionTable+" WHERE "+UserGrantID+" = $1 AND "+UserGrantInstanceID+" = $2 FOR UPDATE", grantID, instanceID)
 
 	var changeDate time.Time
 
-	if err := row.Scan(changeDate); err != nil {
+	if err := row.Scan(&changeDate); err != nil {
 		return nil, err
 	}
 

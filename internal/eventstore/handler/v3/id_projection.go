@@ -55,8 +55,8 @@ func StartSubscriptionIDProjection(ctx context.Context, name string, config Conf
 			case <-ctx.Done():
 				sub.Unsubscribe()
 				return
-			default:
-				err := p.Process(ctx, sub.Events)
+			case e := <-sub.Events:
+				err := p.Process(ctx, e)
 				logging.WithFields("name", name).OnError(err).Error("error occured in reduce, stop processing")
 			}
 		}
@@ -66,49 +66,50 @@ func StartSubscriptionIDProjection(ctx context.Context, name string, config Conf
 }
 
 // Process updates the projection by the given events
-func (p *IDProjection) Process(ctx context.Context, events <-chan eventstore.Event) error {
-	for event := range events {
-		reducer, ok := p.eventReduce(event)
-		if !ok {
-			logging.WithFields("eventType", event.Type()).Info("no reducer registered")
-			continue
-		}
+func (p *IDProjection) Process(ctx context.Context, event eventstore.Event) error {
+	// for event := range events {
+	reducer, ok := p.eventReduce(event)
+	if !ok {
+		logging.WithFields("eventType", event.Type()).Info("no reducer registered")
+		return nil
+		// continue
+	}
 
-		tx, err := p.client.BeginTx(ctx, nil)
+	tx, err := p.client.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	var stmts handler.Statements
+
+	if reducer.PreviousEvents != nil {
+		previousEventsQuery, err := reducer.PreviousEvents(tx, event)
 		if err != nil {
 			return err
 		}
-
-		var stmts handler.Statements
-
-		if reducer.PreviousEvents != nil {
-			previousEventsQuery, err := reducer.PreviousEvents(tx, event)
+		if previousEventsQuery != nil {
+			previousEvents, err := p.es.Filter(ctx, previousEventsQuery)
 			if err != nil {
 				return err
 			}
-			if previousEventsQuery != nil {
-				previousEvents, err := p.es.Filter(ctx, previousEventsQuery)
-				if err != nil {
-					return err
-				}
-				stmts, err = p.reduceAdditionalEvents(previousEvents)
-				if err != nil {
-					return err
-				}
+			stmts, err = p.reducePreviousEvents(previousEvents)
+			if err != nil {
+				return err
 			}
 		}
-
-		stmt, err := reducer.Reduce(event)
-		if err != nil {
-			return err
-		}
-
-		stmts = append(stmts, *stmt)
-
-		if err := p.execStmts(ctx, tx, stmts); err != nil {
-			return err
-		}
 	}
+
+	stmt, err := reducer.Reduce(event)
+	if err != nil {
+		return err
+	}
+
+	stmts = append(stmts, *stmt)
+
+	if err := p.execStmts(ctx, tx, stmts); err != nil {
+		return err
+	}
+	// }
 	return nil
 }
 
@@ -166,8 +167,8 @@ func (p *IDProjection) subscribe() *eventstore.Subscription {
 	return eventstore.SubscribeEventTypes(queue, types)
 }
 
-func (p *IDProjection) reduceAdditionalEvents(events []eventstore.Event) (handler.Statements, error) {
-	stmts := make(handler.Statements, len(events))
+func (p *IDProjection) reducePreviousEvents(events []eventstore.Event) (handler.Statements, error) {
+	stmts := make(handler.Statements, 0, len(events))
 	for _, event := range events {
 		reducer, ok := p.eventReduce(event)
 		if !ok {

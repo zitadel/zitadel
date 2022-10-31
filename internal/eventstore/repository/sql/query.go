@@ -32,11 +32,10 @@ type scan func(dest ...interface{}) error
 func query(ctx context.Context, criteria querier, searchQuery *repository.SearchQuery, dest interface{}) error {
 	query, rowScanner := prepareColumns(criteria, searchQuery.Columns)
 	values := make([]interface{}, 0, len(searchQuery.Filters)+2)
-	if !searchQuery.SystemTime.IsZero() {
-		query += " AS OF SYSTEM TIME ?"
-		values = append(values, searchQuery.SystemTime)
+	if !searchQuery.SystemTime.IsZero() && searchQuery.Tx == nil {
+		query += " AS OF SYSTEM TIME '" + searchQuery.SystemTime.Format("2006-01-02 15:04:05.999999-07:00") + "'"
 	}
-	where, conditionValues := prepareCondition(criteria, searchQuery.Filters)
+	where, conditionValues := prepareCondition(criteria, searchQuery)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
@@ -156,15 +155,15 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	return nil
 }
 
-func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause string, values []interface{}) {
-	values = make([]interface{}, 0, len(filters))
+func prepareCondition(criteria querier, searchQuery *repository.SearchQuery) (clause string, values []interface{}) {
+	values = make([]interface{}, 0, len(searchQuery.Filters))
 
-	if len(filters) == 0 {
+	if len(searchQuery.Filters) == 0 {
 		return clause, values
 	}
 
-	clauses := make([]string, len(filters))
-	for idx, filter := range filters {
+	clauses := make([]string, len(searchQuery.Filters))
+	for idx, filter := range searchQuery.Filters {
 		subClauses := make([]string, 0, len(filter))
 		for _, f := range filter {
 			value := f.Value
@@ -186,6 +185,10 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 		}
 		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
+	// if !searchQuery.SystemTime.IsZero() && searchQuery.Tx != nil {
+	// 	clauses = append(clauses, "creation_date")
+	// 	values
+	// }
 	return " WHERE " + strings.Join(clauses, " OR "), values
 }
 
