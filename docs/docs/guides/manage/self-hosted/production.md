@@ -9,7 +9,7 @@ you are ready to configure ZITADEL for production usage.
 
 We recommend running ZITADEL higly available using an orchestrator that schedules ZITADEL on multiple nodes, like [Kubernetes](/docs/guides/deploy/kubernetes).
 
-## Binary Configuration
+## Configuration
 
 Read [on the configure page](/docs/guides/manage/self-hosted/configure) about the available options you have to configure the ZITADEL.
 
