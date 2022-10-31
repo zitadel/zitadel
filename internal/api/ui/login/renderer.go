@@ -329,12 +329,9 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, errType, errMessage string) userData {
-	translator := l.getTranslator(r.Context(), authReq)
-	title :=  translator.LocalizeWithoutArgs(titleI18nKey)
-
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, titleI18nKey, errType, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
