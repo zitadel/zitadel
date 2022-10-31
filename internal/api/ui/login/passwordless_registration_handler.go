@@ -103,7 +103,7 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &passwordlessRegistrationData{
 		webAuthNData{
-			userData:               l.getUserData(r, authReq, "PasswordlessRegistration.Title", errID, errMessage),
+			userData:               l.getUserData(r, authReq, "PasswordlessRegistration.Title", "PasswordlessRegistration.Description", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		code,
@@ -195,7 +195,7 @@ func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *htt
 	translator := l.getTranslator(r.Context(), authReq)
 
 	data := passwordlessRegistrationDoneDate{
-		userData:       l.getUserData(r, authReq, "PasswordlessRegistrationDone.Title", errID, errMessage),
+		userData:       l.getUserData(r, authReq, "PasswordlessRegistrationDone.Title","PasswordlessRegistrationDone.Description", errID, errMessage),
 		HideNextButton: authReq == nil,
 	}
 	if authReq == nil {

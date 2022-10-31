@@ -22,11 +22,13 @@ func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, auth
 	linking := len(authReq.LinkingUsers) > 0
 
 	titleI18nKey := "SelectAccount.Title"
+	descriptionI18nKey := "SelectAccount.Description"
 	if linking {
 		titleI18nKey = "SelectAccount.TitleLinking"
+		descriptionI18nKey = "SelectAccount.DescriptionLinking"
 	}
 	data := userSelectionData{
-		baseData: l.getBaseData(r, authReq, titleI18nKey, "", ""),
+		baseData: l.getBaseData(r, authReq, titleI18nKey,descriptionI18nKey, "", ""),
 		Users:    selectionData.Users,
 		Linking:  linking,
 	}

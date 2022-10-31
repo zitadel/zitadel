@@ -118,7 +118,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, "InitUser.Title", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "InitUser.Title", "InitUser.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		LoginName:   loginName,
@@ -151,7 +151,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
-	data := l.getUserData(r, authReq, "User Init Done", "", "")
+	data := l.getUserData(r, authReq,"InitUserDone.Title" ,"InitUserDone.Description", "", "")
 	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
 		l.customTexts(r.Context(), translator, orgID)

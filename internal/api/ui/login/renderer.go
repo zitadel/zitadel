@@ -325,13 +325,13 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	if err != nil {
 		_, msg = l.getErrorMessage(r, err)
 	}
-	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
+	data := l.getBaseData(r, authReq, "Error","", "Internal", msg)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, errType, errMessage string) userData {
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, titleI18nKey, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, titleI18nKey, descriptionI18nKey, errType, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
@@ -340,9 +340,19 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, errType, errMessage string) baseData {
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) baseData {
 	translator := l.getTranslator(r.Context(), authReq)
-	title :=  translator.LocalizeWithoutArgs(titleI18nKey)
+	
+	title := ""
+	if (titleI18nKey != "") {
+		title = translator.LocalizeWithoutArgs(titleI18nKey)
+	}
+
+	description := ""
+	if (titleI18nKey != "") {
+		description =  translator.LocalizeWithoutArgs(descriptionI18nKey)
+	}
+	
 	lang, _ := l.renderer.ReqLang(translator, r).Base()
 	baseData := baseData{
 		errorData: errorData{
@@ -351,6 +361,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 		},
 		Lang:                   lang.String(),
 		Title:                  title,
+		Description:			description,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
@@ -579,6 +590,7 @@ type baseData struct {
 	errorData
 	Lang                   string
 	Title                  string
+	Description            string
 	Theme                  string
 	ThemeMode              string
 	DarkMode               bool
