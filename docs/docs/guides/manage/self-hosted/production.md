@@ -37,7 +37,7 @@ Tracing:
 
 ## Database
 
-Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the Database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database/database).
+Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the Database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database).
 
 ```yaml
 Database:
@@ -99,4 +99,4 @@ DefaultInstance:
 - If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [startup phase](/docs/guides/manage/self-hosted/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
 - Learn how to configure ZITADEL via the [Console user interface](/docs/guides/manage/console/overview).
 - Probably, you also want [apply your custom branding](/docs/guides/manage/customize/branding), [hook into certain events](/docs/guides/manage/customize/behavior), [customize texts](/docs/guides/manage/customize/texts) or [add metadata to your users](/docs/guides/manage/customize/user-metadata)
-- If you want to automatically setup ZITADEL resources, you can use the [ZITADEL Terraform Provider](/docs/guides/manage/self-hosted/terraform/basics)
+- If you want to automatically setup ZITADEL resources, you can use the [ZITADEL Terraform Provider](/docs/guides/manage/terraform/basics)
