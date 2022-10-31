@@ -105,6 +105,16 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			}
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
 		},
+		"customIconResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
+			fileName := policy.IconURL
+			if darkMode && policy.IconDarkURL != "" {
+				fileName = policy.IconDarkURL
+			}
+			if fileName == "" {
+				return ""
+			}
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
+		},
 		"avatarResource": func(orgID, avatar string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", false, "filename", avatar))
 		},
