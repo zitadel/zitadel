@@ -17,7 +17,7 @@ import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListUsersResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { LoginNameQuery, SearchQuery, User, UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { LoginNameQuery, SearchQuery, User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
