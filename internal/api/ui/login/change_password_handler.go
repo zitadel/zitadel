@@ -41,9 +41,8 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), authReq)
-	title :=  translator.LocalizeWithoutArgs("PasswordChange.Title")
 	data := passwordData{
-		baseData:    l.getBaseData(r, authReq, title , errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "PasswordChange.Title" , errID, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	policy := l.getPasswordComplexityPolicy(r, authReq.UserOrgID)
@@ -68,7 +67,6 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 func (l *Login) renderChangePasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	var errType, errMessage string
 	translator := l.getTranslator(r.Context(), authReq)
-	title :=  translator.LocalizeWithoutArgs("PasswordChange.Title")
-	data := l.getUserData(r, authReq, title, errType, errMessage)
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplChangePasswordDone], data, nil)
+	data := l.getUserData(r, authReq, "PasswordChange.Title", errType, errMessage)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplChangePasswordDone], data, nil)
 }

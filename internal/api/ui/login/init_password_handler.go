@@ -125,10 +125,9 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)
-	title :=  translator.LocalizeWithoutArgs("InitPassword.Title")
 
 	data := initPasswordData{
-		baseData:    l.getBaseData(r, authReq, title, errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "InitPassword.Title", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,

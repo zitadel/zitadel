@@ -180,10 +180,8 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)
-	title :=  translator.LocalizeWithoutArgs("ExternalRegistrationUserOverview.Title")
-
 	data := externalRegisterData{
-		baseData: l.getBaseData(r, authReq, title, errID, errMessage),
+		baseData: l.getBaseData(r, authReq, "ExternalRegistrationUserOverview.Title", errID, errMessage),
 		externalRegisterFormData: externalRegisterFormData{
 			Email:     human.EmailAddress,
 			Username:  human.Username,

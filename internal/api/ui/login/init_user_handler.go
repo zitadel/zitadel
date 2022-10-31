@@ -117,10 +117,8 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)
-	title :=  translator.LocalizeWithoutArgs("InitUser.Title")
-
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, title, errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "InitUser.Title", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		LoginName:   loginName,
