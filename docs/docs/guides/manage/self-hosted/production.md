@@ -11,7 +11,7 @@ We recommend running ZITADEL higly available using an orchestrator that schedule
 
 ## Binary Configuration
 
-Read [on the configure page](/docs/guides/manage/self-hosted/configure) about the available options you have to configure the ZITADEL binary.
+Read [on the configure page](/docs/guides/manage/self-hosted/configure) about the available options you have to configure the ZITADEL.
 
 ## Networking
 
