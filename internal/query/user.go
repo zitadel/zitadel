@@ -569,6 +569,34 @@ func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(userLoginNamesListCol, value, TextListContains)
 }
 
+func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
+	//linking queries for the subselect
+	instanceQuery, err := NewColumnComparisonQuery(LoginNameInstanceIDCol, UserInstanceIDCol, ColumnEquals)
+	if err != nil {
+		return nil, err
+	}
+	userIDQuery, err := NewColumnComparisonQuery(LoginNameUserIDCol, UserIDCol, ColumnEquals)
+	if err != nil {
+		return nil, err
+	}
+	//text query to select data from the linked sub select
+	loginNameQuery, err := NewTextQuery(LoginNameNameCol, value, comparison)
+	if err != nil {
+		return nil, err
+	}
+	//full definition of the sub select
+	subSelect, err := NewSubSelect(LoginNameUserIDCol, []SearchQuery{instanceQuery, userIDQuery, loginNameQuery})
+	if err != nil {
+		return nil, err
+	}
+	// "WHERE * IN (*)" query with subquery as list-data provider
+	return NewListQuery(
+		UserIDCol,
+		subSelect,
+		ListIn,
+	)
+}
+
 func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 	loginNamesQuery, loginNamesArgs, err := sq.Select(
 		userLoginNamesUserIDCol.identifier(),
