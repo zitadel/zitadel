@@ -3,7 +3,7 @@ title: Production Checklist
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/guides/deploy/overview),
-you are ready to configure ZITADEL for production use in your system landscape.
+you are ready to configure ZITADEL for production usage.
 
 ## High Availability
 
