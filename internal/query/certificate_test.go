@@ -41,8 +41,8 @@ func Test_CertificatePrepares(t *testing.T) {
 						` projections.keys3_private.key,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.keys3`+
-						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id`+
-						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id`),
+						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id AND projections.keys3.instance_id = projections.keys3_certificate.instance_id`+
+						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id AND projections.keys3.instance_id = projections.keys3_private.instance_id`),
 					nil,
 					nil,
 				),
@@ -72,8 +72,8 @@ func Test_CertificatePrepares(t *testing.T) {
 						` projections.keys3_private.key,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.keys3`+
-						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id`+
-						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id`),
+						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id AND projections.keys3.instance_id = projections.keys3_certificate.instance_id`+
+						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id AND projections.keys3.instance_id = projections.keys3_private.instance_id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -147,8 +147,8 @@ func Test_CertificatePrepares(t *testing.T) {
 						` projections.keys3_private.key,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.keys3`+
-						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id`+
-						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id`),
+						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id AND projections.keys3.instance_id = projections.keys3_certificate.instance_id`+
+						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id AND projections.keys3.instance_id = projections.keys3_private.instance_id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

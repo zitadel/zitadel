@@ -59,7 +59,8 @@ type JWTIDP struct {
 
 var (
 	idpTable = table{
-		name: projection.IDPTable,
+		name:          projection.IDPTable,
+		instanceIDCol: projection.IDPInstanceIDCol,
 	}
 	IDPIDCol = Column{
 		name:  projection.IDPIDCol,
@@ -113,7 +114,8 @@ var (
 
 var (
 	oidcIDPTable = table{
-		name: projection.IDPOIDCTable,
+		name:          projection.IDPOIDCTable,
+		instanceIDCol: projection.OIDCConfigInstanceIDCol,
 	}
 	OIDCIDPColIDPID = Column{
 		name:  projection.OIDCConfigIDPIDCol,
@@ -155,7 +157,8 @@ var (
 
 var (
 	jwtIDPTable = table{
-		name: projection.IDPJWTTable,
+		name:          projection.IDPJWTTable,
+		instanceIDCol: projection.JWTConfigInstanceIDCol,
 	}
 	JWTIDPColIDPID = Column{
 		name:  projection.JWTConfigIDPIDCol,
@@ -179,7 +182,7 @@ var (
 	}
 )
 
-//IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
+// IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
 func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string) (*IDP, error) {
 	if shouldTriggerBulk {
 		projection.IDPProjection.Trigger(ctx)
@@ -210,7 +213,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	return scan(row)
 }
 
-//IDPs searches idps matching the query
+// IDPs searches idps matching the query
 func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries) (idps *IDPs, err error) {
 	query, scan := prepareIDPsQuery()
 	stmt, args, err := queries.toQuery(query).
