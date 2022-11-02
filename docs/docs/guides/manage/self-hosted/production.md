@@ -52,7 +52,7 @@ Database:
     Options: ""
 ```
 
-You also might want to configure how projections are computed. These are the default values:
+You also might want to configure how [projections](/docs/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
 ```yaml
 Projections:
