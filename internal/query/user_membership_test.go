@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"testing"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/zitadel/zitadel/internal/database"
 )
 
@@ -40,6 +42,7 @@ var (
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
 			" FROM projections.org_members3 AS members" +
+			" WHERE members.owner_removed = $1 AND members.owner_removed_user = $2" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -53,6 +56,7 @@ var (
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
 			" FROM projections.instance_members3 AS members" +
+			" WHERE members.owner_removed = $3 AND members.owner_removed_user = $4" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -66,6 +70,7 @@ var (
 			", members.project_id" +
 			", NULL::TEXT AS grant_id" +
 			" FROM projections.project_members3 AS members" +
+			" WHERE members.owner_removed = $5 AND members.owner_removed_project = $6 AND members.owner_removed_user = $7" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -79,10 +84,11 @@ var (
 			", members.project_id" +
 			", members.grant_id" +
 			" FROM projections.project_grant_members3 AS members" +
+			" WHERE members.owner_removed = $8 AND members.owner_removed_project = $9 AND members.owner_removed_user = $10" +
 			") AS memberships" +
-			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id" +
-			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id" +
-			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id")
+			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
+			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id AND memberships.instance_id = projections.project_grants3.instance_id")
 	membershipCols = []string{
 		"user_id",
 		"roles",
@@ -114,7 +120,7 @@ func Test_MembershipPrepares(t *testing.T) {
 	}{
 		{
 			name:    "prepareMembershipsQuery no result",
-			prepare: prepareMembershipsQuery,
+			prepare: prepareMembershipWrapper(false),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -126,7 +132,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one org member",
-			prepare: prepareMembershipsQuery,
+			prepare: prepareMembershipWrapper(false),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -169,7 +175,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one instance member",
-			prepare: prepareMembershipsQuery,
+			prepare: prepareMembershipWrapper(false),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -212,7 +218,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one project member",
-			prepare: prepareMembershipsQuery,
+			prepare: prepareMembershipWrapper(false),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -255,7 +261,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one project grant member",
-			prepare: prepareMembershipsQuery,
+			prepare: prepareMembershipWrapper(false),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -303,7 +309,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one for each member type",
-			prepare: prepareMembershipsQuery,
+			prepare: prepareMembershipWrapper(false),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -423,7 +429,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery sql err",
-			prepare: prepareMembershipsQuery,
+			prepare: prepareMembershipWrapper(false),
 			want: want{
 				sqlExpectations: mockQueryErr(
 					membershipsStmt,
@@ -443,5 +449,12 @@ func Test_MembershipPrepares(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
 		})
+	}
+}
+
+func prepareMembershipWrapper(withOwnerRemoved bool) func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+	builder, _, fun := prepareMembershipsQuery(withOwnerRemoved)
+	return func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+		return builder, fun
 	}
 }

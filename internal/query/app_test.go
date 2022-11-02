@@ -50,9 +50,9 @@ var (
 		` projections.apps4_saml_configs.metadata,` +
 		` projections.apps4_saml_configs.metadata_url` +
 		` FROM projections.apps4` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id`)
+		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
+		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
 	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps4.id,` +
 		` projections.apps4.name,` +
 		` projections.apps4.project_id,` +
@@ -89,19 +89,19 @@ var (
 		` projections.apps4_saml_configs.metadata_url,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.apps4` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id`)
+		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
+		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
 	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps4_api_configs.client_id,` +
 		` projections.apps4_oidc_configs.client_id` +
 		` FROM projections.apps4` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id`)
+		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
+		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id`)
 	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps4.project_id` +
 		` FROM projections.apps4` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id`)
+		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
+		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects3.id,` +
 		` projections.projects3.creation_date,` +
 		` projections.projects3.change_date,` +
@@ -114,10 +114,10 @@ var (
 		` projections.projects3.has_project_check,` +
 		` projections.projects3.private_labeling_setting` +
 		` FROM projections.projects3` +
-		` JOIN projections.apps4 ON projections.projects3.id = projections.apps4.project_id` +
-		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id` +
-		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id` +
-		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id`)
+		` JOIN projections.apps4 ON projections.projects3.id = projections.apps4.project_id AND projections.projects3.instance_id = projections.apps4.instance_id` +
+		` LEFT JOIN projections.apps4_api_configs ON projections.apps4.id = projections.apps4_api_configs.app_id AND projections.apps4.instance_id = projections.apps4_api_configs.instance_id` +
+		` LEFT JOIN projections.apps4_oidc_configs ON projections.apps4.id = projections.apps4_oidc_configs.app_id AND projections.apps4.instance_id = projections.apps4_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps4_saml_configs ON projections.apps4.id = projections.apps4_saml_configs.app_id AND projections.apps4.instance_id = projections.apps4_saml_configs.instance_id`)
 
 	appCols = database.StringArray{
 		"id",

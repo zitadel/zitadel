@@ -27,7 +27,8 @@ type MailTemplate struct {
 
 var (
 	mailTemplateTable = table{
-		name: projection.MailTemplateTable,
+		name:          projection.MailTemplateTable,
+		instanceIDCol: projection.MailTemplateInstanceIDCol,
 	}
 	MailTemplateColAggregateID = Column{
 		name:  projection.MailTemplateAggregateIDCol,

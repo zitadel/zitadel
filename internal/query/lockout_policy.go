@@ -31,7 +31,8 @@ type LockoutPolicy struct {
 
 var (
 	lockoutTable = table{
-		name: projection.LockoutPolicyTable,
+		name:          projection.LockoutPolicyTable,
+		instanceIDCol: projection.LockoutPolicyInstanceIDCol,
 	}
 	LockoutColID = Column{
 		name:  projection.LockoutPolicyIDCol,

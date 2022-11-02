@@ -181,6 +181,14 @@ func (v *View) DeleteUser(userID, instanceID string, event *models.Event) error 
 	return v.ProcessedUserSequence(event)
 }
 
+func (v *View) DeleteInstanceUsers(event *models.Event) error {
+	err := view.DeleteInstanceUsers(v.Db, userTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedUserSequence(event)
+}
+
 func (v *View) GetLatestUserSequence(instanceID string) (*repository.CurrentSequence, error) {
 	return v.latestSequence(userTable, instanceID)
 }

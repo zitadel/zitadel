@@ -204,3 +204,8 @@ func DeleteUser(db *gorm.DB, table, userID, instanceID string) error {
 	)
 	return delete(db)
 }
+
+func DeleteInstanceUsers(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.UserSearchKeyInstanceID), instanceID)
+	return delete(db)
+}

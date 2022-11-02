@@ -17,6 +17,13 @@ import (
 )
 
 var (
+	loginNamesQuery = `SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames` +
+		` FROM projections.login_names2 AS login_names` +
+		` WHERE login_names.domain_owner_removed = $1 AND login_names.instance_id = $2 AND login_names.policy_owner_removed = $3 AND login_names.user_owner_removed = $4` +
+		` GROUP BY login_names.user_id`
+	preferredLoginNameQuery = `SELECT preferred_login_name.user_id, preferred_login_name.login_name` +
+		` FROM projections.login_names2 AS preferred_login_name` +
+		` WHERE preferred_login_name.domain_owner_removed = $5 AND preferred_login_name.instance_id = $6 AND preferred_login_name.is_primary = $7 AND preferred_login_name.policy_owner_removed = $8 AND preferred_login_name.user_owner_removed = $9`
 	userQuery = `SELECT projections.users4.id,` +
 		` projections.users4.creation_date,` +
 		` projections.users4.change_date,` +
@@ -44,16 +51,13 @@ var (
 		` projections.users4_machines.description,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id` +
-		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id` +
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id` +
+		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id AND projections.users4.instance_id = projections.users4_machines.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames` +
-		` FROM projections.login_names2 AS login_names` +
-		` WHERE login_names.instance_id = $1` +
-		` GROUP BY login_names.user_id) AS login_names` +
+		` (` + loginNamesQuery + `) AS login_names` +
 		` ON login_names.user_id = projections.users4.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names2 AS preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) AS preferred_login_name` +
+		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
 		` ON preferred_login_name.user_id = projections.users4.id`
 	userCols = []string{
 		"id",
@@ -99,7 +103,7 @@ var (
 		` projections.users4_humans.gender,` +
 		` projections.users4_humans.avatar_key` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id`
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id`
 	profileCols = []string{
 		"id",
 		"creation_date",
@@ -124,7 +128,7 @@ var (
 		` projections.users4_humans.email,` +
 		` projections.users4_humans.is_email_verified` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id`
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id`
 	emailCols = []string{
 		"id",
 		"creation_date",
@@ -144,7 +148,7 @@ var (
 		` projections.users4_humans.phone,` +
 		` projections.users4_humans.is_phone_verified` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id`
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id`
 	phoneCols = []string{
 		"id",
 		"creation_date",
@@ -162,7 +166,7 @@ var (
 		` projections.users4_humans.email,` +
 		` projections.users4_humans.is_email_verified` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id`
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id`
 	userUniqueCols = []string{
 		"id",
 		"state",
@@ -197,16 +201,13 @@ var (
 		` projections.users4_notifications.password_set,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id` +
-		` LEFT JOIN projections.users4_notifications ON projections.users4.id = projections.users4_notifications.user_id` +
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id` +
+		` LEFT JOIN projections.users4_notifications ON projections.users4.id = projections.users4_notifications.user_id AND projections.users4.instance_id = projections.users4_notifications.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames` +
-		` FROM projections.login_names2 AS login_names` +
-		` WHERE login_names.instance_id = $1` +
-		` GROUP BY login_names.user_id) AS login_names` +
+		` (` + loginNamesQuery + `) AS login_names` +
 		` ON login_names.user_id = projections.users4.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names2 AS preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) AS preferred_login_name` +
+		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
 		` ON preferred_login_name.user_id = projections.users4.id`
 	notifyUserCols = []string{
 		"id",
@@ -264,15 +265,13 @@ var (
 		` projections.users4_machines.description,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users4` +
-		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id` +
-		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id` +
+		` LEFT JOIN projections.users4_humans ON projections.users4.id = projections.users4_humans.user_id AND projections.users4.instance_id = projections.users4_humans.instance_id` +
+		` LEFT JOIN projections.users4_machines ON projections.users4.id = projections.users4_machines.user_id AND projections.users4.instance_id = projections.users4_machines.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames` +
-		` FROM projections.login_names2 AS login_names` +
-		` GROUP BY login_names.user_id) AS login_names` +
+		` (` + loginNamesQuery + `) AS login_names` +
 		` ON login_names.user_id = projections.users4.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names2 AS preferred_login_name WHERE preferred_login_name.is_primary = $1) AS preferred_login_name` +
+		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
 		` ON preferred_login_name.user_id = projections.users4.id`
 	usersCols = []string{
 		"id",
@@ -320,7 +319,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery("instanceID")
+				return prepareUserQuery("instanceID", false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -340,7 +339,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery human found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery("instanceID")
+				return prepareUserQuery("instanceID", false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -407,7 +406,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery machine found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery("instanceID")
+				return prepareUserQuery("instanceID", false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -465,7 +464,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery("instanceID")
+				return prepareUserQuery("instanceID", false)
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -832,7 +831,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery("instanceID")
+				return prepareNotifyUserQuery("instanceID", false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -852,7 +851,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery notify found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery("instanceID")
+				return prepareNotifyUserQuery("instanceID", false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -917,7 +916,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery not notify found (error)",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery("instanceID")
+				return prepareNotifyUserQuery("instanceID", false)
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -964,7 +963,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery("instanceID")
+				return prepareNotifyUserQuery("instanceID", false)
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -981,8 +980,10 @@ func Test_UserPrepares(t *testing.T) {
 			object: nil,
 		},
 		{
-			name:    "prepareUsersQuery no result",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery no result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery("instanceID", false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -999,8 +1000,10 @@ func Test_UserPrepares(t *testing.T) {
 			object: &Users{Users: []*User{}},
 		},
 		{
-			name:    "prepareUsersQuery one result",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery one result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery("instanceID", false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1072,8 +1075,10 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUsersQuery multiple results",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery multiple results",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery("instanceID", false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1190,8 +1195,10 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUsersQuery sql err",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery sql err",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery("instanceID", false)
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(usersQuery),

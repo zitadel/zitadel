@@ -32,7 +32,8 @@ type DomainPolicy struct {
 
 var (
 	domainPolicyTable = table{
-		name: projection.DomainPolicyTable,
+		name:          projection.DomainPolicyTable,
+		instanceIDCol: projection.DomainPolicyInstanceIDCol,
 	}
 	DomainPolicyColID = Column{
 		name:  projection.DomainPolicyIDCol,

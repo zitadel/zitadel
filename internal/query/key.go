@@ -101,7 +101,8 @@ func (r *rsaPublicKey) Key() interface{} {
 
 var (
 	keyTable = table{
-		name: projection.KeyProjectionTable,
+		name:          projection.KeyProjectionTable,
+		instanceIDCol: projection.KeyColumnInstanceID,
 	}
 	KeyColID = Column{
 		name:  projection.KeyColumnID,
@@ -139,7 +140,8 @@ var (
 
 var (
 	keyPrivateTable = table{
-		name: projection.KeyPrivateTable,
+		name:          projection.KeyPrivateTable,
+		instanceIDCol: projection.KeyPrivateColumnInstanceID,
 	}
 	KeyPrivateColID = Column{
 		name:  projection.KeyPrivateColumnID,
@@ -157,7 +159,8 @@ var (
 
 var (
 	keyPublicTable = table{
-		name: projection.KeyPublicTable,
+		name:          projection.KeyPublicTable,
+		instanceIDCol: projection.KeyPrivateColumnInstanceID,
 	}
 	KeyPublicColID = Column{
 		name:  projection.KeyPublicColumnID,

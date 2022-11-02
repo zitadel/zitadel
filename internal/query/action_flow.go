@@ -15,7 +15,8 @@ import (
 
 var (
 	flowsTriggersTable = table{
-		name: projection.FlowTriggerTable,
+		name:          projection.FlowTriggerTable,
+		instanceIDCol: projection.FlowInstanceIDCol,
 	}
 	FlowsTriggersColumnFlowType = Column{
 		name:  projection.FlowTypeCol,

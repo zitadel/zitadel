@@ -20,7 +20,8 @@ const (
 
 var (
 	actionTable = table{
-		name: projection.ActionTable,
+		name:          projection.ActionTable,
+		instanceIDCol: projection.ActionInstanceIDCol,
 	}
 	ActionColumnID = Column{
 		name:  projection.ActionIDCol,

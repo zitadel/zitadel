@@ -538,7 +538,7 @@ func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) pre
 			if err != nil {
 				return nil, err
 			}
-			if writeModel.State == domain.InstanceStateUnspecified {
+			if !writeModel.State.Exists() {
 				return nil, errors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
 			}
 			if writeModel.Name == name {
@@ -619,17 +619,16 @@ func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Vali
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := c.getInstanceWriteModelByID(ctx, a.ID)
 			if err != nil {
-				return nil, errors.ThrowPreconditionFailed(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
+				return nil, errors.ThrowNotFound(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
 			}
-			events := []eventstore.Command{instance.NewInstanceRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}
-
-			domainsWriteModel, err := c.getInstanceDomainsWriteModel(ctx, a.ID)
-			if err == nil {
-				for _, domainName := range domainsWriteModel.Domains {
-					events = append(events, instance.NewDomainRemovedEvent(ctx, &a.Aggregate, domainName))
-				}
+			if !writeModel.State.Exists() {
+				return nil, errors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
 			}
-			return events, nil
+			return []eventstore.Command{instance.NewInstanceRemovedEvent(ctx,
+					&a.Aggregate,
+					writeModel.Name,
+					writeModel.Domains)},
+				nil
 		}, nil
 	}
 }

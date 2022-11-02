@@ -23,7 +23,8 @@ const (
 
 var (
 	projectGrantsTable = table{
-		name: projection.ProjectGrantProjectionTable,
+		name:          projection.ProjectGrantProjectionTable,
+		instanceIDCol: projection.ProjectGrantColumnInstanceID,
 	}
 	ProjectGrantColumnCreationDate = Column{
 		name:  projection.ProjectGrantColumnCreationDate,

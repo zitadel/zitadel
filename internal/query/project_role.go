@@ -14,7 +14,8 @@ import (
 
 var (
 	projectRolesTable = table{
-		name: projection.ProjectRoleProjectionTable,
+		name:          projection.ProjectRoleProjectionTable,
+		instanceIDCol: projection.ProjectRoleColumnInstanceID,
 	}
 	ProjectRoleColumnCreationDate = Column{
 		name:  projection.ProjectRoleColumnCreationDate,

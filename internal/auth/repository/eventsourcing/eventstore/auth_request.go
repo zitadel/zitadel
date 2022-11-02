@@ -1106,6 +1106,9 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, reques
 	if user.MFAMaxSetUp > domain.MFALevelNotSetUp {
 		return true
 	}
+	if request.LoginPolicy.MFAInitSkipLifetime == 0 {
+		return true
+	}
 	return checkVerificationTime(user.MFAInitSkipped, request.LoginPolicy.MFAInitSkipLifetime)
 }
 

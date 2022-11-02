@@ -38,11 +38,11 @@ var (
 			", projections.user_grants3.project_id" +
 			", projections.projects3.name" +
 			" FROM projections.user_grants3" +
-			" LEFT JOIN projections.users4 ON projections.user_grants3.user_id = projections.users4.id" +
-			" LEFT JOIN projections.users4_humans ON projections.user_grants3.user_id = projections.users4_humans.user_id" +
-			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id" +
-			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id" +
-			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id" +
+			" LEFT JOIN projections.users4 ON projections.user_grants3.user_id = projections.users4.id AND projections.user_grants3.instance_id = projections.users4.instance_id" +
+			" LEFT JOIN projections.users4_humans ON projections.user_grants3.user_id = projections.users4_humans.user_id AND projections.user_grants3.instance_id = projections.users4_humans.instance_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id AND projections.user_grants3.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id AND projections.user_grants3.instance_id = projections.projects3.instance_id" +
+			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id AND projections.user_grants3.instance_id = projections.login_names2.instance_id" +
 			" WHERE projections.login_names2.is_primary = $1")
 	userGrantCols = []string{
 		"id",
@@ -93,11 +93,11 @@ var (
 			", projections.projects3.name" +
 			", COUNT(*) OVER ()" +
 			" FROM projections.user_grants3" +
-			" LEFT JOIN projections.users4 ON projections.user_grants3.user_id = projections.users4.id" +
-			" LEFT JOIN projections.users4_humans ON projections.user_grants3.user_id = projections.users4_humans.user_id" +
-			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id" +
-			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id" +
-			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id" +
+			" LEFT JOIN projections.users4 ON projections.user_grants3.user_id = projections.users4.id AND projections.user_grants3.instance_id = projections.users4.instance_id" +
+			" LEFT JOIN projections.users4_humans ON projections.user_grants3.user_id = projections.users4_humans.user_id AND projections.user_grants3.instance_id = projections.users4_humans.instance_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants3.resource_owner = projections.orgs.id AND projections.user_grants3.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.projects3 ON projections.user_grants3.project_id = projections.projects3.id AND projections.user_grants3.instance_id = projections.projects3.instance_id" +
+			" LEFT JOIN projections.login_names2 ON projections.user_grants3.user_id = projections.login_names2.user_id AND projections.user_grants3.instance_id = projections.login_names2.instance_id" +
 			" WHERE projections.login_names2.is_primary = $1")
 	userGrantsCols = append(
 		userGrantCols,

@@ -85,9 +85,9 @@ func hostFromContext(ctx context.Context, headerName string) (string, error) {
 	return host[0], nil
 }
 
-//isAllowedToSendHTTP1Header check if the gRPC call was sent to `localhost`
-//this is only possible when calling the server directly running on localhost
-//or through the gRPC gateway
+// isAllowedToSendHTTP1Header check if the gRPC call was sent to `localhost`
+// this is only possible when calling the server directly running on localhost
+// or through the gRPC gateway
 func isAllowedToSendHTTP1Header(md metadata.MD) bool {
 	authority, ok := md[":authority"]
 	return ok && len(authority) == 1 && strings.Split(authority[0], ":")[0] == "localhost"
