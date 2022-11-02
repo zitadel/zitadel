@@ -2,9 +2,9 @@ name: ZITADEL PR
 
 on:
   pull_request:
-#    paths:
-#      - "docs/**"
-#      - "**.md"
+    paths:
+      - "docs/**"
+      - "**.md"
 
 jobs:
   Test:
@@ -15,4 +15,4 @@ jobs:
       - name: Prettify code
         uses: creyD/prettier_action@v4.2
         with:
-          prettier_options: --check **/*.md,docs/docs
+          prettier_options: --check docs/docs --check **/*.md

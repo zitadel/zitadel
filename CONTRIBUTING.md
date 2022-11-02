@@ -176,7 +176,7 @@ Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 
-We use angular-eslint and Prettier for linting and formatting, so please run `npm run lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+We use angular-eslint and Prettier for linting and formatting, so please run `npm run lint:fix` before committing. VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development.
 
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
@@ -276,7 +276,7 @@ Please refer to the [README](./docs/README.md) for more information and local te
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the parentheses) or refer to the top navigation sections.
 
-We use Prettier for formatting the docs, so please run `yarn run lint:fix` in the docs folder before committing. (VSCode users, check out [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix formatting issues in development).
+We use Prettier for formatting the docs, so please run `yarn run fmt:fix` in the docs folder before committing. VSCode users, check out [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix formatting issues in development.
 
 ## Contribute Internationalization
 

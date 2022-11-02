@@ -29,6 +29,12 @@ docker compose up
 These commands start a local development server.
 Most changes are reflected live without having to restart the server.
 
+## Format
+
+```console
+yarn run fmt:fix
+```
+
 ## Build
 
 ```console

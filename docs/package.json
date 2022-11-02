@@ -12,8 +12,8 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "lint": "prettier --check docs",
-    "lint:fix": "prettier --write docs"
+    "fmt": "prettier --check docs --check ../**/*.md",
+    "fmt:fix": "prettier --write docs --write ../**/*.md"
   },
   "dependencies": {
     "@algolia/autocomplete-core": "1.5.2",
