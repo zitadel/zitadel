@@ -3,20 +3,20 @@ title: Production Checklist
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/guides/deploy/overview),
-you are ready to configure ZITADEL for production use in your system landscape.
+you are ready to configure ZITADEL for production usage.
 
 ## High Availability
 
 We recommend running ZITADEL higly available using an orchestrator that schedules ZITADEL on multiple nodes, like [Kubernetes](/docs/guides/deploy/kubernetes).
 
-## Binary Configuration
+## Configuration
 
-Read [on the configure page](/docs/guides/manage/self-hosted/configure) about the available options you have to configure the ZITADEL binary.
+Read [on the configure page](/docs/guides/manage/self-hosted/configure) about the available options you have to configure the ZITADEL.
 
 ## Networking
 
 - To make ZITADEL available at the domain of your choice, [you need to configure the ExternalDomain property](/docs/guides/manage/self-hosted/custom-domain).
-- For enabling access via **HTTPS** and restricting access to **HTTPS**, head to [the description of your TLS options](/docs/guides/manage/self-hosted/tls_modes).
+- To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/docs/guides/manage/self-hosted/tls_modes).
 - If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/docs/guides/manage/self-hosted/http2)**.
 - You can also refer to some **[example reverse proxy configurations](/docs/guides/manage/self-hosted/reverseproxy/reverse_proxy)**.
 
@@ -38,7 +38,7 @@ Tracing:
 
 ## Database
 
-Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the Database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database).
+Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database).
 
 ```yaml
 Database:
