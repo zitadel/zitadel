@@ -68,7 +68,7 @@ type projection interface {
 }
 
 var (
-	projections = make([]projection, 42)
+	projections []projection
 )
 
 func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {

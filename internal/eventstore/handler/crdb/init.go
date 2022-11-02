@@ -207,10 +207,7 @@ func (h *StatementHandler) Init(ctx context.Context) error {
 			break
 		}
 	}
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-	return nil
+	return tx.Commit()
 }
 
 func NewTableCheck(table *Table, opts ...execOption) *handler.Check {
