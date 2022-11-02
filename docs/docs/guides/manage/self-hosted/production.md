@@ -22,9 +22,7 @@ Read [on the configure page](/docs/guides/manage/self-hosted/configure) about th
 
 ## Monitoring
 
-By default, **metrics** are exposed at /debug/metrics in OpenTelemetry (otel) format.
-They can easily be consumed by an [otel collector](https://opentelemetry.io/docs/collector/) and be sent to or scraped by various backends,
-for example [Prometheus](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusexporter).
+By default, [**metrics**](docs/apis/observability/metrics) are exposed at /debug/metrics in OpenTelemetry (otel) format.
 
 Also, you can enable **tracing** in the ZITADEL configuration.
 
