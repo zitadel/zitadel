@@ -12,8 +12,8 @@ jobs:
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
-      - name: Prettify code
+      - name: Check formatting
         uses: creyD/prettier_action@v4.2
         with:
           prettier_version: "2.7.1"
-          prettier_options: --check docs/docs --check "**/*.md"
+          prettier_options: --check docs/docs --check **/*.md
