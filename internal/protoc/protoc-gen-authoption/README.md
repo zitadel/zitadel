@@ -3,10 +3,12 @@
 Proto options to annotate auth methods in protos
 
 ## Generate protos/templates
+
 protos: `go generate authoption/generate.go`  
 templates/install: `go generate generate.go`
 
 ## Usage
+
 ```
 // proto file
 import "authoption/options.proto";
@@ -29,9 +31,10 @@ service MyService {
     }
 }
 ```
+
 Caos Auth Option is used for granting groups
 On each zitadel role is specified which auth methods are allowed to call
 
-Get protoc-get-authoption: ``go get github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption``
+Get protoc-get-authoption: `go get github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption`
 
-Protc-Flag: ``--authoption_out=.``
+Protc-Flag: `--authoption_out=.`

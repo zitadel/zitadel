@@ -7,6 +7,7 @@ s.Rect(currX, currY, qs.blockSize, qs.blockSize, "class=\"color\"")
 ```
 
 and not
+
 ```go
 s.Rect(currX, currY, qs.blockSize, qs.blockSize, "fill:black;stroke:none")
 ```
