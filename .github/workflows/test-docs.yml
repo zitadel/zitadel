@@ -16,4 +16,4 @@ jobs:
         uses: creyD/prettier_action@v4.2
         with:
           prettier_version: "2.7.1"
-          prettier_options: --check docs/docs --check '**/*.md'
+          prettier_options: --check docs/docs --check "**/*.md"
