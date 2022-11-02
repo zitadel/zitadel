@@ -48,11 +48,11 @@ With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
 
 Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a try!
 
-* [Linux](https://docs.zitadel.com/docs/guides/deploy/linux)
-* [MacOS](https://docs.zitadel.com/docs/guides/deploy/macos)
-* [Docker compose](https://docs.zitadel.com/docs/guides/deploy/compose)
-* [Knative](https://docs.zitadel.com/docs/guides/deploy/knative)
-* [Kubernetes](https://docs.zitadel.com/docs/guides/deploy/kubernetes)
+- [Linux](https://docs.zitadel.com/docs/guides/deploy/linux)
+- [MacOS](https://docs.zitadel.com/docs/guides/deploy/macos)
+- [Docker compose](https://docs.zitadel.com/docs/guides/deploy/compose)
+- [Knative](https://docs.zitadel.com/docs/guides/deploy/knative)
+- [Kubernetes](https://docs.zitadel.com/docs/guides/deploy/kubernetes)
 
 See all guides [here](https://docs.zitadel.com/docs/guides/deploy/overview)
 
@@ -90,7 +90,7 @@ Yet it offers everything you need for a customer identity (CIAM) use case.
 - [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/manage/console/projects)
 - [Self-registration](https://docs.zitadel.com/docs/concepts/features/selfservice#registration) including verification
 - [Self-service](https://docs.zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
-- [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://docs.zitadel.com/docs/apis/openidoauth/endpoints),  [OIDC Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-oidc)
+- [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://docs.zitadel.com/docs/apis/openidoauth/endpoints), [OIDC Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-oidc)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://docs.zitadel.com/docs/apis/saml/endpoints), [SAML Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-saml)
 - [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres) (version >= 14) or [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach) (version >= 22.0)
 
@@ -115,16 +115,16 @@ As certified OpenID Provider, ZITADEL is compatible with any of the implementati
 
 ### Client libraries
 
-| Language / Framework | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
-|----------|--------|--------------|----------|---------|---------------------------|
-| .NET     | [zitadel-net](https://github.com/smartive/zitadel-net) | GRPC | ✔️ | ✔️ | [smartive 👑](https://github.com/smartive/) |
-| Dart     | [zitadel-dart](https://github.com/smartive/zitadel-dart) | GRPC | ✔️ | ❌ | [smartive 👑](https://github.com/smartive/) |
-| Elixir   | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | GRPC | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
-| Go       | [zitadel-go](https://github.com/zitadel/zitadel-go) | GRPC | ✔️ | ✔️ | [ZITADEL](https://github.com/zitadel/) |
-| Rust     | [zitadel-rust](https://crates.io/crates/zitadel) | GRPC | ✔️ | ❌ | [smartive 👑](https://github.com/smartive/) |
-| JVM      | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓ | ❓ | | TBD |
-| Python   | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675) | ❓ | ❓ | | TBD |
-| Javascript | ❓ | ❓ | ❓ | | Maybe you? |
+| Language / Framework | Client                                                        | API  | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers                   |
+| -------------------- | ------------------------------------------------------------- | ---- | ----------------- | ----------------- | ------------------------------------------- |
+| .NET                 | [zitadel-net](https://github.com/smartive/zitadel-net)        | GRPC | ✔️                | ✔️                | [smartive 👑](https://github.com/smartive/) |
+| Dart                 | [zitadel-dart](https://github.com/smartive/zitadel-dart)      | GRPC | ✔️                | ❌                | [smartive 👑](https://github.com/smartive/) |
+| Elixir               | [zitadel_api](https://github.com/jshmrtn/zitadel_api)         | GRPC | ✔️                | ✔️                | [jshmrtn 🙏🏻](https://github.com/jshmrtn)    |
+| Go                   | [zitadel-go](https://github.com/zitadel/zitadel-go)           | GRPC | ✔️                | ✔️                | [ZITADEL](https://github.com/zitadel/)      |
+| Rust                 | [zitadel-rust](https://crates.io/crates/zitadel)              | GRPC | ✔️                | ❌                | [smartive 👑](https://github.com/smartive/) |
+| JVM                  | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓   | ❓                |                   | TBD                                         |
+| Python               | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675)      | ❓   | ❓                |                   | TBD                                         |
+| Javascript           | ❓                                                            | ❓   | ❓                |                   | Maybe you?                                  |
 
 (\*) Automatically authenticate service accounts with [JWT Profile](https://docs.zitadel.com/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
 (\*\*) Automatically check if the access token is valid and claims match
