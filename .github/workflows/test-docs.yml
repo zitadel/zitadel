@@ -2,9 +2,9 @@ name: ZITADEL PR
 
 on:
   pull_request:
-    paths:
-      - "docs/**"
-      - "**.md"
+#    paths:
+#      - "docs/**"
+#      - "**.md"
 
 jobs:
   Test:
