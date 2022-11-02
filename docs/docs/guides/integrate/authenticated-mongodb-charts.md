@@ -2,20 +2,27 @@
 title: Authenticated MongoDB Charts
 ---
 
-This integration guide shows how you can embed authenticated MongoDB Charts in your web application using ZITADEL as authentication provider.
+This integration guide shows how you can embed authenticated MongoDB Charts in
+your web application using ZITADEL as authentication provider.
 
 ## Setup ZITADEL Application
 
-Before you can embed an authenticated chart in your application, you have to do a few configuration steps in ZITADEL Console.
-You will need to provide some information about your app. We recommend creating a new app to start from scratch.
+Before you can embed an authenticated chart in your application, you have to do
+a few configuration steps in ZITADEL Console. You will need to provide some
+information about your app. We recommend creating a new app to start from
+scratch.
 
 1. Navigate to your Project
 2. Add a new application at the top of the page.
 3. Select Web application type and continue.
-4. Use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
+4. Use
+   [Authorization Code](../../apis/openidoauth/grant-types#authorization-code)
+   in combination with
+   [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
 5. Skip the redirect settings and confirm the app creation
 6. Copy the client ID, you will need to tell MongoDB Charts about it.
-7. When you created the app, expand its _OIDC Configuration_ section, change the _Auth Token Type_ to _JWT_ and save the change.
+7. When you created the app, expand its _OIDC Configuration_ section, change the
+   _Auth Token Type_ to _JWT_ and save the change.
 
 Your application configuration should now look similar to this:
 
@@ -23,14 +30,16 @@ Your application configuration should now look similar to this:
 
 ## Setup Custom JWT Provider for MongoDB Charts
 
-Configure ZITADEL as your _Custom JWT Provider_ following the [MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) .
+Configure ZITADEL as your _Custom JWT Provider_ following the
+[MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) .
 
 Configure the following values:
 
 - Signing Algorithm: RS256
 - Signing Key: JWK or JWKS URL
 - JWKS: https://{your_domain}.zitadel.cloud/oauth/v2/keys
-- Audience: Your app's client ID which you copied when you created the ZITADEL app
+- Audience: Your app's client ID which you copied when you created the ZITADEL
+  app
 
 Your configuration should look similar to this:
 
@@ -38,9 +47,11 @@ Your configuration should look similar to this:
 
 ## Embedding your Chart
 
-Embed a chart into your application now, following the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
+Embed a chart into your application now, following the corresponding
+[MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
 
-If you've done the [Angular Quickstart](../../examples/login/angular.md), your code could look something like this:
+If you've done the [Angular Quickstart](../../examples/login/angular.md), your
+code could look something like this:
 
 ```html
 <!-- chart.component.html -->

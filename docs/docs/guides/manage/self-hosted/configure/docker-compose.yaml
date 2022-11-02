@@ -6,7 +6,10 @@ services:
     networks:
       - "zitadel"
     image: "ghcr.io/zitadel/zitadel:stable"
-    command: 'start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled'
+    command:
+      'start-from-init --config /example-zitadel-config.yaml --config
+      /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml
+      --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled'
     depends_on:
       certs:
         condition: "service_completed_successfully"
@@ -23,7 +26,9 @@ services:
     entrypoint: ["/bin/bash", "-c"]
     command:
       [
-        "cp /certs/* /zitadel-certs/ && cockroach cert create-client --overwrite --certs-dir /zitadel-certs/ --ca-key /zitadel-certs/ca.key zitadel_user && chown 1000:1000 /zitadel-certs/*",
+        "cp /certs/* /zitadel-certs/ && cockroach cert create-client --overwrite
+        --certs-dir /zitadel-certs/ --ca-key /zitadel-certs/ca.key zitadel_user
+        && chown 1000:1000 /zitadel-certs/*",
       ]
     volumes:
       - "certs:/certs:ro"

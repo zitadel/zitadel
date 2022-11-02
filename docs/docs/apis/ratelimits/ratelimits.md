@@ -2,7 +2,8 @@
 title: ZITADEL Cloud Rate Limits
 ---
 
-Rate limits are implemented according to our [rate limit policy](/docs/legal/rate-limit-policy.md) with the following rules:
+Rate limits are implemented according to our
+[rate limit policy](/docs/legal/rate-limit-policy.md) with the following rules:
 
 | Path                     | Description                                                                                         | Throttling                           | One Minute Banning                     |
 | ------------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------ | -------------------------------------- |

@@ -2,20 +2,25 @@
 title: Flutter
 ---
 
-This guide demonstrates how you integrate **ZITADEL** as an idendity provider to a Flutter app.
+This guide demonstrates how you integrate **ZITADEL** as an idendity provider to
+a Flutter app.
 
-At the end of the guide you have a mobile application on Android and iOS with the ability
-to authenticate users via ZITADEL.
+At the end of the guide you have a mobile application on Android and iOS with
+the ability to authenticate users via ZITADEL.
 
-If you need any other information about Flutter, head over to the [documentation](https://flutter.dev/).
+If you need any other information about Flutter, head over to the
+[documentation](https://flutter.dev/).
 
 ## Prerequisites
 
 To move further in this quickstart, you'll need the following things prepared:
 
-- Have Flutter (and Dart) installed ([how-to](https://flutter.dev/docs/get-started/install))
-- Have an IDE set up for developing Flutter ([how-to](https://flutter.dev/docs/get-started/editor))
-- Create a basic Flutter app ([how-to](https://flutter.dev/docs/get-started/codelab))
+- Have Flutter (and Dart) installed
+  ([how-to](https://flutter.dev/docs/get-started/install))
+- Have an IDE set up for developing Flutter
+  ([how-to](https://flutter.dev/docs/get-started/editor))
+- Create a basic Flutter app
+  ([how-to](https://flutter.dev/docs/get-started/codelab))
 - Create a "Native" application in a ZITADEL project
 
 ## Flutter with ZITADEL
@@ -23,13 +28,15 @@ To move further in this quickstart, you'll need the following things prepared:
 In your native application on ZITADEL, you need to add a callback (redirect) uri
 which matches the selected custom url scheme. As an example, if you intend to
 use `ch.myexample.app://sign-me-in` as redirect URI on ZITADEL and in your app,
-you need to register the `ch.myexample.app://` custom url scheme within Android and iOS.
+you need to register the `ch.myexample.app://` custom url scheme within Android
+and iOS.
 
 :::caution Use Custom Redirect URI!
 
 You'll need the custom redirect url to be compliant with the OAuth 2.0
-authentication for mobile devices ([RFC 8252 specification](https://tools.ietf.org/html/rfc8252)).
-Otherwise your app might get rejected.
+authentication for mobile devices
+([RFC 8252 specification](https://tools.ietf.org/html/rfc8252)). Otherwise your
+app might get rejected.
 
 :::
 
@@ -55,13 +62,15 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 ```
 
-With this, you'll enable "nullable by default" mode in Flutter, as well as new language features.
-For this quickstart, the minimal Flutter SDK version is set to the default: `sdk: ">=2.7.0 <3.0.0"`.
+With this, you'll enable "nullable by default" mode in Flutter, as well as new
+language features. For this quickstart, the minimal Flutter SDK version is set
+to the default: `sdk: ">=2.7.0 <3.0.0"`.
 
 ### Install Dependencies
 
-To authenticate users with ZITADEL in a mobile application, some specific packages are needed.
-The [RFC 8252 specification](https://tools.ietf.org/html/rfc8252) defines how
+To authenticate users with ZITADEL in a mobile application, some specific
+packages are needed. The
+[RFC 8252 specification](https://tools.ietf.org/html/rfc8252) defines how
 [OAUTH2.0 for mobile and native apps](https://oauth.net/2/native-apps/) works.
 Basically, there are two major points in this specification:
 
@@ -69,7 +78,8 @@ Basically, there are two major points in this specification:
 2. It does not allow third party apps to open the browser for the login process,
    the app must open the login page within the embedded browser view
 
-Install the [`appauth`](https://appauth.io/) package and a secure storage (to store the auth / refresh tokens):
+Install the [`appauth`](https://appauth.io/) package and a secure storage (to
+store the auth / refresh tokens):
 
 ```bash
 flutter pub add http
@@ -79,8 +89,10 @@ flutter pub add flutter_secure_storage
 
 #### Important on Android
 
-To use this app auth method on Android 11, you'll need to add a `query` to the `AndroidManifest.xml`.
-Go to `<projectRoot>/android/app/src/main/AndroidManifest.xml` and add to the `<manifest>` root:
+To use this app auth method on Android 11, you'll need to add a `query` to the
+`AndroidManifest.xml`. Go to
+`<projectRoot>/android/app/src/main/AndroidManifest.xml` and add to the
+`<manifest>` root:
 
 ```xml title="<projectRoot>/android/app/src/main/AndroidManifest.xml"
 <queries>
@@ -100,9 +112,9 @@ Go to `<projectRoot>/android/app/src/main/AndroidManifest.xml` and add to the `<
 This allows the app to query for internal browser activities.
 
 Furthermore, for `secure_storage`, you need to set the minimum SDK version to 18
-in `<projectRoot>/android/app/src/build.gradle`. Then, add the manifest placeholder
-for your redirect url (the custom url scheme). In the end, the `defaultConfig`
-section of the `build.gradle` file should look like this:
+in `<projectRoot>/android/app/src/build.gradle`. Then, add the manifest
+placeholder for your redirect url (the custom url scheme). In the end, the
+`defaultConfig` section of the `build.gradle` file should look like this:
 
 ```groovy title="<projectRoot>/android/app/src/build.gradle"
 defaultConfig {
@@ -119,9 +131,9 @@ defaultConfig {
 
 #### Important on iOS
 
-In a similar way to Android, you need to register the custom url scheme within iOS to
-be able to use custom redirect schemes. In the `Info.plist` file of the Runner
-project, you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
+In a similar way to Android, you need to register the custom url scheme within
+iOS to be able to use custom redirect schemes. In the `Info.plist` file of the
+Runner project, you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
 
 ```xml title="<projectRoot>/ios/Runner/Info.plist"
 <key>CFBundleURLTypes</key>
@@ -141,9 +153,10 @@ project, you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
 
 :::note
 
-The auth redirect scheme "`ch.myexample.app`" does register all auth urls with the given
-scheme for the app. So an url pointing to `ch.myexample.app://signin` and another one
-for `ch.myexample.app://logout` will work with the same registration.
+The auth redirect scheme "`ch.myexample.app`" does register all auth urls with
+the given scheme for the app. So an url pointing to `ch.myexample.app://signin`
+and another one for `ch.myexample.app://logout` will work with the same
+registration.
 
 :::
 
@@ -166,8 +179,8 @@ class MyApp extends StatelessWidget {
 }
 ```
 
-Second, the `MyHomePage` class will remain a stateful widget with
-its title, we don't change any code here.
+Second, the `MyHomePage` class will remain a stateful widget with its title, we
+don't change any code here.
 
 ```dart
 class MyHomePage extends StatefulWidget {
@@ -180,9 +193,9 @@ class MyHomePage extends StatefulWidget {
 }
 ```
 
-What we'll change now, is the `_MyHomePageState` class to enable
-authentication via ZITADEL and remove the counter button of the hello
-world application. We'll show the username of the authenticated user.
+What we'll change now, is the `_MyHomePageState` class to enable authentication
+via ZITADEL and remove the counter button of the hello world application. We'll
+show the username of the authenticated user.
 
 We define the needed elements for our state:
 
@@ -196,8 +209,8 @@ var _username = '';
 ```
 
 Then the builder method, which does show the login button if you're not
-authenticated, a loading bar if the login process is going on and
-your name if you are authenticated:
+authenticated, a loading bar if the login process is going on and your name if
+you are authenticated:
 
 ```dart
 @override

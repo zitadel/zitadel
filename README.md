@@ -27,26 +27,35 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
-Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak?
+Do you look for a user management that's quickly set up like Auth0 and open
+source like Keycloak?
 
-Do you have project that requires a multi-tenant user management with self-service for your customers?
+Do you have project that requires a multi-tenant user management with
+self-service for your customers?
 
-Look no further — ZITADEL combines the ease of Auth0 with the versatility of Keycloak.
+Look no further — ZITADEL combines the ease of Auth0 with the versatility of
+Keycloak.
 
-We provide you with a wide range of out of the box features to accelerate your project.
-Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
+We provide you with a wide range of out of the box features to accelerate your
+project. Multi-tenancy with branding customization, secure login, self-service,
+OpenID Connect, OAuth2.x, SAML2, Passwordless with FIDO2 (including Passkeys),
+OTP, U2F, and an unlimited audit trail is there for you, ready to use.
 
-With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs.
+With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
+all of your authentication and authorization needs.
 
 ---
 
-**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat) [📋 Docs](https://docs.zitadel.com/) [🧑‍💻 Blog](https://zitadel.com/blog) [📞 Contact](https://zitadel.com/contact/)**
+**[🏡 Website](https://zitadel.com) [💬 Chat](https://zitadel.com/chat)
+[📋 Docs](https://docs.zitadel.com/) [🧑‍💻 Blog](https://zitadel.com/blog)
+[📞 Contact](https://zitadel.com/contact/)**
 
 ## Get started
 
 ### Deploy ZITADEL (Self-Hosted)
 
-Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a try!
+Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a
+try!
 
 - [Linux](https://docs.zitadel.com/docs/guides/deploy/linux)
 - [MacOS](https://docs.zitadel.com/docs/guides/deploy/macos)
@@ -56,26 +65,37 @@ Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a t
 
 See all guides [here](https://docs.zitadel.com/docs/guides/deploy/overview)
 
-> If you are interested to get professional support for your self-hosted ZITADEL [please reach out to us](https://zitadel.com/contact)!
+> If you are interested to get professional support for your self-hosted ZITADEL
+> [please reach out to us](https://zitadel.com/contact)!
 
 ### Setup ZITADEL Cloud (SaaS)
 
-If you want to experience a hands-free ZITADEL, you should use [ZITADEL Cloud](https://zitadel.cloud).
+If you want to experience a hands-free ZITADEL, you should use
+[ZITADEL Cloud](https://zitadel.cloud).
 
-It is free for up to 25'000 authenticated requests and provides you all the features that make ZITADEL great.
-Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
+It is free for up to 25'000 authenticated requests and provides you all the
+features that make ZITADEL great. Learn more about the
+[pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ## Why choose ZITADEL
 
-We built ZITADEL with a complex multi-tenancy architecture in mind and provide the best solution to handle B2B customers and partners.
-Yet it offers everything you need for a customer identity (CIAM) use case.
+We built ZITADEL with a complex multi-tenancy architecture in mind and provide
+the best solution to handle B2B customers and partners. Yet it offers everything
+you need for a customer identity (CIAM) use case.
 
 - [API-first approach](https://docs.zitadel.com/docs/apis/introduction)
-- Strong audit trail thanks to [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview) as storage pattern
-- [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on events with custom code and extended ZITADEL for you needs
-- [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
-- [Self-service](https://docs.zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
-- [CockroachDB](https://www.cockroachlabs.com/) or a [Postgres](https://www.postgresql.org/) database as reliable and widespread storage option
+- Strong audit trail thanks to
+  [event sourcing](https://docs.zitadel.com/docs/concepts/eventstore/overview)
+  as storage pattern
+- [Actions](https://docs.zitadel.com/docs/concepts/features/actions) to react on
+  events with custom code and extended ZITADEL for you needs
+- [Branding](https://docs.zitadel.com/docs/guides/manage/customize/branding) for
+  a uniform user experience across multiple organizations
+- [Self-service](https://docs.zitadel.com/docs/concepts/features/selfservice)
+  for end-users, business customers, and administrators
+- [CockroachDB](https://www.cockroachlabs.com/) or a
+  [Postgres](https://www.postgresql.org/) database as reliable and widespread
+  storage option
 
 ## Features
 
@@ -88,11 +108,20 @@ Yet it offers everything you need for a customer identity (CIAM) use case.
 - Personal Access Tokens (PAT)
 - Role Based Access Control (RBAC)
 - [Delegate role management to third-parties](https://docs.zitadel.com/docs/guides/manage/console/projects)
-- [Self-registration](https://docs.zitadel.com/docs/concepts/features/selfservice#registration) including verification
-- [Self-service](https://docs.zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
-- [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://docs.zitadel.com/docs/apis/openidoauth/endpoints), [OIDC Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-oidc)
-- [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://docs.zitadel.com/docs/apis/saml/endpoints), [SAML Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-saml)
-- [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres) (version >= 14) or [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach) (version >= 22.0)
+- [Self-registration](https://docs.zitadel.com/docs/concepts/features/selfservice#registration)
+  including verification
+- [Self-service](https://docs.zitadel.com/docs/concepts/features/selfservice)
+  for end-users, business customers, and administrators
+- [OpenID Connect certified](https://openid.net/certification/#OPs) =>
+  [OIDC Endpoints](https://docs.zitadel.com/docs/apis/openidoauth/endpoints),
+  [OIDC Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-oidc)
+- [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html)
+  => [SAML Endpoints](https://docs.zitadel.com/docs/apis/saml/endpoints),
+  [SAML Integration Guides](https://docs.zitadel.com/docs/guides/integrate/auth0-saml)
+- [Postgres](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#postgres)
+  (version >= 14) or
+  [CockroachDB](https://docs.zitadel.com/docs/guides/manage/self-hosted/database#cockroach)
+  (version >= 22.0)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
@@ -100,18 +129,24 @@ Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
 ### Quickstarts
 
-Get started with your preferred language with our [Quickstarts](https://docs.zitadel.com/docs/examples/introduction).
+Get started with your preferred language with our
+[Quickstarts](https://docs.zitadel.com/docs/examples/introduction).
 
-> If you miss something please feel free to [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
+> If you miss something please feel free to
+> [join the Discussion](https://github.com/zitadel/zitadel/discussions/1717)
 
 ### Example applications
 
-Clone one of our [example applications](https://docs.zitadel.com/docs/examples/introduction#clone-a-sample-project) or deploy them directly to Vercel.
+Clone one of our
+[example applications](https://docs.zitadel.com/docs/examples/introduction#clone-a-sample-project)
+or deploy them directly to Vercel.
 
 ### OpenID Connect RP Libraries
 
-Use any of the [Open ID Connect certified RP implementations](https://openid.net/developers/certified/) in your preferred language.
-As certified OpenID Provider, ZITADEL is compatible with any of the implementations.
+Use any of the
+[Open ID Connect certified RP implementations](https://openid.net/developers/certified/)
+in your preferred language. As certified OpenID Provider, ZITADEL is compatible
+with any of the implementations.
 
 ### Client libraries
 
@@ -126,12 +161,14 @@ As certified OpenID Provider, ZITADEL is compatible with any of the implementati
 | Python               | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675)      | ❓   | ❓                |                   | TBD                                         |
 | Javascript           | ❓                                                            | ❓   | ❓                |                   | Maybe you?                                  |
 
-(\*) Automatically authenticate service accounts with [JWT Profile](https://docs.zitadel.com/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
+(\*) Automatically authenticate service accounts with
+[JWT Profile](https://docs.zitadel.com/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
 (\*\*) Automatically check if the access token is valid and claims match
 
 ## How To Contribute
 
-Details about how to contribute you can find in the [Contribution Guide](./CONTRIBUTING.md)
+Details about how to contribute you can find in the
+[Contribution Guide](./CONTRIBUTING.md)
 
 ## Contributors
 
@@ -145,18 +182,22 @@ Made with [contrib.rocks](https://contrib.rocks).
 
 ### Passwordless Login
 
-Use our login widget to allow easy and secure access to your applications and enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
+Use our login widget to allow easy and secure access to your applications and
+enjoy all the benefits of passwordless (FIDO 2 / WebAuthN):
 
 - works on all modern platforms, devices, and browsers
 - phishing resistant alternative
 - requires only one gesture by the user
-- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-profile) of the device during registration
+- easy [enrollment](https://docs.zitadel.com/docs/manuals/user-profile) of the
+  device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
 
 ### Admin Console
 
-Use [Console](https://docs.zitadel.com/docs/manuals/introduction) or our [APIs](https://docs.zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
+Use [Console](https://docs.zitadel.com/docs/manuals/introduction) or our
+[APIs](https://docs.zitadel.com/docs/apis/introduction) to setup organizations,
+projects and applications.
 
 [![Console Showcase](http://img.youtube.com/vi/RPpHktAcCtk/0.jpg)](http://www.youtube.com/watch?v=RPpHktAcCtk "Console Showcase")
 
@@ -168,5 +209,7 @@ See the policy [here](./SECURITY.md)
 
 See the exact licensing terms [here](./LICENSE)
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and limitations under the License.
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.

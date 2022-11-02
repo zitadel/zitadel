@@ -2,16 +2,19 @@
 title: Go
 ---
 
-This integration guide shows you how to integrate **ZITADEL** into your Go API. It demonstrates how to secure your API using
-OAuth 2 Token Introspection.
+This integration guide shows you how to integrate **ZITADEL** into your Go API.
+It demonstrates how to secure your API using OAuth 2 Token Introspection.
 
 At the end of the guide you should have an API with a protected endpoint.
 
 ## Prerequisites
 
-The client [SDK](https://github.com/zitadel/zitadel-go) will provides an interceptor for both GRPC and HTTP.
-This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [OIDC client library](https://github.com/zitadel/oidc).
-All that is required, is to create your API and download the private key file later called `Key JSON` for the service user.
+The client [SDK](https://github.com/zitadel/zitadel-go) will provides an
+interceptor for both GRPC and HTTP. This will handle the OAuth 2.0 introspection
+request including authentication using JWT with Private Key using our
+[OIDC client library](https://github.com/zitadel/oidc). All that is required, is
+to create your API and download the private key file later called `Key JSON` for
+the service user.
 
 ## Go Setup
 
@@ -25,11 +28,15 @@ go get github.com/zitadel/zitadel-go/v2
 
 ### Create example API
 
-Create a new go file with the content below. This will create an API with two endpoints. On path `/public` it will always write
-back `ok` and the current timestamp. On `/protected` it will respond the same but only if a valid access_token is sent. The token
-must not be expired and the API has to be part of the audience (either client_id or project_id).
+Create a new go file with the content below. This will create an API with two
+endpoints. On path `/public` it will always write back `ok` and the current
+timestamp. On `/protected` it will respond the same but only if a valid
+access_token is sent. The token must not be expired and the API has to be part
+of the audience (either client_id or project_id).
 
-Make sure to fill the var `issuer` with your own domain. This is the domain of your instance you can find it on the instance detail in the ZITADEL Cloud Customer Portal or in the ZITADEL Console.
+Make sure to fill the var `issuer` with your own domain. This is the domain of
+your instance you can find it on the instance detail in the ZITADEL Cloud
+Customer Portal or in the ZITADEL Console.
 
 ```go
 package main
@@ -72,7 +79,8 @@ func writeOK(w http.ResponseWriter, r *http.Request) {
 
 #### Key JSON
 
-To provide the key JSON to the SDK, simply set an environment variable `ZITADEL_KEY_PATH` with the path to the JSON as value.
+To provide the key JSON to the SDK, simply set an environment variable
+`ZITADEL_KEY_PATH` with the path to the JSON as value.
 
 ```bash
 export ZITADEL_KEY_PATH=/Users/test/apikey.json
@@ -80,7 +88,8 @@ export ZITADEL_KEY_PATH=/Users/test/apikey.json
 
 For development purposes you should be able to set this in your IDE.
 
-If you're not able to set it via environment variable, you can also exchange the `middleware.OSKeyPath()` and pass it directly:
+If you're not able to set it via environment variable, you can also exchange the
+`middleware.OSKeyPath()` and pass it directly:
 
 ```go
 introspection, err := http_mw.NewIntrospectionInterceptor(
@@ -91,7 +100,8 @@ introspection, err := http_mw.NewIntrospectionInterceptor(
 
 ### Test API
 
-After you have configured everything correctly, you can simply start the example by:
+After you have configured everything correctly, you can simply start the example
+by:
 
 ```bash
 go run main.go
@@ -131,8 +141,9 @@ Content-Length: 21
 "auth header missing"
 ```
 
-Get a valid access_token for the API. You can achieve this by login into an application of the same project or
-by explicitly requesting the project_id for the audience by scope `urn:zitadel:iam:org:project:id:{projectid}:aud`.
+Get a valid access_token for the API. You can achieve this by login into an
+application of the same project or by explicitly requesting the project_id for
+the audience by scope `urn:zitadel:iam:org:project:id:{projectid}:aud`.
 
 If you provide a valid Bearer Token:
 

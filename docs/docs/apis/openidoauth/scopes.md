@@ -2,7 +2,8 @@
 title: Scopes
 ---
 
-ZITADEL supports the usage of scopes as way of requesting information from the IAM and also instruct ZITADEL to do certain operations.
+ZITADEL supports the usage of scopes as way of requesting information from the
+IAM and also instruct ZITADEL to do certain operations.
 
 ## Standard Scopes
 

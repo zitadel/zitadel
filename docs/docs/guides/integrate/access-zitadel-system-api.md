@@ -2,19 +2,22 @@
 title: Access ZITADEL System API
 ---
 
-:::note
-This guide focuses on the ZITADEL System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis).
-The ZITADEL System API is currently only available for ZITADEL Self-Hosted deployments.
-:::
+:::note This guide focuses on the ZITADEL System API. To access the other APIs
+(Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis).
+The ZITADEL System API is currently only available for ZITADEL Self-Hosted
+deployments. :::
 
 ## System API User
 
-The System API works superordinate over all instances. Therefore, you need to define a separate users to get access to this API.
-You can do so by customizing the [runtime configuration](/docs/guides/manage/self-hosted/configure#runtime-configuration).
+The System API works superordinate over all instances. Therefore, you need to
+define a separate users to get access to this API. You can do so by customizing
+the
+[runtime configuration](/docs/guides/manage/self-hosted/configure#runtime-configuration).
 
 To authenticate the user a self-signed JWT will be created and utilized.
 
-You can define any id for your user. This guide will assume it's `system-user-1`.
+You can define any id for your user. This guide will assume it's
+`system-user-1`.
 
 ## Generate an RSA keypair
 
@@ -52,7 +55,9 @@ SystemAPIUsers:
 
 ## Generate JWT
 
-Similar to the OAuth 2.0 JWT Profile, we will create and sign a JWT. For this API, the JWT will not be used to authenticate against ZITADEL Authorization Server, but rather directly to the API itself.
+Similar to the OAuth 2.0 JWT Profile, we will create and sign a JWT. For this
+API, the JWT will not be used to authenticate against ZITADEL Authorization
+Server, but rather directly to the API itself.
 
 The JWT payload will need to contain the following claims:
 
@@ -66,7 +71,8 @@ The JWT payload will need to contain the following claims:
 }
 ```
 
-So for your instance running on `custom-domain.com` the claims could look like this:
+So for your instance running on `custom-domain.com` the claims could look like
+this:
 
 ```json
 {
@@ -78,13 +84,14 @@ So for your instance running on `custom-domain.com` the claims could look like t
 }
 ```
 
-:::note
-If your system is exposed without TLS or on a dedicated port, be sure to provide this in your audience, e.g. http://localhost:8080
-:::
+:::note If your system is exposed without TLS or on a dedicated port, be sure to
+provide this in your audience, e.g. http://localhost:8080 :::
 
 ### ZITADEL Tools
 
-If you want to manually create a JWT for a test, you can also use our [ZITADEL Tools](https://github.com/zitadel/zitadel-tools). Download the latest release and run:
+If you want to manually create a JWT for a test, you can also use our
+[ZITADEL Tools](https://github.com/zitadel/zitadel-tools). Download the latest
+release and run:
 
 ```bash
 ./key2jwt -audience=https://custom-domain.com -key=system-user-1.pem -issuer=system-user-1
@@ -92,7 +99,8 @@ If you want to manually create a JWT for a test, you can also use our [ZITADEL T
 
 ## Call the System API
 
-Now that you configured ZITADEL and created a JWT, you can call the System API and authenticate using the token:
+Now that you configured ZITADEL and created a JWT, you can call the System API
+and authenticate using the token:
 
 ```bash
 curl --request POST \
@@ -101,7 +109,8 @@ curl --request POST \
   --header 'Content-Type: application/json'
 ```
 
-You should get a successful response with a `totalResult` number of 1 and the details of your instance:
+You should get a successful response with a `totalResult` number of 1 and the
+details of your instance:
 
 ```json
 {
@@ -146,12 +155,14 @@ You should get a successful response with a `totalResult` number of 1 and the de
 }
 ```
 
-With this token you are allowed to access the whole [ZITADEL System API](../../apis/proto/system).
+With this token you are allowed to access the whole
+[ZITADEL System API](../../apis/proto/system).
 
 ## Summary
 
 - Create an RSA keypair
-- Provide the public key with a userID to ZITADEL using the runtime configuration
+- Provide the public key with a userID to ZITADEL using the runtime
+  configuration
 - Authorize the request with a JWT signed with your private key
 
 Where to go from here:

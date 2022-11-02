@@ -2,8 +2,9 @@
 title: Claims
 ---
 
-ZITADEL asserts claims on different places according to the corresponding specifications or project and clients settings.
-Please check below the matrix for an overview where which scope is asserted.
+ZITADEL asserts claims on different places according to the corresponding
+specifications or project and clients settings. Please check below the matrix
+for an overview where which scope is asserted.
 
 | Claims                                            | Userinfo       | Introspection  | ID Token                                    | Access Token                         |
 | :------------------------------------------------ | :------------- | -------------- | ------------------------------------------- | ------------------------------------ |
@@ -71,7 +72,8 @@ Please check below the matrix for an overview where which scope is asserted.
 
 ## Reserved Claims
 
-ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes).
+ZITADEL reserves some claims to assert certain data. Please check out the
+[reserved scopes](scopes#reserved-scopes).
 
 | Claims                                            | Example                                                                                              | Description                                                                                                                                                                        |
 | :------------------------------------------------ | :--------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

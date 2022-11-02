@@ -2,7 +2,10 @@
 title: Onboarding Project
 ---
 
-Effort required during depends on the complexity of your infrastructure and the overall setup. With a Multi-Zone Setup (excl. Multi-Region), support during this phase requires around 10-25h over 2 weeks. Actual effort is based on time and material.
+Effort required during depends on the complexity of your infrastructure and the
+overall setup. With a Multi-Zone Setup (excl. Multi-Region), support during this
+phase requires around 10-25h over 2 weeks. Actual effort is based on time and
+material.
 
 Scope of the project is agreed on individual basis.
 
@@ -31,5 +34,8 @@ Scope of the project is agreed on individual basis.
 
 - Running Kubernetes with possibility to deploy to namespaces
 - Inbound and outbound HTTP/2 traffic possible
-- For being able to send SMS, we need a Twilio sender name, SID and an auth token
-- ZITADEL also needs to connect to an email relay of your choice. We need the SMTP host, user and app key as well as the ZITADEL emails sender address and name.
+- For being able to send SMS, we need a Twilio sender name, SID and an auth
+  token
+- ZITADEL also needs to connect to an email relay of your choice. We need the
+  SMTP host, user and app key as well as the ZITADEL emails sender address and
+  name.

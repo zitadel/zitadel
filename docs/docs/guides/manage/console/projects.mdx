@@ -10,14 +10,19 @@ import ProjectDescription from "../../../concepts/structure/_project_description
 
 ### Example
 
-If you'd build a Point of Sales Platform, you would have one Project (maybe called `POS`) and all your applications (one Webapplication for administration, and your mobile applications for your users iOS and Android), would be part of it.
-You would have to create roles for administration and your clients in this very project, and then create authorizations based on them.
+If you'd build a Point of Sales Platform, you would have one Project (maybe
+called `POS`) and all your applications (one Webapplication for administration,
+and your mobile applications for your users iOS and Android), would be part of
+it. You would have to create roles for administration and your clients in this
+very project, and then create authorizations based on them.
 
 ![POS Project](/img/guides/console/posproject.png)
 
 ## Create a project
 
-To create a project, navigate to your organization, then projects or directly via <https://{your_domain}.zitadel.cloud/ui/console/projects>, and then click the button to create a new project.
+To create a project, navigate to your organization, then projects or directly
+via <https://{your_domain}.zitadel.cloud/ui/console/projects>, and then click
+the button to create a new project.
 
 <img alt="Empty Project" src="/img/console_projects_empty.png" width="270px" />
 
@@ -25,19 +30,24 @@ then enter your project name and continue.
 
 ## What is a granted project?
 
-Now imagine you could use the POS platform from the example not only for yourself but sell it to other business partners too.
-Those partners would maybe have the need to have their own domain, their own branding and add additional social login options.
-Setting this up in ZITADEL is very easy since all organizations can overwrite their settings.
-You would only need a method to grant them access.
+Now imagine you could use the POS platform from the example not only for
+yourself but sell it to other business partners too. Those partners would maybe
+have the need to have their own domain, their own branding and add additional
+social login options. Setting this up in ZITADEL is very easy since all
+organizations can overwrite their settings. You would only need a method to
+grant them access.
 
-To add a grant to another organization is done from the project itself. Navigate to grants and hit the new button.
-Now, enter the domain of the partner organization (if you can't remember it, navigate to the organization and pick it up from the detail page), hit search and then continue.
+To add a grant to another organization is done from the project itself. Navigate
+to grants and hit the new button. Now, enter the domain of the partner
+organization (if you can't remember it, navigate to the organization and pick it
+up from the detail page), hit search and then continue.
 
-Now select the roles you want this organization to use and save.
-This enables you to lock a certain organization out of a feature if you don't want their users to use it.
-You can learn more about roles [here](./roles).
+Now select the roles you want this organization to use and save. This enables
+you to lock a certain organization out of a feature if you don't want their
+users to use it. You can learn more about roles [here](./roles).
 
-Organizations can then create authorizations for their users on their own. The project is shown them seperated from their own projects.
+Organizations can then create authorizations for their users on their own. The
+project is shown them seperated from their own projects.
 
 <img
   alt="Granted project"
@@ -47,11 +57,14 @@ Organizations can then create authorizations for their users on their own. The p
 
 ## Grant a project
 
-1. Visit the project `POS` that you have created before, then in the section **Grants** click **New**.
+1. Visit the project `POS` that you have created before, then in the section
+   **Grants** click **New**.
 
 <img src="/img/guides/console/grantsmenu.png" alt="Grants" width="170px" />
 
-2. Enter the domain of the organization you want to grant (go to the organization detail page if you can't remember it), hit the search button and continue.
+2. Enter the domain of the organization you want to grant (go to the
+   organization detail page if you can't remember it), hit the search button and
+   continue.
 3. Select some roles you would like to grant to the organization and confirm.
 4. You should now see the granted organization in the section **grants**.
 
@@ -59,7 +72,8 @@ Organizations can then create authorizations for their users on their own. The p
 
 ### Branding
 
-If you have different designs for your organizations or probably and use project grants, you can define the login behaviour on the project detail page.
+If you have different designs for your organizations or probably and use project
+grants, you can define the login behaviour on the project detail page.
 
 <img
   src="/img/guides/console/projectbranding.png"
@@ -75,17 +89,22 @@ You can choose from
 | Enforce project resource owner policy  | This setting will enforce the private labeling of the organization (resource owner) of the project through the whole login process.                                                                                                                          |
 | Allow Login User resource owner policy | With this setting first the private labeling of the organization (resource owner) of the project will trigger. As soon as the user and its organization (resource owner) is identified by ZITADEL, the settings will change to the organization of the user. |
 
-In a B2B use case, you would typically use the organization setting. If you want to omit organization detection, you can preselect an organization with the [primary domain scope](/docs/apis/openidoauth/scopes#reserved-scopes) (ex. `urn:zitadel:iam:org:domain:primary:{domainname}`).
+In a B2B use case, you would typically use the organization setting. If you want
+to omit organization detection, you can preselect an organization with the
+[primary domain scope](/docs/apis/openidoauth/scopes#reserved-scopes) (ex.
+`urn:zitadel:iam:org:domain:primary:{domainname}`).
 
 ### Role settings
 
-Below the branding settings, you can check different checkboxes to get even more custom behaviour on authentication.
+Below the branding settings, you can check different checkboxes to get even more
+custom behaviour on authentication.
 
-- **Assert Roles on Authentication**:
-  Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.
-- **Check authorization on Authentication**: If set, users are only allowed to authenticate if any role is assigned to their account.
-- **Check for Project on Authentication**:
-  It is checked whether the user's organization has this project. If not, the user cannot be authenticated.
+- **Assert Roles on Authentication**: Role information is sent from Userinfo
+  endpoint and depending on your application settings in tokens and other types.
+- **Check authorization on Authentication**: If set, users are only allowed to
+  authenticate if any role is assigned to their account.
+- **Check for Project on Authentication**: It is checked whether the user's
+  organization has this project. If not, the user cannot be authenticated.
 
 <img
   src="/img/guides/console/rolesettings.png"
@@ -93,7 +112,9 @@ Below the branding settings, you can check different checkboxes to get even more
   alt="Role settings"
 />
 
-If you want to have roles in your token, this has to be set in your applications as this is dependent on your application type. Navigate to your application and check this setting if you want so.
+If you want to have roles in your token, this has to be set in your applications
+as this is dependent on your application type. Navigate to your application and
+check this setting if you want so.
 
 <img
   src="/img/guides/console/tokenroles.png"
@@ -101,4 +122,6 @@ If you want to have roles in your token, this has to be set in your applications
   alt="Roles in token"
 />
 
-You can learn more about [Application and Token settings](./applications#token-settings) in the next section.
+You can learn more about
+[Application and Token settings](./applications#token-settings) in the next
+section.

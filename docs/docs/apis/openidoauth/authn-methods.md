@@ -4,18 +4,24 @@ title: Authentication Methods
 
 ## Client Secret Basic
 
-When using `client_secret_basic` on token or introspection endpoints, provide an`Authorization` header with a Basic auth value in the following form:
+When using `client_secret_basic` on token or introspection endpoints, provide
+an`Authorization` header with a Basic auth value in the following form:
 
 ```markdown
-Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" + formUrlEncode(client_secret) )
+Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" +
+formUrlEncode(client_secret) )
 ```
 
-Given the client_id `78366401571920522@amce` and client_secret `veryweaksecret!`, this would result in the following `Authorization` header:
+Given the client_id `78366401571920522@amce` and client_secret
+`veryweaksecret!`, this would result in the following `Authorization` header:
 `Basic NzgzNjY0MDE1NzE5MjA1MjIlNDBhbWNlOnZlcnl3ZWFrc2VjcmV0JTIx`
 
 ## JWT with Private Key
 
-When using `private_key_jwt` (`urn:ietf:params:oauth:client-assertion-type:jwt-bearer`) for token or introspection endpoints, provide a JWT as assertion generated with the following structure and signed with a downloaded key:
+When using `private_key_jwt`
+(`urn:ietf:params:oauth:client-assertion-type:jwt-bearer`) for token or
+introspection endpoints, provide a JWT as assertion generated with the following
+structure and signed with a downloaded key:
 
 ---
 
@@ -61,7 +67,8 @@ JWT
 }
 ```
 
-> To identify your key, it is necessary that you provide a JWT with a `kid` header claim representing your keyId from the Key JSON:
+> To identify your key, it is necessary that you provide a JWT with a `kid`
+> header claim representing your keyId from the Key JSON:
 >
 > ```json
 > {

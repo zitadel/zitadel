@@ -2,10 +2,12 @@
 title: TLS Modes
 ---
 
-To allow ZITADEL to be run on any kind of infrastrucute it allows to configure on how tho handle TLS connections.
-There are three mode of operation: `external`, `enabled`, `disabled`.
+To allow ZITADEL to be run on any kind of infrastrucute it allows to configure
+on how tho handle TLS connections. There are three mode of operation:
+`external`, `enabled`, `disabled`.
 
-Generally this command is set as argument while starting ZITADEL. For example like this:
+Generally this command is set as argument while starting ZITADEL. For example
+like this:
 
 ```bash
 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
@@ -13,16 +15,19 @@ zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode
 
 ## External
 
-The mode `external` allows you to configure ZITADEL in such a way that it will instruct its clients to use https.
-However ZITADEL delegates the management of TLS connections to a reverseproxy, web application firewall or a service mesh.
+The mode `external` allows you to configure ZITADEL in such a way that it will
+instruct its clients to use https. However ZITADEL delegates the management of
+TLS connections to a reverseproxy, web application firewall or a service mesh.
 
 ## Enabled
 
-When using the mode `enabled` ZITADEL is setup to await incoming connections in an encrypted fashion.
-Wether it is from a client directly, a reverseproxy or web application firewall.
-This allows http connections to be secured at the transport level the whole way.
+When using the mode `enabled` ZITADEL is setup to await incoming connections in
+an encrypted fashion. Wether it is from a client directly, a reverseproxy or web
+application firewall. This allows http connections to be secured at the
+transport level the whole way.
 
-If you use the mode `enabled` you need to configure ZITADEL with the nessecary TLS settings.
+If you use the mode `enabled` you need to configure ZITADEL with the nessecary
+TLS settings.
 
 ```yaml
 TLS:
@@ -44,7 +49,8 @@ TLS:
 
 ## Disabled
 
-With the mode `disabled` ZITADEL is instructed to await all connections with plain http without TLS.
+With the mode `disabled` ZITADEL is instructed to await all connections with
+plain http without TLS.
 
 :::caution
 
@@ -54,5 +60,7 @@ Be aware this is not a secure setup and should only be used for test systems!
 
 ## HTTP/2
 
-To allow ZITADEL to function properly please make sure that HTTP/2 is enabled. If you are using the mode `external` or `disabled` make sure to verify h2c compatibilty.
-You can read more about how ZITADEL utilizes in our [HTTP/2 docs](/docs/guides/manage/self-hosted/http2).
+To allow ZITADEL to function properly please make sure that HTTP/2 is enabled.
+If you are using the mode `external` or `disabled` make sure to verify h2c
+compatibilty. You can read more about how ZITADEL utilizes in our
+[HTTP/2 docs](/docs/guides/manage/self-hosted/http2).

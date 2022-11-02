@@ -2,13 +2,15 @@
 title: Implementation
 ---
 
-This documentation gives you an insight into the structure of the ZITADEL database.
-The goal is to give you a rough overview, so you know where which data is stored and which database schemas and tables are used.
+This documentation gives you an insight into the structure of the ZITADEL
+database. The goal is to give you a rough overview, so you know where which data
+is stored and which database schemas and tables are used.
 
 ## Event
 
-The single source of truth of ZITADEL are the events that are stored in the eventstore.
-From these events all different kind of resources e.g Users, Projects, Applications, etc. can be computed.
+The single source of truth of ZITADEL are the events that are stored in the
+eventstore. From these events all different kind of resources e.g Users,
+Projects, Applications, etc. can be computed.
 
 An event has the following data:
 
@@ -41,23 +43,27 @@ An event has the following data:
 
 ## Projections
 
-The projections in ZITADEL contain all the computed objects, that are used for the reading requests.
-It is possible that the projections are slightly behind the actual event and not all objects are up-to-date.
+The projections in ZITADEL contain all the computed objects, that are used for
+the reading requests. It is possible that the projections are slightly behind
+the actual event and not all objects are up-to-date.
 
 ### Pub-Sub
 
-To keep the projections as up-to-date as possible, an internal pub-sub system is used.
-As soon as an event is written to the event store, it is sent to the projections that have subscribed to this aggregate.
+To keep the projections as up-to-date as possible, an internal pub-sub system is
+used. As soon as an event is written to the event store, it is sent to the
+projections that have subscribed to this aggregate.
 
 ### Spooler
 
-It is sometimes possible for technical reasons that not all events were sent to the projections.
-For this reason, a spooler runs in parallel, which checks every n minutes whether there are new events that have not yet been processed.
+It is sometimes possible for technical reasons that not all events were sent to
+the projections. For this reason, a spooler runs in parallel, which checks every
+n minutes whether there are new events that have not yet been processed.
 
 ### Current Sequence
 
-To ensure that no events get missed when creating the Projections, ZITADEL stores the current sequence, that was processed.
-You can find the current sequence in the following tables:
+To ensure that no events get missed when creating the Projections, ZITADEL
+stores the current sequence, that was processed. You can find the current
+sequence in the following tables:
 
 - projections.current_sequences
 - notification.current_sequences
@@ -76,10 +82,11 @@ The current sequence is stored for each ZITADEL instance and table.
 
 ### Failed Events
 
-Sometimes an event cannot be processed correctly for some reason and an error occurs.
-The event is then tried to be processed n times.
-When a defined number of attempts have failed, the event is stored in the Failed Events Table and the next event is processed.
-This must be done so that the projection is not blocked and no further events are processed.
+Sometimes an event cannot be processed correctly for some reason and an error
+occurs. The event is then tried to be processed n times. When a defined number
+of attempts have failed, the event is stored in the Failed Events Table and the
+next event is processed. This must be done so that the projection is not blocked
+and no further events are processed.
 
 You can find the failed_events in the following tables:
 
