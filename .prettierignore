@@ -1,0 +1,3 @@
+# Ingore generated docs
+docs/docs/apis/proto
+docs/docs/apis/assets

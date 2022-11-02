@@ -15,5 +15,4 @@ jobs:
       - name: Prettify code
         uses: creyD/prettier_action@v4.2
         with:
-          working_directory: ./docs/
-          prettier_options: --check docs --check ../**/*.md
+          prettier_options: --check docs/docs --check **/*.md
