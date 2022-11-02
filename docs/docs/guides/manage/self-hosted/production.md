@@ -7,7 +7,7 @@ you are ready to configure ZITADEL for production usage.
 
 ## High Availability
 
-We recommend running ZITADEL higly available using an orchestrator that schedules ZITADEL on multiple nodes, like [Kubernetes](/docs/guides/deploy/kubernetes).
+We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers, like [Kubernetes](/docs/guides/deploy/kubernetes).
 
 ## Configuration
 
