@@ -138,11 +138,11 @@ Build the binary. This takes some minutes, but you can speed up rebuilds.
 goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
 ```
 
-> Note: With this command, several steps are executed.
-> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.
-> Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`
-> Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`
-> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . --target angular-export -o internal/api/ui/console/static/`
+> Note: With this command, several steps are executed.<space><space>
+> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.<space><space>
+> Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`<space><space>
+> Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`<space><space>
+> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . --target angular-export -o internal/api/ui/console/static/`<space><space>
 > Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
