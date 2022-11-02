@@ -1,8 +1,9 @@
 ---
 title: Access ZITADEL System API
 ---
+
 :::note
-This guide focuses on the ZITADEL System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis). 
+This guide focuses on the ZITADEL System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis).
 The ZITADEL System API is currently only available for ZITADEL Self-Hosted deployments.
 :::
 
@@ -78,7 +79,7 @@ So for your instance running on `custom-domain.com` the claims could look like t
 ```
 
 :::note
-If your system is exposed without TLS or on a dedicated port, be sure to provide this in your audience, e.g. http://localhost:8080 
+If your system is exposed without TLS or on a dedicated port, be sure to provide this in your audience, e.g. http://localhost:8080
 :::
 
 ### ZITADEL Tools
@@ -104,44 +105,44 @@ You should get a successful response with a `totalResult` number of 1 and the de
 
 ```json
 {
-	"details": {
-		"totalResult": "1"
-	},
-	"result": [
-		{
-			"id": "172698969497928101",
-			"details": {
-				"sequence": "102",
-				"creationDate": "2022-08-02T09:30:10.781068Z",
-				"changeDate": "2022-08-02T09:30:10.781068Z",
-				"resourceOwner": "172698969497928101"
-			},
-			"state": "STATE_RUNNING",
-			"name": "ZITADEL",
-			"domains": [
-				{
-					"details": {
-						"sequence": "108",
-						"creationDate": "2022-08-02T09:30:10.781068Z",
-						"changeDate": "2022-08-02T09:30:10.781068Z",
-						"resourceOwner": "172698969497928101"
-					},
-					"domain": "custom-domain.com",
-					"primary": true
-				},
-				{
-					"details": {
-						"sequence": "108",
-						"creationDate": "2022-08-02T09:30:10.781068Z",
-						"changeDate": "2022-08-02T09:30:10.781068Z",
-						"resourceOwner": "172698969497928101"
-					},
-					"domain": "zitadel-gnft7o.custom-domain.com",
-					"generated": true
-				}
-			]
-		}
-	]
+  "details": {
+    "totalResult": "1"
+  },
+  "result": [
+    {
+      "id": "172698969497928101",
+      "details": {
+        "sequence": "102",
+        "creationDate": "2022-08-02T09:30:10.781068Z",
+        "changeDate": "2022-08-02T09:30:10.781068Z",
+        "resourceOwner": "172698969497928101"
+      },
+      "state": "STATE_RUNNING",
+      "name": "ZITADEL",
+      "domains": [
+        {
+          "details": {
+            "sequence": "108",
+            "creationDate": "2022-08-02T09:30:10.781068Z",
+            "changeDate": "2022-08-02T09:30:10.781068Z",
+            "resourceOwner": "172698969497928101"
+          },
+          "domain": "custom-domain.com",
+          "primary": true
+        },
+        {
+          "details": {
+            "sequence": "108",
+            "creationDate": "2022-08-02T09:30:10.781068Z",
+            "changeDate": "2022-08-02T09:30:10.781068Z",
+            "resourceOwner": "172698969497928101"
+          },
+          "domain": "zitadel-gnft7o.custom-domain.com",
+          "generated": true
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -149,10 +150,10 @@ With this token you are allowed to access the whole [ZITADEL System API](../../a
 
 ## Summary
 
-* Create an RSA keypair
-* Provide the public key with a userID to ZITADEL using the runtime configuration
-* Authorize the request with a JWT signed with your private key
+- Create an RSA keypair
+- Provide the public key with a userID to ZITADEL using the runtime configuration
+- Authorize the request with a JWT signed with your private key
 
 Where to go from here:
 
-* [ZITADEL API Documentation](../../apis/introduction)
+- [ZITADEL API Documentation](../../apis/introduction)

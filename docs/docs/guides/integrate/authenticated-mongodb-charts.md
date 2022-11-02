@@ -26,6 +26,7 @@ Your application configuration should now look similar to this:
 Configure ZITADEL as your _Custom JWT Provider_ following the [MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) .
 
 Configure the following values:
+
 - Signing Algorithm: RS256
 - Signing Key: JWK or JWKS URL
 - JWKS: https://{your_domain}.zitadel.cloud/oauth/v2/keys
@@ -49,41 +50,40 @@ If you've done the [Angular Quickstart](../../examples/login/angular.md), your c
 ```css
 /* chart.component.css */
 div#chart {
-    height: 500px;    
+  height: 500px;
 }
 ```
 
 ```ts
 // chart.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 import ChartsEmbedSDK from "@mongodb-js/charts-embed-dom";
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { AuthenticationService } from "src/app/services/authentication.service";
 
 @Component({
-  selector: 'app-chart',
-  templateUrl: './chart.component.html',
-  styleUrls: ['./chart.component.css']
+  selector: "app-chart",
+  templateUrl: "./chart.component.html",
+  styleUrls: ["./chart.component.css"],
 })
 export class ChartComponent implements OnInit {
-
-  constructor(private auth: AuthenticationService) { }
+  constructor(private auth: AuthenticationService) {}
 
   ngOnInit(): void {
-    this.renderChart().catch(e => window.alert(e.message));    
+    this.renderChart().catch((e) => window.alert(e.message));
   }
 
   async renderChart() {
     const sdk = new ChartsEmbedSDK({
       baseUrl: "<YOUR CHARTS BASE URL HERE>",
       getUserToken: () => {
-        return this.auth.getAccessToken()
+        return this.auth.getAccessToken();
       },
     });
-  
+
     const chart = sdk.createChart({
-      chartId: "<YOUR CHART ID HERE>"
+      chartId: "<YOUR CHART ID HERE>",
     });
     await chart.render(<HTMLElement>document.getElementById("chart"));
-  }  
+  }
 }
 ```

@@ -33,23 +33,23 @@ spec.** [Bindings for the OASIS Security Assertion Markup Language (SAML) V2.0 â
 
 ### Required request parameters
 
-| Parameter | Description                                                                                                                                                                         |
-|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| RelayState | ID to associate the exchange with the original request.                                                                                                                             |
-| SAMLRequest | The request made to the SAML IDP.  (base64 encoded)                                                                                                                                 |
-| SigAlg | Algorithm used to sign the request, only if binding is 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' as signature has to be provided es separate parameter. (base64 encoded) |
-| Signature | Signature of the request as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding.  (base64 encoded)                                                                            |
+| Parameter   | Description                                                                                                                                                                         |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RelayState  | ID to associate the exchange with the original request.                                                                                                                             |
+| SAMLRequest | The request made to the SAML IDP. (base64 encoded)                                                                                                                                  |
+| SigAlg      | Algorithm used to sign the request, only if binding is 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' as signature has to be provided es separate parameter. (base64 encoded) |
+| Signature   | Signature of the request as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding. (base64 encoded)                                                           |
 
 ### Successful Response
 
 Depending on the content of the request the response comes back in the requested binding, but the content is the same.
 
-| Parameter | Description                                                                                                                                                          |
-|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| RelayState | ID to associate the exchange with the original request.                                                                                                              |
-| SAMLResponse | The response form the SAML IDP.  (base64 encoded)                                                                                                                    |
-| SigAlg | Algorithm used to sign the response, only if binding is 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' as signature has to be provided es separate parameter.  (base64 encoded)  |
-| Signature | Signature of the response as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding.  (base64 encoded)                                                            |
+| Parameter    | Description                                                                                                                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| RelayState   | ID to associate the exchange with the original request.                                                                                                                              |
+| SAMLResponse | The response form the SAML IDP. (base64 encoded)                                                                                                                                     |
+| SigAlg       | Algorithm used to sign the response, only if binding is 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' as signature has to be provided es separate parameter. (base64 encoded) |
+| Signature    | Signature of the response as parameter with 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' binding. (base64 encoded)                                                           |
 
 ### Error Response
 

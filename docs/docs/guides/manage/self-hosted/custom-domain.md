@@ -15,7 +15,7 @@ If not using localhost as ExternalDomain, ExternalSecure must be true and you ne
 
 ```yaml
 ExternalSecure: true
-ExternalDomain: 'zitadel.my.domain'
+ExternalDomain: "zitadel.my.domain"
 ExternalPort: 443
 ```
 

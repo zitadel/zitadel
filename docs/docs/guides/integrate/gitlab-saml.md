@@ -1,5 +1,5 @@
 ---
-title: Connect with Gitlab through SAML 2.0 
+title: Connect with Gitlab through SAML 2.0
 ---
 
 This guide shows how to enable login with ZITADEL on Gitlab.
@@ -62,6 +62,6 @@ Save the changes.
 Once you saved the changes, click on the button "Verify SAML configuration".
 
 You should be redirected to ZITADEL.
-Login with your user. 
+Login with your user.
 After that you should be redirected back to GitLab and you can inspect the Response Output.
 ![Validate Setup](/img/saml/gitlab/gitlab-03.png)

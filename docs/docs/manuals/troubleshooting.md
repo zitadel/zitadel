@@ -22,7 +22,7 @@ To make sure, that your new settings will trigger, please restart your mobile ph
 
 ![Same Site Strict Enforvement](/img/manuals/errors/same-site-strict.png)
 
-**Settings > Safari > disable: "Block All cookies"** 
+**Settings > Safari > disable: "Block All cookies"**
 ![Block all cookies](/img/manuals/errors/block-cookies.png)
 
 Do you still face this issue? Please contact us, and we will help you find out what the problem is.

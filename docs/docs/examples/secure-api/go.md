@@ -30,6 +30,7 @@ back `ok` and the current timestamp. On `/protected` it will respond the same bu
 must not be expired and the API has to be part of the audience (either client_id or project_id).
 
 Make sure to fill the var `issuer` with your own domain. This is the domain of your instance you can find it on the instance detail in the ZITADEL Cloud Customer Portal or in the ZITADEL Console.
+
 ```go
 package main
 
@@ -102,7 +103,7 @@ You can now call the API by browser or curl. Try the public endpoint first:
 curl -i localhost:5001/public
 ```
 
-it should return something like: 
+it should return something like:
 
 ```
 HTTP/1.1 200 OK
@@ -140,6 +141,7 @@ curl -i -H "Authorization: Bearer ${token}" localhost:5001/protected
 ```
 
 it will return an OK response as well:
+
 ```
 HTTP/1.1 200 OK
 Date: Tue, 24 Aug 2021 11:13:33 GMT

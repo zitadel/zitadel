@@ -139,10 +139,10 @@ goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifac
 ```
 
 > Note: With this command, several steps are executed.
-> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.  
-> Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`  
-> Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`  
-> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . --target angular-export -o internal/api/ui/console/static/`  
+> For speeding up rebuilds, you can reexecute only specific steps you think are necessary based on your changes.
+> Generating gRPC stubs: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-copy -o .`
+> Running unit tests: `DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . --target go-codecov`
+> Generating the console: `DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . --target angular-export -o internal/api/ui/console/static/`
 > Build the binary: `goreleaser build --id dev --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel --skip-before`
 
 You can now run and debug the binary in .artifacts/zitadel/zitadel using your favourite IDE, for example GoLand.
@@ -176,7 +176,7 @@ Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 
-We use angular-eslint/Prettier for linting/formatting, so please run `npm run lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+We use angular-eslint and Prettier for linting and formatting, so please run `npm run lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
@@ -274,7 +274,9 @@ Project documentation is made with docusaurus and is located under [./docs](./do
 Please refer to the [README](./docs/README.md) for more information and local testing.
 
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
-Scope can be left empty (omit the brackets) or refer to the top navigation sections.
+Scope can be left empty (omit the parentheses) or refer to the top navigation sections.
+
+We use Prettier for formatting the docs, so please run `yarn run lint:fix` in the docs folder before committing. (VSCode users, check out [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix formatting issues in development).
 
 ## Contribute Internationalization
 

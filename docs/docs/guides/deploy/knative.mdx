@@ -2,9 +2,9 @@
 title: Knative
 ---
 
-import Disclaimer from './_disclaimer.mdx'
-import DefaultUser from './_defaultuser.mdx'
-import Next from './_next.mdx'
+import Disclaimer from "./_disclaimer.mdx";
+import DefaultUser from "./_defaultuser.mdx";
+import Next from "./_next.mdx";
 
 ## Install Knative
 
@@ -31,7 +31,7 @@ kn service create zitadel \
 --env ZITADEL_EXTERNALPORT=80 \
 --env ZITADEL_TLS_ENABLED=false \
 --env ZITADEL_EXTERNALDOMAIN=zitadel.default.127.0.0.1.sslip.io \
---arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters" 
+--arg "start-from-init" --arg "--masterkey" --arg "MasterkeyNeedsToHave32Characters"
 ```
 
 ### Knavite yaml
@@ -56,8 +56,8 @@ http://zitadel.default.127.0.0.1.sslip.io/ui/console
 
 If you didn't configure something else, this is the default IAM admin users login:
 
-* username: zitadel-admin@<span></span>zitadel.zitadel.default.127.0.0.1.sslip.io
-* password: Password1!
+- username: zitadel-admin@<span></span>zitadel.zitadel.default.127.0.0.1.sslip.io
+- password: Password1!
 
 <Next components={props.components} />
 <Disclaimer components={props.components} />

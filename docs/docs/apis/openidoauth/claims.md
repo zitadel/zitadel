@@ -6,7 +6,7 @@ ZITADEL asserts claims on different places according to the corresponding specif
 Please check below the matrix for an overview where which scope is asserted.
 
 | Claims                                            | Userinfo       | Introspection  | ID Token                                    | Access Token                         |
-|:--------------------------------------------------|:---------------|----------------|---------------------------------------------|--------------------------------------|
+| :------------------------------------------------ | :------------- | -------------- | ------------------------------------------- | ------------------------------------ |
 | acr                                               | No             | No             | Yes                                         | No                                   |
 | address                                           | When requested | When requested | When requested amd response_type `id_token` | No                                   |
 | amr                                               | No             | No             | Yes                                         | No                                   |
@@ -40,7 +40,7 @@ Please check below the matrix for an overview where which scope is asserted.
 ## Standard Claims
 
 | Claims             | Example                                  | Description                                                                                                                                            |
-|:-------------------|:-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :----------------- | :--------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | acr                | TBA                                      | TBA                                                                                                                                                    |
 | address            | `Teufener Strasse 19, 9000 St. Gallen`   | TBA                                                                                                                                                    |
 | amr                | `pwd mfa`                                | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) <br/> `password` value is deprecated, please check `pwd` |
@@ -71,10 +71,10 @@ Please check below the matrix for an overview where which scope is asserted.
 
 ## Reserved Claims
 
-ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes). 
+ZITADEL reserves some claims to assert certain data. Please check out the [reserved scopes](scopes#reserved-scopes).
 
 | Claims                                            | Example                                                                                              | Description                                                                                                                                                                        |
-|:--------------------------------------------------|:-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :------------------------------------------------ | :--------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | urn:zitadel:iam:action:{actionname}:log           | `{"urn:zitadel:iam:action:appendCustomClaims:log": ["test log", "another test log"]}`                | This claim is set during Actions as a log, e.g. if two custom claims with the same keys are set.                                                                                   |
 | urn:zitadel:iam:org:domain:primary:{domainname}   | `{"urn:zitadel:iam:org:domain:primary": "acme.ch"}`                                                  | This claim represents the primary domain of the organization the user belongs to.                                                                                                  |
 | urn:zitadel:iam:org:project:roles                 | `{"urn:zitadel:iam:org:project:roles": [ {"user": {"id1": "acme.zitade.ch", "id2": "caos.ch"} } ] }` | When roles are asserted, ZITADEL does this by providing the `id` and `primaryDomain` below the role. This gives you the option to check in which organization a user has the role. |

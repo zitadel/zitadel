@@ -2,17 +2,17 @@
 title: Software
 ---
 
-ZITADEL is built with two essential patterns. Event Sourcing (ES) and Command and Query Responsibility Segregation (CQRS). 
+ZITADEL is built with two essential patterns. Event Sourcing (ES) and Command and Query Responsibility Segregation (CQRS).
 Due to the nature of Event Sourcing ZITADEL provides the unique capability to generate a strong audit trail of ALL the things that happen to its resources, without compromising on storage cost or audit trail length.
 
-The combination of ES and CQRS makes ZITADEL eventual consistent which, from our perspective, is a great benefit in many ways. 
-It allows us to build a Source of Records (SOR) which is the one single point of truth for all computed states. 
+The combination of ES and CQRS makes ZITADEL eventual consistent which, from our perspective, is a great benefit in many ways.
+It allows us to build a Source of Records (SOR) which is the one single point of truth for all computed states.
 The SOR needs to be transaction safe to make sure all operations are in order.
 You can read more about this in our [ES documentation](../eventstore/overview).
 
 Each ZITADEL binary contains all components necessary to serve traffic
 From serving the API, rendering GUI's, background processing of events and task.
-This All in One (AiO) approach makes operating ZITADEL simple. 
+This All in One (AiO) approach makes operating ZITADEL simple.
 
 ## Software Structure
 
@@ -36,7 +36,7 @@ The http server is responsible for the following functions:
 #### API Server
 
 The API layer consist of the multiple APIs provided by ZITADEL. Each serves a dedicated purpose.
-All APIs of ZITADEL are always available as gRCP, gRPC-web and REST service. 
+All APIs of ZITADEL are always available as gRCP, gRPC-web and REST service.
 The only exception is the [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoints) and [Asset API](/docs/apis/introduction#assets) due their unique nature.
 
 - [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoints) - allows to request authentication and authorization of ZITADEL
@@ -74,7 +74,7 @@ These events now are being handed down to the storage layer for storage.
 
 #### Events
 
-ZITADEL handles events in two ways. 
+ZITADEL handles events in two ways.
 Events that should be processed in near real time are processed by a in memory pub sub system.
 Some events hand be handled in background processing for which the spooler is responsible.
 
@@ -123,7 +123,7 @@ It has some unique requirements, which include:
 
 The query handler receives all read relevant operations. These can either be query or simple `getById` calls.
 When receiving a query it will proceed by passing this to the repository which will call the database and return the dataset.
-If a request calls for a specific id the call will, most of the times, be revalidated against the Event Store. 
+If a request calls for a specific id the call will, most of the times, be revalidated against the Event Store.
 This is achieved by triggering the projection to make sure that the last sequence of a id is loaded into the query view.
 
 > The query side has the option to dynamically check the Event Store for newer events on a certain id to make sure for consistent responses without delay.

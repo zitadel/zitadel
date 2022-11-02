@@ -1,13 +1,12 @@
 ---
-title: Quickstart 
+title: Quickstart
 ---
 
 import Column from "../../../src/components/column";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
-import Zcloud from './_zitadel_cloud.mdx'
-import LocalInstance from './_local_instance.mdx'
-
+import Zcloud from "./_zitadel_cloud.mdx";
+import LocalInstance from "./_local_instance.mdx";
 
 Most applications need to know the identity of a user allowing to securely store user data in the cloud and provide the same personalised experience across all of the user's devices.
 
@@ -15,6 +14,7 @@ ZITADEL's authentication provides backend services, easy-to-use SDKs, and ready-
 It additionally leverages industry standards like OAuth 2.0 and OpenID Connect such that it can be easily integrated in your custom backend.
 
 ZITADEL currently support two ways of using it:
+
 - Use the ZITADEL Cloud free tier to get started in minutes
 - Deploy a self-hosted ZITADEL, where ever you like
 
@@ -40,21 +40,21 @@ Support is available either through the opensource community or a support contra
 :::
 
 <Tabs
-    groupId="proxy-vendor"
-    default="zcloud"
-    values={[
-        {'label': 'ZITADEL Cloud', 'value': 'zcloud'},
-        {'label': 'Local Instance', 'value': 'local'},
-    ]}
+  groupId="proxy-vendor"
+  default="zcloud"
+  values={[
+    { label: "ZITADEL Cloud", value: "zcloud" },
+    { label: "Local Instance", value: "local" },
+  ]}
 >
-    <TabItem value="zcloud">
-        <Zcloud/>
-        <More/>
-    </TabItem>
-    <TabItem value="local">
-        <LocalInstance/>
-        <More/>
-    </TabItem>
+  <TabItem value="zcloud">
+    <Zcloud />
+    <More />
+  </TabItem>
+  <TabItem value="local">
+    <LocalInstance />
+    <More />
+  </TabItem>
 </Tabs>
 
 ## Create first project and application

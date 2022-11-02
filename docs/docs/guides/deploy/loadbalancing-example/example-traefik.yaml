@@ -7,7 +7,7 @@ entrypoints:
 
 tls:
   stores:
-    default: 
+    default:
       # generates self-signed certificates
       defaultCertificate:
 
@@ -16,13 +16,12 @@ providers:
     filename: /etc/traefik/traefik.yaml
 
 http:
-
   middlewares:
     zitadel:
       headers:
         isDevelopment: false
         allowedHosts:
-        - 'my.domain'
+          - "my.domain"
     redirect-to-https:
       redirectScheme:
         scheme: https
@@ -33,19 +32,19 @@ http:
     # Redirect HTTP to HTTPS
     router0:
       entryPoints:
-      - web
+        - web
       middlewares:
-      - redirect-to-https
-      rule: 'HostRegexp(`my.domain`, `{subdomain:[a-z]+}.my.domain`)'
+        - redirect-to-https
+      rule: "HostRegexp(`my.domain`, `{subdomain:[a-z]+}.my.domain`)"
       service: zitadel
     # The actual ZITADEL router
     router1:
       entryPoints:
-      - websecure
+        - websecure
       service: zitadel
       middlewares:
-      - zitadel
-      rule: 'HostRegexp(`my.domain`, `{subdomain:[a-z]+}.my.domain`)'
+        - zitadel
+      rule: "HostRegexp(`my.domain`, `{subdomain:[a-z]+}.my.domain`)"
       tls:
         domains:
           - main: "my.domain"
@@ -59,5 +58,5 @@ http:
       loadBalancer:
         servers:
           # h2c is the scheme for unencrypted HTTP/2
-        - url: h2c://zitadel:8080
+          - url: h2c://zitadel:8080
         passHostHeader: true

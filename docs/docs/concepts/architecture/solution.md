@@ -4,7 +4,7 @@ title: Deployment
 
 ## High Availability
 
-ZITADEL can be run as high available system with ease. 
+ZITADEL can be run as high available system with ease.
 Since the storage layer takes the heavy lifting of making sure that data in synched across, server, data centers or regions.
 
 Depending on your projects needs our general recommendation is to run ZITADEL and ZITADELs storage layer across multiple availability zones in the same region or if you need higher guarantees run the storage layer across multiple regions.
@@ -21,7 +21,7 @@ ZITADEL can be scaled in a linear fashion in multiple dimensions.
 - Horizontal in multiple regions
 
 Our customers can reuse the same already known binary or container and scale it across multiple server, data center and regions.
-To distribute traffic an already existing proxy infrastructure can be reused. 
+To distribute traffic an already existing proxy infrastructure can be reused.
 Simply steer traffic by path, hostname, IP address or any other metadata to the ZITADEL of your choice.
 
 > To improve your service quality we recommend steering traffic by path to different ZITADEL deployments
@@ -69,7 +69,7 @@ The common update involves the following steps and do not need manual interventi
 - The new version will start ...
   - by updating databases schemas if needed
   - participate in the leader election for background jobs
-- As soon as the new version is ready to accept traffic it will signal this on the readiness endpoint `/debug/ready` 
+- As soon as the new version is ready to accept traffic it will signal this on the readiness endpoint `/debug/ready`
 - At this point your network infrastructure can send traffic to the new version
 
 Users who use [Kubernetes/Helm](../../guides/deploy/kubernetes) or serverless container services like Google Cloud Run can benefit from the fact the above process is automated.

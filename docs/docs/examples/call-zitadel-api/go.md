@@ -13,8 +13,9 @@ The client [SDK](https://github.com/zitadel/zitadel-go) will handle all necessar
 All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
 
 However, we recommend you read the guide on [how to access ZITADEL API](../../guides/integrate/access-zitadel-apis) and the associated guides for a basic knowledge of :
- - [Recommended Authorization Flows](../../guides/integrate/oauth-recommended-flows.md)
- - [Service Users](../../guides/integrate/serviceusers.md)
+
+- [Recommended Authorization Flows](../../guides/integrate/oauth-recommended-flows.md)
+- [Service Users](../../guides/integrate/serviceusers.md)
 
 > Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 
@@ -37,7 +38,7 @@ Make sure to fill the vars `issuer` and `api`.
 The issuer and api is the domain of your instance you can find it on the instance detail in the ZITADEL Cloud Customer Portal or in the ZITADEL Console.
 
 :::note
-The issuer will require the protocol (`https://` and `http://`) and you will only have to specify a port if they're not default (443 for https and 80 for http). The API will always require a port, but no protocol. 
+The issuer will require the protocol (`https://` and `http://`) and you will only have to specify a port if they're not default (443 for https and 80 for http). The API will always require a port, but no protocol.
 :::
 
 ```go
@@ -134,7 +135,7 @@ This will output something similar to:
 
 You have successfully used the ZITADEL Go SDK to call the management API!
 
-If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`), 
+If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`),
 ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
 and check the mentioned [guides](#prerequisites) at the beginning.
 
@@ -152,6 +153,7 @@ Now you can proceed implementing our APIs by adding more calls or trying to over
     log.Printf("%s was created on: %s", respOverwrite.Org.Name, respOverwrite.Org.Details.CreationDate.AsTime())
 }
 ```
+
 Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
 
 > This guide will be updated soon to show you how to use the SDK for your own API as well.

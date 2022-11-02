@@ -23,7 +23,7 @@ The data is stored as events in an append-only log.
 ## Benefits
 
 - Audit: You have a built-in audit trail that tracks all changes over an unlimited period of time.
-- Travel back in time: With our way of storing data we can show you all of your resources at a given point in time. 
+- Travel back in time: With our way of storing data we can show you all of your resources at a given point in time.
 - Future Projections: It is easy to compute projections with new business logic by replaying all events since installation.
 
 ## Definitions
@@ -36,6 +36,7 @@ An event is something that happens in the system and gets written to the databas
 Events are immutable and the current state of your system is derived from the events.
 
 Possible Events:
+
 - user.added
 - user.changed
 - product.added

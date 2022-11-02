@@ -1,7 +1,7 @@
 ---
 title: Support Services
 custom_edit_url: null
---- 
+---
 
 :::note
 
@@ -31,13 +31,13 @@ Last revised: June 14, 2022
 
 Support features for cloud subscriptions are as follows:
 
-Subscription Plans | Default | Extended SLA  | Self-hosted or dedicated
---- | --- | --- | ---
-Support hours | Business hours | Business hours | Business hours
-Response Time (Severity 1) | Best effort | 1 business hour | bespoke
-eMail Support | yes | yes | yes
-Phone Support | no | no | yes
-Chat Support |  no | no | optional
+| Subscription Plans         | Default        | Extended SLA    | Self-hosted or dedicated |
+| -------------------------- | -------------- | --------------- | ------------------------ |
+| Support hours              | Business hours | Business hours  | Business hours           |
+| Response Time (Severity 1) | Best effort    | 1 business hour | bespoke                  |
+| eMail Support              | yes            | yes             | yes                      |
+| Phone Support              | no             | no              | yes                      |
+| Chat Support               | no             | no              | optional                 |
 
 If you want to add a [Technical Account Manager] or need assistance during onboarding, please [get in touch](https://zitadel.com/contact).
 
@@ -49,14 +49,14 @@ Customers can choose support hours (business, extended, 24x7), initial response 
 
 ### SLO - Initial response time
 
-CAOS service level objective (SLO) for Support Services  is defined in terms of initial response time to a support request, as outlined in the table below per plan. CAOS will use reasonable efforts to resolve support requests, but does not guarantee a work-around, resolution or resolution time.
+CAOS service level objective (SLO) for Support Services is defined in terms of initial response time to a support request, as outlined in the table below per plan. CAOS will use reasonable efforts to resolve support requests, but does not guarantee a work-around, resolution or resolution time.
 
-Subscription Plans | Default | Extended SLA
---- | --- | --- 
-Severity 1| Best effort | 1 business hour
-Severity 2| Best effort | 2 business hour
-Severity 3| Best effort | 12 business hour
-Severity 4| Best effort | 24 business hour
+| Subscription Plans | Default     | Extended SLA     |
+| ------------------ | ----------- | ---------------- |
+| Severity 1         | Best effort | 1 business hour  |
+| Severity 2         | Best effort | 2 business hour  |
+| Severity 3         | Best effort | 12 business hour |
+| Severity 4         | Best effort | 24 business hour |
 
 If we fail to provide the initial response time objective, you will be entitled to service credits. For every 15 minutes exceeding the state objective, 1 day will be added as extension to the current term.
 
@@ -66,11 +66,11 @@ If we fail to provide the initial response time objective, you will be entitled 
 - Default contact: Whenever customers require support, Customers should consult the documentation of the service or product or post a question to our community.
 - When Customer is eligible for support services through a Subscription Plan, Customer may contact CAOS support via the following channels
 
-Support Feature | Contact information
---- | ---
-eMail Support | support@zitadel.com
-Chat Support | Private chat channel between CAOS and Customer that is opened when Subscription becomes active
-Phone Support | +41 43 215 27 34
+| Support Feature | Contact information                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------- |
+| eMail Support   | support@zitadel.com                                                                            |
+| Chat Support    | Private chat channel between CAOS and Customer that is opened when Subscription becomes active |
+| Phone Support   | +41 43 215 27 34                                                                               |
 
 - ZITADEL Cloud system status, incidents and maintenance windows will be communicated via [our status page](https://status.zitadel.com).
 - Questions regarding pricing, billing, and invoicing of our services should be addressed to billing@zitadel.com
@@ -110,19 +110,20 @@ The customer may submit support requests (“ticket”) through any means of eli
 
 - Single discrete problem, issue, or request
 - Initial severity level and impact statement for assessment
-- Description of the issue and if possible a description of the observed and expected behavior,  steps to reproduce the issue, evidence that issue is not caused by connectivity / compute, relevant anonymized log-files etc.
+- Description of the issue and if possible a description of the observed and expected behavior, steps to reproduce the issue, evidence that issue is not caused by connectivity / compute, relevant anonymized log-files etc.
 - All information requested by CAOS as we resolve the ticket (e.g. system logs)
 
 CAOS will review the case information and determine the severity level (see below), working with the customer to assess the urgency of the request and use reasonable efforts to respond to support requests within the initial response time.
 
 CAOS will use reasonable efforts to resolve support request as defined below, but does not guarantee a workaround, resolution or resolution time.
 
-Severity Level | Description
---- | --- 
-**Severity 1**<br/> Critical / Service down| <p>Widespread failure or complete unavailability of CAOS Core Services. </p><p> CAOS will use continuous effort to provide a workaround or permanent solution. When Core Services are available, the severity will be lowered to the new appropriate level.</p>
-**Severity 2**<br/> Core functionality unavailable or severely degraded| <p>Core Services of CAOS software continue to operate in severely restricted fashion, yet long-term productivity may be impacted.</p><p> When Core Services are no longer severely degraded (eg, through a viable workaround or release), the severity level will be lowered to Severity 3.</p>
-**Severity 3**<br/>Standard support request| <p>Partial and non-critical loss of CAOS software functionality or major software defect, yet a workaround exists for viable long-term operation.</p><p>CAOS will continue to work on developing permanent resolution.</p>
-**Severity 4**<br/>Non-urgent request| <p>Defined as follows: <ul><li>Request for information or general query</li><li>Feature request</li><li>Performance issues and little to none functional impact</li><li>Defects with workarounds and little to low functional impact</li></ul></p>
+| Severity Level                                                          | Description                                                                                                                                                                                                                                                                                     |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Severity 1**<br/> Critical / Service down                             | <p>Widespread failure or complete unavailability of CAOS Core Services. </p><p> CAOS will use continuous effort to provide a workaround or permanent solution. When Core Services are available, the severity will be lowered to the new appropriate level.</p>                                 |
+| **Severity 2**<br/> Core functionality unavailable or severely degraded | <p>Core Services of CAOS software continue to operate in severely restricted fashion, yet long-term productivity may be impacted.</p><p> When Core Services are no longer severely degraded (eg, through a viable workaround or release), the severity level will be lowered to Severity 3.</p> |
+| **Severity 3**<br/>Standard support request                             | <p>Partial and non-critical loss of CAOS software functionality or major software defect, yet a workaround exists for viable long-term operation.</p><p>CAOS will continue to work on developing permanent resolution.</p>                                                                      |
+| **Severity 4**<br/>Non-urgent request                                   | <p>Defined as follows: <ul><li>Request for information or general query</li><li>Feature request</li><li>Performance issues and little to none functional impact</li><li>Defects with workarounds and little to low functional impact</li></ul></p>                                              |
+
 <p>CAOS will continue to work on developing permanent resolution and response to general requests. CAOS does not provide a timeline or guarantee to include any feature requests.</p>
 
 ### Escalation

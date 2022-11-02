@@ -8,14 +8,16 @@ It demonstrates how to fetch some data from the ZITADEL management API.
 At the end of the guide you should have an application able to read the details of your organization.
 
 If you need any other information about the .NET SDK go to the [documentation](https://zitadel.github.io/zitadel-net/) of the SDK itself.
+
 ## Prerequisites
 
 The client [SDK](https://github.com/zitadel/zitadel-net) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API.
 All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
 
 However, we recommend you read the guide on [how to access ZITADEL API](../../guides/integrate/access-zitadel-apis) and the associated guides for a basic knowledge of :
- - [Recommended Authorization Flows](../../guides/integrate/oauth-recommended-flows.md)
- - [Service Users](../../guides/integrate/serviceusers.md)
+
+- [Recommended Authorization Flows](../../guides/integrate/oauth-recommended-flows.md)
+- [Service Users](../../guides/integrate/serviceusers.md)
 
 > Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 
@@ -103,7 +105,7 @@ You have successfully used the ZITADEL .NET SDK to call the auth API!
 To use the auth API you will not need a specific role, because only an authenticated user is needed.
 
 For accessing the admin or management API the user will need some specific roles.
-If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`), 
+If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`),
 ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
 and check the mentioned [guides](#prerequisites) at the beginning.
 

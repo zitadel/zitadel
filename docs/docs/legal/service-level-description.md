@@ -1,7 +1,7 @@
 ---
 title: Service Level
 custom_edit_url: null
---- 
+---
 
 :::note
 
@@ -55,12 +55,12 @@ This excludes specifically:
 
 **Financial Credit** means the percent of the monthly subscription fee applicable to the month in which the guaranteed service level was not met, according to the actual achieved monthly uptime percentage, as shown in the following table
 
-Achieved vs.  Guaranteed| 99.50% | 99.90% | 99.95%
---- | --- | --- | ---
-99.5% - < 99.9% | n/a | n/a | 10%
-99.0% - < 99.5% | n/a | 10% | 25%
-95.0% - < 99.0% | 10% | 25% | 50%
-< 95.0% | 50% | 50% | 50%
+| Achieved vs. Guaranteed | 99.50% | 99.90% | 99.95% |
+| ----------------------- | ------ | ------ | ------ |
+| 99.5% - < 99.9%         | n/a    | n/a    | 10%    |
+| 99.0% - < 99.5%         | n/a    | 10%    | 25%    |
+| 95.0% - < 99.0%         | 10%    | 25%    | 50%    |
+| < 95.0%                 | 50%    | 50%    | 50%    |
 
 ## Service Levels
 
@@ -68,11 +68,11 @@ Achieved vs.  Guaranteed| 99.50% | 99.90% | 99.95%
 
 1. During the term of the subscription agreement under which CAOS has agreed to provide ZITADEL Cloud to Customer, the Core Services will provide a Monthly Uptime Percentage to Customer conditional on the subscription plan as follows (the “SLO”):
 
-Option | Monthly Uptime Percentage
---- | ---
-Default | 99.50%
-Extended SLA | 99.95%
+| Option       | Monthly Uptime Percentage |
+| ------------ | ------------------------- |
+| Default      | 99.50%                    |
+| Extended SLA | 99.95%                    |
 
 1. If CAOS Ltd. does not meet the guaranteed service level, Customer might be eligible to receive Financial Credit as described in this document. Financial Credit shall be the sole and exclusive remedy for breach of this SLA.
-2. The Customer must request Financial Credit and must notify CAOS Support in writing within 30 days of becoming eligible for Financial Credit and must prove Failed Customer Requests during Downtime Periods. Financial Credit will be made in the form of a monetary credit applied to the next possible subscription invoice of ZITADEL Cloud,  may only be used to book services in the future, and will in no case be paid as a cash equivalent. No further guarantees are provided.
+2. The Customer must request Financial Credit and must notify CAOS Support in writing within 30 days of becoming eligible for Financial Credit and must prove Failed Customer Requests during Downtime Periods. Financial Credit will be made in the form of a monetary credit applied to the next possible subscription invoice of ZITADEL Cloud, may only be used to book services in the future, and will in no case be paid as a cash equivalent. No further guarantees are provided.
 3. The Service Level commitments apply only to organizations with a subscription plan where a Service Level is applicable and does not include any other organizations of the same customer. The Customer is not entitled to any Financial Credit, if it is in breach of the Agreement at the time of the occurrence of the event giving rise to the credit.

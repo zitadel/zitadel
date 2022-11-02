@@ -81,7 +81,7 @@ Once you created the IdP you need to activate it, to make it usable for your use
 
 ### Test the setup
 
-To test the setup use a incognito mode and browse to your login page. 
+To test the setup use a incognito mode and browse to your login page.
 If you succeeded you should see a new button which should redirect you to your AzureAD Tenant.
 
 ![AzureAD Button](/img/guides/azure_zitadel_button.png)

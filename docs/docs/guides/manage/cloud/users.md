@@ -7,7 +7,6 @@ For the moment all users with access to the Customer Portal will have the role "
 
 ![Create user](/img/manuals/portal/customer_portal_user_list.png)
 
-
 ## Add new user
 
 1. Go to the Users tab in the ZITADEL Customer Portal

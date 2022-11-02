@@ -24,13 +24,13 @@ Upload your logo for the chosen theme, as soon as it is uploaded the preview on 
 
 ### Colors
 
-In the next part you can configure your colors. 
-Background colour is self-explanatory, the primary color will be used for buttons, links and some highlights. 
-The warn color is used for all the error messages and warnings and the font colour for texts. 
+In the next part you can configure your colors.
+Background colour is self-explanatory, the primary color will be used for buttons, links and some highlights.
+The warn color is used for all the error messages and warnings and the font colour for texts.
 
 ### Font
 
-Last step to apply to your branding is the font upload. 
+Last step to apply to your branding is the font upload.
 The best way is to upload a ttf file after a successful upload you will see it in the font part, but not in the preview.
 
 ### Advanced Settings

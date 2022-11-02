@@ -2,7 +2,7 @@
 title: SaaS Product with Authentication and Authorization
 ---
 
-This is an example architecture for a typical SaaS product. 
+This is an example architecture for a typical SaaS product.
 To illustrate it, a fictional organization and project is used.
 
 ## Example Case
@@ -16,7 +16,7 @@ This means that the users and also their authorizations will be managed within Z
 
 ## Organization
 
-An organization is the ZITADEL resource which contains users, projects, applications, policies and so on. 
+An organization is the ZITADEL resource which contains users, projects, applications, policies and so on.
 In an organization projects and users are managed by the organization.
 You need at least one organization for your own company in our case "The Timing Company".
 As next step grate an organization for each of your costumers.

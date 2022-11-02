@@ -3,7 +3,7 @@ title: TLS Modes
 ---
 
 To allow ZITADEL to be run on any kind of infrastrucute it allows to configure on how tho handle TLS connections.
-There are three mode of operation:  `external`, `enabled`, `disabled`.
+There are three mode of operation: `external`, `enabled`, `disabled`.
 
 Generally this command is set as argument while starting ZITADEL. For example like this:
 
@@ -11,14 +11,14 @@ Generally this command is set as argument while starting ZITADEL. For example li
 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
 ```
 
-## External 
+## External
 
 The mode `external` allows you to configure ZITADEL in such a way that it will instruct its clients to use https.
 However ZITADEL delegates the management of TLS connections to a reverseproxy, web application firewall or a service mesh.
 
 ## Enabled
 
-When using the mode `enabled` ZITADEL is setup to await incoming connections in an encrypted fashion. 
+When using the mode `enabled` ZITADEL is setup to await incoming connections in an encrypted fashion.
 Wether it is from a client directly, a reverseproxy or web application firewall.
 This allows http connections to be secured at the transport level the whole way.
 
@@ -41,7 +41,7 @@ TLS:
   # Certificate for the TLS connection (CertPath will this overwrite, if specified)
   Cert: #<bas64 encoded content of a pem file>
 ```
- 
+
 ## Disabled
 
 With the mode `disabled` ZITADEL is instructed to await all connections with plain http without TLS.

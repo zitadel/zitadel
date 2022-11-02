@@ -1,20 +1,21 @@
 ---
 title: Terms and Conditions for Support Services
 custom_edit_url: null
---- 
+---
+
 ## General
 
 ### Introduction
 
 CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office located at Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers amongst other services and websites (**Services**) as well commercial support services (**Support Services**) for units of CAOS software products (**Unit**), if not otherwise defined a Unit refers to a is a single, dedicated setup of an application or service.
 
-The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by accepting a **Purchase Order** (**"PO"**) for the specified Support Services (**Booking**). Jointly you and CAOS will be referred to as **the Parties**. The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any other services. 
+The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by accepting a **Purchase Order** (**"PO"**) for the specified Support Services (**Booking**). Jointly you and CAOS will be referred to as **the Parties**. The terms of service (**"TOS"**) outlined in this document establish the most important points of this Framework Agreement – independently of the use of any other services.
 
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
-* [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
-* [**Support Service Descriptions**](support-services) - How we provide support services to you
-* [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
+- [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
+- [**Support Service Descriptions**](support-services) - How we provide support services to you
+- [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
 
 ### Alterations
 
@@ -142,9 +143,9 @@ Please contact us for current fees.
 
 Recertification of a unit, to be covered under Support Services, is required for:
 
-* units for which Support Services have been expired for more than 180 days
-* units that run a release that is older than 180 days from the products most recent stable release
-* requests for support on products and services purchased or supported from non-authorized resellers
+- units for which Support Services have been expired for more than 180 days
+- units that run a release that is older than 180 days from the products most recent stable release
+- requests for support on products and services purchased or supported from non-authorized resellers
 
 Recertification of a unit requires payment of a Recertification Fee which results in a checkup of the unit by CAOS. The unit will be inspected to asses its condition and eligibility for service coverage.
 
@@ -168,10 +169,10 @@ Any remaining credit shall automatically expire upon termination of the Framewor
 
 We are entitled to suspend and terminate services used by you if
 
-* Your credit has been used up by services and/or any applicable credit limit has been reached;
-* You are in default in the payment of open invoices and/or prompt payment seems unlikely (i.e. in the event of insolvency proceedings);
-* Your services were used illegally or in breach of contract, or if there is reasonable suspicion of such use (i.e. in the event of complaints or abuse reports);
-* We consider the suspension or termination of the services to be necessary for the protection of ourselves, our infrastructure or other customers.
+- Your credit has been used up by services and/or any applicable credit limit has been reached;
+- You are in default in the payment of open invoices and/or prompt payment seems unlikely (i.e. in the event of insolvency proceedings);
+- Your services were used illegally or in breach of contract, or if there is reasonable suspicion of such use (i.e. in the event of complaints or abuse reports);
+- We consider the suspension or termination of the services to be necessary for the protection of ourselves, our infrastructure or other customers.
 
 We reserve the right to immediately terminate the Framework Agreement in such cases.
 

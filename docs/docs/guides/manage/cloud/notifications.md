@@ -10,7 +10,6 @@ You can subscribe to different newsletters and notifications.
 2. In the menu that has opend you can see click on "Edit Notifications"
 3. You can see all the different newsletters and notifications and can now enable or disable them
 
-
 ![Create user](/img/manuals/portal/customer_portal_notifications.png)
 
 ## Notifications

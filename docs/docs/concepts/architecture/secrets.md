@@ -2,7 +2,7 @@
 title: Secrets
 ---
 
-In this chapter you can find information of how ZITADEL processes and stores secrets and credentials in a secure fashion. 
+In this chapter you can find information of how ZITADEL processes and stores secrets and credentials in a secure fashion.
 
 :::info
 We use the terms secret and credentials interchangeable to keep this guide lean.
@@ -105,4 +105,3 @@ The initial Admin User of ZITADEL can be configured through [ZITADELs config opt
 :::info
 To prevent elevated breaches ZITADEL forces the Admin Users password to be changed during the first login.
 :::
-

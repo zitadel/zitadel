@@ -2,7 +2,6 @@
 title: JWT IDP
 ---
 
-
 # JWT IDP
 
 JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as federated identity.
@@ -41,15 +40,15 @@ To further explain and illustrate how a JWT IDP works, we will assume the follow
 - the **Login UI of ZITADEL** is deployed under `accounts.test.com`
 
 The **JWT IDP Configuration** might then be:
-  - **JWT Endpoint** (Endpoint where ZITADEL will redirect to):<br/>`https://apps.test.com/existing/auth-new`
-  - **Issuer** (of the JWT):<br/>`https://issuer.test.internal`
-  - **Keys Endpoint** (where keys of the JWT Signature can be gathered):<br/>`https://issuer.test.internal/keys`
-  - **Header Name** (of the JWT, Authorization if omitted):<br/>`x-custom-tkn`
 
-Therefore, if the user is redirected from ZITADEL to the JWT Endpoint on the WAF (`https://apps.test.com/existing/auth-new`), 
+- **JWT Endpoint** (Endpoint where ZITADEL will redirect to):<br/>`https://apps.test.com/existing/auth-new`
+- **Issuer** (of the JWT):<br/>`https://issuer.test.internal`
+- **Keys Endpoint** (where keys of the JWT Signature can be gathered):<br/>`https://issuer.test.internal/keys`
+- **Header Name** (of the JWT, Authorization if omitted):<br/>`x-custom-tkn`
+
+Therefore, if the user is redirected from ZITADEL to the JWT Endpoint on the WAF (`https://apps.test.com/existing/auth-new`),
 the session cookies previously issued by the WAF, will be sent along by the browser due to the path being on the same domain as the exiting application.
 The WAF will reuse the session and send the JWT in the HTTP header `x-custom-tkn` to its upstream, the ZITADEL JWT Endpoint (`https://accounts.test.com/ui/login/login/jwt/authorize`).
 
-For the signature validation, ZITADEL must be able to connect to Keys Endpoint (`https://issuer.test.internal/keys`) 
+For the signature validation, ZITADEL must be able to connect to Keys Endpoint (`https://issuer.test.internal/keys`)
 and it will check if the token was signed (claim `iss`) by the defined Issuer (`https://issuer.test.internal`).
-

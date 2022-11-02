@@ -5,6 +5,7 @@ title: Support
 In the header you can find a button for the support.
 
 Create a new support request with the following information:
+
 - Subject
 - Message
 - Affected instance

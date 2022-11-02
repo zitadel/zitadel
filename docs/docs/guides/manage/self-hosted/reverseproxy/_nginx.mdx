@@ -12,7 +12,7 @@ http {
 
         ssl_certificate     ssl/certificate.pem;
         ssl_certificate_key ssl/key.pem;
- 
+
         location / {
             grpc_pass grpc://localhost:8080;
             grpc_set_header Host $host;
@@ -45,7 +45,7 @@ http {
 
         ssl_certificate     ssl/certificate.pem;
         ssl_certificate_key ssl/key.pem;
- 
+
         location / {
             grpc_pass grpcs://localhost:8080;
             grpc_set_header Host $host;
@@ -75,7 +75,7 @@ events {
 http {
     server {
         listen 80;
- 
+
         location / {
             grpc_pass grpc://localhost:8080;
             grpc_set_header Host $host;

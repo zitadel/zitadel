@@ -11,10 +11,10 @@ In this session you can refresh knowledge about existing and gain experience wit
 
 **Topics covered**:
 
-* Walk-through new features
-* Review of difficult support issues
-* Review of customer feedback
-* Q&A
+- Walk-through new features
+- Review of difficult support issues
+- Review of customer feedback
+- Q&A
 
 ## ZITADEL Support Onboarding
 
@@ -25,9 +25,9 @@ In this hands-on training new support staff will get an overview of the system a
 
 **Topics covered**:
 
-* Event types
-* Accessing database
-* Logs and Errors
-* Validation of tokens
-* Walk-through key features
-* Q&A
+- Event types
+- Accessing database
+- Logs and Errors
+- Validation of tokens
+- Walk-through key features
+- Q&A

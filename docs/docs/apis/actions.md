@@ -5,6 +5,7 @@ title: Actions
 This page describes the options you have when writing ZITADEL actions scripts.
 
 ## Language
+
 ZITADEL interpretes the scripts as JavaScript.
 Make sure your scripts are ECMAScript 5.1(+) compliant.
 Go to the [goja GitHub page](https://github.com/dop251/goja) for detailed reference about the underlying library features and limitations.
@@ -16,6 +17,7 @@ Also, sending HTTP requests is not supported yet.
 ## Flows
 
 Each flow type supports its own set of:
+
 - Triggers
 - Readable information
 - Writable information
@@ -29,8 +31,8 @@ The object `api` provides mutable properties and state mutating functions.
 The script of an action called **doSomething** should have a function called `doSomething` and look something like this:
 
 ```js
-function doSomething(ctx, api){
-    // read from ctx and manipulate with api
+function doSomething(ctx, api) {
+  // read from ctx and manipulate with api
 }
 ```
 
@@ -40,7 +42,7 @@ ZITADEL supports only the external authentication flow at the moment.
 ### External authentication flow triggers
 
 - Post authentication: A user has authenticated externally. ZITADEL retrieved and mapped the external information.
-- Pre creation:  A user selected **Register** on the overview page after external authentication. ZITADEL did not create the user yet.
+- Pre creation: A user selected **Register** on the overview page after external authentication. ZITADEL did not create the user yet.
 - Post creation: A user selected **Register** on the overview page after external authentication. ZITADEL created the user.
 
 ### External authentication flow context
@@ -60,7 +62,7 @@ ZITADEL supports only the external authentication flow at the moment.
 - `api.setNickName(string)`
 - `api.setDisplayName(string)`
 - `api.setPreferredLanguage(string)`
-- `api.setGender(Gender)`  
+- `api.setGender(Gender)`
 - `api.setUsername(string)`  
   This function is only available for the pre creation trigger
 - `api.setPreferredUsername(string)`  
@@ -70,22 +72,21 @@ ZITADEL supports only the external authentication flow at the moment.
 - `api.setPhone(string)`
 - `api.setPhoneVerified(bool)`
 - `api.metadata array<Metadata>`  
-  Push entries.  
+  Push entries.
 - `api.userGrants array<UserGrant>`  
   Push entries.  
   This field is only available for the post creation trigger
-
 
 ### External authentication flow types <!-- TODO: Are these types correct? -->
 
 - `Gender` is a code number
 
-| code | gender |
-| ---- | ------ |
-| 0 | unspecified |
-| 1 | female |
-| 2 | male |
-| 3 | diverse |
+| code | gender      |
+| ---- | ----------- |
+| 0    | unspecified |
+| 1    | female      |
+| 2    | male        |
+| 3    | diverse     |
 
 - `UserGrant` is a JavaScript object
 

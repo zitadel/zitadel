@@ -2,7 +2,7 @@
 title: Billing
 ---
 
-In the billing page shows your configured payment methods and the invoice 
+In the billing page shows your configured payment methods and the invoice
 
 ![Customer Portal Billing](/img/manuals/portal/customer_portal_billing.png)
 
@@ -13,10 +13,11 @@ At the moment we provide only "Credit Card" payment
 
 Once a payment method is configured, it can be selected directly in the instance creation process.
 
-## Customer 
+## Customer
 
 To be able to create correct billings we will need some customer information from you.
 This includes the following fields:
+
 - Name
 - Country
 - Email address
@@ -31,7 +32,6 @@ You will only need to add billing information if your instance is in the paid ti
 
 2. Go to the billing menu and add a new payment method. You will be able to choose the added method, when upgrading the instance to the paid tier.
 3. Add the billing information directly during the upgrade process.
-
 
 ## Invoices
 

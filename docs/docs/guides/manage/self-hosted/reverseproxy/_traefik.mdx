@@ -8,7 +8,7 @@ entrypoints:
     address: ":443"
 tls:
   stores:
-    default: 
+    default:
       defaultCertificate:
 providers:
   file:
@@ -19,7 +19,7 @@ http:
       headers:
         isDevelopment: false
         allowedHosts:
-        - 'localhost'
+          - "localhost"
     redirect-to-https:
       redirectScheme:
         scheme: https
@@ -28,18 +28,18 @@ http:
   routers:
     router0:
       entryPoints:
-      - web
+        - web
       middlewares:
-      - redirect-to-https
-      rule: 'HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)'
+        - redirect-to-https
+      rule: "HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)"
       service: zitadel
     router1:
       entryPoints:
-      - websecure
+        - websecure
       service: zitadel
       middlewares:
-      - zitadel
-      rule: 'HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)'
+        - zitadel
+      rule: "HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)"
       tls:
         domains:
           - main: "localhost"
@@ -50,7 +50,7 @@ http:
     zitadel:
       loadBalancer:
         servers:
-        - url: h2c://localhost:8080
+          - url: h2c://localhost:8080
         passHostHeader: true
 ```
 
@@ -64,7 +64,7 @@ entrypoints:
     address: ":443"
 tls:
   stores:
-    default: 
+    default:
       defaultCertificate:
 providers:
   file:
@@ -75,7 +75,7 @@ http:
       headers:
         isDevelopment: false
         allowedHosts:
-        - 'localhost'
+          - "localhost"
     redirect-to-https:
       redirectScheme:
         scheme: https
@@ -84,19 +84,19 @@ http:
   routers:
     router0:
       entryPoints:
-      - web
+        - web
       middlewares:
-      - redirect-to-https
-      rule: 'HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)'
+        - redirect-to-https
+      rule: "HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)"
       service: zitadel
     # The actual ZITADEL router
     router1:
       entryPoints:
-      - websecure
+        - websecure
       service: zitadel
       middlewares:
-      - zitadel
-      rule: 'HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)'
+        - zitadel
+      rule: "HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)"
       tls:
         domains:
           - main: "localhost"
@@ -107,7 +107,7 @@ http:
     zitadel:
       loadBalancer:
         servers:
-        - url: https://localhost:8080
+          - url: https://localhost:8080
         passHostHeader: true
 ```
 
@@ -126,19 +126,19 @@ http:
       headers:
         isDevelopment: false
         allowedHosts:
-        - 'localhost'
+          - "localhost"
   routers:
     router0:
       entryPoints:
-      - web
+        - web
       middlewares:
-      - redirect-to-https
-      rule: 'HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)'
+        - redirect-to-https
+      rule: "HostRegexp(`localhost`, `{subdomain:[a-z]+}.localhost`)"
       service: zitadel
   services:
     zitadel:
       loadBalancer:
         servers:
-        - url: h2c://localhost:8080
+          - url: h2c://localhost:8080
         passHostHeader: true
 ```

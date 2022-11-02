@@ -1,7 +1,8 @@
 ---
 title: Dedicated Instance Terms
 custom_edit_url: null
---- 
+---
+
 ## General
 
 Last revised: June 3, 2022
