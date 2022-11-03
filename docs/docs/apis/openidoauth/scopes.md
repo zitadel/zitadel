@@ -2,8 +2,7 @@
 title: Scopes
 ---
 
-ZITADEL supports the usage of scopes as way of requesting information from the
-IAM and also instruct ZITADEL to do certain operations.
+ZITADEL supports the usage of scopes as way of requesting information from the IAM and also instruct ZITADEL to do certain operations.
 
 ## Standard Scopes
 
@@ -24,8 +23,8 @@ IAM and also instruct ZITADEL to do certain operations.
 In addition to the standard compliant scopes we utilize the following scopes.
 
 | Scopes                                            | Example                                                | Description                                                                                                                                                                                                                                                           |
-| :------------------------------------------------ | :----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `urn:zitadel:iam:org:project:role:{rolekey}`      | `urn:zitadel:iam:org:project:role:user`                | By using this scope a client can request the claim urn:zitadel:iam:roles to be asserted when possible. As an alternative approach you can enable all roles to be asserted from the [project](../../guides/manage/console/roles#authorizations) a client belongs to.   |
+|:--------------------------------------------------|:-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `urn:zitadel:iam:org:project:role:{rolekey}`      | `urn:zitadel:iam:org:project:role:user`                | By using this scope a client can request the claim urn:zitadel:iam:roles to be asserted when possible. As an alternative approach you can enable all roles to be asserted from the [project](../../guides/manage/console/roles#authorizations) a client belongs to.               |
 | `urn:zitadel:iam:org:id:{id}`                     | `urn:zitadel:iam:org:id:178204173316174381`            | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed. It will assert the `urn:zitadel:iam:user:resourceowner` claims.                                |
 | `urn:zitadel:iam:org:domain:primary:{domainname}` | `urn:zitadel:iam:org:domain:primary:acme.ch`           | When requesting this scope **ZITADEL** will enforce that the user is a member of the selected organization. If the organization does not exist a failure is displayed                                                                                                 |
 | `urn:zitadel:iam:role:{rolename}`                 |                                                        |                                                                                                                                                                                                                                                                       |

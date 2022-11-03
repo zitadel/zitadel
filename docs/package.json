@@ -11,9 +11,7 @@
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids",
-    "fmt": "prettier --check docs --check '../**/*.md' --prose-wrap always",
-    "fmt:fix": "prettier --write docs --write '../**/*.md' --prose-wrap always"
+    "write-heading-ids": "docusaurus write-heading-ids"
   },
   "dependencies": {
     "@algolia/autocomplete-core": "1.5.2",
@@ -141,7 +139,6 @@
     "postcss-svgo": "5.1.0",
     "postcss-unique-selectors": "5.1.1",
     "postcss-zindex": "5.1.0",
-    "prettier": "^2.7.1",
     "prismjs": "1.28.0",
     "raw-body": "2.5.1",
     "raw-loader": "^4.0.2",

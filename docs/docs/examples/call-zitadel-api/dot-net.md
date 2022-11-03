@@ -2,32 +2,22 @@
 title: .NET
 ---
 
-This integration guide shows you how to integrate **ZITADEL** into your .NET
-application. It demonstrates how to fetch some data from the ZITADEL management
-API.
+This integration guide shows you how to integrate **ZITADEL** into your .NET application.
+It demonstrates how to fetch some data from the ZITADEL management API.
 
-At the end of the guide you should have an application able to read the details
-of your organization.
+At the end of the guide you should have an application able to read the details of your organization.
 
-If you need any other information about the .NET SDK go to the
-[documentation](https://zitadel.github.io/zitadel-net/) of the SDK itself.
-
+If you need any other information about the .NET SDK go to the [documentation](https://zitadel.github.io/zitadel-net/) of the SDK itself.
 ## Prerequisites
 
-The client [SDK](https://github.com/zitadel/zitadel-net) will handle all
-necessary OAuth 2.0 requests and send the required headers to the ZITADEL API.
-All that is required, is a service account with an Org Owner (or another role,
-depending on the needed api requests) role assigned and its key JSON.
+The client [SDK](https://github.com/zitadel/zitadel-net) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API.
+All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
 
-However, we recommend you read the guide on
-[how to access ZITADEL API](../../guides/integrate/access-zitadel-apis) and the
-associated guides for a basic knowledge of :
+However, we recommend you read the guide on [how to access ZITADEL API](../../guides/integrate/access-zitadel-apis) and the associated guides for a basic knowledge of :
+ - [Recommended Authorization Flows](../../guides/integrate/oauth-recommended-flows.md)
+ - [Service Users](../../guides/integrate/serviceusers.md)
 
-- [Recommended Authorization Flows](../../guides/integrate/oauth-recommended-flows.md)
-- [Service Users](../../guides/integrate/serviceusers.md)
-
-> Be sure to have a valid key JSON and that its service account is either
-> ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
+> Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
 
 ## .NET Setup
 
@@ -49,18 +39,12 @@ dotnet add package Zitadel.Api
 
 ### Create example client
 
-Change the program.cs file to the content below. This will create a client for
-the management api and call its `GetMyUsers` function. The SDK will make sure
-you will have access to the API by retrieving a Bearer Token using JWT Profile
-with the provided scopes (`openid` and
-`urn:zitadel:iam:org:project:id:{projectID}:aud`).
+Change the program.cs file to the content below. This will create a client for the management api and call its `GetMyUsers` function.
+The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:{projectID}:aud`).
 
-Make sure to fill the const `apiUrl`, `apiProject` and `personalAccessToken`
-with your own instance data. The used vars below are from a test instance, to
-show you how it should look. The apiURL is the domain of your instance you can
-find it on the instance detail in the Customer Portal or in the Console The
-apiProject you will find in the ZITADEL project in the first organization of
-your instance.
+Make sure to fill the const `apiUrl`, `apiProject` and `personalAccessToken` with your own instance data. The used vars below are from a test instance, to show you how it should look.
+The apiURL is the domain of your instance you can find it on the instance detail in the Customer Portal or in the Console
+The apiProject you will find in the ZITADEL project in the first organization of your instance.
 
 ```csharp
 // This file contains two examples:
@@ -101,8 +85,7 @@ Console.WriteLine($"User: {result.User}");
 
 ### Test client
 
-After you have configured everything correctly, you can simply start the example
-by:
+After you have configured everything correctly, you can simply start the example by:
 
 ```bash
 dotnet run
@@ -116,28 +99,20 @@ User: {"FirstName": "MyName", "LastName": "MyLastName" ... }
 
 ## Completion
 
-You have successfully used the ZITADEL .NET SDK to call the auth API! To use the
-auth API you will not need a specific role, because only an authenticated user
-is needed.
+You have successfully used the ZITADEL .NET SDK to call the auth API!
+To use the auth API you will not need a specific role, because only an authenticated user is needed.
 
-For accessing the admin or management API the user will need some specific
-roles. If you encountered an error (e.g.
-`code = PermissionDenied desc = No matching permissions found`), ensure your
-service user has the required permissions by assigning the `ORG_OWNER` or
-`ORG_OWNER_VIEWER` role and check the mentioned [guides](#prerequisites) at the
-beginning.
+For accessing the admin or management API the user will need some specific roles.
+If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`), 
+ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
+and check the mentioned [guides](#prerequisites) at the beginning.
 
-If you've run into any other problem, don't hesitate to contact us or raise an
-issue on [ZITADEL](https://github.com/zitadel/zitadel/issues) or in the
-[SDK](https://github.com/zitadel/zitadel-go/issues).
+If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/zitadel/zitadel/issues) or in the [SDK](https://github.com/zitadel/zitadel-go/issues).
 
 ### Whats next?
 
 Now you can proceed implementing our APIs by adding more calls.
 
-Checkout more
-[examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example)
-or refer to our [API Docs](../../apis/introduction).
+Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
 
-> This guide will be updated soon to show you how to use the SDK for your own
-> API as well.
+> This guide will be updated soon to show you how to use the SDK for your own API as well.

@@ -1,4 +1,4 @@
-# Run e2e Tests
+# Run  e2e Tests
 
 ```bash
 docker compose run e2e
@@ -9,3 +9,4 @@ docker compose run e2e
 ```bash
 docker compose down
 ```
+

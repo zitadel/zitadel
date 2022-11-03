@@ -1,19 +1,20 @@
+# ATTENTION: Although this workflow doesn't do much, it is still important.
+# It is complementary to the workflow in the file test-code.yml.
+# It enables to exclude files for the workflow and still mark the Test job as required without having pending PRs.
+# GitHub recommends this solution here:
+# https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/troubleshooting-required-status-checks#handling-skipped-but-required-checks
+
 name: ZITADEL PR
 
 on:
   pull_request:
     paths:
-      - "docs/**"
-      - "**.md"
+      - 'docs/**'
+      - 'guides/**'
+      - '**.md'
 
 jobs:
   Test:
     runs-on: ubuntu-20.04
     steps:
-      - name: Source checkout
-        uses: actions/checkout@v2
-      - name: Check formatting
-        uses: creyD/prettier_action@v4.2
-        with:
-          prettier_version: "2.7.1"
-          prettier_options: --check docs/docs --check **/*.md
+      - run: 'echo "No tests for docs are implemented, yet"'

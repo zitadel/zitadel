@@ -2,17 +2,15 @@
 title: Behavior Customization
 ---
 
-In this guide, you will create a
-[ZITADEL action](../../../concepts/features/actions). After users register using
-an external identity provider, the action assigns them a role.
+In this guide, you will create a [ZITADEL action](../../../concepts/features/actions).
+After users register using an external identity provider, the action assigns them a role.
 
 ## Prerequisites
 
 Before you start, make sure you have everything set up correctly.
 
-- You need to be at least a ZITADEL _ORG_OWNER_
-- Your ZITADEL organization needs to have the actions feature enabled.
-  <!-- TODO: How to enable it for SaaS ZITADEL? -->
+- You need to be at least a ZITADEL *ORG_OWNER*
+- Your ZITADEL organization needs to have the actions feature enabled. <!-- TODO: How to enable it for SaaS ZITADEL? -->
 - [Your ZITADEL organization needs to have at least one external identity provider enabled](../../integrate/identity-brokering)
 - [You need to have at least one role configured for a project](../console/projects)
 
@@ -26,8 +24,7 @@ Before you start, make sure you have everything set up correctly.
 ## Create the action
 
 1. Select the **Actions** navigation item.
-1. In the **Actions <i class="las la-code"></i>** section, select the **+ New**
-   button.
+1. In the **Actions <i class="las la-code"></i>** section, select the **+ New** button.
 1. Give the new action the name `addGrant`.
 1. Paste this snippet into the multiline textfield.
 1. Replace the snippets placeholders and select **Save**.
@@ -35,28 +32,25 @@ Before you start, make sure you have everything set up correctly.
 ```js
 function addGrant(ctx, api) {
   api.userGrants.push({
-    ProjectID: "<the projects resource ID you copied above>",
-    Roles: ["<the role key you copied above>"],
+    ProjectID: '<the projects resource ID you copied above>',
+    Roles: ['<the role key you copied above>']
   });
 }
 ```
 
 ## Run the action when a user registers
 
-Now, make the action hook into the
-[external authentication flow](../../../apis/actions#external-authentication-flow).
+Now, make the action hook into the [external authentication flow](../../../apis/actions#external-authentication-flow).
 
-1. In the **Flows <i class="las la-exchange-alt"></i>** section, select the **+
-   New** button.
-1. Select the **Flow Type** _External Authentication_.
-1. Select the **Trigger Type** _Post Creation_.
-1. In the **Actions** dropdown, check _addGrant_.
+1. In the **Flows <i class="las la-exchange-alt"></i>** section, select the **+ New** button.
+1. Select the **Flow Type** *External Authentication*.
+1. Select the **Trigger Type** *Post Creation*.
+1. In the **Actions** dropdown, check *addGrant*.
 1. Select the **Save** button.
 
 <!-- TODO: ## Test if your action works -->
 
-New users automatically are assiged a role now if they register by
-authenticating with an external identity provider.
+New users automatically are assiged a role now if they register by authenticating with an external identity provider.
 
 ## What's next?
 

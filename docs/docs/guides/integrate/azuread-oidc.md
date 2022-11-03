@@ -6,55 +6,52 @@ title: Connect with AzureAD through OIDC
 
 This guides shows you how to connect an AzureAD Tenant to ZITADEL.
 
-:::info In ZITADEL you can connect an Identity Provider (IdP) like an AzureAD to
-your instance and provide it as default to all organizations or you can register
-the IdP to a specific organization only. This can also be done through your
-customers in a self-service fashion. :::
+:::info
+In ZITADEL you can connect an Identity Provider (IdP) like an AzureAD to your instance and provide it as default to all organizations or you can register the IdP to a specific organization only. This can also be done through your customers in a self-service fashion.
+:::
 
 ### Prerequisite
 
-You need to have access to an AzureAD Tenant. If you do not yet have one follow
-[this guide from Microsoft](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant)
-to create one for free.
+You need to have access to an AzureAD Tenant. If you do not yet have one follow [this guide from Microsoft](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant) to create one for free.
 
 ### AzureAD Configuration
 
 #### Create a new Application
 
-Browse to the
-[App registration menus create dialog](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType~/null/isMSAApp~/false)
-to create a new app.
+Browse to the [App registration menus create dialog](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType~/null/isMSAApp~/false) to create a new app.
 
 ![Create an Application](/img/guides/azure_app_register.png)
 
-:::info Mare sure to select `web` as application type in the
-`Redirect URI (optional)` section. You can leave the second field empty since we
-will change this in the next step. :::
+:::info
+Mare sure to select `web` as application type in the `Redirect URI (optional)` section.
+You can leave the second field empty since we will change this in the next step.
+:::
 
 ![Create an Application](/img/guides/azure_app.png)
 
 #### Configure Redirect URIS
 
-For this to work you need to whitelist the redirect URIs from your ZITADEL
-Instance. In this example our test instance has the domain
-`test-qcon0h.zitadel.cloud`. In this case we need to whitelist these two
-entries:
+For this to work you need to whitelist the redirect URIs from your ZITADEL Instance.
+In this example our test instance has the domain `test-qcon0h.zitadel.cloud`. In this case we need to whitelist these two entries:
 
 - `https://test-qcon0h.zitadel.cloud/ui/login/register/externalidp/callback`
 - `https://test-qcon0h.zitadel.cloud/ui/login/login/externalidp/callback`
 
-:::info To adapt this for you setup just replace the domain :::
+:::info
+To adapt this for you setup just replace the domain
+:::
 
 ![Configure Redirect URIS](/img/guides/azure_app_redirects.png)
 
 #### Create Client Secret
 
-To allow your ZITADEL to communicate with the AzureAD you need to create a
-Secret
+To allow your ZITADEL to communicate with the AzureAD you need to create a Secret
 
 ![Create Client Secret](/img/guides/azure_app_secrets.png)
 
-:::info Please save this for the later configuration of ZITADEL :::
+:::info
+Please save this for the later configuration of ZITADEL
+:::
 
 #### Configure ID Token Claims
 
@@ -64,14 +61,10 @@ Secret
 
 #### Create IdP
 
-Use the values displayed on the AzureAD Application page in your ZITADEL IdP
-Settings.
+Use the values displayed on the AzureAD Application page in your ZITADEL IdP Settings.
 
-- You need to extract the `issuer` of your AzureAD Tenant from the OpenID
-  configuration (`OpenID Connect metadata document`) in the `Endpoints submenu`.
-  It should be your tenant's domain appended with `/v2.0`
-- The `Client ID` of ZITADEL corresponds to the `Application (client) ID` in the
-  Overview page
+- You need to extract the `issuer` of your AzureAD Tenant from the OpenID configuration (`OpenID Connect metadata document`) in the `Endpoints submenu`. It should be your tenant's domain appended with `/v2.0`
+- The `Client ID` of ZITADEL corresponds to the `Application (client) ID` in the Overview page
 - The `Client Secret` was generated during the `Create Client Secret` step
 
 ![Azure Application](/img/guides/azure_app.png)
@@ -80,8 +73,7 @@ Settings.
 
 #### Activate IdP
 
-Once you created the IdP you need to activate it, to make it usable for your
-users.
+Once you created the IdP you need to activate it, to make it usable for your users.
 
 ![Activate the AzureAD](/img/guides/azure_zitadel_activate.png)
 
@@ -89,9 +81,8 @@ users.
 
 ### Test the setup
 
-To test the setup use a incognito mode and browse to your login page. If you
-succeeded you should see a new button which should redirect you to your AzureAD
-Tenant.
+To test the setup use a incognito mode and browse to your login page. 
+If you succeeded you should see a new button which should redirect you to your AzureAD Tenant.
 
 ![AzureAD Button](/img/guides/azure_zitadel_button.png)
 

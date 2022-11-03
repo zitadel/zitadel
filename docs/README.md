@@ -2,14 +2,11 @@
 
 # Website
 
-This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern
-static website generator.
+This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern static website generator.
 
 ## Add new Sites to existing Topics
 
-To add a new site to the already existing structure simply save the `md` file
-into the corresponding folder and append the sites id int the file
-`sidebars.js`.
+To add a new site to the already existing structure simply save the `md` file into the corresponding folder and append the sites id int the file `sidebars.js`.
 
 ## Installation
 
@@ -29,14 +26,8 @@ As an alternative you can use this docker compose command:
 docker compose up
 ```
 
-These commands start a local development server. Most changes are reflected live
-without having to restart the server.
-
-## Format
-
-```console
-yarn run fmt:fix
-```
+These commands start a local development server.
+Most changes are reflected live without having to restart the server.
 
 ## Build
 
@@ -44,8 +35,7 @@ yarn run fmt:fix
 yarn build
 ```
 
-This command generates static content into the `build` directory and can be
-served using any static contents hosting service.
+This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
 ## Deployment
 

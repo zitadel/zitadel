@@ -2,43 +2,33 @@
 title: Endpoints
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## OpenID Connect 1.0 Discovery
 
-The OpenID Connect Discovery Endpoint is located within the issuer domain. This
-would give us {your_domain}/.well-known/openid-configuration.
+The OpenID Connect Discovery Endpoint is located within the issuer domain.
+ This would give us {your_domain}/.well-known/openid-configuration.
 
-**Link to spec.**
-[OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
+**Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
 ## authorization_endpoint
 
 {your_domain}/oauth/v2/authorize
 
-:::note The authorization_endpoint is located with the login page, due to the
-need of accessing the same cookie domain :::
+:::note
+The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
+:::
 
-The authorization_endpoint is the starting point for all initial user
-authentications. The user agent (browser) will be redirected to this endpoint to
-authenticate the user in exchange for an authorization_code (authorization code
-flow) or tokens (implicit flow).
+The authorization_endpoint is the starting point for all initial user authentications. The user agent (browser) will be redirected to this endpoint to
+authenticate the user in exchange for an authorization_code (authorization code flow) or tokens (implicit flow). 
 
 <details>
-  <summary>Links to specs</summary>
-  <ul>
-    <li>
-      <a href="https://datatracker.ietf.org/doc/html/rfc6749#section-3.1">
-        Section 3.1 of OAuth2.0 (RFC6749)
-      </a>
-    </li>
-    <li>
-      <a href="https://openid.net/specs/openid-connect-core-1_0.html#AuthorizationEndpoint">
-        Section 3.1.2 of OpenID Connect Core 1.0 incorporating errata set 1
-      </a>
-    </li>
-  </ul>
+    <summary>Links to specs</summary>
+    <ul>
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc6749#section-3.1">Section 3.1 of OAuth2.0 (RFC6749)</a></li>
+        <li><a href="https://openid.net/specs/openid-connect-core-1_0.html#AuthorizationEndpoint">Section 3.1.2 of OpenID Connect Core 1.0 incorporating errata set 1</a></li>
+    </ul>
 </details>
 
 ### Required request parameters
@@ -50,18 +40,15 @@ flow) or tokens (implicit flow).
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
 | scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`                      |
 
-:::important Following the
-[OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims)
-whenever an access_token is issued, the id_token will not contain any claims of
-the scopes `profile`, `email`, `phone` and `address`.
+:::important
+Following the [OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims) whenever an access_token is issued, 
+the id_token will not contain any claims of the scopes `profile`, `email`, `phone` and `address`. 
 
-Send the access_token to the [userinfo_endpoint](#userinfo_endpoint) or
-[introspection_endpoint](#introspection_endpoint) the retrieve these claims or
-set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in
-Console) to true. :::
+Send the access_token to the [userinfo_endpoint](#userinfo_endpoint) or [introspection_endpoint](#introspection_endpoint) the retrieve these claims
+or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Console) to true.
+:::
 
-Depending on your authorization method you will have to provide additional
-parameters or headers:
+Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
     groupId="token-auth-methods"
@@ -97,7 +84,7 @@ no additional parameters required
 ### Additional parameters
 
 | Parameter     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ------------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | id_token_hint | Valid `id_token` (of an existing session) used to identity the subject. **SHOULD** be provided when using prompt `none`.                                                                                                                                                                                                                                                                                                                                                                       |
 | login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`. Be sure to encode the hint correctly using url encoding (especially when using `+` or alike in the loginname)                                                                                                                                                                                                                                                                       |
 | max_age       | Seconds since the last active successful authentication of the user                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -108,8 +95,7 @@ no additional parameters required
 
 ### Successful Code Response
 
-When your `response_type` was `code` and no error occurred, the following
-response will be returned:
+When your `response_type` was `code` and no error occurred, the following response will be returned: 
 
 | Property | Description                                                                   |
 | -------- | ----------------------------------------------------------------------------- |
@@ -118,8 +104,7 @@ response will be returned:
 
 ### Successful Implicit Response
 
-When your `response_type` was either `it_token` or `id_token token` and no error
-occurred, the following response will be returned:
+When your `response_type` was either `it_token` or `id_token token` and no error occurred, the following response will be returned:
 
 | Property     | Description                                                                           |
 | ------------ | ------------------------------------------------------------------------------------- |
@@ -132,12 +117,12 @@ occurred, the following response will be returned:
 
 ### Error Response
 
-Regardless of the authorization flow chosen, if an error occurs the following
-response will be returned to the redirect_uri.
+Regardless of the authorization flow chosen, if an error occurs the following response will be returned to the redirect_uri.
 
-:::note If the redirect_uri is not provided, was not registered or anything
-other prevents the auth server form returning the response to the client, the
-error will be display directly to the user on the auth server :::
+:::note
+If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client,
+the error will be display directly to the user on the auth server
+:::
 
 | Property          | Description                                                          |
 | ----------------- | -------------------------------------------------------------------- |
@@ -159,18 +144,13 @@ error will be display directly to the user on the auth server :::
 
 {your_domain}/oauth/v2/token
 
-The token_endpoint will as the name suggests return various tokens (access, id
-and refresh) depending on the used `grant_type`. When using
-[`authorization_code`](#authorization-code-grant-code-exchange) flow call this
-endpoint after receiving the code from the authorization_endpoint. When using
-[`refresh_token`](#authorization-code-grant-code-exchange) or
-[`urn:ietf:params:oauth:grant-type:jwt-bearer` (JWT Profile)](#jwt-profile-grant)
-you will call this endpoint directly.
+The token_endpoint will as the name suggests return various tokens (access, id and refresh) depending on the used `grant_type`. 
+When using [`authorization_code`](#authorization-code-grant-code-exchange) flow call this endpoint after receiving the code from the authorization_endpoint.
+When using [`refresh_token`](#authorization-code-grant-code-exchange) or [`urn:ietf:params:oauth:grant-type:jwt-bearer` (JWT Profile)](#jwt-profile-grant) you will call this endpoint directly.
 
 ### Authorization Code Grant (Code Exchange)
 
-As mention above, when using `authorization_code` grant, this endpoint will be
-your second request for authorizing a user with its user agent (browser).
+As mention above, when using `authorization_code` grant, this endpoint will be your second request for authorizing a user with its user agent (browser).
 
 #### Required request Parameters
 
@@ -180,8 +160,7 @@ your second request for authorizing a user with its user agent (browser).
 | grant_type   | Must be `authorization_code`                                                                                  |
 | redirect_uri | Callback uri where the code was be sent to. Must match exactly the redirect_uri of the authorization request. |
 
-Depending on your authorization method you will have to provide additional
-parameters or headers:
+Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
     groupId="token-auth-methods"
@@ -195,9 +174,7 @@ parameters or headers:
 >
 <TabItem value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check
-[Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to
-build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
 </TabItem>
 <TabItem value="client_secret_post">
@@ -212,8 +189,7 @@ Send your `client_id` and `client_secret` as parameters in the body:
 </TabItem>
 <TabItem value="none">
 
-Send your `code_verifier` for us to recompute the `code_challenge` of the
-authorization request.
+Send your `code_verifier` for us to recompute the `code_challenge` of the authorization request.
 
 | Parameter     | Description                                                  |
 | ------------- | ------------------------------------------------------------ |
@@ -222,11 +198,10 @@ authorization request.
 </TabItem>
 <TabItem value="private_key_jwt">
 
-Send a client assertion as JWT for us to validate the signature against the
-registered public key.
+Send a client assertion as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                  |
-| --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| --------------------- |--------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
@@ -249,7 +224,7 @@ registered public key.
 #### Required request Parameters
 
 | Parameter  | Description                                                                                                             |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| ---------- |-------------------------------------------------------------------------------------------------------------------------|
 | grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                   |
 | assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](grant-types#using-jwts-as-authorization-grants) |
 | scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`        |
@@ -264,30 +239,28 @@ curl --request POST \
 
 #### Successful JWT Profile response {#token-jwt-response}
 
-| Property     | Description                                                                           |
-| ------------ | ------------------------------------------------------------------------------------- |
-| access_token | An `access_token` as JWT or opaque token                                              |
-| expires_in   | Number of second until the expiration of the `access_token`                           |
-| id_token     | An `id_token` of the authorized service user                                          |
-| scope        | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
-| token_type   | Type of the `access_token`. Value is always `Bearer`                                  |
+| Property      | Description                                                                           |
+| ------------- | ------------------------------------------------------------------------------------- |
+| access_token  | An `access_token` as JWT or opaque token                                              |
+| expires_in    | Number of second until the expiration of the `access_token`                           |
+| id_token      | An `id_token` of the authorized service user                                          |
+| scope         | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
+| token_type    | Type of the `access_token`. Value is always `Bearer`                                  |
 
 ### Refresh Token Grant
 
-To request a new `access_token` without user interaction, you can use the
-`refresh_token` grant. See [offline_access Scope](scopes#standard-scopes) for
-how to request a `refresh_token` in the authorization request.
+To request a new `access_token` without user interaction, you can use the `refresh_token` grant. 
+See [offline_access Scope](scopes#standard-scopes) for how to request a `refresh_token` in the authorization request.
 
 #### Required request Parameters
 
-| Parameter     | Description                                                                                                                                                                                                                                                                                                     |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| grant_type    | Must be `refresh_token`                                                                                                                                                                                                                                                                                         |
-| refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request.                                                                                                                                                                                                                    |
+| Parameter     | Description                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| grant_type    | Must be `refresh_token`                                                                      |
+| refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request. |
 | scope         | [Scopes](scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
 
-Depending on your authorization method you will have to provide additional
-parameters or headers:
+Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
     groupId="token-auth-methods"
@@ -301,9 +274,7 @@ parameters or headers:
 >
 <TabItem value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check
-[Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to
-build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
 </TabItem>
 <TabItem value="client_secret_post">
@@ -323,11 +294,10 @@ Send your `client_id` as parameter in the body. No authentication is required.
 </TabItem>
 <TabItem value="private_key_jwt">
 
-Send a `client_assertion` as JWT for us to validate the signature against the
-registered public key.
+Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                  |
-| --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| --------------------- |--------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
@@ -353,16 +323,14 @@ registered public key.
 
 {your_domain}/oauth/v2/introspect
 
-This endpoint enables clients to validate an `acccess_token`, either opaque or
-JWT. Unlike client side JWT validation, this endpoint will check if the token is
-not revoked (by client or logout).
+This endpoint enables clients to validate an `acccess_token`, either opaque or JWT. Unlike client side JWT validation,
+this endpoint will check if the token is not revoked (by client or logout).
 
 | Parameter | Description     |
 | --------- | --------------- |
 | token     | An access token |
 
-Depending on your authorization method you will have to provide additional
-parameters or headers:
+Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
     groupId="introspect-auth-methods"
@@ -374,9 +342,7 @@ parameters or headers:
 >
 <TabItem value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check
-[Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to
-build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
 
 ```BASH
 curl --request POST \
@@ -390,8 +356,7 @@ curl --request POST \
 
 <TabItem value="private_key_jwt">
 
-Send a `client_assertion` as JWT for us to validate the signature against the
-registered public key.
+Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                 |
 | --------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -412,28 +377,26 @@ curl --request POST \
 
 ### Successful introspection response {#introspect-response}
 
-Upon successful authorization of the client a response with the boolean `active`
-is returned, indicating if the provided token is active and the requesting
-client is part of the token audience.
+Upon successful authorization of the client a response with the boolean `active` is returned, indicating if the provided token 
+is active and the requesting client is part of the token audience.
 
 If `active` is **true**, further information will be provided:
 
-| Property   | Description                                                           |
-| ---------- | --------------------------------------------------------------------- |
-| aud        | The audience of the token                                             |
-| client_id  | The client_id of the application the token was issued to              |
-| exp        | Time the token expires (as unix time)                                 |
-| iat        | Time of the token was issued at (as unix time)                        |
-| iss        | Issuer of the token                                                   |
-| jti        | Unique id of the token                                                |
-| nbf        | Time the token must not be used before (as unix time)                 |
-| scope      | Space delimited list of scopes granted to the token                   |
-| token_type | Type of the inspected token. Value is always `Bearer`                 |
-| username   | ZITADEL's login name of the user. Consist of `username@primarydomain` |
+| Property   | Description                                                            |
+|------------|------------------------------------------------------------------------|
+| aud        | The audience of the token                                              |
+| client_id  | The client_id of the application the token was issued to               |
+| exp        | Time the token expires (as unix time)                                  |
+| iat        | Time of the token was issued at (as unix time)                         |
+| iss        | Issuer of the token                                                    |
+| jti        | Unique id of the token                                                 |
+| nbf        | Time the token must not be used before (as unix time)                  |
+| scope      | Space delimited list of scopes granted to the token                    |
+| token_type | Type of the inspected token. Value is always `Bearer`                  |
+| username   | ZITADEL's login name of the user.  Consist of `username@primarydomain` |
 
-Additionally and depending on the granted scopes, information about the
-authorized user is provided. Check the [Claims](claims) page if a specific
-claims might be returned and for detailed description.
+Additionally and depending on the granted scopes, information about the authorized user is provided. 
+Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
 
 ### Error response {#introspect-error-response}
 
@@ -445,9 +408,7 @@ If the authorization fails, an HTTP 401 with `invalid_client` will be returned.
 
 This endpoint will return information about the authorized user.
 
-Send the `access_token` of the **user** (not the client) as Bearer Token in the
-`authorization` header:
-
+Send the `access_token` of the **user** (not the client) as Bearer Token in the `authorization` header:
 ```BASH
 curl --request GET \
   --url {your_domain}/oidc/v1/userinfo
@@ -456,9 +417,8 @@ curl --request GET \
 
 ### Successful userinfo response {#userinfo-response}
 
-If the `access_token` is valid, the information about the user depending on the
-granted scopes is returned. Check the [Claims](claims) page if a specific claims
-might be returned and for detailed description.
+If the `access_token` is valid, the information about the user depending on the granted scopes is returned.
+Check the [Claims](claims) page if a specific claims might be returned and for detailed description.
 
 ### Error response {#userinfo-error-response}
 
@@ -468,19 +428,19 @@ If the token is invalid or expired, an HTTP 401 will be returned.
 
 {your_domain}/oauth/v2/revoke
 
-This endpoint enables clients to revoke an `access_token` or `refresh_token`
-they have been granted.
+This endpoint enables clients to revoke an `access_token` or `refresh_token` they have been granted.
 
-:::important If you revoke an `access_token` only the specific token will be
-revoked. When revoking a `refresh_token`, the corresponding `access_token` will
-be revoked as well. :::
+:::important
+If you revoke an `access_token` only the specific token will be revoked. When revoking a `refresh_token`,
+the corresponding `access_token` will be revoked as well.
+:::
+
 
 | Parameter | Description                      |
 | --------- | -------------------------------- |
 | token     | An access token or refresh token |
 
-Depending on your authorization method you will have to provide additional
-parameters or headers:
+Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
     groupId="token-auth-methods"
@@ -494,9 +454,7 @@ parameters or headers:
 >
 <TabItem value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check
-[Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to
-construct a request correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to construct a request correctly.
 
 </TabItem>
 <TabItem value="client_secret_post">
@@ -520,11 +478,10 @@ Send your `client_id` as parameters in the body:
 </TabItem>
 <TabItem value="private_key_jwt">
 
-Send a `client_assertion` as JWT for ZITADEL to verify the signature against the
-registered public key.
+Send a `client_assertion` as JWT for ZITADEL to verify the signature against the registered public key.
 
 | Parameter             | Description                                                                                                   |
-| --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| --------------------- |---------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT created and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                              |
 
@@ -544,31 +501,26 @@ curl --request POST \
 
 {your_domain}/oidc/v1/end_session
 
-The endpoint has to be opened in the user agent (browser) to terminate the user
-sessions.
+The endpoint has to be opened in the user agent (browser) to terminate the user sessions.
 
-No parameters are needed apart from the user agent cookie, but you can provide
-the following to customize the behaviour:
+No parameters are needed apart from the user agent cookie, but you can provide the following to customize the behaviour: 
 
 | Parameter                | Description                                                                                                                      |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+|--------------------------|----------------------------------------------------------------------------------------------------------------------------------|
 | id_token_hint            | the id_token that was previously issued to the client                                                                            |
 | client_id                | client_id of the application                                                                                                     |
 | post_logout_redirect_uri | Callback uri of the logout where the user (agent) will be redirected to. Must match exactly one of the preregistered in Console. |
 | state                    | Opaque value used to maintain state between the request and the callback                                                         |
 
-The `post_logout_redirect_uri` will be checked against the previously registered
-uris of the client provided by the `azp` claim of the `id_token_hint` or the
-`client_id` parameter. If both parameters are provided, they must be equal.
+The `post_logout_redirect_uri` will be checked against the previously registered uris of the client provided by the `azp` claim of the `id_token_hint` or the `client_id` parameter.
+If both parameters are provided, they must be equal.
 
 ## jwks_uri
 
 {your_domain}/oauth/v2/keys
 
-> Be aware that these keys can be rotated without any prior notice. We will
-> however make sure that a proper `kid` is set with each key!
+> Be aware that these keys can be rotated without any prior notice. We will however make sure that a proper `kid` is set with each key!
 
 ## OAuth 2.0 Metadata
 
-**ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead
-provides a [OpenID Connect Discovery Endpoint](#OpenID_Connect_1_0_Discovery).
+**ZITADEL** does not yet provide a OAuth 2.0 Metadata endpoint but instead provides a [OpenID Connect Discovery Endpoint](#OpenID_Connect_1_0_Discovery).

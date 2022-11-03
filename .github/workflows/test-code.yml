@@ -3,8 +3,9 @@ name: ZITADEL PR
 on:
   pull_request:
     paths-ignore:
-      - "docs/**"
-      - "**.md"
+      - 'docs/**'
+      - 'guides/**'
+      - '**.md'
 
 jobs:
   Test:
