@@ -361,7 +361,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 		},
 		Lang:                   lang.String(),
 		Title:                  title,
-		Description:			description,
+		Description:		description,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
