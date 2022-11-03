@@ -286,11 +286,9 @@ func (h *ProjectionHandler) hasSucceededOnce(ctx context.Context) (bool, error) 
 		}).
 		Builder(),
 	)
-	if err != nil {
-		return false, err
-	}
-	return len(events) > 0, nil
+	return len(events) > 0 && err != nil, err
 }
+
 func (h *ProjectionHandler) setSucceededOnce(ctx context.Context) error {
 	_, err := h.Eventstore.Push(ctx, &ProjectionSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(ctx,
@@ -328,7 +326,6 @@ func (h *ProjectionHandler) cancelOnErr(ctx context.Context, errs <-chan error, 
 			cancel()
 			return
 		}
-
 	}
 }
 
