@@ -344,12 +344,12 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 	translator := l.getTranslator(r.Context(), authReq)
 	
 	title := ""
-	if (titleI18nKey != "") {
+	if titleI18nKey != "" {
 		title = translator.LocalizeWithoutArgs(titleI18nKey)
 	}
 
 	description := ""
-	if (titleI18nKey != "") {
+	if descriptionI18nKey != "" {
 		description =  translator.LocalizeWithoutArgs(descriptionI18nKey)
 	}
 	
