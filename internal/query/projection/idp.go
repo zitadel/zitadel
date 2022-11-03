@@ -80,8 +80,8 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
-			crdb.WithIndex(crdb.NewIndex("idp3_ro_idx", []string{IDPResourceOwnerCol})),
-			crdb.WithConstraint(crdb.NewConstraint("idp3_id_unique", []string{IDPIDCol})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{IDPResourceOwnerCol})),
+			crdb.WithConstraint(crdb.NewConstraint("id", []string{IDPIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText),
@@ -97,7 +97,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(OIDCConfigInstanceIDCol, OIDCConfigIDPIDCol),
 			IDPOIDCSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_idp3")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(JWTConfigIDPIDCol, crdb.ColumnTypeText),
@@ -109,7 +109,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(JWTConfigInstanceIDCol, JWTConfigIDPIDCol),
 			IDPJWTSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_jwt_ref_idp3")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

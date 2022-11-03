@@ -71,8 +71,8 @@ func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
-			crdb.WithIndex(crdb.NewIndex("user_grant3_user_idx", []string{UserGrantUserID})),
-			crdb.WithIndex(crdb.NewIndex("user_grant3_ro_idx", []string{UserGrantResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("user_id", []string{UserGrantUserID})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
 		),
 	)
 

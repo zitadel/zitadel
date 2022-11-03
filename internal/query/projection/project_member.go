@@ -37,7 +37,7 @@ func newProjectMemberProjection(ctx context.Context, config crdb.StatementHandle
 				crdb.NewColumn(ProjectMemberOwnerRemovedProject, crdb.ColumnTypeBool, crdb.Default(false)),
 			),
 			crdb.NewPrimaryKey(MemberInstanceID, ProjectMemberProjectIDCol, MemberUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("proj_memb_user_idx", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
 		),
 	)
 

@@ -69,7 +69,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
 		},
 			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
-			crdb.WithConstraint(crdb.NewConstraint("key4_id_unique", []string{KeyColumnID})),
+			crdb.WithConstraint(crdb.NewConstraint("id", []string{KeyColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText),
@@ -79,7 +79,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 		},
 			crdb.NewPrimaryKey(KeyPrivateColumnInstanceID, KeyPrivateColumnID),
 			privateKeyTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_private_ref_keys4")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText),
@@ -89,7 +89,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 		},
 			crdb.NewPrimaryKey(KeyPublicColumnInstanceID, KeyPublicColumnID),
 			publicKeyTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_public_ref_keys4")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(CertificateColumnID, crdb.ColumnTypeText),
@@ -99,7 +99,7 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 		},
 			crdb.NewPrimaryKey(CertificateColumnInstanceID, CertificateColumnID),
 			certificateTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_certificate_ref_keys4")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 	)
 	p.encryptionAlgorithm = keyEncryptionAlgorithm

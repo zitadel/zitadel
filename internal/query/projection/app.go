@@ -88,8 +88,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
-			crdb.WithIndex(crdb.NewIndex("app4_project_id_idx", []string{AppColumnProjectID})),
-			crdb.WithConstraint(crdb.NewConstraint("app4_id_unique", []string{AppColumnID})),
+			crdb.WithIndex(crdb.NewIndex("project_id", []string{AppColumnProjectID})),
+			crdb.WithConstraint(crdb.NewConstraint("app_id", []string{AppColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText),
@@ -100,8 +100,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
 			appAPITableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_api_ref_apps4")),
-			crdb.WithIndex(crdb.NewIndex("api_client_id4_idx", []string{AppAPIConfigColumnClientID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("client_id", []string{AppAPIConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText),
@@ -125,8 +125,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_oidc_ref_apps4")),
-			crdb.WithIndex(crdb.NewIndex("oidc_client_id_idx3", []string{AppOIDCConfigColumnClientID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("client_id", []string{AppOIDCConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppSAMLConfigColumnAppID, crdb.ColumnTypeText),
@@ -137,8 +137,8 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppSAMLConfigColumnInstanceID, AppSAMLConfigColumnAppID),
 			appSAMLTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_saml_ref_apps3")),
-			crdb.WithIndex(crdb.NewIndex("saml_entity_id_idx3", []string{AppSAMLConfigColumnEntityID})),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			crdb.WithIndex(crdb.NewIndex("entity_id", []string{AppSAMLConfigColumnEntityID})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

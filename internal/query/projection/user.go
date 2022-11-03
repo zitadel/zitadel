@@ -92,9 +92,9 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserIDCol, UserInstanceIDCol),
-			crdb.WithIndex(crdb.NewIndex("username_idx4", []string{UserUsernameCol})),
-			crdb.WithIndex(crdb.NewIndex("user_ro_idx4", []string{UserResourceOwnerCol})),
-			crdb.WithConstraint(crdb.NewConstraint("user_id_unique4", []string{UserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("username", []string{UserUsernameCol})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{UserResourceOwnerCol})),
+			crdb.WithConstraint(crdb.NewConstraint("user_id", []string{UserIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText),
@@ -113,7 +113,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(HumanUserIDCol, HumanUserInstanceIDCol),
 			UserHumanSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_human_ref_user4")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText),
@@ -123,7 +123,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(MachineUserIDCol, MachineUserInstanceIDCol),
 			UserMachineSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user4")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(NotifyUserIDCol, crdb.ColumnTypeText),
@@ -136,7 +136,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(NotifyUserIDCol, NotifyInstanceIDCol),
 			UserNotifySuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user4")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
