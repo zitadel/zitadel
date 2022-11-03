@@ -325,7 +325,7 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	if err != nil {
 		_, msg = l.getErrorMessage(r, err)
 	}
-	data := l.getBaseData(r, authReq, "Error","", "Internal", msg)
+	data := l.getBaseData(r, authReq, "Errors.Internal","", "Internal", msg)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
