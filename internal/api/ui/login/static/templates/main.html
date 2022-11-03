@@ -10,10 +10,7 @@
     <link rel="stylesheet" href="{{ resourceThemeUrl "css/zitadel.css" .Theme }}" type="text/css">
     
     {{ if hasCustomPolicy .LabelPolicy }}
-    <link rel="stylesheet" href="{{ variablesCssFileUrl .PrivateLabelingOrgID .LabelPolicy}}" type="text/css">
-    {{ end}}
-
-    {{ if hasCustomPolicy .LabelPolicy }}
+        <link rel="stylesheet" href="{{ variablesCssFileUrl .PrivateLabelingOrgID .LabelPolicy}}" type="text/css">
         {{ $icon := customIconResource .PrivateLabelingOrgID .LabelPolicy .DarkMode }}
         {{if $icon}}
             <link rel="icon" type="image" href="{{$icon}}">
