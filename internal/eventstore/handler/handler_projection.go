@@ -286,7 +286,7 @@ func (h *ProjectionHandler) hasSucceededOnce(ctx context.Context) (bool, error) 
 		}).
 		Builder(),
 	)
-	return len(events) > 0 && err != nil, err
+	return len(events) > 0 && err == nil, err
 }
 
 func (h *ProjectionHandler) setSucceededOnce(ctx context.Context) error {
