@@ -31,8 +31,7 @@ Before you start, make sure you have everything set up correctly.
 
 
 ```js reference
-
-https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js#L1-L6
+https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js
 ```
 
 ## Run the action when a user registers
