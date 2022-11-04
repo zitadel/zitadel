@@ -100,7 +100,7 @@ To create the user with a verified email address you can add an action.
 2. Create a new action with the email verify script
 
 ```js reference
-https://github.com/zitadel/actions/blob/main/examples/verify_email.js#L1-L3
+https://github.com/zitadel/actions/blob/main/examples/verify_email.js
 ```
 
 ![img.png](../../../static/img/guides/action_email_verify.png)
