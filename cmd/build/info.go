@@ -3,7 +3,7 @@ package build
 import "time"
 
 var (
-	version  = ""
+	version  = time.Now().Format(time.RFC3339)
 	commit   = ""
 	date     = ""
 	dateTime time.Time
