@@ -109,6 +109,15 @@ https://github.com/zitadel/actions/blob/main/examples/verify_email.js
 
 ![img.png](../../../static/img/guides/action_pre_creation_email_verify.png)
 
+#### Automatically redirect to Azure AD
+
+If you like to get automatically redirected to your Azure AD login instead of showing the ZITADEL login with the Username/Password and a button "Login with AzureAD" you have to do the following steps:
+
+1. Go to the login behaviour settings of your instance or organization
+2. Disable login with username and password
+3. Make sure you have only configured AzureAD as external identity provider
+4. If you did all your settings on the organization level make sure to send the organization scope in your authorization request: [scope](../../../apis/openidoauth/scopes#reserved-scopes)
+
 ### Test the setup
 
 To test the setup use a incognito mode and browse to your login page.
