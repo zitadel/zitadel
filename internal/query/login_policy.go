@@ -175,8 +175,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 				},
 			},
 		}).
-		OrderBy(LoginPolicyColumnIsDefault.identifier()).
-		Limit(1).ToSql()
+		OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
