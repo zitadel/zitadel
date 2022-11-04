@@ -87,13 +87,11 @@ To not get this prompt if you are using the Azure AD you have to disable it.
 1. Go to the login behaviour settings of your instance or organization (depending on if you like to disable it for all or just this organization)
 2. Set "Multi-factor init lifetimes" to 0
 
-
 ![img.png](../../../static/img/guides/login_lifetimes.png)
-
 
 #### Create user with verified email
 
-Azure AD does not send the email verified claim in its token. 
+Azure AD does not send the email verified claim in its token.
 Due to that the user will get an email verification mail to verify his email address.
 
 To create the user with a verified email address you can add an action.
@@ -102,21 +100,18 @@ To create the user with a verified email address you can add an action.
 2. Create a new action with the email verify script
 
 ```js reference
-
 https://github.com/zitadel/actions/blob/main/examples/verify_email.js
 ```
 
 ![img.png](../../../static/img/guides/action_email_verify.png)
 
-
 3. Add the action "email verify" to the flow "external authentication" and to the trigger "pre creation"
 
 ![img.png](../../../static/img/guides/action_pre_creation_email_verify.png)
 
-
 ### Test the setup
 
-To test the setup use a incognito mode and browse to your login page. 
+To test the setup use a incognito mode and browse to your login page.
 If you succeeded you should see a new button which should redirect you to your AzureAD Tenant.
 
 ![AzureAD Button](/img/guides/azure_zitadel_button.png)
