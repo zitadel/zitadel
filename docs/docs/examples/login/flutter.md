@@ -2,7 +2,7 @@
 title: Flutter
 ---
 
-This guide demonstrates how you integrate **ZITADEL** into a Flutter app.
+This guide demonstrates how you integrate **ZITADEL** into a Flutter app. It refers to our example on [GitHub](https://github.com/zitadel/zitadel_flutter)
 
 At the end of the guide you have a mobile application for **Android**, **iOS** and **Web** with the ability to authenticate users via ZITADEL.
 
