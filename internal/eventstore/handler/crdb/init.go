@@ -203,7 +203,7 @@ func (h *StatementHandler) Init(ctx context.Context) error {
 			return err
 		}
 		if !next {
-			logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("skipping next check")
+			logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("projection set up")
 			break
 		}
 	}
