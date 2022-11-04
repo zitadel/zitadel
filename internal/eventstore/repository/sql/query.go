@@ -32,9 +32,6 @@ type scan func(dest ...interface{}) error
 func query(ctx context.Context, criteria querier, searchQuery *repository.SearchQuery, dest interface{}) error {
 	query, rowScanner := prepareColumns(criteria, searchQuery.Columns)
 	values := make([]interface{}, 0, len(searchQuery.Filters)+2)
-	if !searchQuery.SystemTime.IsZero() && searchQuery.Tx == nil {
-		query += " AS OF SYSTEM TIME '" + searchQuery.SystemTime.Format("2006-01-02 15:04:05.999999-07:00") + "'"
-	}
 	where, conditionValues := prepareCondition(criteria, searchQuery)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
@@ -155,6 +152,8 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	return nil
 }
 
+const sqlTimeLayout = "2006-01-02 15:04:05.999999-07:00"
+
 func prepareCondition(criteria querier, searchQuery *repository.SearchQuery) (clause string, values []interface{}) {
 	values = make([]interface{}, 0, len(searchQuery.Filters))
 
@@ -185,11 +184,16 @@ func prepareCondition(criteria querier, searchQuery *repository.SearchQuery) (cl
 		}
 		clauses[idx] = "( " + strings.Join(subClauses, " AND ") + " )"
 	}
-	// if !searchQuery.SystemTime.IsZero() && searchQuery.Tx != nil {
-	// 	clauses = append(clauses, "creation_date")
-	// 	values
-	// }
-	return " WHERE " + strings.Join(clauses, " OR "), values
+	clause = " WHERE (" + strings.Join(clauses, " OR ") + ")"
+	if !searchQuery.SystemTime.IsZero() {
+		if searchQuery.Tx == nil {
+			clause = " AS OF SYSTEM TIME '" + searchQuery.SystemTime.Format(sqlTimeLayout) + "'" + clause
+		} else {
+			clause += " AND " + criteria.columnName(repository.FieldCreationDate) + " = ?"
+			values = append(values, searchQuery.SystemTime)
+		}
+	}
+	return clause, values
 }
 
 func getCondition(cond querier, filter *repository.Filter) (condition string) {
