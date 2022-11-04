@@ -53,8 +53,8 @@ SSLRandomSeed connect builtin
     ProxyPreserveHost On
     SSLCertificateFile /certs/server.crt
     SSLCertificateKeyFile /certs/server.key
-    ProxyPass / h2c://zitadel:8080/
-    ProxyPassReverse / h2c://zitadel:8080/
+    ProxyPass / h2c://localhost:8080/
+    ProxyPassReverse / h2c://localhost:8080/
 </VirtualHost>
 ```
 
@@ -114,7 +114,7 @@ SSLRandomSeed connect builtin
     SSLProxyEngine on
     SSLCertificateFile /certs/server.crt
     SSLCertificateKeyFile /certs/server.key
-    ProxyPass / h2://zitadel:8080/
+    ProxyPass / h2://localhost:8080/
 </VirtualHost>
 ```
 
@@ -160,7 +160,7 @@ Listen 80
 <VirtualHost *:80>
     ServerName my.domain
     ProxyPreserveHost On
-    ProxyPass / h2c://zitadel:8080/
-    ProxyPassReverse / h2c://zitadel:8080/
+    ProxyPass / h2c://localhost:8080/
+    ProxyPassReverse / h2c://localhost:8080/
 </VirtualHost>
 ```

@@ -7,7 +7,7 @@ you are ready to configure ZITADEL for production usage.
 
 ## High Availability
 
-We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers, like [Kubernetes](/docs/guides/deploy/kubernetes).
+We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers, like [Kubernetes](/docs/guides/deploy/kubernetes). For keeping startup times fast when scaling ZITADEL, you should also consider using separate jobs with `zitadel init` and `zitadel setup`, so your workload containers just have to execute `zitadel start`.
 
 ## Configuration
 
