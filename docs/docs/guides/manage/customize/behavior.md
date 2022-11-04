@@ -29,13 +29,10 @@ Before you start, make sure you have everything set up correctly.
 1. Paste this snippet into the multiline textfield.
 1. Replace the snippets placeholders and select **Save**.
 
-```js
-function addGrant(ctx, api) {
-  api.userGrants.push({
-    ProjectID: '<the projects resource ID you copied above>',
-    Roles: ['<the role key you copied above>']
-  });
-}
+
+```js reference
+
+https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js#L1-L6
 ```
 
 ## Run the action when a user registers
