@@ -2,7 +2,7 @@
 title: Flutter
 ---
 
-This guide demonstrates how you integrate **ZITADEL** as an idendity provider to a Flutter app.
+This guide demonstrates how you integrate **ZITADEL** into a Flutter app.
 
 At the end of the guide you have a mobile application for **Android**, **iOS** and **Web** with the ability to authenticate users via ZITADEL.
 
@@ -14,15 +14,24 @@ Before we can start building our application, we have to do a few configuration 
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
 Select **Native** application type and continue.
 
-![Create app in console](/img/angular/app-create.png)
+![Create app in console](/img/flutter/nativeapp.png)
 
 ### Redirect URIs
 
-With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
-
+With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication.
 As our application will also support web, we have to make sure to set redirects for http and https, as well as a **custom-scheme** for our native Android and IOS Setup.
 
-For local development, add a redirectURI for `http://localhost:4444/auth.html` and your custom scheme. In our case it is `com.example.zitadelflutter`.
+For our local web development, add a redirectURI for `http://localhost:4444/auth.html` with your custom port. For Android and IOS, add your **custom scheme**. In our case it is `com.example.zitadelflutter`.
+
+:::caution Use Custom Redirect URI!
+
+Your custom scheme has to be compliant with the OAuth 2.0
+authentication for mobile devices ([RFC 8252 specification](https://tools.ietf.org/html/rfc8252)).
+Otherwise your app might get rejected.
+
+:::
+
+For development, you need to set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
 If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.
 
@@ -33,7 +42,7 @@ Make sure to save the application.
 
 ### Client ID
 
-After successful app creation, a pop-up will appear, showing the app's client ID. Copy the client ID, as you will need it to configure your Angular client.
+After successful app creation, a pop-up will appear, showing the app's client ID. Copy the client ID, as you will need it to configure your Flutter application.
 
 ## Flutter Prerequisites
 
@@ -42,24 +51,7 @@ To move further in this quickstart, you'll need the following things prepared:
 - Have Flutter (and Dart) installed ([how-to](https://flutter.dev/docs/get-started/install))
 - Have an IDE set up for developing Flutter ([how-to](https://flutter.dev/docs/get-started/editor))
 - Create a basic Flutter app ([how-to](https://flutter.dev/docs/get-started/codelab))
-- Create a "Native" application in a ZITADEL project
-
-## Flutter with ZITADEL
-
-In your native application on ZITADEL, you need to add a callback (redirect) uri
-which matches the selected custom url scheme. As an example, if you intend to
-use `ch.myexample.app://sign-me-in` as redirect URI on ZITADEL and in your app,
-you need to register the `ch.myexample.app://` custom url scheme within Android and iOS.
-
-:::caution Use Custom Redirect URI!
-
-You'll need the custom redirect url to be compliant with the OAuth 2.0
-authentication for mobile devices ([RFC 8252 specification](https://tools.ietf.org/html/rfc8252)).
-Otherwise your app might get rejected.
-
-:::
-
-### Hello World
+- Create a "Native" application in ZITADEL
 
 After you created the starter Flutter app, the app will show a simple, templated Flutter app.
 
@@ -75,7 +67,7 @@ Basically, there are two major points in this specification:
    the app must open the login page within the embedded browser view
 
 First install [http](https://pub.dev/packages/http) a library for making HTTP calls,
-then [`flutter_web_auth_2`](https://pub.dev/packages/flutter_web_auth_2) package and a secure storage to store the auth / refresh tokens [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage).
+then [`flutter_web_auth_2`](https://pub.dev/packages/flutter_web_auth_2) and a secure storage to store the auth / refresh tokens [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage).
 
 To install run:
 
@@ -87,7 +79,7 @@ flutter pub add flutter_secure_storage
 
 #### Setup for Android
 
-Navigate to your `AndroidManifest.xml` at `<projectRoot>/android/app/src/main/AndroidManifest.xml` and add the following activity with your scheme.
+Navigate to your `AndroidManifest.xml` at `<projectRoot>/android/app/src/main/AndroidManifest.xml` and add the following activity with your custom scheme.
 
 ```xml reference
 https://github.com/zitadel/zitadel_flutter/blob/main/android/app/src/main/AndroidManifest.xml#L29-L38
@@ -97,14 +89,6 @@ Furthermore, for `secure_storage`, you need to set the minimum SDK version to 18
 in `<projectRoot>/android/app/src/build.gradle`.
 
 ### Add Authentication
-
-:::note
-
-The auth redirect scheme "`ch.myexample.app`" does register all auth urls with the given
-scheme for the app. So an url pointing to `ch.myexample.app://signin` and another one
-for `ch.myexample.app://logout` will work with the same registration.
-
-:::
 
 To reduce the commented default code, we will modify the `main.dart` file.
 
@@ -148,6 +132,16 @@ then fetches the user info and stores the tokens into the secure storage.
 https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L45-L117
 ```
 
+Note that we have to use our http redirect URL for webapplications or otherwise use our custom scheme for Android and IOS devices.
+To setup other platforms, read the documentation of the [Flutter Web Auth](https://pub.dev/packages/flutter_web_auth_2).
+
+To ensure our application catches the callback URL, you have to create a `auth.html` file in the `/web`
+folder with the following content:
+
+```html reference
+https://github.com/zitadel/zitadel_flutter/blob/main/web/auth.html
+```
+
 Now, you can run your application for IOS and Android devices with
 
 ```bash
@@ -160,15 +154,17 @@ or by directly selecting your device
 flutter run -d iphone
 ```
 
-for Web make sure you run the application on a fixed port such that you can setup your redirect URI in ZITADEL console for testing.
+for Web make sure you run the application on your fixed port such that it maches your redirect URI in your ZITADEL application. We used 4444 as port before so the command would look like this:
 
 ```bash
 flutter run -d chrome --web-port=4444
 ```
 
+Our Android and IOS Application opens ZITADEL's login within a custom tab, on Web a new tab is opened.
+
 ### Result
 
-If everything works out correctly, you should see you applications like this:
+If everything works out correctly, your applications should look like this:
 
 <div style={{display: 'grid', 'grid-column-gap': '1rem', 'grid-template-columns': '1fr 1fr', 'max-width': '500px', 'margin': '0 auto'}}>
     <img src="/img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
@@ -179,5 +175,3 @@ If everything works out correctly, you should see you applications like this:
     <img src="/img/flutter/web-not-authed.png" alt="Unauthenticated" height="500px" />
     <img src="/img/flutter/web-authed.png" alt="Flutter Authenticated" height="500px" />
 </div>
-
-Now the next step is ensuring our access tokens are valid on a next startup, and refreshing it via refresh_token if its not.
