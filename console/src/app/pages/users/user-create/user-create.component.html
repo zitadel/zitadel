@@ -30,7 +30,7 @@
               required
               [ngStyle]="{ 'padding-right': suffixPadding ? suffixPadding : '10px' }"
             />
-            <span #suffix *ngIf="envSuffixLabel" cnslSuffix>{{ envSuffixLabel }}</span>
+            <span #suffix *ngIf="envSuffix" cnslSuffix>{{ envSuffix }}</span>
 
             <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
               {{ 'USER.VALIDATION.REQUIRED' | translate }}
