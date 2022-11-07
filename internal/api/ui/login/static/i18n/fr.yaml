@@ -284,7 +284,7 @@ LinkingUsersDone:
   NextButtonText: suivant
 
 ExternalNotFound:
-  Title: Utilisateur externe
+  Title: Utilisateur externe introuvable
   Description: Utilisateur externe non trouvé. Voulez-vous lier votre utilisateur ou enregistrer automatiquement un nouvel utilisateur.
   LinkButtonText: Lier
   AutoRegisterButtonText: enregistrer
