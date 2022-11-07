@@ -84,7 +84,7 @@ Once you created the IdP you need to activate it, to make it usable for your use
 If a user has no 2-factor configured, ZITADEL does ask on a regularly basis, if the user likes to add a new 2-factor for more security.
 If you don't want your users to get this prompt when using Azure, you have to disable this feature.
 
-1. Go to the login behaviour settings of your instance or organization (depending on if you like to disable it for all or just this organization)
+1. Go to the login behaviour settings of your instance or organization, depending if you like to disable it for all or just a specific organization respectively
 2. Set "Multi-factor init lifetimes" to 0
 
 ![img.png](../../../static/img/guides/login_lifetimes.png)
