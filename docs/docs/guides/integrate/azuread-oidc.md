@@ -97,7 +97,7 @@ Due to that the user will get an email verification mail to verify his email add
 To create the user with a verified email address you must add an action.
 
 1. Go to the actions of your organization
-2. Create a new action with the email verify script
+2. Create a new action with the following code to set the email to verified automatically
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/verify_email.js
