@@ -120,7 +120,7 @@ If you like to get automatically redirected to your Azure AD login instead of sh
 
 ### Test the setup
 
-To test the setup use a incognito mode and browse to your login page.
+To test the setup use incognito mode and browse to your login page.
 If you succeeded you should see a new button which should redirect you to your AzureAD Tenant.
 
 ![AzureAD Button](/img/guides/azure_zitadel_button.png)
