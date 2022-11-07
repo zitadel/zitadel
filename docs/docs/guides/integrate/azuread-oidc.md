@@ -91,7 +91,7 @@ If you don't want your users to get this prompt when using Azure, you have to di
 
 #### Create user with verified email
 
-Azure AD does not send the email verified claim in its token.
+Azure AD does not send the "email verified claim" in its token.
 Due to that the user will get an email verification mail to verify his email address.
 
 To create the user with a verified email address you can add an action.
