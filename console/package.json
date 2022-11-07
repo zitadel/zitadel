@@ -22,7 +22,7 @@
     "@angular/material-moment-adapter": "^14.2.3",
     "@angular/platform-browser": "^14.2.4",
     "@angular/platform-browser-dynamic": "^14.2.4",
-    "@angular/router": "^14.2.4",
+    "@angular/router": "^14.2.9",
     "@angular/service-worker": "^14.2.4",
     "@ctrl/ngx-codemirror": "^5.1.1",
     "@grpc/grpc-js": "^1.7.1",
