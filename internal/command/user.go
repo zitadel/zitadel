@@ -224,14 +224,6 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) prepareUserOwnerRemoved(a *user.Aggregate) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			return []eventstore.Command{user.NewUserOwnerRemovedEvent(ctx, &a.Aggregate)}, nil
-		}, nil
-	}
-}
-
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
 	if userID == "" { //do not check for empty orgID (JWT Profile requests won't provide it, so service user requests fail)
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")

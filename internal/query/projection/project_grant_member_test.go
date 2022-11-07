@@ -72,7 +72,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.project_grant_members3 (user_id, user_resource_owner, owner_removed_user, roles, creation_date, change_date, sequence, resource_owner, instance_id, owner_removed, project_id, project_resource_owner, owner_removed_project, grant_id, grant_granted_org, granted_org_removed_grant) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+							expectedStmt: "INSERT INTO projections.project_grant_members3 (user_id, user_resource_owner, user_owner_removed, roles, creation_date, change_date, sequence, resource_owner, instance_id, owner_removed, project_id, project_resource_owner, project_owner_removed, grant_id, granted_org, granted_org_removed) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
 							expectedArgs: []interface{}{
 								"user-id",
 								"org1",
@@ -323,7 +323,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.project_grant_members3 SET (change_date, sequence, owner_removed_user) = ($1, $2, $3) WHERE (user_resource_owner = $4)",
+							expectedStmt: "UPDATE projections.project_grant_members3 SET (change_date, sequence, user_owner_removed) = ($1, $2, $3) WHERE (user_resource_owner = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -332,7 +332,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.project_grant_members3 SET (change_date, sequence, owner_removed_project) = ($1, $2, $3) WHERE (project_resource_owner = $4)",
+							expectedStmt: "UPDATE projections.project_grant_members3 SET (change_date, sequence, project_owner_removed) = ($1, $2, $3) WHERE (project_resource_owner = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -341,7 +341,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.project_grant_members3 SET (change_date, sequence, granted_org_removed_grant) = ($1, $2, $3) WHERE (grant_granted_org = $4)",
+							expectedStmt: "UPDATE projections.project_grant_members3 SET (change_date, sequence, granted_org_removed) = ($1, $2, $3) WHERE (granted_org = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

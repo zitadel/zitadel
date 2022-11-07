@@ -10,7 +10,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(ProjectDeactivatedType, ProjectDeactivatedEventMapper).
 		RegisterFilterEventMapper(ProjectReactivatedType, ProjectReactivatedEventMapper).
 		RegisterFilterEventMapper(ProjectRemovedType, ProjectRemovedEventMapper).
-		RegisterFilterEventMapper(ProjectOwnerRemovedType, ProjectOwnerRemovedEventMapper).
 		RegisterFilterEventMapper(MemberAddedType, MemberAddedEventMapper).
 		RegisterFilterEventMapper(MemberChangedType, MemberChangedEventMapper).
 		RegisterFilterEventMapper(MemberRemovedType, MemberRemovedEventMapper).

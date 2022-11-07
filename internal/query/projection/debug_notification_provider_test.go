@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
 func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
@@ -206,36 +205,6 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.NotificationProviderTypeLog,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "org.reduceOwnerRemoved",
-			reduce: (&debugNotificationProviderProjection{}).reduceOwnerRemoved,
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
-			},
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.notification_providers2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (aggregate_id = $5)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								true,
-								"instance-id",
-								"agg-id",
 							},
 						},
 					},

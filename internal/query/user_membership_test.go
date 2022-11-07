@@ -42,7 +42,7 @@ var (
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
 			" FROM projections.org_members3 AS members" +
-			" WHERE members.owner_removed = $1 AND members.owner_removed_user = $2" +
+			" WHERE members.owner_removed = $1 AND members.user_owner_removed = $2" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -56,7 +56,7 @@ var (
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
 			" FROM projections.instance_members3 AS members" +
-			" WHERE members.owner_removed = $3 AND members.owner_removed_user = $4" +
+			" WHERE members.owner_removed = $3 AND members.user_owner_removed = $4" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -70,7 +70,7 @@ var (
 			", members.project_id" +
 			", NULL::TEXT AS grant_id" +
 			" FROM projections.project_members3 AS members" +
-			" WHERE members.owner_removed = $5 AND members.owner_removed_project = $6 AND members.owner_removed_user = $7" +
+			" WHERE members.owner_removed = $5 AND members.user_owner_removed = $6" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -84,7 +84,7 @@ var (
 			", members.project_id" +
 			", members.grant_id" +
 			" FROM projections.project_grant_members3 AS members" +
-			" WHERE members.owner_removed = $8 AND members.owner_removed_project = $9 AND members.owner_removed_user = $10" +
+			" WHERE members.granted_org_removed = $7 AND members.owner_removed = $8 AND members.project_owner_removed = $9 AND members.user_owner_removed = $10" +
 			") AS memberships" +
 			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
 			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +

@@ -58,16 +58,16 @@ var (
 		name:  projection.MemberOwnerRemoved,
 		table: projectGrantMemberTable,
 	}
-	ProjectGrantMemberOwnerRemovedUser = Column{
-		name:  projection.MemberOwnerRemovedUser,
+	ProjectGrantMemberUserOwnerRemoved = Column{
+		name:  projection.MemberUserOwnerRemoved,
 		table: projectGrantMemberTable,
 	}
-	ProjectGrantMemberOwnerRemovedProject = Column{
-		name:  projection.ProjectGrantMemberOwnerRemovedProject,
+	ProjectGrantMemberProjectOwnerRemoved = Column{
+		name:  projection.ProjectGrantMemberProjectOwnerRemoved,
 		table: projectGrantMemberTable,
 	}
-	ProjectGrantMemberGrantGrantedOrg = Column{
-		name:  projection.ProjectGrantMemberGrantGrantedOrgRemoved,
+	ProjectGrantMemberGrantedOrgRemoved = Column{
+		name:  projection.ProjectGrantMemberGrantedOrgRemoved,
 		table: projectGrantMemberTable,
 	}
 )
@@ -94,9 +94,9 @@ func (q *ProjectGrantMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuil
 
 func addProjectGrantMemberWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[ProjectGrantMemberOwnerRemoved.identifier()] = false
-	eq[ProjectGrantMemberOwnerRemovedUser.identifier()] = false
-	eq[ProjectGrantMemberOwnerRemovedProject.identifier()] = false
-	eq[ProjectGrantMemberGrantGrantedOrg.identifier()] = false
+	eq[ProjectGrantMemberUserOwnerRemoved.identifier()] = false
+	eq[ProjectGrantMemberProjectOwnerRemoved.identifier()] = false
+	eq[ProjectGrantMemberGrantedOrgRemoved.identifier()] = false
 }
 
 func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrantMembersQuery, withOwnerRemoved bool) (*Members, error) {

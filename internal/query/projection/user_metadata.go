@@ -47,7 +47,7 @@ func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(UserMetadataColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID, UserMetadataColumnKey),
-			crdb.WithIndex(crdb.NewIndex("usr_md4_ro_idx", []string{UserGrantResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("usr_md_ro_idx4", []string{UserGrantResourceOwner})),
 		),
 	)
 

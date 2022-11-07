@@ -67,21 +67,13 @@ var (
 		name:  projection.DebugNotificationProviderCompactCol,
 		table: notificationProviderTable,
 	}
-	NotificationProviderColumnOwnerRemoved = Column{
-		name:  projection.DebugNotificationProviderOwnerRemovedCol,
-		table: notificationProviderTable,
-	}
 )
 
 func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType, withOwnerRemoved bool) (*DebugNotificationProvider, error) {
 	query, scan := prepareDebugNotificationProviderQuery()
-	eq := sq.Eq{NotificationProviderColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[NotificationProviderColumnOwnerRemoved.identifier()] = false
-	}
 	stmt, args, err := query.Where(
 		sq.And{
-			eq,
+			sq.Eq{NotificationProviderColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			sq.Or{
 				sq.Eq{
 					NotificationProviderColumnAggID.identifier(): aggID,

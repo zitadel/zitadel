@@ -54,7 +54,7 @@ var (
 		table: instanceMemberTable,
 	}
 	InstanceMemberOwnerRemovedUser = Column{
-		name:  projection.MemberOwnerRemovedUser,
+		name:  projection.MemberUserOwnerRemoved,
 		table: instanceMemberTable,
 	}
 )

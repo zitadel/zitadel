@@ -203,7 +203,7 @@ var (
 		table: userGrantTable,
 	}
 	UserGrantGrantGrantedOrgRemoved = Column{
-		name:  projection.UserGrantGrantGrantedOrgRemoved,
+		name:  projection.UserGrantGrantedOrgRemoved,
 		table: userGrantTable,
 	}
 )

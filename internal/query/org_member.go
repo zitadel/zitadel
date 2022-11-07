@@ -54,7 +54,7 @@ var (
 		table: orgMemberTable,
 	}
 	OrgMemberOwnerRemovedUser = Column{
-		name:  projection.MemberOwnerRemovedUser,
+		name:  projection.MemberUserOwnerRemoved,
 		table: orgMemberTable,
 	}
 )

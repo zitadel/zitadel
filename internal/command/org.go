@@ -104,7 +104,7 @@ func (c *Commands) getOrg(ctx context.Context, orgID string) (*domain.Org, error
 	if err != nil {
 		return nil, err
 	}
-	if writeModel.State == domain.OrgStateUnspecified || writeModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(writeModel.State) {
 		return nil, errors.ThrowInternal(err, "COMMAND-4M9sf", "Errors.Org.NotFound")
 	}
 	return orgWriteModelToOrg(writeModel), nil
@@ -115,7 +115,7 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	if err != nil {
 		return err
 	}
-	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(orgWriteModel.State) {
 		return errors.ThrowPreconditionFailed(nil, "COMMAND-QXPGs", "Errors.Org.NotFound")
 	}
 	return nil
@@ -182,7 +182,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 	if err != nil {
 		return nil, err
 	}
-	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(orgWriteModel.State) {
 		return nil, errors.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.Name == name {
@@ -214,7 +214,7 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(orgWriteModel.State) {
 		return nil, errors.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateInactive {
@@ -237,7 +237,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(orgWriteModel.State) {
 		return nil, errors.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateActive {
@@ -282,11 +282,8 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, errors.ThrowPreconditionFailed(err, "COMMA-wG9p1", "Errors.Org.NotFound")
 			}
-			if writeModel.State == domain.OrgStateUnspecified {
+			if !isOrgStateExists(writeModel.State) {
 				return nil, errors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
-			}
-			if writeModel.State == domain.OrgStateRemoved {
-				return nil, errors.ThrowInvalidArgument(nil, "COMMA-pSAVZ", "Errors.NoChangesFound")
 			}
 			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}, nil
 		}, nil
@@ -352,4 +349,17 @@ func (c *Commands) getOrgWriteModelByID(ctx context.Context, orgID string) (*Org
 		return nil, err
 	}
 	return orgWriteModel, nil
+}
+
+func isOrgStateExists(state domain.OrgState) bool {
+	return !hasOrgState(state, domain.OrgStateRemoved, domain.OrgStateUnspecified)
+}
+
+func hasOrgState(check domain.OrgState, states ...domain.OrgState) bool {
+	for _, state := range states {
+		if check == state {
+			return true
+		}
+	}
+	return false
 }

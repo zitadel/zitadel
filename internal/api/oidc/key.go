@@ -186,7 +186,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 func (o *OPStorage) getMaxKeySequence(ctx context.Context) (uint64, error) {
 	return o.eventstore.LatestSequence(ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxSequence).
-			InstanceID(authz.GetInstance(ctx).InstanceID()).
+			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AddQuery().
 			AggregateTypes(keypair.AggregateType, instance.AggregateType).
 			Builder(),

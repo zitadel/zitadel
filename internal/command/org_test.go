@@ -1067,7 +1067,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: errors.IsNotFound,
 			},
 		},
 		{

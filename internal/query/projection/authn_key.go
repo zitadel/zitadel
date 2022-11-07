@@ -59,8 +59,8 @@ func newAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(AuthNKeyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
-			crdb.WithIndex(crdb.NewIndex("enabled_idx", []string{AuthNKeyEnabledCol})),
-			crdb.WithIndex(crdb.NewIndex("identifier_idx", []string{AuthNKeyIdentifierCol})),
+			crdb.WithIndex(crdb.NewIndex("enabled_idx2", []string{AuthNKeyEnabledCol})),
+			crdb.WithIndex(crdb.NewIndex("identifier_idx2", []string{AuthNKeyIdentifierCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
