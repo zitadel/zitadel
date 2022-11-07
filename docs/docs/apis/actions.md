@@ -104,4 +104,4 @@ ZITADEL supports only the external authentication flow at the moment.
 
 - [Actions concept](../concepts/features/actions)
 - [Actions guide](../guides/manage/customize/behavior)
-- [Actions Marketplace: Find example actions to use in your ZITADEL instance](https://github.com/zitadel/actions)
+- [Actions Marketplace: Find example actions to use in ZITADEL](https://github.com/zitadel/actions)
