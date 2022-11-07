@@ -1,16 +1,27 @@
 function CheckRegisterPwPolicy() {
-    let policyElement = document.getElementById("register-password");
-    let pwNew = policyElement.value;
-    let pwNewConfirmation = document.getElementById("register-password-confirmation").value;
+  const pwNew = document.getElementById("register-password");
+  const pwNewConfirmation = document.getElementById(
+    "register-password-confirmation"
+  );
+  const pwNewValue = pwNew.value;
+  const pwNewConfirmationValue = pwNewConfirmation.value;
 
-    if (ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) === false) {
-        policyElement.setAttribute("color", "warn");
-        return false;
-    } else {
-        policyElement.setAttribute("color", "primary");
-    }
+  if (
+    ComplexityPolicyCheck(pwNew, pwNewValue, pwNewConfirmationValue) === false
+  ) {
+    pwNew.setAttribute("color", "warn");
+    return false;
+  } else {
+    pwNew.setAttribute("color", "primary");
+  }
 
-    return pwNew == pwNewConfirmation;
+  if (pwNewValue !== pwNewConfirmationValue && pwNewConfirmationValue !== "") {
+    pwNewConfirmation.setAttribute("color", "warn");
+  } else {
+    pwNewConfirmation.setAttribute("color", "primary");
+  }
+
+  return pwNewValue == pwNewConfirmationValue;
 }
 
 let button = document.getElementById("register-button");
