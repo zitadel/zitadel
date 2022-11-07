@@ -284,7 +284,7 @@ LinkingUsersDone:
   NextButtonText: next
 
 ExternalNotFound:
-  Title: External User
+  Title: External User not found
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
   AutoRegisterButtonText: register
