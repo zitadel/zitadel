@@ -174,8 +174,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 					LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
-		}).
-		OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
+		}).OrderBy(LoginPolicyColumnIsDefault.identifier() + " DESC").ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
@@ -220,7 +219,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (*Second
 				},
 			},
 		}).
-		OrderBy(LoginPolicyColumnIsDefault.identifier()).
+		OrderBy(LoginPolicyColumnIsDefault.identifier() + " DESC").
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
@@ -270,7 +269,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (*MultiFa
 				},
 			},
 		}).
-		OrderBy(LoginPolicyColumnIsDefault.identifier()).
+		OrderBy(LoginPolicyColumnIsDefault.identifier() + " DESC").
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-B4o7h", "Errors.Query.SQLStatement")
