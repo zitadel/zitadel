@@ -1,10 +1,10 @@
 function CheckInitPwPolicy() {
-  let pwNew = document.getElementById("password");
-  let pwNewValue = pwNew.value;
+  const pwNew = document.getElementById("password");
+  const pwNewValue = pwNew.value;
   const pwNewConfirmation = document.getElementById("passwordconfirm");
-  let pwNewConfirmationValue = pwNewConfirmation.value;
+  const pwNewConfirmationValue = pwNewConfirmation.value;
 
-  if (ComplexityPolicyCheck(pwNew) === false) {
+  if (!ComplexityPolicyCheck(pwNew)) {
     return false;
   }
 
