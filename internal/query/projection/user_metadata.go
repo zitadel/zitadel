@@ -2,11 +2,15 @@ package projection
 
 import (
 	"context"
+	"database/sql"
+	errs "errors"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	v3 "github.com/zitadel/zitadel/internal/eventstore/handler/v3"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -26,11 +30,10 @@ type userMetadataProjection struct {
 	crdb.StatementHandler
 }
 
-func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userMetadataProjection {
+func newUserMetadataProjection(ctx context.Context, config v3.Config) *v3.IDProjection {
 	p := new(userMetadataProjection)
-	config.ProjectionName = UserMetadataProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
+
+	config.Check = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(UserMetadataColumnUserID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserMetadataColumnCreationDate, crdb.ColumnTypeTimestamp),
@@ -45,34 +48,32 @@ func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 		),
 	)
 
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
-}
-
-func (p *userMetadataProjection) reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  user.MetadataSetType,
-					Reduce: p.reduceMetadataSet,
-				},
-				{
-					Event:  user.MetadataRemovedType,
-					Reduce: p.reduceMetadataRemoved,
-				},
-				{
-					Event:  user.MetadataRemovedAllType,
-					Reduce: p.reduceMetadataRemovedAll,
-				},
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceMetadataRemovedAll,
-				},
+	config.Reduces = map[eventstore.AggregateType][]v3.Reducer{
+		user.AggregateType: {
+			{
+				Event:          user.MetadataSetType,
+				Reduce:         p.reduceMetadataSet,
+				PreviousEvents: p.previousEventsSet,
+			},
+			{
+				Event:          user.MetadataRemovedType,
+				Reduce:         p.reduceMetadataRemoved,
+				PreviousEvents: p.previousEventsRemoved,
+			},
+			{
+				Event:          user.MetadataRemovedAllType,
+				Reduce:         p.reduceMetadataRemovedAll,
+				PreviousEvents: p.previousEventsRemovedAll,
+			},
+			{
+				Event:          user.UserRemovedType,
+				Reduce:         p.reduceMetadataRemovedAll,
+				PreviousEvents: p.previousEventsRemovedAll,
 			},
 		},
 	}
+
+	return v3.StartSubscriptionIDProjection(ctx, UserMetadataProjectionTable, config)
 }
 
 func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
@@ -99,6 +100,37 @@ func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 	), nil
 }
 
+func (p *userMetadataProjection) previousEventsSet(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	e, ok := event.(*user.MetadataSetEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-u7mzn", "reduce.wrong.event.type %s", user.MetadataSetType)
+	}
+
+	row := tx.QueryRow("SELECT "+UserMetadataColumnChangeDate+" FROM "+UserMetadataProjectionTable+" WHERE "+UserMetadataColumnUserID+" = $1 AND "+UserMetadataColumnInstanceID+" = $2 AND "+UserMetadataColumnKey+" = $3 FOR UPDATE", e.Aggregate().ID, e.Aggregate().InstanceID, e.Key)
+
+	var changeDate time.Time
+
+	if err := row.Scan(&changeDate); err != nil && !errs.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		SetTx(tx).
+		InstanceID(e.Aggregate().InstanceID).
+		SystemTime(e.CreationDate()).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(e.Aggregate().ID).
+		EventTypes(
+			user.MetadataSetType,
+			user.MetadataRemovedType,
+			user.MetadataRemovedAllType,
+			user.UserRemovedType,
+		).
+		CreationDateAfter(changeDate).
+		Builder(), nil
+}
+
 func (p *userMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MetadataRemovedEvent)
 	if !ok {
@@ -108,9 +140,41 @@ func (p *userMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (
 		e,
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnUserID, e.Aggregate().ID),
+			handler.NewCond(UserMetadataColumnInstanceID, event.Aggregate().InstanceID),
 			handler.NewCond(UserMetadataColumnKey, e.Key),
 		},
 	), nil
+}
+
+func (p *userMetadataProjection) previousEventsRemoved(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	e, ok := event.(*user.MetadataRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-TAFtA", "reduce.wrong.event.type %s", user.MetadataRemovedType)
+	}
+
+	row := tx.QueryRow("SELECT "+UserMetadataColumnChangeDate+" FROM "+UserMetadataProjectionTable+" WHERE "+UserMetadataColumnUserID+" = $1 AND "+UserMetadataColumnInstanceID+" = $2 AND "+UserMetadataColumnKey+" = $3 FOR UPDATE", e.Aggregate().ID, e.Aggregate().InstanceID, e.Key)
+
+	var changeDate time.Time
+
+	if err := row.Scan(&changeDate); err != nil && !errs.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		SetTx(tx).
+		InstanceID(e.Aggregate().InstanceID).
+		SystemTime(e.CreationDate()).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(e.Aggregate().ID).
+		EventTypes(
+			user.MetadataSetType,
+			user.MetadataRemovedType,
+			user.MetadataRemovedAllType,
+			user.UserRemovedType,
+		).
+		CreationDateAfter(changeDate).
+		Builder(), nil
 }
 
 func (p *userMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event) (*handler.Statement, error) {
@@ -125,6 +189,12 @@ func (p *userMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnUserID, event.Aggregate().ID),
+			handler.NewCond(UserMetadataColumnInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
+}
+
+func (p *userMetadataProjection) previousEventsRemovedAll(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	_, err := tx.Exec("SELECT 1 FROM "+UserMetadataProjectionTable+" WHERE "+UserMetadataColumnUserID+" = $1 AND "+UserMetadataColumnInstanceID+" = $2 FOR UPDATE", event.Aggregate().ID, event.Aggregate().InstanceID)
+	return nil, err
 }

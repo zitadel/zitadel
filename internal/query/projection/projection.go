@@ -50,9 +50,9 @@ var (
 	ProjectMemberProjection             *projectMemberProjection
 	ProjectGrantMemberProjection        *projectGrantMemberProjection
 	AuthNKeyProjection                  *authNKeyProjection
-	PersonalAccessTokenProjection       *personalAccessTokenProjection
+	PersonalAccessTokenProjection       *v3.IDProjection
 	UserGrantProjection                 *v3.IDProjection
-	UserMetadataProjection              *userMetadataProjection
+	UserMetadataProjection              *v3.IDProjection
 	UserAuthMethodProjection            *userAuthMethodProjection
 	InstanceProjection                  *instanceProjection
 	SecretGeneratorProjection           *secretGeneratorProjection
@@ -115,9 +115,9 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	ProjectMemberProjection = newProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
 	ProjectGrantMemberProjection = newProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
 	AuthNKeyProjection = newAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
-	PersonalAccessTokenProjection = newPersonalAccessTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["personal_access_tokens"]))
+	PersonalAccessTokenProjection = newPersonalAccessTokenProjection(ctx, *v3Config)
 	UserGrantProjection = newUserGrantProjection(ctx, *v3Config)
-	UserMetadataProjection = newUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
+	UserMetadataProjection = newUserMetadataProjection(ctx, *v3Config)
 	UserAuthMethodProjection = newUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
 	InstanceProjection = newInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))
 	SecretGeneratorProjection = newSecretGeneratorProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["secret_generators"]))

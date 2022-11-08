@@ -2,12 +2,16 @@ package projection
 
 import (
 	"context"
+	"database/sql"
+	errs "errors"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	v3 "github.com/zitadel/zitadel/internal/eventstore/handler/v3"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -28,11 +32,9 @@ type personalAccessTokenProjection struct {
 	crdb.StatementHandler
 }
 
-func newPersonalAccessTokenProjection(ctx context.Context, config crdb.StatementHandlerConfig) *personalAccessTokenProjection {
+func newPersonalAccessTokenProjection(ctx context.Context, config v3.Config) *v3.IDProjection {
 	p := new(personalAccessTokenProjection)
-	config.ProjectionName = PersonalAccessTokenProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
+	config.Check = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(PersonalAccessTokenColumnID, crdb.ColumnTypeText),
 			crdb.NewColumn(PersonalAccessTokenColumnCreationDate, crdb.ColumnTypeTimestamp),
@@ -49,30 +51,26 @@ func newPersonalAccessTokenProjection(ctx context.Context, config crdb.Statement
 		),
 	)
 
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
-}
-
-func (p *personalAccessTokenProjection) reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  user.PersonalAccessTokenAddedType,
-					Reduce: p.reducePersonalAccessTokenAdded,
-				},
-				{
-					Event:  user.PersonalAccessTokenRemovedType,
-					Reduce: p.reducePersonalAccessTokenRemoved,
-				},
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserRemoved,
-				},
+	config.Reduces = map[eventstore.AggregateType][]v3.Reducer{
+		user.AggregateType: {
+			{
+				Event:  user.PersonalAccessTokenAddedType,
+				Reduce: p.reducePersonalAccessTokenAdded,
+			},
+			{
+				Event:          user.PersonalAccessTokenRemovedType,
+				Reduce:         p.reducePersonalAccessTokenRemoved,
+				PreviousEvents: p.previousEventsRemoved,
+			},
+			{
+				Event:          user.UserRemovedType,
+				Reduce:         p.reduceUserRemoved,
+				PreviousEvents: p.previousEventsUserRemoved,
 			},
 		},
 	}
+
+	return v3.StartSubscriptionIDProjection(ctx, PersonalAccessTokenProjectionTable, config)
 }
 
 func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -108,6 +106,36 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 	), nil
 }
 
+func (p *personalAccessTokenProjection) previousEventsRemoved(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	e, ok := event.(*user.PersonalAccessTokenRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Ca7Yv", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
+	}
+
+	row := tx.QueryRow("SELECT "+PersonalAccessTokenColumnChangeDate+" FROM "+PersonalAccessTokenProjectionTable+" WHERE "+PersonalAccessTokenColumnUserID+" = $1 AND "+PersonalAccessTokenColumnInstanceID+" = $2 AND "+PersonalAccessTokenColumnID+" = $3 FOR UPDATE", e.Aggregate().ID, e.Aggregate().InstanceID, e.Id)
+
+	var changeDate time.Time
+
+	if err := row.Scan(&changeDate); err != nil && !errs.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		SetTx(tx).
+		InstanceID(e.Aggregate().InstanceID).
+		SystemTime(e.CreationDate()).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(e.Aggregate().ID).
+		EventTypes(
+			user.PersonalAccessTokenAddedType,
+			user.PersonalAccessTokenRemovedType,
+			user.UserRemovedType,
+		).
+		CreationDateAfter(changeDate).
+		Builder(), nil
+}
+
 func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
@@ -119,4 +147,14 @@ func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event
 			handler.NewCond(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
 		},
 	), nil
+}
+
+func (p *personalAccessTokenProjection) previousEventsUserRemoved(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	e, ok := event.(*user.UserRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Ca7Yv", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
+	}
+
+	_, err := tx.Exec("SELECT 1 FROM "+PersonalAccessTokenProjectionTable+" WHERE "+PersonalAccessTokenColumnUserID+" = $1 AND "+PersonalAccessTokenColumnInstanceID+" = $2 FOR UPDATE", e.Aggregate().ID, e.Aggregate().InstanceID)
+	return nil, err
 }
