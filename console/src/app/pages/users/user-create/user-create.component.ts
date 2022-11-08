@@ -46,8 +46,6 @@ export class UserCreateComponent implements OnDestroy {
   public languages: string[] = ['de', 'en', 'it', 'fr'];
   public userForm!: UntypedFormGroup;
   public pwdForm!: UntypedFormGroup;
-
-  public envSuffixLabel: string = '';
   private destroyed$: Subject<void> = new Subject();
 
   public userLoginMustBeDomain: boolean = false;
@@ -84,14 +82,12 @@ export class UserCreateComponent implements OnDestroy {
         }
         this.initForm();
         this.loading = false;
-        this.envSuffixLabel = this.envSuffix();
         this.changeDetRef.detectChanges();
       })
       .catch((error) => {
         console.error(error);
         this.initForm();
         this.loading = false;
-        this.envSuffixLabel = this.envSuffix();
         this.changeDetRef.detectChanges();
       });
 
@@ -249,7 +245,8 @@ export class UserCreateComponent implements OnDestroy {
   public get confirmPassword(): AbstractControl | null {
     return this.pwdForm.get('confirmPassword');
   }
-  private envSuffix(): string {
+
+  public get envSuffix(): string {
     if (this.userLoginMustBeDomain && this.primaryDomain?.domainName) {
       return `@${this.primaryDomain.domainName}`;
     } else {

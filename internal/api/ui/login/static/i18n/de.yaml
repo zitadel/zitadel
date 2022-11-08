@@ -284,7 +284,7 @@ LinkingUsersDone:
   NextButtonText: weiter
 
 ExternalNotFound:
-  Title: Externer Benutzer
+  Title: Externer Benutzer nicht gefunden
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
   LinkButtonText: Verlinken
   AutoRegisterButtonText: registrieren

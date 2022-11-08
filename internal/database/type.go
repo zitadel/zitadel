@@ -20,7 +20,7 @@ func (s *StringArray) Scan(src any) error {
 	return nil
 }
 
-// Value implements the `database/sql/driver.Valuer`` interface.
+// Value implements the `database/sql/driver.Valuer` interface.
 func (s StringArray) Value() (driver.Value, error) {
 	if len(s) == 0 {
 		return nil, nil
@@ -57,7 +57,7 @@ func (s *EnumArray[F]) Scan(src any) error {
 	return nil
 }
 
-// Value implements the `database/sql/driver.Valuer`` interface.
+// Value implements the `database/sql/driver.Valuer` interface.
 func (s EnumArray[F]) Value() (driver.Value, error) {
 	if len(s) == 0 {
 		return nil, nil

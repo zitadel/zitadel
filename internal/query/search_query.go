@@ -89,6 +89,52 @@ func (q *orQuery) comp() sq.Sqlizer {
 	return or
 }
 
+type ColumnComparisonQuery struct {
+	Column1 Column
+	Compare ColumnComparison
+	Column2 Column
+}
+
+func NewColumnComparisonQuery(col1 Column, col2 Column, compare ColumnComparison) (*ColumnComparisonQuery, error) {
+	if compare < 0 || compare >= columnCompareMax {
+		return nil, ErrInvalidCompare
+	}
+	if col1.isZero() {
+		return nil, ErrMissingColumn
+	}
+	if col2.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &ColumnComparisonQuery{
+		Column1: col1,
+		Column2: col2,
+		Compare: compare,
+	}, nil
+}
+
+func (q *ColumnComparisonQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (s *ColumnComparisonQuery) comp() sq.Sqlizer {
+	switch s.Compare {
+	case ColumnEquals:
+		return sq.Expr(s.Column1.identifier() + " = " + s.Column2.identifier())
+	case ColumnNotEquals:
+		return sq.Expr(s.Column1.identifier() + " != " + s.Column2.identifier())
+	}
+	return nil
+}
+
+type ColumnComparison int
+
+const (
+	ColumnEquals ColumnComparison = iota
+	ColumnNotEquals
+
+	columnCompareMax
+)
+
 type TextQuery struct {
 	Column  Column
 	Text    string
@@ -96,9 +142,10 @@ type TextQuery struct {
 }
 
 var (
-	ErrInvalidCompare = errors.New("invalid compare")
-	ErrMissingColumn  = errors.New("missing column")
-	ErrInvalidNumber  = errors.New("value is no number")
+	ErrNothingSelected = errors.New("nothing selected")
+	ErrInvalidCompare  = errors.New("invalid compare")
+	ErrMissingColumn   = errors.New("missing column")
+	ErrInvalidNumber   = errors.New("value is no number")
 )
 
 func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
@@ -262,13 +309,44 @@ func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	}
 }
 
+type SubSelect struct {
+	Column  Column
+	Queries []SearchQuery
+}
+
+func NewSubSelect(c Column, queries []SearchQuery) (*SubSelect, error) {
+	if len(queries) == 0 {
+		return nil, ErrNothingSelected
+	}
+	if c.isZero() {
+		return nil, ErrMissingColumn
+	}
+
+	return &SubSelect{
+		Column:  c,
+		Queries: queries,
+	}, nil
+}
+
+func (q *SubSelect) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *SubSelect) comp() sq.Sqlizer {
+	selectQuery := sq.Select(q.Column.identifier()).From(q.Column.table.identifier())
+	for _, query := range q.Queries {
+		selectQuery = query.toQuery(selectQuery)
+	}
+	return selectQuery
+}
+
 type ListQuery struct {
 	Column  Column
-	List    []interface{}
+	Data    interface{}
 	Compare ListComparison
 }
 
-func NewListQuery(column Column, value []interface{}, compare ListComparison) (*ListQuery, error) {
+func NewListQuery(column Column, value interface{}, compare ListComparison) (*ListQuery, error) {
 	if compare < 0 || compare >= listCompareMax {
 		return nil, ErrInvalidCompare
 	}
@@ -277,7 +355,7 @@ func NewListQuery(column Column, value []interface{}, compare ListComparison) (*
 	}
 	return &ListQuery{
 		Column:  column,
-		List:    value,
+		Data:    value,
 		Compare: compare,
 	}, nil
 }
@@ -289,7 +367,14 @@ func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (s *ListQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case ListIn:
-		return sq.Eq{s.Column.identifier(): s.List}
+		if subSelect, ok := s.Data.(*SubSelect); ok {
+			subSelect, args, err := subSelect.comp().ToSql()
+			if err != nil {
+				return nil
+			}
+			return sq.Expr(s.Column.identifier()+" IN ( "+subSelect+" )", args...)
+		}
+		return sq.Eq{s.Column.identifier(): s.Data}
 	}
 	return nil
 }
@@ -426,6 +511,9 @@ func (c Column) isZero() bool {
 }
 
 func join(join, from Column) string {
+	if join.identifier() == join.table.InstanceIDIdentifier() {
+		return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier()
+	}
 	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier() + " AND " + from.table.InstanceIDIdentifier() + " = " + join.table.InstanceIDIdentifier()
 }
 
