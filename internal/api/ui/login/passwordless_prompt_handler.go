@@ -32,7 +32,7 @@ func (l *Login) renderPasswordlessPrompt(w http.ResponseWriter, r *http.Request,
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	data := &passwordlessPromptData{
-		userData: l.getUserData(r, authReq, "Passwordless Prompt", errID, errMessage),
+		userData: l.getUserData(r, authReq, "PasswordlessPrompt.Title", "PasswordlessPrompt.Description", errID, errMessage),
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)

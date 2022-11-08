@@ -105,6 +105,16 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			}
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
 		},
+		"customIconResource": func(orgID string, policy *domain.LabelPolicy, darkMode bool) string {
+			fileName := policy.IconURL
+			if darkMode && policy.IconDarkURL != "" {
+				fileName = policy.IconDarkURL
+			}
+			if fileName == "" {
+				return ""
+			}
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", policy.Default, "filename", fileName))
+		},
 		"avatarResource": func(orgID, avatar string) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v&%s=%s", EndpointDynamicResources, "orgId", orgID, "default-policy", false, "filename", avatar))
 		},
@@ -315,13 +325,13 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 	if err != nil {
 		_, msg = l.getErrorMessage(r, err)
 	}
-	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
+	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) userData {
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, title, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, titleI18nKey, descriptionI18nKey, errType, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
@@ -330,8 +340,20 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, title 
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title string, errType, errMessage string) baseData {
-	lang, _ := l.renderer.ReqLang(l.getTranslator(r.Context(), authReq), r).Base()
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) baseData {
+	translator := l.getTranslator(r.Context(), authReq)
+
+	title := ""
+	if titleI18nKey != "" {
+		title = translator.LocalizeWithoutArgs(titleI18nKey)
+	}
+
+	description := ""
+	if descriptionI18nKey != "" {
+		description = translator.LocalizeWithoutArgs(descriptionI18nKey)
+	}
+
+	lang, _ := l.renderer.ReqLang(translator, r).Base()
 	baseData := baseData{
 		errorData: errorData{
 			ErrID:      errType,
@@ -339,6 +361,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		},
 		Lang:                   lang.String(),
 		Title:                  title,
+		Description:            description,
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
@@ -567,6 +590,7 @@ type baseData struct {
 	errorData
 	Lang                   string
 	Title                  string
+	Description            string
 	Theme                  string
 	ThemeMode              string
 	DarkMode               bool
