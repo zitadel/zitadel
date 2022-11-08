@@ -1,14 +1,14 @@
-function ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) {
-  let minLength = policyElement.dataset.minlength;
-  let upperRegex = policyElement.dataset.hasUppercase;
-  let lowerRegex = policyElement.dataset.hasLowercase;
-  let numberRegex = policyElement.dataset.hasNumber;
-  let symbolRegex = policyElement.dataset.hasSymbol;
+function ComplexityPolicyCheck(passwordElement) {
+  let minLength = passwordElement.dataset.minlength;
+  let upperRegex = passwordElement.dataset.hasUppercase;
+  let lowerRegex = passwordElement.dataset.hasLowercase;
+  let numberRegex = passwordElement.dataset.hasNumber;
+  let symbolRegex = passwordElement.dataset.hasSymbol;
 
   let invalid = 0;
 
   let minlengthelem = document.getElementById("minlength");
-  if (pwNew.length >= minLength) {
+  if (passwordElement.value.length >= minLength) {
     ValidPolicy(minlengthelem);
   } else {
     InvalidPolicy(minlengthelem);
@@ -16,7 +16,7 @@ function ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) {
   }
   let upper = document.getElementById("uppercase");
   if (upperRegex !== "") {
-    if (RegExp(upperRegex).test(pwNew)) {
+    if (RegExp(upperRegex).test(passwordElement.value)) {
       ValidPolicy(upper);
     } else {
       InvalidPolicy(upper);
@@ -25,7 +25,7 @@ function ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) {
   }
   let lower = document.getElementById("lowercase");
   if (lowerRegex !== "") {
-    if (RegExp(lowerRegex).test(pwNew)) {
+    if (RegExp(lowerRegex).test(passwordElement.value)) {
       ValidPolicy(lower);
     } else {
       InvalidPolicy(lower);
@@ -34,7 +34,7 @@ function ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) {
   }
   let number = document.getElementById("number");
   if (numberRegex !== "") {
-    if (RegExp(numberRegex).test(pwNew)) {
+    if (RegExp(numberRegex).test(passwordElement.value)) {
       ValidPolicy(number);
     } else {
       InvalidPolicy(number);
@@ -43,7 +43,7 @@ function ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) {
   }
   let symbol = document.getElementById("symbol");
   if (symbolRegex !== "") {
-    if (RegExp(symbolRegex).test(pwNew)) {
+    if (RegExp(symbolRegex).test(passwordElement.value)) {
       ValidPolicy(symbol);
     } else {
       InvalidPolicy(symbol);

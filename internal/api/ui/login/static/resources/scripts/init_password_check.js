@@ -1,13 +1,14 @@
 function CheckInitPwPolicy() {
-    let policyElement = document.getElementById("password");
-    let pwNew = policyElement.value;
-    let pwNewConfirmation = document.getElementById("passwordconfirm").value;
+  let pwNew = document.getElementById("password");
+  let pwNewValue = pwNew.value;
+  const pwNewConfirmation = document.getElementById("passwordconfirm");
+  let pwNewConfirmationValue = pwNewConfirmation.value;
 
-    if (ComplexityPolicyCheck(policyElement, pwNew, pwNewConfirmation) === false) {
-        return false;
-    }
+  if (ComplexityPolicyCheck(pwNew) === false) {
+    return false;
+  }
 
-    return pwNew == pwNewConfirmation;
+  return pwNewValue == pwNewConfirmationValue;
 }
 
 let button = document.getElementById("init-button");
