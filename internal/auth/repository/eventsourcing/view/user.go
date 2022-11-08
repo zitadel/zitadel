@@ -189,6 +189,14 @@ func (v *View) DeleteInstanceUsers(event *models.Event) error {
 	return v.ProcessedUserSequence(event)
 }
 
+func (v *View) UpdateOrgOwnerRemovedUsers(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.AggregateID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedUserSequence(event)
+}
+
 func (v *View) GetLatestUserSequence(instanceID string) (*repository.CurrentSequence, error) {
 	return v.latestSequence(userTable, instanceID)
 }

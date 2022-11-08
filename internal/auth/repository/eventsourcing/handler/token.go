@@ -17,6 +17,7 @@ import (
 	project_es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/zitadel/zitadel/internal/project/repository/view"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
@@ -147,6 +148,8 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		return t.view.DeleteApplicationTokens(event, applicationsIDs...)
 	case instance.InstanceRemovedEventType:
 		return t.view.DeleteInstanceTokens(event)
+	case org.OrgRemovedEventType:
+		return t.view.DeleteOrgTokens(event)
 	default:
 		return t.view.ProcessedTokenSequence(event)
 	}

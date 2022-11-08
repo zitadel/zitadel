@@ -73,6 +73,14 @@ func (v *View) DeleteInstanceRefreshTokens(event *models.Event) error {
 	return v.ProcessedRefreshTokenSequence(event)
 }
 
+func (v *View) DeleteOrgRefreshTokens(event *models.Event) error {
+	err := usr_view.DeleteOrgRefreshTokens(v.Db, refreshTokenTable, event.ResourceOwner)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedRefreshTokenSequence(event)
+}
+
 func (v *View) GetLatestRefreshTokenSequence(instanceID string) (*repository.CurrentSequence, error) {
 	return v.latestSequence(refreshTokenTable, instanceID)
 }

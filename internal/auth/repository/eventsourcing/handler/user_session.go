@@ -156,6 +156,8 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		return u.view.DeleteUserSessions(event.AggregateID, event.InstanceID, event)
 	case instance.InstanceRemovedEventType:
 		return u.view.DeleteInstanceUserSessions(event)
+	case org.OrgRemovedEventType:
+		return u.view.DeleteOrgUserSessions(event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event)
 	}

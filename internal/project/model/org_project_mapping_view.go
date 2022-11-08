@@ -27,6 +27,7 @@ const (
 	OrgProjectMappingSearchKeyOrgID
 	OrgProjectMappingSearchKeyProjectGrantID
 	OrgProjectMappingSearchKeyInstanceID
+	OrgProjectMappingSearchKeyOwnerRemoved
 )
 
 type OrgProjectMappingViewSearchQuery struct {

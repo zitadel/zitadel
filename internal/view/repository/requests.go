@@ -109,6 +109,19 @@ func PrepareDeleteByKey(table string, key ColumnKey, id interface{}) func(db *go
 	}
 }
 
+func PrepareUpdateByKey(table string, key ColumnKey, id interface{}, column ColumnKey, value interface{}) func(db *gorm.DB) error {
+	return func(db *gorm.DB) error {
+		err := db.Table(table).
+			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
+			Update(column.ToColumnName(), value).
+			Error
+		if err != nil {
+			return caos_errs.ThrowInternal(err, "VIEW-ps099xj", "could not update object")
+		}
+		return nil
+	}
+}
+
 type Key struct {
 	Key   ColumnKey
 	Value interface{}

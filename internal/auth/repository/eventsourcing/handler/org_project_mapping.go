@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
 	view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -99,6 +100,8 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 		}
 	case instance.InstanceRemovedEventType:
 		return p.view.DeleteInstanceOrgProjectMappings(event)
+	case org.OrgRemovedEventType:
+		return p.view.UpdateOwnerRemovedOrgProjectMappings(event)
 	default:
 		return p.view.ProcessedOrgProjectMappingSequence(event)
 	}

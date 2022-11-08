@@ -64,6 +64,14 @@ func (v *View) DeleteInstanceExternalIDPs(event *models.Event) error {
 	return v.ProcessedExternalIDPSequence(event)
 }
 
+func (v *View) UpdateOrgOwnerRemovedExternalIDPs(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedExternalIDPs(v.Db, externalIDPTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedExternalIDPSequence(event)
+}
+
 func (v *View) GetLatestExternalIDPSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(externalIDPTable, instanceID)
 }

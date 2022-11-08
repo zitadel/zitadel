@@ -31,6 +31,14 @@ func (v *View) DeleteInstanceStyling(event *models.Event) error {
 	return v.ProcessedStylingSequence(event)
 }
 
+func (v *View) UpdateOrgOwnerRemovedStyling(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedStyling(v.Db, stylingTyble, event.AggregateID)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedStylingSequence(event)
+}
+
 func (v *View) GetLatestStylingSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(stylingTyble, instanceID)
 }

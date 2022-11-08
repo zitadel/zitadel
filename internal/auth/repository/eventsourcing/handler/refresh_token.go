@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
@@ -112,6 +113,8 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 		return t.view.DeleteUserRefreshTokens(event.AggregateID, event.InstanceID, event)
 	case instance.InstanceRemovedEventType:
 		return t.view.DeleteInstanceRefreshTokens(event)
+	case org.OrgRemovedEventType:
+		return t.view.DeleteOrgRefreshTokens(event)
 	default:
 		return t.view.ProcessedRefreshTokenSequence(event)
 	}

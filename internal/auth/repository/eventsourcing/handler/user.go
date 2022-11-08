@@ -227,6 +227,8 @@ func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 		return u.fillLoginNamesOnOrgUsers(event)
 	case org.OrgDomainPrimarySetEventType:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
+	case org.OrgRemovedEventType:
+		return u.view.UpdateOrgOwnerRemovedUsers(event)
 	default:
 		return u.view.ProcessedUserSequence(event)
 	}
