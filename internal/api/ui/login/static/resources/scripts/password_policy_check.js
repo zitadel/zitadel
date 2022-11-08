@@ -7,7 +7,7 @@ function ComplexityPolicyCheck(passwordElement) {
 
   let invalid = 0;
 
-  let minlengthelem = document.getElementById("minlength");
+  let minLengthElem = document.getElementById("minlength");
   if (passwordElement.value.length >= minLength) {
     ValidPolicy(minlengthelem);
   } else {
