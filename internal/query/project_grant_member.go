@@ -62,10 +62,6 @@ var (
 		name:  projection.MemberUserOwnerRemoved,
 		table: projectGrantMemberTable,
 	}
-	ProjectGrantMemberProjectOwnerRemoved = Column{
-		name:  projection.ProjectGrantMemberProjectOwnerRemoved,
-		table: projectGrantMemberTable,
-	}
 	ProjectGrantMemberGrantedOrgRemoved = Column{
 		name:  projection.ProjectGrantMemberGrantedOrgRemoved,
 		table: projectGrantMemberTable,
@@ -95,7 +91,6 @@ func (q *ProjectGrantMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuil
 func addProjectGrantMemberWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[ProjectGrantMemberOwnerRemoved.identifier()] = false
 	eq[ProjectGrantMemberUserOwnerRemoved.identifier()] = false
-	eq[ProjectGrantMemberProjectOwnerRemoved.identifier()] = false
 	eq[ProjectGrantMemberGrantedOrgRemoved.identifier()] = false
 }
 

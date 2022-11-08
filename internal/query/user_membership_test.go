@@ -84,7 +84,7 @@ var (
 			", members.project_id" +
 			", members.grant_id" +
 			" FROM projections.project_grant_members3 AS members" +
-			" WHERE members.granted_org_removed = $7 AND members.owner_removed = $8 AND members.project_owner_removed = $9 AND members.user_owner_removed = $10" +
+			" WHERE members.granted_org_removed = $7 AND members.owner_removed = $8 AND members.user_owner_removed = $9" +
 			") AS memberships" +
 			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
 			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
