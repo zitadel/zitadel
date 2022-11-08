@@ -6,7 +6,7 @@ function CheckChangePwPolicy() {
   );
   let pwNewConfirmationValue = pwNewConfirmation.value;
 
-  if (ComplexityPolicyCheck(pwNew) === false) {
+  if (!ComplexityPolicyCheck(pwNew)) {
     pwNew.setAttribute("color", "warn");
     return false;
   } else {
