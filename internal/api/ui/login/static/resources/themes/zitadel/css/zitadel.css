@@ -656,8 +656,14 @@ a.sub-formfield-link {
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;
 }
+.content-container .lgn-login-profile .lgn-names .lgn-loginname {
+  min-width: 0;
+}
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .content-container .lgn-left-action {
   position: absolute;
@@ -1624,8 +1630,14 @@ a.sub-formfield-link {
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;
 }
+.content-container .lgn-login-profile .lgn-names .lgn-loginname {
+  min-width: 0;
+}
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .content-container .lgn-left-action {
   position: absolute;
@@ -2482,8 +2494,14 @@ i {
 .content-container .lgn-login-profile .lgn-names .lgn-displayname {
   margin: 0.5rem 1rem;
 }
+.content-container .lgn-login-profile .lgn-names .lgn-loginname {
+  min-width: 0;
+}
 .content-container .lgn-login-profile .lgn-names .lgn-loginname p {
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0.5rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .content-container .lgn-left-action {
   position: absolute;
@@ -3040,7 +3058,6 @@ ul li i.lgn-valid {
 .lgn-mfa-options .mfa label input[type=radio]:hover + .mfa-img, .lgn-mfa-options .mfa label input[type=radio]:focus + .mfa-img {
   background-color: var(--zitadel-color-card-hover);
   border-color: var(--zitadel-color-input-border-hover);
-  box-shadow: 0 5px 10px #0000001f;
 }
 .lgn-mfa-options .mfa label .mfa-img {
   border: 1px solid var(--zitadel-color-input-border);
