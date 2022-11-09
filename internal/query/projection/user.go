@@ -3,12 +3,15 @@ package projection
 import (
 	"context"
 	"database/sql"
+	errs "errors"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	v3 "github.com/zitadel/zitadel/internal/eventstore/handler/v3"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -70,11 +73,9 @@ const (
 	NotifyPasswordSetCol   = "password_set"
 )
 
-func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userProjection {
+func newUserProjection(ctx context.Context, config v3.Config) *v3.IDProjection {
 	p := new(userProjection)
-	config.ProjectionName = UserTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
+	config.Check = crdb.NewMultiTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(UserIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserCreationDateCol, crdb.ColumnTypeTimestamp),
@@ -133,146 +134,169 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user")),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
-}
 
-func (p *userProjection) reducers() []handler.AggregateReducer {
-	return []handler.AggregateReducer{
-		{
-			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  user.UserV1AddedType,
-					Reduce: p.reduceHumanAdded,
-				},
-				{
-					Event:  user.HumanAddedType,
-					Reduce: p.reduceHumanAdded,
-				},
-				{
-					Event:  user.UserV1RegisteredType,
-					Reduce: p.reduceHumanRegistered,
-				},
-				{
-					Event:  user.HumanRegisteredType,
-					Reduce: p.reduceHumanRegistered,
-				},
-				{
-					Event:  user.HumanInitialCodeAddedType,
-					Reduce: p.reduceHumanInitCodeAdded,
-				},
-				{
-					Event:  user.UserV1InitialCodeAddedType,
-					Reduce: p.reduceHumanInitCodeAdded,
-				},
-				{
-					Event:  user.HumanInitializedCheckSucceededType,
-					Reduce: p.reduceHumanInitCodeSucceeded,
-				},
-				{
-					Event:  user.UserV1InitializedCheckSucceededType,
-					Reduce: p.reduceHumanInitCodeSucceeded,
-				},
-				{
-					Event:  user.UserLockedType,
-					Reduce: p.reduceUserLocked,
-				},
-				{
-					Event:  user.UserUnlockedType,
-					Reduce: p.reduceUserUnlocked,
-				},
-				{
-					Event:  user.UserDeactivatedType,
-					Reduce: p.reduceUserDeactivated,
-				},
-				{
-					Event:  user.UserReactivatedType,
-					Reduce: p.reduceUserReactivated,
-				},
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserRemoved,
-				},
-				{
-					Event:  user.UserUserNameChangedType,
-					Reduce: p.reduceUserNameChanged,
-				},
-				{
-					Event:  user.UserDomainClaimedType,
-					Reduce: p.reduceDomainClaimed,
-				},
-				{
-					Event:  user.HumanProfileChangedType,
-					Reduce: p.reduceHumanProfileChanged,
-				},
-				{
-					Event:  user.UserV1ProfileChangedType,
-					Reduce: p.reduceHumanProfileChanged,
-				},
-				{
-					Event:  user.HumanPhoneChangedType,
-					Reduce: p.reduceHumanPhoneChanged,
-				},
-				{
-					Event:  user.UserV1PhoneChangedType,
-					Reduce: p.reduceHumanPhoneChanged,
-				},
-				{
-					Event:  user.HumanPhoneRemovedType,
-					Reduce: p.reduceHumanPhoneRemoved,
-				},
-				{
-					Event:  user.UserV1PhoneRemovedType,
-					Reduce: p.reduceHumanPhoneRemoved,
-				},
-				{
-					Event:  user.HumanPhoneVerifiedType,
-					Reduce: p.reduceHumanPhoneVerified,
-				},
-				{
-					Event:  user.UserV1PhoneVerifiedType,
-					Reduce: p.reduceHumanPhoneVerified,
-				},
-				{
-					Event:  user.HumanEmailChangedType,
-					Reduce: p.reduceHumanEmailChanged,
-				},
-				{
-					Event:  user.UserV1EmailChangedType,
-					Reduce: p.reduceHumanEmailChanged,
-				},
-				{
-					Event:  user.HumanEmailVerifiedType,
-					Reduce: p.reduceHumanEmailVerified,
-				},
-				{
-					Event:  user.UserV1EmailVerifiedType,
-					Reduce: p.reduceHumanEmailVerified,
-				},
-				{
-					Event:  user.HumanAvatarAddedType,
-					Reduce: p.reduceHumanAvatarAdded,
-				},
-				{
-					Event:  user.HumanAvatarRemovedType,
-					Reduce: p.reduceHumanAvatarRemoved,
-				},
-				{
-					Event:  user.MachineAddedEventType,
-					Reduce: p.reduceMachineAdded,
-				},
-				{
-					Event:  user.MachineChangedEventType,
-					Reduce: p.reduceMachineChanged,
-				},
-				{
-					Event:  user.HumanPasswordChangedType,
-					Reduce: p.reduceHumanPasswordChanged,
-				},
+	config.Reduces = map[eventstore.AggregateType][]v3.Reducer{
+		user.AggregateType: {
+			{
+				Event:  user.UserV1AddedType,
+				Reduce: p.reduceHumanAdded,
+			},
+			{
+				Event:  user.HumanAddedType,
+				Reduce: p.reduceHumanAdded,
+			},
+			{
+				Event:  user.UserV1RegisteredType,
+				Reduce: p.reduceHumanRegistered,
+			},
+			{
+				Event:  user.HumanRegisteredType,
+				Reduce: p.reduceHumanRegistered,
+			},
+			{
+				Event:          user.HumanInitialCodeAddedType,
+				Reduce:         p.reduceHumanInitCodeAdded,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserV1InitialCodeAddedType,
+				Reduce:         p.reduceHumanInitCodeAdded,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanInitializedCheckSucceededType,
+				Reduce:         p.reduceHumanInitCodeSucceeded,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserV1InitializedCheckSucceededType,
+				Reduce:         p.reduceHumanInitCodeSucceeded,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserLockedType,
+				Reduce:         p.reduceUserLocked,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserUnlockedType,
+				Reduce:         p.reduceUserUnlocked,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserDeactivatedType,
+				Reduce:         p.reduceUserDeactivated,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserReactivatedType,
+				Reduce:         p.reduceUserReactivated,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserRemovedType,
+				Reduce:         p.reduceUserRemoved,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserUserNameChangedType,
+				Reduce:         p.reduceUserNameChanged,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserDomainClaimedType,
+				Reduce:         p.reduceDomainClaimed,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanProfileChangedType,
+				Reduce:         p.reduceHumanProfileChanged,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserV1ProfileChangedType,
+				Reduce:         p.reduceHumanProfileChanged,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanPhoneChangedType,
+				Reduce:         p.reduceHumanPhoneChanged,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserV1PhoneChangedType,
+				Reduce:         p.reduceHumanPhoneChanged,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanPhoneRemovedType,
+				Reduce:         p.reduceHumanPhoneRemoved,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserV1PhoneRemovedType,
+				Reduce:         p.reduceHumanPhoneRemoved,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanPhoneVerifiedType,
+				Reduce:         p.reduceHumanPhoneVerified,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserV1PhoneVerifiedType,
+				Reduce:         p.reduceHumanPhoneVerified,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanEmailChangedType,
+				Reduce:         p.reduceHumanEmailChanged,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserV1EmailChangedType,
+				Reduce:         p.reduceHumanEmailChanged,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanEmailVerifiedType,
+				Reduce:         p.reduceHumanEmailVerified,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.UserV1EmailVerifiedType,
+				Reduce:         p.reduceHumanEmailVerified,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanAvatarAddedType,
+				Reduce:         p.reduceHumanAvatarAdded,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanAvatarRemovedType,
+				Reduce:         p.reduceHumanAvatarRemoved,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.MachineAddedEventType,
+				Reduce:         p.reduceMachineAdded,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.MachineChangedEventType,
+				Reduce:         p.reduceMachineChanged,
+				PreviousEvents: p.previousEvents,
+			},
+			{
+				Event:          user.HumanPasswordChangedType,
+				Reduce:         p.reduceHumanPasswordChanged,
+				PreviousEvents: p.previousEvents,
 			},
 		},
 	}
+
+	return v3.StartSubscriptionIDProjection(ctx, UserTable, config)
 }
 
 func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -958,4 +982,58 @@ func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 			crdb.WithTableSuffix(UserMachineSuffix),
 		),
 	), nil
+}
+
+func (p *userProjection) previousEvents(tx *sql.Tx, event eventstore.Event) (*eventstore.SearchQueryBuilder, error) {
+	row := tx.QueryRow("SELECT "+UserChangeDateCol+" FROM "+UserTable+" WHERE "+UserIDCol+" = $1 AND "+UserInstanceIDCol+" = $2 FOR UPDATE", event.Aggregate().ID, event.Aggregate().InstanceID)
+
+	var changeDate time.Time
+
+	if err := row.Scan(&changeDate); err != nil && !errs.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		SetTx(tx).
+		InstanceID(event.Aggregate().InstanceID).
+		SystemTime(event.CreationDate()).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(event.Aggregate().ID).
+		EventTypes(
+			user.UserV1AddedType,
+			user.HumanAddedType,
+			user.UserV1RegisteredType,
+			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
+			user.UserV1InitialCodeAddedType,
+			user.HumanInitializedCheckSucceededType,
+			user.UserV1InitializedCheckSucceededType,
+			user.UserLockedType,
+			user.UserUnlockedType,
+			user.UserDeactivatedType,
+			user.UserReactivatedType,
+			user.UserRemovedType,
+			user.UserUserNameChangedType,
+			user.UserDomainClaimedType,
+			user.HumanProfileChangedType,
+			user.UserV1ProfileChangedType,
+			user.HumanPhoneChangedType,
+			user.UserV1PhoneChangedType,
+			user.HumanPhoneRemovedType,
+			user.UserV1PhoneRemovedType,
+			user.HumanPhoneVerifiedType,
+			user.UserV1PhoneVerifiedType,
+			user.HumanEmailChangedType,
+			user.UserV1EmailChangedType,
+			user.HumanEmailVerifiedType,
+			user.UserV1EmailVerifiedType,
+			user.HumanAvatarAddedType,
+			user.HumanAvatarRemovedType,
+			user.MachineAddedEventType,
+			user.MachineChangedEventType,
+			user.HumanPasswordChangedType,
+		).
+		CreationDateAfter(changeDate).
+		Builder(), nil
 }

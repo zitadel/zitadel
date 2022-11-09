@@ -42,7 +42,7 @@ var (
 	MailTemplateProjection              *mailTemplateProjection
 	MessageTextProjection               *messageTextProjection
 	CustomTextProjection                *customTextProjection
-	UserProjection                      *userProjection
+	UserProjection                      *v3.IDProjection
 	LoginNameProjection                 *loginNameProjection
 	OrgMemberProjection                 *orgMemberProjection
 	InstanceDomainProjection            *instanceDomainProjection
@@ -107,7 +107,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	MailTemplateProjection = newMailTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["mail_templates"]))
 	MessageTextProjection = newMessageTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["message_texts"]))
 	CustomTextProjection = newCustomTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["custom_texts"]))
-	UserProjection = newUserProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["users"]))
+	UserProjection = newUserProjection(ctx, *v3Config)
 	LoginNameProjection = newLoginNameProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_names"]))
 	OrgMemberProjection = newOrgMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_members"]))
 	InstanceDomainProjection = newInstanceDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains"]))
