@@ -122,7 +122,8 @@ func prepareDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Domains, error))
 
 var (
 	orgDomainsTable = table{
-		name: projection.OrgDomainTable,
+		name:          projection.OrgDomainTable,
+		instanceIDCol: projection.OrgDomainInstanceIDCol,
 	}
 
 	OrgDomainCreationDateCol = Column{

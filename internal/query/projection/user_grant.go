@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	v3 "github.com/zitadel/zitadel/internal/eventstore/handler/v3"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -124,6 +125,12 @@ func newUserGrantProjection(ctx context.Context, config v3.Config) *v3.IDProject
 				Event:          project.GrantCascadeChangedType,
 				Reduce:         p.reduceProjectGrantChanged,
 				PreviousEvents: p.previousEventsProject,
+			},
+		},
+		instance.AggregateType: {
+			{
+				Event:  instance.InstanceRemovedEventType,
+				Reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),
 			},
 		},
 	}

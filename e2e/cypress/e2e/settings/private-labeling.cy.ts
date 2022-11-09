@@ -1,4 +1,4 @@
-import { apiAuth, apiCallProperties } from '../../support/api/apiauth';
+import { apiAuth, API } from '../../support/api/apiauth';
 import { Policy, resetPolicy } from '../../support/api/policies';
 import { login, User } from '../../support/login/users';
 
@@ -7,7 +7,7 @@ describe('private labeling', () => {
 
   [User.OrgOwner].forEach((user) => {
     describe(`as user "${user}"`, () => {
-      let api: apiCallProperties;
+      let api: API;
 
       beforeEach(() => {
         login(user);

@@ -21,7 +21,8 @@ const (
 
 var (
 	instanceTable = table{
-		name: projection.InstanceProjectionTable,
+		name:          projection.InstanceProjectionTable,
+		instanceIDCol: projection.InstanceColumnID,
 	}
 	InstanceColumnID = Column{
 		name:  projection.InstanceColumnID,

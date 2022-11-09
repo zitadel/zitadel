@@ -72,6 +72,10 @@ func (p *smtpConfigProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.SMTPConfigPasswordChangedEventType,
 					Reduce: p.reduceSMTPConfigPasswordChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(SMTPConfigColumnInstanceID),
+				},
 			},
 		},
 	}

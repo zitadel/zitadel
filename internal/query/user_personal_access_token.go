@@ -18,7 +18,8 @@ import (
 
 var (
 	personalAccessTokensTable = table{
-		name: projection.PersonalAccessTokenProjectionTable,
+		name:          projection.PersonalAccessTokenProjectionTable,
+		instanceIDCol: projection.PersonalAccessTokenColumnInstanceID,
 	}
 	PersonalAccessTokenColumnID = Column{
 		name:  projection.PersonalAccessTokenColumnID,

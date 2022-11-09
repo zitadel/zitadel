@@ -87,6 +87,8 @@ func newNotificationsProjection(
 	p.fileSystemPath = fileSystemPath
 	p.statikDir = statikDir
 
+	// needs to be started here as it is not part of the projection.projections / projection.newProjectionsList()
+	p.Start()
 	return p
 }
 
@@ -169,7 +171,7 @@ func (p *notificationsProjection) reduceInitCodeAdded(event eventstore.Event) (*
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +234,7 @@ func (p *notificationsProjection) reduceEmailCodeAdded(event eventstore.Event) (
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +297,7 @@ func (p *notificationsProjection) reducePasswordCodeAdded(event eventstore.Event
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +368,7 @@ func (p *notificationsProjection) reduceDomainClaimed(event eventstore.Event) (*
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 	if err != nil {
 		return nil, err
 	}
@@ -427,7 +429,7 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 	if err != nil {
 		return nil, err
 	}
@@ -485,7 +487,7 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GeNotifyUser(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 	if err != nil {
 		return nil, err
 	}

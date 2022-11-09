@@ -22,13 +22,13 @@ func (s *Server) GetLoginPolicy(ctx context.Context, _ *admin_pb.GetLoginPolicyR
 }
 
 func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginPolicyRequest) (*admin_pb.UpdateLoginPolicyResponse, error) {
-	policy, err := s.command.ChangeDefaultLoginPolicy(ctx, updateLoginPolicyToDomain(p))
+	policy, err := s.command.ChangeDefaultLoginPolicy(ctx, updateLoginPolicyToCommand(p))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateLoginPolicyResponse{
 		Details: object.ChangeToDetailsPb(
-			policy.ChangeDate,
+			policy.EventDate,
 			policy.ResourceOwner,
 		),
 	}, nil

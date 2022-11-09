@@ -84,6 +84,10 @@ func (p *passwordAgeProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.PasswordAgePolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(AgePolicyInstanceIDCol),
+				},
 			},
 		},
 	}

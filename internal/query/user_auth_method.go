@@ -15,7 +15,8 @@ import (
 
 var (
 	userAuthMethodTable = table{
-		name: projection.UserAuthMethodTable,
+		name:          projection.UserAuthMethodTable,
+		instanceIDCol: projection.UserAuthMethodInstanceIDCol,
 	}
 	UserAuthMethodColumnTokenID = Column{
 		name:  projection.UserAuthMethodTokenIDCol,

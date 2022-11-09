@@ -12,6 +12,7 @@ import (
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
@@ -56,7 +57,7 @@ func (t *RefreshToken) Subscription() *v1.Subscription {
 }
 
 func (t *RefreshToken) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{es_models.AggregateType(user.AggregateType), es_models.AggregateType(project.AggregateType)}
+	return []es_models.AggregateType{es_models.AggregateType(user.AggregateType), es_models.AggregateType(project.AggregateType), instance.AggregateType}
 }
 
 func (t *RefreshToken) CurrentCreationDate(instanceID string) (time.Time, error) {
@@ -110,6 +111,8 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 		user.UserDeactivatedType,
 		user.UserRemovedType:
 		return t.view.DeleteUserRefreshTokens(event.AggregateID, event.InstanceID, event)
+	case instance.InstanceRemovedEventType:
+		return t.view.DeleteInstanceRefreshTokens(event)
 	default:
 		return t.view.ProcessedRefreshTokenSequence(event)
 	}

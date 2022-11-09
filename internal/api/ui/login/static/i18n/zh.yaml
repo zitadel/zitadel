@@ -284,7 +284,7 @@ LinkingUsersDone:
   NextButtonText: 继续
 
 ExternalNotFound:
-  Title: 外部用户
+  Title: 未找到外部用户
   Description: 未找到外部用户。你想绑定你已存在的用户还是自动注册一个新用户。
   LinkButtonText: 绑定
   AutoRegisterButtonText: 注册

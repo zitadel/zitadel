@@ -19,7 +19,8 @@ import (
 
 var (
 	secretGeneratorsTable = table{
-		name: projection.SecretGeneratorProjectionTable,
+		name:          projection.SecretGeneratorProjectionTable,
+		instanceIDCol: projection.SecretGeneratorColumnInstanceID,
 	}
 	SecretGeneratorColumnAggregateID = Column{
 		name:  projection.SecretGeneratorColumnAggregateID,

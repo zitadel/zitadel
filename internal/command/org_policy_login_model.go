@@ -68,7 +68,10 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	allowExternalIDP,
 	forceMFA,
 	hidePasswordReset,
-	ignoreUnknownUsernames bool,
+	ignoreUnknownUsernames,
+	allowDomainDiscovery,
+	disableLoginWithEmail,
+	disableLoginWithPhone bool,
 	passwordlessType domain.PasswordlessType,
 	defaultRedirectURI string,
 	passwordCheckLifetime,
@@ -97,6 +100,9 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	if wm.IgnoreUnknownUsernames != ignoreUnknownUsernames {
 		changes = append(changes, policy.ChangeIgnoreUnknownUsernames(ignoreUnknownUsernames))
 	}
+	if wm.AllowDomainDiscovery != allowDomainDiscovery {
+		changes = append(changes, policy.ChangeAllowDomainDiscovery(allowDomainDiscovery))
+	}
 	if wm.PasswordCheckLifetime != passwordCheckLifetime {
 		changes = append(changes, policy.ChangePasswordCheckLifetime(passwordCheckLifetime))
 	}
@@ -117,6 +123,12 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.DefaultRedirectURI != defaultRedirectURI {
 		changes = append(changes, policy.ChangeDefaultRedirectURI(defaultRedirectURI))
+	}
+	if wm.DisableLoginWithEmail != disableLoginWithEmail {
+		changes = append(changes, policy.ChangeDisableLoginWithEmail(disableLoginWithEmail))
+	}
+	if wm.DisableLoginWithPhone != disableLoginWithPhone {
+		changes = append(changes, policy.ChangeDisableLoginWithPhone(disableLoginWithPhone))
 	}
 	if len(changes) == 0 {
 		return nil, false

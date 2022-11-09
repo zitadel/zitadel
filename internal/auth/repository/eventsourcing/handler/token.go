@@ -17,6 +17,7 @@ import (
 	proj_model "github.com/zitadel/zitadel/internal/project/model"
 	project_es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/zitadel/zitadel/internal/project/repository/view"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
@@ -62,7 +63,7 @@ func (t *Token) Subscription() *v1.Subscription {
 }
 
 func (_ *Token) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{es_models.AggregateType(user.AggregateType), es_models.AggregateType(project.AggregateType)}
+	return []es_models.AggregateType{es_models.AggregateType(user.AggregateType), es_models.AggregateType(project.AggregateType), instance.AggregateType}
 }
 
 func (p *Token) CurrentCreationDate(instanceID string) (time.Time, error) {
@@ -145,6 +146,8 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 			applicationsIDs = append(applicationsIDs, app.AppID)
 		}
 		return t.view.DeleteApplicationTokens(event, applicationsIDs...)
+	case instance.InstanceRemovedEventType:
+		return t.view.DeleteInstanceTokens(event)
 	default:
 		return t.view.ProcessedTokenSequence(event)
 	}

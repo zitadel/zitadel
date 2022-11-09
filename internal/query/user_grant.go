@@ -142,7 +142,8 @@ func NewUserGrantContainsRolesSearchQuery(roles ...string) (SearchQuery, error) 
 
 var (
 	userGrantTable = table{
-		name: projection.UserGrantProjectionTable,
+		name:          projection.UserGrantProjectionTable,
+		instanceIDCol: projection.UserGrantInstanceID,
 	}
 	UserGrantID = Column{
 		name:  projection.UserGrantID,

@@ -7,7 +7,6 @@ import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { Org, OrgFieldName, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PaginatorComponent } from '../paginator/paginator.component';
@@ -57,7 +56,6 @@ export class OrgTableComponent {
     private router: Router,
     private toast: ToastService,
     private _liveAnnouncer: LiveAnnouncer,
-    private themeService: ThemeService,
   ) {
     this.requestOrgs$.next({ limit: this.initialLimit, offset: 0, queries: this.searchQueries });
     this.authService.getActiveOrg().then((org) => (this.activeOrg = org));
@@ -96,7 +94,7 @@ export class OrgTableComponent {
 
   public refresh(): void {
     this.requestOrgs$.next({
-      limit: this.paginator.length,
+      limit: this.paginator.pageSize,
       offset: this.paginator.pageSize * this.paginator.pageIndex,
       queries: this.searchQueries,
     });
@@ -137,7 +135,6 @@ export class OrgTableComponent {
 
   public setAndNavigateToOrg(org: Org.AsObject): void {
     this.authService.setActiveOrg(org);
-    this.themeService.loadPrivateLabelling();
     this.router.navigate(['/org']);
   }
 

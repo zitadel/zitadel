@@ -38,7 +38,8 @@ type CustomText struct {
 
 var (
 	customTextTable = table{
-		name: projection.CustomTextTable,
+		name:          projection.CustomTextTable,
+		instanceIDCol: projection.CustomTextInstanceIDCol,
 	}
 	CustomTextColAggregateID = Column{
 		name:  projection.CustomTextAggregateIDCol,

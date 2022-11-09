@@ -18,6 +18,7 @@ import (
 	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/zitadel/zitadel/internal/org/repository/view"
 	query2 "github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
@@ -62,7 +63,7 @@ func (u *UserSession) Subscription() *v1.Subscription {
 }
 
 func (_ *UserSession) AggregateTypes() []models.AggregateType {
-	return []models.AggregateType{models.AggregateType(user.AggregateType), org.AggregateType}
+	return []models.AggregateType{models.AggregateType(user.AggregateType), org.AggregateType, instance.AggregateType}
 }
 
 func (u *UserSession) CurrentCreationDate(instanceID string) (time.Time, error) {
@@ -154,6 +155,8 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		return u.fillLoginNamesOnOrgUsers(event)
 	case user.UserRemovedType:
 		return u.view.DeleteUserSessions(event.AggregateID, event.InstanceID, event)
+	case instance.InstanceRemovedEventType:
+		return u.view.DeleteInstanceUserSessions(event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event)
 	}

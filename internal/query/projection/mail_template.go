@@ -80,6 +80,10 @@ func (p *mailTemplateProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.MailTemplateChangedEventType,
 					Reduce: p.reduceChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(MailTemplateInstanceIDCol),
+				},
 			},
 		},
 	}

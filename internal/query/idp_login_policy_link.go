@@ -38,7 +38,8 @@ func (q *IDPLoginPolicyLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.Sele
 
 var (
 	idpLoginPolicyLinkTable = table{
-		name: projection.IDPLoginPolicyLinkTable,
+		name:          projection.IDPLoginPolicyLinkTable,
+		instanceIDCol: projection.IDPLoginPolicyLinkInstanceIDCol,
 	}
 	IDPLoginPolicyLinkIDPIDCol = Column{
 		name:  projection.IDPLoginPolicyLinkIDPIDCol,

@@ -17,6 +17,7 @@ import (
 	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/zitadel/zitadel/internal/org/repository/view"
 	query2 "github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
@@ -64,7 +65,7 @@ func (u *User) Subscription() *v1.Subscription {
 	return u.subscription
 }
 func (_ *User) AggregateTypes() []es_models.AggregateType {
-	return []es_models.AggregateType{es_models.AggregateType(user_repo.AggregateType), org.AggregateType}
+	return []es_models.AggregateType{es_models.AggregateType(user_repo.AggregateType), org.AggregateType, instance.AggregateType}
 }
 
 func (u *User) CurrentCreationDate(instanceID string) (time.Time, error) {
@@ -89,6 +90,8 @@ func (u *User) Reduce(event *es_models.Event) (err error) {
 		return u.ProcessUser(event)
 	case org.AggregateType:
 		return u.ProcessOrg(event)
+	case instance.AggregateType:
+		return u.ProcessInstance(event)
 	default:
 		return nil
 	}
@@ -225,6 +228,15 @@ func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 		return u.fillLoginNamesOnOrgUsers(event)
 	case org.OrgDomainPrimarySetEventType:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
+	default:
+		return u.view.ProcessedUserSequence(event)
+	}
+}
+
+func (u *User) ProcessInstance(event *es_models.Event) (err error) {
+	switch eventstore.EventType(event.Type) {
+	case instance.InstanceRemovedEventType:
+		return u.view.DeleteInstanceUsers(event)
 	default:
 		return u.view.ProcessedUserSequence(event)
 	}

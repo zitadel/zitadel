@@ -62,6 +62,10 @@ func (p *instanceDomainProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.InstanceDomainRemovedEventType,
 					Reduce: p.reduceDomainRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(InstanceDomainInstanceIDCol),
+				},
 			},
 		},
 	}

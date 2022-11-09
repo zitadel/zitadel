@@ -17,7 +17,8 @@ import (
 
 var (
 	projectsTable = table{
-		name: projection.ProjectProjectionTable,
+		name:          projection.ProjectProjectionTable,
+		instanceIDCol: projection.ProjectColumnInstanceID,
 	}
 	ProjectColumnID = Column{
 		name:  projection.ProjectColumnID,

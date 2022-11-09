@@ -43,8 +43,10 @@ type StatementHandler struct {
 	failureCountStmt        string
 	setFailureCountStmt     string
 
-	aggregates []eventstore.AggregateType
-	reduces    map[eventstore.EventType]handler.Reduce
+	aggregates  []eventstore.AggregateType
+	reduces     map[eventstore.EventType]handler.Reduce
+	initCheck   *handler.Check
+	initialized chan bool
 
 	bulkLimit uint64
 }
@@ -74,17 +76,19 @@ func NewStatementHandler(
 		reduces:                 reduces,
 		bulkLimit:               config.BulkLimit,
 		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionName),
+		initCheck:               config.InitCheck,
+		initialized:             make(chan bool),
 	}
 
-	initialized := make(chan bool)
-	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, initialized)
-
-	err := h.Init(ctx, initialized, config.InitCheck)
-	logging.OnError(err).WithField("projection", config.ProjectionName).Fatal("unable to initialize projections")
-
-	h.Subscribe(h.aggregates...)
+	h.ProjectionHandler = handler.NewProjectionHandler(ctx, config.ProjectionHandlerConfig, h.reduce, h.Update, h.SearchQuery, h.Lock, h.Unlock, h.initialized)
 
 	return h
+}
+
+func (h *StatementHandler) Start() {
+	h.initialized <- true
+	close(h.initialized)
+	h.Subscribe(h.aggregates...)
 }
 
 func (h *StatementHandler) SearchQuery(ctx context.Context, instanceIDs []string) (*eventstore.SearchQueryBuilder, uint64, error) {

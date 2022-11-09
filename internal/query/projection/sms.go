@@ -96,6 +96,10 @@ func (p *smsConfigProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.SMSConfigRemovedEventType,
 					Reduce: p.reduceSMSConfigRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(SMSColumnInstanceID),
+				},
 			},
 		},
 	}

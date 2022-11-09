@@ -10,11 +10,10 @@ import (
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
-	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
+	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
@@ -80,10 +79,11 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql
 		},
 	}
 
-	err = projection.Start(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
+	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {
 		return nil, err
 	}
+	projection.Start()
 
 	return repo, nil
 }

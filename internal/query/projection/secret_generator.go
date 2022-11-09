@@ -74,6 +74,10 @@ func (p *secretGeneratorProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.SecretGeneratorRemovedEventType,
 					Reduce: p.reduceSecretGeneratorRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(SecretGeneratorColumnInstanceID),
+				},
 			},
 		},
 	}

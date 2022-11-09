@@ -30,7 +30,8 @@ type PrivacyPolicy struct {
 
 var (
 	privacyTable = table{
-		name: projection.PrivacyPolicyTable,
+		name:          projection.PrivacyPolicyTable,
+		instanceIDCol: projection.PrivacyPolicyInstanceIDCol,
 	}
 	PrivacyColID = Column{
 		name:  projection.PrivacyPolicyIDCol,

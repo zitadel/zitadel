@@ -136,7 +136,8 @@ func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance
 
 var (
 	instanceDomainsTable = table{
-		name: projection.InstanceDomainTable,
+		name:          projection.InstanceDomainTable,
+		instanceIDCol: projection.InstanceDomainInstanceIDCol,
 	}
 
 	InstanceDomainCreationDateCol = Column{

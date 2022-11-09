@@ -117,6 +117,7 @@
         [urisList]="oidcAppRequest.toObject().redirectUrisList"
         [getValues]="requestRedirectValuesSubject$"
         title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+        data-e2e="redirect-uris"
       >
       </cnsl-redirect-uris>
 
@@ -145,6 +146,7 @@
         title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
         [getValues]="requestRedirectValuesSubject$"
         [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        data-e2e="postlogout-uris"
       >
       </cnsl-redirect-uris>
 

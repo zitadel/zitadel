@@ -255,6 +255,8 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 		return repository.UniqueConstraintAdd
 	case UniqueConstraintRemove:
 		return repository.UniqueConstraintRemoved
+	case UniqueConstraintInstanceRemove:
+		return repository.UniqueConstraintInstanceRemoved
 	default:
 		return repository.UniqueConstraintAdd
 	}

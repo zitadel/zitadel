@@ -8,7 +8,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -16,7 +15,8 @@ import (
 
 var (
 	flowsTriggersTable = table{
-		name: projection.FlowTriggerTable,
+		name:          projection.FlowTriggerTable,
+		instanceIDCol: projection.FlowInstanceIDCol,
 	}
 	FlowsTriggersColumnFlowType = Column{
 		name:  projection.FlowTypeCol,
@@ -145,6 +145,8 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 			ActionColumnState.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
+			ActionColumnAllowedToFail.identifier(),
+			ActionColumnTimeout.identifier(),
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
@@ -161,6 +163,8 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 					&action.State,
 					&action.Name,
 					&action.Script,
+					&action.AllowedToFail,
+					&action.timeout,
 				)
 				if err != nil {
 					return nil, err
@@ -185,6 +189,8 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 			ActionColumnState.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
+			ActionColumnAllowedToFail.identifier(),
+			ActionColumnTimeout.identifier(),
 			FlowsTriggersColumnTriggerType.identifier(),
 			FlowsTriggersColumnFlowType.identifier(),
 			FlowsTriggersColumnChangeDate.identifier(),
@@ -207,6 +213,8 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 					actionState         sql.NullInt32
 					actionName          sql.NullString
 					actionScript        sql.NullString
+					actionAllowedToFail sql.NullBool
+					actionTimeout       sql.NullInt64
 
 					triggerType domain.TriggerType
 				)
@@ -218,6 +226,8 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 					&actionState,
 					&actionName,
 					&actionScript,
+					&actionAllowedToFail,
+					&actionTimeout,
 					&triggerType,
 					&flow.Type,
 					&flow.ChangeDate,
@@ -237,6 +247,8 @@ func prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Row
 					State:         domain.ActionState(actionState.Int32),
 					Name:          actionName.String,
 					Script:        actionScript.String,
+					AllowedToFail: actionAllowedToFail.Bool,
+					timeout:       time.Duration(actionTimeout.Int64),
 				})
 			}
 

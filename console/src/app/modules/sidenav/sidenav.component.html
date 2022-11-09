@@ -30,11 +30,12 @@
             (click)="value = setting.id"
             *ngIf="
               !setting.requiredRoles ||
-              (setting.requiredRoles.mgmt && (setting.requiredRoles.mgmt | hasRole: true | async)) ||
-              (setting.requiredRoles.admin && (setting.requiredRoles.admin | hasRole: true | async))
+              (setting.requiredRoles.mgmt && (setting.requiredRoles.mgmt | hasRole | async)) ||
+              (setting.requiredRoles.admin && (setting.requiredRoles.admin | hasRole | async))
             "
             class="sidenav-setting-list-element hide-on-mobile"
             [ngClass]="{ active: currentSetting === setting.id, show: currentSetting === undefined }"
+            [attr.data-e2e]="'sidenav-element-' + setting.id"
           >
             <span>{{ setting.i18nKey | translate }}</span>
             <mat-icon *ngIf="setting.showWarn" class="warn-icon" svgIcon="mdi_shield_alert"></mat-icon>

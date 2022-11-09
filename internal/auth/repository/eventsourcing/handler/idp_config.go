@@ -119,6 +119,8 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 			return err
 		}
 		return i.view.DeleteIDPConfig(idp.IDPConfigID, event)
+	case instance.InstanceRemovedEventType:
+		return i.view.DeleteInstanceIDPs(event)
 	default:
 		return i.view.ProcessedIDPConfigSequence(event)
 	}

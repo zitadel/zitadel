@@ -58,7 +58,8 @@ type JWTIDP struct {
 
 var (
 	idpTable = table{
-		name: projection.IDPTable,
+		name:          projection.IDPTable,
+		instanceIDCol: projection.IDPInstanceIDCol,
 	}
 	IDPIDCol = Column{
 		name:  projection.IDPIDCol,
@@ -108,7 +109,8 @@ var (
 
 var (
 	oidcIDPTable = table{
-		name: projection.IDPOIDCTable,
+		name:          projection.IDPOIDCTable,
+		instanceIDCol: projection.OIDCConfigInstanceIDCol,
 	}
 	OIDCIDPColIDPID = Column{
 		name:  projection.OIDCConfigIDPIDCol,
@@ -150,7 +152,8 @@ var (
 
 var (
 	jwtIDPTable = table{
-		name: projection.IDPJWTTable,
+		name:          projection.IDPJWTTable,
+		instanceIDCol: projection.JWTConfigInstanceIDCol,
 	}
 	JWTIDPColIDPID = Column{
 		name:  projection.JWTConfigIDPIDCol,

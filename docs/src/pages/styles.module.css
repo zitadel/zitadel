@@ -74,6 +74,7 @@
   height: 70px;
   width: 70px;
   margin: 1rem 1rem 1rem 0 !important;
+  border-radius: 50% !important;
 }
 
 .homelink:hover,
@@ -103,6 +104,7 @@
   align-items: center;
   background: var(--list-background);
   border-radius: 1rem;
+  border: 1px solid var(--card-border);
 }
 
 .quickstart p {

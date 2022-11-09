@@ -15,7 +15,8 @@ import (
 
 var (
 	oidcSettingsTable = table{
-		name: projection.OIDCSettingsProjectionTable,
+		name:          projection.OIDCSettingsProjectionTable,
+		instanceIDCol: projection.OIDCSettingsColumnInstanceID,
 	}
 	OIDCSettingsColumnAggregateID = Column{
 		name:  projection.OIDCSettingsColumnAggregateID,

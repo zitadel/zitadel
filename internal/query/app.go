@@ -82,7 +82,8 @@ func (q *AppSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 var (
 	appsTable = table{
-		name: projection.AppProjectionTable,
+		name:          projection.AppProjectionTable,
+		instanceIDCol: projection.AppColumnInstanceID,
 	}
 	AppColumnID = Column{
 		name:  projection.AppColumnID,
@@ -120,7 +121,8 @@ var (
 
 var (
 	appSAMLConfigsTable = table{
-		name: projection.AppSAMLTable,
+		name:          projection.AppSAMLTable,
+		instanceIDCol: projection.AppSAMLConfigColumnInstanceID,
 	}
 	AppSAMLConfigColumnAppID = Column{
 		name:  projection.AppSAMLConfigColumnAppID,
@@ -142,7 +144,8 @@ var (
 
 var (
 	appAPIConfigsTable = table{
-		name: projection.AppAPITable,
+		name:          projection.AppAPITable,
+		instanceIDCol: projection.AppAPIConfigColumnInstanceID,
 	}
 	AppAPIConfigColumnAppID = Column{
 		name:  projection.AppAPIConfigColumnAppID,
@@ -160,7 +163,8 @@ var (
 
 var (
 	appOIDCConfigsTable = table{
-		name: projection.AppOIDCTable,
+		name:          projection.AppOIDCTable,
+		instanceIDCol: projection.AppOIDCConfigColumnInstanceID,
 	}
 	AppOIDCConfigColumnAppID = Column{
 		name:  projection.AppOIDCConfigColumnAppID,

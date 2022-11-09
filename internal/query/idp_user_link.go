@@ -42,7 +42,8 @@ func (q *IDPUserLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuild
 
 var (
 	idpUserLinkTable = table{
-		name: projection.IDPUserLinkTable,
+		name:          projection.IDPUserLinkTable,
+		instanceIDCol: projection.IDPUserLinkInstanceIDCol,
 	}
 	IDPUserLinkIDPIDCol = Column{
 		name:  projection.IDPUserLinkIDPIDCol,

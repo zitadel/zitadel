@@ -131,7 +131,8 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 var (
 	//membershipAlias is a hack to satisfy checks in the queries
 	membershipAlias = table{
-		name: "memberships",
+		name:          "memberships",
+		instanceIDCol: projection.MemberInstanceID,
 	}
 	membershipUserID = Column{
 		name:  projection.MemberUserIDCol,

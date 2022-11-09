@@ -3,17 +3,18 @@ import { ensureMachineUserExists, ensureUserDoesntExist } from '../../support/ap
 import { loginname } from '../../support/login/users';
 
 describe('machines', () => {
+  beforeEach(() => {
+    apiAuth().as('api');
+  });
+
   const machinesPath = `/users?type=machine`;
   const testMachineUserNameAdd = 'e2emachineusernameadd';
   const testMachineUserNameRemove = 'e2emachineusernameremove';
 
   describe('add', () => {
-    before(`ensure it doesn't exist already`, () => {
-      apiAuth().then((apiCallProperties) => {
-        ensureUserDoesntExist(apiCallProperties, testMachineUserNameAdd).then(() => {
-          cy.visit(machinesPath);
-        });
-      });
+    beforeEach(`ensure it doesn't exist already`, function () {
+      ensureUserDoesntExist(this.api, testMachineUserNameAdd);
+      cy.visit(machinesPath);
     });
 
     it('should add a machine', () => {
@@ -25,31 +26,28 @@ describe('machines', () => {
       cy.get('[formcontrolname="description"]').type('e2emachinedescription');
       cy.get('[data-e2e="create-button"]').click();
       cy.get('.data-e2e-success');
-      cy.wait(200);
-      cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+      cy.contains('[data-e2e="copy-loginname"]', testMachineUserNameAdd).click();
+      cy.clipboardMatches(testMachineUserNameAdd);
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
   });
 
-  describe('remove', () => {
-    before('ensure it exists', () => {
-      apiAuth().then((api) => {
-        ensureMachineUserExists(api, testMachineUserNameRemove).then(() => {
-          cy.visit(machinesPath);
-        });
-      });
+  describe('edit', () => {
+    beforeEach('ensure it exists', function () {
+      ensureMachineUserExists(this.api, testMachineUserNameRemove);
+      cy.visit(machinesPath);
     });
 
     it('should delete a machine', () => {
-      cy.contains('tr', testMachineUserNameRemove)
-        // doesn't work, need to force click.
-        // .trigger('mouseover')
-        .find('[data-e2e="enabled-delete-button"]')
-        .click({ force: true });
+      const rowSelector = `tr:contains(${testMachineUserNameRemove})`;
+      cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
       cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testMachineUserNameRemove);
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.get('.data-e2e-success');
-      cy.wait(200);
-      cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+      cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
+
+    it('should create a personal access token');
   });
 });

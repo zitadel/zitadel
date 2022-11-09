@@ -116,7 +116,7 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 		return err
 	}
 	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.Org.NotFound")
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-QXPGs", "Errors.Org.NotFound")
 	}
 	return nil
 }

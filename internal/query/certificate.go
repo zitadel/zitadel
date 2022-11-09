@@ -47,7 +47,8 @@ func (c *rsaCertificate) Certificate() []byte {
 
 var (
 	certificateTable = table{
-		name: projection.CertificateTable,
+		name:          projection.CertificateTable,
+		instanceIDCol: projection.CertificateColumnInstanceID,
 	}
 	CertificateColID = Column{
 		name:  projection.CertificateColumnID,

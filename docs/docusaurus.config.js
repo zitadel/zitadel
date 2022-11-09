@@ -18,15 +18,19 @@ module.exports = {
       "data-api": "/proxy/api/event",
     },
   ],
+  customFields: {
+    description: "Documentation for ZITADEL - The best of Auth0 and Keycloak combined. Built for the serverless era.",
+  },
   themeConfig: {
+    metadata: [{name: 'keywords', content: 'zitadel, documentation, jwt, saml, oauth2, authentication, serverless, login, auth, authorization, sso, openid-connect, oidc, mfa, 2fa, passkeys, fido2, docker'}],
     zoom: {
-      selector: '.markdown :not(em) > img',
+      selector: ".markdown :not(em) > img",
       background: {
-        light: 'rgb(243, 244, 246)',
-        dark: 'rgb(55, 59, 82)'
+        light: "rgb(243, 244, 246)",
+        dark: "rgb(55, 59, 82)",
       },
       // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
-      config: {}
+      config: {},
     },
     navbar: {
       // title: 'ZITADEL',
@@ -119,7 +123,6 @@ module.exports = {
         {
           title: "Legal",
           items: [
-
             {
               label: "Terms and Conditions",
               href: "/docs/legal/terms-of-service",
@@ -152,21 +155,25 @@ module.exports = {
             {
               label: "Docs v1 (deprecated)",
               href: "https://docs-v1.zitadel.com/",
-            }
+            },
           ],
         },
-
       ],
       copyright: `Copyright © ${new Date().getFullYear()} ZITADEL Docs - Built with Docusaurus.`,
     },
     algolia: {
       appId: "8H6ZKXENLO",
       apiKey: "124fe1c102a184bc6fc70c75dc84f96f",
-      indexName: 'zitadel',
-      selector: 'div#'
-  },
+      indexName: "zitadel",
+      selector: "div#",
+    },
     prism: {
       additionalLanguages: ["csharp", "dart", "groovy", "regex"],
+    },
+    colorMode: {
+      defaultMode: "dark",
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
     },
   },
   presets: [
@@ -187,4 +194,5 @@ module.exports = {
     ],
   ],
   plugins: [require.resolve("docusaurus-plugin-image-zoom")],
+  themes: ["@saucelabs/theme-github-codeblock"],
 };

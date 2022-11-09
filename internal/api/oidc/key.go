@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -186,7 +187,7 @@ func (o *OPStorage) getMaxKeyCreationDate(ctx context.Context) (time.Time, error
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsMaxCreationDate).
 			ResourceOwner(authz.GetInstance(ctx).InstanceID()).
 			AddQuery().
-			AggregateTypes(keypair.AggregateType).
+			AggregateTypes(keypair.AggregateType, instance.AggregateType).
 			Builder(),
 	)
 }

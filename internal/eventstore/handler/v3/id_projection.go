@@ -15,6 +15,7 @@ type IDProjection struct {
 	reduces map[eventstore.AggregateType][]Reducer
 	client  *sql.DB
 	es      *eventstore.Eventstore
+	check   *handler.Check
 }
 
 func NewConfig(client *sql.DB, es *eventstore.Eventstore) *Config {
@@ -38,14 +39,9 @@ type Reducer struct {
 }
 
 func StartSubscriptionIDProjection(ctx context.Context, name string, config Config) *IDProjection {
-	p := &IDProjection{
-		client:  config.client,
-		es:      config.eventstore,
-		Name:    name,
-		reduces: config.Reduces,
-	}
+	p := New(name, config)
 
-	err := p.Init(ctx, config.Check)
+	err := p.Init(ctx)
 	logging.OnError(err).WithField("projection", name).Fatal("unable to initialize projection")
 
 	go func() {
@@ -63,6 +59,33 @@ func StartSubscriptionIDProjection(ctx context.Context, name string, config Conf
 	}()
 
 	return p
+}
+
+func New(name string, config Config) *IDProjection {
+	return &IDProjection{
+		client:  config.client,
+		es:      config.eventstore,
+		Name:    name,
+		reduces: config.Reduces,
+		check:   config.Check,
+	}
+}
+
+func (p *IDProjection) Start() {
+	ctx := context.TODO()
+	go func() {
+		sub := p.subscribe()
+		for {
+			select {
+			case <-ctx.Done():
+				sub.Unsubscribe()
+				return
+			case e := <-sub.Events:
+				err := p.Process(ctx, e)
+				logging.WithFields("name", p.Name).OnError(err).Error("error occured in reduce, stop processing")
+			}
+		}
+	}()
 }
 
 // Process updates the projection by the given events
@@ -113,16 +136,16 @@ func (p *IDProjection) Process(ctx context.Context, event eventstore.Event) erro
 	return nil
 }
 
-func (p *IDProjection) Init(ctx context.Context, check *handler.Check) error {
+func (p *IDProjection) Init(ctx context.Context) error {
 	// for _, check := range checks {
-	if check == nil || check.IsNoop() {
+	if p.check == nil || p.check.IsNoop() {
 		return nil
 	}
 	tx, err := p.client.BeginTx(ctx, nil)
 	if err != nil {
 		return errors.ThrowInternal(err, "V3-iSUtO", "begin failed")
 	}
-	for i, execute := range check.Executes {
+	for i, execute := range p.check.Executes {
 		logging.WithFields("projection", p.Name, "execute", i).Debug("executing check")
 		next, err := execute(p.client, p.Name)
 		if err != nil {

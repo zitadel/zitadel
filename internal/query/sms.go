@@ -52,7 +52,8 @@ func (q *SMSConfigsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuild
 
 var (
 	smsConfigsTable = table{
-		name: projection.SMSConfigProjectionTable,
+		name:          projection.SMSConfigProjectionTable,
+		instanceIDCol: projection.SMSColumnInstanceID,
 	}
 	SMSConfigColumnID = Column{
 		name:  projection.SMSColumnID,
@@ -86,7 +87,8 @@ var (
 
 var (
 	smsTwilioConfigsTable = table{
-		name: projection.SMSTwilioTable,
+		name:          projection.SMSTwilioTable,
+		instanceIDCol: projection.SMSTwilioColumnInstanceID,
 	}
 	SMSTwilioConfigColumnSMSID = Column{
 		name:  projection.SMSTwilioConfigColumnSMSID,

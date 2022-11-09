@@ -32,6 +32,14 @@ func (v *View) DeleteOrgProjectMapping(orgID, projectID, instanceID string, even
 	return v.ProcessedOrgProjectMappingSequence(event)
 }
 
+func (v *View) DeleteInstanceOrgProjectMappings(event *models.Event) error {
+	err := view.DeleteInstanceOrgProjectMappings(v.Db, orgPrgojectMappingTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedOrgProjectMappingSequence(event)
+}
+
 func (v *View) DeleteOrgProjectMappingsByProjectID(projectID, instanceID string) error {
 	return view.DeleteOrgProjectMappingsByProjectID(v.Db, orgPrgojectMappingTable, projectID, instanceID)
 }

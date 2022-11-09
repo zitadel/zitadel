@@ -151,6 +151,8 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 			i.fillConfigData(provider, config)
 		}
 		return i.view.PutExternalIDPs(event, exterinalIDPs...)
+	case instance.InstanceRemovedEventType:
+		return i.view.DeleteInstanceExternalIDPs(event)
 	default:
 		return i.view.ProcessedExternalIDPSequence(event)
 	}

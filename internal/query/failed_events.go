@@ -21,7 +21,8 @@ const (
 
 var (
 	failedEventsTable = table{
-		name: projection.FailedEventsTable,
+		name:          projection.FailedEventsTable,
+		instanceIDCol: failedEventsColumnInstanceID,
 	}
 	FailedEventsColumnProjectionName = Column{
 		name:  failedEventsColumnProjectionName,
@@ -33,10 +34,6 @@ var (
 	}
 	FailedEventsColumnError = Column{
 		name:  failedEventsColumnError,
-		table: failedEventsTable,
-	}
-	FailedEventsColumnInstanceID = Column{
-		name:  failedEventsColumnInstanceID,
 		table: failedEventsTable,
 	}
 	FailedEventsColumnEventID = Column{

@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	v3 "github.com/zitadel/zitadel/internal/eventstore/handler/v3"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -66,6 +67,12 @@ func newPersonalAccessTokenProjection(ctx context.Context, config v3.Config) *v3
 				Event:          user.UserRemovedType,
 				Reduce:         p.reduceUserRemoved,
 				PreviousEvents: p.previousEventsUserRemoved,
+			},
+		},
+		instance.AggregateType: {
+			{
+				Event:  instance.InstanceRemovedEventType,
+				Reduce: reduceInstanceRemovedHelper(PersonalAccessTokenColumnInstanceID),
 			},
 		},
 	}
