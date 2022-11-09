@@ -688,6 +688,25 @@ func TestProjection_schedule(t *testing.T) {
 			want{},
 		},
 		{
+			"filter succeeded once error",
+			args{
+				ctx: context.Background(),
+			},
+			fields{
+				eventstore: func(t *testing.T) *eventstore.Eventstore {
+					return eventstore.NewEventstore(
+						es_repo_mock.NewRepo(t).ExpectFilterEventsError(ErrFilter),
+					)
+				},
+				triggerProjection: time.NewTimer(0),
+			},
+			want{
+				locksCount:   0,
+				lockCanceled: false,
+				unlockCount:  0,
+			},
+		},
+		{
 			"filter instance ids error",
 			args{
 				ctx: context.Background(),
@@ -695,7 +714,15 @@ func TestProjection_schedule(t *testing.T) {
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
 					return eventstore.NewEventstore(
-						es_repo_mock.NewRepo(t).ExpectInstanceIDsError(ErrFilter),
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(
+							&repository.Event{
+								AggregateType:             "system",
+								Sequence:                  6,
+								PreviousAggregateSequence: 5,
+								InstanceID:                "",
+								Type:                      "system.projections.scheduler.succeeded",
+							}).
+							ExpectInstanceIDsError(ErrFilter),
 					)
 				},
 				triggerProjection: time.NewTimer(0),
@@ -714,7 +741,14 @@ func TestProjection_schedule(t *testing.T) {
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
 					return eventstore.NewEventstore(
-						es_repo_mock.NewRepo(t).ExpectInstanceIDs("instanceID1"),
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(
+							&repository.Event{
+								AggregateType:             "system",
+								Sequence:                  6,
+								PreviousAggregateSequence: 5,
+								InstanceID:                "",
+								Type:                      "system.projections.scheduler.succeeded",
+							}).ExpectInstanceIDs("instanceID1"),
 					)
 				},
 				triggerProjection: time.NewTimer(0),
@@ -738,7 +772,14 @@ func TestProjection_schedule(t *testing.T) {
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
 					return eventstore.NewEventstore(
-						es_repo_mock.NewRepo(t).ExpectInstanceIDs("instanceID1"),
+						es_repo_mock.NewRepo(t).ExpectFilterEvents(
+							&repository.Event{
+								AggregateType:             "system",
+								Sequence:                  6,
+								PreviousAggregateSequence: 5,
+								InstanceID:                "",
+								Type:                      "system.projections.scheduler.succeeded",
+							}).ExpectInstanceIDs("instanceID1"),
 					)
 				},
 				triggerProjection: time.NewTimer(0),

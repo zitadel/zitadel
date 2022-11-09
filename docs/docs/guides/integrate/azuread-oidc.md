@@ -23,7 +23,7 @@ Browse to the [App registration menus create dialog](https://portal.azure.com/#v
 ![Create an Application](/img/guides/azure_app_register.png)
 
 :::info
-Mare sure to select `web` as application type in the `Redirect URI (optional)` section.
+Make sure to select `web` as application type in the `Redirect URI (optional)` section.
 You can leave the second field empty since we will change this in the next step.
 :::
 
@@ -79,9 +79,49 @@ Once you created the IdP you need to activate it, to make it usable for your use
 
 ![Active AzureAD](/img/guides/azure_zitadel_active.png)
 
+#### Disable 2-Factor prompt
+
+If a user has no 2-factor configured, ZITADEL does ask on a regularly basis, if the user likes to add a new 2-factor for more security.
+If you don't want your users to get this prompt when using Azure, you have to disable this feature.
+
+1. Go to the login behaviour settings of your instance or organization, depending if you like to disable it for all or just a specific organization respectively
+2. Set "Multi-factor init lifetimes" to 0
+
+![img.png](../../../static/img/guides/login_lifetimes.png)
+
+#### Create user with verified email
+
+Azure AD does not send the "email verified claim" in its token.
+Due to that the user will get an email verification mail to verify his email address.
+
+To create the user with a verified email address you must add an action.
+
+1. Go to the actions of your organization
+2. Create a new action with the following code to set the email to verified automatically
+3. Make sure the action name matches the function in the action itself e.g: "setEmailVerified"
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/verify_email.js
+```
+
+![img.png](../../../static/img/guides/action_email_verify.png)
+
+3. Add the action "email verify" to the flow "external authentication" and to the trigger "pre creation"
+
+![img.png](../../../static/img/guides/action_pre_creation_email_verify.png)
+
+#### Automatically redirect to Azure AD
+
+If you like to get automatically redirected to your Azure AD login instead of showing the ZITADEL login with the Username/Password and a button "Login with AzureAD" you have to do the following steps:
+
+1. Go to the login behaviour settings of your instance or organization
+2. Disable login with username and password
+3. Make sure you have only configured AzureAD as external identity provider
+4. If you did all your settings on the organization level make sure to send the organization scope in your authorization request: [scope](../../apis/openidoauth/scopes#reserved-scopes)
+
 ### Test the setup
 
-To test the setup use a incognito mode and browse to your login page. 
+To test the setup use incognito mode and browse to your login page.
 If you succeeded you should see a new button which should redirect you to your AzureAD Tenant.
 
 ![AzureAD Button](/img/guides/azure_zitadel_button.png)

@@ -77,8 +77,9 @@ module.exports = {
           type: "category",
           label: "Self-Hosted",
           items: [
+            "guides/manage/self-hosted/production",
             "guides/manage/self-hosted/configure/configure",
-            "guides/manage/self-hosted/proxy/proxy",
+            "guides/manage/self-hosted/reverseproxy/reverse_proxy",
             "guides/manage/self-hosted/custom-domain",
             "guides/manage/self-hosted/http2",
             "guides/manage/self-hosted/tls_modes",

@@ -113,6 +113,18 @@ title: zitadel/user.proto
 
 
 
+### LoginNameQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| login_name |  string | - | string.max_len: 200<br />  |
+| method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
 ### Machine
 
 
@@ -288,6 +300,7 @@ this query is always equals
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.email_query |  EmailQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.state_query |  StateQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.type_query |  TypeQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.login_name_query |  LoginNameQuery | - |  |
 
 
 
