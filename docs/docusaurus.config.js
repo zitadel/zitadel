@@ -18,7 +18,11 @@ module.exports = {
       "data-api": "/proxy/api/event",
     },
   ],
+  customFields: {
+    description: "Documentation for ZITADEL - The best of Auth0 and Keycloak combined. Built for the serverless era.",
+  },
   themeConfig: {
+    metadata: [{name: 'keywords', content: 'zitadel, documentation, jwt, saml, oauth2, authentication, serverless, login, auth, authorization, sso, openid-connect, oidc, mfa, 2fa, passkeys, fido2, docker'}],
     zoom: {
       selector: ".markdown :not(em) > img",
       background: {

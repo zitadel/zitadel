@@ -52,8 +52,9 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 			return
 		}
 	}
+	translator := l.getTranslator(r.Context(), authReq)
 	data := registerOptionData{
-		baseData: l.getBaseData(r, authReq, "RegisterOption", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, "RegisterOption.Title","RegisterOption.Description", errID, errMessage),
 	}
 	funcs := map[string]interface{}{
 		"hasRegistration": func() bool {
@@ -63,7 +64,6 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 			return externalAllowed
 		},
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOption], data, funcs)
 }
 
