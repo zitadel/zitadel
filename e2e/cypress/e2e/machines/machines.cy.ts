@@ -4,13 +4,11 @@ import { loginname } from '../../support/login/users';
 import { ensureDomainPolicy } from '../../support/api/policies';
 
 describe('machines', () => {
+  const machinesPath = `/users?type=machine`;
+
   beforeEach(() => {
     apiAuth().as('api');
   });
-
-  const machinesPath = `/users?type=machine`;
-  const testMachineUserNameAdd = 'e2emachineusernameadd';
-  const testMachineUserNameRemove = 'e2emachineusernameremove';
 
   [
     { mustBeDomain: true, addName: 'e2emachineusernameadd', removeName: 'e2emachineusernameremove' },
