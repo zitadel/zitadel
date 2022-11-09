@@ -1057,7 +1057,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgRemovedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
-								"org"),
+								"org", []string{}, []string{}),
 						),
 					),
 				),
@@ -1082,16 +1082,27 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 								"org"),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
 					expectPushFailed(
 						errors.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewOrgRemovedEvent(
-									context.Background(), &org.NewAggregate("org1").Aggregate, "org",
+									context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, []string{},
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
 					),
 				),
 			},
@@ -1115,13 +1126,98 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 								"org"),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org"),
+								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, []string{}),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgNameUniqueConstraint("org")),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{},
+		},
+		{
+			name: "remove org with usernames and domains",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org"),
+						),
+					),
+
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"user1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						), eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user2", "org1").Aggregate,
+								"user2",
+								"name",
+								"description",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "domain1"),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "domain2"),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{"user1", "user2"}, []string{"domain1", "domain2"}),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user1org1", "", false)),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user2org1", "", false)),
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("domain1")),
+						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("domain2")),
 					),
 				),
 			},

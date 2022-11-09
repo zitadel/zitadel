@@ -285,13 +285,142 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if !isOrgStateExists(writeModel.State) {
 				return nil, errors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}, nil
+
+			domainPolicy, err := c.getOrgDomainPolicy(ctx, a.ID)
+			if err != nil {
+				return nil, err
+			}
+			usernames, err := OrgUsers(ctx, filter, a.ID, domainPolicy.UserLoginMustBeDomain)
+			if err != nil {
+				return nil, err
+			}
+			domains, err := OrgDomains(ctx, filter, a.ID)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domains)}, nil
 		}, nil
 	}
 }
 
+func OrgDomains(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		EventTypes(
+			org.OrgDomainVerifiedEventType,
+			org.OrgDomainRemovedEventType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, 0)
+	for _, event := range events {
+		switch event.(type) {
+		case *org.DomainVerifiedEvent:
+			eventTyped := event.(*org.DomainVerifiedEvent)
+			names = append(names, eventTyped.Domain)
+		case *org.DomainRemovedEvent:
+			eventTyped := event.(*org.DomainRemovedEvent)
+			found := false
+			for i := range names {
+				if names[i] == eventTyped.Domain {
+					found = true
+					names[i] = names[len(names)-1]
+					break
+				}
+			}
+			if found {
+				names = names[:len(names)-1]
+			}
+		}
+	}
+	return names, nil
+}
+
+type userIDName struct {
+	name string
+	id   string
+}
+
+func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string, userLoginMustBeDomain bool) ([]string, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID(authz.GetInstance(ctx).InstanceID()).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(user_repo.AggregateType).
+		EventTypes(
+			user_repo.HumanAddedType,
+			user_repo.MachineAddedEventType,
+			user_repo.HumanRegisteredType,
+			user_repo.UserDomainClaimedType,
+			user_repo.UserUserNameChangedType,
+			user_repo.UserRemovedType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+
+	users := make([]userIDName, 0)
+	for _, event := range events {
+		switch event.(type) {
+		case *user_repo.HumanAddedEvent:
+			eventTyped := event.(*user_repo.HumanAddedEvent)
+			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+		case *user_repo.MachineAddedEvent:
+			eventTyped := event.(*user_repo.MachineAddedEvent)
+			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+		case *user_repo.HumanRegisteredEvent:
+			eventTyped := event.(*user_repo.HumanRegisteredEvent)
+			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+		case *user_repo.DomainClaimedEvent:
+			eventTyped := event.(*user_repo.DomainClaimedEvent)
+			for i := range users {
+				if users[i].id == eventTyped.Aggregate().ID {
+					users[i].name = eventTyped.UserName
+				}
+			}
+		case *user_repo.UsernameChangedEvent:
+			eventTyped := event.(*user_repo.UsernameChangedEvent)
+			for i := range users {
+				if users[i].id == eventTyped.Aggregate().ID {
+					users[i].name = eventTyped.UserName
+				}
+			}
+		case *user_repo.UserRemovedEvent:
+			eventTyped := event.(*user_repo.UserRemovedEvent)
+			found := false
+
+			for i := range users {
+				if users[i].id == eventTyped.Aggregate().ID {
+					found = true
+					users[i] = users[len(users)-1]
+					break
+				}
+			}
+			if found {
+				users = users[:len(users)-1]
+			}
+		}
+	}
+	if userLoginMustBeDomain {
+		for i := range users {
+			users[i].name = users[i].name + orgID
+		}
+	}
+	names := make([]string, len(users))
+	for i := range users {
+		names[i] = users[i].name
+	}
+	return names, nil
+}
+
 func ExistsOrg(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
 	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		ResourceOwner(id).
 		OrderAsc().
 		AddQuery().

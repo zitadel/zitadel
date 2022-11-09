@@ -315,7 +315,7 @@ type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	oldUserName           string `json:"-"`
+	OldUserName           string `json:"-"`
 	userLoginMustBeDomain bool   `json:"-"`
 }
 
@@ -325,7 +325,7 @@ func (e *DomainClaimedEvent) Data() interface{} {
 
 func (e *DomainClaimedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.OldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
 }
@@ -344,7 +344,7 @@ func NewDomainClaimedEvent(
 			UserDomainClaimedType,
 		),
 		UserName:              userName,
-		oldUserName:           oldUserName,
+		OldUserName:           oldUserName,
 		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
@@ -396,7 +396,7 @@ type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	oldUserName           string `json:"-"`
+	OldUserName           string `json:"-"`
 	userLoginMustBeDomain bool   `json:"-"`
 }
 
@@ -406,7 +406,7 @@ func (e *UsernameChangedEvent) Data() interface{} {
 
 func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.OldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
 }
@@ -425,7 +425,7 @@ func NewUsernameChangedEvent(
 			UserUserNameChangedType,
 		),
 		UserName:              newUserName,
-		oldUserName:           oldUserName,
+		OldUserName:           oldUserName,
 		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
