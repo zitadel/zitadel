@@ -53,8 +53,8 @@ var (
 		` projections.instance_domains.change_date, ` +
 		` projections.instance_domains.sequence` +
 		` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f` +
-		` LEFT JOIN projections.instances ON f.id = projections.instances.id AND f.id = projections.instances.id` +
-		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id AND f.id = projections.instance_domains.instance_id`
+		` LEFT JOIN projections.instances ON f.id = projections.instances.id` +
+		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`
 	instancesCols = []string{
 		"count",
 		"id",

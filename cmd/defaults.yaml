@@ -8,6 +8,12 @@ Metrics:
   # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
   Type: otel
 
+Tracing:
+  # Choose one in "otel", "google", "log" and "none"
+  Type: none
+  Fraction: 1
+  MetricPrefix: zitadel
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
