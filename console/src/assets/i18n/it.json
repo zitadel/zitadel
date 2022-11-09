@@ -868,7 +868,7 @@
       "GENERAL": "Generale",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
-      "COMPLEXITY": "complessità della password",
+      "COMPLEXITY": "Complessità della password",
       "NOTIFICATIONS": "Notifiche",
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",

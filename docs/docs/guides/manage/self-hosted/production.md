@@ -10,12 +10,15 @@ configure ZITADEL for production usage.
 
 We recommend running ZITADEL highly available using an orchestrator that
 schedules ZITADEL on multiple servers, like
-[Kubernetes](/docs/guides/deploy/kubernetes).
+[Kubernetes](/docs/guides/deploy/kubernetes). For keeping startup times fast
+when scaling ZITADEL, you should also consider using separate jobs with
+`zitadel init` and `zitadel setup`, so your workload containers just have to
+execute `zitadel start`.
 
 ## Configuration
 
 Read [on the configure page](/docs/guides/manage/self-hosted/configure) about
-the available options you have to configure the ZITADEL.
+the available options you have to configure ZITADEL.
 
 ## Networking
 
@@ -87,7 +90,7 @@ Projections:
 - You can configure instance defaults in the DefaultInstance section. If you
   plan to eventually create
   [multiple virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances),
-  these defaults take effect, too. Also, these configurations apply to the first
+  these defaults take effect. Also, these configurations apply to the first
   instance, that ZITADEL automatically creates for you. Especially the following
   properties are of special interest for your production setup.
 
@@ -114,14 +117,14 @@ DefaultInstance:
 
 - If you don't want to use the DefaultInstance configuration for the first
   instance that ZITADEL automatically creates for you during the
-  [startup phase](/docs/guides/manage/self-hosted/configure#database-initialization),
+  [setup phase](/docs/guides/manage/self-hosted/configure#database-initialization),
   you can provide a FirstInstance YAML section using the --steps argument.
 - Learn how to configure ZITADEL via the
   [Console user interface](/docs/guides/manage/console/overview).
-- Probably, you also want
+- Probably, you also want to
   [apply your custom branding](/docs/guides/manage/customize/branding),
   [hook into certain events](/docs/guides/manage/customize/behavior),
   [customize texts](/docs/guides/manage/customize/texts) or
-  [add metadata to your users](/docs/guides/manage/customize/user-metadata)
-- If you want to automatically setup ZITADEL resources, you can use the
-  [ZITADEL Terraform Provider](/docs/guides/manage/terraform/basics)
+  [add metadata to your users](/docs/guides/manage/customize/user-metadata).
+- If you want to automatically create ZITADEL resources, you can use the
+  [ZITADEL Terraform Provider](/docs/guides/manage/terraform/basics).
