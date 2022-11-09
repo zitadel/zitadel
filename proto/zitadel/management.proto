@@ -849,7 +849,7 @@ service ManagementService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "org.write"
+            permission: "org.remove"
         };
     }
 
