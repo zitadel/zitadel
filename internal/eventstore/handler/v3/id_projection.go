@@ -3,11 +3,16 @@ package v3
 import (
 	"context"
 	"database/sql"
+	"sync"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
+)
+
+var (
+	once sync.Once
 )
 
 type IDProjection struct {
@@ -16,6 +21,7 @@ type IDProjection struct {
 	client  *sql.DB
 	es      *eventstore.Eventstore
 	check   *handler.Check
+	version string
 }
 
 func NewConfig(client *sql.DB, es *eventstore.Eventstore) *Config {
@@ -30,6 +36,7 @@ type Config struct {
 	eventstore *eventstore.Eventstore
 	Check      *handler.Check
 	Reduces    map[eventstore.AggregateType][]Reducer
+	Version    string
 }
 
 type Reducer struct {
@@ -68,6 +75,7 @@ func New(name string, config Config) *IDProjection {
 		Name:    name,
 		reduces: config.Reduces,
 		check:   config.Check,
+		version: config.Version,
 	}
 }
 
@@ -86,6 +94,24 @@ func (p *IDProjection) Start() {
 			}
 		}
 	}()
+
+	once.Do(func() {
+		row := p.client.QueryRow("SELECT COUNT(*) FROM " + p.Name + " AS OF SYSTEM TIME '-1ms'")
+		var count int
+		err := row.Scan(&count)
+		if err != nil || count > 0 {
+			logging.OnError(err).WithField("name", p.Name).Error("unable to check projection")
+			return
+		}
+
+		err = p.es.TriggerSubscriptions(ctx,
+			eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+				OrderAsc().
+				AddQuery().
+				ExcludedInstanceID("").
+				Builder())
+		logging.OnError(err).WithField("name", p.Name).Error("unable to trigger subscribers")
+	})
 }
 
 // Process updates the projection by the given events
@@ -108,15 +134,18 @@ func (p *IDProjection) Process(ctx context.Context, event eventstore.Event) erro
 	if reducer.PreviousEvents != nil {
 		previousEventsQuery, err := reducer.PreviousEvents(tx, event)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 		if previousEventsQuery != nil {
 			previousEvents, err := p.es.Filter(ctx, previousEventsQuery)
 			if err != nil {
+				tx.Rollback()
 				return err
 			}
 			stmts, err = p.reducePreviousEvents(previousEvents)
 			if err != nil {
+				tx.Rollback()
 				return err
 			}
 		}
@@ -124,16 +153,13 @@ func (p *IDProjection) Process(ctx context.Context, event eventstore.Event) erro
 
 	stmt, err := reducer.Reduce(event)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
 	stmts = append(stmts, *stmt)
 
-	if err := p.execStmts(ctx, tx, stmts); err != nil {
-		return err
-	}
-	// }
-	return nil
+	return p.execStmts(ctx, tx, stmts)
 }
 
 func (p *IDProjection) Init(ctx context.Context) error {
@@ -215,6 +241,7 @@ func (p *IDProjection) execStmts(ctx context.Context, tx *sql.Tx, stmts handler.
 				"event", stmt.EventID,
 				"instance", stmt.InstanceID,
 			).WithError(err).Error("unable to execute statement")
+			tx.Rollback()
 			return err
 		}
 	}

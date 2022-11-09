@@ -131,6 +131,15 @@ func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuild
 	return es.mapEvents(events)
 }
 
+func (es *Eventstore) TriggerSubscriptions(ctx context.Context, queryFactory *SearchQueryBuilder) error {
+	events, err := es.Filter(ctx, queryFactory)
+	if err != nil {
+		return err
+	}
+	notify(events)
+	return nil
+}
+
 func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Event, err error) {
 	mappedEvents = make([]Event, len(events))
 
