@@ -89,8 +89,8 @@ export class ProjectGrantCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  public selectRoles(roles: Role.AsObject[]): void {
-    this.rolesKeyList = roles.map((role) => role.key);
+  public selectRoles(roles: string[]): void {
+    this.rolesKeyList = roles;
   }
 
   public next(): void {

@@ -121,6 +121,7 @@ func (p *orgMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*
 		[]handler.Condition{
 			handler.NewCond(OrgMetadataColumnOrgID, e.Aggregate().ID),
 			handler.NewCond(OrgMetadataColumnKey, e.Key),
+			handler.NewCond(OrgMetadataColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -137,6 +138,7 @@ func (p *orgMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event)
 		event,
 		[]handler.Condition{
 			handler.NewCond(OrgMetadataColumnOrgID, event.Aggregate().ID),
+			handler.NewCond(OrgMetadataColumnInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
