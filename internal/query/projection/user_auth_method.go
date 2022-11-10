@@ -184,6 +184,7 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 			handler.NewCond(UserAuthMethodTypeCol, methodType),
 			handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
 			handler.NewCond(UserAuthMethodTokenIDCol, tokenID),
+			handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -208,6 +209,7 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),
 		handler.NewCond(UserAuthMethodTypeCol, methodType),
 		handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+		handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 	}
 	if tokenID != "" {
 		conditions = append(conditions, handler.NewCond(UserAuthMethodTokenIDCol, tokenID))

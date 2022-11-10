@@ -76,10 +76,11 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (key = $2)",
+							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (key = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
+								"instance-id",
 							},
 						},
 					},
@@ -103,9 +104,10 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -129,9 +131,10 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},

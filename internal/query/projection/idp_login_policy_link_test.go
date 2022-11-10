@@ -23,7 +23,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "iam.reduceAdded",
+			name: "iam reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LoginPolicyIDPProviderAddedEventType),
@@ -59,7 +59,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceRemoved",
+			name: "iam reduceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LoginPolicyIDPProviderRemovedEventType),
@@ -78,10 +78,11 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -89,7 +90,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceCascadeRemoved",
+			name: "iam reduceCascadeRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LoginPolicyIDPProviderCascadeRemovedEventType),
@@ -108,10 +109,11 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -119,7 +121,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceAdded",
+			name: "org reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicyIDPProviderAddedEventType),
@@ -155,7 +157,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceRemoved",
+			name: "org reduceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicyIDPProviderRemovedEventType),
@@ -174,10 +176,11 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -185,7 +188,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -211,7 +214,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.reduceCascadeRemoved",
+			name: "org reduceCascadeRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LoginPolicyIDPProviderCascadeRemovedEventType),
@@ -230,10 +233,11 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -257,9 +261,10 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (resource_owner = $1)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (resource_owner = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -283,9 +288,10 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (aggregate_id = $1)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (aggregate_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -293,7 +299,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.IDPConfigRemovedEvent",
+			name: "org IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPConfigRemovedEventType),
@@ -311,10 +317,11 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -322,7 +329,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.IDPConfigRemovedEvent",
+			name: "iam IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigRemovedEventType),
@@ -340,10 +347,11 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
