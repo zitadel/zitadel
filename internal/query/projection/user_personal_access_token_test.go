@@ -74,9 +74,10 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.personal_access_tokens2 WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.personal_access_tokens2 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"tokenID",
+								"instance-id",
 							},
 						},
 					},
@@ -100,9 +101,10 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.personal_access_tokens2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.personal_access_tokens2 WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -110,7 +112,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
