@@ -279,9 +279,8 @@ func newUserProjection(ctx context.Context, config v3.Config) *v3.IDProjection {
 				PreviousEvents: p.previousEvents,
 			},
 			{
-				Event:          user.MachineAddedEventType,
-				Reduce:         p.reduceMachineAdded,
-				PreviousEvents: p.previousEvents,
+				Event:  user.MachineAddedEventType,
+				Reduce: p.reduceMachineAdded,
 			},
 			{
 				Event:          user.MachineChangedEventType,
