@@ -47,14 +47,18 @@ body:
   id: expected
   label: Expected behavior
   placeholder: A clear and concise description of what you expected to happen.
-- type: textarea
+- type: input
   id: version
   label: Version
   description: Which version of ZITADEL are you using.
 - type: textarea
   id: os
   label: Operating System
-  description: Please complete informations about your operating-system, device, browser, etc.
+  description: Please complete information about your operating-system, device, browser, etc.
+- type: textarea
+  id: config
+  label: Relevant Configuration
+  description: Add any relevant configurations that could help as. Make sure to redact any sensitive information. 
 - type: textarea
   id: additional
   label: Additional Context
