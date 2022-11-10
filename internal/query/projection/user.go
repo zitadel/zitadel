@@ -978,7 +978,7 @@ func (p *userProjection) previousEvents(tx *sql.Tx, event eventstore.Event) (*ev
 	}
 
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		SetTx(tx).
+		// SetTx(tx).
 		InstanceID(event.Aggregate().InstanceID).
 		SystemTime(event.CreationDate()).
 		AddQuery().

@@ -128,7 +128,7 @@ func (p *personalAccessTokenProjection) previousEventsRemoved(tx *sql.Tx, event 
 	}
 
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		SetTx(tx).
+		// SetTx(tx).
 		InstanceID(e.Aggregate().InstanceID).
 		SystemTime(e.CreationDate()).
 		AddQuery().

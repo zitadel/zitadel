@@ -405,7 +405,7 @@ func (p *userGrantProjection) previousEvents(event eventstore.Event, grantID str
 	}
 
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		SetTx(tx).
+		// SetTx(tx).
 		InstanceID(event.Aggregate().InstanceID).
 		SystemTime(event.CreationDate()).
 		AddQuery().
