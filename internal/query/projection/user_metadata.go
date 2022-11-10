@@ -80,7 +80,7 @@ func newUserMetadataProjection(ctx context.Context, config v3.Config) *v3.IDProj
 		},
 	}
 
-	return v3.StartSubscriptionIDProjection(ctx, UserMetadataProjectionTable, config)
+	return v3.New(UserMetadataProjectionTable, config)
 }
 
 func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {

@@ -77,7 +77,7 @@ func newPersonalAccessTokenProjection(ctx context.Context, config v3.Config) *v3
 		},
 	}
 
-	return v3.StartSubscriptionIDProjection(ctx, PersonalAccessTokenProjectionTable, config)
+	return v3.New(PersonalAccessTokenProjectionTable, config)
 }
 
 func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {

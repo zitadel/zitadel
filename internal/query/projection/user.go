@@ -302,7 +302,7 @@ func newUserProjection(ctx context.Context, config v3.Config) *v3.IDProjection {
 		},
 	}
 
-	return v3.StartSubscriptionIDProjection(ctx, UserTable, config)
+	return v3.New(UserTable, config)
 }
 
 func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Statement, error) {

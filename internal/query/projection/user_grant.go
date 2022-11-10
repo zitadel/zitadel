@@ -135,7 +135,7 @@ func newUserGrantProjection(ctx context.Context, config v3.Config) *v3.IDProject
 		},
 	}
 
-	return v3.StartSubscriptionIDProjection(ctx, UserGrantProjectionTable, config)
+	return v3.New(UserGrantProjectionTable, config)
 }
 
 func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {

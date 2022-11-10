@@ -52,7 +52,7 @@ var (
 	PersonalAccessTokenProjection       *v3.IDProjection
 	UserGrantProjection                 *v3.IDProjection
 	UserMetadataProjection              *v3.IDProjection
-	UserAuthMethodProjection            *userAuthMethodProjection
+	UserAuthMethodProjection            *v3.IDProjection
 	InstanceProjection                  *instanceProjection
 	SecretGeneratorProjection           *secretGeneratorProjection
 	SMTPConfigProjection                *smtpConfigProjection
@@ -126,7 +126,7 @@ func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, c
 	PersonalAccessTokenProjection = newPersonalAccessTokenProjection(ctx, *v3Config)
 	UserGrantProjection = newUserGrantProjection(ctx, *v3Config)
 	UserMetadataProjection = newUserMetadataProjection(ctx, *v3Config)
-	UserAuthMethodProjection = newUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
+	UserAuthMethodProjection = newUserAuthMethodProjection(ctx, *v3Config)
 	InstanceProjection = newInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))
 	SecretGeneratorProjection = newSecretGeneratorProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["secret_generators"]))
 	SMTPConfigProjection = newSMTPConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["smtp_configs"]))
