@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	KeyProjectionTable = "projections.keys3"
+	KeyProjectionTable = "projections.keys4"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 	CertificateTable   = KeyProjectionTable + "_" + certificateTableSuffix
@@ -69,7 +69,6 @@ func newKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeEnum, crdb.Default(0)),
 		},
 			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
-			crdb.WithConstraint(crdb.NewConstraint("id", []string{KeyColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText),
