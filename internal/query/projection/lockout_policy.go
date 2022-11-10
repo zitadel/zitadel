@@ -149,6 +149,7 @@ func (p *lockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 		cols,
 		[]handler.Condition{
 			handler.NewCond(LockoutPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -161,5 +162,6 @@ func (p *lockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handle
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(LockoutPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
