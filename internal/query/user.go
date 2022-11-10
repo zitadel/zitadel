@@ -316,14 +316,13 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		projection.LoginNameProjection.Trigger(ctx)
 	}
 
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareUserQuery(instanceID, withOwnerRemoved)
+	query, scan := prepareUserQuery(withOwnerRemoved)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): instanceID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		addUserWithoutOwnerRemoved(eq)
@@ -343,13 +342,12 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 		projection.LoginNameProjection.Trigger(ctx)
 	}
 
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareUserQuery(instanceID, withOwnerRemoved)
+	query, scan := prepareUserQuery(withOwnerRemoved)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
 	eq := sq.Eq{
-		UserInstanceIDCol.identifier(): instanceID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		addUserWithoutOwnerRemoved(eq)
@@ -432,14 +430,13 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 		projection.LoginNameProjection.Trigger(ctx)
 	}
 
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareNotifyUserQuery(instanceID, withOwnerRemoved)
+	query, scan := prepareNotifyUserQuery(withOwnerRemoved)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): instanceID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		addUserWithoutOwnerRemoved(eq)
@@ -459,13 +456,12 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 		projection.LoginNameProjection.Trigger(ctx)
 	}
 
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareNotifyUserQuery(instanceID, withOwnerRemoved)
+	query, scan := prepareNotifyUserQuery(withOwnerRemoved)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
 	eq := sq.Eq{
-		UserInstanceIDCol.identifier(): instanceID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		addUserWithoutOwnerRemoved(eq)
@@ -480,13 +476,13 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 }
 
 func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, withOwnerRemoved bool) (*Users, error) {
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	query, scan := prepareUsersQuery(instanceID, withOwnerRemoved)
-	eq := sq.Eq{UserInstanceIDCol.identifier(): instanceID}
+	query, scan := prepareUsersQuery(withOwnerRemoved)
+	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		addUserWithoutOwnerRemoved(eq)
 	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	stmt, args, err := queries.toQuery(query).Where(eq).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
@@ -643,27 +639,28 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	)
 }
 
-func prepareLoginNamesQuery(instanceID string, withOwnerRemoved bool) (string, []interface{}, error) {
-	eq := sq.Eq{
-		userLoginNamesInstanceIDCol.identifier(): instanceID,
-	}
-	if !withOwnerRemoved {
-		eq[userLoginNamesOwnerRemovedUserCol.identifier()] = false
-		eq[userLoginNamesOwnerRemovedPolicyCol.identifier()] = false
-		eq[userLoginNamesOwnerRemovedDomainCol.identifier()] = false
-	}
-	return sq.Select(
+func prepareLoginNamesQuery(withOwnerRemoved bool) (string, []interface{}, error) {
+	builder := sq.Select(
 		userLoginNamesUserIDCol.identifier(),
-		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name).
+		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name,
+		userLoginNamesInstanceIDCol.identifier()).
 		From(userLoginNamesTable.identifier()).
-		GroupBy(userLoginNamesUserIDCol.identifier()).
-		Where(eq).ToSql()
+		GroupBy(userLoginNamesUserIDCol.identifier(), userLoginNamesInstanceIDCol.identifier())
+
+	if !withOwnerRemoved {
+		eq := sq.Eq{
+			userLoginNamesOwnerRemovedUserCol.identifier():   false,
+			userLoginNamesOwnerRemovedPolicyCol.identifier(): false,
+			userLoginNamesOwnerRemovedDomainCol.identifier(): false,
+		}
+		builder = builder.Where(eq)
+	}
+	return builder.ToSql()
 }
 
-func preparePreferredLoginNamesQuery(instanceID string, withOwnerRemoved bool) (string, []interface{}, error) {
+func preparePreferredLoginNamesQuery(withOwnerRemoved bool) (string, []interface{}, error) {
 	eq := sq.Eq{
-		userPreferredLoginNameIsPrimaryCol.identifier():  true,
-		userPreferredLoginNameInstanceIDCol.identifier(): instanceID,
+		userPreferredLoginNameIsPrimaryCol.identifier(): true,
 	}
 	if !withOwnerRemoved {
 		eq[userPreferredLoginNameOwnerRemovedUserCol.identifier()] = false
@@ -673,17 +670,18 @@ func preparePreferredLoginNamesQuery(instanceID string, withOwnerRemoved bool) (
 
 	return sq.Select(
 		userPreferredLoginNameUserIDCol.identifier(),
-		userPreferredLoginNameCol.identifier()).
+		userPreferredLoginNameCol.identifier(),
+		userPreferredLoginNameInstanceIDCol.identifier()).
 		From(userPreferredLoginNameTable.identifier()).
 		Where(eq).ToSql()
 }
 
-func prepareUserQuery(instanceID string, withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
+func prepareUserQuery(withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
+	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -718,8 +716,14 @@ func prepareUserQuery(instanceID string, withLoginNamesOwnerRemoved bool) (sq.Se
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier(), loginNamesArgs...).
-			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier(), preferredLoginNameArgs...).
+			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
+				userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
+				userLoginNamesInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				loginNamesArgs...).
+			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
+				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*User, error) {
 			u := new(User)
@@ -965,12 +969,12 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 		}
 }
 
-func prepareNotifyUserQuery(instanceID string, withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
+func prepareNotifyUserQuery(withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
+	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
+	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -1004,8 +1008,14 @@ func prepareNotifyUserQuery(instanceID string, withLoginNamesOwnerRemoved bool) 
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(NotifyUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier(), loginNamesArgs...).
-			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier(), preferredLoginNameArgs...).
+			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
+				userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
+				userLoginNamesInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				loginNamesArgs...).
+			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
+				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*NotifyUser, error) {
 			u := new(NotifyUser)
@@ -1128,16 +1138,15 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 		}
 }
 
-func prepareUsersQuery(instanceID string, withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
+func prepareUsersQuery(withLoginNamesOwnerRemoved bool) (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+	loginNamesQuery, loginNamesArgs, err := prepareLoginNamesQuery(withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(instanceID, withLoginNamesOwnerRemoved)
+	preferredLoginNameQuery, preferredLoginNameArgs, err := preparePreferredLoginNamesQuery(withLoginNamesOwnerRemoved)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -1168,8 +1177,14 @@ func prepareUsersQuery(instanceID string, withLoginNamesOwnerRemoved bool) (sq.S
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier(), loginNamesArgs...).
-			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier(), preferredLoginNameArgs...).
+			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
+				userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
+				userLoginNamesInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				loginNamesArgs...).
+			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
+				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {
 			users := make([]*User, 0)

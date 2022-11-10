@@ -49,6 +49,14 @@ func (v *View) DeleteInstanceIDPs(event *models.Event) error {
 	return v.ProcessedIDPConfigSequence(event)
 }
 
+func (v *View) UpdateOrgOwnerRemovedIDPs(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedIDPs(v.Db, idpConfigTable, event.AggregateID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedIDPConfigSequence(event)
+}
+
 func (v *View) GetLatestIDPConfigSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(idpConfigTable, instanceID)
 }

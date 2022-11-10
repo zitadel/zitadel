@@ -15,10 +15,8 @@ import (
 )
 
 const (
-	ProjectMemberProjectionTable      = "projections.project_members3"
-	ProjectMemberProjectIDCol         = "project_id"
-	ProjectMemberProjectResourceOwner = "project_resource_owner"
-	ProjectMemberOwnerRemovedProject  = "owner_removed_project"
+	ProjectMemberProjectionTable = "projections.project_members3"
+	ProjectMemberProjectIDCol    = "project_id"
 )
 
 type projectMemberProjection struct {
@@ -33,8 +31,6 @@ func newProjectMemberProjection(ctx context.Context, config crdb.StatementHandle
 		crdb.NewTable(
 			append(memberColumns,
 				crdb.NewColumn(ProjectMemberProjectIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectMemberProjectResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectMemberOwnerRemovedProject, crdb.ColumnTypeBool, crdb.Default(false)),
 			),
 			crdb.NewPrimaryKey(MemberInstanceID, ProjectMemberProjectIDCol, MemberUserIDCol),
 			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
@@ -112,16 +108,10 @@ func (p *projectMemberProjection) reduceAdded(event eventstore.Event) (*handler.
 	if err != nil {
 		return nil, err
 	}
-	projectOwner, err := getResourceOwnerOfProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.Aggregate().ID)
-	if err != nil {
-		return nil, err
-	}
 	return reduceMemberAdded(
 		*member.NewMemberAddedEvent(&e.BaseEvent, e.UserID, e.Roles...),
 		userOwner,
 		withMemberCol(ProjectMemberProjectIDCol, e.Aggregate().ID),
-		withMemberCol(ProjectMemberProjectResourceOwner, projectOwner),
-		withMemberCol(ProjectMemberOwnerRemovedProject, false),
 	)
 }
 
@@ -175,16 +165,6 @@ func (p *projectMemberProjection) reduceOrgRemoved(event eventstore.Event) (*han
 		e,
 		multiReduceMemberOwnerRemoved(e),
 		multiReduceMemberUserOwnerRemoved(e),
-		crdb.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(MemberChangeDate, e.CreationDate()),
-				handler.NewCol(MemberSequence, e.Sequence()),
-				handler.NewCol(ProjectMemberOwnerRemovedProject, true),
-			},
-			[]handler.Condition{
-				handler.NewCond(ProjectMemberProjectResourceOwner, e.Aggregate().ID),
-			},
-		),
 	), nil
 }
 

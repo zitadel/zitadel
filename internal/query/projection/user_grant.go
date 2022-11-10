@@ -18,27 +18,26 @@ import (
 )
 
 const (
-	UserGrantUser            = "USERGRANT" //TODO: system?
 	UserGrantProjectionTable = "projections.user_grants3"
 
-	UserGrantID                     = "id"
-	UserGrantCreationDate           = "creation_date"
-	UserGrantChangeDate             = "change_date"
-	UserGrantSequence               = "sequence"
-	UserGrantState                  = "state"
-	UserGrantResourceOwner          = "resource_owner"
-	UserGrantInstanceID             = "instance_id"
-	UserGrantUserID                 = "user_id"
-	UserGrantResourceOwnerUser      = "resource_owner_user"
-	UserGrantUserOwnerRemoved       = "user_owner_removed"
-	UserGrantProjectID              = "project_id"
-	UserGrantResourceOwnerProject   = "resource_owner_project"
-	UserGrantProjectOwnerRemoved    = "project_owner_removed"
-	UserGrantGrantID                = "grant_id"
-	UserGrantGrantGrantedOrg        = "grant_granted_org"
-	UserGrantGrantGrantedOrgRemoved = "granted_org_removed"
-	UserGrantRoles                  = "roles"
-	UserGrantOwnerRemoved           = "owner_removed"
+	UserGrantID                   = "id"
+	UserGrantCreationDate         = "creation_date"
+	UserGrantChangeDate           = "change_date"
+	UserGrantSequence             = "sequence"
+	UserGrantState                = "state"
+	UserGrantResourceOwner        = "resource_owner"
+	UserGrantInstanceID           = "instance_id"
+	UserGrantUserID               = "user_id"
+	UserGrantResourceOwnerUser    = "resource_owner_user"
+	UserGrantUserOwnerRemoved     = "user_owner_removed"
+	UserGrantProjectID            = "project_id"
+	UserGrantResourceOwnerProject = "resource_owner_project"
+	UserGrantProjectOwnerRemoved  = "project_owner_removed"
+	UserGrantGrantID              = "grant_id"
+	UserGrantGrantedOrg           = "granted_org"
+	UserGrantGrantedOrgRemoved    = "granted_org_removed"
+	UserGrantRoles                = "roles"
+	UserGrantOwnerRemoved         = "owner_removed"
 )
 
 type userGrantProjection struct {
@@ -65,8 +64,8 @@ func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantResourceOwnerProject, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantProjectOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(UserGrantGrantID, crdb.ColumnTypeText),
-			crdb.NewColumn(UserGrantGrantGrantedOrg, crdb.ColumnTypeText),
-			crdb.NewColumn(UserGrantGrantGrantedOrgRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(UserGrantGrantedOrg, crdb.ColumnTypeText),
+			crdb.NewColumn(UserGrantGrantedOrgRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(UserGrantRoles, crdb.ColumnTypeTextArray, crdb.Nullable()),
 			crdb.NewColumn(UserGrantOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
@@ -209,7 +208,7 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantProjectID, e.ProjectID),
 			handler.NewCol(UserGrantResourceOwnerProject, projectOwner),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
-			handler.NewCol(UserGrantGrantGrantedOrg, grantOwner),
+			handler.NewCol(UserGrantGrantedOrg, grantOwner),
 			handler.NewCol(UserGrantRoles, database.StringArray(e.RoleKeys)),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},
@@ -420,11 +419,11 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 			[]handler.Column{
 				handler.NewCol(UserGrantChangeDate, e.CreationDate()),
 				handler.NewCol(UserGrantSequence, e.Sequence()),
-				handler.NewCol(UserGrantGrantGrantedOrgRemoved, true),
+				handler.NewCol(UserGrantGrantedOrgRemoved, true),
 			},
 			[]handler.Condition{
 				handler.NewCond(UserGrantInstanceID, e.Aggregate().InstanceID),
-				handler.NewCond(UserGrantGrantGrantedOrg, e.Aggregate().ID),
+				handler.NewCond(UserGrantGrantedOrg, e.Aggregate().ID),
 			},
 		),
 	), nil
@@ -498,6 +497,5 @@ func getGrantedOrgOfGrantedProject(ctx context.Context, es *eventstore.Eventstor
 }
 
 func setUserGrantContext(event eventstore.Aggregate) context.Context {
-	ctx := authz.WithInstanceID(context.Background(), event.InstanceID)
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: UserGrantUser, OrgID: event.ResourceOwner})
+	return authz.WithInstanceID(context.Background(), event.InstanceID)
 }

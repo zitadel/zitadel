@@ -12,11 +12,10 @@ import (
 )
 
 const (
-	UserMember              = "MEMBER" //TODO: system?
 	MemberUserIDCol         = "user_id"
 	MemberRolesCol          = "roles"
 	MemberUserResourceOwner = "user_resource_owner"
-	MemberOwnerRemovedUser  = "owner_removed_user"
+	MemberUserOwnerRemoved  = "user_owner_removed"
 
 	MemberCreationDate  = "creation_date"
 	MemberChangeDate    = "change_date"
@@ -32,7 +31,7 @@ var (
 		crdb.NewColumn(MemberChangeDate, crdb.ColumnTypeTimestamp),
 		crdb.NewColumn(MemberUserIDCol, crdb.ColumnTypeText),
 		crdb.NewColumn(MemberUserResourceOwner, crdb.ColumnTypeText),
-		crdb.NewColumn(MemberOwnerRemovedUser, crdb.ColumnTypeBool, crdb.Default(false)),
+		crdb.NewColumn(MemberUserOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		crdb.NewColumn(MemberRolesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		crdb.NewColumn(MemberSequence, crdb.ColumnTypeInt64),
 		crdb.NewColumn(MemberResourceOwner, crdb.ColumnTypeText),
@@ -67,7 +66,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, userResourceOwner string, opts
 		cols: []handler.Column{
 			handler.NewCol(MemberUserIDCol, e.UserID),
 			handler.NewCol(MemberUserResourceOwner, userResourceOwner),
-			handler.NewCol(MemberOwnerRemovedUser, false),
+			handler.NewCol(MemberUserOwnerRemoved, false),
 			handler.NewCol(MemberRolesCol, database.StringArray(e.Roles)),
 			handler.NewCol(MemberCreationDate, e.CreationDate()),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
@@ -177,7 +176,7 @@ func memberUserOwnerRemovedCols(e eventstore.Event) []handler.Column {
 	return []handler.Column{
 		handler.NewCol(MemberChangeDate, e.CreationDate()),
 		handler.NewCol(MemberSequence, e.Sequence()),
-		handler.NewCol(MemberOwnerRemovedUser, true),
+		handler.NewCol(MemberUserOwnerRemoved, true),
 	}
 }
 
@@ -197,6 +196,5 @@ func multiReduceMemberUserOwnerRemoved(e eventstore.Event, opts ...reduceMemberO
 }
 
 func setMemberContext(event eventstore.Aggregate) context.Context {
-	ctx := authz.WithInstanceID(context.Background(), event.InstanceID)
-	return authz.SetCtxData(ctx, authz.CtxData{UserID: UserMember, OrgID: event.ResourceOwner})
+	return authz.WithInstanceID(context.Background(), event.InstanceID)
 }

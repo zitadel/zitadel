@@ -62,7 +62,16 @@ var (
 	NotificationsProjection             interface{}
 )
 
-func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
+type projection interface {
+	Start()
+	Init(ctx context.Context) error
+}
+
+var (
+	projections []projection
+)
+
+func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm) error {
 	projectionConfig = crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
@@ -122,7 +131,23 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	OIDCSettingsProjection = newOIDCSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["oidc_settings"]))
 	DebugNotificationProviderProjection = newDebugNotificationProviderProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_notification_provider"]))
 	KeyProjection = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, certEncryptionAlgorithm)
+	newProjectionsList()
 	return nil
+}
+
+func Init(ctx context.Context) error {
+	for _, p := range projections {
+		if err := p.Init(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func Start() {
+	for _, projection := range projections {
+		projection.Start()
+	}
 }
 
 func ApplyCustomConfig(customConfig CustomConfig) crdb.StatementHandlerConfig {
@@ -145,4 +170,56 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	}
 
 	return config
+}
+
+// we know this is ugly, but we need to have a singleton slice of all projections
+// and are only able to initialize it after all projections are created
+// as setup and start currently create them individually, we make sure we get the right one
+// will be refactored when changing to new id based projections
+//
+// NotificationsProjection is not added here, because it does not statement based / has no proprietary projection table
+func newProjectionsList() {
+	projections = []projection{
+		OrgProjection,
+		OrgMetadataProjection,
+		ActionProjection,
+		FlowProjection,
+		ProjectProjection,
+		PasswordComplexityProjection,
+		PasswordAgeProjection,
+		LockoutPolicyProjection,
+		PrivacyPolicyProjection,
+		DomainPolicyProjection,
+		LabelPolicyProjection,
+		ProjectGrantProjection,
+		ProjectRoleProjection,
+		OrgDomainProjection,
+		LoginPolicyProjection,
+		IDPProjection,
+		AppProjection,
+		IDPUserLinkProjection,
+		IDPLoginPolicyLinkProjection,
+		MailTemplateProjection,
+		MessageTextProjection,
+		CustomTextProjection,
+		UserProjection,
+		LoginNameProjection,
+		OrgMemberProjection,
+		InstanceDomainProjection,
+		InstanceMemberProjection,
+		ProjectMemberProjection,
+		ProjectGrantMemberProjection,
+		AuthNKeyProjection,
+		PersonalAccessTokenProjection,
+		UserGrantProjection,
+		UserMetadataProjection,
+		UserAuthMethodProjection,
+		InstanceProjection,
+		SecretGeneratorProjection,
+		SMTPConfigProjection,
+		SMSConfigProjection,
+		OIDCSettingsProjection,
+		DebugNotificationProviderProjection,
+		KeyProjection,
+	}
 }

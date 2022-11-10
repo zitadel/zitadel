@@ -61,7 +61,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_members3 (user_id, user_resource_owner, owner_removed_user, roles, creation_date, change_date, sequence, resource_owner, instance_id, owner_removed, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO projections.org_members3 (user_id, user_resource_owner, user_owner_removed, roles, creation_date, change_date, sequence, resource_owner, instance_id, owner_removed, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"user-id",
 								"org1",
@@ -223,7 +223,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.org_members3 SET (change_date, sequence, owner_removed_user) = ($1, $2, $3) WHERE (user_resource_owner = $4)",
+							expectedStmt: "UPDATE projections.org_members3 SET (change_date, sequence, user_owner_removed) = ($1, $2, $3) WHERE (user_resource_owner = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

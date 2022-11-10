@@ -69,6 +69,14 @@ func (v *View) DeleteInstanceIDPProviders(event *models.Event) error {
 	return v.ProcessedIDPProviderSequence(event)
 }
 
+func (v *View) UpdateOrgOwnerRemovedIDPProviders(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedIDPProviders(v.Db, idpProviderTable, event.AggregateID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedIDPConfigSequence(event)
+}
+
 func (v *View) GetLatestIDPProviderSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(idpProviderTable, instanceID)
 }

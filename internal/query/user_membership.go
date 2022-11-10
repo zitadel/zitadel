@@ -188,15 +188,11 @@ var (
 		table: membershipAlias,
 	}
 	membershipOwnerRemovedUser = Column{
-		name:  projection.MemberOwnerRemovedUser,
-		table: membershipAlias,
-	}
-	membershipOwnerRemovedProject = Column{
-		name:  projection.ProjectMemberOwnerRemovedProject,
+		name:  projection.MemberUserOwnerRemoved,
 		table: membershipAlias,
 	}
 	membershipGrantedOrgRemoved = Column{
-		name:  projection.ProjectGrantMemberGrantGrantedOrgRemoved,
+		name:  projection.ProjectGrantMemberGrantedOrgRemoved,
 		table: membershipAlias,
 	}
 )
@@ -403,7 +399,7 @@ func prepareProjectGrantMember(withOwnerRemoved bool) (string, []interface{}) {
 	).From(projectGrantMemberTable.identifier())
 	if !withOwnerRemoved {
 		eq := sq.Eq{}
-		addProjectMemberWithoutOwnerRemoved(eq)
+		addProjectGrantMemberWithoutOwnerRemoved(eq)
 		builder = builder.Where(eq)
 	}
 	return builder.MustSql()

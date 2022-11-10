@@ -186,36 +186,28 @@ type ForeignKey struct {
 }
 
 // Init implements handler.Init
-func (h *StatementHandler) Init(ctx context.Context, initialized chan<- bool, checks ...*handler.Check) error {
-	for _, check := range checks {
-		if check == nil || check.IsNoop() {
-			initialized <- true
-			close(initialized)
-			return nil
-		}
-		tx, err := h.client.BeginTx(ctx, nil)
+func (h *StatementHandler) Init(ctx context.Context) error {
+	check := h.initCheck
+	if check == nil || check.IsNoop() {
+		return nil
+	}
+	tx, err := h.client.BeginTx(ctx, nil)
+	if err != nil {
+		return caos_errs.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
+	}
+	for i, execute := range check.Executes {
+		logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("executing check")
+		next, err := execute(h.client, h.ProjectionName)
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
-		}
-		for i, execute := range check.Executes {
-			logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("executing check")
-			next, err := execute(h.client, h.ProjectionName)
-			if err != nil {
-				tx.Rollback()
-				return err
-			}
-			if !next {
-				logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("skipping next check")
-				break
-			}
-		}
-		if err := tx.Commit(); err != nil {
+			tx.Rollback()
 			return err
 		}
+		if !next {
+			logging.WithFields("projection", h.ProjectionName, "execute", i).Debug("projection set up")
+			break
+		}
 	}
-	initialized <- true
-	close(initialized)
-	return nil
+	return tx.Commit()
 }
 
 func NewTableCheck(table *Table, opts ...execOption) *handler.Check {

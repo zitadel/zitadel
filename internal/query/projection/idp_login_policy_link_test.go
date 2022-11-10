@@ -241,32 +241,6 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceOrgRemoved",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					[]byte(`{}`),
-				), org.OrgRemovedEventMapper),
-			},
-			reduce: (&idpLoginPolicyLinkProjection{}).reduceOrgRemoved,
-			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (resource_owner = $1)",
-							expectedArgs: []interface{}{
-								"agg-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
 			name: "reducePolicyRemoved",
 			args: args{
 				event: getEvent(testEvent(

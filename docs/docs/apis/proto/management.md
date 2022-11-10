@@ -809,7 +809,7 @@ Sets the state of my organisation to active
 > **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
 [RemoveOrgResponse](#removeorgresponse)
 
-Sets the state of my organisation to deactivated
+Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed
 Users of this organisation will not be able login
 
 

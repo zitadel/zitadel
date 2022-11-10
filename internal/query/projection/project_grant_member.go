@@ -15,13 +15,11 @@ import (
 )
 
 const (
-	ProjectGrantMemberProjectionTable        = "projections.project_grant_members3"
-	ProjectGrantMemberProjectIDCol           = "project_id"
-	ProjectGrantMemberProjectResourceOwner   = "project_resource_owner"
-	ProjectGrantMemberOwnerRemovedProject    = "owner_removed_project"
-	ProjectGrantMemberGrantIDCol             = "grant_id"
-	ProjectGrantMemberGrantGrantedOrg        = "grant_granted_org"
-	ProjectGrantMemberGrantGrantedOrgRemoved = "granted_org_removed_grant"
+	ProjectGrantMemberProjectionTable   = "projections.project_grant_members3"
+	ProjectGrantMemberProjectIDCol      = "project_id"
+	ProjectGrantMemberGrantIDCol        = "grant_id"
+	ProjectGrantMemberGrantedOrg        = "granted_org"
+	ProjectGrantMemberGrantedOrgRemoved = "granted_org_removed"
 )
 
 type projectGrantMemberProjection struct {
@@ -36,11 +34,9 @@ func newProjectGrantMemberProjection(ctx context.Context, config crdb.StatementH
 		crdb.NewTable(
 			append(memberColumns,
 				crdb.NewColumn(ProjectGrantMemberProjectIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectGrantMemberProjectResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectGrantMemberOwnerRemovedProject, crdb.ColumnTypeBool, crdb.Default(false)),
 				crdb.NewColumn(ProjectGrantMemberGrantIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectGrantMemberGrantGrantedOrg, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectGrantMemberGrantGrantedOrgRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(ProjectGrantMemberGrantedOrg, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberGrantedOrgRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 			),
 			crdb.NewPrimaryKey(MemberInstanceID, ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
 			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
@@ -122,10 +118,6 @@ func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 	if err != nil {
 		return nil, err
 	}
-	projectOwner, err := getResourceOwnerOfProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.Aggregate().ID)
-	if err != nil {
-		return nil, err
-	}
 	grantedOrg, err := getGrantedOrgOfGrantedProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.Aggregate().ID, e.GrantID)
 	if err != nil {
 		return nil, err
@@ -134,11 +126,9 @@ func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 		*member.NewMemberAddedEvent(&e.BaseEvent, e.UserID, e.Roles...),
 		userOwner,
 		withMemberCol(ProjectGrantMemberProjectIDCol, e.Aggregate().ID),
-		withMemberCol(ProjectGrantMemberProjectResourceOwner, projectOwner),
-		withMemberCol(ProjectGrantMemberOwnerRemovedProject, false),
 		withMemberCol(ProjectGrantMemberGrantIDCol, e.GrantID),
-		withMemberCol(ProjectGrantMemberGrantGrantedOrg, grantedOrg),
-		withMemberCol(ProjectGrantMemberGrantGrantedOrgRemoved, false),
+		withMemberCol(ProjectGrantMemberGrantedOrg, grantedOrg),
+		withMemberCol(ProjectGrantMemberGrantedOrgRemoved, false),
 	)
 }
 
@@ -207,20 +197,10 @@ func (p *projectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) 
 			[]handler.Column{
 				handler.NewCol(MemberChangeDate, e.CreationDate()),
 				handler.NewCol(MemberSequence, e.Sequence()),
-				handler.NewCol(ProjectGrantMemberOwnerRemovedProject, true),
+				handler.NewCol(ProjectGrantMemberGrantedOrgRemoved, true),
 			},
 			[]handler.Condition{
-				handler.NewCond(ProjectGrantMemberProjectResourceOwner, e.Aggregate().ID),
-			},
-		),
-		crdb.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(MemberChangeDate, e.CreationDate()),
-				handler.NewCol(MemberSequence, e.Sequence()),
-				handler.NewCol(ProjectGrantMemberGrantGrantedOrgRemoved, true),
-			},
-			[]handler.Condition{
-				handler.NewCond(ProjectGrantMemberGrantGrantedOrg, e.Aggregate().ID),
+				handler.NewCond(ProjectGrantMemberGrantedOrg, e.Aggregate().ID),
 			},
 		),
 	), nil

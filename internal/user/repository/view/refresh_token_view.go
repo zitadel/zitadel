@@ -95,6 +95,11 @@ func DeleteApplicationRefreshTokens(db *gorm.DB, table string, appIDs []string) 
 	return delete(db)
 }
 
+func DeleteOrgRefreshTokens(db *gorm.DB, table string, orgID string) error {
+	delete := repository.PrepareDeleteByKey(table, usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyResourceOwner), orgID)
+	return delete(db)
+}
+
 func DeleteInstanceRefreshTokens(db *gorm.DB, table string, instanceID string) error {
 	delete := repository.PrepareDeleteByKey(table, usr_model.RefreshTokenSearchKey(model.RefreshTokenSearchKeyInstanceID), instanceID)
 	return delete(db)

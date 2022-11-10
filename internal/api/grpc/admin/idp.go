@@ -100,7 +100,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 	}
 	idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{
 		Queries: []query.SearchQuery{providerQuery},
-	}, false)
+	}, true)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 	}
 	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{idpQuery},
-	}, false)
+	}, true)
 	if err != nil {
 		return nil, err
 	}

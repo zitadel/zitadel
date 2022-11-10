@@ -287,8 +287,9 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	translator := l.getTranslator(r.Context(), authReq)
 	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, "ExternalNotFoundOption", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
 		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
 			externalRegisterFormData: externalRegisterFormData{
 				Email:     human.EmailAddress,
@@ -313,7 +314,6 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
 }
 

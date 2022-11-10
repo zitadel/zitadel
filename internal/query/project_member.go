@@ -55,11 +55,7 @@ var (
 		table: orgMemberTable,
 	}
 	ProjectMemberOwnerRemovedUser = Column{
-		name:  projection.MemberOwnerRemovedUser,
-		table: orgMemberTable,
-	}
-	ProjectMemberOwnerRemovedProject = Column{
-		name:  projection.ProjectMemberOwnerRemovedProject,
+		name:  projection.MemberUserOwnerRemoved,
 		table: orgMemberTable,
 	}
 )
@@ -78,7 +74,6 @@ func (q *ProjectMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func addProjectMemberWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[ProjectMemberOwnerRemoved.identifier()] = false
 	eq[ProjectMemberOwnerRemovedUser.identifier()] = false
-	eq[ProjectMemberOwnerRemovedProject.identifier()] = false
 }
 
 func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery, withOwnerRemoved bool) (*Members, error) {

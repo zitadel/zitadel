@@ -39,7 +39,7 @@ func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, au
 	}
 	data := &mfaU2FData{
 		webAuthNData: webAuthNData{
-			userData:               l.getUserData(r, authReq, "Login WebAuthNToken", errID, errMessage),
+			userData:               l.getUserData(r, authReq, "VerifyMFAU2F.Title", "VerifyMFAU2F.Description", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		MFAProviders:     providers,

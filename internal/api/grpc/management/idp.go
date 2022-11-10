@@ -80,7 +80,7 @@ func (s *Server) ReactivateOrgIDP(ctx context.Context, req *mgmt_pb.ReactivateOr
 }
 
 func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequest) (*mgmt_pb.RemoveOrgIDPResponse, error) {
-	idp, err := s.query.IDPByIDAndResourceOwner(ctx, true, req.IdpId, authz.GetCtxData(ctx).OrgID, false)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, true, req.IdpId, authz.GetCtxData(ctx).OrgID, true)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequ
 	}
 	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{idpQuery},
-	}, false)
+	}, true)
 	if err != nil {
 		return nil, err
 	}

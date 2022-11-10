@@ -312,14 +312,6 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	return writeModelToObjectDetails(&existingProject.WriteModel), nil
 }
 
-func (c *Commands) prepareProjectOwnerRemoved(a *project.Aggregate) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			return []eventstore.Command{project.NewProjectOwnerRemovedEvent(ctx, &a.Aggregate)}, nil
-		}, nil
-	}
-}
-
 func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {
 	projectWriteModel := NewProjectWriteModel(projectID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, projectWriteModel)

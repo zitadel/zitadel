@@ -14,7 +14,8 @@ func IDPByID(db *gorm.DB, table, idpID, instanceID string) (*model.IDPConfigView
 	idp := new(model.IDPConfigView)
 	idpIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyIdpConfigID, Value: idpID, Method: domain.SearchMethodEquals}
 	instanceIDQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyInstanceID, Value: instanceID, Method: domain.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, idpIDQuery, instanceIDQuery)
+	ownerRemovedQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyOwnerRemoved, Value: false, Method: domain.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, idpIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, idp)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.IDP.NotExisting")
@@ -32,6 +33,11 @@ func GetIDPConfigsByAggregateID(db *gorm.DB, table string, aggregateID, instance
 		}, {
 			Key:    iam_model.IDPConfigSearchKeyInstanceID,
 			Value:  instanceID,
+			Method: domain.SearchMethodEquals,
+		},
+		{
+			Key:    iam_model.IDPConfigSearchKeyOwnerRemoved,
+			Value:  false,
 			Method: domain.SearchMethodEquals,
 		},
 	}
@@ -64,6 +70,16 @@ func DeleteIDP(db *gorm.DB, table, idpID, instanceID string) error {
 		repository.Key{model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyInstanceID), instanceID},
 	)
 	return delete(db)
+}
+
+func UpdateOrgOwnerRemovedIDPs(db *gorm.DB, table, aggID string) error {
+	update := repository.PrepareUpdateByKey(table,
+		model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyAggregateID),
+		aggID,
+		model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyOwnerRemoved),
+		true,
+	)
+	return update(db)
 }
 
 func DeleteInstanceIDPs(db *gorm.DB, table, instanceID string) error {

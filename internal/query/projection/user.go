@@ -19,7 +19,7 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users4"
+	UserTable        = "projections.users6"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix

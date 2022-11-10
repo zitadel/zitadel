@@ -77,10 +77,6 @@ func (p *idpLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reducePolicyRemoved,
 				},
 				{
-					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRemoved,
-				},
-				{
 					Event:  org.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
@@ -205,18 +201,6 @@ func (p *idpLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idpID),
 			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
-		},
-	), nil
-}
-
-func (p *idpLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*org.OrgRemovedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QSoSe", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-	}
-	return crdb.NewDeleteStatement(e,
-		[]handler.Condition{
-			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),
 		},
 	), nil
 }

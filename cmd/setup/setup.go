@@ -8,11 +8,13 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/migration"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 var (
@@ -54,6 +56,7 @@ func Flags(cmd *cobra.Command) {
 }
 
 func Setup(config *Config, steps *Steps, masterKey string) {
+	ctx := context.Background()
 	logging.Info("setup started")
 
 	dbClient, err := database.Connect(config.Database, false)
@@ -79,6 +82,10 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.externalPort = config.ExternalPort
 
 	steps.s4EventstoreIndexes = &EventstoreIndexes{dbClient: dbClient, dbType: config.Database.Type()}
+	steps.s5OwnerRemoveColumns = &OwnerRemovedColumns{dbClient: dbClient, dbType: config.Database.Type()}
+
+	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
+	logging.OnError(err).Fatal("unable to start projections")
 
 	repeatableSteps := []migration.RepeatableMigration{
 		&externalConfigChange{
@@ -87,9 +94,12 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 			ExternalPort:   config.ExternalPort,
 			ExternalSecure: config.ExternalSecure,
 		},
+		&projectionTables{
+			es:      eventstoreClient,
+			Version: build.Version(),
+		},
 	}
 
-	ctx := context.Background()
 	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
 	logging.OnError(err).Fatal("unable to migrate step 1")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
@@ -98,6 +108,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 3")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s4EventstoreIndexes)
 	logging.OnError(err).Fatal("unable to migrate step 4")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s5OwnerRemoveColumns)
+	logging.OnError(err).Fatal("unable to migrate step 5")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

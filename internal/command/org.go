@@ -104,7 +104,7 @@ func (c *Commands) getOrg(ctx context.Context, orgID string) (*domain.Org, error
 	if err != nil {
 		return nil, err
 	}
-	if writeModel.State == domain.OrgStateUnspecified || writeModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(writeModel.State) {
 		return nil, errors.ThrowInternal(err, "COMMAND-4M9sf", "Errors.Org.NotFound")
 	}
 	return orgWriteModelToOrg(writeModel), nil
@@ -115,7 +115,7 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	if err != nil {
 		return err
 	}
-	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(orgWriteModel.State) {
 		return errors.ThrowPreconditionFailed(nil, "COMMAND-QXPGs", "Errors.Org.NotFound")
 	}
 	return nil
@@ -182,7 +182,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 	if err != nil {
 		return nil, err
 	}
-	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(orgWriteModel.State) {
 		return nil, errors.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.Name == name {
@@ -214,7 +214,7 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(orgWriteModel.State) {
 		return nil, errors.ThrowNotFound(nil, "ORG-oL9nT", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateInactive {
@@ -237,7 +237,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	if orgWriteModel.State == domain.OrgStateUnspecified || orgWriteModel.State == domain.OrgStateRemoved {
+	if !isOrgStateExists(orgWriteModel.State) {
 		return nil, errors.ThrowNotFound(nil, "ORG-Dgf3g", "Errors.Org.NotFound")
 	}
 	if orgWriteModel.State == domain.OrgStateActive {
@@ -282,19 +282,145 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, errors.ThrowPreconditionFailed(err, "COMMA-wG9p1", "Errors.Org.NotFound")
 			}
-			if writeModel.State == domain.OrgStateUnspecified {
+			if !isOrgStateExists(writeModel.State) {
 				return nil, errors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
 			}
-			if writeModel.State == domain.OrgStateRemoved {
-				return nil, errors.ThrowInvalidArgument(nil, "COMMA-pSAVZ", "Errors.NoChangesFound")
+
+			domainPolicy, err := c.getOrgDomainPolicy(ctx, a.ID)
+			if err != nil {
+				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name)}, nil
+			usernames, err := OrgUsers(ctx, filter, a.ID, domainPolicy.UserLoginMustBeDomain)
+			if err != nil {
+				return nil, err
+			}
+			domains, err := OrgDomains(ctx, filter, a.ID)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domains)}, nil
 		}, nil
 	}
 }
 
+func OrgDomains(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		EventTypes(
+			org.OrgDomainVerifiedEventType,
+			org.OrgDomainRemovedEventType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, 0)
+	for _, event := range events {
+		switch event.(type) {
+		case *org.DomainVerifiedEvent:
+			eventTyped := event.(*org.DomainVerifiedEvent)
+			names = append(names, eventTyped.Domain)
+		case *org.DomainRemovedEvent:
+			eventTyped := event.(*org.DomainRemovedEvent)
+			found := false
+			for i := range names {
+				if names[i] == eventTyped.Domain {
+					found = true
+					names[i] = names[len(names)-1]
+					break
+				}
+			}
+			if found {
+				names = names[:len(names)-1]
+			}
+		}
+	}
+	return names, nil
+}
+
+type userIDName struct {
+	name string
+	id   string
+}
+
+func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string, userLoginMustBeDomain bool) ([]string, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID(authz.GetInstance(ctx).InstanceID()).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(user_repo.AggregateType).
+		EventTypes(
+			user_repo.HumanAddedType,
+			user_repo.MachineAddedEventType,
+			user_repo.HumanRegisteredType,
+			user_repo.UserDomainClaimedType,
+			user_repo.UserUserNameChangedType,
+			user_repo.UserRemovedType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+
+	users := make([]userIDName, 0)
+	for _, event := range events {
+		switch event.(type) {
+		case *user_repo.HumanAddedEvent:
+			eventTyped := event.(*user_repo.HumanAddedEvent)
+			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+		case *user_repo.MachineAddedEvent:
+			eventTyped := event.(*user_repo.MachineAddedEvent)
+			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+		case *user_repo.HumanRegisteredEvent:
+			eventTyped := event.(*user_repo.HumanRegisteredEvent)
+			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
+		case *user_repo.DomainClaimedEvent:
+			eventTyped := event.(*user_repo.DomainClaimedEvent)
+			for i := range users {
+				if users[i].id == eventTyped.Aggregate().ID {
+					users[i].name = eventTyped.UserName
+				}
+			}
+		case *user_repo.UsernameChangedEvent:
+			eventTyped := event.(*user_repo.UsernameChangedEvent)
+			for i := range users {
+				if users[i].id == eventTyped.Aggregate().ID {
+					users[i].name = eventTyped.UserName
+				}
+			}
+		case *user_repo.UserRemovedEvent:
+			eventTyped := event.(*user_repo.UserRemovedEvent)
+			found := false
+
+			for i := range users {
+				if users[i].id == eventTyped.Aggregate().ID {
+					found = true
+					users[i] = users[len(users)-1]
+					break
+				}
+			}
+			if found {
+				users = users[:len(users)-1]
+			}
+		}
+	}
+	if userLoginMustBeDomain {
+		for i := range users {
+			users[i].name = users[i].name + orgID
+		}
+	}
+	names := make([]string, len(users))
+	for i := range users {
+		names[i] = users[i].name
+	}
+	return names, nil
+}
+
 func ExistsOrg(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
 	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		ResourceOwner(id).
 		OrderAsc().
 		AddQuery().
@@ -352,4 +478,17 @@ func (c *Commands) getOrgWriteModelByID(ctx context.Context, orgID string) (*Org
 		return nil, err
 	}
 	return orgWriteModel, nil
+}
+
+func isOrgStateExists(state domain.OrgState) bool {
+	return !hasOrgState(state, domain.OrgStateRemoved, domain.OrgStateUnspecified)
+}
+
+func hasOrgState(check domain.OrgState, states ...domain.OrgState) bool {
+	for _, state := range states {
+		if check == state {
+			return true
+		}
+	}
+	return false
 }

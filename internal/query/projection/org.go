@@ -196,7 +196,7 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 func (p *orgProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DgMSg", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DgMSg", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,

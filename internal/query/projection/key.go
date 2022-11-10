@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	KeyProjectionTable = "projections.keys4"
+	KeyProjectionTable = "projections.keys3"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 	CertificateTable   = KeyProjectionTable + "_" + certificateTableSuffix
