@@ -9,9 +9,9 @@ function ComplexityPolicyCheck(passwordElement) {
 
   let minLengthElem = document.getElementById("minlength");
   if (passwordElement.value.length >= minLength) {
-    ValidPolicy(minlengthelem);
+    ValidPolicy(minLengthElem);
   } else {
-    InvalidPolicy(minlengthelem);
+    InvalidPolicy(minLengthElem);
     invalid++;
   }
   let upper = document.getElementById("uppercase");
