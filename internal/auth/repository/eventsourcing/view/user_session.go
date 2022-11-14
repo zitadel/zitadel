@@ -65,7 +65,7 @@ func (v *View) DeleteInstanceUserSessions(event *models.Event) error {
 }
 
 func (v *View) DeleteOrgUserSessions(event *models.Event) error {
-	err := view.DeleteOrgUserSessions(v.Db, userSessionTable, event.InstanceID)
+	err := view.DeleteOrgUserSessions(v.Db, userSessionTable, event.InstanceID, event.ResourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

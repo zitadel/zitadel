@@ -592,7 +592,7 @@ func (p *notificationsProjection) getTwilioConfig(ctx context.Context) (*twilio.
 
 // Read iam filesystem provider config
 func (p *notificationsProjection) getFileSystemProvider(ctx context.Context) (*fs.FSConfig, error) {
-	config, err := p.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeFile, false)
+	config, err := p.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeFile)
 	if err != nil {
 		return nil, err
 	}
@@ -604,7 +604,7 @@ func (p *notificationsProjection) getFileSystemProvider(ctx context.Context) (*f
 
 // Read iam log provider config
 func (p *notificationsProjection) getLogProvider(ctx context.Context) (*log.LogConfig, error) {
-	config, err := p.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeLog, false)
+	config, err := p.queries.NotificationProviderByIDAndType(ctx, authz.GetInstance(ctx).InstanceID(), domain.NotificationProviderTypeLog)
 	if err != nil {
 		return nil, err
 	}

@@ -109,10 +109,13 @@ func PrepareDeleteByKey(table string, key ColumnKey, id interface{}) func(db *go
 	}
 }
 
-func PrepareUpdateByKey(table string, key ColumnKey, id interface{}, column ColumnKey, value interface{}) func(db *gorm.DB) error {
+func PrepareUpdateByKeys(table string, column ColumnKey, value interface{}, keys ...Key) func(db *gorm.DB) error {
 	return func(db *gorm.DB) error {
-		err := db.Table(table).
-			Where(fmt.Sprintf("%s = ?", key.ToColumnName()), id).
+		for _, key := range keys {
+			db = db.Table(table).
+				Where(fmt.Sprintf("%s = ?", key.Key.ToColumnName()), key.Value)
+		}
+		err := db.
 			Update(column.ToColumnName(), value).
 			Error
 		if err != nil {

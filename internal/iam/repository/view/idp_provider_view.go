@@ -125,16 +125,19 @@ func DeleteIDPProvidersByAggregateID(db *gorm.DB, table, aggregateID, instanceID
 }
 
 func DeleteInstanceIDPProviders(db *gorm.DB, table, instanceID string) error {
-	delete := repository.PrepareDeleteByKey(table, model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID), instanceID)
+	delete := repository.PrepareDeleteByKey(table,
+		model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID),
+		instanceID,
+	)
 	return delete(db)
 }
 
-func UpdateOrgOwnerRemovedIDPProviders(db *gorm.DB, table, aggID string) error {
-	update := repository.PrepareUpdateByKey(table,
-		model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyAggregateID),
-		aggID,
+func UpdateOrgOwnerRemovedIDPProviders(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
 		model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyOwnerRemoved),
 		true,
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyAggregateID), Value: aggID},
 	)
 	return update(db)
 }

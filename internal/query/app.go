@@ -28,7 +28,6 @@ type App struct {
 	ResourceOwner string
 	State         domain.AppState
 	Sequence      uint64
-	OwnerRemoved  bool
 
 	ProjectID string
 	Name      string

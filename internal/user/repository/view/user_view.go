@@ -241,12 +241,12 @@ func DeleteInstanceUsers(db *gorm.DB, table, instanceID string) error {
 	return delete(db)
 }
 
-func UpdateOrgOwnerRemovedUsers(db *gorm.DB, table, aggID string) error {
-	delete := repository.PrepareUpdateByKey(table,
-		model.UserSearchKey(usr_model.UserSearchKeyResourceOwner),
-		aggID,
+func UpdateOrgOwnerRemovedUsers(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
 		model.UserSearchKey(usr_model.UserSearchOwnerRemoved),
 		true,
+		repository.Key{Key: model.UserSearchKey(usr_model.UserSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.UserSearchKey(usr_model.UserSearchKeyResourceOwner), Value: aggID},
 	)
-	return delete(db)
+	return update(db)
 }

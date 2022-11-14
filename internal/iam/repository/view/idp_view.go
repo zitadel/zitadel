@@ -72,12 +72,12 @@ func DeleteIDP(db *gorm.DB, table, idpID, instanceID string) error {
 	return delete(db)
 }
 
-func UpdateOrgOwnerRemovedIDPs(db *gorm.DB, table, aggID string) error {
-	update := repository.PrepareUpdateByKey(table,
-		model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyAggregateID),
-		aggID,
+func UpdateOrgOwnerRemovedIDPs(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
 		model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyOwnerRemoved),
 		true,
+		repository.Key{Key: model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.IDPConfigSearchKey(iam_model.IDPConfigSearchKeyAggregateID), Value: aggID},
 	)
 	return update(db)
 }

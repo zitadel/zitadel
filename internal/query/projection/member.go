@@ -124,9 +124,10 @@ func reduceMemberRemoved(e eventstore.Event, opts ...reduceMemberOpt) (*handler.
 	return crdb.NewDeleteStatement(e, config.conds), nil
 }
 
-func memberOwnerRemovedConds(e eventstore.Event, opts ...reduceMemberOpt) []handler.Condition {
+func multiReduceMemberOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) func(eventstore.Event) crdb.Exec {
 	config := reduceMemberConfig{
 		conds: []handler.Condition{
+			handler.NewCond(MemberInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(MemberResourceOwner, e.Aggregate().ID),
 		},
 	}
@@ -134,34 +135,20 @@ func memberOwnerRemovedConds(e eventstore.Event, opts ...reduceMemberOpt) []hand
 	for _, opt := range opts {
 		config = opt(config)
 	}
-	return config.conds
-}
-
-func memberOwnerRemovedCols(e eventstore.Event) []handler.Column {
-	return []handler.Column{
-		handler.NewCol(MemberChangeDate, e.CreationDate()),
-		handler.NewCol(MemberSequence, e.Sequence()),
-		handler.NewCol(MemberOwnerRemoved, true),
-	}
-}
-
-func reduceMemberOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) (*handler.Statement, error) {
-	return crdb.NewUpdateStatement(
-		e,
-		memberOwnerRemovedCols(e),
-		memberOwnerRemovedConds(e, opts...),
-	), nil
-}
-
-func multiReduceMemberOwnerRemoved(e eventstore.Event, opts ...reduceMemberOpt) func(eventstore.Event) crdb.Exec {
 	return crdb.AddUpdateStatement(
-		memberOwnerRemovedCols(e),
-		memberOwnerRemovedConds(e, opts...),
+		[]handler.Column{
+			handler.NewCol(MemberChangeDate, e.CreationDate()),
+			handler.NewCol(MemberSequence, e.Sequence()),
+			handler.NewCol(MemberOwnerRemoved, true),
+		},
+		config.conds,
 	)
 }
+
 func memberUserOwnerRemovedConds(e eventstore.Event, opts ...reduceMemberOpt) []handler.Condition {
 	config := reduceMemberConfig{
 		conds: []handler.Condition{
+			handler.NewCond(MemberInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(MemberUserResourceOwner, e.Aggregate().ID),
 		},
 	}

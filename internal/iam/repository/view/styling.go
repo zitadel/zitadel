@@ -29,12 +29,12 @@ func PutStyling(db *gorm.DB, table string, policy *model.LabelPolicyView) error 
 	return save(db, policy)
 }
 
-func UpdateOrgOwnerRemovedStyling(db *gorm.DB, table, aggID string) error {
-	update := repository.PrepareUpdateByKey(table,
-		model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyAggregateID),
-		aggID,
+func UpdateOrgOwnerRemovedStyling(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
 		model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyOwnerRemoved),
 		true,
+		repository.Key{Key: model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyAggregateID), Value: aggID},
 	)
 	return update(db)
 }

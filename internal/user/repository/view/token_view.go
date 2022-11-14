@@ -99,11 +99,17 @@ func DeleteApplicationTokens(db *gorm.DB, table, instanceID string, appIDs []str
 }
 
 func DeleteInstanceTokens(db *gorm.DB, table, instanceID string) error {
-	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID)
+	delete := repository.PrepareDeleteByKey(table,
+		usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID),
+		instanceID,
+	)
 	return delete(db)
 }
 
-func DeleteOrgTokens(db *gorm.DB, table, orgID string) error {
-	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyResourceOwner), orgID)
+func DeleteOrgTokens(db *gorm.DB, table, instanceID, orgID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyResourceOwner), orgID},
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+	)
 	return delete(db)
 }

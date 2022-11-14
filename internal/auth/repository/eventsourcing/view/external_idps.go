@@ -65,7 +65,7 @@ func (v *View) DeleteInstanceExternalIDPs(event *models.Event) error {
 }
 
 func (v *View) UpdateOrgOwnerRemovedExternalIDPs(event *models.Event) error {
-	err := view.UpdateOrgOwnerRemovedExternalIDPs(v.Db, externalIDPTable, event.InstanceID)
+	err := view.UpdateOrgOwnerRemovedExternalIDPs(v.Db, externalIDPTable, event.InstanceID, event.ResourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

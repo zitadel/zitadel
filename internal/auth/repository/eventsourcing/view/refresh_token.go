@@ -74,7 +74,7 @@ func (v *View) DeleteInstanceRefreshTokens(event *models.Event) error {
 }
 
 func (v *View) DeleteOrgRefreshTokens(event *models.Event) error {
-	err := usr_view.DeleteOrgRefreshTokens(v.Db, refreshTokenTable, event.ResourceOwner)
+	err := usr_view.DeleteOrgRefreshTokens(v.Db, refreshTokenTable, event.InstanceID, event.ResourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

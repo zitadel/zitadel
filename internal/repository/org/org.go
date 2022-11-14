@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -171,7 +173,10 @@ type OrgRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	name                 string
 	usernames            []string
+	loginMustBeDomain    bool
 	domains              []string
+	externalIDPs         []*domain.UserIDPLink
+	samlEntityIDs        []string
 }
 
 func (e *OrgRemovedEvent) Data() interface{} {
@@ -182,24 +187,33 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrain
 	constraints := []*eventstore.EventUniqueConstraint{}
 	for _, name := range e.usernames {
 		//username already contains resourceowner is necessary
-		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, "", false))
+		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.loginMustBeDomain))
 	}
 	for _, domain := range e.domains {
 		constraints = append(constraints, NewRemoveOrgDomainUniqueConstraint(domain))
 	}
+	for _, idp := range e.externalIDPs {
+		constraints = append(constraints, user.NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
+	}
+	for _, entityID := range e.samlEntityIDs {
+		constraints = append(constraints, project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID))
+	}
 	return constraints
 }
 
-func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames, domains []string) *OrgRemovedEvent {
+func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, loginMustBeDomain bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			OrgRemovedEventType,
 		),
-		name:      name,
-		usernames: usernames,
-		domains:   domains,
+		name:              name,
+		usernames:         usernames,
+		domains:           domains,
+		externalIDPs:      externalIDPs,
+		samlEntityIDs:     samlEntityIDs,
+		loginMustBeDomain: loginMustBeDomain,
 	}
 }
 

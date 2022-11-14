@@ -437,13 +437,13 @@ func getResourceOwnerOfUser(ctx context.Context, es *eventstore.Eventstore, inst
 			AddQuery().
 			AggregateTypes(user.AggregateType).
 			AggregateIDs(aggID).
-			EventTypes(user.HumanAddedType, user.MachineAddedEventType).
+			EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType).
 			Builder(),
 	)
 	if err != nil {
 		return "", err
 	}
-	if len(events) == 0 || len(events) > 1 {
+	if len(events) != 1 {
 		return "", errors.ThrowNotFound(nil, "PROJ-0I92sp", "Errors.User.NotFound")
 	}
 	return events[0].Aggregate().ResourceOwner, nil

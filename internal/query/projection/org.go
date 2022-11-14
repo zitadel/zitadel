@@ -134,6 +134,7 @@ func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 			handler.NewCol(OrgColumnName, e.Name),
 		},
 		[]handler.Condition{
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
 		},
 	), nil
@@ -152,6 +153,7 @@ func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 			handler.NewCol(OrgColumnState, domain.OrgStateInactive),
 		},
 		[]handler.Condition{
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
 		},
 	), nil
@@ -170,6 +172,7 @@ func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 			handler.NewCol(OrgColumnState, domain.OrgStateActive),
 		},
 		[]handler.Condition{
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
 		},
 	), nil
@@ -188,6 +191,7 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 			handler.NewCol(OrgColumnDomain, e.Domain),
 		},
 		[]handler.Condition{
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
 		},
 	), nil
@@ -206,6 +210,7 @@ func (p *orgProjection) reduceOrgRemoved(event eventstore.Event) (*handler.State
 			handler.NewCol(OrgColumnState, domain.OrgStateRemoved),
 		},
 		[]handler.Condition{
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
 		},
 	), nil

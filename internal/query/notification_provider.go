@@ -69,7 +69,7 @@ var (
 	}
 )
 
-func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType, withOwnerRemoved bool) (*DebugNotificationProvider, error) {
+func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*DebugNotificationProvider, error) {
 	query, scan := prepareDebugNotificationProviderQuery()
 	stmt, args, err := query.Where(
 		sq.And{

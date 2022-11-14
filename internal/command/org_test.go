@@ -17,6 +17,7 @@ import (
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/member"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -1057,7 +1058,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 						eventFromEventPusher(
 							org.NewOrgRemovedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
-								"org", []string{}, []string{}),
+								"org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{}),
 						),
 					),
 				),
@@ -1094,12 +1095,14 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					),
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
+					expectFilter(),
 					expectPushFailed(
 						errors.ThrowInternal(nil, "id", "message"),
 						[]*repository.Event{
 							eventFromEventPusher(
 								org.NewOrgRemovedEvent(
-									context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, []string{},
+									context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
 								),
 							),
 						},
@@ -1138,10 +1141,14 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					),
 					expectFilter(),
 					expectFilter(),
+					expectFilter(),
+					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, []string{}),
+								org.NewOrgRemovedEvent(
+									context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
+								),
 							),
 						},
 					),
@@ -1208,16 +1215,42 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 							org.NewDomainVerifiedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "domain2"),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(), &user.NewAggregate("user1", "org1").Aggregate, "config1", "display1", "id1"),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(), &user.NewAggregate("user2", "org1").Aggregate, "config2", "display2", "id2"),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, ""),
+						),
+						eventFromEventPusher(
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, ""),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{"user1", "user2"}, []string{"domain1", "domain2"}),
+								org.NewOrgRemovedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, "org",
+									[]string{"user1", "user2"},
+									false,
+									[]string{"domain1", "domain2"},
+									[]*domain.UserIDPLink{{IDPConfigID: "config1", ExternalUserID: "id1", DisplayName: "display1"}, {IDPConfigID: "config2", ExternalUserID: "id2", DisplayName: "display2"}},
+									[]string{"entity1", "entity2"},
+								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user1org1", "", false)),
-						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user2org1", "", false)),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user1", "org1", true)),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user2", "org1", true)),
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("domain1")),
 						uniqueConstraintsFromEventConstraint(org.NewRemoveOrgDomainUniqueConstraint("domain2")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("config1", "id1")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("config2", "id2")),
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("entity1")),
+						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("entity2")),
 					),
 				),
 			},

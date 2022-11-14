@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -290,7 +291,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, err
 			}
-			usernames, err := OrgUsers(ctx, filter, a.ID, domainPolicy.UserLoginMustBeDomain)
+			usernames, err := OrgUsers(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -298,9 +299,108 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if err != nil {
 				return nil, err
 			}
-			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domains)}, nil
+			links, err := OrgUserIDPLinks(ctx, filter, a.ID)
+			if err != nil {
+				return nil, err
+			}
+			entityIds, err := OrgSamlEntityIDs(ctx, filter, a.ID)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{org.NewOrgRemovedEvent(ctx, &a.Aggregate, writeModel.Name, usernames, domainPolicy.UserLoginMustBeDomain, domains, links, entityIds)}, nil
 		}, nil
 	}
+}
+
+func OrgUserIDPLinks(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]*domain.UserIDPLink, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(user_repo.AggregateType).
+		EventTypes(
+			user_repo.UserIDPLinkAddedType, user_repo.UserIDPLinkRemovedType, user_repo.UserIDPLinkCascadeRemovedType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+	links := make([]*domain.UserIDPLink, 0)
+	for _, event := range events {
+		switch eventTyped := event.(type) {
+		case *user_repo.UserIDPLinkAddedEvent:
+			links = append(links, &domain.UserIDPLink{
+				IDPConfigID:    eventTyped.IDPConfigID,
+				ExternalUserID: eventTyped.ExternalUserID,
+				DisplayName:    eventTyped.DisplayName,
+			})
+		case *user_repo.UserIDPLinkRemovedEvent:
+			for i := range links {
+				if links[i].ExternalUserID == eventTyped.ExternalUserID &&
+					links[i].IDPConfigID == eventTyped.IDPConfigID {
+					links[i] = links[len(links)-1]
+					links = links[:len(links)-1]
+					break
+				}
+			}
+
+		case *user_repo.UserIDPLinkCascadeRemovedEvent:
+			for i := range links {
+				if links[i].ExternalUserID == eventTyped.ExternalUserID &&
+					links[i].IDPConfigID == eventTyped.IDPConfigID {
+					links[i] = links[len(links)-1]
+					links = links[:len(links)-1]
+					break
+				}
+			}
+		}
+	}
+	return links, nil
+}
+
+type samlEntityID struct {
+	appID    string
+	entityID string
+}
+
+func OrgSamlEntityIDs(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(orgID).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		EventTypes(
+			project.SAMLConfigAddedType, project.SAMLConfigChangedType, project.ApplicationRemovedType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+	entityIDs := make([]samlEntityID, 0)
+	for _, event := range events {
+		switch eventTyped := event.(type) {
+		case *project.SAMLConfigAddedEvent:
+			entityIDs = append(entityIDs, samlEntityID{appID: eventTyped.AppID, entityID: eventTyped.EntityID})
+		case *project.SAMLConfigChangedEvent:
+			for i := range entityIDs {
+				if entityIDs[i].appID == eventTyped.AppID {
+					entityIDs[i].entityID = eventTyped.EntityID
+					break
+				}
+			}
+		case *project.ApplicationRemovedEvent:
+			for i := range entityIDs {
+				if entityIDs[i].appID == eventTyped.AppID {
+					entityIDs[i] = entityIDs[len(entityIDs)-1]
+					entityIDs = entityIDs[:len(entityIDs)-1]
+					break
+				}
+			}
+		}
+	}
+	ids := make([]string, len(entityIDs))
+	for i := range entityIDs {
+		ids[i] = entityIDs[i].entityID
+	}
+	return ids, nil
 }
 
 func OrgDomains(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
@@ -318,22 +418,16 @@ func OrgDomains(ctx context.Context, filter preparation.FilterToQueryReducer, or
 	}
 	names := make([]string, 0)
 	for _, event := range events {
-		switch event.(type) {
+		switch eventTyped := event.(type) {
 		case *org.DomainVerifiedEvent:
-			eventTyped := event.(*org.DomainVerifiedEvent)
 			names = append(names, eventTyped.Domain)
 		case *org.DomainRemovedEvent:
-			eventTyped := event.(*org.DomainRemovedEvent)
-			found := false
 			for i := range names {
 				if names[i] == eventTyped.Domain {
-					found = true
 					names[i] = names[len(names)-1]
+					names = names[:len(names)-1]
 					break
 				}
-			}
-			if found {
-				names = names[:len(names)-1]
 			}
 		}
 	}
@@ -345,7 +439,7 @@ type userIDName struct {
 	id   string
 }
 
-func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string, userLoginMustBeDomain bool) ([]string, error) {
+func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) ([]string, error) {
 	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		ResourceOwner(orgID).
@@ -366,49 +460,33 @@ func OrgUsers(ctx context.Context, filter preparation.FilterToQueryReducer, orgI
 
 	users := make([]userIDName, 0)
 	for _, event := range events {
-		switch event.(type) {
+		switch eventTyped := event.(type) {
 		case *user_repo.HumanAddedEvent:
-			eventTyped := event.(*user_repo.HumanAddedEvent)
 			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
 		case *user_repo.MachineAddedEvent:
-			eventTyped := event.(*user_repo.MachineAddedEvent)
 			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
 		case *user_repo.HumanRegisteredEvent:
-			eventTyped := event.(*user_repo.HumanRegisteredEvent)
 			users = append(users, userIDName{eventTyped.UserName, eventTyped.Aggregate().ID})
 		case *user_repo.DomainClaimedEvent:
-			eventTyped := event.(*user_repo.DomainClaimedEvent)
 			for i := range users {
 				if users[i].id == eventTyped.Aggregate().ID {
 					users[i].name = eventTyped.UserName
 				}
 			}
 		case *user_repo.UsernameChangedEvent:
-			eventTyped := event.(*user_repo.UsernameChangedEvent)
 			for i := range users {
 				if users[i].id == eventTyped.Aggregate().ID {
 					users[i].name = eventTyped.UserName
 				}
 			}
 		case *user_repo.UserRemovedEvent:
-			eventTyped := event.(*user_repo.UserRemovedEvent)
-			found := false
-
 			for i := range users {
 				if users[i].id == eventTyped.Aggregate().ID {
-					found = true
 					users[i] = users[len(users)-1]
+					users = users[:len(users)-1]
 					break
 				}
 			}
-			if found {
-				users = users[:len(users)-1]
-			}
-		}
-	}
-	if userLoginMustBeDomain {
-		for i := range users {
-			users[i].name = users[i].name + orgID
 		}
 	}
 	names := make([]string, len(users))

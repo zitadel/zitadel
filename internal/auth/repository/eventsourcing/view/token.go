@@ -85,7 +85,7 @@ func (v *View) DeleteInstanceTokens(event *models.Event) error {
 }
 
 func (v *View) DeleteOrgTokens(event *models.Event) error {
-	err := usr_view.DeleteOrgTokens(v.Db, tokenTable, event.ResourceOwner)
+	err := usr_view.DeleteOrgTokens(v.Db, tokenTable, event.InstanceID, event.ResourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

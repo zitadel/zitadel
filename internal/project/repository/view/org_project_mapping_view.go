@@ -43,12 +43,12 @@ func DeleteInstanceOrgProjectMappings(db *gorm.DB, table, instanceID string) err
 	return delete(db)
 }
 
-func UpdateOwnerRemovedOrgProjectMappings(db *gorm.DB, table, orgID string) error {
-	update := repository.PrepareUpdateByKey(table,
-		model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyOrgID),
-		orgID,
+func UpdateOwnerRemovedOrgProjectMappings(db *gorm.DB, table, instanceID, orgID string) error {
+	update := repository.PrepareUpdateByKeys(table,
 		model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyOwnerRemoved),
 		true,
+		repository.Key{Key: model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.OrgProjectMappingSearchKey(proj_model.OrgProjectMappingSearchKeyOrgID), Value: orgID},
 	)
 	return update(db)
 }

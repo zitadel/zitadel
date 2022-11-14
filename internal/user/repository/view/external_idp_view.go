@@ -136,12 +136,12 @@ func DeleteInstanceExternalIDPs(db *gorm.DB, table, instanceID string) error {
 	return delete(db)
 }
 
-func UpdateOrgOwnerRemovedExternalIDPs(db *gorm.DB, table, aggID string) error {
-	update := repository.PrepareUpdateByKey(table,
-		model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyResourceOwner),
-		aggID,
+func UpdateOrgOwnerRemovedExternalIDPs(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
 		model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyOwnerRemoved),
 		true,
+		repository.Key{Key: model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.ExternalIDPSearchKey(usr_model.ExternalIDPSearchKeyResourceOwner), Value: aggID},
 	)
 	return update(db)
 }

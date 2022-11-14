@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	DebugNotificationProviderTable = "projections.notification_providers2"
+	DebugNotificationProviderTable = "projections.notification_providers"
 
 	DebugNotificationProviderAggIDCol         = "aggregate_id"
 	DebugNotificationProviderCreationDateCol  = "creation_date"

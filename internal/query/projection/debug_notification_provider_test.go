@@ -40,7 +40,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.notification_providers2 (aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.notification_providers (aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -76,7 +76,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.notification_providers2 SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
+							expectedStmt: "UPDATE projections.notification_providers SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -106,7 +106,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.notification_providers2 WHERE (aggregate_id = $1) AND (provider_type = $2)",
+							expectedStmt: "DELETE FROM projections.notification_providers WHERE (aggregate_id = $1) AND (provider_type = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.NotificationProviderTypeFile,
@@ -135,7 +135,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.notification_providers2 (aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.notification_providers (aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -171,7 +171,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.notification_providers2 SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
+							expectedStmt: "UPDATE projections.notification_providers SET (change_date, sequence, compact) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -201,7 +201,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.notification_providers2 WHERE (aggregate_id = $1) AND (provider_type = $2)",
+							expectedStmt: "DELETE FROM projections.notification_providers WHERE (aggregate_id = $1) AND (provider_type = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.NotificationProviderTypeLog,
@@ -228,7 +228,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.notification_providers2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.notification_providers WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

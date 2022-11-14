@@ -50,7 +50,7 @@ func (v *View) DeleteInstanceIDPs(event *models.Event) error {
 }
 
 func (v *View) UpdateOrgOwnerRemovedIDPs(event *models.Event) error {
-	err := view.UpdateOrgOwnerRemovedIDPs(v.Db, idpConfigTable, event.AggregateID)
+	err := view.UpdateOrgOwnerRemovedIDPs(v.Db, idpConfigTable, event.InstanceID, event.AggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

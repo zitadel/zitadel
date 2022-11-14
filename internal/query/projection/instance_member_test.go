@@ -211,11 +211,12 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.instance_members3 SET (change_date, sequence, user_owner_removed) = ($1, $2, $3) WHERE (user_resource_owner = $4)",
+							expectedStmt: "UPDATE projections.instance_members3 SET (change_date, sequence, user_owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_resource_owner = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								true,
+								"instance-id",
 								"agg-id",
 							},
 						},

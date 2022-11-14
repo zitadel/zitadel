@@ -280,7 +280,3 @@ func ProjectRemovedEventMapper(event *repository.Event) (eventstore.Event, error
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }
-
-type ProjectOwnerRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-}

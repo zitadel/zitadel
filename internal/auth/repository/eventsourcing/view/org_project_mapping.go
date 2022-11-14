@@ -41,7 +41,7 @@ func (v *View) DeleteInstanceOrgProjectMappings(event *models.Event) error {
 }
 
 func (v *View) UpdateOwnerRemovedOrgProjectMappings(event *models.Event) error {
-	err := view.UpdateOwnerRemovedOrgProjectMappings(v.Db, orgProjectMappingTable, event.AggregateID)
+	err := view.UpdateOwnerRemovedOrgProjectMappings(v.Db, orgProjectMappingTable, event.InstanceID, event.AggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

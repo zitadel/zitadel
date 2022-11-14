@@ -32,7 +32,7 @@ func (v *View) DeleteInstanceStyling(event *models.Event) error {
 }
 
 func (v *View) UpdateOrgOwnerRemovedStyling(event *models.Event) error {
-	err := view.UpdateOrgOwnerRemovedStyling(v.Db, stylingTyble, event.AggregateID)
+	err := view.UpdateOrgOwnerRemovedStyling(v.Db, stylingTyble, event.InstanceID, event.AggregateID)
 	if err != nil {
 		return err
 	}

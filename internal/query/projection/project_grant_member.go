@@ -200,6 +200,7 @@ func (p *projectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) 
 				handler.NewCol(ProjectGrantMemberGrantedOrgRemoved, true),
 			},
 			[]handler.Condition{
+				handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCond(ProjectGrantMemberGrantedOrg, e.Aggregate().ID),
 			},
 		),
