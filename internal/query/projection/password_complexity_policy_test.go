@@ -23,7 +23,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceAdded",
+			name: "org reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.PasswordComplexityPolicyAddedEventType),
@@ -67,7 +67,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceChanged",
+			name:   "org reduceChanged",
 			reduce: (&passwordComplexityProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -89,7 +89,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
+							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -99,6 +99,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -106,7 +107,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceRemoved",
+			name:   "org reduceRemoved",
 			reduce: (&passwordComplexityProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -122,9 +123,10 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.password_complexity_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.password_complexity_policies WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -132,7 +134,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -158,7 +160,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceAdded",
+			name:   "instance reduceAdded",
 			reduce: (&passwordComplexityProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -202,7 +204,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceChanged",
+			name:   "instance reduceChanged",
 			reduce: (&passwordComplexityProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -224,7 +226,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
+							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -234,6 +236,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},

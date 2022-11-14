@@ -3,13 +3,17 @@ package build
 import "time"
 
 var (
-	version  = time.Now().Format(time.RFC3339)
+	version  = ""
 	commit   = ""
 	date     = ""
 	dateTime time.Time
 )
 
 func Version() string {
+	if version != "" {
+		return version
+	}
+	version = Date().Format(time.RFC3339)
 	return version
 }
 

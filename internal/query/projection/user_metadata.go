@@ -122,6 +122,7 @@ func (p *userMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnUserID, e.Aggregate().ID),
 			handler.NewCond(UserMetadataColumnKey, e.Key),
+			handler.NewCond(UserAuthMethodInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -138,6 +139,7 @@ func (p *userMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnUserID, event.Aggregate().ID),
+			handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }

@@ -170,6 +170,7 @@ module.exports = {
         "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
+        "guides/solution-scenarios/configurations",
       ],
     },
     {
