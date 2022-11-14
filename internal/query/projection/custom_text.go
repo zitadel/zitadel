@@ -151,6 +151,7 @@ func (p *customTextProjection) reduceRemoved(event eventstore.Event) (*handler.S
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCond(CustomTextKeyCol, customTextEvent.Key),
 			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
+			handler.NewCond(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -170,5 +171,6 @@ func (p *customTextProjection) reduceTemplateRemoved(event eventstore.Event) (*h
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
+			handler.NewCond(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 		}), nil
 }

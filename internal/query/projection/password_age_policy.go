@@ -149,6 +149,7 @@ func (p *passwordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 		cols,
 		[]handler.Condition{
 			handler.NewCond(AgePolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(AgePolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -161,5 +162,6 @@ func (p *passwordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(AgePolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(AgePolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }

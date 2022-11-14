@@ -23,7 +23,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "instance.reduceSMSTwilioAdded",
+			name: "instance reduceSMSTwilioAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigTwilioAddedEventType),
@@ -81,7 +81,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceSMSConfigTwilioChanged",
+			name: "instance reduceSMSConfigTwilioChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigTwilioChangedEventType),
@@ -123,7 +123,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceSMSConfigTwilioTokenChanged",
+			name: "instance reduceSMSConfigTwilioTokenChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigTwilioTokenChangedEventType),
@@ -173,7 +173,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceSMSConfigActivated",
+			name: "instance reduceSMSConfigActivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigActivatedEventType),
@@ -205,7 +205,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceSMSConfigDeactivated",
+			name: "instance reduceSMSConfigDeactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigDeactivatedEventType),
@@ -237,7 +237,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceSMSConfigRemoved",
+			name: "instance reduceSMSConfigRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigRemovedEventType),
@@ -266,7 +266,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),

@@ -120,7 +120,7 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 	return h
 }
 
-func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool) {
+func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool, links []*domain.UserIDPLink) {
 	human = &domain.Human{
 		Username: req.UserName,
 	}
@@ -153,8 +153,16 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 	if req.HashedPassword != nil && req.HashedPassword.Value != "" && req.HashedPassword.Algorithm != "" {
 		human.HashedPassword = domain.NewHashedPassword(req.HashedPassword.Value, req.HashedPassword.Algorithm)
 	}
+	links = make([]*domain.UserIDPLink, len(req.Idps))
+	for i, idp := range req.Idps {
+		links[i] = &domain.UserIDPLink{
+			IDPConfigID:    idp.ConfigId,
+			ExternalUserID: idp.ExternalUserId,
+			DisplayName:    idp.DisplayName,
+		}
+	}
 
-	return human, req.RequestPasswordlessRegistration
+	return human, req.RequestPasswordlessRegistration, links
 }
 
 func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resourceowner string) *command.Machine {
