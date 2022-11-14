@@ -256,6 +256,7 @@
       "DELETE_SELF_DESCRIPTION": "You are about to permanently delete your personal account. This will log you out and delete your user. This action cannot be undone!",
       "DELETE_AUTH_DESCRIPTION": "You are about to permanently delete your personal account. Are you sure?",
       "TYPEUSERNAME": "Type '{{value}}', to confirm and delete the user.",
+      "USERNAME": "Loginname",
       "DELETE_BTN": "Delete permanently"
     },
     "SENDEMAILDIALOG": {
