@@ -142,6 +142,7 @@ func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -161,6 +162,7 @@ func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -180,6 +182,7 @@ func (p *projectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -199,6 +202,7 @@ func (p *projectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -213,6 +217,7 @@ func (p *projectGrantProjection) reduceProjectGrantRemoved(event eventstore.Even
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -226,6 +231,7 @@ func (p *projectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

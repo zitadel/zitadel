@@ -256,6 +256,7 @@ func (p *loginNameProjection) reduceUserRemoved(event eventstore.Event) (*handle
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -274,6 +275,7 @@ func (p *loginNameProjection) reduceUserNameChanged(event eventstore.Event) (*ha
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -292,6 +294,7 @@ func (p *loginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -349,6 +352,7 @@ func (p *loginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) 
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNamePoliciesResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNamePoliciesInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNamePolicySuffix),
 	), nil
@@ -364,6 +368,7 @@ func (p *loginNameProjection) reduceDomainPolicyRemoved(event eventstore.Event) 
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNamePoliciesResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNamePolicySuffix),
 	), nil
@@ -401,6 +406,7 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCond(LoginNameDomainIsPrimaryCol, true),
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(loginNameDomainSuffix),
 		),
@@ -411,6 +417,7 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainNameCol, e.Domain),
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(loginNameDomainSuffix),
 		),
@@ -428,6 +435,7 @@ func (p *loginNameProjection) reduceDomainRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LoginNameDomainNameCol, e.Domain),
 			handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameDomainSuffix),
 	), nil

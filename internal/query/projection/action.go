@@ -145,6 +145,7 @@ func (p *actionProjection) reduceActionChanged(event eventstore.Event) (*handler
 		values,
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+			handler.NewCond(ActionInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -163,6 +164,7 @@ func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 		},
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+			handler.NewCond(ActionInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -181,6 +183,7 @@ func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*han
 		},
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+			handler.NewCond(ActionInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -194,6 +197,7 @@ func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler
 		e,
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+			handler.NewCond(ActionInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
