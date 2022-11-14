@@ -142,7 +142,7 @@ folder with the following content:
 https://github.com/zitadel/zitadel_flutter/blob/main/web/auth.html
 ```
 
-Now, you can run your application for IOS and Android devices with
+Now, you can run your application for iOS and Android devices with
 
 ```bash
 flutter run
