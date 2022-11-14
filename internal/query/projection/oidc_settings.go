@@ -125,6 +125,7 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Even
 		columns,
 		[]handler.Condition{
 			handler.NewCond(OIDCSettingsColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(OIDCSettingsColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

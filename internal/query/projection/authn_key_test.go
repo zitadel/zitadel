@@ -112,9 +112,10 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.authn_keys WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.authn_keys WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"keyId",
+								"instance-id",
 							},
 						},
 					},
@@ -157,10 +158,11 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys SET enabled = $1 WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys SET enabled = $1 WHERE (object_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"appId",
+								"instance-id",
 							},
 						},
 					},
@@ -184,10 +186,11 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys SET enabled = $1 WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys SET enabled = $1 WHERE (object_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"appId",
+								"instance-id",
 							},
 						},
 					},
@@ -211,9 +214,10 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.authn_keys WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.authn_keys WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"keyId",
+								"instance-id",
 							},
 						},
 					},
@@ -282,10 +286,11 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys SET enabled = $1 WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys SET enabled = $1 WHERE (object_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"appId",
+								"instance-id",
 							},
 						},
 					},
@@ -309,10 +314,11 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.authn_keys SET enabled = $1 WHERE (object_id = $2)",
+							expectedStmt: "UPDATE projections.authn_keys SET enabled = $1 WHERE (object_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"appId",
+								"instance-id",
 							},
 						},
 					},
@@ -336,9 +342,10 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.authn_keys WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.authn_keys WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"keyId",
+								"instance-id",
 							},
 						},
 					},
@@ -362,9 +369,10 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.authn_keys WHERE (object_id = $1)",
+							expectedStmt: "DELETE FROM projections.authn_keys WHERE (object_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"appId",
+								"instance-id",
 							},
 						},
 					},
@@ -388,9 +396,10 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.authn_keys WHERE (aggregate_id = $1)",
+							expectedStmt: "DELETE FROM projections.authn_keys WHERE (aggregate_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -414,9 +423,10 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.authn_keys WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.authn_keys WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"keyId",
+								"instance-id",
 							},
 						},
 					},
@@ -440,9 +450,10 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.authn_keys WHERE (aggregate_id = $1)",
+							expectedStmt: "DELETE FROM projections.authn_keys WHERE (aggregate_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
