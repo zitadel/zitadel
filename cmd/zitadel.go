@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin"
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/setup"
@@ -33,6 +34,7 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return errors.New("no additional command provided")
 		},
+		Version: build.Version(),
 	}
 
 	viper.AutomaticEnv()
@@ -54,6 +56,8 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 		start.NewStartFromSetup(),
 		key.New(),
 	)
+
+	cmd.InitDefaultVersionFlag()
 
 	return cmd
 }

@@ -194,7 +194,10 @@ func (p *authNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{handler.NewCol(AuthNKeyEnabledCol, enabled)},
-		[]handler.Condition{handler.NewCond(AuthNKeyObjectIDCol, appID)},
+		[]handler.Condition{
+			handler.NewCond(AuthNKeyObjectIDCol, appID),
+			handler.NewCond(AuthNKeyInstanceIDCol, event.Aggregate().InstanceID),
+		},
 	), nil
 }
 
@@ -216,6 +219,9 @@ func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 	}
 	return crdb.NewDeleteStatement(
 		event,
-		[]handler.Condition{condition},
+		[]handler.Condition{
+			condition,
+			handler.NewCond(AuthNKeyInstanceIDCol, event.Aggregate().InstanceID),
+		},
 	), nil
 }
