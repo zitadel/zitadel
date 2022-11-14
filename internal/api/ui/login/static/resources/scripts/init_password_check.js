@@ -4,9 +4,7 @@ function CheckInitPwPolicy() {
   const pwNewConfirmation = document.getElementById("passwordconfirm");
   const pwNewConfirmationValue = pwNewConfirmation.value;
 
-  if (!ComplexityPolicyCheck(pwNew)) {
-    return false;
-  }
+  ComplexityPolicyCheck(pwNew, pwNewConfirmation);
 
   return pwNewValue == pwNewConfirmationValue;
 }

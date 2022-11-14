@@ -6,18 +6,7 @@ function CheckRegisterPwPolicy() {
   const pwNewValue = pwNew.value;
   const pwNewConfirmationValue = pwNewConfirmation.value;
 
-  if (ComplexityPolicyCheck(pwNew) === false) {
-    pwNew.setAttribute("color", "warn");
-    return false;
-  } else {
-    pwNew.setAttribute("color", "primary");
-  }
-
-  if (pwNewValue !== pwNewConfirmationValue && pwNewConfirmationValue !== "") {
-    pwNewConfirmation.setAttribute("color", "warn");
-  } else {
-    pwNewConfirmation.setAttribute("color", "primary");
-  }
+  ComplexityPolicyCheck(pwNew, pwNewConfirmation);
 
   return pwNewValue == pwNewConfirmationValue;
 }

@@ -1,25 +1,14 @@
 function CheckChangePwPolicy() {
-  let pwNew = document.getElementById("change-new-password");
-  let pwNewValue = pwNew.value;
-  let pwNewConfirmation = document.getElementById(
+  const pwNew = document.getElementById("change-new-password");
+  const pwNewValue = pwNew.value;
+  const pwNewConfirmation = document.getElementById(
     "change-password-confirmation"
   );
-  let pwNewConfirmationValue = pwNewConfirmation.value;
+  const pwNewConfirmationValue = pwNewConfirmation.value;
 
-  if (!ComplexityPolicyCheck(pwNew)) {
-    pwNew.setAttribute("color", "warn");
-    return false;
-  } else {
-    pwNew.setAttribute("color", "primary");
-  }
+  ComplexityPolicyCheck(pwNew, pwNewConfirmation);
 
-  if (pwNewValue !== pwNewConfirmationValue && pwNewConfirmationValue !== "") {
-    pwNewConfirmation.setAttribute("color", "warn");
-  } else {
-    pwNewConfirmation.setAttribute("color", "primary");
-  }
-
-  return pwNewValue === pwNewConfirmationValue;
+  return pwNewValue == pwNewConfirmationValue;
 }
 
 let button = document.getElementById("change-password-button");

@@ -1,20 +1,21 @@
-function ComplexityPolicyCheck(passwordElement) {
-  let minLength = passwordElement.dataset.minlength;
-  let upperRegex = passwordElement.dataset.hasUppercase;
-  let lowerRegex = passwordElement.dataset.hasLowercase;
-  let numberRegex = passwordElement.dataset.hasNumber;
-  let symbolRegex = passwordElement.dataset.hasSymbol;
+function ComplexityPolicyCheck(passwordElement, passwordConfirmationElement) {
+  const minLength = passwordElement.dataset.minlength;
+  const upperRegex = passwordElement.dataset.hasUppercase;
+  const lowerRegex = passwordElement.dataset.hasLowercase;
+  const numberRegex = passwordElement.dataset.hasNumber;
+  const symbolRegex = passwordElement.dataset.hasSymbol;
 
   let invalid = 0;
 
-  let minLengthElem = document.getElementById("minlength");
+  const minLengthElem = document.getElementById("minlength");
   if (passwordElement.value.length >= minLength) {
     ValidPolicy(minLengthElem);
   } else {
     InvalidPolicy(minLengthElem);
     invalid++;
   }
-  let upper = document.getElementById("uppercase");
+
+  const upper = document.getElementById("uppercase");
   if (upperRegex !== "") {
     if (RegExp(upperRegex).test(passwordElement.value)) {
       ValidPolicy(upper);
@@ -23,7 +24,8 @@ function ComplexityPolicyCheck(passwordElement) {
       invalid++;
     }
   }
-  let lower = document.getElementById("lowercase");
+
+  const lower = document.getElementById("lowercase");
   if (lowerRegex !== "") {
     if (RegExp(lowerRegex).test(passwordElement.value)) {
       ValidPolicy(lower);
@@ -32,7 +34,8 @@ function ComplexityPolicyCheck(passwordElement) {
       invalid++;
     }
   }
-  let number = document.getElementById("number");
+
+  const number = document.getElementById("number");
   if (numberRegex !== "") {
     if (RegExp(numberRegex).test(passwordElement.value)) {
       ValidPolicy(number);
@@ -41,7 +44,8 @@ function ComplexityPolicyCheck(passwordElement) {
       invalid++;
     }
   }
-  let symbol = document.getElementById("symbol");
+
+  const symbol = document.getElementById("symbol");
   if (symbolRegex !== "") {
     if (RegExp(symbolRegex).test(passwordElement.value)) {
       ValidPolicy(symbol);
@@ -51,7 +55,26 @@ function ComplexityPolicyCheck(passwordElement) {
     }
   }
 
-  return invalid === 0;
+  const confirmation = document.getElementById("confirmation");
+  if (
+    passwordElement.value === passwordConfirmationElement.value &&
+    passwordConfirmationElement.value !== ""
+  ) {
+    ValidPolicy(confirmation);
+    passwordConfirmationElement.setAttribute("color", "primary");
+  } else {
+    InvalidPolicy(confirmation);
+    passwordConfirmationElement.setAttribute("color", "warn");
+  }
+
+  if (invalid > 0) {
+    console.log("invalid");
+    passwordElement.setAttribute("color", "warn");
+    return false;
+  } else {
+    passwordElement.setAttribute("color", "primary");
+    return true;
+  }
 }
 
 function ValidPolicy(element) {
