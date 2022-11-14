@@ -160,7 +160,7 @@ For Web make sure you run the application on your fixed port such that it matche
 flutter run -d chrome --web-port=4444
 ```
 
-Our Android and IOS Application opens ZITADEL's login within a custom tab, on Web a new tab is opened.
+Our Android and iOS Application opens ZITADEL's login within a custom tab, on Web a new tab is opened.
 
 ### Result
 
