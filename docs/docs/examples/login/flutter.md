@@ -132,7 +132,7 @@ then fetches the user info and stores the tokens into the secure storage.
 https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L45-L117
 ```
 
-Note that we have to use our http redirect URL for webapplications or otherwise use our custom scheme for Android and IOS devices.
+Note that we have to use our http redirect URL for web applications or otherwise use our custom scheme for Android and iOS devices.
 To setup other platforms, read the documentation of the [Flutter Web Auth](https://pub.dev/packages/flutter_web_auth_2).
 
 To ensure our application catches the callback URL, you have to create a `auth.html` file in the `/web`
