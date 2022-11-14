@@ -68,7 +68,6 @@ function ComplexityPolicyCheck(passwordElement, passwordConfirmationElement) {
   }
 
   if (invalid > 0) {
-    console.log("invalid");
     passwordElement.setAttribute("color", "warn");
     return false;
   } else {
