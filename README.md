@@ -4,6 +4,7 @@
 </p>
 
 <p align="center">
+    <a href="https://bestpractices.coreinfrastructure.org/projects/6662"><img src="https://bestpractices.coreinfrastructure.org/projects/6662/badge"></a>
     <a href="https://github.com/zitadel/zitadel/graphs/contributors" alt="Release">
         <img src="https://badgen.net/github/contributors/zitadel/zitadel" /></a>
     <a href="https://github.com/semantic-release/semantic-release" alt="semantic-release">

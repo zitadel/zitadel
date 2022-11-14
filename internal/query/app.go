@@ -279,6 +279,7 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (*App,
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppSAMLConfigColumnEntityID.identifier(): entityID,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -292,10 +293,13 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (*App,
 func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (*Project, error) {
 	stmt, scan := prepareProjectByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
-			sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
-			sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
-			sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
+		sq.And{
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+			sq.Or{
+				sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+				sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+				sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
+			},
 		},
 	).ToSql()
 	if err != nil {

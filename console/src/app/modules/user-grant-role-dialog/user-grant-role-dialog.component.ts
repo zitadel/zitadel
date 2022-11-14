@@ -12,7 +12,7 @@ export class UserGrantRoleDialogComponent {
   public grantId: string = '';
   public selectedRoleKeysList: string[] = [];
 
-  public selectedRoles: Role.AsObject[] = [];
+  public selectedRoleKeys: string[] = [];
 
   constructor(public dialogRef: MatDialogRef<UserGrantRoleDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.projectId = data.projectId;
@@ -20,8 +20,8 @@ export class UserGrantRoleDialogComponent {
     this.selectedRoleKeysList = data.selectedRoleKeysList;
   }
 
-  public selectRoles(selected: any): void {
-    this.selectedRoles = selected;
+  public selectRoles(selected: string[]): void {
+    this.selectedRoleKeys = selected;
   }
 
   public closeDialog(): void {
@@ -29,6 +29,6 @@ export class UserGrantRoleDialogComponent {
   }
 
   public closeDialogWithSuccess(): void {
-    this.dialogRef.close({ roles: this.selectedRoles.map((r) => r.key) });
+    this.dialogRef.close({ roles: this.selectedRoleKeys });
   }
 }
