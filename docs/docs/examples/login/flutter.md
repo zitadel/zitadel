@@ -154,7 +154,7 @@ or by directly selecting your device
 flutter run -d iphone
 ```
 
-for Web make sure you run the application on your fixed port such that it maches your redirect URI in your ZITADEL application. We used 4444 as port before so the command would look like this:
+For Web make sure you run the application on your fixed port such that it matches your redirect URI in your ZITADEL application. We used 4444 as port before so the command would look like this:
 
 ```bash
 flutter run -d chrome --web-port=4444
