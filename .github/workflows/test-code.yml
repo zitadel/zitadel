@@ -8,7 +8,7 @@ on:
       - '**.md'
 
 jobs:
-  Linting:
+  Build-ZITADEL:
     runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
