@@ -14,7 +14,7 @@ jobs:
       DOCKER_BUILDKIT: 1
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: 1.19
       - name: Source checkout
@@ -33,14 +33,12 @@ jobs:
           version: v1.10.3
       - name: Build and Unit Test
         run: GOOS="linux" GOARCH="amd64" goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifacts/zitadel/zitadel
-      - uses: actions/setup-go@v3
-        with:
-          go-version: 1.19
       - name: linting
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.50.1
           only-new-issues: true
+          working-directory: /home/runner/work/zitadel/zitadel
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
         with:
