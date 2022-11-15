@@ -39,7 +39,7 @@ jobs:
       - name: linting
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.49.0
+          version: v1.51.0
           only-new-issues: true
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
