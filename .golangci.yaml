@@ -1,5 +1,7 @@
 issues:
   new: true
+  fix: false
+
 run:
   concurrency: 2
   timeout: 10m
