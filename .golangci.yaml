@@ -1,3 +1,5 @@
+issues:
+  new: true
 run:
   concurency: 2
   timeout: 10m
@@ -23,6 +25,8 @@ linters:
   enable:
     # Simple linter to check that your code does not contain non-ASCII identifiers [fast: true, auto-fix: false]
     - asciicheck
+    # checks whether HTTP response body is closed successfully [fast: false, auto-fix: false]
+    - bodyclose
     # check the function whether use a non-inherited context [fast: false, auto-fix: false]
     - contextcheck
     # Computes and checks the cognitive complexity of functions [fast: true, auto-fix: false]
@@ -57,8 +61,6 @@ linters:
     - staticcheck 
     # Like the front-end of a Go compiler, parses and type-checks Go code [fast: false, auto-fix: false]
     - typecheck
-    # Simple linter to check that your code does not contain non-ASCII identifiers
-    - asciicheck
     # Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: false]
     - nolintlint
     # Checks for misuse of Sprintf to construct a host with port in a URL.
@@ -73,9 +75,6 @@ linters:
     # Checks for dangerous unicode character sequences [fast: true, auto-fix: false]
     # not needed because github does that out of the box
     - bidichk
-    # checks whether HTTP response body is closed successfully [fast: false, auto-fix: false]
-    # zitadel makes no http calls
-    - bodyclose
     # containedctx is a linter that detects struct contained context.Context field [fast: true, auto-fix: false]
     # using contextcheck which looks more active
     - containedctx
@@ -97,6 +96,9 @@ linters:
     # Tool for code clone detection [fast: true, auto-fix: false]
     # FUTURE: old code is not compatible
     - dupl
+    # checks for duplicate words in the source code
+    # not sure if it makes sense
+    - dupword
     # check for two durations multiplied together [fast: false, auto-fix: false]
     # FUTURE: checks for accident `1 * time.Second * time.Second`
     - durationcheck
@@ -193,9 +195,9 @@ linters:
     # Reports long lines [fast: true, auto-fix: false]
     # FUTURE: would make code more readable
     - lll
-    # Check for logr arguments
-    # Don't use: deprecated
-    - logrlint
+    # Checks key valur pairs for common logger libraries (kitlog,klog,logr,zap).
+    # FUTURE: useable as soon as we switch logger library
+    - loggercheck
     # maintidx measures the maintainability index of each function. [fast: true, auto-fix: false]
     # not used because volume of halstead complexity feels strange as measurement https://en.wikipedia.org/wiki/Halstead_complexity_measures
     - maintidx
@@ -256,6 +258,9 @@ linters:
     # tenv is analyzer that detects using os.Setenv instead of t.Setenv since Go1.17 [fast: false, auto-fix: false]
     # FUTURE: currently are no env vars set
     - tenv
+    # linter checks if examples are testable (have an expected output)
+    # FUTURE: as soon as examples are added
+    - testableexamples
     # linter that makes you use a separate _test package [fast: true, auto-fix: false]
     # don't use because we test some unexported functions
     - testpackage
