@@ -113,6 +113,10 @@ type InstanceSetup struct {
 		RefreshTokenIdleExpiration time.Duration
 		RefreshTokenExpiration     time.Duration
 	}
+	Quotas *struct {
+		DetailsPath string
+		Items       []*Quota
+	}
 }
 
 type ZitadelConfig struct {
@@ -255,6 +259,12 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareActivateDefaultLabelPolicy(instanceAgg),
 
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
+	}
+
+	if setup.Quotas != nil {
+		for _, quota := range setup.Quotas.Items {
+			validations = append(validations, c.AddInstanceQuotaCommand(instanceAgg, quota))
+		}
 	}
 
 	for _, msg := range setup.MessageTexts {

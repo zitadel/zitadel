@@ -6,6 +6,7 @@ import "zitadel/instance.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -146,7 +147,7 @@ service SystemService {
     };
   }
 
-  // Removes a instances
+  // Removes an instances
   // This might take some time
   rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
     option (google.api.http) = {
@@ -340,6 +341,29 @@ service SystemService {
       };
     };
   }
+
+  // Creates a new quota
+  rpc AddQuota(AddQuotaRequest) returns (AddQuotaResponse) {
+    option (google.api.http) = {
+      post: "/quotas"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  // Removes a quota
+  rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
+    option (google.api.http) = {
+      delete: "/quotas/{quota_id}"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
 }
 
 
@@ -426,10 +450,97 @@ message RemoveInstanceResponse {
   zitadel.v1.ObjectDetails details = 1;
 }
 
+
+message AddQuotaRequest {
+  enum Unit {
+      UNIT_REQUESTS_ALL_AUTHENTICATED = 0;
+      UNIT_ACTIONS_ALL_RUNS_SECONDS = 1;
+  }
+
+  message Limitations {
+      Block block = 1 [
+          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+              description: "makes ZITADEL prevent the quotas unit to increment after the quotas amount is reached";
+          }
+      ];
+      string cookie_value = 2 [
+          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+              description: "makes ZITADEL send a SetCookie header field containting this value for all requests except to the system API after the quota is reached";
+          }
+      ];
+      string redirect_url = 3 [
+          (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+              description: "makes ZITADEL redirect requests to this URL for all requests to ZITADEL except to the system API after the quota is reached";
+          }
+      ];
+  }
+
+  message Block {
+      string message = 1;
+      uint32 http_status = 2;
+      uint32 grpc_status = 3;
+  }
+
+  message Notification {
+      uint32 percent = 1;
+      bool repeat = 2;
+      string call_url = 3;
+  }
+
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  Unit unit = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "the unit ZITADEL should measure";
+    }
+  ];
+  google.protobuf.Timestamp from = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          example: "\"2019-04-01T08:45:00.000000Z\"";
+          description: "the first intervals start timestamp";
+      }
+  ];
+  google.protobuf.Duration interval = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the quotas repeated time window after which ZITADEL resets the measurement";
+      }
+  ];
+  uint64 amount = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the count limit after which ZITADEL enforces the quotas actions";
+    }
+  ];
+  Limitations limitations = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the actions ZITADEL enforces when the quotas limit was exceeded";
+    }
+  ];
+  repeated Notification notifications = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+          description: "the handlers, ZITADEL executes when certain quota percentages are reached";
+    }
+  ];
+}
+
+message AddQuotaResponse {
+  string quota_id = 1;
+  zitadel.v1.ObjectDetails details = 2;
+}
+
+message RemoveQuotaRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  string quota_id = 2;
+}
+
+message RemoveQuotaResponse {
+  zitadel.v1.ObjectDetails details = 1;
+}
+
+// TODO: Delete?
 message GetUsageRequest {
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
+// TODO: Delete?
 message GetUsageResponse {
   zitadel.v1.ObjectDetails details = 1;
   uint64 executed_requests = 2;

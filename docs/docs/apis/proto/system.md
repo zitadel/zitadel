@@ -74,7 +74,7 @@ Updates name of an existing instance
 > **rpc** RemoveInstance([RemoveInstanceRequest](#removeinstancerequest))
 [RemoveInstanceResponse](#removeinstanceresponse)
 
-Removes a instances
+Removes an instances
 This might take some time
 
 
@@ -201,6 +201,30 @@ failed event. You can find out if it worked on the `failure_count`
     DELETE: /failedevents/{database}/{view_name}/{failed_sequence}
 
 
+### AddQuota
+
+> **rpc** AddQuota([AddQuotaRequest](#addquotarequest))
+[AddQuotaResponse](#addquotaresponse)
+
+Creates a new quota
+
+
+
+    POST: /quotas
+
+
+### RemoveQuota
+
+> **rpc** RemoveQuota([RemoveQuotaRequest](#removequotarequest))
+[RemoveQuotaResponse](#removequotaresponse)
+
+Removes a quota
+
+
+
+    DELETE: /quotas/{quota_id}
+
+
 
 
 
@@ -294,6 +318,74 @@ failed event. You can find out if it worked on the `failure_count`
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddQuotaRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| unit |  AddQuotaRequest.Unit | - |  |
+| from |  google.protobuf.Timestamp | - |  |
+| interval |  google.protobuf.Duration | - |  |
+| amount |  uint64 | - |  |
+| actions |  AddQuotaRequest.Actions | - |  |
+| notifications | repeated AddQuotaRequest.Notification | - |  |
+
+
+
+
+### AddQuotaRequest.Actions
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| block |  AddQuotaRequest.Block | - |  |
+| cookie_value |  string | - |  |
+| redirect_url |  string | - |  |
+
+
+
+
+### AddQuotaRequest.Block
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| message |  string | - |  |
+| http_status |  uint32 | - |  |
+| grpc_status |  uint32 | - |  |
+
+
+
+
+### AddQuotaRequest.Notification
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| percent |  uint32 | - |  |
+| repeat |  bool | - |  |
+| call_url |  string | - |  |
+
+
+
+
+### AddQuotaResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| quota_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
@@ -402,7 +494,7 @@ This is an empty response
 
 
 ### GetUsageRequest
-
+TODO: Delete?
 
 
 | Field | Type | Description | Validation |
@@ -413,7 +505,7 @@ This is an empty response
 
 
 ### GetUsageResponse
-
+TODO: Delete?
 
 
 | Field | Type | Description | Validation |
@@ -578,6 +670,29 @@ This is an empty response
 
 
 ### RemoveInstanceResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveQuotaRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| quota_id |  string | - |  |
+
+
+
+
+### RemoveQuotaResponse
 
 
 
