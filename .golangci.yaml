@@ -20,7 +20,6 @@ run:
     - guides
     - internal/api/ui/login/static
     - openapi
-    - pkg/grpc/*/*.pb.*
     - proto
     - tools
 linters:
