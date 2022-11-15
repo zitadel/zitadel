@@ -38,7 +38,7 @@ jobs:
         with:
           version: v1.50.1
           only-new-issues: true
-          working-directory: /home/runner/work/zitadel/zitadel
+          skip-pkg-cache: true
       - name: Publish go coverage
         uses: codecov/codecov-action@v3.1.0
         with:
