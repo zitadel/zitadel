@@ -804,6 +804,78 @@ Sets the state of my organisation to active
     POST: /orgs/me/_reactivate
 
 
+### SetOrgMetadata
+
+> **rpc** SetOrgMetadata([SetOrgMetadataRequest](#setorgmetadatarequest))
+[SetOrgMetadataResponse](#setorgmetadataresponse)
+
+Sets a org metadata by key
+
+
+
+    POST: /metadata/{key}
+
+
+### BulkSetOrgMetadata
+
+> **rpc** BulkSetOrgMetadata([BulkSetOrgMetadataRequest](#bulksetorgmetadatarequest))
+[BulkSetOrgMetadataResponse](#bulksetorgmetadataresponse)
+
+Set a list of org metadata
+
+
+
+    POST: /metadata/_bulk
+
+
+### ListOrgMetadata
+
+> **rpc** ListOrgMetadata([ListOrgMetadataRequest](#listorgmetadatarequest))
+[ListOrgMetadataResponse](#listorgmetadataresponse)
+
+Returns the org metadata
+
+
+
+    POST: /metadata/_search
+
+
+### GetOrgMetadata
+
+> **rpc** GetOrgMetadata([GetOrgMetadataRequest](#getorgmetadatarequest))
+[GetOrgMetadataResponse](#getorgmetadataresponse)
+
+Returns the org metadata by key
+
+
+
+    GET: /metadata/{key}
+
+
+### RemoveOrgMetadata
+
+> **rpc** RemoveOrgMetadata([RemoveOrgMetadataRequest](#removeorgmetadatarequest))
+[RemoveOrgMetadataResponse](#removeorgmetadataresponse)
+
+Removes a org metadata by key
+
+
+
+    DELETE: /metadata/{key}
+
+
+### BulkRemoveOrgMetadata
+
+> **rpc** BulkRemoveOrgMetadata([BulkRemoveOrgMetadataRequest](#bulkremoveorgmetadatarequest))
+[BulkRemoveOrgMetadataResponse](#bulkremoveorgmetadataresponse)
+
+Set a list of org metadata
+
+
+
+    DELETE: /metadata/_bulk
+
+
 ### ListOrgDomains
 
 > **rpc** ListOrgDomains([ListOrgDomainsRequest](#listorgdomainsrequest))
@@ -1254,6 +1326,19 @@ Returns a new generated secret if needed (Depending on the configuration)
     POST: /projects/{project_id}/apps/oidc
 
 
+### AddSAMLApp
+
+> **rpc** AddSAMLApp([AddSAMLAppRequest](#addsamlapprequest))
+[AddSAMLAppResponse](#addsamlappresponse)
+
+Adds a new saml service provider
+Returns a entityID
+
+
+
+    POST: /projects/{project_id}/apps/saml
+
+
 ### AddAPIApp
 
 > **rpc** AddAPIApp([AddAPIAppRequest](#addapiapprequest))
@@ -1290,6 +1375,18 @@ Changes the configuration of the oidc client
 
 
     PUT: /projects/{project_id}/apps/{app_id}/oidc_config
+
+
+### UpdateSAMLAppConfig
+
+> **rpc** UpdateSAMLAppConfig([UpdateSAMLAppConfigRequest](#updatesamlappconfigrequest))
+[UpdateSAMLAppConfigResponse](#updatesamlappconfigresponse)
+
+Changes the configuration of the saml application
+
+
+
+    PUT: /projects/{project_id}/apps/{app_id}/saml_config
 
 
 ### UpdateAPIAppConfig
@@ -2859,6 +2956,30 @@ Change JWT identity provider configuration of the organisation
     DELETE: /actions/{id}
 
 
+### ListFlowTypes
+
+> **rpc** ListFlowTypes([ListFlowTypesRequest](#listflowtypesrequest))
+[ListFlowTypesResponse](#listflowtypesresponse)
+
+
+
+
+
+    POST: /flows/types/_search
+
+
+### ListFlowTriggerTypes
+
+> **rpc** ListFlowTriggerTypes([ListFlowTriggerTypesRequest](#listflowtriggertypesrequest))
+[ListFlowTriggerTypesResponse](#listflowtriggertypesresponse)
+
+
+
+
+
+    POST: /flows/{type}/triggers/_search
+
+
 ### GetFlow
 
 > **rpc** GetFlow([GetFlowRequest](#getflowrequest))
@@ -2994,7 +3115,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | primary_color |  string | - | string.max_len: 50<br />  |
-| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this [scope in](../openidoauth/scopes) |  |
+| hide_login_name_suffix |  bool | hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set |  |
 | warn_color |  string | - | string.max_len: 50<br />  |
 | background_color |  string | - | string.max_len: 50<br />  |
 | font_color |  string | - | string.max_len: 50<br />  |
@@ -3062,6 +3183,9 @@ This is an empty request
 | second_factors | repeated zitadel.policy.v1.SecondFactorType | - |  |
 | multi_factors | repeated zitadel.policy.v1.MultiFactorType | - |  |
 | idps | repeated AddCustomLoginPolicyRequest.IDP | - |  |
+| allow_domain_discovery |  bool | If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success. |  |
+| disable_login_with_email |  bool | - |  |
+| disable_login_with_phone |  bool | - |  |
 
 
 
@@ -3670,6 +3794,32 @@ This is an empty request
 
 
 
+### AddSAMLAppRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - | bytes.max_len: 500000<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### AddSAMLAppResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| app_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -3754,6 +3904,28 @@ This is an empty request
 
 
 
+### BulkRemoveOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### BulkRemoveUserGrantRequest
 
 
@@ -3784,6 +3956,40 @@ This is an empty request
 
 
 ### BulkRemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata | repeated BulkSetOrgMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetOrgMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetOrgMetadataResponse
 
 
 
@@ -3835,7 +4041,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| type |  zitadel.action.v1.FlowType | - |  |
+| type |  string | id of the flow |  |
 
 
 
@@ -4594,7 +4800,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| type |  zitadel.action.v1.FlowType | - |  |
+| type |  string | id of the flow |  |
 
 
 
@@ -4894,6 +5100,28 @@ This is an empty request
 
 
 
+### GetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
 ### GetPasswordAgePolicyRequest
 This is an empty request
 
@@ -5180,6 +5408,7 @@ This is an empty response
 | password_change_required |  bool | - |  |
 | request_passwordless_registration |  bool | - |  |
 | otp_code |  string | - |  |
+| idps | repeated ImportHumanUserRequest.IDP | - |  |
 
 
 
@@ -5204,6 +5433,19 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | value |  string | - |  |
 | algorithm |  string | - |  |
+
+
+
+
+### ImportHumanUserRequest.IDP
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config_id |  string | internal id of the IDP in ZITADEL | string.min_len: 1<br /> string.max_len: 200<br />  |
+| external_user_id |  string | id of the user on the IDP | string.min_len: 1<br /> string.max_len: 200<br />  |
+| display_name |  string | (display) name of the user on the IDP | string.max_len: 200<br />  |
 
 
 
@@ -5405,6 +5647,45 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.app.v1.App | - |  |
+
+
+
+
+### ListFlowTriggerTypesRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  string | - |  |
+
+
+
+
+### ListFlowTriggerTypesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.action.v1.TriggerType | - |  |
+
+
+
+
+### ListFlowTypesRequest
+
+
+
+
+
+### ListFlowTypesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| result | repeated zitadel.action.v1.FlowType | - |  |
 
 
 
@@ -5719,6 +6000,30 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | list limitations and ordering |  |
 | result | repeated zitadel.member.v1.Member | criterias the client is looking for |  |
+
+
+
+
+### ListOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
 
 
 
@@ -6724,6 +7029,28 @@ This is an empty response
 
 
 
+### RemoveOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemovePersonalAccessTokenRequest
 
 
@@ -7597,6 +7924,29 @@ This is an empty request
 
 
 
+### SetOrgMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetPrimaryOrgDomainRequest
 
 
@@ -7625,8 +7975,8 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| flow_type |  zitadel.action.v1.FlowType | - |  |
-| trigger_type |  zitadel.action.v1.TriggerType | - |  |
+| flow_type |  string | id of the flow type |  |
+| trigger_type |  string | id of the trigger type |  |
 | action_ids | repeated string | - |  |
 
 
@@ -7836,6 +8186,9 @@ This is an empty request
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| allow_domain_discovery |  bool | If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success. |  |
+| disable_login_with_email |  bool | - |  |
+| disable_login_with_phone |  bool | - |  |
 
 
 
@@ -8299,6 +8652,31 @@ This is an empty request
 
 
 ### UpdateProjectRoleResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSAMLAppConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| app_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_xml |  bytes | - | bytes.max_len: 500000<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) metadata.metadata_url |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### UpdateSAMLAppConfigResponse
 
 
 

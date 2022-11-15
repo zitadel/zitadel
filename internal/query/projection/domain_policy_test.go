@@ -23,7 +23,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceAdded",
+			name: "org reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.DomainPolicyAddedEventType),
@@ -40,7 +40,6 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -64,7 +63,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceChanged",
+			name:   "org reduceChanged",
 			reduce: (&domainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -81,11 +80,10 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -93,6 +91,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -100,7 +99,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceRemoved",
+			name:   "org reduceRemoved",
 			reduce: (&domainPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -113,11 +112,37 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.domain_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.domain_policies WHERE (id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(DomainPolicyInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.domain_policies WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -127,7 +152,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceAdded",
+			name:   "instance reduceAdded",
 			reduce: (&domainPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -144,7 +169,6 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -168,7 +192,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceChanged",
+			name:   "instance reduceChanged",
 			reduce: (&domainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -185,11 +209,10 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -197,6 +220,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -214,7 +238,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, DomainPolicyTable, tt.want)
 		})
 	}
 }

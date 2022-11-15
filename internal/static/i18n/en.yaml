@@ -86,6 +86,7 @@ Errors:
     Machine:
       Key:
         NotFound: Machine key not found
+        AlreadyExisting: Machine key already existing
     PAT:
       NotFound: Personal Access Token not found
     NotHuman: The User must be personal
@@ -142,6 +143,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token is invalid
       NotFound: Refresh Token not found
+  Instance:
+    NotFound: Instance not found
+    AlreadyExists: Instance already exists
+    NotChanged: Instance not changed
   Org:
     AlreadyExists: Organisation's name already taken
     Invalid: Organisation is invalid
@@ -249,12 +254,20 @@ Errors:
       NotInactive: Application is not inactive
       OIDCConfigInvalid: OIDC configuration is invalid
       APIConfigInvalid: API configuration is invalid
-      IsNotOIDC: Application is not type oidc
+      SAMLConfigInvalid: SAML configuration is invalid
+      IsNotOIDC: Application is not type OIDC
       IsNotAPI: Application is not type API
+      IsNotSAML: Application is not type SAML
+      SAMLMetadataMissing: SAML metadata is missing
+      SAMLMetadataFormat: SAML Metadata format error
+      SAMLEntityIDAlreadyExisting: SAML EntityID already existing
       OIDCAuthMethodNoSecret: Chosen OIDC Auth Method does not require a secret
       APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
       AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
       ClientSecretInvalid: Client Secret is invalid
+      Key:
+        AlreadyExisting: Application key already existing
+        NotFound: Application key not found
     RequiredFieldsMissing: Some required fields are missing
     Grant:
       AlreadyExists: Project grant already exists
@@ -389,7 +402,7 @@ Errors:
     ReadError: Error in reading translation file
     MergeError: Translation file could not be merged with custom translations
     NotFound: Translation file doesn't exist
-  MetaData:
+  Metadata:
     NotFound: Metadata not found
     NoData: Metadata list is empty
     Invalid: Metadata is invalid
@@ -751,6 +764,9 @@ EventTypes:
           added: Application key added
           removed: Application key removed
       config:
+        saml:
+          added: SAML Configuration added
+          changed: SAML Configuration changed
         oidc:
           added: OIDC Configuration added
           changed: OIDC Configuration changed
@@ -899,3 +915,17 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token only allowed in combination with Authorization Code.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Unspecified
+      ExternalAuthentication: External Authentication
+      CustomiseToken: Complement Token
+  TriggerType:
+    Unspecified: Unspecified
+    PostAuthentication: Post Authentication
+    PreCreation: Pre Creation
+    PostCreation: Post Creation
+    PreUserinfoCreation: Pre Userinfo creation
+    PreAccessTokenCreation: Pre access token creation

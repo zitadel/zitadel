@@ -73,7 +73,7 @@ func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*La
 	stmt, args, err := query.
 		Where(or).
 		Where(sq.Eq{CurrentSequenceColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).
-		OrderBy(CurrentSequenceColCurrentSequence.identifier()).
+		OrderBy(CurrentSequenceColCurrentSequence.identifier() + " DESC").
 		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
@@ -194,7 +194,7 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 	return sq.Select(
 			CurrentSequenceColCurrentSequence.identifier(),
 			CurrentSequenceColTimestamp.identifier()).
-			From(currentSequencesTable.identifier() + " AS OF SYSTEM TIME '-1ms'").PlaceholderFormat(sq.Dollar),
+			From(currentSequencesTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LatestSequence, error) {
 			seq := new(LatestSequence)
 			err := row.Scan(
@@ -249,7 +249,8 @@ func prepareCurrentSequencesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Current
 
 var (
 	currentSequencesTable = table{
-		name: projection.CurrentSeqTable,
+		name:          projection.CurrentSeqTable,
+		instanceIDCol: "instance_id",
 	}
 	CurrentSequenceColAggregateType = Column{
 		name:  "aggregate_type",
@@ -275,7 +276,8 @@ var (
 
 var (
 	locksTable = table{
-		name: projection.LocksTable,
+		name:          projection.LocksTable,
+		instanceIDCol: "instance_id",
 	}
 	LocksColLockerID = Column{
 		name:  "locker_id",

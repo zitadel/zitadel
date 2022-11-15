@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -81,6 +82,15 @@ func (p *orgProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(OrgColumnInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -121,6 +131,7 @@ func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -139,6 +150,7 @@ func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -157,6 +169,7 @@ func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -175,6 +188,7 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

@@ -86,6 +86,7 @@ Errors:
     Machine:
       Key:
         NotFound: Clé de la machine non trouvée
+        AlreadyExisting: Clé de la machine déjà existante
     PAT:
       NotFound: Token d'accès personnel non trouvé
     NotHuman: L'utilisateur doit être personnel
@@ -142,6 +143,10 @@ Errors:
     RefreshToken:
       Invalid: Le jeton de rafraîchissement n'est pas valide
       NotFound: Jeton de rafraîchissement non trouvé
+  Instance:
+    NotFound: Instance non trouvée
+    AlreadyExists: L'instance existe déjà
+    NotChanged: L'instance n'a pas changé
   Org:
     AlreadyExists: Le nom de l'organisation est déjà pris
     Invalid: L'organisation n'est pas valide
@@ -249,12 +254,20 @@ Errors:
       NotInactive: L'application n'est pas inactive
       OIDCConfigInvalid: La configuration de l'OIDC n'est pas valide
       APIConfigInvalid: La configuration de l'API n'est pas valide
-      IsNotOIDC: L'application n'est pas de type oidc
+      SAMLConfigInvalid: La configuration de l'SAML n'est pas valide
+      IsNotOIDC: L'application n'est pas de type OIDC
       IsNotAPI: L'application n'est pas de type API
+      IsNotSAML: L'application n'est pas de type SAML
+      SAMLMetadataMissing: Les métadonnées SAML sont manquantes
+      SAMLMetadataFormat: Erreur de format des métadonnées SAML
+      SAMLEntityIDAlreadyExisting: SAML EntityID déjà existant
       OIDCAuthMethodNoSecret: La méthode d'authentification OIDC choisie ne nécessite pas de secret.
       APIAuthMethodNoSecret: La méthode d'authentification API choisie ne nécessite pas de secret.
       AuthMethodNoPrivateKeyJWT: La méthode d'authentification choisie ne nécessite pas de clé.
       ClientSecretInvalid: Le secret du client n'est pas valide
+      Key:
+        AlreadyExisting: Clé d'application déjà existante
+        NotFound: Clé d'application non trouvée
     RequiredFieldsMissing: Certains champs obligatoires sont manquants
     Grant:
       AlreadyExists: La subvention du projet existe déjà
@@ -389,7 +402,7 @@ Errors:
     ReadError: Erreur de lecture du fichier de traduction
     MergeError: Le fichier de traduction n'a pas pu être fusionné avec les traductions personnalisées.
     NotFound: Le fichier de traduction n'existe pas
-  MetaData:
+  Metadata:
     NotFound: Métadonnées non trouvées
     NoData: La liste des métadonnées est vide
     Invalid: Les métadonnées ne sont pas valides
@@ -751,6 +764,9 @@ EventTypes:
           added: Clé d'application ajoutée
           removed: Clé d'application supprimée
       config:
+        saml:
+          added: Configuration SAML ajoutée
+          changed: La configuration de SAML a été modifiée
         oidc:
           added: Configuration OIDC ajoutée
           changed: Modification de la configuration de l'OIDC
@@ -899,3 +915,17 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Le jeton de rafraîchissement n'est autorisé qu'en combinaison avec le code d'autorisation.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Non spécifié
+      ExternalAuthentication: Authentification externe
+      CustomiseToken: Compléter Token
+  TriggerType:
+    Unspecified: Non spécifié
+    PostAuthentication: Authentification postérieure
+    PreCreation: Pré création
+    PostCreation: Post-création
+    PreUserinfoCreation: Pré Userinfo création
+    PreAccessTokenCreation: Pré access token création

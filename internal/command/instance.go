@@ -71,6 +71,9 @@ type InstanceSetup struct {
 		ForceMFA                   bool
 		HidePasswordReset          bool
 		IgnoreUnknownUsername      bool
+		AllowDomainDiscovery       bool
+		DisableLoginWithEmail      bool
+		DisableLoginWithPhone      bool
 		PasswordlessType           domain.PasswordlessType
 		DefaultRedirectURI         string
 		PasswordCheckLifetime      time.Duration
@@ -104,6 +107,12 @@ type InstanceSetup struct {
 	EmailTemplate     []byte
 	MessageTexts      []*domain.CustomMessageText
 	SMTPConfiguration *smtp.EmailConfig
+	OIDCSettings      *struct {
+		AccessTokenLifetime        time.Duration
+		IdTokenLifetime            time.Duration
+		RefreshTokenIdleExpiration time.Duration
+		RefreshTokenExpiration     time.Duration
+	}
 }
 
 type ZitadelConfig struct {
@@ -211,6 +220,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.HidePasswordReset,
 			setup.LoginPolicy.IgnoreUnknownUsername,
+			setup.LoginPolicy.AllowDomainDiscovery,
+			setup.LoginPolicy.DisableLoginWithEmail,
+			setup.LoginPolicy.DisableLoginWithPhone,
 			setup.LoginPolicy.PasswordlessType,
 			setup.LoginPolicy.DefaultRedirectURI,
 			setup.LoginPolicy.PasswordCheckLifetime,
@@ -346,6 +358,18 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
+	if setup.OIDCSettings != nil {
+		validations = append(validations,
+			c.prepareAddOIDCSettings(
+				instanceAgg,
+				setup.OIDCSettings.AccessTokenLifetime,
+				setup.OIDCSettings.IdTokenLifetime,
+				setup.OIDCSettings.RefreshTokenIdleExpiration,
+				setup.OIDCSettings.RefreshTokenExpiration,
+			),
+		)
+	}
+
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return "", nil, err
@@ -359,6 +383,24 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
+	}, nil
+}
+
+func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	validation := c.prepareUpdateInstance(instanceAgg, name)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
 
@@ -376,7 +418,7 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
 
@@ -394,7 +436,7 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
 
@@ -444,7 +486,7 @@ func prepareAddInstance(a *instance.Aggregate, instanceName string, defaultLangu
 	}
 }
 
-//SetIAMProject defines the command to set the id of the IAM project onto the instance
+// SetIAMProject defines the command to set the id of the IAM project onto the instance
 func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -455,7 +497,7 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 	}
 }
 
-//SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+// SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
 func SetIAMConsoleID(a *instance.Aggregate, clientID, appID *string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -496,6 +538,27 @@ func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggrega
 		return nil, errors.ThrowPreconditionFailed(nil, "IAM-EGbw2", "Errors.IAM.IAMProjectAlreadySet")
 	}
 	return instance.NewIAMProjectSetEvent(ctx, iamAgg, projectID), nil
+}
+
+func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if name == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-092mid", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := getInstanceWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, errors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
+			}
+			if writeModel.Name == name {
+				return nil, errors.ThrowPreconditionFailed(nil, "INST-alpxism", "Errors.Instance.NotChanged")
+			}
+			return []eventstore.Command{instance.NewInstanceChangedEvent(ctx, &a.Aggregate, name)}, nil
+		}, nil
+	}
 }
 
 func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {
@@ -542,4 +605,51 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
 	return writeModel, err
+}
+
+func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := c.getInstanceWriteModelByID(ctx, a.ID)
+			if err != nil {
+				return nil, errors.ThrowNotFound(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
+			}
+			if !writeModel.State.Exists() {
+				return nil, errors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
+			}
+			return []eventstore.Command{instance.NewInstanceRemovedEvent(ctx,
+					&a.Aggregate,
+					writeModel.Name,
+					writeModel.Domains)},
+				nil
+		}, nil
+	}
+}
+
+func (c *Commands) getInstanceWriteModelByID(ctx context.Context, orgID string) (*InstanceWriteModel, error) {
+	instanceWriteModel := NewInstanceWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, instanceWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return instanceWriteModel, nil
 }

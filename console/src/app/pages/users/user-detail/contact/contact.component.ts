@@ -14,7 +14,8 @@ import { EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.comp
 export class ContactComponent {
   @Input() disablePhoneCode: boolean = false;
   @Input() canWrite: boolean | null = false;
-  @Input() human!: Human.AsObject;
+  @Input() human?: Human.AsObject;
+  @Input() username: string = '';
   @Input() state!: UserState;
   @Output() editType: EventEmitter<EditDialogType> = new EventEmitter<EditDialogType>();
   @Output() resendEmailVerification: EventEmitter<void> = new EventEmitter<void>();

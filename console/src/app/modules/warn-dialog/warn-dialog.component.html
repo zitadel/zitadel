@@ -8,6 +8,9 @@
   <cnsl-info-section *ngIf="data.warnSectionKey" [type]="InfoSectionType.WARN">{{
     data.warnSectionKey | translate
   }}</cnsl-info-section>
+
+  <p *ngIf="data.hintKey" class="desc cnsl-secondary-text">{{ data.hintKey | translate: { value: data.confirmation } }}</p>
+
   <cnsl-form-field *ngIf="data.confirmation && data.confirmationKey" class="formfield">
     <cnsl-label>{{ data.confirmationKey | translate: { value: data.confirmation } }}</cnsl-label>
     <input cnslInput [(ngModel)]="confirm" data-e2e="confirm-dialog-input" />

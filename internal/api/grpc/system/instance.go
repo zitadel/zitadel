@@ -41,13 +41,35 @@ func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequ
 }
 
 func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequest) (*system_pb.AddInstanceResponse, error) {
-	id, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.DefaultInstance))
+	id, details, err := s.command.SetUpInstance(ctx, AddInstancePbToSetupInstance(req, s.defaultInstance, s.externalDomain))
 	if err != nil {
 		return nil, err
 	}
 	return &system_pb.AddInstanceResponse{
 		InstanceId: id,
 		Details:    object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
+func (s *Server) UpdateInstance(ctx context.Context, req *system_pb.UpdateInstanceRequest) (*system_pb.UpdateInstanceResponse, error) {
+	ctx = authz.WithInstanceID(ctx, req.InstanceId)
+	details, err := s.command.UpdateInstance(ctx, req.InstanceName)
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.UpdateInstanceResponse{
+		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
+func (s *Server) RemoveInstance(ctx context.Context, req *system_pb.RemoveInstanceRequest) (*system_pb.RemoveInstanceResponse, error) {
+	ctx = authz.WithInstanceID(ctx, req.InstanceId)
+	details, err := s.command.RemoveInstance(ctx, req.InstanceId)
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.RemoveInstanceResponse{
+		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
 }
 

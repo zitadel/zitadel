@@ -75,7 +75,10 @@ func (s *spooledHandler) load(workerID string) {
 		err := recover()
 
 		if err != nil {
-			logging.WithFields("cause", err, "stack", string(debug.Stack())).Error("reduce panicked")
+			logging.WithFields(
+				"cause", err,
+				"stack", string(debug.Stack()),
+			).Error("reduce panicked")
 		}
 	}()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -167,7 +170,7 @@ func (s *spooledHandler) query(ctx context.Context, instanceIDs ...string) ([]*m
 	return s.eventstore.FilterEvents(ctx, query)
 }
 
-//lock ensures the lock on the database.
+// lock ensures the lock on the database.
 // the returned channel will be closed if ctx is done or an error occured durring lock
 func (s *spooledHandler) lock(ctx context.Context, errs chan<- error, workerID string) chan bool {
 	renewTimer := time.After(0)

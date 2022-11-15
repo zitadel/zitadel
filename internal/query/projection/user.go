@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -17,7 +18,7 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users2"
+	UserTable        = "projections.users5"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -88,9 +89,8 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(UserIDCol, UserInstanceIDCol),
-			crdb.WithIndex(crdb.NewIndex("username_idx", []string{UserUsernameCol})),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserResourceOwnerCol})),
-			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{UserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("username_idx5", []string{UserUsernameCol})),
+			crdb.WithIndex(crdb.NewIndex("user_ro_idx5", []string{UserResourceOwnerCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText),
@@ -109,7 +109,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(HumanUserIDCol, HumanUserInstanceIDCol),
 			UserHumanSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_human_ref_user")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_human_ref_user5")),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText),
@@ -119,7 +119,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(MachineUserIDCol, MachineUserInstanceIDCol),
 			UserMachineSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user5")),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(NotifyUserIDCol, crdb.ColumnTypeText),
@@ -132,7 +132,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		},
 			crdb.NewPrimaryKey(NotifyUserIDCol, NotifyInstanceIDCol),
 			UserNotifySuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user5")),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -271,6 +271,15 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reduceHumanPasswordChanged,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(UserInstanceIDCol),
 				},
 			},
 		},
@@ -708,16 +717,9 @@ func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
-		crdb.AddCopyStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyLastPhoneCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyVerifiedPhoneCol, nil),
+				crdb.NewCopyCol(NotifyVerifiedPhoneCol, NotifyLastPhoneCol),
 			},
 			[]handler.Condition{
 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
@@ -798,16 +800,9 @@ func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
-		crdb.AddCopyStatement(
+		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyLastEmailCol, nil),
-			},
-			[]handler.Column{
-				handler.NewCol(NotifyUserIDCol, nil),
-				handler.NewCol(NotifyInstanceIDCol, nil),
-				handler.NewCol(NotifyVerifiedEmailCol, nil),
+				crdb.NewCopyCol(NotifyVerifiedEmailCol, NotifyLastEmailCol),
 			},
 			[]handler.Condition{
 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),

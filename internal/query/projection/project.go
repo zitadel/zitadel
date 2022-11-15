@@ -8,11 +8,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
-	ProjectProjectionTable = "projections.projects"
+	ProjectProjectionTable = "projections.projects2"
 
 	ProjectColumnID                     = "id"
 	ProjectColumnCreationDate           = "creation_date"
@@ -52,7 +53,7 @@ func newProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(ProjectColumnPrivateLabelingSetting, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(ProjectColumnInstanceID, ProjectColumnID),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{ProjectColumnResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("project_ro_idx", []string{ProjectColumnResourceOwner})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -83,6 +84,15 @@ func (p *projectProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.ProjectRemovedType,
 					Reduce: p.reduceProjectRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(ProjectColumnInstanceID),
 				},
 			},
 		},
@@ -145,6 +155,7 @@ func (p *projectProjection) reduceProjectChanged(event eventstore.Event) (*handl
 		columns,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -163,6 +174,7 @@ func (p *projectProjection) reduceProjectDeactivated(event eventstore.Event) (*h
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -181,6 +193,7 @@ func (p *projectProjection) reduceProjectReactivated(event eventstore.Event) (*h
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -194,6 +207,7 @@ func (p *projectProjection) reduceProjectRemoved(event eventstore.Event) (*handl
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

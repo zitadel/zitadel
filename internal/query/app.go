@@ -7,12 +7,10 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -35,27 +33,34 @@ type App struct {
 	Name      string
 
 	OIDCConfig *OIDCApp
+	SAMLConfig *SAMLApp
 	APIConfig  *APIApp
 }
 
 type OIDCApp struct {
-	RedirectURIs           []string
-	ResponseTypes          []domain.OIDCResponseType
-	GrantTypes             []domain.OIDCGrantType
+	RedirectURIs           database.StringArray
+	ResponseTypes          database.EnumArray[domain.OIDCResponseType]
+	GrantTypes             database.EnumArray[domain.OIDCGrantType]
 	AppType                domain.OIDCApplicationType
 	ClientID               string
 	AuthMethodType         domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs []string
+	PostLogoutRedirectURIs database.StringArray
 	Version                domain.OIDCVersion
-	ComplianceProblems     []string
+	ComplianceProblems     database.StringArray
 	IsDevMode              bool
 	AccessTokenType        domain.OIDCTokenType
 	AssertAccessTokenRole  bool
 	AssertIDTokenRole      bool
 	AssertIDTokenUserinfo  bool
 	ClockSkew              time.Duration
-	AdditionalOrigins      []string
-	AllowedOrigins         []string
+	AdditionalOrigins      database.StringArray
+	AllowedOrigins         database.StringArray
+}
+
+type SAMLApp struct {
+	Metadata    []byte
+	MetadataURL string
+	EntityID    string
 }
 
 type APIApp struct {
@@ -78,7 +83,8 @@ func (q *AppSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 var (
 	appsTable = table{
-		name: projection.AppProjectionTable,
+		name:          projection.AppProjectionTable,
+		instanceIDCol: projection.AppColumnInstanceID,
 	}
 	AppColumnID = Column{
 		name:  projection.AppColumnID,
@@ -119,8 +125,32 @@ var (
 )
 
 var (
+	appSAMLConfigsTable = table{
+		name:          projection.AppSAMLTable,
+		instanceIDCol: projection.AppSAMLConfigColumnInstanceID,
+	}
+	AppSAMLConfigColumnAppID = Column{
+		name:  projection.AppSAMLConfigColumnAppID,
+		table: appSAMLConfigsTable,
+	}
+	AppSAMLConfigColumnEntityID = Column{
+		name:  projection.AppSAMLConfigColumnEntityID,
+		table: appSAMLConfigsTable,
+	}
+	AppSAMLConfigColumnMetadata = Column{
+		name:  projection.AppSAMLConfigColumnMetadata,
+		table: appSAMLConfigsTable,
+	}
+	AppSAMLConfigColumnMetadataURL = Column{
+		name:  projection.AppSAMLConfigColumnMetadataURL,
+		table: appSAMLConfigsTable,
+	}
+)
+
+var (
 	appAPIConfigsTable = table{
-		name: projection.AppAPITable,
+		name:          projection.AppAPITable,
+		instanceIDCol: projection.AppAPIConfigColumnInstanceID,
 	}
 	AppAPIConfigColumnAppID = Column{
 		name:  projection.AppAPIConfigColumnAppID,
@@ -138,7 +168,8 @@ var (
 
 var (
 	appOIDCConfigsTable = table{
-		name: projection.AppOIDCTable,
+		name:          projection.AppOIDCTable,
+		instanceIDCol: projection.AppOIDCConfigColumnInstanceID,
 	}
 	AppOIDCConfigColumnAppID = Column{
 		name:  projection.AppOIDCConfigColumnAppID,
@@ -227,6 +258,58 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	return scan(row)
 }
 
+func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
+	stmt, scan := prepareAppQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			AppColumnID.identifier():         appID,
+			AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (*App, error) {
+	stmt, scan := prepareAppQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			AppSAMLConfigColumnEntityID.identifier(): entityID,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (*Project, error) {
+	stmt, scan := prepareProjectByAppQuery()
+	query, args, err := stmt.Where(
+		sq.And{
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+			sq.Or{
+				sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+				sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+				sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
+			},
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-XhJi3", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
 func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (string, error) {
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
@@ -251,6 +334,7 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (stri
 			sq.Or{
 				sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
 				sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+				sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
 			},
 		},
 	).ToSql()
@@ -391,15 +475,22 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+
+			AppSAMLConfigColumnAppID.identifier(),
+			AppSAMLConfigColumnEntityID.identifier(),
+			AppSAMLConfigColumnMetadata.identifier(),
+			AppSAMLConfigColumnMetadataURL.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
 			app := new(App)
 
 			var (
 				apiConfig  = sqlAPIConfig{}
 				oidcConfig = sqlOIDCConfig{}
+				samlConfig = sqlSAMLConfig{}
 			)
 
 			err := row.Scan(
@@ -432,6 +523,11 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.iDTokenUserinfoAssertion,
 				&oidcConfig.clockSkew,
 				&oidcConfig.additionalOrigins,
+
+				&samlConfig.appID,
+				&samlConfig.entityID,
+				&samlConfig.metadata,
+				&samlConfig.metadataURL,
 			)
 
 			if err != nil {
@@ -443,6 +539,7 @@ func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 
 			apiConfig.set(app)
 			oidcConfig.set(app)
+			samlConfig.set(app)
 
 			return app, nil
 		}
@@ -454,6 +551,7 @@ func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID s
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (projectID string, err error) {
 			err = row.Scan(
 				&projectID,
@@ -487,6 +585,7 @@ func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, err
 			Join(join(AppColumnProjectID, ProjectColumnID)).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
@@ -544,10 +643,16 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+
+			AppSAMLConfigColumnAppID.identifier(),
+			AppSAMLConfigColumnEntityID.identifier(),
+			AppSAMLConfigColumnMetadata.identifier(),
+			AppSAMLConfigColumnMetadataURL.identifier(),
 			countColumn.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*Apps, error) {
 			apps := &Apps{Apps: []*App{}}
 
@@ -556,6 +661,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 				var (
 					apiConfig  = sqlAPIConfig{}
 					oidcConfig = sqlOIDCConfig{}
+					samlConfig = sqlSAMLConfig{}
 				)
 
 				err := row.Scan(
@@ -588,6 +694,12 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&oidcConfig.iDTokenUserinfoAssertion,
 					&oidcConfig.clockSkew,
 					&oidcConfig.additionalOrigins,
+
+					&samlConfig.appID,
+					&samlConfig.entityID,
+					&samlConfig.metadata,
+					&samlConfig.metadataURL,
+
 					&apps.Count,
 				)
 
@@ -597,6 +709,7 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 
 				apiConfig.set(app)
 				oidcConfig.set(app)
+				samlConfig.set(app)
 
 				apps.Apps = append(apps.Apps, app)
 			}
@@ -613,7 +726,7 @@ func prepareClientIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
-			ids := []string{}
+			ids := database.StringArray{}
 
 			for rows.Next() {
 				var apiID sql.NullString
@@ -639,19 +752,19 @@ type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
 	clientID                 sql.NullString
-	redirectUris             pq.StringArray
+	redirectUris             database.StringArray
 	applicationType          sql.NullInt16
 	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   pq.StringArray
+	postLogoutRedirectUris   database.StringArray
 	devMode                  sql.NullBool
 	accessTokenType          sql.NullInt16
 	accessTokenRoleAssertion sql.NullBool
 	iDTokenRoleAssertion     sql.NullBool
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
-	additionalOrigins        pq.StringArray
-	responseTypes            pq.Int32Array
-	grantTypes               pq.Int32Array
+	additionalOrigins        database.StringArray
+	responseTypes            database.EnumArray[domain.OIDCResponseType]
+	grantTypes               database.EnumArray[domain.OIDCGrantType]
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -672,8 +785,8 @@ func (c sqlOIDCConfig) set(app *App) {
 		AssertIDTokenUserinfo:  c.iDTokenUserinfoAssertion.Bool,
 		ClockSkew:              time.Duration(c.clockSkew.Int64),
 		AdditionalOrigins:      c.additionalOrigins,
-		ResponseTypes:          oidcResponseTypesToDomain(c.responseTypes),
-		GrantTypes:             oidcGrantTypesToDomain(c.grantTypes),
+		ResponseTypes:          c.responseTypes,
+		GrantTypes:             c.grantTypes,
 	}
 	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems
@@ -681,6 +794,24 @@ func (c sqlOIDCConfig) set(app *App) {
 	var err error
 	app.OIDCConfig.AllowedOrigins, err = domain.OIDCOriginAllowList(app.OIDCConfig.RedirectURIs, app.OIDCConfig.AdditionalOrigins)
 	logging.LogWithFields("app", app.ID).OnError(err).Warn("unable to set allowed origins")
+}
+
+type sqlSAMLConfig struct {
+	appID       sql.NullString
+	entityID    sql.NullString
+	metadataURL sql.NullString
+	metadata    []byte
+}
+
+func (c sqlSAMLConfig) set(app *App) {
+	if !c.appID.Valid {
+		return
+	}
+	app.SAMLConfig = &SAMLApp{
+		MetadataURL: c.metadataURL.String,
+		Metadata:    c.metadata,
+		EntityID:    c.entityID.String,
+	}
 }
 
 type sqlAPIConfig struct {
@@ -697,20 +828,4 @@ func (c sqlAPIConfig) set(app *App) {
 		ClientID:       c.clientID.String,
 		AuthMethodType: domain.APIAuthMethodType(c.authMethod.Int16),
 	}
-}
-
-func oidcResponseTypesToDomain(t pq.Int32Array) []domain.OIDCResponseType {
-	types := make([]domain.OIDCResponseType, len(t))
-	for i, typ := range t {
-		types[i] = domain.OIDCResponseType(typ)
-	}
-	return types
-}
-
-func oidcGrantTypesToDomain(t pq.Int32Array) []domain.OIDCGrantType {
-	types := make([]domain.OIDCGrantType, len(t))
-	for i, typ := range t {
-		types[i] = domain.OIDCGrantType(typ)
-	}
-	return types
 }

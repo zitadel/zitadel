@@ -4,15 +4,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProjectCreateComponent } from './project-create.component';
 
 const routes: Routes = [
-    {
-        path: '',
-        component: ProjectCreateComponent,
-        data: { animation: 'AddPage' },
-    },
+  {
+    path: '',
+    component: ProjectCreateComponent,
+    data: { animation: 'AddPage' },
+  },
 ];
 
 @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule],
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-export class ProjectCreateRoutingModule { }
+export class ProjectCreateRoutingModule {}

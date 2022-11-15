@@ -212,10 +212,9 @@
       "TITLE": "Einstellungen",
       "GENERAL": "Allgemein",
       "IDP": "Identity Provider",
-      "MFA": "Multifactor Authentication",
+      "SECURITY": "Passwort und Sicherheit",
       "KEYS": "Schlüssel",
       "PAT": "Personal Access Tokens",
-      "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
       "MEMBERSHIPS": "Memberships",
       "METADATA": "Metadata"
@@ -257,6 +256,7 @@
       "DELETE_SELF_DESCRIPTION": "Sie sind im Begriff Ihren eigenen Benutzer endgültig zu löschen. Dadurch werden Sie ausgeloggt und Ihr Account wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden!",
       "DELETE_AUTH_DESCRIPTION": "Sie sind im Begriff Ihren Account endgültig zu löschen. Wollen Sie dies wirklich tun?",
       "TYPEUSERNAME": "Wiederholen Sie '{{value}}', um den Benutzer zu löschen.",
+      "USERNAME": "Loginname",
       "DELETE_BTN": "Endgültig löschen"
     },
     "SENDEMAILDIALOG": {
@@ -294,7 +294,7 @@
       "TITLE": "Passwortlose Authentifizierungsmethoden",
       "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
-      "U2F": "Authentifikator hinzufügen",
+      "U2F": "Methode hinzufügen",
       "U2F_DIALOG_TITLE": "Authentifikator hinzufügen",
       "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
       "U2F_SUCCESS": "Passwortlos erfolgreich erstellt!",
@@ -326,17 +326,6 @@
         "NEW": "Hinzufügen"
       }
     },
-    "METADATA": {
-      "TITLE": "Metadata",
-      "DESCRIPTION": "",
-      "KEY": "Schlüssel",
-      "VALUE": "Wert",
-      "ADD": "Neues Element",
-      "SAVE": "Speichern",
-      "EMPTY": "Keine Metadaten",
-      "SETSUCCESS": "Element erfolgreich gespeichert",
-      "REMOVESUCCESS": "Element erfolgreich gelöscht"
-    },
     "MFA": {
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
@@ -346,7 +335,7 @@
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
       "ADD": "Faktor hinzufügen",
-      "OTP": "OTP (One-Time Password)",
+      "OTP": "Authentikator App für OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "OTP hinzufügen",
       "OTP_DIALOG_DESCRIPTION": "Scanne den QR-Code mit einer Authenticator App und verifiziere den erhaltenen Code, um OTP zu aktivieren.",
       "U2F": "Fingerabdruck, Security Key, Face ID oder andere",
@@ -472,6 +461,7 @@
     },
     "PASSWORD": {
       "TITLE": "Passwort",
+      "LABEL": "Ein sicheres Passwort trägt zum Schutz des Accounts bei.",
       "DESCRIPTION": "Gebe das neue Passwort unter Einhaltung der Richtlinie für die Komplexität ein.",
       "OLD": "Aktuelles Passwort",
       "NEW": "Neues Passwort",
@@ -493,9 +483,10 @@
     "EMAILVERIFIED": "Email verifiziert",
     "NOTVERIFIED": "nicht verifiziert",
     "PREFERRED_LOGINNAME": "Bevorzugter Loginname",
+    "ISINITIAL": "Dieser Benutzer wurde noch nicht verifiziert.",
     "LOGINMETHODS": {
       "TITLE": "Kontaktinformationen",
-      "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um Dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
+      "DESCRIPTION": "Die Kontaktinformationen werden benötigt, um dir wichtige Informationen wie Verifikationsnachrichten und Links für das Zurücksetzen des Passworts per E-Mail zu senden.",
       "EMAIL": {
         "TITLE": "E-Mail",
         "VALID": "Validiert",
@@ -639,6 +630,17 @@
       "DELETED": "Personal Access Token gelöscht."
     }
   },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "DESCRIPTION": "",
+    "KEY": "Schlüssel",
+    "VALUE": "Wert",
+    "ADD": "Neues Element",
+    "SAVE": "Speichern",
+    "EMPTY": "Keine Metadaten",
+    "SETSUCCESS": "Element erfolgreich gespeichert",
+    "REMOVESUCCESS": "Element erfolgreich gelöscht"
+  },
   "FLOWS": {
     "TITLE": "Aktionen und Abläufe",
     "DESCRIPTION": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
@@ -653,15 +655,6 @@
       "0": "Kein Status",
       "1": "inaktiv",
       "2": "aktiv"
-    },
-    "TYPES": {
-      "0": "Unspezifisch",
-      "1": "Externe Authentifizierung"
-    },
-    "TRIGGERTYPES": {
-      "1": "Post Authentication",
-      "2": "Pre Creation",
-      "3": "Post Creation"
     },
     "ADDTRIGGER": "Trigger hinzufügen",
     "FLOWCHANGED": "Der Ablauf wurde geändert",
@@ -689,6 +682,10 @@
       "CLEAR": {
         "TITLE": "Flow zurücksetzen?",
         "DESCRIPTION": "Sie sind im Begriff den Flow mitsamt seinen Triggern und Aktionen zurückzusetzen. Diese Änderung kann nicht wiederhergestellt werden."
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Ausgewählte Aktionen löschen?",
+        "DESCRIPTION": "Wollen Sie die gewählten Aktionen wirklich löschen?"
       }
     },
     "TOAST": {
@@ -781,6 +778,12 @@
       "ORGDETAIL_TITLE": "Gebe den Namen und die Domain für die neue Organisation ein.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Geben Sie den Namen der neuen Organisation ein.",
       "ORGDETAILUSER_TITLE": "Organisationsbesitzer hinzufügen",
+      "RENAME": {
+        "ACTION": "Umbenennen",
+        "TITLE": "Organisation umbenennen",
+        "DESCRIPTION": "Geben Sie den neuen Namen Ihrer Organisation an.",
+        "BTN": "Umbenennen"
+      },
       "ORGDOMAIN": {
         "TITLE": "Verifikation der Domain der Organisation",
         "VERIFICATION": "Überprüfe den Besitz Deiner Domain, indem Du eine Bestätigungsdatei herunterlädst und unter der angegebenen URL speicherst, oder indem Du sie mit einem DNS-Eintrag verifizierst.",
@@ -832,6 +835,7 @@
       "DESCRIPTION": "Definiere hier die Benutzer, die Operationen auf Deinen Organisationen vornehmen dürfen."
     },
     "TOAST": {
+      "UPDATED": "Organisation geändert",
       "DEACTIVATED": "Organisation deaktiviert.",
       "REACTIVATED": "Organisation reaktiviert.",
       "DOMAINADDED": "Domain hinzugefügt.",
@@ -892,7 +896,8 @@
       "de": "Deutsch",
       "en": "English",
       "it": "Italiano",
-      "fr": "Français"
+      "fr": "Français",
+      "zh": "Chinese"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1072,7 +1077,8 @@
         "de": "Deutsch",
         "en": "English",
         "it": "Italiano",
-        "fr": "Français"
+        "fr": "Français",
+        "zh": "Chinese"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1172,12 +1178,18 @@
       "HIDEPASSWORDRESET": "Passwort vergessen ausblenden",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
+      "HIDELOGINNAMESUFFIX_DESC": "Blendet das Suffix des Login-Namens in der Login-Oberfläche aus",
       "IGNOREUNKNOWNUSERNAMES": "Unbekannte Usernamen ignorieren",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Ist die Option gewählt, wird der Passwort Schritt im Login auch angezeigt wenn der User nicht gefunden wurde. Dem Benutzer wird auf bei der Passwortprüfung nicht angezeigt ob der Username oder das Passwort falsch war.",
+      "ALLOWDOMAINDISCOVERY": "Domänenentdeckung erlauben",
+      "ALLOWDOMAINDISCOVERY_DESC": "Ist die Option gewählt, wird die Endung (@domain.com) eines unbekannten Benutzernamens im Login mit den Organisationsdomänen verglichen. Bei Übereinstimmung wird der Benutzer auf die Registrierung dieser Organisation weitergeleitet.",
+      "DISABLELOGINWITHEMAIL": "Login mittels E-Mailadresse deaktivieren",
+      "DISABLELOGINWITHPHONE": "Login mittels Telefonnummer deaktivieren",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
       "DISABLEWATERMARK": "Wasserzeichen ausblenden",
+      "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden",
       "PASSWORDCHECKLIFETIME": "Passwort Check Lifetime",
       "EXTERNALLOGINCHECKLIFETIME": "Externer Login Check Lifetime",
       "MFAINITSKIPLIFETIME": "Multifaktor Init Lifetime",
@@ -1363,6 +1375,7 @@
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Besitzer",
       "GRANTEDORGNAME": "Name der Organisation",
+      "GRANTID": "Grant Id",
       "CREATIONDATE": "Erstelldatum",
       "CHANGEDATE": "Letzte Änderung",
       "DATES": "Datum",
@@ -1607,9 +1620,9 @@
       "TITLE": "Anwendung",
       "ID": "ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
-      "CREATE_OIDC": "OIDC-Anwendung",
-      "CREATE_OIDC_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
-      "CREATE_OIDC_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert.",
+      "CREATE": "Applikation erstellen",
+      "CREATE_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
+      "CREATE_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert.",
       "STATE": "Status",
       "DATECREATED": "Erstellt",
       "DATECHANGED": "Geändert",
@@ -1662,6 +1675,10 @@
     "ADDITIONALORIGINSDESC": "Wenn sie zusätzliche Origins definieren wollen, die nicht den Redirect URIs gleichzusetzen sind, können Sie dies hier tun.",
     "ORIGINS": "Origins",
     "NOTANORIGIN": "Der Angegebene Wert ist kein Origin.",
+    "PROSWITCH": "Konfigurator überspringen",
+    "NAMEANDTYPESECTION": "Name und Typ",
+    "TITLEFIRST": "Name der Applikation.",
+    "TYPETITLE": "Art der Anwendung",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1670,10 +1687,6 @@
       "CURRENT": "Aktuelle Konfiguration",
       "TOKENSECTIONTITLE": "AuthToken Optionen",
       "REDIRECTSECTIONTITLE": "Weiterleitungseinstellungen",
-      "PROSWITCH": "Konfigurator überspringen",
-      "NAMEANDTYPESECTION": "Name und Typ",
-      "TITLEFIRST": "Gebe zuerst einen Namen ein.",
-      "TYPETITLE": "Welche Art von Anwendung möchtest Du erstellen?",
       "REDIRECTTITLE": "Wohin soll nach dem Log-in weitergeleitet werden?",
       "REDIRECTDESCRIPTIONWEB": "Die Weiterleitung muss mit https:// beginnen. http:// ist nur im Entwicklermodus zulässig.",
       "REDIRECTDESCRIPTIONNATIVE": "Die Weiterleitung muss mit einem eigenen Protokoll, http://127.0.0.1, http://[::1] oder http://localhost beginnen.",
@@ -1765,6 +1778,18 @@
         "1": "Private Key JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML Applikationen"
+      },
+      "CONFIGSECTION": "SAML Konfiguration",
+      "URL": "Url des Metadata Files",
+      "OR": "oder",
+      "XML": "Metadata XML hochladen",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata aus Datei"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
@@ -1817,7 +1842,8 @@
     "de": "Deutsch",
     "en": "English",
     "it": "Italiano",
-    "fr": "Français"
+    "fr": "Français",
+    "zh": "Chinese"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

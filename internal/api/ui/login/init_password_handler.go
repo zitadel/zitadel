@@ -29,14 +29,13 @@ type initPasswordFormData struct {
 type initPasswordData struct {
 	baseData
 	profileData
-	Code                      string
-	UserID                    string
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
+	Code         string
+	UserID       string
+	MinLength    uint64
+	HasUppercase string
+	HasLowercase string
+	HasNumber    string
+	HasSymbol    string
 }
 
 func InitPasswordLink(origin, userID, code, orgID string) string {
@@ -85,7 +84,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
 	}
-	l.renderInitPasswordDone(w, r, authReq)
+	l.renderInitPasswordDone(w, r, authReq, userOrg)
 }
 
 func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
@@ -124,15 +123,17 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	if userID == "" && authReq != nil {
 		userID = authReq.UserID
 	}
+
+	translator := l.getTranslator(r.Context(), authReq)
+
 	data := initPasswordData{
-		baseData:    l.getBaseData(r, authReq, "Init Password", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "InitPassword.Title","InitPassword.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
 	}
-	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, authReq, userID)
+	policy := l.getPasswordComplexityPolicyByUserID(r, userID)
 	if policy != nil {
-		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
 		if policy.HasUppercase {
 			data.HasUppercase = UpperCaseRegex
@@ -147,7 +148,6 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 			data.HasNumber = NumberRegex
 		}
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
 		user, err := l.query.GetUserByID(r.Context(), false, userID)
 		if err == nil {
@@ -157,7 +157,11 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitPassword], data, nil)
 }
 
-func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	data := l.getUserData(r, authReq, "Password Init Done", "", "")
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplInitPasswordDone], data, nil)
+func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
+	data := l.getUserData(r, authReq, "InitPasswordDone.Title", "InitPasswordDone.Description", "", "")
+	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		l.customTexts(r.Context(), translator, orgID)
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitPasswordDone], data, nil)
 }

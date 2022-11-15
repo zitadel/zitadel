@@ -6,9 +6,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -20,7 +20,7 @@ type Memberships struct {
 
 type Membership struct {
 	UserID        string
-	Roles         []string
+	Roles         database.StringArray
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	Sequence      uint64
@@ -132,7 +132,8 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 var (
 	//membershipAlias is a hack to satisfy checks in the queries
 	membershipAlias = table{
-		name: "memberships",
+		name:          "memberships",
+		instanceIDCol: projection.MemberInstanceID,
 	}
 	membershipUserID = Column{
 		name:  projection.MemberUserIDCol,
@@ -227,14 +228,13 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					projectID    = sql.NullString{}
 					grantID      = sql.NullString{}
 					grantedOrgID = sql.NullString{}
-					roles        = pq.StringArray{}
 					projectName  = sql.NullString{}
 					orgName      = sql.NullString{}
 				)
 
 				err := rows.Scan(
 					&membership.UserID,
-					&roles,
+					&membership.Roles,
 					&membership.CreationDate,
 					&membership.ChangeDate,
 					&membership.Sequence,
@@ -252,8 +252,6 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 				if err != nil {
 					return nil, err
 				}
-
-				membership.Roles = roles
 
 				if orgID.Valid {
 					membership.Org = &OrgMembership{
@@ -305,9 +303,9 @@ func prepareOrgMember() string {
 		OrgMemberResourceOwner.identifier(),
 		OrgMemberInstanceID.identifier(),
 		OrgMemberOrgID.identifier(),
-		"NULL::STRING AS "+membershipIAMID.name,
-		"NULL::STRING AS "+membershipProjectID.name,
-		"NULL::STRING AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipIAMID.name,
+		"NULL::TEXT AS "+membershipProjectID.name,
+		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(orgMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -321,10 +319,10 @@ func prepareIAMMember() string {
 		InstanceMemberSequence.identifier(),
 		InstanceMemberResourceOwner.identifier(),
 		InstanceMemberInstanceID.identifier(),
-		"NULL::STRING AS "+membershipOrgID.name,
+		"NULL::TEXT AS "+membershipOrgID.name,
 		InstanceMemberIAMID.identifier(),
-		"NULL::STRING AS "+membershipProjectID.name,
-		"NULL::STRING AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipProjectID.name,
+		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(instanceMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -338,10 +336,10 @@ func prepareProjectMember() string {
 		ProjectMemberSequence.identifier(),
 		ProjectMemberResourceOwner.identifier(),
 		ProjectMemberInstanceID.identifier(),
-		"NULL::STRING AS "+membershipOrgID.name,
-		"NULL::STRING AS "+membershipIAMID.name,
+		"NULL::TEXT AS "+membershipOrgID.name,
+		"NULL::TEXT AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
-		"NULL::STRING AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+membershipGrantID.name,
 	).From(projectMemberTable.identifier()).MustSql()
 
 	return stmt
@@ -356,8 +354,8 @@ func prepareProjectGrantMember() string {
 		ProjectGrantMemberSequence.identifier(),
 		ProjectGrantMemberResourceOwner.identifier(),
 		ProjectGrantMemberInstanceID.identifier(),
-		"NULL::STRING AS "+membershipOrgID.name,
-		"NULL::STRING AS "+membershipIAMID.name,
+		"NULL::TEXT AS "+membershipOrgID.name,
+		"NULL::TEXT AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
 	).From(projectGrantMemberTable.identifier()).

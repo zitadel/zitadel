@@ -1,49 +1,51 @@
-import { apiCallProperties } from "./apiauth"
-import { ensureSomethingDoesntExist, ensureSomethingExists } from "./ensure"
+import { ensureItemDoesntExist, ensureItemExists } from './ensure';
+import { API } from './types';
 
-export function ensureHumanUserExists(api: apiCallProperties, username: string): Cypress.Chainable<number> {
-
-    return ensureSomethingExists(
-        api,
-        'users/_search',
-        (user: any) => user.userName === username,
-        'users/human',
-        {
-            user_name: username,
-            profile: {
-                first_name: 'e2efirstName',
-                last_name: 'e2elastName',
-            },
-            email: { 
-                email: 'e2e@email.ch',
-            },
-            phone: {
-                phone: '+41 123456789',
-        },
-    })
+export function ensureHumanUserExists(api: API, username: string): Cypress.Chainable<number> {
+  return ensureItemExists(
+    api,
+    `${api.mgmtBaseURL}/users/_search`,
+    (user: any) => user.userName === username,
+    `${api.mgmtBaseURL}/users/human`,
+    {
+      user_name: username,
+      profile: {
+        first_name: 'e2efirstName',
+        last_name: 'e2elastName',
+      },
+      email: {
+        email: 'e2e@email.ch',
+      },
+      phone: {
+        phone: '+41 123456789',
+      },
+    },
+    undefined,
+    'userId',
+  );
 }
 
-export function ensureMachineUserExists(api: apiCallProperties, username: string): Cypress.Chainable<number> {
-    
-    return ensureSomethingExists(
-        api,
-        'users/_search',
-        (user: any) => user.userName === username,
-        'users/machine',
-        {
-            user_name: username,
-            name: 'e2emachinename',
-            description: 'e2emachinedescription',
-        },
-    )
+export function ensureMachineUserExists(api: API, username: string): Cypress.Chainable<number> {
+  return ensureItemExists(
+    api,
+    `${api.mgmtBaseURL}/users/_search`,
+    (user: any) => user.userName === username,
+    `${api.mgmtBaseURL}/users/machine`,
+    {
+      user_name: username,
+      name: 'e2emachinename',
+      description: 'e2emachinedescription',
+    },
+    undefined,
+    'userId',
+  );
 }
 
-export function ensureUserDoesntExist(api: apiCallProperties, username: string): Cypress.Chainable<null> {
-
-    return ensureSomethingDoesntExist(
-        api,
-        'users/_search',
-        (user: any) => user.userName === username,
-        (user) => `users/${user.id}`
-    )
+export function ensureUserDoesntExist(api: API, username: string): Cypress.Chainable<null> {
+  return ensureItemDoesntExist(
+    api,
+    `${api.mgmtBaseURL}/users/_search`,
+    (user: any) => user.userName === username,
+    (user) => `${api.mgmtBaseURL}/users/${user.id}`,
+  );
 }

@@ -7,16 +7,10 @@ import { LabelModule } from '../label/label.module';
 import { ErrorStateMatcher } from './error-options';
 import { InputDirective } from './input.directive';
 
-
 @NgModule({
-    declarations: [InputDirective],
-    imports: [
-        LabelModule,
-        CommonModule,
-        FormFieldModule,
-        MatRippleModule,
-    ],
-    exports: [InputDirective, FormFieldModule],
-    providers: [ErrorStateMatcher],
+  declarations: [InputDirective],
+  imports: [LabelModule, CommonModule, FormFieldModule, MatRippleModule],
+  exports: [InputDirective, FormFieldModule],
+  providers: [ErrorStateMatcher],
 })
-export class InputModule { }
+export class InputModule {}

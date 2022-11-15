@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -265,7 +264,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 			res: res{
 				clause: " WHERE ( aggregate_type = ANY(?) )",
-				values: []interface{}{pq.Array([]repository.AggregateType{"user", "org"})},
+				values: []interface{}{[]repository.AggregateType{"user", "org"}},
 			},
 		},
 		{
@@ -281,7 +280,7 @@ func Test_prepareCondition(t *testing.T) {
 			},
 			res: res{
 				clause: " WHERE ( aggregate_type = ANY(?) AND aggregate_id = ? AND event_type = ANY(?) )",
-				values: []interface{}{pq.Array([]repository.AggregateType{"user", "org"}), "1234", pq.Array([]repository.EventType{"user.created", "org.created"})},
+				values: []interface{}{[]repository.AggregateType{"user", "org"}, "1234", []repository.EventType{"user.created", "org.created"}},
 			},
 		},
 	}

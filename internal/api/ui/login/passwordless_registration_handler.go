@@ -99,9 +99,11 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 	if webAuthNToken != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(webAuthNToken.CredentialCreationData)
 	}
+
+	translator := l.getTranslator(r.Context(), authReq)
 	data := &passwordlessRegistrationData{
 		webAuthNData{
-			userData:               l.getUserData(r, authReq, "Login Passwordless", errID, errMessage),
+			userData:               l.getUserData(r, authReq, "PasswordlessRegistration.Title", "PasswordlessRegistration.Description", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		code,
@@ -111,7 +113,6 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 		requestedPlatformType,
 		disabled,
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
 		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID)
 		logging.Log("HANDL-XjWKE").OnError(err).Error("unable to get active label policy")
@@ -183,17 +184,22 @@ func (l *Login) checkPasswordlessRegistration(w http.ResponseWriter, r *http.Req
 		l.renderPasswordlessRegistration(w, r, authReq, formData.UserID, formData.OrgID, formData.CodeID, formData.Code, formData.RequestPlatformType, err)
 		return
 	}
-	l.renderPasswordlessRegistrationDone(w, r, authReq, nil)
+	l.renderPasswordlessRegistrationDone(w, r, authReq, formData.OrgID, nil)
 }
 
-func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
+func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+	translator := l.getTranslator(r.Context(), authReq)
+
 	data := passwordlessRegistrationDoneDate{
-		userData:       l.getUserData(r, authReq, "Passwordless Registration Done", errID, errMessage),
+		userData:       l.getUserData(r, authReq, "PasswordlessRegistrationDone.Title","PasswordlessRegistrationDone.Description", errID, errMessage),
 		HideNextButton: authReq == nil,
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplPasswordlessRegistrationDone], data, nil)
+	if authReq == nil {
+		l.customTexts(r.Context(), translator, orgID)
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPasswordlessRegistrationDone], data, nil)
 }

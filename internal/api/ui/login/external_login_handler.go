@@ -17,7 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -121,7 +120,7 @@ func (l *Login) handleJWTAuthorize(w http.ResponseWriter, r *http.Request, authR
 	q.Set(QueryAuthRequestID, authReq.ID)
 	userAgentID, ok := http_mw.UserAgentIDFromCtx(r.Context())
 	if !ok {
-		l.renderLogin(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-dsgg3", "Errors.AuthRequest.UserAgentNotFound"))
+		l.renderLogin(w, r, authReq, errors.ThrowPreconditionFailed(nil, "LOGIN-dsgg3", "Errors.AuthRequest.UserAgentNotFound"))
 		return
 	}
 	nonce, err := l.idpConfigAlg.Encrypt([]byte(userAgentID))
@@ -166,7 +165,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 		return
 	}
-	l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+	l.renderError(w, r, authReq, errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 }
 
 func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) (rp.RelyingParty, error) {
@@ -178,7 +177,7 @@ func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigV
 		return rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL(ctx)+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 	}
 	if idpConfig.OAuthAuthorizationEndpoint == "" || idpConfig.OAuthTokenEndpoint == "" {
-		return nil, caos_errors.ThrowPreconditionFailed(nil, "RP-4n0fs", "Errors.IdentityProvider.InvalidConfig")
+		return nil, errors.ThrowPreconditionFailed(nil, "RP-4n0fs", "Errors.IdentityProvider.InvalidConfig")
 	}
 	oauth2Config := &oauth2.Config{
 		ClientID:     idpConfig.OIDCClientID,
@@ -288,8 +287,9 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	translator := l.getTranslator(r.Context(), authReq)
 	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, "ExternalNotFoundOption", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
 		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
 			externalRegisterFormData: externalRegisterFormData{
 				Email:     human.EmailAddress,
@@ -314,7 +314,6 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
 }
 
@@ -361,7 +360,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	if len(authReq.LinkingUsers) == 0 {
-		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
+		l.renderError(w, r, authReq, errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
 		return
 	}
 
@@ -374,7 +373,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 			return
 		}
 		linkingUser = l.mapExternalNotFoundOptionFormDataToLoginUser(data)
-	} 
+	}
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
 
@@ -407,19 +406,19 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 }
 
 func (l *Login) mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOptionFormData) *domain.ExternalUser {
-	isEmailVerified := formData.externalRegisterFormData.ExternalEmailVerified && formData.externalRegisterFormData.Email == formData.externalRegisterFormData.ExternalEmail
-	isPhoneVerified := formData.externalRegisterFormData.ExternalPhoneVerified && formData.externalRegisterFormData.Phone == formData.externalRegisterFormData.ExternalPhone
+	isEmailVerified := formData.ExternalEmailVerified && formData.Email == formData.ExternalEmail
+	isPhoneVerified := formData.ExternalPhoneVerified && formData.Phone == formData.ExternalPhone
 	return &domain.ExternalUser{
-		IDPConfigID:       formData.externalRegisterFormData.ExternalIDPConfigID,
-		ExternalUserID:    formData.externalRegisterFormData.ExternalIDPExtUserID,
-		PreferredUsername: formData.externalRegisterFormData.Username,
-		DisplayName:       formData.externalRegisterFormData.Email,
-		FirstName:         formData.externalRegisterFormData.Firstname,
-		LastName:          formData.externalRegisterFormData.Lastname,
-		NickName:          formData.externalRegisterFormData.Nickname,
-		Email:             formData.externalRegisterFormData.Email,
+		IDPConfigID:       formData.ExternalIDPConfigID,
+		ExternalUserID:    formData.ExternalIDPExtUserID,
+		PreferredUsername: formData.Username,
+		DisplayName:       formData.Email,
+		FirstName:         formData.Firstname,
+		LastName:          formData.Lastname,
+		NickName:          formData.Nickname,
+		Email:             formData.Email,
 		IsEmailVerified:   isEmailVerified,
-		Phone:             formData.externalRegisterFormData.Phone,
+		Phone:             formData.Phone,
 		IsPhoneVerified:   isPhoneVerified,
 	}
 }

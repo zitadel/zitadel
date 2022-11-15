@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	IDPUserLinkTable             = "projections.idp_user_links"
+	IDPUserLinkTable             = "projections.idp_user_links2"
 	IDPUserLinkIDPIDCol          = "idp_id"
 	IDPUserLinkUserIDCol         = "user_id"
 	IDPUserLinkExternalUserIDCol = "external_user_id"
@@ -46,7 +46,7 @@ func newIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(IDPUserLinkDisplayNameCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(IDPUserLinkInstanceIDCol, IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{IDPUserLinkUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("idp_user_idx", []string{IDPUserLinkUserIDCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -96,6 +96,10 @@ func (p *idpUserLinkProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
+				},
 			},
 		},
 	}
@@ -133,6 +137,7 @@ func (p *idpUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.
 			handler.NewCond(IDPUserLinkIDPIDCol, e.IDPConfigID),
 			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
 			handler.NewCond(IDPUserLinkExternalUserIDCol, e.ExternalUserID),
+			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -148,6 +153,7 @@ func (p *idpUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*h
 			handler.NewCond(IDPUserLinkIDPIDCol, e.IDPConfigID),
 			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
 			handler.NewCond(IDPUserLinkExternalUserIDCol, e.ExternalUserID),
+			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -161,6 +167,7 @@ func (p *idpUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handl
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkResourceOwnerCol, e.Aggregate().ID),
+			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -174,6 +181,7 @@ func (p *idpUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*hand
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
+			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -194,6 +202,7 @@ func (p *idpUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkIDPIDCol, idpID),
 			handler.NewCond(IDPUserLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCond(IDPUserLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }

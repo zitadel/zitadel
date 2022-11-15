@@ -59,11 +59,15 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	l.handleExternalRegisterByConfigID(w, r, authReq, data.IDPConfigID)
+}
+
+func (l *Login) handleExternalRegisterByConfigID(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, configID string) {
 	if authReq == nil {
 		l.defaultRedirect(w, r)
 		return
 	}
-	idpConfig, err := l.getIDPConfigByID(r, data.IDPConfigID)
+	idpConfig, err := l.getIDPConfigByID(r, configID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -151,12 +155,17 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
+	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
 	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -170,8 +179,9 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 
+	translator := l.getTranslator(r.Context(), authReq)
 	data := externalRegisterData{
-		baseData: l.getBaseData(r, authReq, "ExternalRegisterOverview", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, "ExternalRegistrationUserOverview.Title", "ExternalRegistrationUserOverview.Description", errID, errMessage),
 		externalRegisterFormData: externalRegisterFormData{
 			Email:     human.EmailAddress,
 			Username:  human.Username,
@@ -194,7 +204,6 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, nil)
 }
 
@@ -226,12 +235,17 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
+	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
 	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, phoneCodeGenerator)
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

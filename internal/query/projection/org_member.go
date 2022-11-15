@@ -7,12 +7,13 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	OrgMemberProjectionTable = "projections.org_members"
+	OrgMemberProjectionTable = "projections.org_members2"
 	OrgMemberOrgIDCol        = "org_id"
 )
 
@@ -28,7 +29,7 @@ func newOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 		crdb.NewTable(
 			append(memberColumns, crdb.NewColumn(OrgMemberOrgIDCol, crdb.ColumnTypeText)),
 			crdb.NewPrimaryKey(MemberInstanceID, OrgMemberOrgIDCol, MemberUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("org_memb_user_idx", []string{MemberUserIDCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -68,6 +69,15 @@ func (p *orgMemberProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.UserRemovedType,
 					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(MemberInstanceID),
 				},
 			},
 		},

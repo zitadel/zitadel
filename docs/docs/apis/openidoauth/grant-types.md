@@ -14,7 +14,7 @@ For a list of supported or unsupported `Grant Types` please have a look at the t
 | JSON Web Token (JWT) Profile                          | yes                 |
 | Refresh Token                                         | yes                 |
 | Resource Owner Password Credentials                   | no                  |
-| Security Assertion Markup Language (SAML) 2.0 Profile | no                  |
+| Security Assertion Markup Language (SAML) 2.0 Profile | no                 |
 | Token Exchange                                        | no    |
 
 ## Authorization Code
@@ -75,19 +75,19 @@ Key JSON
 
 JWT
 
-| Claim | Example                       | Description                                                                                                   |
-|:------|:------------------------------|:--------------------------------------------------------------------------------------------------------------|
-| aud   | `"{your_domain}"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                   |
-| exp   | `1605183582`                  | Unix timestamp of the expiry                                                                                  |
-| iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                             |
-| iss   | `"77479219772321307"`         | String which represents the requesting party (owner of the key), normally the `userId` from the json key file |
-| sub   | `"77479219772321307"`         | The subject ID of the service user, normally the `userId` from the json key file                              |
+| Claim | Example                   | Description                                                                                                   |
+|:------|:--------------------------|:--------------------------------------------------------------------------------------------------------------|
+| aud   | `"https://{your_domain}"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                   |
+| exp   | `1605183582`              | Unix timestamp of the expiry                                                                                  |
+| iat   | `1605179982`              | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                             |
+| iss   | `"77479219772321307"`     | String which represents the requesting party (owner of the key), normally the `userId` from the json key file |
+| sub   | `"77479219772321307"`     | The subject ID of the service user, normally the `userId` from the json key file                              |
 
 ```JSON
 {
 	"iss": "77479219772321307",
 	"sub": "77479219772321307",
-	"aud": "{your_domain}",
+	"aud": "https://{your_domain}",
 	"exp": 1605183582,
 	"iat": 1605179982
 }
@@ -120,6 +120,11 @@ Find out how to use it on the [token endpoint](endpoints#token_endpoint) or the 
 
 **Link to spec.** [OAuth 2.0 Device Authorization Grant](https://tools.ietf.org/html/rfc8628)
 
+## Security Assertion Markup Language (SAML) 2.0 Profile
+
+**Link to spec.** [Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7522)
+
+
 ## Not Supported Grant Types
 
 ### Resource Owner Password Credentials
@@ -127,7 +132,3 @@ Find out how to use it on the [token endpoint](endpoints#token_endpoint) or the 
 > Due to growing security concerns we do not support this grant type. With OAuth 2.1 it looks like this grant will be removed.
 
 **Link to spec.** [OThe OAuth 2.0 Authorization Framework Section 1.3.3](https://tools.ietf.org/html/rfc6749#section-1.3.3)
-
-### Security Assertion Markup Language (SAML) 2.0 Profile
-
-**Link to spec.** [Security Assertion Markup Language (SAML) 2.0 Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7522)

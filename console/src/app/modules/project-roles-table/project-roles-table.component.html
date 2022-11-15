@@ -2,11 +2,11 @@
   [showSelectionActionButton]="showSelectionActionButton"
   *ngIf="projectId"
   (refreshed)="refreshPage()"
-  [dataSize]="dataSource?.totalResult ?? 0"
+  [dataSize]="dataSource.totalResult"
   [emitRefreshOnPreviousRoutes]="['/projects/' + projectId + '/roles/create']"
   [selection]="selection"
-  [loading]="dataSource?.loading$ | async"
-  [timestamp]="dataSource?.viewTimestamp"
+  [loading]="dataSource.loading$ | async"
+  [timestamp]="dataSource.viewTimestamp"
 >
   <ng-template cnslHasRole [hasRole]="['project.role.write:' + projectId, 'project.role.write']" actions>
     <a
@@ -41,8 +41,8 @@
             color="primary"
             [disabled]="disabled"
             (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)"
+            (change)="$event ? selection.toggle(row.key) : null"
+            [checked]="selection.isSelected(row.key)"
           >
           </mat-checkbox>
         </td>
@@ -126,7 +126,7 @@
 
   <cnsl-paginator
     #paginator
-    [timestamp]="dataSource?.viewTimestamp"
+    [timestamp]="dataSource.viewTimestamp"
     [length]="dataSource.totalResult"
     [pageSize]="50"
     (page)="changePage()"

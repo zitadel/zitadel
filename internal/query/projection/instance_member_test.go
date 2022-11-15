@@ -3,8 +3,7 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -24,7 +23,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "instance.MemberAddedType",
+			name: "instance MemberAddedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.MemberAddedEventType),
@@ -40,14 +39,13 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.instance_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.instance_members2 (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"user-id",
-								pq.StringArray{"role"},
+								database.StringArray{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -61,7 +59,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.MemberChangedType",
+			name: "instance MemberChangedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.MemberChangedEventType),
@@ -77,15 +75,15 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.instance_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4)",
+							expectedStmt: "UPDATE projections.instance_members2 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5)",
 							expectedArgs: []interface{}{
-								pq.StringArray{"role", "changed"},
+								database.StringArray{"role", "changed"},
 								anyArg{},
 								uint64(15),
+								"instance-id",
 								"user-id",
 							},
 						},
@@ -94,7 +92,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.MemberCascadeRemovedType",
+			name: "instance MemberCascadeRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.MemberCascadeRemovedEventType),
@@ -109,12 +107,12 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_members2 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 							},
 						},
@@ -123,7 +121,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.MemberRemovedType",
+			name: "instance MemberRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.MemberRemovedEventType),
@@ -138,12 +136,12 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_members2 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 							},
 						},
@@ -152,7 +150,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.UserRemoved",
+			name: "user UserRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.UserRemovedType),
@@ -165,11 +163,37 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_members2 WHERE (instance_id = $1) AND (user_id = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.instance_members2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -189,7 +213,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, InstanceMemberProjectionTable, tt.want)
 		})
 	}
 }

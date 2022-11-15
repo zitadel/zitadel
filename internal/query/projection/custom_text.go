@@ -89,6 +89,10 @@ func (p *customTextProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.CustomTextTemplateRemovedEventType,
 					Reduce: p.reduceTemplateRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(CustomTextInstanceIDCol),
+				},
 			},
 		},
 	}
@@ -109,6 +113,13 @@ func (p *customTextProjection) reduceSet(event eventstore.Event) (*handler.State
 	}
 	return crdb.NewUpsertStatement(
 		&customTextEvent,
+		[]handler.Column{
+			handler.NewCol(CustomTextInstanceIDCol, nil),
+			handler.NewCol(CustomTextAggregateIDCol, nil),
+			handler.NewCol(CustomTextTemplateCol, nil),
+			handler.NewCol(CustomTextKeyCol, nil),
+			handler.NewCol(CustomTextLanguageCol, nil),
+		},
 		[]handler.Column{
 			handler.NewCol(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCol(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
@@ -140,6 +151,7 @@ func (p *customTextProjection) reduceRemoved(event eventstore.Event) (*handler.S
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCond(CustomTextKeyCol, customTextEvent.Key),
 			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
+			handler.NewCond(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -159,5 +171,6 @@ func (p *customTextProjection) reduceTemplateRemoved(event eventstore.Event) (*h
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
+			handler.NewCond(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 		}), nil
 }

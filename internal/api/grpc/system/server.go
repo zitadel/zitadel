@@ -25,25 +25,29 @@ type Server struct {
 	command         *command.Commands
 	query           *query.Queries
 	administrator   repository.AdministratorRepository
-	DefaultInstance command.InstanceSetup
+	defaultInstance command.InstanceSetup
+	externalDomain  string
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands,
+func CreateServer(
+	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
 	database string,
 	defaultInstance command.InstanceSetup,
+	externalDomain string,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		administrator:   repo,
 		database:        database,
-		DefaultInstance: defaultInstance,
+		defaultInstance: defaultInstance,
+		externalDomain:  externalDomain,
 	}
 }
 

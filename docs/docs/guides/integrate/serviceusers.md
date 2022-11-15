@@ -2,10 +2,7 @@
 title: Service Users
 ---
 
-import UserDescription from '../../concepts/structure/_user_description.mdx';
-
-<UserDescription name="UserDescription" />
-
+This is a guide on how to create service users in ZITADEL. You can read more about users [here](/docs/concepts/structure/users.md).
 ## Create a Service User
 
 1. Navigate to Service Users
@@ -70,7 +67,7 @@ Payload
 {
     "iss": "100507859606888466",
     "sub": "100507859606888466",
-    "aud": "{your_domain}.zitadel.cloud",
+    "aud": "https://{your_domain}.zitadel.cloud",
     "iat": [Current UTC timestamp, e.g. 1605179982, max. 1 hour ago],
     "exp": [UTC timestamp, e.g. 1605183582]
 }

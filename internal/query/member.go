@@ -3,6 +3,7 @@ package query
 import (
 	"time"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 
 	sq "github.com/Masterminds/squirrel"
@@ -52,7 +53,7 @@ type Member struct {
 	ResourceOwner string
 
 	UserID             string
-	Roles              []string
+	Roles              database.StringArray
 	PreferredLoginName string
 	Email              string
 	FirstName          string
@@ -63,8 +64,9 @@ type Member struct {
 
 var (
 	memberTableAlias = table{
-		name:  "members",
-		alias: "members",
+		name:          "members",
+		alias:         "members",
+		instanceIDCol: projection.MemberInstanceID,
 	}
 	memberUserID = Column{
 		name:  projection.MemberUserIDCol,

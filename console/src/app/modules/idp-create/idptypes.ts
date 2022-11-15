@@ -1,4 +1,3 @@
-
 export enum IdpCreateType {
   OIDC = 'OIDC',
   JWT = 'JWT',

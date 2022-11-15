@@ -9,13 +9,13 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 )
 
 var (
 	orgMemberTable = table{
-		name:  projection.OrgMemberProjectionTable,
-		alias: "members",
+		name:          projection.OrgMemberProjectionTable,
+		alias:         "members",
+		instanceIDCol: projection.MemberInstanceID,
 	}
 	OrgMemberUserID = Column{
 		name:  projection.MemberUserIDCol,
@@ -120,7 +120,6 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 				member := new(Member)
 
 				var (
-					roles              = pq.StringArray{}
 					preferredLoginName = sql.NullString{}
 					email              = sql.NullString{}
 					firstName          = sql.NullString{}
@@ -136,7 +135,7 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 					&member.Sequence,
 					&member.ResourceOwner,
 					&member.UserID,
-					&roles,
+					&member.Roles,
 					&preferredLoginName,
 					&email,
 					&firstName,
@@ -152,7 +151,6 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 					return nil, err
 				}
 
-				member.Roles = roles
 				member.PreferredLoginName = preferredLoginName.String
 				member.Email = email.String
 				member.FirstName = firstName.String

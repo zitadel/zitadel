@@ -2,9 +2,9 @@ import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/co
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import {
-    AddCustomDomainPolicyRequest,
-    GetCustomOrgIAMPolicyResponse,
-    UpdateDomainPolicyRequest,
+  AddCustomDomainPolicyRequest,
+  GetCustomOrgIAMPolicyResponse,
+  UpdateDomainPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
@@ -79,7 +79,7 @@ export class DomainPolicyComponent implements OnInit, OnDestroy {
       case PolicyComponentServiceType.MGMT:
         return this.managementService.getDomainPolicy();
       case PolicyComponentServiceType.ADMIN:
-        return this.adminService.getCustomDomainPolicy(this.org.id);
+        return this.adminService.getDomainPolicy();
       default:
         return Promise.reject();
     }

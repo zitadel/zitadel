@@ -2,7 +2,6 @@ package view
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -11,10 +10,11 @@ import (
 	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
-func TokenByID(db *gorm.DB, table, tokenID, instanceID string) (*usr_model.TokenView, error) {
+func TokenByIDs(db *gorm.DB, table, tokenID, userID, instanceID string) (*usr_model.TokenView, error) {
 	token := new(usr_model.TokenView)
 	query := repository.PrepareGetByQuery(table,
 		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyTokenID, Method: domain.SearchMethodEquals, Value: tokenID},
+		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyUserID, Method: domain.SearchMethodEquals, Value: userID},
 		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID},
 	)
 	err := query(db, token)
@@ -92,8 +92,13 @@ func DeleteTokensFromRefreshToken(db *gorm.DB, table, refreshTokenID, instanceID
 
 func DeleteApplicationTokens(db *gorm.DB, table, instanceID string, appIDs []string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyApplicationID), pq.StringArray(appIDs)},
+		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyApplicationID), appIDs},
 		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
 	)
+	return delete(db)
+}
+
+func DeleteInstanceTokens(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID)
 	return delete(db)
 }

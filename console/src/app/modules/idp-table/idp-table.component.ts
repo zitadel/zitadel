@@ -9,9 +9,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ListIDPsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { IDP, IDPLoginPolicyLink, IDPOwnerType, IDPState, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-    AddCustomLoginPolicyRequest,
-    AddCustomLoginPolicyResponse,
-    ListOrgIDPsResponse,
+  AddCustomLoginPolicyRequest,
+  AddCustomLoginPolicyResponse,
+  ListOrgIDPsResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -33,7 +33,7 @@ export class IdpTableComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public dataSource: MatTableDataSource<IDP.AsObject> = new MatTableDataSource<IDP.AsObject>();
   public selection: SelectionModel<IDP.AsObject> = new SelectionModel<IDP.AsObject>(true, []);
-  public idpResult!: ListIDPsResponse.AsObject | ListOrgIDPsResponse.AsObject;
+  public idpResult?: ListIDPsResponse.AsObject | ListOrgIDPsResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -271,6 +271,7 @@ export class IdpTableComponent implements OnInit {
       .setNanos(this.loginPolicy.multiFactorCheckLifetime?.nanos ?? 0);
     mgmtreq.setMultiFactorCheckLifetime(mficl);
 
+    mgmtreq.setAllowDomainDiscovery(this.loginPolicy.allowDomainDiscovery);
     mgmtreq.setIgnoreUnknownUsernames(this.loginPolicy.ignoreUnknownUsernames);
     mgmtreq.setDefaultRedirectUri(this.loginPolicy.defaultRedirectUri);
 
@@ -283,6 +284,7 @@ export class IdpTableComponent implements OnInit {
         if (this.isDefault) {
           return this.addLoginPolicy()
             .then(() => {
+              this.loginPolicy.isDefault = false;
               return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, idp.owner).then(() => {
                 this.toast.showInfo('IDP.TOAST.ADDED', true);
 
@@ -338,6 +340,7 @@ export class IdpTableComponent implements OnInit {
         if (this.isDefault) {
           return this.addLoginPolicy()
             .then(() => {
+              this.loginPolicy.isDefault = false;
               return (this.service as ManagementService)
                 .removeIDPFromLoginPolicy(idp.id)
                 .then(() => {

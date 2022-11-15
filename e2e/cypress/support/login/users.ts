@@ -1,4 +1,4 @@
-import { debug } from "console";
+import { debug } from 'console';
 
 export enum User {
   OrgOwner = 'org_owner',
@@ -23,77 +23,82 @@ export function login(
   const loginUrl: string = '/ui/login';
   const issuerUrl: string = '/oauth/v2';
 
-  return cy.session(
-    creds.username,
-    () => {
-      const cookies = new Map<string, string>();
+  return cy
+    .session(
+      creds.username,
+      () => {
+        const cookies = new Map<string, string>();
 
-      cy.intercept({
-        times: 6
-      }, req => {
-        req.headers['cookie'] = requestCookies(cookies);
-        req.continue((res) => {
-          updateCookies(res.headers['set-cookie'] as string[], cookies);
-        });
-      })
+        cy.intercept(
+          {
+            times: 6,
+          },
+          (req) => {
+            req.headers['cookie'] = requestCookies(cookies);
+            req.continue((res) => {
+              updateCookies(res.headers['set-cookie'] as string[], cookies);
+            });
+          },
+        );
 
-      let userToken: string
-      cy.intercept({
-        method: 'POST',
-        url: `${issuerUrl}/token`,
-      }, req => {
-        req.continue(res => {
-          userToken = res.body["access_token"]}
-        )
-      }).as('token')
+        let userToken: string;
+        cy.intercept(
+          {
+            method: 'POST',
+            url: `${issuerUrl}/token`,
+          },
+          (req) => {
+            req.continue((res) => {
+              userToken = res.body['access_token'];
+            });
+          },
+        ).as('token');
 
-      cy.intercept({
+        cy.intercept({
           method: 'POST',
           url: `${loginUrl}/password*`,
           times: 1,
-      }).as('password');
+        }).as('password');
 
-      cy.visit(loginUrl, { retryOnNetworkFailure: true });
+        cy.visit(loginUrl, { retryOnNetworkFailure: true });
 
-      onUsernameScreen ? onUsernameScreen() : null;
-      cy.get('#loginName').type(creds.username);
-      cy.get('#submit-button').click();
+        onUsernameScreen ? onUsernameScreen() : null;
+        cy.get('#loginName').type(creds.username);
+        cy.get('#submit-button').click();
 
-      onPasswordScreen ? onPasswordScreen() : null;
-      cy.get('#password').type(creds.password);
-      cy.get('#submit-button').click();
+        onPasswordScreen ? onPasswordScreen() : null;
+        cy.get('#password').type(creds.password);
+        cy.get('#submit-button').click();
 
-      cy.wait('@password').then((interception) => {
-        if (interception.response.body.indexOf('Multifactor Setup') === -1){
-          return
-        }
+        cy.wait('@password').then((interception) => {
+          if (interception.response.body.indexOf('/ui/login/mfa/prompt') === -1) {
+            return;
+          }
 
-        cy.contains('button', 'skip').click()
-        cy.get('#change-old-password').type(creds.password)
-        cy.get('#change-new-password').type(creds.password)
-        cy.get('#change-password-confirmation').type(creds.password)
-        cy.contains('button', 'next').click()
-        cy.contains('button', 'next').click()
-      })
+          cy.contains('button', 'skip').click();
+        });
 
-      cy.wait('@token').then(() => {
-        cy.task('safetoken', {key: creds.username, token: userToken})
-      })
+        cy.wait('@token').then(() => {
+          cy.task('safetoken', { key: creds.username, token: userToken });
+        });
 
-      onAuthenticated ? onAuthenticated() : null;
+        onAuthenticated ? onAuthenticated() : null;
 
-      cy.get("[data-e2e=authenticated-welcome]");
-    },
-    {
-      validate: () => {
-        if (force) {
-          throw new Error('clear session');
-        }
+        cy.get('[data-e2e=authenticated-welcome]', {
+          timeout: 10_000,
+        });
       },
-    },
-  ).then(() => {
-    return cy.task('loadtoken', {key: creds.username})
-  });
+      {
+        validate: () => {
+          if (force) {
+            throw new Error('clear session');
+          }
+        },
+      },
+    )
+    .then(() => {
+      return cy.task('loadtoken', { key: creds.username });
+    });
 }
 
 export function loginname(withoutDomain: string, org?: string): string {
@@ -101,10 +106,9 @@ export function loginname(withoutDomain: string, org?: string): string {
 }
 
 function credentials(user: User, pw?: string) {
-
   // TODO: ugly
-  const woDomain = user == User.IAMAdminUser ? User.IAMAdminUser : `${user}_user_name`
-  const org = Cypress.env('ORGANIZATION') ? Cypress.env('ORGANIZATION') : 'zitadel'
+  const woDomain = user == User.IAMAdminUser ? User.IAMAdminUser : `${user}_user_name`;
+  const org = Cypress.env('ORGANIZATION') ? Cypress.env('ORGANIZATION') : 'zitadel';
 
   return {
     username: loginname(woDomain, org),

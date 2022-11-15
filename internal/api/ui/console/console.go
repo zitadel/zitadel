@@ -65,8 +65,8 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return &file{File: f}, nil
 }
 
-//file wraps the http.File and fs.FileInfo interfaces
-//to return the build.Date() as ModTime() of the file
+// file wraps the http.File and fs.FileInfo interfaces
+// to return the build.Date() as ModTime() of the file
 type file struct {
 	http.File
 	fs.FileInfo

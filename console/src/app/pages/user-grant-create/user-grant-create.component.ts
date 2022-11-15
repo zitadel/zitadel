@@ -21,11 +21,11 @@ import { ToastService } from 'src/app/services/toast.service';
 export class UserGrantCreateComponent implements OnDestroy {
   public context!: UserGrantContext;
 
-  public org!: Org.AsObject;
+  public org?: Org.AsObject;
   public userIds: string[] = [];
 
-  public project!: Project.AsObject;
-  public grantedProject!: GrantedProject.AsObject;
+  public project?: Project.AsObject;
+  public grantedProject?: GrantedProject.AsObject;
 
   public rolesList: string[] = [];
 
@@ -34,7 +34,7 @@ export class UserGrantCreateComponent implements OnDestroy {
 
   public UserGrantContext: any = UserGrantContext;
 
-  public user!: User.AsObject;
+  public user?: User.AsObject;
   public UserTarget: any = UserTarget;
 
   public editState: boolean = false;
@@ -114,7 +114,7 @@ export class UserGrantCreateComponent implements OnDestroy {
   public addGrant(): void {
     switch (this.context) {
       case UserGrantContext.OWNED_PROJECT:
-        const prom = this.userIds.map((id) => this.userService.addUserGrant(id, this.rolesList, this.project.id));
+        const prom = this.userIds.map((id) => this.userService.addUserGrant(id, this.rolesList, this.project?.id));
         Promise.all(prom)
           .then(() => {
             this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
@@ -127,7 +127,7 @@ export class UserGrantCreateComponent implements OnDestroy {
         break;
       case UserGrantContext.GRANTED_PROJECT:
         const promp = this.userIds.map((id) =>
-          this.userService.addUserGrant(id, this.rolesList, this.grantedProject.projectId, this.grantedProject.grantId),
+          this.userService.addUserGrant(id, this.rolesList, this.grantedProject?.projectId, this.grantedProject?.grantId),
         );
         Promise.all(promp)
           .then(() => {
@@ -208,8 +208,8 @@ export class UserGrantCreateComponent implements OnDestroy {
     }
   }
 
-  public selectRoles(roles: Role.AsObject[]): void {
-    this.rolesList = roles.map((role) => role.key);
+  public selectRoles(roleKeys: string[]): void {
+    this.rolesList = roleKeys;
   }
 
   public next(): void {

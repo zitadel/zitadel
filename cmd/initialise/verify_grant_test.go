@@ -18,19 +18,9 @@ func Test_verifyGrant(t *testing.T) {
 		targetErr error
 	}{
 		{
-			name: "exists fails",
-			args: args{
-				db:       prepareDB(t, expectQueryErr("SELECT EXISTS(SELECT * FROM [SHOW GRANTS ON DATABASE zitadel] where grantee = $1 AND privilege_type = 'ALL'", sql.ErrConnDone, "zitadel-user")),
-				database: "zitadel",
-				username: "zitadel-user",
-			},
-			targetErr: sql.ErrConnDone,
-		},
-		{
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT * FROM [SHOW GRANTS ON DATABASE zitadel] where grantee = $1 AND privilege_type = 'ALL'", false, "zitadel-user"),
 					expectExec("GRANT ALL ON DATABASE zitadel TO zitadel-user", sql.ErrTxDone),
 				),
 				database: "zitadel",
@@ -42,7 +32,6 @@ func Test_verifyGrant(t *testing.T) {
 			name: "correct",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT * FROM [SHOW GRANTS ON DATABASE zitadel] where grantee = $1 AND privilege_type = 'ALL'", false, "zitadel-user"),
 					expectExec("GRANT ALL ON DATABASE zitadel TO zitadel-user", nil),
 				),
 				database: "zitadel",
@@ -54,7 +43,7 @@ func Test_verifyGrant(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
-					expectExists("SELECT EXISTS(SELECT * FROM [SHOW GRANTS ON DATABASE zitadel] where grantee = $1 AND privilege_type = 'ALL'", true, "zitadel-user"),
+					expectExec("GRANT ALL ON DATABASE zitadel TO zitadel-user", nil),
 				),
 				database: "zitadel",
 				username: "zitadel-user",

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SecretGeneratorProjectionTable = "projections.secret_generators"
+	SecretGeneratorProjectionTable = "projections.secret_generators2"
 
 	SecretGeneratorColumnGeneratorType       = "generator_type"
 	SecretGeneratorColumnAggregateID         = "aggregate_id"
@@ -38,7 +38,7 @@ func newSecretGeneratorProjection(ctx context.Context, config crdb.StatementHand
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(SecretGeneratorColumnGeneratorType, crdb.ColumnTypeText),
+			crdb.NewColumn(SecretGeneratorColumnGeneratorType, crdb.ColumnTypeEnum),
 			crdb.NewColumn(SecretGeneratorColumnAggregateID, crdb.ColumnTypeText),
 			crdb.NewColumn(SecretGeneratorColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(SecretGeneratorColumnChangeDate, crdb.ColumnTypeTimestamp),
@@ -75,6 +75,10 @@ func (p *secretGeneratorProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.SecretGeneratorRemovedEventType,
 					Reduce: p.reduceSecretGeneratorRemoved,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(SecretGeneratorColumnInstanceID),
 				},
 			},
 		},
@@ -139,6 +143,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 		[]handler.Condition{
 			handler.NewCond(SecretGeneratorColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SecretGeneratorColumnGeneratorType, e.GeneratorType),
+			handler.NewCond(SecretGeneratorColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -153,6 +158,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstor
 		[]handler.Condition{
 			handler.NewCond(SecretGeneratorColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SecretGeneratorColumnGeneratorType, e.GeneratorType),
+			handler.NewCond(SecretGeneratorColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

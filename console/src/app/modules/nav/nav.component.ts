@@ -6,10 +6,10 @@ import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, map, Observable, Subject, take } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
-import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { KeyboardShortcutsService } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -73,7 +73,6 @@ export class NavComponent implements OnDestroy {
 
   @Input() public isDarkTheme: boolean = true;
   @Input() public user!: User.AsObject;
-  @Input() public labelpolicy!: LabelPolicy.AsObject;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
       return result.matches;
@@ -91,6 +90,7 @@ export class NavComponent implements OnDestroy {
   public customerPortalLink: string = '';
 
   constructor(
+    public authService: GrpcAuthService,
     public authenticationService: AuthenticationService,
     public breadcrumbService: BreadcrumbService,
     public mgmtService: ManagementService,

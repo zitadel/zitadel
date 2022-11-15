@@ -81,7 +81,7 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 		l.renderMailVerification(w, r, authReq, userID, err)
 		return
 	}
-	l.renderMailVerified(w, r, authReq)
+	l.renderMailVerified(w, r, authReq, userOrg)
 }
 
 func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, err error) {
@@ -92,12 +92,13 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 	if userID == "" {
 		userID = authReq.UserID
 	}
+
+	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, "Mail Verification", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "EmailVerification.Title","EmailVerification.Description", errID, errMessage),
 		UserID:      userID,
 		profileData: l.getProfileData(authReq),
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
 		user, err := l.query.GetUserByID(r.Context(), false, userID)
 		if err == nil {
@@ -107,11 +108,14 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerification], data, nil)
 }
 
-func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
+	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
+		baseData:    l.getBaseData(r, authReq, "EmailVerificationDone.Title","EmailVerificationDone.Description", "", ""),
 		profileData: l.getProfileData(authReq),
 	}
-	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		l.customTexts(r.Context(), translator, orgID)
+	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMailVerified], data, nil)
 }

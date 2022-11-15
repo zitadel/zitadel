@@ -15,15 +15,27 @@ type Storage interface {
 	GetObjectInfo(ctx context.Context, instanceID, resourceOwner, name string) (*Asset, error)
 	RemoveObject(ctx context.Context, instanceID, resourceOwner, name string) error
 	RemoveObjects(ctx context.Context, instanceID, resourceOwner string, objectType ObjectType) error
+	RemoveInstanceObjects(ctx context.Context, instanceID string) error
 	//TODO: add functionality to move asset location
 }
 
 type ObjectType int32
 
 const (
-	ObjectTypeUserAvatar = iota
+	ObjectTypeUserAvatar ObjectType = iota
 	ObjectTypeStyling
 )
+
+func (o ObjectType) String() string {
+	switch o {
+	case ObjectTypeUserAvatar:
+		return "0"
+	case ObjectTypeStyling:
+		return "1"
+	default:
+		return ""
+	}
+}
 
 type Asset struct {
 	InstanceID    string

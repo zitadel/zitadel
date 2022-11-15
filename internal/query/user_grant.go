@@ -7,9 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -20,7 +20,7 @@ type UserGrant struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
 	Sequence     uint64
-	Roles        []string
+	Roles        database.StringArray
 	GrantID      string
 	State        domain.UserGrantState
 
@@ -143,7 +143,8 @@ func NewUserGrantContainsRolesSearchQuery(roles ...string) (SearchQuery, error) 
 
 var (
 	userGrantTable = table{
-		name: projection.UserGrantProjectionTable,
+		name:          projection.UserGrantProjectionTable,
+		instanceIDCol: projection.UserGrantInstanceID,
 	}
 	UserGrantID = Column{
 		name:  projection.UserGrantID,
@@ -281,7 +282,6 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			g := new(UserGrant)
 
 			var (
-				roles              = pq.StringArray{}
 				username           sql.NullString
 				firstName          sql.NullString
 				userType           sql.NullInt32
@@ -304,7 +304,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				&g.ChangeDate,
 				&g.Sequence,
 				&g.GrantID,
-				&roles,
+				&g.Roles,
 				&g.State,
 
 				&g.UserID,
@@ -332,7 +332,6 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				return nil, errors.ThrowInternal(err, "QUERY-oQPcP", "Errors.Internal")
 			}
 
-			g.Roles = roles
 			g.Username = username.String
 			g.UserType = domain.UserType(userType.Int32)
 			g.UserResourceOwner = userOwner.String
@@ -396,7 +395,6 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				g := new(UserGrant)
 
 				var (
-					roles              = pq.StringArray{}
 					username           sql.NullString
 					userType           sql.NullInt32
 					userOwner          sql.NullString
@@ -419,7 +417,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 					&g.ChangeDate,
 					&g.Sequence,
 					&g.GrantID,
-					&roles,
+					&g.Roles,
 					&g.State,
 
 					&g.UserID,
@@ -446,7 +444,6 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 					return nil, err
 				}
 
-				g.Roles = roles
 				g.Username = username.String
 				g.UserType = domain.UserType(userType.Int32)
 				g.UserResourceOwner = userOwner.String

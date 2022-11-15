@@ -63,6 +63,14 @@ func (p *instanceProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceInstanceAdded,
 				},
 				{
+					Event:  instance.InstanceChangedEventType,
+					Reduce: p.reduceInstanceChanged,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(InstanceColumnID),
+				},
+				{
 					Event:  instance.DefaultOrgSetEventType,
 					Reduce: p.reduceDefaultOrgSet,
 				},
@@ -96,6 +104,39 @@ func (p *instanceProjection) reduceInstanceAdded(event eventstore.Event) (*handl
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnName, e.Name),
+		},
+	), nil
+}
+
+func reduceInstanceRemovedHelper(instanceIDCol string) func(event eventstore.Event) (*handler.Statement, error) {
+	return func(event eventstore.Event) (*handler.Statement, error) {
+		e, ok := event.(*instance.InstanceRemovedEvent)
+		if !ok {
+			return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-22nlS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+		}
+		return crdb.NewDeleteStatement(
+			e,
+			[]handler.Condition{
+				handler.NewCond(instanceIDCol, e.Aggregate().ID),
+			},
+		), nil
+	}
+}
+
+func (p *instanceProjection) reduceInstanceChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.InstanceChangedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
+	}
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(InstanceColumnName, e.Name),
+			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
+			handler.NewCol(InstanceColumnSequence, e.Sequence()),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

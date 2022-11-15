@@ -44,8 +44,8 @@ const (
 var (
 	viewStmt = fmt.Sprintf("SELECT"+
 		" user_id"+
-		" , IF(%[1]s, CONCAT(%[2]s, '@', domain), %[2]s) AS login_name"+
-		" , IFNULL(%[3]s, true) AS %[3]s"+
+		" , (CASE WHEN %[1]s THEN CONCAT(%[2]s, '@', domain) ELSE %[2]s END) AS login_name"+
+		" , COALESCE(%[3]s, true) AS %[3]s"+
 		" , %[4]s"+
 		" FROM ("+
 		" SELECT"+
@@ -62,12 +62,12 @@ var (
 		" , users.%[2]s"+
 		" , users.%[4]s"+
 		" , users.%[5]s"+
-		" , IFNULL(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
+		" , COALESCE(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
 		" FROM %[7]s users"+
 		" LEFT JOIN %[8]s policy_custom on policy_custom.%[9]s = users.%[5]s AND policy_custom.%[10]s = users.%[4]s"+
 		" LEFT JOIN %[8]s policy_default on policy_default.%[11]s = true AND policy_default.%[10]s = users.%[4]s) policy_users"+
 		" LEFT JOIN %[12]s domains ON policy_users.%[1]s AND policy_users.%[5]s = domains.%[13]s AND policy_users.%[10]s = domains.%[14]s"+
-		");",
+		") AS login_names;",
 		LoginNamePoliciesMustBeDomainCol,
 		LoginNameUserUserNameCol,
 		LoginNameDomainIsPrimaryCol,
@@ -211,6 +211,10 @@ func (p *loginNameProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.DomainPolicyChangedEventType,
 					Reduce: p.reduceDomainPolicyChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: p.reduceInstanceRemoved,
+				},
 			},
 		},
 	}
@@ -252,6 +256,7 @@ func (p *loginNameProjection) reduceUserRemoved(event eventstore.Event) (*handle
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -270,6 +275,7 @@ func (p *loginNameProjection) reduceUserNameChanged(event eventstore.Event) (*ha
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -288,6 +294,7 @@ func (p *loginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -345,6 +352,7 @@ func (p *loginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) 
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNamePoliciesResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNamePoliciesInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNamePolicySuffix),
 	), nil
@@ -360,6 +368,7 @@ func (p *loginNameProjection) reduceDomainPolicyRemoved(event eventstore.Event) 
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNamePoliciesResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNamePolicySuffix),
 	), nil
@@ -397,6 +406,7 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCond(LoginNameDomainIsPrimaryCol, true),
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(loginNameDomainSuffix),
 		),
@@ -407,6 +417,7 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainNameCol, e.Domain),
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(loginNameDomainSuffix),
 		),
@@ -424,7 +435,37 @@ func (p *loginNameProjection) reduceDomainRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LoginNameDomainNameCol, e.Domain),
 			handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameDomainSuffix),
+	), nil
+}
+
+func (p *loginNameProjection) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.InstanceRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASeg3", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+	}
+
+	return crdb.NewMultiStatement(
+		event,
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNameDomainSuffix),
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNamePolicySuffix),
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNameUserSuffix),
+		),
 	), nil
 }

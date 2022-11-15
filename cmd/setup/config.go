@@ -14,6 +14,8 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 type Config struct {
@@ -26,6 +28,8 @@ type Config struct {
 	Log             *logging.Config
 	EncryptionKeys  *encryptionKeyConfig
 	DefaultInstance command.InstanceSetup
+	Machine         *id.Config
+	Projections     projection.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -44,13 +48,16 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 
+	id.Configure(config.Machine)
+
 	return config
 }
 
 type Steps struct {
-	s1ProjectionTable *ProjectionTable
-	s2AssetsTable     *AssetTable
-	FirstInstance     *FirstInstance
+	s1ProjectionTable   *ProjectionTable
+	s2AssetsTable       *AssetTable
+	FirstInstance       *FirstInstance
+	s4EventstoreIndexes *EventstoreIndexes
 }
 
 type encryptionKeyConfig struct {

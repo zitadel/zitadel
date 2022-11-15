@@ -3,12 +3,12 @@ package projection
 import (
 	"testing"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -25,7 +25,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "project.MemberAddedType",
+			name: "project MemberAddedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.MemberAddedType),
@@ -41,14 +41,13 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.project_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, project_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.project_members2 (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, project_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"user-id",
-								pq.StringArray{"role"},
+								database.StringArray{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -62,7 +61,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.MemberChangedType",
+			name: "project MemberChangedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.MemberChangedType),
@@ -78,15 +77,15 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_members2 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5) AND (project_id = $6)",
 							expectedArgs: []interface{}{
-								pq.StringArray{"role", "changed"},
+								database.StringArray{"role", "changed"},
 								anyArg{},
 								uint64(15),
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -96,7 +95,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.MemberCascadeRemovedType",
+			name: "project MemberCascadeRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.MemberCascadeRemovedType),
@@ -111,12 +110,12 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (user_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (instance_id = $1) AND (user_id = $2) AND (project_id = $3)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -126,7 +125,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.MemberRemovedType",
+			name: "project MemberRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.MemberRemovedType),
@@ -141,12 +140,12 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (user_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (instance_id = $1) AND (user_id = $2) AND (project_id = $3)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -156,7 +155,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.UserRemovedEventType",
+			name: "user UserRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.UserRemovedType),
@@ -169,12 +168,12 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -183,7 +182,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgRemovedEventType",
+			name: "org OrgRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgRemovedEventType),
@@ -196,11 +195,37 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    org.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (resource_owner = $1)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -210,7 +235,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.ProjectRemovedEventType",
+			name: "project ProjectRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ProjectRemovedType),
@@ -223,12 +248,12 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       ProjectMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_members WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_members2 WHERE (instance_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -247,7 +272,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ProjectMemberProjectionTable, tt.want)
 		})
 	}
 }

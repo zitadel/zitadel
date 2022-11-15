@@ -8,11 +8,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	UserAuthMethodTable = "projections.user_auth_methods"
+	UserAuthMethodTable = "projections.user_auth_methods3"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
@@ -37,7 +38,7 @@ func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(UserAuthMethodUserIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(UserAuthMethodTokenIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserAuthMethodCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(UserAuthMethodChangeDateCol, crdb.ColumnTypeTimestamp),
@@ -48,7 +49,7 @@ func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 			crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserAuthMethodResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("auth_meth_ro_idx", []string{UserAuthMethodResourceOwnerCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -98,6 +99,15 @@ func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(UserAuthMethodInstanceIDCol),
+				},
+			},
+		},
 	}
 }
 
@@ -119,6 +129,12 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 
 	return crdb.NewUpsertStatement(
 		event,
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodInstanceIDCol, nil),
+			handler.NewCol(UserAuthMethodUserIDCol, nil),
+			handler.NewCol(UserAuthMethodTypeCol, nil),
+			handler.NewCol(UserAuthMethodTokenIDCol, nil),
+		},
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
 			handler.NewCol(UserAuthMethodCreationDateCol, event.CreationDate()),
@@ -168,6 +184,7 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 			handler.NewCond(UserAuthMethodTypeCol, methodType),
 			handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
 			handler.NewCond(UserAuthMethodTokenIDCol, tokenID),
+			handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -192,6 +209,7 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),
 		handler.NewCond(UserAuthMethodTypeCol, methodType),
 		handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+		handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 	}
 	if tokenID != "" {
 		conditions = append(conditions, handler.NewCond(UserAuthMethodTokenIDCol, tokenID))

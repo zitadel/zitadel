@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	InstanceMemberProjectionTable = "projections.instance_members"
+	InstanceMemberProjectionTable = "projections.instance_members2"
 
 	InstanceMemberIAMIDCol = "id"
 )
@@ -29,7 +29,7 @@ func newInstanceMemberProjection(ctx context.Context, config crdb.StatementHandl
 		crdb.NewTable(
 			append(memberColumns, crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText)),
 			crdb.NewPrimaryKey(MemberInstanceID, InstanceColumnID, MemberUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("inst_memb_user_idx", []string{MemberUserIDCol})),
 		),
 	)
 
@@ -57,6 +57,10 @@ func (p *instanceMemberProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.MemberRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(AppColumnInstanceID),
 				},
 			},
 		},

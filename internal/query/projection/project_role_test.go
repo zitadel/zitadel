@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -31,14 +32,40 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_roles WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_roles WHERE (project_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(ProjectRoleColumnInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.project_roles WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -58,17 +85,17 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleRemoved,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_roles WHERE (role_key = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_roles WHERE (role_key = $1) AND (project_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"key",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -86,14 +113,13 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_roles SET (change_date, sequence, display_name, group_name) = ($1, $2, $3, $4) WHERE (role_key = $5) AND (project_id = $6)",
+							expectedStmt: "UPDATE projections.project_roles SET (change_date, sequence, display_name, group_name) = ($1, $2, $3, $4) WHERE (role_key = $5) AND (project_id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -101,6 +127,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 								"New Group",
 								"key",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -118,7 +145,6 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleChanged,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -136,7 +162,6 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectRoleProjection{}).reduceProjectRoleAdded,
 			want: wantReduce{
-				projection:       ProjectRoleProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
@@ -171,7 +196,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ProjectRoleProjectionTable, tt.want)
 		})
 	}
 }

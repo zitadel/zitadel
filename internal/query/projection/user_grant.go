@@ -3,20 +3,20 @@ package projection
 import (
 	"context"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants"
+	UserGrantProjectionTable = "projections.user_grants2"
 
 	UserGrantID            = "id"
 	UserGrantCreationDate  = "creation_date"
@@ -54,8 +54,8 @@ func newUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantRoles, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
-			crdb.WithIndex(crdb.NewIndex("user_idx", []string{UserGrantUserID})),
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
+			crdb.WithIndex(crdb.NewIndex("user_grant_user_idx", []string{UserGrantUserID})),
+			crdb.WithIndex(crdb.NewIndex("user_grant_ro_idx", []string{UserGrantResourceOwner})),
 		),
 	)
 
@@ -132,6 +132,15 @@ func (p *userGrantProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -152,14 +161,14 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantUserID, e.UserID),
 			handler.NewCol(UserGrantProjectID, e.ProjectID),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
-			handler.NewCol(UserGrantRoles, pq.StringArray(e.RoleKeys)),
+			handler.NewCol(UserGrantRoles, database.StringArray(e.RoleKeys)),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},
 	), nil
 }
 
 func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
-	var roles pq.StringArray
+	var roles database.StringArray
 
 	switch e := event.(type) {
 	case *usergrant.UserGrantChangedEvent:
@@ -179,6 +188,7 @@ func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.St
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -195,6 +205,7 @@ func (p *userGrantProjection) reduceRemoved(event eventstore.Event) (*handler.St
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -213,6 +224,7 @@ func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -231,6 +243,7 @@ func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -244,6 +257,7 @@ func (p *userGrantProjection) reduceUserRemoved(event eventstore.Event) (*handle
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantUserID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -257,6 +271,7 @@ func (p *userGrantProjection) reduceProjectRemoved(event eventstore.Event) (*han
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantProjectID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -271,6 +286,7 @@ func (p *userGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) 
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, e.GrantID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -288,6 +304,7 @@ func (p *userGrantProjection) reduceRoleRemoved(event eventstore.Event) (*handle
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantProjectID, e.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -309,10 +326,11 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			crdb.NewArrayIntersectCol(UserGrantRoles, pq.StringArray(keys)),
+			crdb.NewArrayIntersectCol(UserGrantRoles, database.StringArray(keys)),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, grantID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }

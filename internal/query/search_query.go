@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -90,6 +89,52 @@ func (q *orQuery) comp() sq.Sqlizer {
 	return or
 }
 
+type ColumnComparisonQuery struct {
+	Column1 Column
+	Compare ColumnComparison
+	Column2 Column
+}
+
+func NewColumnComparisonQuery(col1 Column, col2 Column, compare ColumnComparison) (*ColumnComparisonQuery, error) {
+	if compare < 0 || compare >= columnCompareMax {
+		return nil, ErrInvalidCompare
+	}
+	if col1.isZero() {
+		return nil, ErrMissingColumn
+	}
+	if col2.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &ColumnComparisonQuery{
+		Column1: col1,
+		Column2: col2,
+		Compare: compare,
+	}, nil
+}
+
+func (q *ColumnComparisonQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (s *ColumnComparisonQuery) comp() sq.Sqlizer {
+	switch s.Compare {
+	case ColumnEquals:
+		return sq.Expr(s.Column1.identifier() + " = " + s.Column2.identifier())
+	case ColumnNotEquals:
+		return sq.Expr(s.Column1.identifier() + " != " + s.Column2.identifier())
+	}
+	return nil
+}
+
+type ColumnComparison int
+
+const (
+	ColumnEquals ColumnComparison = iota
+	ColumnNotEquals
+
+	columnCompareMax
+)
+
 type TextQuery struct {
 	Column  Column
 	Text    string
@@ -97,9 +142,10 @@ type TextQuery struct {
 }
 
 var (
-	ErrInvalidCompare = errors.New("invalid compare")
-	ErrMissingColumn  = errors.New("missing column")
-	ErrInvalidNumber  = errors.New("value is no number")
+	ErrNothingSelected = errors.New("nothing selected")
+	ErrInvalidCompare  = errors.New("invalid compare")
+	ErrMissingColumn   = errors.New("missing column")
+	ErrInvalidNumber   = errors.New("value is no number")
 )
 
 func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
@@ -139,7 +185,7 @@ func (s *TextQuery) comp() sq.Sqlizer {
 	case TextContainsIgnoreCase:
 		return sq.ILike{s.Column.identifier(): "%" + s.Text + "%"}
 	case TextListContains:
-		return &listContains{col: s.Column, args: []interface{}{pq.StringArray{s.Text}}}
+		return &listContains{col: s.Column, args: []interface{}{s.Text}}
 	}
 	return nil
 }
@@ -161,7 +207,7 @@ const (
 	textCompareMax
 )
 
-//Deprecated: Use TextComparison, will be removed as soon as all calls are changed to query
+// Deprecated: Use TextComparison, will be removed as soon as all calls are changed to query
 func TextComparisonFromMethod(m domain.SearchMethod) TextComparison {
 	switch m {
 	case domain.SearchMethodEquals:
@@ -228,7 +274,7 @@ func (s *NumberQuery) comp() sq.Sqlizer {
 	case NumberGreater:
 		return sq.Gt{s.Column.identifier(): s.Number}
 	case NumberListContains:
-		return &listContains{col: s.Column, args: []interface{}{pq.GenericArray{s.Number}}}
+		return &listContains{col: s.Column, args: []interface{}{s.Number}}
 	}
 	return nil
 }
@@ -245,7 +291,7 @@ const (
 	numberCompareMax
 )
 
-//Deprecated: Use NumberComparison, will be removed as soon as all calls are changed to query
+// Deprecated: Use NumberComparison, will be removed as soon as all calls are changed to query
 func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	switch m {
 	case domain.SearchMethodEquals:
@@ -263,13 +309,44 @@ func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	}
 }
 
+type SubSelect struct {
+	Column  Column
+	Queries []SearchQuery
+}
+
+func NewSubSelect(c Column, queries []SearchQuery) (*SubSelect, error) {
+	if len(queries) == 0 {
+		return nil, ErrNothingSelected
+	}
+	if c.isZero() {
+		return nil, ErrMissingColumn
+	}
+
+	return &SubSelect{
+		Column:  c,
+		Queries: queries,
+	}, nil
+}
+
+func (q *SubSelect) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *SubSelect) comp() sq.Sqlizer {
+	selectQuery := sq.Select(q.Column.identifier()).From(q.Column.table.identifier())
+	for _, query := range q.Queries {
+		selectQuery = query.toQuery(selectQuery)
+	}
+	return selectQuery
+}
+
 type ListQuery struct {
 	Column  Column
-	List    []interface{}
+	Data    interface{}
 	Compare ListComparison
 }
 
-func NewListQuery(column Column, value []interface{}, compare ListComparison) (*ListQuery, error) {
+func NewListQuery(column Column, value interface{}, compare ListComparison) (*ListQuery, error) {
 	if compare < 0 || compare >= listCompareMax {
 		return nil, ErrInvalidCompare
 	}
@@ -278,7 +355,7 @@ func NewListQuery(column Column, value []interface{}, compare ListComparison) (*
 	}
 	return &ListQuery{
 		Column:  column,
-		List:    value,
+		Data:    value,
 		Compare: compare,
 	}, nil
 }
@@ -290,7 +367,14 @@ func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (s *ListQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case ListIn:
-		return sq.Eq{s.Column.identifier(): s.List}
+		if subSelect, ok := s.Data.(*SubSelect); ok {
+			subSelect, args, err := subSelect.comp().ToSql()
+			if err != nil {
+				return nil
+			}
+			return sq.Expr(s.Column.identifier()+" IN ( "+subSelect+" )", args...)
+		}
+		return sq.Eq{s.Column.identifier(): s.Data}
 	}
 	return nil
 }
@@ -366,8 +450,9 @@ var (
 )
 
 type table struct {
-	name  string
-	alias string
+	name          string
+	alias         string
+	instanceIDCol string
 }
 
 func (t table) setAlias(a string) table {
@@ -379,11 +464,18 @@ func (t table) identifier() string {
 	if t.alias == "" {
 		return t.name
 	}
-	return t.name + " as " + t.alias
+	return t.name + " AS " + t.alias
 }
 
 func (t table) isZero() bool {
 	return t.name == ""
+}
+
+func (t table) InstanceIDIdentifier() string {
+	if t.alias != "" {
+		return t.alias + "." + t.instanceIDCol
+	}
+	return t.name + "." + t.instanceIDCol
 }
 
 type Column struct {
@@ -419,14 +511,17 @@ func (c Column) isZero() bool {
 }
 
 func join(join, from Column) string {
-	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier()
+	if join.identifier() == join.table.InstanceIDIdentifier() {
+		return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier()
+	}
+	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier() + " AND " + from.table.InstanceIDIdentifier() + " = " + join.table.InstanceIDIdentifier()
 }
 
 type listContains struct {
 	col  Column
-	args []interface{}
+	args interface{}
 }
 
 func (q *listContains) ToSql() (string, []interface{}, error) {
-	return q.col.identifier() + " @> ? ", q.args, nil
+	return q.col.identifier() + " @> ? ", []interface{}{q.args}, nil
 }

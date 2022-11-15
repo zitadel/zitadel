@@ -1,0 +1,1 @@
+CREATE DATABASE %[1]s

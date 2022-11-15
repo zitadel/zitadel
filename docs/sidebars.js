@@ -15,9 +15,7 @@ module.exports = {
     {
       type: "category",
       label: "Secure your API",
-      items: [
-        "examples/secure-api/go",
-        "examples/secure-api/dot-net"],
+      items: ["examples/secure-api/go", "examples/secure-api/dot-net"],
       collapsed: false,
     },
     {
@@ -42,9 +40,7 @@ module.exports = {
       type: "category",
       label: "Get started",
       collapsed: false,
-      items: [
-        "guides/start/quickstart",
-      ],
+      items: ["guides/start/quickstart"],
     },
     {
       type: "category",
@@ -66,8 +62,8 @@ module.exports = {
       collapsed: false,
       items: [
         {
-          type: 'category',
-          label: 'Cloud',
+          type: "category",
+          label: "Cloud",
           items: [
             "guides/manage/cloud/overview",
             "guides/manage/cloud/start",
@@ -75,39 +71,51 @@ module.exports = {
             "guides/manage/cloud/billing",
             "guides/manage/cloud/users",
             "guides/manage/cloud/support",
-          ]
+          ],
         },
         {
-          type: 'category',
-          label: 'Self-Hosted',
+          type: "category",
+          label: "Self-Hosted",
           items: [
+            "guides/manage/self-hosted/production",
             "guides/manage/self-hosted/configure/configure",
-            "guides/manage/self-hosted/proxy/proxy",
+            "guides/manage/self-hosted/reverseproxy/reverse_proxy",
             "guides/manage/self-hosted/custom-domain",
             "guides/manage/self-hosted/http2",
             "guides/manage/self-hosted/tls_modes",
-          ]
+            "guides/manage/self-hosted/database/database",
+          ],
         },
         {
-          type: 'category',
-          label: 'Console',
+          type: "category",
+          label: "Console",
           items: [
+            "guides/manage/console/overview",
+            "guides/manage/console/instance-settings",
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
+            "guides/manage/console/roles",
             "guides/manage/console/applications",
-
-          ]
+            "guides/manage/console/users",
+            "guides/manage/console/managers",
+            "guides/manage/console/actions",
+          ],
         },
         {
-          type: 'category',
-          label: 'Customize',
+          type: "category",
+          label: "Customize",
           items: [
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
             "guides/manage/customize/user-metadata",
-          ]
-        }
+          ],
+        },
+        {
+          type: "category",
+          label: "Terraform",
+          items: ["guides/manage/terraform/basics"],
+        },
       ],
     },
     {
@@ -115,17 +123,43 @@ module.exports = {
       label: "Integrate",
       collapsed: false,
       items: [
-        "guides/integrate/identity-brokering",
-        "guides/integrate/access-zitadel-apis",
-        "guides/integrate/access-zitadel-system-api",
-        "guides/integrate/authenticated-mongodb-charts",
-        "guides/integrate/auth0",
-        "guides/integrate/azuread",
-        "guides/integrate/gitlab-self-hosted",
         "guides/integrate/login-users",
-        "guides/integrate/serviceusers",
-        "guides/integrate/oauth-recommended-flows",
-        "guides/integrate/export-and-import"
+        "guides/integrate/identity-brokering",
+        {
+          type: "category",
+          label: "Access ZITADEL APIs",
+          collapsed: false,
+          items: [
+            "guides/integrate/serviceusers",
+            "guides/integrate/access-zitadel-apis",
+            "guides/integrate/access-zitadel-system-api",
+            "guides/integrate/export-and-import",
+          ],
+        },
+        {
+          type: "category",
+          label: "OpenID Connect 1.0 Clients",
+          collapsed: false,
+          items: [
+            "guides/integrate/oauth-recommended-flows",
+            "guides/integrate/auth0-oidc",
+            "guides/integrate/azuread-oidc",
+            "guides/integrate/authenticated-mongodb-charts",
+            "guides/integrate/gitlab-self-hosted",
+          ],
+        },
+        {
+          type: "category",
+          label: "SAML 2.0 Clients",
+          collapsed: false,
+          items: [
+            "guides/integrate/auth0-saml",
+            "guides/integrate/aws-saml",
+            "guides/integrate/pingidentity-saml",
+            "guides/integrate/atlassian-saml",
+            "guides/integrate/gitlab-saml",
+          ],
+        },
       ],
     },
     {
@@ -136,6 +170,7 @@ module.exports = {
         "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
+        "guides/solution-scenarios/configurations",
       ],
     },
     {
@@ -190,7 +225,7 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
-          "apis/actions"
+        "apis/actions",
       ],
     },
     {
@@ -207,12 +242,21 @@ module.exports = {
     },
     {
       type: "category",
+      label: "SAML",
+      collapsed: false,
+      items: ["apis/saml/endpoints"],
+    },
+    {
+      type: "category",
+      label: "Observability",
+      collapsed: false,
+      items: ["apis/observability/metrics", "apis/observability/health"],
+    },
+    {
+      type: "category",
       label: "Rate Limits",
       collapsed: false,
-      items: [
-        "apis/ratelimits/ratelimits",
-        "legal/rate-limit-policy",
-      ],
+      items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
     },
   ],
   concepts: [
@@ -245,12 +289,13 @@ module.exports = {
         "concepts/structure/overview",
         "concepts/structure/instance",
         "concepts/structure/organizations",
-        "concepts/structure/policies",
         "concepts/structure/projects",
         "concepts/structure/applications",
         "concepts/structure/granted_projects",
         "concepts/structure/users",
         "concepts/structure/managers",
+        "concepts/structure/policies",
+        "concepts/structure/jwt_idp",
       ],
     },
     {
@@ -263,7 +308,7 @@ module.exports = {
       type: "category",
       label: "Features",
       collapsed: false,
-      items: ["concepts/features/actions"],
+      items: ["concepts/features/actions", "concepts/features/selfservice"],
     },
   ],
   manuals: [
@@ -280,7 +325,11 @@ module.exports = {
       type: "category",
       label: "Service Description",
       collapsed: false,
-      items: ["legal/cloud-service-description", "legal/service-level-description", "legal/support-services"],
+      items: [
+        "legal/cloud-service-description",
+        "legal/service-level-description",
+        "legal/support-services",
+      ],
     },
     {
       type: "category",

@@ -9,51 +9,53 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 var (
-	userQuery = `SELECT projections.users2.id,` +
-		` projections.users2.creation_date,` +
-		` projections.users2.change_date,` +
-		` projections.users2.resource_owner,` +
-		` projections.users2.sequence,` +
-		` projections.users2.state,` +
-		` projections.users2.type,` +
-		` projections.users2.username,` +
+	userQuery = `SELECT projections.users5.id,` +
+		` projections.users5.creation_date,` +
+		` projections.users5.change_date,` +
+		` projections.users5.resource_owner,` +
+		` projections.users5.sequence,` +
+		` projections.users5.state,` +
+		` projections.users5.type,` +
+		` projections.users5.username,` +
 		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
-		` projections.users2_humans.user_id,` +
-		` projections.users2_humans.first_name,` +
-		` projections.users2_humans.last_name,` +
-		` projections.users2_humans.nick_name,` +
-		` projections.users2_humans.display_name,` +
-		` projections.users2_humans.preferred_language,` +
-		` projections.users2_humans.gender,` +
-		` projections.users2_humans.avatar_key,` +
-		` projections.users2_humans.email,` +
-		` projections.users2_humans.is_email_verified,` +
-		` projections.users2_humans.phone,` +
-		` projections.users2_humans.is_phone_verified,` +
-		` projections.users2_machines.user_id,` +
-		` projections.users2_machines.name,` +
-		` projections.users2_machines.description` +
-		` FROM projections.users2` +
-		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id` +
-		` LEFT JOIN projections.users2_machines ON projections.users2.id = projections.users2_machines.user_id` +
+		` projections.users5_humans.user_id,` +
+		` projections.users5_humans.first_name,` +
+		` projections.users5_humans.last_name,` +
+		` projections.users5_humans.nick_name,` +
+		` projections.users5_humans.display_name,` +
+		` projections.users5_humans.preferred_language,` +
+		` projections.users5_humans.gender,` +
+		` projections.users5_humans.avatar_key,` +
+		` projections.users5_humans.email,` +
+		` projections.users5_humans.is_email_verified,` +
+		` projections.users5_humans.phone,` +
+		` projections.users5_humans.is_phone_verified,` +
+		` projections.users5_machines.user_id,` +
+		` projections.users5_machines.name,` +
+		` projections.users5_machines.description,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.users5` +
+		` LEFT JOIN projections.users5_humans ON projections.users5.id = projections.users5_humans.user_id AND projections.users5.instance_id = projections.users5_humans.instance_id` +
+		` LEFT JOIN projections.users5_machines ON projections.users5.id = projections.users5_machines.user_id AND projections.users5.instance_id = projections.users5_machines.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
-		` FROM projections.login_names as login_names` +
-		` WHERE login_names.instance_id = $1` +
-		` GROUP BY login_names.user_id) as login_names` +
-		` on login_names.user_id = projections.users2.id` +
+		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames, login_names.instance_id` +
+		` FROM projections.login_names AS login_names` +
+		` GROUP BY login_names.user_id, login_names.instance_id) AS login_names` +
+		` ON login_names.user_id = projections.users5.id AND login_names.instance_id = projections.users5.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) as preferred_login_name` +
-		` on preferred_login_name.user_id = projections.users2.id`
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name, preferred_login_name.instance_id` +
+		` FROM projections.login_names AS preferred_login_name` +
+		` WHERE preferred_login_name.is_primary = $1) AS preferred_login_name` +
+		` ON preferred_login_name.user_id = projections.users5.id AND preferred_login_name.instance_id = projections.users5.instance_id`
 	userCols = []string{
 		"id",
 		"creation_date",
@@ -82,22 +84,23 @@ var (
 		"user_id",
 		"name",
 		"description",
+		"count",
 	}
-	profileQuery = `SELECT projections.users2.id,` +
-		` projections.users2.creation_date,` +
-		` projections.users2.change_date,` +
-		` projections.users2.resource_owner,` +
-		` projections.users2.sequence,` +
-		` projections.users2_humans.user_id,` +
-		` projections.users2_humans.first_name,` +
-		` projections.users2_humans.last_name,` +
-		` projections.users2_humans.nick_name,` +
-		` projections.users2_humans.display_name,` +
-		` projections.users2_humans.preferred_language,` +
-		` projections.users2_humans.gender,` +
-		` projections.users2_humans.avatar_key` +
-		` FROM projections.users2` +
-		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id`
+	profileQuery = `SELECT projections.users5.id,` +
+		` projections.users5.creation_date,` +
+		` projections.users5.change_date,` +
+		` projections.users5.resource_owner,` +
+		` projections.users5.sequence,` +
+		` projections.users5_humans.user_id,` +
+		` projections.users5_humans.first_name,` +
+		` projections.users5_humans.last_name,` +
+		` projections.users5_humans.nick_name,` +
+		` projections.users5_humans.display_name,` +
+		` projections.users5_humans.preferred_language,` +
+		` projections.users5_humans.gender,` +
+		` projections.users5_humans.avatar_key` +
+		` FROM projections.users5` +
+		` LEFT JOIN projections.users5_humans ON projections.users5.id = projections.users5_humans.user_id AND projections.users5.instance_id = projections.users5_humans.instance_id`
 	profileCols = []string{
 		"id",
 		"creation_date",
@@ -113,16 +116,16 @@ var (
 		"gender",
 		"avatar_key",
 	}
-	emailQuery = `SELECT projections.users2.id,` +
-		` projections.users2.creation_date,` +
-		` projections.users2.change_date,` +
-		` projections.users2.resource_owner,` +
-		` projections.users2.sequence,` +
-		` projections.users2_humans.user_id,` +
-		` projections.users2_humans.email,` +
-		` projections.users2_humans.is_email_verified` +
-		` FROM projections.users2` +
-		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id`
+	emailQuery = `SELECT projections.users5.id,` +
+		` projections.users5.creation_date,` +
+		` projections.users5.change_date,` +
+		` projections.users5.resource_owner,` +
+		` projections.users5.sequence,` +
+		` projections.users5_humans.user_id,` +
+		` projections.users5_humans.email,` +
+		` projections.users5_humans.is_email_verified` +
+		` FROM projections.users5` +
+		` LEFT JOIN projections.users5_humans ON projections.users5.id = projections.users5_humans.user_id AND projections.users5.instance_id = projections.users5_humans.instance_id`
 	emailCols = []string{
 		"id",
 		"creation_date",
@@ -133,16 +136,16 @@ var (
 		"email",
 		"is_email_verified",
 	}
-	phoneQuery = `SELECT projections.users2.id,` +
-		` projections.users2.creation_date,` +
-		` projections.users2.change_date,` +
-		` projections.users2.resource_owner,` +
-		` projections.users2.sequence,` +
-		` projections.users2_humans.user_id,` +
-		` projections.users2_humans.phone,` +
-		` projections.users2_humans.is_phone_verified` +
-		` FROM projections.users2` +
-		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id`
+	phoneQuery = `SELECT projections.users5.id,` +
+		` projections.users5.creation_date,` +
+		` projections.users5.change_date,` +
+		` projections.users5.resource_owner,` +
+		` projections.users5.sequence,` +
+		` projections.users5_humans.user_id,` +
+		` projections.users5_humans.phone,` +
+		` projections.users5_humans.is_phone_verified` +
+		` FROM projections.users5` +
+		` LEFT JOIN projections.users5_humans ON projections.users5.id = projections.users5_humans.user_id AND projections.users5.instance_id = projections.users5_humans.instance_id`
 	phoneCols = []string{
 		"id",
 		"creation_date",
@@ -153,14 +156,14 @@ var (
 		"phone",
 		"is_phone_verified",
 	}
-	userUniqueQuery = `SELECT projections.users2.id,` +
-		` projections.users2.state,` +
-		` projections.users2.username,` +
-		` projections.users2_humans.user_id,` +
-		` projections.users2_humans.email,` +
-		` projections.users2_humans.is_email_verified` +
-		` FROM projections.users2` +
-		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id`
+	userUniqueQuery = `SELECT projections.users5.id,` +
+		` projections.users5.state,` +
+		` projections.users5.username,` +
+		` projections.users5_humans.user_id,` +
+		` projections.users5_humans.email,` +
+		` projections.users5_humans.is_email_verified` +
+		` FROM projections.users5` +
+		` LEFT JOIN projections.users5_humans ON projections.users5.id = projections.users5_humans.user_id AND projections.users5.instance_id = projections.users5_humans.instance_id`
 	userUniqueCols = []string{
 		"id",
 		"state",
@@ -169,42 +172,44 @@ var (
 		"email",
 		"is_email_verified",
 	}
-	notifyUserQuery = `SELECT projections.users2.id,` +
-		` projections.users2.creation_date,` +
-		` projections.users2.change_date,` +
-		` projections.users2.resource_owner,` +
-		` projections.users2.sequence,` +
-		` projections.users2.state,` +
-		` projections.users2.type,` +
-		` projections.users2.username,` +
+	notifyUserQuery = `SELECT projections.users5.id,` +
+		` projections.users5.creation_date,` +
+		` projections.users5.change_date,` +
+		` projections.users5.resource_owner,` +
+		` projections.users5.sequence,` +
+		` projections.users5.state,` +
+		` projections.users5.type,` +
+		` projections.users5.username,` +
 		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
-		` projections.users2_humans.user_id,` +
-		` projections.users2_humans.first_name,` +
-		` projections.users2_humans.last_name,` +
-		` projections.users2_humans.nick_name,` +
-		` projections.users2_humans.display_name,` +
-		` projections.users2_humans.preferred_language,` +
-		` projections.users2_humans.gender,` +
-		` projections.users2_humans.avatar_key,` +
-		` projections.users2_notifications.user_id,` +
-		` projections.users2_notifications.last_email,` +
-		` projections.users2_notifications.verified_email,` +
-		` projections.users2_notifications.last_phone,` +
-		` projections.users2_notifications.verified_phone,` +
-		` projections.users2_notifications.password_set` +
-		` FROM projections.users2` +
-		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id` +
-		` LEFT JOIN projections.users2_notifications ON projections.users2.id = projections.users2_notifications.user_id` +
+		` projections.users5_humans.user_id,` +
+		` projections.users5_humans.first_name,` +
+		` projections.users5_humans.last_name,` +
+		` projections.users5_humans.nick_name,` +
+		` projections.users5_humans.display_name,` +
+		` projections.users5_humans.preferred_language,` +
+		` projections.users5_humans.gender,` +
+		` projections.users5_humans.avatar_key,` +
+		` projections.users5_notifications.user_id,` +
+		` projections.users5_notifications.last_email,` +
+		` projections.users5_notifications.verified_email,` +
+		` projections.users5_notifications.last_phone,` +
+		` projections.users5_notifications.verified_phone,` +
+		` projections.users5_notifications.password_set,` +
+		` COUNT(*) OVER ()` +
+		` FROM projections.users5` +
+		` LEFT JOIN projections.users5_humans ON projections.users5.id = projections.users5_humans.user_id AND projections.users5.instance_id = projections.users5_humans.instance_id` +
+		` LEFT JOIN projections.users5_notifications ON projections.users5.id = projections.users5_notifications.user_id AND projections.users5.instance_id = projections.users5_notifications.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
-		` FROM projections.login_names as login_names` +
-		` WHERE login_names.instance_id = $1` +
-		` GROUP BY login_names.user_id) as login_names` +
-		` on login_names.user_id = projections.users2.id` +
+		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames, login_names.instance_id` +
+		` FROM projections.login_names AS login_names` +
+		` GROUP BY login_names.user_id, login_names.instance_id) AS login_names` +
+		` ON login_names.user_id = projections.users5.id AND login_names.instance_id = projections.users5.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) as preferred_login_name` +
-		` on preferred_login_name.user_id = projections.users2.id`
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name, preferred_login_name.instance_id` +
+		` FROM projections.login_names AS preferred_login_name` +
+		` WHERE preferred_login_name.is_primary = $1) AS preferred_login_name` +
+		` ON preferred_login_name.user_id = projections.users5.id AND preferred_login_name.instance_id = projections.users5.instance_id`
 	notifyUserCols = []string{
 		"id",
 		"creation_date",
@@ -232,44 +237,47 @@ var (
 		"last_phone",
 		"verified_phone",
 		"password_set",
+		"count",
 	}
-	usersQuery = `SELECT projections.users2.id,` +
-		` projections.users2.creation_date,` +
-		` projections.users2.change_date,` +
-		` projections.users2.resource_owner,` +
-		` projections.users2.sequence,` +
-		` projections.users2.state,` +
-		` projections.users2.type,` +
-		` projections.users2.username,` +
+	usersQuery = `SELECT projections.users5.id,` +
+		` projections.users5.creation_date,` +
+		` projections.users5.change_date,` +
+		` projections.users5.resource_owner,` +
+		` projections.users5.sequence,` +
+		` projections.users5.state,` +
+		` projections.users5.type,` +
+		` projections.users5.username,` +
 		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
-		` projections.users2_humans.user_id,` +
-		` projections.users2_humans.first_name,` +
-		` projections.users2_humans.last_name,` +
-		` projections.users2_humans.nick_name,` +
-		` projections.users2_humans.display_name,` +
-		` projections.users2_humans.preferred_language,` +
-		` projections.users2_humans.gender,` +
-		` projections.users2_humans.avatar_key,` +
-		` projections.users2_humans.email,` +
-		` projections.users2_humans.is_email_verified,` +
-		` projections.users2_humans.phone,` +
-		` projections.users2_humans.is_phone_verified,` +
-		` projections.users2_machines.user_id,` +
-		` projections.users2_machines.name,` +
-		` projections.users2_machines.description,` +
+		` projections.users5_humans.user_id,` +
+		` projections.users5_humans.first_name,` +
+		` projections.users5_humans.last_name,` +
+		` projections.users5_humans.nick_name,` +
+		` projections.users5_humans.display_name,` +
+		` projections.users5_humans.preferred_language,` +
+		` projections.users5_humans.gender,` +
+		` projections.users5_humans.avatar_key,` +
+		` projections.users5_humans.email,` +
+		` projections.users5_humans.is_email_verified,` +
+		` projections.users5_humans.phone,` +
+		` projections.users5_humans.is_phone_verified,` +
+		` projections.users5_machines.user_id,` +
+		` projections.users5_machines.name,` +
+		` projections.users5_machines.description,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.users2` +
-		` LEFT JOIN projections.users2_humans ON projections.users2.id = projections.users2_humans.user_id` +
-		` LEFT JOIN projections.users2_machines ON projections.users2.id = projections.users2_machines.user_id` +
+		` FROM projections.users5` +
+		` LEFT JOIN projections.users5_humans ON projections.users5.id = projections.users5_humans.user_id AND projections.users5.instance_id = projections.users5_humans.instance_id` +
+		` LEFT JOIN projections.users5_machines ON projections.users5.id = projections.users5_machines.user_id AND projections.users5.instance_id = projections.users5_machines.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
-		` FROM projections.login_names as login_names` +
-		` GROUP BY login_names.user_id) as login_names` +
-		` on login_names.user_id = projections.users2.id` +
+		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) AS loginnames, login_names.instance_id` +
+		` FROM projections.login_names AS login_names` +
+		` GROUP BY login_names.user_id, login_names.instance_id) AS login_names` +
+		` ON login_names.user_id = projections.users5.id AND login_names.instance_id = projections.users5.instance_id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
-		` on preferred_login_name.user_id = projections.users2.id`
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name, preferred_login_name.instance_id` +
+		` FROM projections.login_names AS preferred_login_name` +
+		` WHERE preferred_login_name.is_primary = $1) AS preferred_login_name` +
+		` ON preferred_login_name.user_id = projections.users5.id AND preferred_login_name.instance_id = projections.users5.instance_id`
 	usersCols = []string{
 		"id",
 		"creation_date",
@@ -316,7 +324,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery("instanceID")
+				return prepareUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -336,7 +344,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery human found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery("instanceID")
+				return prepareUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -351,7 +359,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						pq.StringArray{"login_name1", "login_name2"},
+						database.StringArray{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -370,6 +378,7 @@ func Test_UserPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						1,
 					},
 				),
 			},
@@ -382,7 +391,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeHuman,
 				Username:           "username",
-				LoginNames:         []string{"login_name1", "login_name2"},
+				LoginNames:         database.StringArray{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				Human: &Human{
 					FirstName:         "first_name",
@@ -402,7 +411,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery machine found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery("instanceID")
+				return prepareUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -417,7 +426,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeMachine,
 						"username",
-						pq.StringArray{"login_name1", "login_name2"},
+						database.StringArray{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						nil,
@@ -436,6 +445,7 @@ func Test_UserPrepares(t *testing.T) {
 						"id",
 						"name",
 						"description",
+						1,
 					},
 				),
 			},
@@ -448,7 +458,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeMachine,
 				Username:           "username",
-				LoginNames:         []string{"login_name1", "login_name2"},
+				LoginNames:         database.StringArray{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				Machine: &Machine{
 					Name:        "name",
@@ -459,7 +469,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery("instanceID")
+				return prepareUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -826,7 +836,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery("instanceID")
+				return prepareNotifyUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -846,7 +856,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery notify found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery("instanceID")
+				return prepareNotifyUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -861,7 +871,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						pq.StringArray{"login_name1", "login_name2"},
+						database.StringArray{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -879,6 +889,7 @@ func Test_UserPrepares(t *testing.T) {
 						"lastPhone",
 						"verifiedPhone",
 						true,
+						1,
 					},
 				),
 			},
@@ -891,7 +902,7 @@ func Test_UserPrepares(t *testing.T) {
 				State:              domain.UserStateActive,
 				Type:               domain.UserTypeHuman,
 				Username:           "username",
-				LoginNames:         []string{"login_name1", "login_name2"},
+				LoginNames:         database.StringArray{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				FirstName:          "first_name",
 				LastName:           "last_name",
@@ -910,7 +921,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery not notify found (error)",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery("instanceID")
+				return prepareNotifyUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -925,7 +936,7 @@ func Test_UserPrepares(t *testing.T) {
 						domain.UserStateActive,
 						domain.UserTypeHuman,
 						"username",
-						pq.StringArray{"login_name1", "login_name2"},
+						database.StringArray{"login_name1", "login_name2"},
 						"login_name1",
 						//human
 						"id",
@@ -942,6 +953,7 @@ func Test_UserPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						1,
 					},
 				),
 				err: func(err error) (error, bool) {
@@ -956,7 +968,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery("instanceID")
+				return prepareNotifyUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -973,8 +985,10 @@ func Test_UserPrepares(t *testing.T) {
 			object: nil,
 		},
 		{
-			name:    "prepareUsersQuery no result",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery no result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery()
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -991,8 +1005,10 @@ func Test_UserPrepares(t *testing.T) {
 			object: &Users{Users: []*User{}},
 		},
 		{
-			name:    "prepareUsersQuery one result",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery one result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery()
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1007,7 +1023,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeHuman,
 							"username",
-							pq.StringArray{"login_name1", "login_name2"},
+							database.StringArray{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							"id",
@@ -1044,7 +1060,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeHuman,
 						Username:           "username",
-						LoginNames:         []string{"login_name1", "login_name2"},
+						LoginNames:         database.StringArray{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Human: &Human{
 							FirstName:         "first_name",
@@ -1064,8 +1080,10 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUsersQuery multiple results",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery multiple results",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery()
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(usersQuery),
@@ -1080,7 +1098,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeHuman,
 							"username",
-							pq.StringArray{"login_name1", "login_name2"},
+							database.StringArray{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							"id",
@@ -1109,7 +1127,7 @@ func Test_UserPrepares(t *testing.T) {
 							domain.UserStateActive,
 							domain.UserTypeMachine,
 							"username",
-							pq.StringArray{"login_name1", "login_name2"},
+							database.StringArray{"login_name1", "login_name2"},
 							"login_name1",
 							//human
 							nil,
@@ -1146,7 +1164,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeHuman,
 						Username:           "username",
-						LoginNames:         []string{"login_name1", "login_name2"},
+						LoginNames:         database.StringArray{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Human: &Human{
 							FirstName:         "first_name",
@@ -1171,7 +1189,7 @@ func Test_UserPrepares(t *testing.T) {
 						State:              domain.UserStateActive,
 						Type:               domain.UserTypeMachine,
 						Username:           "username",
-						LoginNames:         []string{"login_name1", "login_name2"},
+						LoginNames:         database.StringArray{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Machine: &Machine{
 							Name:        "name",
@@ -1182,8 +1200,10 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUsersQuery sql err",
-			prepare: prepareUsersQuery,
+			name: "prepareUsersQuery sql err",
+			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
+				return prepareUsersQuery()
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(usersQuery),

@@ -6,7 +6,7 @@ At ZITADEL we are extremely grateful for security aware people who disclose vuln
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.x.x   | :white_check_mark: as soon as officially released |
+| 2.x.x   | :white_check_mark: |
 | 1.x.x   | :white_check_mark: |
 | 0.x.x   | :x:                |
 

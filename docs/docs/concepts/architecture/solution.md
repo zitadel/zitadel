@@ -10,7 +10,7 @@ Since the storage layer takes the heavy lifting of making sure that data in sync
 Depending on your projects needs our general recommendation is to run ZITADEL and ZITADELs storage layer across multiple availability zones in the same region or if you need higher guarantees run the storage layer across multiple regions.
 Consult the [CockroachDB documentation](https://www.cockroachlabs.com/docs/) for more details or use the [CockroachCloud Service](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
 
-> Soon ZITADEL will also support Postgres as database.
+> Postgres support of ZITADEL is currently in beta.
 
 ## Scalability
 
@@ -57,3 +57,25 @@ CockroachDB needs to be configured with locality flags to proper distribute data
 
 ![Multi-Cluster Architecture](/img/zitadel_multicluster_architecture.png)
 
+## Zero Downtime Updates
+
+Since an Identity system tends to be a critical piece of infrastructure, the "in place zero downtime update" is a well needed feature.
+ZITADEL is built in a way that upgrades can be executed without downtime by just updating to a more recent version.
+
+The common update involves the following steps and do not need manual intervention of the operator:
+
+- Keep the old version running
+- Deploy the version in parallel to the old version
+- The new version will start ...
+  - by updating databases schemas if needed
+  - participate in the leader election for background jobs
+- As soon as the new version is ready to accept traffic it will signal this on the readiness endpoint `/debug/ready` 
+- At this point your network infrastructure can send traffic to the new version
+
+Users who use [Kubernetes/Helm](../../guides/deploy/kubernetes) or serverless container services like Google Cloud Run can benefit from the fact the above process is automated.
+
+:::info
+As a good practice we recommend creating Database Backups prior to an update.
+It is also recommend to read the release notes on GitHub before upgrading.
+Since ZITADEL utilizes Semantic Versioning Breaking Changes of any kind will always increase the major version (e.g Version 2 would become Version 3).
+:::

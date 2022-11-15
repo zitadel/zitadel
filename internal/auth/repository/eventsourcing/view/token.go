@@ -12,8 +12,8 @@ const (
 	tokenTable = "auth.tokens"
 )
 
-func (v *View) TokenByID(tokenID, instanceID string) (*model.TokenView, error) {
-	return usr_view.TokenByID(v.Db, tokenTable, tokenID, instanceID)
+func (v *View) TokenByIDs(tokenID, userID, instanceID string) (*model.TokenView, error) {
+	return usr_view.TokenByIDs(v.Db, tokenTable, tokenID, userID, instanceID)
 }
 
 func (v *View) TokensByUserID(userID, instanceID string) ([]*model.TokenView, error) {
@@ -70,6 +70,14 @@ func (v *View) DeleteApplicationTokens(event *models.Event, ids ...string) error
 
 func (v *View) DeleteTokensFromRefreshToken(refreshTokenID, instanceID string, event *models.Event) error {
 	err := usr_view.DeleteTokensFromRefreshToken(v.Db, tokenTable, refreshTokenID, instanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedTokenSequence(event)
+}
+
+func (v *View) DeleteInstanceTokens(event *models.Event) error {
+	err := usr_view.DeleteInstanceTokens(v.Db, tokenTable, event.InstanceID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

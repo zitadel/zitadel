@@ -21,8 +21,7 @@ export class HeaderComponent implements OnDestroy {
   @ViewChild('input', { static: false }) input!: ElementRef;
 
   @Input() public isDarkTheme: boolean = true;
-  @Input() public user!: User.AsObject;
-  @Input() public labelpolicy!: LabelPolicy.AsObject;
+  @Input() public user?: User.AsObject;
   public showOrgContext: boolean = false;
 
   public orgs$: Observable<Org.AsObject[]> = of([]);
@@ -45,7 +44,7 @@ export class HeaderComponent implements OnDestroy {
   ];
   constructor(
     public authenticationService: AuthenticationService,
-    private authService: GrpcAuthService,
+    public authService: GrpcAuthService,
     public mgmtService: ManagementService,
     public breadcrumbService: BreadcrumbService,
     public router: Router,

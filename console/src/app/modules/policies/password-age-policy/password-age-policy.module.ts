@@ -14,19 +14,19 @@ import { PasswordAgePolicyRoutingModule } from './password-age-policy-routing.mo
 import { PasswordAgePolicyComponent } from './password-age-policy.component';
 
 @NgModule({
-    declarations: [PasswordAgePolicyComponent],
-    imports: [
-        PasswordAgePolicyRoutingModule,
-        CommonModule,
-        FormsModule,
-        InputModule,
-        MatButtonModule,
-        MatSlideToggleModule,
-        MatIconModule,
-        HasRoleModule,
-        MatTooltipModule,
-        TranslateModule,
-        DetailLayoutModule,
-    ],
+  declarations: [PasswordAgePolicyComponent],
+  imports: [
+    PasswordAgePolicyRoutingModule,
+    CommonModule,
+    FormsModule,
+    InputModule,
+    MatButtonModule,
+    MatSlideToggleModule,
+    MatIconModule,
+    HasRoleModule,
+    MatTooltipModule,
+    TranslateModule,
+    DetailLayoutModule,
+  ],
 })
-export class PasswordAgePolicyModule { }
+export class PasswordAgePolicyModule {}

@@ -6,15 +6,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lib/pq"
-
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
-	currentSequenceStmtFormat        = `SELECT current_sequence, aggregate_type, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
-	updateCurrentSequencesStmtFormat = `UPSERT INTO %s (projection_name, aggregate_type, current_sequence, instance_id, timestamp) VALUES `
+	currentSequenceStmtFormat          = `SELECT current_sequence, aggregate_type, instance_id FROM %s WHERE projection_name = $1 AND instance_id = ANY ($2) FOR UPDATE`
+	updateCurrentSequencesStmtFormat   = `INSERT INTO %s (projection_name, aggregate_type, current_sequence, instance_id, timestamp) VALUES `
+	updateCurrentSequencesConflictStmt = ` ON CONFLICT (projection_name, aggregate_type, instance_id) DO UPDATE SET current_sequence = EXCLUDED.current_sequence, timestamp = EXCLUDED.timestamp`
 )
 
 type currentSequences map[eventstore.AggregateType][]*instanceSequence
@@ -24,8 +24,8 @@ type instanceSequence struct {
 	sequence   uint64
 }
 
-func (h *StatementHandler) currentSequences(ctx context.Context, query func(context.Context, string, ...interface{}) (*sql.Rows, error), instanceIDs []string) (currentSequences, error) {
-	rows, err := query(ctx, h.currentSequenceStmt, h.ProjectionName, pq.StringArray(instanceIDs))
+func (h *StatementHandler) currentSequences(ctx context.Context, query func(context.Context, string, ...interface{}) (*sql.Rows, error), instanceIDs database.StringArray) (currentSequences, error) {
+	rows, err := query(ctx, h.currentSequenceStmt, h.ProjectionName, instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (h *StatementHandler) updateCurrentSequences(tx *sql.Tx, sequences currentS
 		}
 	}
 
-	res, err := tx.Exec(h.updateSequencesBaseStmt+strings.Join(valueQueries, ", "), values...)
+	res, err := tx.Exec(h.updateSequencesBaseStmt+strings.Join(valueQueries, ", ")+updateCurrentSequencesConflictStmt, values...)
 	if err != nil {
 		return errors.ThrowInternal(err, "CRDB-TrH2Z", "unable to exec update sequence")
 	}

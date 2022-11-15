@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/lib/pq"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
@@ -23,8 +23,8 @@ var (
 			", memberships.id" +
 			", memberships.project_id" +
 			", memberships.grant_id" +
-			", projections.project_grants.granted_org_id" +
-			", projections.projects.name" +
+			", projections.project_grants2.granted_org_id" +
+			", projections.projects2.name" +
 			", projections.orgs.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
@@ -36,10 +36,10 @@ var (
 			", members.resource_owner" +
 			", members.instance_id" +
 			", members.org_id" +
-			", NULL::STRING AS id" +
-			", NULL::STRING AS project_id" +
-			", NULL::STRING AS grant_id" +
-			" FROM projections.org_members as members" +
+			", NULL::TEXT AS id" +
+			", NULL::TEXT AS project_id" +
+			", NULL::TEXT AS grant_id" +
+			" FROM projections.org_members2 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -48,11 +48,11 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", members.instance_id" +
-			", NULL::STRING AS org_id" +
+			", NULL::TEXT AS org_id" +
 			", members.id" +
-			", NULL::STRING AS project_id" +
-			", NULL::STRING AS grant_id" +
-			" FROM projections.instance_members as members" +
+			", NULL::TEXT AS project_id" +
+			", NULL::TEXT AS grant_id" +
+			" FROM projections.instance_members2 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -61,11 +61,11 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", members.instance_id" +
-			", NULL::STRING AS org_id" +
-			", NULL::STRING AS id" +
+			", NULL::TEXT AS org_id" +
+			", NULL::TEXT AS id" +
 			", members.project_id" +
-			", NULL::STRING AS grant_id" +
-			" FROM projections.project_members as members" +
+			", NULL::TEXT AS grant_id" +
+			" FROM projections.project_members2 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -74,15 +74,15 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", members.instance_id" +
-			", NULL::STRING AS org_id" +
-			", NULL::STRING AS id" +
+			", NULL::TEXT AS org_id" +
+			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", members.grant_id" +
-			" FROM projections.project_grant_members as members" +
+			" FROM projections.project_grant_members2 AS members" +
 			") AS memberships" +
-			" LEFT JOIN projections.projects ON memberships.project_id = projections.projects.id" +
-			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id" +
-			" LEFT JOIN projections.project_grants ON memberships.grant_id = projections.project_grants.grant_id")
+			" LEFT JOIN projections.projects2 ON memberships.project_id = projections.projects2.id AND memberships.instance_id = projections.projects2.instance_id" +
+			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.project_grants2 ON memberships.grant_id = projections.project_grants2.grant_id AND memberships.instance_id = projections.project_grants2.instance_id")
 	membershipCols = []string{
 		"user_id",
 		"roles",
@@ -134,7 +134,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -157,7 +157,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -177,7 +177,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -200,7 +200,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -220,7 +220,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -243,7 +243,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -263,7 +263,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -286,7 +286,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -311,7 +311,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -326,7 +326,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -341,7 +341,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -356,7 +356,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						},
 						{
 							"user-id",
-							pq.StringArray{"role1", "role2"},
+							database.StringArray{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -379,7 +379,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -388,7 +388,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -397,7 +397,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -406,7 +406,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
+						Roles:         database.StringArray{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,

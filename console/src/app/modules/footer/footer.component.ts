@@ -8,9 +8,8 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
   styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent {
-  public policy!: PrivacyPolicy.AsObject;
-  @Input() public privateLabelPolicy!: LabelPolicy.AsObject;
-  constructor(authService: GrpcAuthService) {
+  public policy?: PrivacyPolicy.AsObject;
+  constructor(public authService: GrpcAuthService) {
     authService.getMyPrivacyPolicy().then((policyResp) => {
       if (policyResp.policy) {
         this.policy = policyResp.policy;

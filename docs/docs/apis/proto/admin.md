@@ -284,6 +284,18 @@ Get OIDC settings (e.g token lifetimes, etc.)
     GET: /settings/oidc
 
 
+### AddOIDCSettings
+
+> **rpc** AddOIDCSettings([AddOIDCSettingsRequest](#addoidcsettingsrequest))
+[AddOIDCSettingsResponse](#addoidcsettingsresponse)
+
+Add oidc settings (e.g token lifetimes, etc)
+
+
+
+    POST: /settings/oidc
+
+
 ### UpdateOIDCSettings
 
 > **rpc** UpdateOIDCSettings([UpdateOIDCSettingsRequest](#updateoidcsettingsrequest))
@@ -1739,6 +1751,31 @@ This is an empty request
 
 
 
+### AddOIDCSettingsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| access_token_lifetime |  google.protobuf.Duration | - |  |
+| id_token_lifetime |  google.protobuf.Duration | - |  |
+| refresh_token_idle_expiration |  google.protobuf.Duration | - |  |
+| refresh_token_expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### AddOIDCSettingsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddSMSProviderTwilioRequest
 
 
@@ -1852,6 +1889,8 @@ This is an empty request
 | jwt_idps | repeated zitadel.v1.v1.DataJWTIDP | - |  |
 | user_links | repeated zitadel.idp.v1.IDPUserLink | - |  |
 | domains | repeated zitadel.org.v1.Domain | - |  |
+| app_keys | repeated zitadel.v1.v1.DataAppKey | - |  |
+| machine_keys | repeated zitadel.v1.v1.DataMachineKey | - |  |
 
 
 
@@ -2872,6 +2911,8 @@ This is an empty response
 | user_links | repeated ImportDataSuccessUserLinks | - |  |
 | user_metadata | repeated ImportDataSuccessUserMetadata | - |  |
 | domains | repeated string | - |  |
+| app_keys | repeated string | - |  |
+| machine_keys | repeated string | - |  |
 
 
 
@@ -4322,6 +4363,9 @@ this is en empty request
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| allow_domain_discovery |  bool | If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success. |  |
+| disable_login_with_email |  bool | - |  |
+| disable_login_with_phone |  bool | - |  |
 
 
 

@@ -10,13 +10,6 @@ import (
 	"github.com/zitadel/logging"
 )
 
-var (
-	searchDatabase = "SELECT database_name FROM [show databases] WHERE database_name = $1"
-
-	//go:embed sql/02_database.sql
-	databaseStmt string
-)
-
 func newDatabase() *cobra.Command {
 	return &cobra.Command{
 		Use:   "database",
@@ -24,7 +17,7 @@ func newDatabase() *cobra.Command {
 		Long: `Sets up the ZITADEL database.
 
 Prereqesits:
-- cockroachdb
+- cockroachDB or postgreSQL
 
 The user provided by flags needs priviledge to 
 - create the database if it does not exist
@@ -32,7 +25,7 @@ The user provided by flags needs priviledge to
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.New())
+			config := MustNewConfig(viper.GetViper())
 
 			err := initialise(config.Database, VerifyDatabase(config.Database.Database()))
 			logging.OnError(err).Fatal("unable to initialize the database")
@@ -40,11 +33,10 @@ The user provided by flags needs priviledge to
 	}
 }
 
-func VerifyDatabase(database string) func(*sql.DB) error {
+func VerifyDatabase(databaseName string) func(*sql.DB) error {
 	return func(db *sql.DB) error {
-		return verify(db,
-			exists(searchDatabase, database),
-			exec(fmt.Sprintf(databaseStmt, database)),
-		)
+		logging.WithFields("database", databaseName).Info("verify database")
+
+		return exec(db, fmt.Sprintf(string(databaseStmt), databaseName), []string{dbAlreadyExistsCode})
 	}
 }

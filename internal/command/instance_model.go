@@ -14,6 +14,7 @@ type InstanceWriteModel struct {
 	Name            string
 	State           domain.InstanceState
 	GeneratedDomain string
+	Domains         []string
 
 	DefaultOrgID    string
 	ProjectID       string
@@ -23,6 +24,7 @@ type InstanceWriteModel struct {
 func NewInstanceWriteModel(instanceID string) *InstanceWriteModel {
 	return &InstanceWriteModel{
 		WriteModel: eventstore.WriteModel{
+			InstanceID:    instanceID,
 			AggregateID:   instanceID,
 			ResourceOwner: instanceID,
 		},
@@ -40,10 +42,16 @@ func (wm *InstanceWriteModel) Reduce() error {
 		case *instance.InstanceRemovedEvent:
 			wm.State = domain.InstanceStateRemoved
 		case *instance.DomainAddedEvent:
-			if !e.Generated {
-				continue
+			if e.Generated {
+				wm.GeneratedDomain = e.Domain
 			}
-			wm.GeneratedDomain = e.Domain
+			wm.Domains = append(wm.Domains, e.Domain)
+		case *instance.DomainRemovedEvent:
+			for _, customDomain := range wm.Domains {
+				if customDomain == e.Domain {
+					wm.Domains = removeDomainFromDomains(wm.Domains, e.Domain)
+				}
+			}
 		case *instance.ProjectSetEvent:
 			wm.ProjectID = e.ProjectID
 		case *instance.DefaultOrgSetEvent:

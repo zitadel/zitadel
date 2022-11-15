@@ -42,7 +42,14 @@ func (repo *TokenVerifierRepo) Health() error {
 func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID string) (_ *usr_model.TokenView, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	token, viewErr := repo.View.TokenByID(tokenID, authz.GetInstance(ctx).InstanceID())
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	sequence, err := repo.View.GetLatestTokenSequence(instanceID)
+	logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID").
+		OnError(err).
+		Errorf("could not get current sequence for token check")
+
+	token, viewErr := repo.View.TokenByIDs(tokenID, userID, instanceID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
@@ -50,9 +57,12 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		token = new(model.TokenView)
 		token.ID = tokenID
 		token.UserID = userID
+		if sequence != nil {
+			token.Sequence = sequence.CurrentSequence
+		}
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence)
+	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.Sequence)
 	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -136,7 +146,7 @@ func (repo *TokenVerifierRepo) getUserEvents(ctx context.Context, userID, instan
 	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
-//getTokenIDAndSubject returns the TokenID and Subject of both opaque tokens and JWTs
+// getTokenIDAndSubject returns the TokenID and Subject of both opaque tokens and JWTs
 func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessToken string) (tokenID string, subject string, valid bool) {
 	// accessToken can be either opaque or JWT
 	// let's try opaque first:
@@ -178,8 +188,8 @@ type openIDKeySet struct {
 	*query.Queries
 }
 
-//VerifySignature implements the oidc.KeySet interface
-//providing an implementation for the keys retrieved directly from Queries
+// VerifySignature implements the oidc.KeySet interface
+// providing an implementation for the keys retrieved directly from Queries
 func (o *openIDKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) ([]byte, error) {
 	keySet, err := o.Queries.ActivePublicKeys(ctx, time.Now())
 	if err != nil {

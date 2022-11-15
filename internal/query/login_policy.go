@@ -7,9 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -24,12 +24,15 @@ type LoginPolicy struct {
 	AllowUsernamePassword      bool
 	AllowExternalIDPs          bool
 	ForceMFA                   bool
-	SecondFactors              []domain.SecondFactorType
-	MultiFactors               []domain.MultiFactorType
+	SecondFactors              database.EnumArray[domain.SecondFactorType]
+	MultiFactors               database.EnumArray[domain.MultiFactorType]
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
+	AllowDomainDiscovery       bool
+	DisableLoginWithEmail      bool
+	DisableLoginWithPhone      bool
 	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
@@ -41,17 +44,18 @@ type LoginPolicy struct {
 
 type SecondFactors struct {
 	SearchResponse
-	Factors []domain.SecondFactorType
+	Factors database.EnumArray[domain.SecondFactorType]
 }
 
 type MultiFactors struct {
 	SearchResponse
-	Factors []domain.MultiFactorType
+	Factors database.EnumArray[domain.MultiFactorType]
 }
 
 var (
 	loginPolicyTable = table{
-		name: projection.LoginPolicyTable,
+		name:          projection.LoginPolicyTable,
+		instanceIDCol: projection.LoginPolicyInstanceIDCol,
 	}
 	LoginPolicyColumnOrgID = Column{
 		name:  projection.LoginPolicyIDCol,
@@ -113,6 +117,18 @@ var (
 		name:  projection.IgnoreUnknownUsernames,
 		table: loginPolicyTable,
 	}
+	LoginPolicyColumnAllowDomainDiscovery = Column{
+		name:  projection.AllowDomainDiscovery,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnDisableLoginWithEmail = Column{
+		name:  projection.DisableLoginWithEmail,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnDisableLoginWithPhone = Column{
+		name:  projection.DisableLoginWithPhone,
+		table: loginPolicyTable,
+	}
 	LoginPolicyColumnDefaultRedirectURI = Column{
 		name:  projection.DefaultRedirectURI,
 		table: loginPolicyTable,
@@ -158,9 +174,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 					LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
-		}).
-		OrderBy(LoginPolicyColumnIsDefault.identifier()).
-		Limit(1).ToSql()
+		}).Limit(1).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
@@ -169,7 +183,23 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
 	}
-	return scan(rows)
+	return q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+}
+
+func (q *Queries) scanAndAddLinksToLoginPolicy(ctx context.Context, rows *sql.Rows, scan func(*sql.Rows) (*LoginPolicy, error)) (*LoginPolicy, error) {
+	policy, err := scan(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	links, err := q.IDPLoginPolicyLinks(ctx, policy.OrgID, &IDPLoginPolicyLinksSearchQuery{})
+	if err != nil {
+		return nil, err
+	}
+	for _, link := range links.Links {
+		policy.IDPLinks = append(policy.IDPLinks, link)
+	}
+	return policy, nil
 }
 
 func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) {
@@ -186,7 +216,7 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) 
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
 	}
-	return scan(rows)
+	return q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
 }
 
 func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (*SecondFactors, error) {
@@ -305,31 +335,21 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnIsDefault.identifier(),
 			LoginPolicyColumnHidePasswordReset.identifier(),
 			LoginPolicyColumnIgnoreUnknownUsernames.identifier(),
+			LoginPolicyColumnAllowDomainDiscovery.identifier(),
+			LoginPolicyColumnDisableLoginWithEmail.identifier(),
+			LoginPolicyColumnDisableLoginWithPhone.identifier(),
 			LoginPolicyColumnDefaultRedirectURI.identifier(),
 			LoginPolicyColumnPasswordCheckLifetime.identifier(),
 			LoginPolicyColumnExternalLoginCheckLifetime.identifier(),
 			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
 			LoginPolicyColumnSecondFactorCheckLifetime.identifier(),
 			LoginPolicyColumnMultiFacotrCheckLifetime.identifier(),
-			IDPLoginPolicyLinkIDPIDCol.identifier(),
-			IDPNameCol.identifier(),
-			IDPTypeCol.identifier(),
 		).From(loginPolicyTable.identifier()).
-			LeftJoin(join(IDPLoginPolicyLinkAggregateIDCol, LoginPolicyColumnOrgID)).
-			LeftJoin(join(IDPIDCol, IDPLoginPolicyLinkIDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
-			secondFactors := pq.Int32Array{}
-			multiFactors := pq.Int32Array{}
 			defaultRedirectURI := sql.NullString{}
-			links := make([]*IDPLoginPolicyLink, 0)
 			for rows.Next() {
-				var (
-					idpID   = sql.NullString{}
-					idpName = sql.NullString{}
-					idpType = sql.NullInt16{}
-				)
 				err := rows.Scan(
 					&p.OrgID,
 					&p.CreationDate,
@@ -339,52 +359,30 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					&p.AllowUsernamePassword,
 					&p.AllowExternalIDPs,
 					&p.ForceMFA,
-					&secondFactors,
-					&multiFactors,
+					&p.SecondFactors,
+					&p.MultiFactors,
 					&p.PasswordlessType,
 					&p.IsDefault,
 					&p.HidePasswordReset,
 					&p.IgnoreUnknownUsernames,
+					&p.AllowDomainDiscovery,
+					&p.DisableLoginWithEmail,
+					&p.DisableLoginWithPhone,
 					&defaultRedirectURI,
 					&p.PasswordCheckLifetime,
 					&p.ExternalLoginCheckLifetime,
 					&p.MFAInitSkipLifetime,
 					&p.SecondFactorCheckLifetime,
 					&p.MultiFactorCheckLifetime,
-					&idpID,
-					&idpName,
-					&idpType,
 				)
 				if err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
-				}
-				var link IDPLoginPolicyLink
-				if idpID.Valid {
-					link = IDPLoginPolicyLink{IDPID: idpID.String}
-
-					link.IDPName = idpName.String
-					//IDPType 0 is oidc so we have to set unspecified manually
-					if idpType.Valid {
-						link.IDPType = domain.IDPConfigType(idpType.Int16)
-					} else {
-						link.IDPType = domain.IDPConfigTypeUnspecified
-					}
-					links = append(links, &link)
 				}
 			}
 			if p.OrgID == "" {
 				return nil, errors.ThrowNotFound(nil, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
 			}
 			p.DefaultRedirectURI = defaultRedirectURI.String
-			p.MultiFactors = make([]domain.MultiFactorType, len(multiFactors))
-			for i, mfa := range multiFactors {
-				p.MultiFactors[i] = domain.MultiFactorType(mfa)
-			}
-			p.SecondFactors = make([]domain.SecondFactorType, len(secondFactors))
-			for i, mfa := range secondFactors {
-				p.SecondFactors[i] = domain.SecondFactorType(mfa)
-			}
-			p.IDPLinks = links
 			return p, nil
 		}
 }
@@ -395,9 +393,8 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecondFactors, error) {
 			p := new(SecondFactors)
-			secondFactors := pq.Int32Array{}
 			err := row.Scan(
-				&secondFactors,
+				&p.Factors,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -406,11 +403,7 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
-			p.Factors = make([]domain.SecondFactorType, len(secondFactors))
-			p.Count = uint64(len(secondFactors))
-			for i, mfa := range secondFactors {
-				p.Factors[i] = domain.SecondFactorType(mfa)
-			}
+			p.Count = uint64(len(p.Factors))
 			return p, nil
 		}
 }
@@ -421,9 +414,8 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MultiFactors, error) {
 			p := new(MultiFactors)
-			multiFactors := pq.Int32Array{}
 			err := row.Scan(
-				&multiFactors,
+				&p.Factors,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -432,11 +424,7 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
-			p.Factors = make([]domain.MultiFactorType, len(multiFactors))
-			p.Count = uint64(len(multiFactors))
-			for i, mfa := range multiFactors {
-				p.Factors[i] = domain.MultiFactorType(mfa)
-			}
+			p.Count = uint64(len(p.Factors))
 			return p, nil
 		}
 }

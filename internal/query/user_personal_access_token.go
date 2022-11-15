@@ -7,9 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 
 	"github.com/zitadel/zitadel/internal/query/projection"
 
@@ -18,7 +18,8 @@ import (
 
 var (
 	personalAccessTokensTable = table{
-		name: projection.PersonalAccessTokenProjectionTable,
+		name:          projection.PersonalAccessTokenProjectionTable,
+		instanceIDCol: projection.PersonalAccessTokenColumnInstanceID,
 	}
 	PersonalAccessTokenColumnID = Column{
 		name:  projection.PersonalAccessTokenColumnID,
@@ -72,7 +73,7 @@ type PersonalAccessToken struct {
 
 	UserID     string
 	Expiration time.Time
-	Scopes     []string
+	Scopes     database.StringArray
 }
 
 type PersonalAccessTokenSearchQueries struct {
@@ -161,7 +162,6 @@ func preparePersonalAccessTokenQuery() (sq.SelectBuilder, func(*sql.Row) (*Perso
 			From(personalAccessTokensTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PersonalAccessToken, error) {
 			p := new(PersonalAccessToken)
-			scopes := pq.StringArray{}
 			err := row.Scan(
 				&p.ID,
 				&p.CreationDate,
@@ -170,9 +170,8 @@ func preparePersonalAccessTokenQuery() (sq.SelectBuilder, func(*sql.Row) (*Perso
 				&p.Sequence,
 				&p.UserID,
 				&p.Expiration,
-				&scopes,
+				&p.Scopes,
 			)
-			p.Scopes = scopes
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.PersonalAccessToken.NotFound")
@@ -200,7 +199,6 @@ func preparePersonalAccessTokensQuery() (sq.SelectBuilder, func(*sql.Rows) (*Per
 			var count uint64
 			for rows.Next() {
 				token := new(PersonalAccessToken)
-				scopes := pq.StringArray{}
 				err := rows.Scan(
 					&token.ID,
 					&token.CreationDate,
@@ -209,13 +207,12 @@ func preparePersonalAccessTokensQuery() (sq.SelectBuilder, func(*sql.Rows) (*Per
 					&token.Sequence,
 					&token.UserID,
 					&token.Expiration,
-					&scopes,
+					&token.Scopes,
 					&count,
 				)
 				if err != nil {
 					return nil, err
 				}
-				token.Scopes = scopes
 				personalAccessTokens = append(personalAccessTokens, token)
 			}
 

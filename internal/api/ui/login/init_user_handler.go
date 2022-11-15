@@ -12,6 +12,7 @@ import (
 const (
 	queryInitUserCode     = "code"
 	queryInitUserUserID   = "userID"
+	queryInitUserLoginName = "loginname"
 	queryInitUserPassword = "passwordset"
 
 	tmplInitUser     = "inituser"
@@ -20,6 +21,7 @@ const (
 
 type initUserFormData struct {
 	Code            string `schema:"code"`
+	LoginName       string `schema:"loginname"`
 	Password        string `schema:"password"`
 	PasswordConfirm string `schema:"passwordconfirm"`
 	UserID          string `schema:"userID"`
@@ -30,26 +32,27 @@ type initUserFormData struct {
 type initUserData struct {
 	baseData
 	profileData
-	Code                      string
-	UserID                    string
-	PasswordSet               bool
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
+	Code         string
+	LoginName    string
+	UserID       string
+	PasswordSet  bool
+	MinLength    uint64
+	HasUppercase string
+	HasLowercase string
+	HasNumber    string
+	HasSymbol    string
 }
 
-func InitUserLink(origin, userID, code, orgID string, passwordSet bool) string {
-	return fmt.Sprintf("%s%s?userID=%s&code=%s&passwordset=%t&orgID=%s", externalLink(origin), EndpointInitUser, userID, code, passwordSet, orgID)
+func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet bool) string {
+	return fmt.Sprintf("%s%s?userID=%s&loginname=%s&code=%s&orgID=%s&passwordset=%t", externalLink(origin), EndpointInitUser, userID, loginName, code, orgID, passwordSet)
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {
 	userID := r.FormValue(queryInitUserUserID)
 	code := r.FormValue(queryInitUserCode)
+	loginName := r.FormValue(queryInitUserLoginName)
 	passwordSet, _ := strconv.ParseBool(r.FormValue(queryInitUserPassword))
-	l.renderInitUser(w, r, nil, userID, code, passwordSet, nil)
+	l.renderInitUser(w, r, nil, userID, loginName, code, passwordSet, nil)
 }
 
 func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +64,7 @@ func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if data.Resend {
-		l.resendUserInit(w, r, authReq, data.UserID, data.PasswordSet)
+		l.resendUserInit(w, r, authReq, data.UserID, data.LoginName, data.PasswordSet)
 		return
 	}
 	l.checkUserInitCode(w, r, authReq, data, nil)
@@ -70,7 +73,7 @@ func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initUserFormData, err error) {
 	if data.Password != data.PasswordConfirm {
 		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
-		l.renderInitUser(w, r, authReq, data.UserID, data.Code, data.PasswordSet, err)
+		l.renderInitUser(w, r, authReq, data.UserID,data.LoginName, data.Code, data.PasswordSet, err)
 		return
 	}
 	userOrgID := ""
@@ -79,32 +82,32 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 	}
 	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
 	if err != nil {
-		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
+		l.renderInitUser(w, r, authReq, data.UserID,data.LoginName, "", data.PasswordSet, err)
 		return
 	}
 	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, initCodeGenerator)
 	if err != nil {
-		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
+		l.renderInitUser(w, r, authReq, data.UserID,data.LoginName, "", data.PasswordSet, err)
 		return
 	}
-	l.renderInitUserDone(w, r, authReq)
+	l.renderInitUserDone(w, r, authReq, userOrgID)
 }
 
-func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, showPassword bool) {
+func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string,loginName string, showPassword bool) {
 	userOrgID := ""
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
 	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
 	if err != nil {
-		l.renderInitUser(w, r, authReq, userID, "", showPassword, err)
+		l.renderInitUser(w, r, authReq, userID,loginName, "", showPassword, err)
 		return
 	}
 	_, err = l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID, initCodeGenerator)
-	l.renderInitUser(w, r, authReq, userID, "", showPassword, err)
+	l.renderInitUser(w, r, authReq, userID, loginName, "", showPassword, err)
 }
 
-func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, passwordSet bool, err error) {
+func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID,loginName string, code string, passwordSet bool, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -112,16 +115,18 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userID = authReq.UserID
 	}
+
+	translator := l.getTranslator(r.Context(), authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, "Init User", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "InitUser.Title", "InitUser.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
+		LoginName:   loginName,
 		Code:        code,
 		PasswordSet: passwordSet,
 	}
-	policy, description, _ := l.getPasswordComplexityPolicyByUserID(r, nil, userID)
+	policy := l.getPasswordComplexityPolicyByUserID(r, userID)
 	if policy != nil {
-		data.PasswordPolicyDescription = description
 		data.MinLength = policy.MinLength
 		if policy.HasUppercase {
 			data.HasUppercase = UpperCaseRegex
@@ -136,7 +141,6 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 			data.HasNumber = NumberRegex
 		}
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
 		user, err := l.query.GetUserByID(r.Context(), false, userID)
 		if err == nil {
@@ -146,7 +150,11 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitUser], data, nil)
 }
 
-func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	data := l.getUserData(r, authReq, "User Init Done", "", "")
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplInitUserDone], data, nil)
+func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
+	data := l.getUserData(r, authReq,"InitUserDone.Title" ,"InitUserDone.Description", "", "")
+	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil {
+		l.customTexts(r.Context(), translator, orgID)
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInitUserDone], data, nil)
 }

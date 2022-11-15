@@ -57,6 +57,18 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 	}
 }
 
+func samlWriteModelToSAMLConfig(writeModel *SAMLApplicationWriteModel) *domain.SAMLApp {
+	return &domain.SAMLApp{
+		ObjectRoot:  writeModelToObjectRoot(writeModel.WriteModel),
+		AppID:       writeModel.AppID,
+		AppName:     writeModel.AppName,
+		State:       writeModel.State,
+		Metadata:    writeModel.Metadata,
+		MetadataURL: writeModel.MetadataURL,
+		EntityID:    writeModel.EntityID,
+	}
+}
+
 func apiWriteModelToAPIConfig(writeModel *APIApplicationWriteModel) *domain.APIApp {
 	return &domain.APIApp{
 		ObjectRoot:     writeModelToObjectRoot(writeModel.WriteModel),
@@ -86,7 +98,7 @@ func memberWriteModelToProjectGrantMember(writeModel *ProjectGrantMemberWriteMod
 	}
 }
 
-func applicationKeyWriteModelToKey(wm *ApplicationKeyWriteModel, privateKey []byte) *domain.ApplicationKey {
+func applicationKeyWriteModelToKey(wm *ApplicationKeyWriteModel) *domain.ApplicationKey {
 	return &domain.ApplicationKey{
 		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
 		ApplicationID:  wm.AppID,
@@ -94,6 +106,5 @@ func applicationKeyWriteModelToKey(wm *ApplicationKeyWriteModel, privateKey []by
 		KeyID:          wm.KeyID,
 		Type:           wm.KeyType,
 		ExpirationDate: wm.ExpirationDate,
-		PrivateKey:     privateKey,
 	}
 }

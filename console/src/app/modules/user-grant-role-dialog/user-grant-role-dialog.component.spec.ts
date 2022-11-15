@@ -8,9 +8,8 @@ describe('UserGrantRoleDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UserGrantRoleDialogComponent ]
-    })
-    .compileComponents();
+      declarations: [UserGrantRoleDialogComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

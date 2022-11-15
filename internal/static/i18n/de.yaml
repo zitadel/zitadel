@@ -85,7 +85,8 @@ Errors:
       NotChanged: Adresse wurde nicht geändert
     Machine:
       Key:
-        NotFound: Maschinen Key nicht gefunden
+        NotFound: Maschinen Schlüssel nicht gefunden
+        AlreadyExisting: Machine Schlüssel exisiert bereits
     PAT:
       NotFound: Persönliches Access Token nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
@@ -142,6 +143,10 @@ Errors:
     RefreshToken:
       Invalid: Refresh Token ist ungültig
       NotFound: Refresh Token nicht gefunden
+  Instance:
+    NotFound: Instanz konnte nicht gefunden werden
+    AlreadyExists: Instanz exisitiert bereits
+    NotChanged: Instanz wurde nicht verändert
   Org:
     AlreadyExists: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
@@ -247,14 +252,22 @@ Errors:
       NotExisting: Applikation existiert nicht
       IsNotOIDC: Applikation ist nicht vom Typ OIDC
       IsNotAPI: Applikation ist nicht vom Typ API
+      IsNotSAML: Applikation ist nicht vom Typ SAML
       NotActive: Applikation ist nicht aktiv
       NotInactive: Applikation ist nickt inaktiv
       OIDCConfigInvalid: OIDC Konfiguration ist ungültig
+      SAMLConfigInvalid: SAML Konfiguration ist ungültig
+      SAMLMetadataMissing: SAML Metadata ist nicht vorhanden
+      SAMLMetadataFormat: SAML Metadata Formatfehler
+      SAMLEntityIDAlreadyExisting: SAML EntityID existiert bereits
       APIConfigInvalid: API Konfiguration ist ungültig
       OIDCAuthMethodNoSecret: Gewählte OIDC Auth Method benötigt kein Secret
       APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
       AuthMethodNoPrivateKeyJWT: Gewählte Auth Method benötigt keinen Key
       ClientSecretInvalid: Client Secret ist ungültig
+      Key:
+        AlreadyExisting: Applikationsschlüssel existiert bereits
+        NotFound: Applikationsschlüssel nicht gefunden
     RequiredFieldsMissing: Benötigte Felder fehlen
     Grant:
       AlreadyExists: Projekt Grant existiert bereits
@@ -389,7 +402,7 @@ Errors:
     ReadError: Übersetzungsdatei konnte nicht gelesen werden
     MergeError: Übersetzungsdatei konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
     NotFound: Übersetzungsdatei existiert nicht
-  MetaData:
+  Metadata:
     NotFound: Meta Daten konnten nicht gefunden werden
     NoData: Meta Daten Liste ist leer
     Invalid: Meta Daten sind ungültig
@@ -751,6 +764,9 @@ EventTypes:
           added: Applikations Schlüssel hinzugefügt
           removed: Applikations Schlüssel entfernt
       config:
+        saml:
+          added: SAML Konfiguration hinzugefügt
+          changed: SAML Konfiguration geändert
         oidc:
           added: OIDC Konfiguration hinzugefügt
           changed: OIDC Konfiguration geändert
@@ -899,3 +915,17 @@ Application:
       GrantType:
         Refresh:
           NoAuthCode: Refresh Token nur in Kombination mit Authorization Code erlaubt.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Unspezifiziert
+      ExternalAuthentication:  Externe Authentifizierung
+      CustomiseToken: Token ergänzen
+  TriggerType:
+    Unspecified: Unspezifiziert
+    PostAuthentication: Nach Authentifizierung
+    PreCreation: Vor Erstellung
+    PostCreation: Nach Erstellung
+    PreUserinfoCreation: Vor Userinfo Erstellung
+    PreAccessTokenCreation: Vor Access Token Erstellung

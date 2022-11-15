@@ -30,15 +30,14 @@ type registerFormData struct {
 type registerData struct {
 	baseData
 	registerFormData
-	PasswordPolicyDescription string
-	MinLength                 uint64
-	HasUppercase              string
-	HasLowercase              string
-	HasNumber                 string
-	HasSymbol                 string
-	ShowUsername              bool
-	ShowUsernameSuffix        bool
-	OrgRegister               bool
+	MinLength          uint64
+	HasUppercase       string
+	HasLowercase       string
+	HasNumber          string
+	HasSymbol          string
+	ShowUsername       bool
+	ShowUsernameSuffix bool
+	OrgRegister        bool
 }
 
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -74,12 +73,17 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
+	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, data, err)
+		return
+	}
 	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, nil, initCodeGenerator, phoneCodeGenerator)
+	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -120,13 +124,12 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, "Register", errID, errMessage),
+		baseData:         l.getBaseData(r, authRequest, "RegistrationUser.Title","RegistrationUser.Description", errID, errMessage),
 		registerFormData: *formData,
 	}
 
-	pwPolicy, description, _ := l.getPasswordComplexityPolicy(r, authRequest, resourceOwner)
+	pwPolicy := l.getPasswordComplexityPolicy(r, resourceOwner)
 	if pwPolicy != nil {
-		data.PasswordPolicyDescription = description
 		data.MinLength = pwPolicy.MinLength
 		if pwPolicy.HasUppercase {
 			data.HasUppercase = UpperCaseRegex
@@ -170,6 +173,9 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 			}
 			return formData.Gender == g
 		},
+	}
+	if authRequest == nil {
+		l.customTexts(r.Context(), translator, resourceOwner)
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegister], data, funcs)
 }

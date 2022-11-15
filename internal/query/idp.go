@@ -7,9 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -42,7 +42,7 @@ type OIDCIDP struct {
 	ClientID              string
 	ClientSecret          *crypto.CryptoValue
 	Issuer                string
-	Scopes                []string
+	Scopes                database.StringArray
 	DisplayNameMapping    domain.OIDCMappingField
 	UsernameMapping       domain.OIDCMappingField
 	AuthorizationEndpoint string
@@ -59,7 +59,8 @@ type JWTIDP struct {
 
 var (
 	idpTable = table{
-		name: projection.IDPTable,
+		name:          projection.IDPTable,
+		instanceIDCol: projection.IDPInstanceIDCol,
 	}
 	IDPIDCol = Column{
 		name:  projection.IDPIDCol,
@@ -113,7 +114,8 @@ var (
 
 var (
 	oidcIDPTable = table{
-		name: projection.IDPOIDCTable,
+		name:          projection.IDPOIDCTable,
+		instanceIDCol: projection.OIDCConfigInstanceIDCol,
 	}
 	OIDCIDPColIDPID = Column{
 		name:  projection.OIDCConfigIDPIDCol,
@@ -155,7 +157,8 @@ var (
 
 var (
 	jwtIDPTable = table{
-		name: projection.IDPJWTTable,
+		name:          projection.IDPJWTTable,
+		instanceIDCol: projection.JWTConfigInstanceIDCol,
 	}
 	JWTIDPColIDPID = Column{
 		name:  projection.JWTConfigIDPIDCol,
@@ -179,7 +182,7 @@ var (
 	}
 )
 
-//IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
+// IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
 func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string) (*IDP, error) {
 	if shouldTriggerBulk {
 		projection.IDPProjection.Trigger(ctx)
@@ -210,7 +213,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	return scan(row)
 }
 
-//IDPs searches idps matching the query
+// IDPs searches idps matching the query
 func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries) (idps *IDPs, err error) {
 	query, scan := prepareIDPsQuery()
 	stmt, args, err := queries.toQuery(query).
@@ -307,7 +310,7 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcIssuer := sql.NullString{}
-			oidcScopes := pq.StringArray{}
+			oidcScopes := database.StringArray{}
 			oidcDisplayNameMapping := sql.NullInt32{}
 			oidcUsernameMapping := sql.NullInt32{}
 			oidcAuthorizationEndpoint := sql.NullString{}
@@ -419,7 +422,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcIssuer := sql.NullString{}
-				oidcScopes := pq.StringArray{}
+				oidcScopes := database.StringArray{}
 				oidcDisplayNameMapping := sql.NullInt32{}
 				oidcUsernameMapping := sql.NullInt32{}
 				oidcAuthorizationEndpoint := sql.NullString{}

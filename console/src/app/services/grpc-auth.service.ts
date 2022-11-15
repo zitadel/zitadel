@@ -2,118 +2,181 @@ import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, filter, finalize, map, mergeMap, switchMap, take, timeout } from 'rxjs/operators';
+import {
+  catchError,
+  distinctUntilChanged,
+  filter,
+  finalize,
+  map,
+  mergeMap,
+  pairwise,
+  switchMap,
+  take,
+  tap,
+  timeout,
+  withLatestFrom,
+} from 'rxjs/operators';
 
 import {
-    AddMyAuthFactorOTPRequest,
-    AddMyAuthFactorOTPResponse,
-    AddMyAuthFactorU2FRequest,
-    AddMyAuthFactorU2FResponse,
-    AddMyPasswordlessLinkRequest,
-    AddMyPasswordlessLinkResponse,
-    AddMyPasswordlessRequest,
-    AddMyPasswordlessResponse,
-    GetMyEmailRequest,
-    GetMyEmailResponse,
-    GetMyLabelPolicyRequest,
-    GetMyLabelPolicyResponse,
-    GetMyPasswordComplexityPolicyRequest,
-    GetMyPasswordComplexityPolicyResponse,
-    GetMyPhoneRequest,
-    GetMyPhoneResponse,
-    GetMyPrivacyPolicyRequest,
-    GetMyPrivacyPolicyResponse,
-    GetMyProfileRequest,
-    GetMyProfileResponse,
-    GetMyUserRequest,
-    GetMyUserResponse,
-    GetSupportedLanguagesRequest,
-    GetSupportedLanguagesResponse,
-    ListMyAuthFactorsRequest,
-    ListMyAuthFactorsResponse,
-    ListMyLinkedIDPsRequest,
-    ListMyLinkedIDPsResponse,
-    ListMyMembershipsRequest,
-    ListMyMembershipsResponse,
-    ListMyMetadataRequest,
-    ListMyMetadataResponse,
-    ListMyPasswordlessRequest,
-    ListMyPasswordlessResponse,
-    ListMyProjectOrgsRequest,
-    ListMyProjectOrgsResponse,
-    ListMyUserChangesRequest,
-    ListMyUserChangesResponse,
-    ListMyUserGrantsRequest,
-    ListMyUserGrantsResponse,
-    ListMyUserSessionsRequest,
-    ListMyUserSessionsResponse,
-    ListMyZitadelPermissionsRequest,
-    ListMyZitadelPermissionsResponse,
-    RemoveMyAuthFactorOTPRequest,
-    RemoveMyAuthFactorOTPResponse,
-    RemoveMyAuthFactorU2FRequest,
-    RemoveMyAuthFactorU2FResponse,
-    RemoveMyAvatarRequest,
-    RemoveMyAvatarResponse,
-    RemoveMyLinkedIDPRequest,
-    RemoveMyLinkedIDPResponse,
-    RemoveMyPasswordlessRequest,
-    RemoveMyPasswordlessResponse,
-    RemoveMyPhoneRequest,
-    RemoveMyPhoneResponse,
-    RemoveMyUserRequest,
-    RemoveMyUserResponse,
-    ResendMyEmailVerificationRequest,
-    ResendMyEmailVerificationResponse,
-    ResendMyPhoneVerificationRequest,
-    ResendMyPhoneVerificationResponse,
-    SendMyPasswordlessLinkRequest,
-    SendMyPasswordlessLinkResponse,
-    SetMyEmailRequest,
-    SetMyEmailResponse,
-    SetMyPhoneRequest,
-    SetMyPhoneResponse,
-    UpdateMyPasswordRequest,
-    UpdateMyPasswordResponse,
-    UpdateMyProfileRequest,
-    UpdateMyProfileResponse,
-    UpdateMyUserNameRequest,
-    UpdateMyUserNameResponse,
-    VerifyMyAuthFactorOTPRequest,
-    VerifyMyAuthFactorOTPResponse,
-    VerifyMyAuthFactorU2FRequest,
-    VerifyMyAuthFactorU2FResponse,
-    VerifyMyPasswordlessRequest,
-    VerifyMyPasswordlessResponse,
-    VerifyMyPhoneRequest,
-    VerifyMyPhoneResponse,
+  AddMyAuthFactorOTPRequest,
+  AddMyAuthFactorOTPResponse,
+  AddMyAuthFactorU2FRequest,
+  AddMyAuthFactorU2FResponse,
+  AddMyPasswordlessLinkRequest,
+  AddMyPasswordlessLinkResponse,
+  AddMyPasswordlessRequest,
+  AddMyPasswordlessResponse,
+  GetMyEmailRequest,
+  GetMyEmailResponse,
+  GetMyLabelPolicyRequest,
+  GetMyLabelPolicyResponse,
+  GetMyPasswordComplexityPolicyRequest,
+  GetMyPasswordComplexityPolicyResponse,
+  GetMyPhoneRequest,
+  GetMyPhoneResponse,
+  GetMyPrivacyPolicyRequest,
+  GetMyPrivacyPolicyResponse,
+  GetMyProfileRequest,
+  GetMyProfileResponse,
+  GetMyUserRequest,
+  GetMyUserResponse,
+  GetSupportedLanguagesRequest,
+  GetSupportedLanguagesResponse,
+  ListMyAuthFactorsRequest,
+  ListMyAuthFactorsResponse,
+  ListMyLinkedIDPsRequest,
+  ListMyLinkedIDPsResponse,
+  ListMyMembershipsRequest,
+  ListMyMembershipsResponse,
+  ListMyMetadataRequest,
+  ListMyMetadataResponse,
+  ListMyPasswordlessRequest,
+  ListMyPasswordlessResponse,
+  ListMyProjectOrgsRequest,
+  ListMyProjectOrgsResponse,
+  ListMyUserChangesRequest,
+  ListMyUserChangesResponse,
+  ListMyUserGrantsRequest,
+  ListMyUserGrantsResponse,
+  ListMyUserSessionsRequest,
+  ListMyUserSessionsResponse,
+  ListMyZitadelPermissionsRequest,
+  ListMyZitadelPermissionsResponse,
+  RemoveMyAuthFactorOTPRequest,
+  RemoveMyAuthFactorOTPResponse,
+  RemoveMyAuthFactorU2FRequest,
+  RemoveMyAuthFactorU2FResponse,
+  RemoveMyAvatarRequest,
+  RemoveMyAvatarResponse,
+  RemoveMyLinkedIDPRequest,
+  RemoveMyLinkedIDPResponse,
+  RemoveMyPasswordlessRequest,
+  RemoveMyPasswordlessResponse,
+  RemoveMyPhoneRequest,
+  RemoveMyPhoneResponse,
+  RemoveMyUserRequest,
+  RemoveMyUserResponse,
+  ResendMyEmailVerificationRequest,
+  ResendMyEmailVerificationResponse,
+  ResendMyPhoneVerificationRequest,
+  ResendMyPhoneVerificationResponse,
+  SendMyPasswordlessLinkRequest,
+  SendMyPasswordlessLinkResponse,
+  SetMyEmailRequest,
+  SetMyEmailResponse,
+  SetMyPhoneRequest,
+  SetMyPhoneResponse,
+  UpdateMyPasswordRequest,
+  UpdateMyPasswordResponse,
+  UpdateMyProfileRequest,
+  UpdateMyProfileResponse,
+  UpdateMyUserNameRequest,
+  UpdateMyUserNameResponse,
+  VerifyMyAuthFactorOTPRequest,
+  VerifyMyAuthFactorOTPResponse,
+  VerifyMyAuthFactorU2FRequest,
+  VerifyMyAuthFactorU2FResponse,
+  VerifyMyPasswordlessRequest,
+  VerifyMyPasswordlessResponse,
+  VerifyMyPhoneRequest,
+  VerifyMyPhoneResponse,
 } from '../proto/generated/zitadel/auth_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { LabelPolicy } from '../proto/generated/zitadel/policy_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
+import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GrpcAuthService {
-  private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
+  private _activeOrgChanged: Subject<Org.AsObject | undefined> = new Subject();
   public user!: Observable<User.AsObject | undefined>;
   public userSubject: BehaviorSubject<User.AsObject | undefined> = new BehaviorSubject<User.AsObject | undefined>(undefined);
-  private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
+  private triggerPermissionsRefresh: Subject<void> = new Subject();
+  public zitadelPermissions$: Observable<string[]> = this.triggerPermissionsRefresh.pipe(
+    switchMap(() =>
+      from(this.listMyZitadelPermissions()).pipe(
+        map((rolesResp) => rolesResp.resultList),
+        filter((roles) => !!roles.length),
+        catchError((_) => {
+          return of([]);
+        }),
+        distinctUntilChanged((a, b) => {
+          return JSON.stringify(a.sort()) === JSON.stringify(b.sort());
+        }),
+        finalize(() => {
+          this.fetchedZitadelPermissions.next(true);
+        }),
+      ),
+    ),
+  );
 
-  public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject(false as boolean);
+  public labelpolicy$!: Observable<LabelPolicy.AsObject>;
+  public labelpolicy: BehaviorSubject<LabelPolicy.AsObject | undefined> = new BehaviorSubject<
+    LabelPolicy.AsObject | undefined
+  >(undefined);
+  labelPolicyLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+
+  public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private cachedOrgs: Org.AsObject[] = [];
+  private cachedLabelPolicies: { [orgId: string]: LabelPolicy.AsObject } = {};
 
   constructor(
     private readonly grpcService: GrpcService,
     private oauthService: OAuthService,
     private storage: StorageService,
+    themeService: ThemeService,
   ) {
+    this.zitadelPermissions$.subscribe(this.zitadelPermissions);
+
+    this.labelpolicy$ = this.activeOrgChanged.pipe(
+      switchMap((org) => {
+        this.labelPolicyLoading$.next(true);
+        return from(this.getMyLabelPolicy(org ? org.id : ''));
+      }),
+      filter((policy) => !!policy),
+    );
+
+    this.labelpolicy$.subscribe({
+      next: (policy) => {
+        themeService.applyLabelPolicy(policy);
+        this.labelpolicy.next(policy);
+        this.labelPolicyLoading$.next(false);
+      },
+      error: (error) => {
+        console.error(error);
+        this.labelPolicyLoading$.next(false);
+      },
+    });
+
     this.user = merge(
       of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
       this.oauthService.events.pipe(
@@ -195,10 +258,12 @@ export class GrpcAuthService {
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
       if (org && orgs.find((tmp) => tmp.id === org.id)) {
         this.storage.setItem(StorageKey.organization, org, StorageLocation.session);
-        return org;
+        this.setActiveOrg(org);
+        return Promise.resolve(org);
       }
 
       if (orgs.length === 0) {
+        this._activeOrgChanged.next(undefined);
         return Promise.reject(new Error('No organizations found!'));
       }
       const orgToSet = orgs.find((element) => element.id !== '0' && element.name !== '');
@@ -211,7 +276,7 @@ export class GrpcAuthService {
     }
   }
 
-  public get activeOrgChanged(): Observable<Org.AsObject> {
+  public get activeOrgChanged(): Observable<Org.AsObject | undefined> {
     return this._activeOrgChanged;
   }
 
@@ -223,19 +288,7 @@ export class GrpcAuthService {
   }
 
   private loadPermissions(): void {
-    from(this.listMyZitadelPermissions())
-      .pipe(
-        map((rolesResp) => rolesResp.resultList),
-        catchError((_) => {
-          return of([]);
-        }),
-        finalize(() => {
-          this.fetchedZitadelPermissions.next(true);
-        }),
-      )
-      .subscribe((roles) => {
-        this.zitadelPermissions.next(roles);
-      });
+    this.triggerPermissionsRefresh.next();
   }
 
   /**
@@ -244,7 +297,17 @@ export class GrpcAuthService {
    */
   public isAllowed(roles: string[] | RegExp[], requiresAll: boolean = false): Observable<boolean> {
     if (roles && roles.length > 0) {
-      return this.zitadelPermissions.pipe(switchMap((zroles) => of(this.hasRoles(zroles, roles, requiresAll))));
+      return this.fetchedZitadelPermissions.pipe(
+        withLatestFrom(this.zitadelPermissions),
+        filter(([hL, p]) => {
+          return hL === true && !!p.length;
+        }),
+        map(([_, zroles]) => {
+          const what = this.hasRoles(zroles, roles, requiresAll);
+          return what;
+        }),
+        distinctUntilChanged(),
+      );
     } else {
       return of(false);
     }
@@ -354,10 +417,6 @@ export class GrpcAuthService {
       req.setPreferredLanguage(preferredLanguage);
     }
     return this.grpcService.auth.updateMyProfile(req, null).then((resp) => resp.toObject());
-  }
-
-  public get zitadelPermissionsChanged(): Observable<string[]> {
-    return this.zitadelPermissions;
   }
 
   public listMyUserSessions(): Promise<ListMyUserSessionsResponse.AsObject> {
@@ -581,8 +640,24 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserChanges(req, null).then((resp) => resp.toObject());
   }
 
-  public getMyLabelPolicy(): Promise<GetMyLabelPolicyResponse.AsObject> {
-    return this.grpcService.auth.getMyLabelPolicy(new GetMyLabelPolicyRequest(), null).then((resp) => resp.toObject());
+  public getMyLabelPolicy(orgIdForCache?: string): Promise<LabelPolicy.AsObject> {
+    if (orgIdForCache && this.cachedLabelPolicies[orgIdForCache]) {
+      return Promise.resolve(this.cachedLabelPolicies[orgIdForCache]);
+    } else {
+      return this.grpcService.auth
+        .getMyLabelPolicy(new GetMyLabelPolicyRequest(), null)
+        .then((resp) => resp.toObject())
+        .then((resp) => {
+          if (resp.policy) {
+            if (orgIdForCache) {
+              this.cachedLabelPolicies[orgIdForCache] = resp.policy;
+            }
+            return Promise.resolve(resp.policy);
+          } else {
+            return Promise.reject();
+          }
+        });
+    }
   }
 
   public getMyPrivacyPolicy(): Promise<GetMyPrivacyPolicyResponse.AsObject> {
