@@ -256,6 +256,7 @@
       "DELETE_SELF_DESCRIPTION": "Vous êtes sur le point de supprimer définitivement votre compte personnel. Cela vous déconnectera et supprimera votre utilisateur. Cette action ne peut être annulée !",
       "DELETE_AUTH_DESCRIPTION": "Vous êtes sur le point de supprimer définitivement votre compte personnel. En êtes-vous sûr ?",
       "TYPEUSERNAME": "Tapez '{{value}}', pour confirmer et supprimer l'utilisateur.",
+      "USERNAME": "Identifiant",
       "DELETE_BTN": "Supprimer définitivement"
     },
     "SENDEMAILDIALOG": {

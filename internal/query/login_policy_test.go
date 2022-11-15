@@ -37,17 +37,8 @@ var (
 		` projections.login_policies4.external_login_check_lifetime,` +
 		` projections.login_policies4.mfa_init_skip_lifetime,` +
 		` projections.login_policies4.second_factor_check_lifetime,` +
-		` projections.login_policies4.multi_factor_check_lifetime,` +
-		` projections.idp_login_policy_links4.idp_id,` +
-		` projections.idps3.name,` +
-		` projections.idps3.type` +
-		` FROM projections.login_policies4` +
-		` LEFT JOIN projections.idp_login_policy_links4 ON ` +
-		` projections.login_policies4.aggregate_id = projections.idp_login_policy_links4.aggregate_id` +
-		` AND projections.login_policies4.instance_id = projections.idp_login_policy_links4.instance_id` +
-		` LEFT JOIN projections.idps3 ON` +
-		` projections.idp_login_policy_links4.idp_id = projections.idps3.id` +
-		` AND projections.idp_login_policy_links4.instance_id = projections.idps3.instance_id`
+		` projections.login_policies4.multi_factor_check_lifetime` +
+		` FROM projections.login_policies4`
 	loginPolicyCols = []string{
 		"aggregate_id",
 		"creation_date",
@@ -72,9 +63,6 @@ var (
 		"mfa_init_skip_lifetime",
 		"second_factor_check_lifetime",
 		"multi_factor_check_lifetime",
-		"idp_id",
-		"name",
-		"type",
 	}
 )
 
@@ -138,9 +126,6 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						time.Hour * 2,
 						time.Hour * 2,
 						time.Hour * 2,
-						"config1",
-						"IDP",
-						domain.IDPConfigTypeJWT,
 					},
 				),
 			},
@@ -168,13 +153,6 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				MFAInitSkipLifetime:        time.Hour * 2,
 				SecondFactorCheckLifetime:  time.Hour * 2,
 				MultiFactorCheckLifetime:   time.Hour * 2,
-				IDPLinks: []*IDPLoginPolicyLink{
-					{
-						IDPID:   "config1",
-						IDPName: "IDP",
-						IDPType: domain.IDPConfigTypeJWT,
-					},
-				},
 			},
 		},
 		{

@@ -129,6 +129,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 		e,
 		[]handler.Condition{
 			handler.NewCond(PersonalAccessTokenColumnID, e.TokenID),
+			handler.NewCond(PersonalAccessTokenColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -142,6 +143,7 @@ func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event
 		e,
 		[]handler.Condition{
 			handler.NewCond(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
+			handler.NewCond(PersonalAccessTokenColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

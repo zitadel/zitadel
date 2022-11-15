@@ -29,7 +29,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "project.GrantMemberAddedType",
+			name: "project GrantMemberAddedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.GrantMemberAddedType),
@@ -90,7 +90,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.GrantMemberChangedType",
+			name: "project GrantMemberChangedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.GrantMemberChangedType),
@@ -110,11 +110,12 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grant_members3 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5) AND (grant_id = $6)",
+							expectedStmt: "UPDATE projections.project_grant_members3 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5) AND (project_id = $6) AND (grant_id = $7)",
 							expectedArgs: []interface{}{
 								database.StringArray{"role", "changed"},
 								anyArg{},
 								uint64(15),
+								"instance-id",
 								"user-id",
 								"agg-id",
 								"grant-id",
@@ -125,7 +126,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.GrantMemberCascadeRemovedType",
+			name: "project GrantMemberCascadeRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.GrantMemberCascadeRemovedType),
@@ -144,8 +145,9 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (user_id = $1) AND (project_id = $2) AND (grant_id = $3)",
+							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (instance_id = $1) AND (user_id = $2) AND (project_id = $3) AND (grant_id = $4)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 								"agg-id",
 								"grant-id",
@@ -156,7 +158,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.GrantMemberRemovedType",
+			name: "project GrantMemberRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.GrantMemberRemovedType),
@@ -175,8 +177,9 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (user_id = $1) AND (project_id = $2) AND (grant_id = $3)",
+							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (instance_id = $1) AND (user_id = $2) AND (project_id = $3) AND (grant_id = $4)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 								"agg-id",
 								"grant-id",
@@ -187,7 +190,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.UserRemovedEventType",
+			name: "user UserRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.UserRemovedType),
@@ -203,8 +206,9 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -213,7 +217,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.ProjectRemovedEventType",
+			name: "project ProjectRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ProjectRemovedType),
@@ -229,8 +233,9 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (instance_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -238,7 +243,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				},
 			},
 		}, {
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -264,7 +269,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.GrantRemovedEventType",
+			name: "project GrantRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.GrantRemovedType),
@@ -280,8 +285,9 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (grant_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_grant_members3 WHERE (instance_id = $1) AND (grant_id = $2) AND (project_id = $3)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"grant-id",
 								"agg-id",
 							},
@@ -291,7 +297,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgRemovedEventType",
+			name: "org OrgRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgRemovedEventType),

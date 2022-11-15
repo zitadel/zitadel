@@ -41,9 +41,10 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grants3 WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_grants3 WHERE (project_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -51,7 +52,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -93,10 +94,11 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grants3 WHERE (grant_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_grants3 WHERE (grant_id = $1) AND (project_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -120,13 +122,14 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.ProjectGrantStateActive,
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -150,13 +153,14 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.ProjectGrantStateInactive,
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -180,13 +184,14 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								database.StringArray{"admin", "user"},
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -210,13 +215,14 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								database.StringArray{"admin", "user"},
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},

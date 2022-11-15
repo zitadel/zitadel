@@ -80,11 +80,12 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (user_id = $2) AND (external_user_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (user_id = $2) AND (external_user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
 								"external-user-id",
+								"instance-id",
 							},
 						},
 					},
@@ -111,11 +112,12 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (user_id = $2) AND (external_user_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (user_id = $2) AND (external_user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
 								"external-user-id",
+								"instance-id",
 							},
 						},
 					},
@@ -139,13 +141,13 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_user_links3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "UPDATE projections.idp_user_links3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (resource_owner = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								true,
-								"instance-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -153,7 +155,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -195,9 +197,10 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -205,7 +208,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.IDPConfigRemovedEvent",
+			name: "org IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.IDPConfigRemovedEventType),
@@ -223,10 +226,11 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -234,7 +238,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.IDPConfigRemovedEvent",
+			name: "iam IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigRemovedEventType),
@@ -252,10 +256,11 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.idp_user_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},

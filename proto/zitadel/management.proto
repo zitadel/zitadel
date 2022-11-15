@@ -3140,6 +3140,14 @@ message ImportHumanUserRequest {
         string value = 1;
         string algorithm = 2;
     }
+    message IDP {
+        // internal id of the IDP in ZITADEL
+        string config_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        // id of the user on the IDP
+        string external_user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        // (display) name of the user on the IDP
+        string display_name = 3 [(validate.rules).string = {max_len: 200}];
+    }
 
     string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
@@ -3150,8 +3158,8 @@ message ImportHumanUserRequest {
     HashedPassword hashed_password = 6;
     bool password_change_required = 7;
     bool request_passwordless_registration = 8;
-
     string otp_code = 9;
+    repeated IDP idps = 10;
 }
 
 message ImportHumanUserResponse {

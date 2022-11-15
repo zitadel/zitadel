@@ -143,6 +143,7 @@ func (p *projectRoleProjection) reduceProjectRoleChanged(event eventstore.Event)
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -157,6 +158,7 @@ func (p *projectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event)
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -170,6 +172,7 @@ func (p *projectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*h
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

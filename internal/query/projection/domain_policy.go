@@ -161,6 +161,7 @@ func (p *domainPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 		cols,
 		[]handler.Condition{
 			handler.NewCond(DomainPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(DomainPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -173,6 +174,7 @@ func (p *domainPolicyProjection) reduceRemoved(event eventstore.Event) (*handler
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(DomainPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(DomainPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 

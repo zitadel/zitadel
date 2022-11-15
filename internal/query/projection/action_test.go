@@ -77,13 +77,14 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions3 SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.actions3 SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"name2",
 								"name2(){}",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -107,12 +108,13 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions3 SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions3 SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.ActionStateInactive,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -136,12 +138,13 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.actions3 SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions3 SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.ActionStateActive,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -165,9 +168,10 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.actions3 WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.actions3 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},

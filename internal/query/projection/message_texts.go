@@ -217,6 +217,7 @@ func (p *messageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 			handler.NewCond(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
 			handler.NewCond(MessageTextTypeCol, templateEvent.Template),
 			handler.NewCond(MessageTextLanguageCol, templateEvent.Language.String()),
+			handler.NewCond(MessageTextInstanceIDCol, templateEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -240,6 +241,7 @@ func (p *messageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 			handler.NewCond(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
 			handler.NewCond(MessageTextTypeCol, templateEvent.Template),
 			handler.NewCond(MessageTextLanguageCol, templateEvent.Language.String()),
+			handler.NewCond(MessageTextInstanceIDCol, templateEvent.Aggregate().InstanceID),
 		},
 	), nil
 }

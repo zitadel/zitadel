@@ -39,11 +39,12 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.flow_triggers2 WHERE (flow_type = $1) AND (trigger_type = $2) AND (resource_owner = $3)",
+							expectedStmt: "DELETE FROM projections.flow_triggers2 WHERE (flow_type = $1) AND (trigger_type = $2) AND (resource_owner = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								domain.FlowTypeExternalAuthentication,
 								domain.TriggerTypePostAuthentication,
 								"ro-id",
+								"instance-id",
 							},
 						},
 						{
@@ -93,10 +94,11 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.flow_triggers2 WHERE (flow_type = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.flow_triggers2 WHERE (flow_type = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.FlowTypeExternalAuthentication,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -134,7 +136,7 @@ func TestFlowProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),

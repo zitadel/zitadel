@@ -91,6 +91,7 @@ func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (
 			handler.NewCol(MemberSequence, e.Sequence()),
 		},
 		conds: []handler.Condition{
+			handler.NewCond(MemberInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(MemberUserIDCol, e.UserID),
 		}}
 
@@ -104,6 +105,7 @@ func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (
 func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		conds: []handler.Condition{
+			handler.NewCond(MemberInstanceID, e.Aggregate().InstanceID),
 			handler.NewCond(MemberUserIDCol, e.UserID),
 		}}
 
@@ -115,7 +117,9 @@ func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, opts ...redu
 
 func reduceMemberRemoved(e eventstore.Event, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
-		conds: []handler.Condition{},
+		conds: []handler.Condition{
+			handler.NewCond(MemberInstanceID, e.Aggregate().InstanceID),
+		},
 	}
 
 	for _, opt := range opts {

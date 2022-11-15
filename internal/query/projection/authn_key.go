@@ -59,8 +59,8 @@ func newAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 			crdb.NewColumn(AuthNKeyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
-			crdb.WithIndex(crdb.NewIndex("enabled", []string{AuthNKeyEnabledCol})),
-			crdb.WithIndex(crdb.NewIndex("identifier", []string{AuthNKeyIdentifierCol})),
+			crdb.WithIndex(crdb.NewIndex("enabled_idx", []string{AuthNKeyEnabledCol})),
+			crdb.WithIndex(crdb.NewIndex("identifier_idx", []string{AuthNKeyIdentifierCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -217,7 +217,10 @@ func (p *authNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 			handler.NewCol(AuthNKeySequenceCol, sequence),
 			handler.NewCol(AuthNKeyEnabledCol, enabled),
 		},
-		[]handler.Condition{handler.NewCond(AuthNKeyObjectIDCol, appID)},
+		[]handler.Condition{
+			handler.NewCond(AuthNKeyObjectIDCol, appID),
+			handler.NewCond(AuthNKeyInstanceIDCol, event.Aggregate().InstanceID),
+		},
 	), nil
 }
 
@@ -239,7 +242,10 @@ func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 	}
 	return crdb.NewDeleteStatement(
 		event,
-		[]handler.Condition{condition},
+		[]handler.Condition{
+			condition,
+			handler.NewCond(AuthNKeyInstanceIDCol, event.Aggregate().InstanceID),
+		},
 	), nil
 }
 

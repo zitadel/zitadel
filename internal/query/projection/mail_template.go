@@ -146,6 +146,7 @@ func (p *mailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 		cols,
 		[]handler.Condition{
 			handler.NewCond(MailTemplateAggregateIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(MailTemplateInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -158,6 +159,7 @@ func (p *mailTemplateProjection) reduceRemoved(event eventstore.Event) (*handler
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(MailTemplateAggregateIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(MailTemplateInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 

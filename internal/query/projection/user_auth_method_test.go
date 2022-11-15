@@ -153,7 +153,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -163,6 +163,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								domain.UserAuthMethodTypePasswordless,
 								"ro-id",
 								"token-id",
+								"instance-id",
 							},
 						},
 					},
@@ -189,7 +190,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -199,6 +200,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								domain.UserAuthMethodTypeU2F,
 								"ro-id",
 								"token-id",
+								"instance-id",
 							},
 						},
 					},
@@ -223,7 +225,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -233,6 +235,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								domain.UserAuthMethodTypeOTP,
 								"ro-id",
 								"",
+								"instance-id",
 							},
 						},
 					},
@@ -240,7 +243,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceOwnerRemoved",
+			name:   "org reduceOwnerRemoved",
 			reduce: (&userAuthMethodProjection{}).reduceOwnerRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -270,7 +273,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),

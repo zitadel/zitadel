@@ -318,6 +318,7 @@ func (p *labelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -330,6 +331,7 @@ func (p *labelPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -431,6 +433,7 @@ func (p *labelPolicyProjection) reduceLogoAdded(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -459,6 +462,7 @@ func (p *labelPolicyProjection) reduceLogoRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -487,6 +491,7 @@ func (p *labelPolicyProjection) reduceIconAdded(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -515,6 +520,7 @@ func (p *labelPolicyProjection) reduceIconRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -539,6 +545,7 @@ func (p *labelPolicyProjection) reduceFontAdded(event eventstore.Event) (*handle
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -563,6 +570,7 @@ func (p *labelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -588,6 +596,7 @@ func (p *labelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*ha
 		[]handler.Condition{
 			handler.NewCond(LabelPolicyIDCol, event.Aggregate().ID),
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
+			handler.NewCond(LabelPolicyInstanceIDCol, event.Aggregate().InstanceID),
 		}), nil
 }
 

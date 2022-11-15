@@ -1619,7 +1619,7 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceOwnerRemoved",
+			name:   "org reduceOwnerRemoved",
 			reduce: (&userProjection{}).reduceOwnerRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -1649,7 +1649,7 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),

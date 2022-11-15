@@ -286,6 +286,7 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string, withOw
 	stmt, scan := prepareAppQuery()
 	eq := sq.Eq{
 		AppSAMLConfigColumnEntityID.identifier(): entityID,
+		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
 		eq[AppColumnOwnerRemoved.identifier()] = false
@@ -301,19 +302,18 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string, withOw
 
 func (q *Queries) ProjectByClientID(ctx context.Context, appID string, withOwnerRemoved bool) (*Project, error) {
 	stmt, scan := prepareProjectByAppQuery()
-	var where sq.Sqlizer
-	where = sq.Or{
-		sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
-		sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
-		sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
-	}
+	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		where = sq.And{
-			where,
-			sq.Eq{ProjectColumnOwnerRemoved.identifier(): false},
-		}
+		eq[ProjectColumnOwnerRemoved.identifier()] = false
 	}
-	query, args, err := stmt.Where(where).ToSql()
+	query, args, err := stmt.Where(sq.And{
+		eq,
+		sq.Or{
+			sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+			sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+			sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
+		},
+	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-XhJi3", "Errors.Query.SQLStatement")
 	}
