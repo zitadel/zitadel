@@ -7,7 +7,7 @@ import (
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
-func (s *Server) ListFailedEvents(ctx context.Context, req *system_pb.ListFailedEventsRequest) (*system_pb.ListFailedEventsResponse, error) {
+func (s *Server) ListFailedEvents(ctx context.Context, _ *system_pb.ListFailedEventsRequest) (*system_pb.ListFailedEventsResponse, error) {
 	failedEventsOld, err := s.administrator.GetFailedEvents(ctx, "")
 	if err != nil {
 		return nil, err

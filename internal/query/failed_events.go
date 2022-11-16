@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -44,6 +43,10 @@ var (
 	}
 	FailedEventsColumnError = Column{
 		name:  failedEventsColumnError,
+		table: failedEventsTable,
+	}
+	FailedEventsColumnInstanceID = Column{
+		name:  failedEventsColumnInstanceID,
 		table: failedEventsTable,
 	}
 )
@@ -92,7 +95,7 @@ func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName, instanc
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-DGgh3", "Errors.RemoveFailed")
 	}
-	_, err = q.client.Exec(stmt, args...)
+	_, err = q.client.ExecContext(ctx, stmt, args...)
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
 	}
@@ -118,31 +121,6 @@ func (q *FailedEventSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 		query = q.toQuery(query)
 	}
 	return query
-}
-
-func prepareFailedEventQuery(instanceIDs ...string) (sq.SelectBuilder, func(*sql.Row) (*FailedEvent, error)) {
-	return sq.Select(
-			FailedEventsColumnProjectionName.identifier(),
-			FailedEventsColumnFailedSequence.identifier(),
-			FailedEventsColumnFailureCount.identifier(),
-			FailedEventsColumnError.identifier()).
-			From(failedEventsTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*FailedEvent, error) {
-			p := new(FailedEvent)
-			err := row.Scan(
-				&p.ProjectionName,
-				&p.FailedSequence,
-				&p.FailureCount,
-				&p.Error,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-5N00f", "Errors.FailedEvents.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-0oJf3", "Errors.Internal")
-			}
-			return p, nil
-		}
 }
 
 func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvents, error)) {

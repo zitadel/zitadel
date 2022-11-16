@@ -8,7 +8,7 @@ import (
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func (s *Server) ListFailedEvents(ctx context.Context, req *admin_pb.ListFailedEventsRequest) (*admin_pb.ListFailedEventsResponse, error) {
+func (s *Server) ListFailedEvents(ctx context.Context, _ *admin_pb.ListFailedEventsRequest) (*admin_pb.ListFailedEventsResponse, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	failedEventsOld, err := s.administrator.GetFailedEvents(ctx, instanceID)
 	if err != nil {

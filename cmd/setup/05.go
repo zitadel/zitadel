@@ -3,12 +3,12 @@ package setup
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 )
 
-const (
-	adminAPI    = `ALTER TABLE adminapi.failed_events ADD COLUMN last_failed TIMESTAMPTZ;`
-	auth        = `ALTER TABLE auth.failed_events ADD COLUMN last_failed TIMESTAMPTZ;`
-	projections = `ALTER TABLE projections.failed_events ADD COLUMN last_failed TIMESTAMPTZ;`
+var (
+	//go:embed 05.sql
+	lastFailedStmts string
 )
 
 type LastFailed struct {
@@ -16,7 +16,7 @@ type LastFailed struct {
 }
 
 func (mig *LastFailed) Execute(ctx context.Context) error {
-	_, err := mig.dbClient.ExecContext(ctx, adminAPI+auth+projections)
+	_, err := mig.dbClient.ExecContext(ctx, lastFailedStmts)
 	return err
 }
 
