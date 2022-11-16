@@ -81,6 +81,7 @@ func newIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
 			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{IDPResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{IDPOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText),

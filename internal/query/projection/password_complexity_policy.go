@@ -58,6 +58,7 @@ func newPasswordComplexityProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(ComplexityPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ComplexityPolicyInstanceIDCol, ComplexityPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ComplexityPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

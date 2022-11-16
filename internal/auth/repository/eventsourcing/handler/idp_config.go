@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	idpConfigTable = "auth.idp_configs"
+	idpConfigTable = "auth.idp_configs2"
 )
 
 type IDPConfig struct {

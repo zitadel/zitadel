@@ -49,6 +49,7 @@ func newIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementH
 		},
 			crdb.NewPrimaryKey(IDPLoginPolicyLinkInstanceIDCol, IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
 			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{IDPLoginPolicyLinkResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{IDPLoginPolicyLinkOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

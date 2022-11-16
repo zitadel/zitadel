@@ -89,6 +89,7 @@ func newAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppColumnInstanceID, AppColumnID),
 			crdb.WithIndex(crdb.NewIndex("project_id", []string{AppColumnProjectID})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{AppColumnOwnerRemoved})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText),

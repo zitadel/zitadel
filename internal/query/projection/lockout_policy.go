@@ -52,6 +52,7 @@ func newLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(LockoutPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LockoutPolicyInstanceIDCol, LockoutPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LockoutPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

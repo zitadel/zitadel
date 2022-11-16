@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	externalIDPTable = "auth.user_external_idps"
+	externalIDPTable = "auth.user_external_idps2"
 )
 
 func (v *View) ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, instanceID string) (*model.ExternalIDPView, error) {

@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	stylingTable = "adminapi.styling"
+	stylingTable = "adminapi.styling2"
 )
 
 type Styling struct {

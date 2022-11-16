@@ -30,6 +30,8 @@ func newOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 			append(memberColumns, crdb.NewColumn(OrgMemberOrgIDCol, crdb.ColumnTypeText)),
 			crdb.NewPrimaryKey(MemberInstanceID, OrgMemberOrgIDCol, MemberUserIDCol),
 			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
+			crdb.WithIndex(crdb.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

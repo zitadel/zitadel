@@ -82,7 +82,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.externalPort = config.ExternalPort
 
 	steps.s4EventstoreIndexes = &EventstoreIndexes{dbClient: dbClient, dbType: config.Database.Type()}
-	steps.s5OwnerRemoveColumns = &OwnerRemovedColumns{dbClient: dbClient, dbType: config.Database.Type()}
+	steps.s5OwnerRemoveColumns = &ProjectionTable05{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")

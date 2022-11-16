@@ -54,6 +54,7 @@ func newDomainPolicyProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(DomainPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(DomainPolicyInstanceIDCol, DomainPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{DomainPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

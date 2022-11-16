@@ -49,6 +49,7 @@ func newOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(OrgDomainOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(OrgDomainOrgIDCol, OrgDomainDomainCol, OrgDomainInstanceIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{OrgDomainOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

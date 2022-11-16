@@ -49,6 +49,7 @@ func newProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(ProjectRoleColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(ProjectRoleColumnInstanceID, ProjectRoleColumnProjectID, ProjectRoleColumnKey),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ProjectRoleColumnOwnerRemoved})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

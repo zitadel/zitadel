@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	idpConfigTable = "auth.idp_configs"
+	idpConfigTable = "auth.idp_configs2"
 )
 
 func (v *View) IDPConfigByID(idpID, instanceID string) (*iam_es_model.IDPConfigView, error) {

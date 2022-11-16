@@ -62,6 +62,7 @@ func newMessageTextProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(MessageTextOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(MessageTextInstanceIDCol, MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MessageTextOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

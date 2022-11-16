@@ -3,34 +3,26 @@ package setup
 import (
 	"context"
 	"database/sql"
-	"embed"
+	_ "embed"
 )
 
 var (
-	//go:embed 05/cockroach/columns.sql
-	//go:embed 05/postgres/columns.sql
-	readOwnerRemovedColumnsStmts embed.FS
+	//go:embed 05/adminapi.sql
+	createAdminViews05 string
+	//go:embed 05/auth.sql
+	createAuthViews05 string
 )
 
-type OwnerRemovedColumns struct {
+type ProjectionTable05 struct {
 	dbClient *sql.DB
-	dbType   string
 }
 
-func (mig *OwnerRemovedColumns) Execute(ctx context.Context) error {
-	readOwnerRemovedColumnsStmts, err := readOwnerRemovedColumnsStmt(mig.dbType)
-	if err != nil {
-		return err
-	}
-	_, err = mig.dbClient.ExecContext(ctx, readOwnerRemovedColumnsStmts)
+func (mig *ProjectionTable05) Execute(ctx context.Context) error {
+	stmt := createAdminViews05 + createAuthViews05
+	_, err := mig.dbClient.ExecContext(ctx, stmt)
 	return err
 }
 
-func (mig *OwnerRemovedColumns) String() string {
-	return "05_owner_removed_columns"
-}
-
-func readOwnerRemovedColumnsStmt(typ string) (string, error) {
-	readOwnerRemovedColumnsStmts, err := readOwnerRemovedColumnsStmts.ReadFile("05/" + typ + "/columns.sql")
-	return string(readOwnerRemovedColumnsStmts), err
+func (mig *ProjectionTable05) String() string {
+	return "05_tables"
 }

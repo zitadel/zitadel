@@ -31,6 +31,7 @@ func newInstanceMemberProjection(ctx context.Context, config crdb.StatementHandl
 			append(memberColumns, crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText)),
 			crdb.NewPrimaryKey(MemberInstanceID, InstanceColumnID, MemberUserIDCol),
 			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
 		),
 	)
 

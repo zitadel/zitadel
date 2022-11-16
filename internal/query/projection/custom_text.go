@@ -51,6 +51,7 @@ func newCustomTextProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(CustomTextOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(CustomTextInstanceIDCol, CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{CustomTextOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

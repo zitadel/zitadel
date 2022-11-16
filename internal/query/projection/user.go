@@ -94,6 +94,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
 			crdb.WithIndex(crdb.NewIndex("username", []string{UserUsernameCol})),
 			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{UserResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{UserOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText),

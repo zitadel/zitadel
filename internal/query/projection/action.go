@@ -54,6 +54,7 @@ func newActionProjection(ctx context.Context, config crdb.StatementHandlerConfig
 		},
 			crdb.NewPrimaryKey(ActionInstanceIDCol, ActionIDCol),
 			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{ActionResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ActionOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

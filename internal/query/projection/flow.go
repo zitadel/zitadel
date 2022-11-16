@@ -45,6 +45,7 @@ func newFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(FlowOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(FlowInstanceIDCol, FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{FlowOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

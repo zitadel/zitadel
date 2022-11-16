@@ -52,6 +52,7 @@ func newPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(AgePolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(AgePolicyInstanceIDCol, AgePolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{AgePolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

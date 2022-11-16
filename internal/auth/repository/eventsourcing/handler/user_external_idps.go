@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	externalIDPTable = "auth.user_external_idps"
+	externalIDPTable = "auth.user_external_idps2"
 )
 
 type ExternalIDP struct {

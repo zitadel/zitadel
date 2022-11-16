@@ -48,6 +48,7 @@ func newMailTemplateProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(MailTemplateOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(MailTemplateInstanceIDCol, MailTemplateAggregateIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MailTemplateOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

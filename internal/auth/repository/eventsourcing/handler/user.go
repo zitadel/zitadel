@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	userTable = "auth.users"
+	userTable = "auth.users2"
 )
 
 type User struct {

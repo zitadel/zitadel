@@ -46,6 +46,7 @@ func newOrgMetadataProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(OrgMetadataColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(OrgMetadataColumnInstanceID, OrgMetadataColumnOrgID, OrgMetadataColumnKey),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{OrgMetadataColumnOwnerRemoved})),
 		),
 	)
 

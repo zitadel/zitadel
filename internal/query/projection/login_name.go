@@ -191,6 +191,7 @@ func newLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
 			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{LoginNameUserResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNameUserOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),
@@ -201,6 +202,7 @@ func newLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 		},
 			crdb.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNameDomainOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LoginNamePoliciesMustBeDomainCol, crdb.ColumnTypeBool),
@@ -212,6 +214,7 @@ func newLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewPrimaryKey(LoginNamePoliciesInstanceIDCol, LoginNamePoliciesResourceOwnerCol),
 			loginNamePolicySuffix,
 			crdb.WithIndex(crdb.NewIndex("is_default", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNamePoliciesOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

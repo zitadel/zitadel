@@ -82,6 +82,7 @@ func newLabelPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LabelPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LabelPolicyInstanceIDCol, LabelPolicyIDCol, LabelPolicyStateCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LabelPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -54,6 +54,7 @@ func newPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(PrivacyPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{PrivacyPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

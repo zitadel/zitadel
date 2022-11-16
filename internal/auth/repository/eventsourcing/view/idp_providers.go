@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	idpProviderTable = "auth.idp_providers"
+	idpProviderTable = "auth.idp_providers2"
 )
 
 func (v *View) IDPProviderByAggregateAndIDPConfigID(aggregateID, idpConfigID, instanceID string) (*model.IDPProviderView, error) {

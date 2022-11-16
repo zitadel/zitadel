@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	orgProjectMappingTable = "auth.org_project_mapping"
+	orgProjectMappingTable = "auth.org_project_mapping2"
 )
 
 type OrgProjectMapping struct {

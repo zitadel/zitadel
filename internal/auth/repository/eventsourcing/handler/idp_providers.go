@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	idpProviderTable = "auth.idp_providers"
+	idpProviderTable = "auth.idp_providers2"
 )
 
 type IDPProvider struct {

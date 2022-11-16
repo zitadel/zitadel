@@ -79,6 +79,7 @@ func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LoginPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

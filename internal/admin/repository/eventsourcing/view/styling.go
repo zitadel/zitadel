@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	stylingTyble = "adminapi.styling"
+	stylingTyble = "adminapi.styling2"
 )
 
 func (v *View) StylingByAggregateIDAndState(aggregateID, instanceID string, state int32) (*model.LabelPolicyView, error) {

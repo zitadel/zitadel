@@ -57,6 +57,8 @@ func newProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
 			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{ProjectGrantColumnResourceOwner})),
 			crdb.WithIndex(crdb.NewIndex("granted_org", []string{ProjectGrantColumnGrantedOrgID})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ProjectGrantColumnOwnerRemoved})),
+			crdb.WithIndex(crdb.NewIndex("granted_org_removed", []string{ProjectGrantColumnGrantedOrgRemoved})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

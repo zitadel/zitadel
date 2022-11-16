@@ -40,6 +40,9 @@ func newProjectGrantMemberProjection(ctx context.Context, config crdb.StatementH
 			),
 			crdb.NewPrimaryKey(MemberInstanceID, ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
 			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
+			crdb.WithIndex(crdb.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
+			crdb.WithIndex(crdb.NewIndex("granted_org_removed", []string{ProjectGrantMemberGrantedOrgRemoved})),
 		),
 	)
 
