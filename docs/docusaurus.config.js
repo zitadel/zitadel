@@ -19,10 +19,17 @@ module.exports = {
     },
   ],
   customFields: {
-    description: "Documentation for ZITADEL - The best of Auth0 and Keycloak combined. Built for the serverless era.",
+    description:
+      "Documentation for ZITADEL - The best of Auth0 and Keycloak combined. Built for the serverless era.",
   },
   themeConfig: {
-    metadata: [{name: 'keywords', content: 'zitadel, documentation, jwt, saml, oauth2, authentication, serverless, login, auth, authorization, sso, openid-connect, oidc, mfa, 2fa, passkeys, fido2, docker'}],
+    metadata: [
+      {
+        name: "keywords",
+        content:
+          "zitadel, documentation, jwt, saml, oauth2, authentication, serverless, login, auth, authorization, sso, openid-connect, oidc, mfa, 2fa, passkeys, fido2, docker",
+      },
+    ],
     zoom: {
       selector: ".markdown :not(em) > img",
       background: {
@@ -90,6 +97,12 @@ module.exports = {
           label: "Discussions",
           position: "right",
           href: "https://github.com/zitadel/zitadel/discussions",
+        },
+        {
+          type: "html",
+          position: "right",
+          value:
+            '<a href="/docs/settings/environment" style="text-decoration: none; width: 24px; height: 24px; display: flex"><i class="las la-cog"></i></a>',
         },
       ],
     },
@@ -185,7 +198,10 @@ module.exports = {
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
-          remarkPlugins: [require("mdx-mermaid")],
+          remarkPlugins: [
+            require("mdx-mermaid"),
+            // require("./src/plugin/environmentvars/index.js"),
+          ],
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -193,6 +209,14 @@ module.exports = {
       },
     ],
   ],
-  plugins: [require.resolve("docusaurus-plugin-image-zoom")],
+  plugins: [
+    require.resolve("docusaurus-plugin-image-zoom"),
+    [
+      "./src/plugin/environmentvars/index.js",
+      {
+        instance: "hello",
+      },
+    ],
+  ],
   themes: ["@saucelabs/theme-github-codeblock"],
 };

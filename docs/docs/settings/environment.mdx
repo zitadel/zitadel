@@ -1,0 +1,18 @@
+---
+title: Environment Variables
+---
+
+import { Environment } from "../../src/components/environment";
+import EnvironmentContext from "../../src/utils/environment";
+import { useContext } from "react";
+
+export const Instance = () => {
+  const { instance } = useContext(EnvironmentContext);
+  return <div>{instance}</div>;
+};
+
+Enter your environment variables which are prefilled in docs here or use the documentation links in your instance console.
+
+<Environment />
+
+<Instance />
