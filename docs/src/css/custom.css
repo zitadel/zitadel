@@ -129,6 +129,9 @@
   --footer-border: rgba(0, 0, 0, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
   --ifm-pagination-nav-color-hover: #000000;
+  --input-border: #1a191954;
+  --input-hover-border: #000000;
+  --input-background: #00000004;
 }
 
 pre code {
@@ -303,6 +306,9 @@ h2 {
   --footer-border: rgba(255, 255, 255, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
   --ifm-pagination-nav-color-hover: #ffffff;
+  --input-border: #f9f7f775;
+  --input-hover-border: #ffffff;
+  --input-background: #00000040;
 }
 
 .get-started:hover {

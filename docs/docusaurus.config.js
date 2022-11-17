@@ -211,12 +211,12 @@ module.exports = {
   ],
   plugins: [
     require.resolve("docusaurus-plugin-image-zoom"),
-    [
-      "./src/plugin/environmentvars/index.js",
-      {
-        instance: "hello",
-      },
-    ],
+    // [
+    //   "./src/plugin/environmentvars/index.js",
+    //   {
+    //     instance: "hello",
+    //   },
+    // ],
   ],
   themes: ["@saucelabs/theme-github-codeblock"],
 };

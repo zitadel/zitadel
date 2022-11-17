@@ -1,18 +1,12 @@
-import { EnvironmentContext } from "../../utils/environment";
-
 var tokenizer = require("./lib/tokenizer");
 var visitor = require("./lib/visitor");
 var utils = require("./lib/utils");
-const { instance } = useContext(EnvironmentContext);
 
 module.exports = variables;
 
 function variables(options) {
   options = utils.settings(options);
-
-  console.log(options);
   var self = this;
-  console.log(self, instance);
   var parser = self.Parser;
   var compiler = self.Compiler;
   var data = self.data();
