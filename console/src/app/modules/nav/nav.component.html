@@ -121,14 +121,14 @@
                   >
                     <div class="c_label">
                       <span> {{ 'MENU.PROJECT' | translate }} </span>
-                      <small
-                        *ngIf="(mgmtService?.ownedProjectsCount | async) && (mgmtService?.grantedProjectsCount | async)"
-                        class="count"
-                        >({{
-                          ((mgmtService.ownedProjectsCount | async) ?? 0) +
-                            ((mgmtService.grantedProjectsCount | async) ?? 0)
-                        }})</small
-                      >
+                      <ng-container *ngIf="projectcounter | async as count">
+                        <div *ngIf="count < 100" class="count">
+                          <span>{{ count }}</span>
+                        </div>
+                        <div *ngIf="count >= 100" class="count">
+                          <span>99+</span>
+                        </div>
+                      </ng-container>
                     </div>
                   </a>
                 </ng-template>
