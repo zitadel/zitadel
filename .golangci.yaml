@@ -33,7 +33,7 @@ linters:
     # Computes and checks the cognitive complexity of functions [fast: true, auto-fix: false]
     - gocognit
     # Checks Go code for unused constants, variables, functions and types [fast: false, auto-fix: false]
-    - unused 
+    - unused
     # Errcheck is a program for checking for unchecked errors in go programs. These unchecked errors can be critical bugs in some cases [fast: false, auto-fix: false]
     - errcheck
     # Checks that sentinel errors are prefixed with the `Err` and error types are suffixed with the `Error`. [fast: false, auto-fix: false]
@@ -59,7 +59,7 @@ linters:
     # Finds naked returns in functions greater than a specified function length [fast: true, auto-fix: false]
     - nakedret
     # Staticcheck is a go vet on steroids, applying a ton of static analysis checks [fast: false, auto-fix: false]
-    - staticcheck 
+    - staticcheck
     # Like the front-end of a Go compiler, parses and type-checks Go code [fast: false, auto-fix: false]
     - typecheck
     # Reports ill-formed or insufficient nolint directives [fast: true, auto-fix: false]
@@ -295,3 +295,10 @@ linters:
     # Whitespace Linter - Forces you to use empty lines! [fast: true, auto-fix: false]
     # FUTURE: improves code quality by allowing and blocking line breaks
     - wsl
+linters-settings:
+  gci:
+    sections:
+      - standard # Standard section: captures all standard packages.
+      - default # Default section: contains all imports that could not be matched to another section type.
+      - prefix(github.com/zitadel/zitadel) # Custom section: groups all imports with the specified Prefix.
+      - blank # Blank section: contains all blank imports. This section is not present unless explicitly enabled.
