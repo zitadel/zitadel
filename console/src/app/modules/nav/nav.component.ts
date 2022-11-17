@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, map, Observable, Subject, take } from 'rxjs';
+import { BehaviorSubject, combineLatest, forkJoin, map, merge, Observable, Subject, switchMap, take } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -131,5 +131,16 @@ export class NavComponent implements OnDestroy {
 
   public openHelp() {
     this.shortcutService.openOverviewDialog();
+  }
+
+  public get projectcounter(): Observable<number> {
+    return combineLatest({
+      owned: this.mgmtService.ownedProjectsCount,
+      granted: this.mgmtService.grantedProjectsCount,
+    }).pipe(
+      map(({ owned, granted }) => {
+        return (owned ?? 0) + (granted ?? 0);
+      }),
+    );
   }
 }
