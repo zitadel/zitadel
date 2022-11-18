@@ -178,6 +178,7 @@ The ZITADEL Team works with an agile product management methodology.
 You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/1/views/2).
 
 Every two weeks the team goes through all the new issues and decided about the priority, effort and if it is ready to start or in the backlog.
+If it is something critical or urgent we will have a look at it earlier.
 To show the community the needed information, each issue gets labels. 
 
 ## About the Labels
