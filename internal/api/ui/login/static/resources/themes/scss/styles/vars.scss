@@ -44,6 +44,8 @@
 
   --zitadel-color-footer-line: rgba(0, 0, 0, 0.12);
 
+  --zitadel-color-card-hover: #ffffff;
+
   --zitadel-color-input-background: #00000003;
   --zitadel-color-input-border: #1a191938;
   --zitadel-color-input-border-hover: #1a1b1b;
@@ -155,9 +157,11 @@
 
   --zitadel-color-footer-line: rgba(255, 255, 255, 0.12);
 
+  --zitadel-color-card-hover: #ffffff20;
+
   --zitadel-color-input-background: rgba(0, 0, 0, 0.2);
   --zitadel-color-input-border: #f9f7f725;
-  --zitadel-color-input-border-hover: #aeafb1;
+  --zitadel-color-input-border-hover: #ffffff;
   --zitadel-color-input-border-active: var(--zitadel-color-primary-500);
   --zitadel-color-input-placeholder: var(--zitadel-color-grey-600);
 
