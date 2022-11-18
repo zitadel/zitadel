@@ -3,6 +3,7 @@ package spooler
 import (
 	"database/sql"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/static"
 
@@ -19,9 +20,10 @@ type SpoolerConfig struct {
 	Handlers              handler.Configs
 }
 
-func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, sql *sql.DB, static static.Storage) *spooler.Spooler {
+func StartSpooler(c SpoolerConfig, es v1.Eventstore, esV2 *eventstore.Eventstore, view *view.View, sql *sql.DB, static static.Storage) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:          es,
+		EventstoreV2:        esV2,
 		Locker:              &locker{dbClient: sql},
 		ConcurrentWorkers:   c.ConcurrentWorkers,
 		ConcurrentInstances: c.ConcurrentInstances,

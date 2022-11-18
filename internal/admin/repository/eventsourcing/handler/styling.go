@@ -79,9 +79,9 @@ func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error)
 		return nil, err
 	}
 	searchQuery := models.NewSearchQuery()
-	for _, sequence := range sequences {
+	for _, instanceID := range instanceIDs {
 		var seq uint64
-		for _, instanceID := range instanceIDs {
+		for _, sequence := range sequences {
 			if sequence.InstanceID == instanceID {
 				seq = sequence.CurrentSequence
 				break
@@ -90,7 +90,7 @@ func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error)
 		searchQuery.AddQuery().
 			AggregateTypeFilter(m.AggregateTypes()...).
 			LatestSequenceFilter(seq).
-			InstanceIDFilter(sequence.InstanceID)
+			InstanceIDFilter(instanceID)
 	}
 	return searchQuery, nil
 }

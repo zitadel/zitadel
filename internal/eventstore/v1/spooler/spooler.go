@@ -9,6 +9,8 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	v1 "github.com/zitadel/zitadel/internal/eventstore/v1"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/query"
@@ -16,13 +18,19 @@ import (
 	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
-const systemID = "system"
+const (
+	systemID           = "system"
+	schedulerSucceeded = eventstore.EventType("system.projections.scheduler.succeeded")
+	aggregateType      = eventstore.AggregateType("system")
+	aggregateID        = "SYSTEM"
+)
 
 type Spooler struct {
 	handlers            []query.Handler
 	locker              Locker
 	lockID              string
 	eventstore          v1.Eventstore
+	esV2                *eventstore.Eventstore
 	workers             int
 	queue               chan *spooledHandler
 	concurrentInstances int
@@ -37,7 +45,9 @@ type spooledHandler struct {
 	locker              Locker
 	queuedAt            time.Time
 	eventstore          v1.Eventstore
+	esV2                *eventstore.Eventstore
 	concurrentInstances int
+	succeededOnce       bool
 }
 
 func (s *Spooler) Start() {
@@ -57,7 +67,7 @@ func (s *Spooler) Start() {
 	}
 	go func() {
 		for _, handler := range s.handlers {
-			s.queue <- &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore, concurrentInstances: s.concurrentInstances}
+			s.queue <- &spooledHandler{Handler: handler, locker: s.locker, queuedAt: time.Now(), eventstore: s.eventstore, esV2: s.esV2, concurrentInstances: s.concurrentInstances}
 		}
 	}()
 }
@@ -66,6 +76,32 @@ func requeueTask(task *spooledHandler, queue chan<- *spooledHandler) {
 	time.Sleep(task.MinimumCycleDuration() - time.Since(task.queuedAt))
 	task.queuedAt = time.Now()
 	queue <- task
+}
+
+func (s *spooledHandler) hasSucceededOnce(ctx context.Context) (bool, error) {
+	events, err := s.esV2.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(aggregateType).
+		AggregateIDs(aggregateID).
+		EventTypes(schedulerSucceeded).
+		EventData(map[string]interface{}{
+			"name": s.ViewModel(),
+		}).
+		Builder(),
+	)
+	return len(events) > 0 && err == nil, err
+}
+
+func (s *spooledHandler) setSucceededOnce(ctx context.Context) error {
+	_, err := s.esV2.Push(ctx, &handler.ProjectionSucceededEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(ctx,
+			eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
+			schedulerSucceeded,
+		),
+		Name: s.ViewModel(),
+	})
+	s.succeededOnce = err == nil
+	return err
 }
 
 func (s *spooledHandler) load(workerID string) {
@@ -86,8 +122,24 @@ func (s *spooledHandler) load(workerID string) {
 	hasLocked := s.lock(ctx, errs, workerID)
 
 	if <-hasLocked {
+		if !s.succeededOnce {
+			var err error
+			s.succeededOnce, err = s.hasSucceededOnce(ctx)
+			if err != nil {
+				logging.WithFields("view", s.ViewModel()).OnError(err).Warn("initial lock failed for first schedule")
+				errs <- err
+				return
+			}
+		}
+
+		instanceIDQuery := models.NewSearchQuery().SetColumn(models.Columns_InstanceIDs).AddQuery().ExcludedInstanceIDsFilter("")
 		for {
-			ids, err := s.eventstore.InstanceIDs(ctx, models.NewSearchQuery().SetColumn(models.Columns_InstanceIDs).AddQuery().ExcludedInstanceIDsFilter("").SearchQuery())
+			if s.succeededOnce {
+				// since we have at least one successful run, we can restrict it to events not older than
+				// twice the requeue time (just to be sure not to miss an event)
+				instanceIDQuery = instanceIDQuery.CreationDateNewerFilter(time.Now().Add(-2 * s.MinimumCycleDuration()))
+			}
+			ids, err := s.eventstore.InstanceIDs(ctx, instanceIDQuery.SearchQuery())
 			if err != nil {
 				errs <- err
 				break
@@ -103,6 +155,10 @@ func (s *spooledHandler) load(workerID string) {
 				}
 			}
 			if ctx.Err() == nil {
+				if !s.succeededOnce {
+					err = s.setSucceededOnce(ctx)
+					logging.WithFields("view", s.ViewModel()).OnError(err).Warn("unable to push first schedule succeeded")
+				}
 				errs <- nil
 			}
 			break
