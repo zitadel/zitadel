@@ -149,9 +149,7 @@ func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvent
 				if err != nil {
 					return nil, err
 				}
-				if lastFailed.Valid {
-					failedEvent.LastFailed = lastFailed.Time
-				}
+				failedEvent.LastFailed = lastFailed.Time
 				failedEvents = append(failedEvents, failedEvent)
 			}
 
