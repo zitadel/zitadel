@@ -171,3 +171,76 @@ See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
+
+## Product Management
+
+The ZITADEL Team works with an agile product management methodology.
+You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/1/views/2).
+
+Every two weeks the team goes through all the new issues and decided about the priority, effort and if it is ready to start or in the backlog.
+To show the community the needed information, each issue gets labels. 
+
+## About the Labels
+
+There are a few general labels that don't belong to a specific category.
+
+- <span style="color:#B8D371">**good first issue**</span>: This label shows contibuters, that it is an easy entry point to start developing on ZITADEL.
+- <span style="color:#B8D371">**help wanted**</span>: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors. 
+
+### Priority
+
+Priority shows you the priority the ZITADEL team has given this issue. In general the more customers want a feature the higher the priority gets.
+
+- <span style="color:#B60205">**priority: critical**</span>: This is a security issue or something that has to be fixed urgently, because customers can't work anymore.
+- <span style="color:#D93F0B">**priority: high**</span>: These are the issues the ZITADEL Team is currently focusing on and will be implemented as soon as possible.
+- <span style="color:#FBCA04">**priority: medium**</span>: After all the high issues are done these will be next.
+- <span style="color:#0E8A16">**priority: low**</span>: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
+
+### State
+
+The state should reflect the progress of the issue and what is going on right now.
+
+- <span style="color:#5319E7">**state: triage**</span>: Each issue gets this state automatically on creating and it means the ZITADEL team should have a look at it, prioritize and sort into categories or ask for more information if needed.
+- <span style="color:#5319E7">**state: tbd**</span>: If the issue has the state tbd (to be defined) it means the team does need more information either from the author or internal.
+- <span style="color:#5319E7">**state: backlog**</span>: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be processed in the future. Issues with this state do not have to be completely defined yet.
+- <span style="color:#5319E7">**state: ready**</span>: An issue with the state ready is ready to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
+- <span style="color:#5319E7">**state: in progress**</span>: Someone is working on this issue right now.
+- <span style="color:#5319E7">**state: waiting**</span>: For some reason, this issue will have to wait. This can be a feedback that is being waited for, a dependent issue or anything else. 
+- <span style="color:#5319E7">**state: duplicate**</span>: The same issue already exists. This issue will probably be closed with a reference to the other issue.
+
+### Category
+
+The category shows which part of ZITADEL is affected.
+
+- <span style="color:#006B75">**category: backend**</span>: The backend includes the APIs, event store, command and query side. This is developed in golang.
+- <span style="color:#006B75">**category: ci**</span>: ci is all about continues integration and pipelines.
+- <span style="color:#006B75">**category: design**</span>: All about the ux/ui of ZITADEL
+- <span style="color:#006B75">**category: docs**</span>: Adjustments or new documentations, this can be found in the docs folder.
+- <span style="color:#006B75">**category: frontend**</span>: The frontend concerns on the one hand the ZITADEL management console (Angular) and on the other hand the login (gohtml)
+- <span style="color:#006B75">**category: infra**</span>: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
+- <span style="color:#006B75">**category: translation**</span>: Everything concerning translations or new languages
+
+### Language
+
+The language shows you in which programming language the affected part is written
+
+- <span style="color:#0052CC">**lang: angular**</span>
+- <span style="color:#0052CC">**lang: go**</span>
+- <span style="color:#0052CC">**lang: javascript**</span>
+
+### Effort
+
+The effort should give you an indication how much work it takes. This is based on a rough estimation.
+Everything that is higher than 8 should be split in smaller parts.
+
+- <span style="color:#BFDADC">**effort: 1**</span>
+- <span style="color:#BFDADC">**effort: 2**</span>
+- <span style="color:#BFDADC">**effort: 3**</span>
+- <span style="color:#BFDADC">**effort: 5**</span>
+- <span style="color:#BFDADC">**effort: 8**</span>
+
+
+
+
+
+
