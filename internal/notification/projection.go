@@ -87,6 +87,8 @@ func newNotificationsProjection(
 	p.fileSystemPath = fileSystemPath
 	p.statikDir = statikDir
 
+	// needs to be started here as it is not part of the projection.projections / projection.newProjectionsList()
+	p.Start()
 	return p
 }
 

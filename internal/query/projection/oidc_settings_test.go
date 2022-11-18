@@ -38,7 +38,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.oidc_settings SET (change_date, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) = ($1, $2, $3, $4, $5, $6) WHERE (aggregate_id = $7)",
+							expectedStmt: "UPDATE projections.oidc_settings SET (change_date, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) = ($1, $2, $3, $4, $5, $6) WHERE (aggregate_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -47,6 +47,7 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 								time.Millisecond * 10,
 								time.Millisecond * 10,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -89,12 +90,12 @@ func TestOIDCSettingsProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
 					instance.AggregateType,
-					[]byte(`{"name": "Name"}`),
+					nil,
 				), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(OIDCSettingsColumnInstanceID),

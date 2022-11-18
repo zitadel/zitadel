@@ -42,6 +42,10 @@ type CurrentSequencesSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func NewCurrentSequencesInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
+	return NewTextQuery(CurrentSequenceColInstanceID, instanceID, TextEquals)
+}
+
 func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
@@ -249,7 +253,8 @@ func prepareCurrentSequencesQuery() (sq.SelectBuilder, func(*sql.Rows) (*Current
 
 var (
 	currentSequencesTable = table{
-		name: projection.CurrentSeqTable,
+		name:          projection.CurrentSeqTable,
+		instanceIDCol: "instance_id",
 	}
 	CurrentSequenceColAggregateType = Column{
 		name:  "aggregate_type",
@@ -275,7 +280,8 @@ var (
 
 var (
 	locksTable = table{
-		name: projection.LocksTable,
+		name:          projection.LocksTable,
+		instanceIDCol: "instance_id",
 	}
 	LocksColLockerID = Column{
 		name:  "locker_id",

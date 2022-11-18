@@ -24,7 +24,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.MemberAddedType",
+			name: "org MemberAddedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.MemberAddedEventType),
@@ -60,7 +60,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.MemberChangedType",
+			name: "org MemberChangedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.MemberChangedEventType),
@@ -79,11 +79,12 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_members2 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (org_id = $5)",
+							expectedStmt: "UPDATE projections.org_members2 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5) AND (org_id = $6)",
 							expectedArgs: []interface{}{
 								database.StringArray{"role", "changed"},
 								anyArg{},
 								uint64(15),
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -93,7 +94,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.MemberCascadeRemovedType",
+			name: "org MemberCascadeRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.MemberCascadeRemovedEventType),
@@ -111,8 +112,9 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1) AND (org_id = $2)",
+							expectedStmt: "DELETE FROM projections.org_members2 WHERE (instance_id = $1) AND (user_id = $2) AND (org_id = $3)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -122,7 +124,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.MemberRemovedType",
+			name: "org MemberRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.MemberRemovedEventType),
@@ -140,8 +142,9 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1) AND (org_id = $2)",
+							expectedStmt: "DELETE FROM projections.org_members2 WHERE (instance_id = $1) AND (user_id = $2) AND (org_id = $3)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -151,7 +154,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.UserRemovedEventType",
+			name: "user UserRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.UserRemovedType),
@@ -167,8 +170,9 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_members2 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -177,7 +181,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgRemovedEventType",
+			name: "org OrgRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgRemovedEventType),
@@ -193,8 +197,9 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (org_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_members2 WHERE (instance_id = $1) AND (org_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -203,12 +208,12 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
 					instance.AggregateType,
-					[]byte(`{"name": "Name"}`),
+					nil,
 				), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(MemberInstanceID),

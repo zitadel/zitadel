@@ -2,7 +2,6 @@ package login
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -121,89 +120,105 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	if authReq.RequestedOrgID != "" {
 		resourceOwner = authReq.RequestedOrgID
 	}
+	externalUser, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(tokens, idpConfig)
+	externalUser, err := l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	if idpConfig.AutoRegister {
+		l.registerExternalUser(w, r, authReq, externalUser)
+		return
+	}
+	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, externalUser, externalIDP, labelPolicy.HideLoginNameSuffix, nil)
+}
+
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
+	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
+
+	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
+		resourceOwner = authReq.RequestedOrgID
+	}
 	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
 
-	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
+	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	user, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(orgIamPolicy, tokens, idpConfig)
+	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, externalUser, idpConfig)
+	user, metadata, err = l.customExternalUserToLoginUserMapping(r.Context(), user, nil, authReq, idpConfig, metadata, resourceOwner)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	if !idpConfig.AutoRegister {
-		l.renderExternalRegisterOverview(w, r, authReq, orgIamPolicy, user, externalIDP, labelPolicy.HideLoginNameSuffix, nil)
-		return
-	}
-	l.registerExternalUser(w, r, authReq, user, externalIDP)
-}
-
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *domain.Human, externalIDP *domain.UserIDPLink) {
-	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		resourceOwner = authReq.RequestedOrgID
-	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, nil, authReq.ID, authReq.AgentID, resourceOwner, metadata, nil)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
+	// read auth request again to get current state including userID
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
 	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
+	userGrants, err := l.customGrants(r.Context(), authReq.UserID, nil, authReq, idpConfig, resourceOwner)
 	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+	err = l.appendUserGrants(r.Context(), userGrants, resourceOwner)
 	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idp *domain.UserIDPLink, hideLoginNameSuffix bool, err error) {
+func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, externalUser *domain.ExternalUser, idp *domain.UserIDPLink, hideLoginNameSuffix bool, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 
+	translator := l.getTranslator(r.Context(), authReq)
 	data := externalRegisterData{
-		baseData: l.getBaseData(r, authReq, "ExternalRegisterOverview", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, "ExternalRegistrationUserOverview.Title", "ExternalRegistrationUserOverview.Description", errID, errMessage),
 		externalRegisterFormData: externalRegisterFormData{
-			Email:     human.EmailAddress,
-			Username:  human.Username,
-			Firstname: human.FirstName,
-			Lastname:  human.LastName,
-			Nickname:  human.NickName,
-			Language:  human.PreferredLanguage.String(),
+			Email:     externalUser.Email,
+			Username:  externalUser.PreferredUsername,
+			Firstname: externalUser.FirstName,
+			Lastname:  externalUser.LastName,
+			Nickname:  externalUser.NickName,
+			Language:  externalUser.PreferredLanguage.String(),
 		},
 		ExternalIDPID:              idp.IDPConfigID,
 		ExternalIDPUserID:          idp.ExternalUserID,
 		ExternalIDPUserDisplayName: idp.DisplayName,
-		ExternalEmail:              human.EmailAddress,
-		ExternalEmailVerified:      human.IsEmailVerified,
+		ExternalEmail:              externalUser.Email,
+		ExternalEmailVerified:      externalUser.IsEmailVerified,
 		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
 		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
 		ShowUsernameSuffix:         !hideLoginNameSuffix,
 	}
-	if human.Phone != nil {
-		data.Phone = human.PhoneNumber
-		data.ExternalPhone = human.PhoneNumber
-		data.ExternalPhoneVerified = human.IsPhoneVerified
-	}
-	translator := l.getTranslator(r.Context(), authReq)
+	data.Phone = externalUser.Phone
+	data.ExternalPhone = externalUser.Phone
+	data.ExternalPhoneVerified = externalUser.IsPhoneVerified
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, nil)
 }
 
@@ -220,79 +235,12 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
 		resourceOwner = authReq.RequestedOrgID
 	}
-	externalIDP, err := l.getExternalIDP(data)
-	if externalIDP == nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	user, err := l.mapExternalRegisterDataToUser(r, data)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
-	if err != nil {
-		l.renderRegisterOption(w, r, authReq, err)
-		return
-	}
-	l.renderNextStep(w, r, authReq)
+
+	user := l.mapExternalRegisterDataToUser(data)
+	l.registerExternalUser(w, r, authReq, user)
 }
 
-func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.DomainPolicy, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink) {
-	username := tokens.IDTokenClaims.GetPreferredUsername()
-	switch idpConfig.OIDCUsernameMapping {
-	case iam_model.OIDCMappingFieldEmail:
-		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
-			username = tokens.IDTokenClaims.GetEmail()
-		}
-	}
-	if username == "" {
-		username = tokens.IDTokenClaims.GetEmail()
-	}
-
-	if orgIamPolicy.UserLoginMustBeDomain {
-		splittedUsername := strings.Split(username, "@")
-		if len(splittedUsername) > 1 {
-			username = splittedUsername[0]
-		}
-	}
-
-	human := &domain.Human{
-		Username: username,
-		Profile: &domain.Profile{
-			FirstName:         tokens.IDTokenClaims.GetGivenName(),
-			LastName:          tokens.IDTokenClaims.GetFamilyName(),
-			PreferredLanguage: tokens.IDTokenClaims.GetLocale(),
-			NickName:          tokens.IDTokenClaims.GetNickname(),
-		},
-		Email: &domain.Email{
-			EmailAddress:    tokens.IDTokenClaims.GetEmail(),
-			IsEmailVerified: tokens.IDTokenClaims.IsEmailVerified(),
-		},
-	}
-
-	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
-		human.Phone = &domain.Phone{
-			PhoneNumber:     tokens.IDTokenClaims.GetPhoneNumber(),
-			IsPhoneVerified: tokens.IDTokenClaims.IsPhoneNumberVerified(),
-		}
-	}
-
+func (l *Login) mapTokenToLoginHumanAndExternalIDP(tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.ExternalUser, *domain.UserIDPLink) {
 	displayName := tokens.IDTokenClaims.GetPreferredUsername()
 	switch idpConfig.OIDCIDPDisplayNameMapping {
 	case iam_model.OIDCMappingFieldEmail:
@@ -304,50 +252,46 @@ func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.DomainPol
 		displayName = tokens.IDTokenClaims.GetEmail()
 	}
 
+	externalUser := &domain.ExternalUser{
+		IDPConfigID:       idpConfig.IDPConfigID,
+		ExternalUserID:    tokens.IDTokenClaims.GetSubject(),
+		PreferredUsername: tokens.IDTokenClaims.GetPreferredUsername(),
+		DisplayName:       displayName,
+		FirstName:         tokens.IDTokenClaims.GetGivenName(),
+		LastName:          tokens.IDTokenClaims.GetFamilyName(),
+		NickName:          tokens.IDTokenClaims.GetNickname(),
+		Email:             tokens.IDTokenClaims.GetEmail(),
+		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
+	}
+
+	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
+		externalUser.Phone = tokens.IDTokenClaims.GetPhoneNumber()
+		externalUser.IsPhoneVerified = tokens.IDTokenClaims.IsPhoneNumberVerified()
+	}
+
 	externalIDP := &domain.UserIDPLink{
 		IDPConfigID:    idpConfig.IDPConfigID,
 		ExternalUserID: tokens.IDTokenClaims.GetSubject(),
 		DisplayName:    displayName,
 	}
-	return human, externalIDP
+	return externalUser, externalIDP
 }
 
-func (l *Login) mapExternalRegisterDataToUser(r *http.Request, data *externalRegisterFormData) (*domain.Human, error) {
-	human := &domain.Human{
-		Username: data.Username,
-		Profile: &domain.Profile{
-			FirstName:         data.Firstname,
-			LastName:          data.Lastname,
-			PreferredLanguage: language.Make(data.Language),
-			NickName:          data.Nickname,
-		},
-		Email: &domain.Email{
-			EmailAddress: data.Email,
-		},
+func (l *Login) mapExternalRegisterDataToUser(data *externalRegisterFormData) *domain.ExternalUser {
+	isEmailVerified := data.ExternalEmailVerified && data.Email == data.ExternalEmail
+	isPhoneVerified := data.ExternalPhoneVerified && data.Phone == data.ExternalPhone
+	return &domain.ExternalUser{
+		IDPConfigID:       data.ExternalIDPConfigID,
+		ExternalUserID:    data.ExternalIDPExtUserID,
+		PreferredUsername: data.Username,
+		DisplayName:       data.Email,
+		FirstName:         data.Firstname,
+		LastName:          data.Lastname,
+		NickName:          data.Nickname,
+		PreferredLanguage: language.Make(data.Language),
+		Email:             data.Email,
+		IsEmailVerified:   isEmailVerified,
+		Phone:             data.Phone,
+		IsPhoneVerified:   isPhoneVerified,
 	}
-	if data.ExternalEmail != data.Email {
-		human.IsEmailVerified = false
-	} else {
-		human.IsEmailVerified = data.ExternalEmailVerified
-	}
-	if data.ExternalPhone == "" {
-		return human, nil
-	}
-	human.Phone = &domain.Phone{
-		PhoneNumber: data.Phone,
-	}
-	if data.ExternalPhone != data.Phone {
-		human.IsPhoneVerified = false
-	} else {
-		human.IsPhoneVerified = data.ExternalPhoneVerified
-	}
-	return human, nil
-}
-
-func (l *Login) getExternalIDP(data *externalRegisterFormData) (*domain.UserIDPLink, error) {
-	return &domain.UserIDPLink{
-		IDPConfigID:    data.ExternalIDPConfigID,
-		ExternalUserID: data.ExternalIDPExtUserID,
-		DisplayName:    data.ExternalIDPDisplayName,
-	}, nil
 }

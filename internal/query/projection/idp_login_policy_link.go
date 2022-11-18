@@ -159,6 +159,7 @@ func (p *idpLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*h
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idp.IDPConfigID),
 			handler.NewCond(IDPLoginPolicyLinkAggregateIDCol, idp.Aggregate().ID),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -179,6 +180,7 @@ func (p *idpLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Eve
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idp.IDPConfigID),
 			handler.NewCond(IDPLoginPolicyLinkAggregateIDCol, idp.Aggregate().ID),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, idp.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -199,6 +201,7 @@ func (p *idpLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idpID),
 			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -211,6 +214,7 @@ func (p *idpLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) 
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -223,6 +227,7 @@ func (p *idpLoginPolicyLinkProjection) reducePolicyRemoved(event eventstore.Even
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkAggregateIDCol, e.Aggregate().ID),
+			handler.NewCond(IDPLoginPolicyLinkInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }

@@ -66,11 +66,6 @@ func (p *oidcSettingsProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.OIDCSettingsChangedEventType,
 					Reduce: p.reduceOIDCSettingsChanged,
 				},
-			},
-		},
-		{
-			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(OIDCSettingsColumnInstanceID),
@@ -130,6 +125,7 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Even
 		columns,
 		[]handler.Condition{
 			handler.NewCond(OIDCSettingsColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(OIDCSettingsColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

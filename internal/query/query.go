@@ -79,10 +79,11 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql
 		},
 	}
 
-	err = projection.Start(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
+	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	if err != nil {
 		return nil, err
 	}
+	projection.Start()
 
 	return repo, nil
 }

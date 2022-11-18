@@ -150,6 +150,12 @@ func (m *Styling) processLabelPolicy(event *models.Event) (err error) {
 			return err
 		}
 		err = m.generateStylingFile(policy)
+	case instance.InstanceRemovedEventType:
+		err = m.deleteInstanceFilesFromStorage(event.InstanceID)
+		if err != nil {
+			return err
+		}
+		return m.view.DeleteInstanceStyling(event)
 	default:
 		return m.view.ProcessedStylingSequence(event)
 	}
@@ -260,6 +266,10 @@ func (m *Styling) uploadFilesToStorage(instanceID, aggregateID, contentType stri
 	//TODO: handle location as soon as possible
 	_, err := m.static.PutObject(context.Background(), instanceID, "", aggregateID, fileName, contentType, static.ObjectTypeStyling, reader, size)
 	return err
+}
+
+func (m *Styling) deleteInstanceFilesFromStorage(instanceID string) error {
+	return m.static.RemoveInstanceObjects(context.Background(), instanceID)
 }
 
 func (m *Styling) generateColorPaletteRGBA255(hex string) map[string]string {

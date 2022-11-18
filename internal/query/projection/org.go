@@ -131,6 +131,7 @@ func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -149,6 +150,7 @@ func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -167,6 +169,7 @@ func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -185,6 +188,7 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(OrgColumnID, e.Aggregate().ID),
+			handler.NewCond(OrgColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
