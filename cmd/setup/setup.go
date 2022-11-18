@@ -82,6 +82,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.externalPort = config.ExternalPort
 
 	steps.s4EventstoreIndexes = &EventstoreIndexes{dbClient: dbClient, dbType: config.Database.Type()}
+	steps.s5LastFailed = &LastFailed{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -107,6 +108,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 3")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s4EventstoreIndexes)
 	logging.OnError(err).Fatal("unable to migrate step 4")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s5LastFailed)
+	logging.OnError(err).Fatal("unable to migrate step 5")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

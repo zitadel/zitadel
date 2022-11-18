@@ -135,7 +135,7 @@ func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID str
 	select {
 	case err := <-errs:
 		cancel()
-		logging.Log("SPOOL-OT8di").OnError(err).WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("load canceled")
+		logging.OnError(err).WithField("view", s.ViewModel()).WithField("worker", workerID).Debug("load canceled")
 	}
 }
 
@@ -216,6 +216,7 @@ func HandleError(event *models.Event, failedErr error,
 	failedEvent.FailureCount++
 	failedEvent.ErrMsg = failedErr.Error()
 	failedEvent.InstanceID = event.InstanceID
+	failedEvent.LastFailed = time.Now()
 	err = processFailedEvent(failedEvent)
 	if err != nil {
 		return err

@@ -23,8 +23,8 @@ func (v *View) latestSequences(viewName string, instanceIDs ...string) ([]*repos
 	return repository.LatestSequences(v.Db, sequencesTable, viewName, instanceIDs...)
 }
 
-func (v *View) AllCurrentSequences(db string) ([]*repository.CurrentSequence, error) {
-	return repository.AllCurrentSequences(v.Db, db+".current_sequences")
+func (v *View) AllCurrentSequences(db, instanceID string) ([]*repository.CurrentSequence, error) {
+	return repository.AllCurrentSequences(v.Db, db+".current_sequences", instanceID)
 }
 
 func (v *View) updateSpoolerRunSequence(viewName string) error {
