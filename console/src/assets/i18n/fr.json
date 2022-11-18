@@ -256,6 +256,7 @@
       "DELETE_SELF_DESCRIPTION": "Vous êtes sur le point de supprimer définitivement votre compte personnel. Cela vous déconnectera et supprimera votre utilisateur. Cette action ne peut être annulée !",
       "DELETE_AUTH_DESCRIPTION": "Vous êtes sur le point de supprimer définitivement votre compte personnel. En êtes-vous sûr ?",
       "TYPEUSERNAME": "Tapez '{{value}}', pour confirmer et supprimer l'utilisateur.",
+      "USERNAME": "Identifiant",
       "DELETE_BTN": "Supprimer définitivement"
     },
     "SENDEMAILDIALOG": {
@@ -742,6 +743,7 @@
       "DATABASE": "Base de données",
       "FAILEDSEQUENCE": "Séquence échouée",
       "FAILURECOUNT": "Nombre d'échecs",
+      "LASTFAILED": "Dernier échec à",
       "ERRORMESSAGE": "Message d'erreur",
       "ACTIONS": "Actions",
       "DELETE": "Supprimer",

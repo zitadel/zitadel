@@ -3,7 +3,9 @@
   $warn: map-get($theme, warn);
   $background: map-get($theme, background);
   $accent: map-get($theme, accent);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $lighter-primary-color: mat.get-color-from-palette($primary, 300);
+  $darker-primary-color: mat.get-color-from-palette($primary, 700);
 
   $warn-color: mat.get-color-from-palette($warn, 500);
   $accent-color: mat.get-color-from-palette($accent, 500);
@@ -11,6 +13,7 @@
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
   $secondary-text: map-get($foreground, secondary-text);
+  $link-hover-color: if($is-dark-theme, $lighter-primary-color, $darker-primary-color);
 
   .footer-wrapper {
     padding: 2rem;
@@ -46,7 +49,7 @@
           }
 
           &:hover {
-            color: $primary-color;
+            color: $link-hover-color;
           }
         }
       }
@@ -114,7 +117,7 @@
           }
 
           &:hover {
-            color: $primary-color;
+            color: $link-hover-color;
 
             i {
               visibility: visible;

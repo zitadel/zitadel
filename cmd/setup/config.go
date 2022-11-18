@@ -58,6 +58,7 @@ type Steps struct {
 	s2AssetsTable       *AssetTable
 	FirstInstance       *FirstInstance
 	s4EventstoreIndexes *EventstoreIndexes
+	s5LastFailed        *LastFailed
 }
 
 type encryptionKeyConfig struct {

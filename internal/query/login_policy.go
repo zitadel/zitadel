@@ -174,9 +174,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 					LoginPolicyColumnOrgID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				},
 			},
-		}).
-		OrderBy(LoginPolicyColumnIsDefault.identifier()).
-		Limit(1).ToSql()
+		}).Limit(1).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
@@ -185,7 +183,23 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
 	}
-	return scan(rows)
+	return q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+}
+
+func (q *Queries) scanAndAddLinksToLoginPolicy(ctx context.Context, rows *sql.Rows, scan func(*sql.Rows) (*LoginPolicy, error)) (*LoginPolicy, error) {
+	policy, err := scan(rows)
+	if err != nil {
+		return nil, err
+	}
+
+	links, err := q.IDPLoginPolicyLinks(ctx, policy.OrgID, &IDPLoginPolicyLinksSearchQuery{})
+	if err != nil {
+		return nil, err
+	}
+	for _, link := range links.Links {
+		policy.IDPLinks = append(policy.IDPLinks, link)
+	}
+	return policy, nil
 }
 
 func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) {
@@ -202,7 +216,7 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) 
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
 	}
-	return scan(rows)
+	return q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
 }
 
 func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (*SecondFactors, error) {
@@ -330,23 +344,12 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
 			LoginPolicyColumnSecondFactorCheckLifetime.identifier(),
 			LoginPolicyColumnMultiFacotrCheckLifetime.identifier(),
-			IDPLoginPolicyLinkIDPIDCol.identifier(),
-			IDPNameCol.identifier(),
-			IDPTypeCol.identifier(),
 		).From(loginPolicyTable.identifier()).
-			LeftJoin(join(IDPLoginPolicyLinkAggregateIDCol, LoginPolicyColumnOrgID)).
-			LeftJoin(join(IDPIDCol, IDPLoginPolicyLinkIDPIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
 			defaultRedirectURI := sql.NullString{}
-			links := make([]*IDPLoginPolicyLink, 0)
 			for rows.Next() {
-				var (
-					idpID   = sql.NullString{}
-					idpName = sql.NullString{}
-					idpType = sql.NullInt16{}
-				)
 				err := rows.Scan(
 					&p.OrgID,
 					&p.CreationDate,
@@ -371,32 +374,15 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Rows) (*LoginPolicy,
 					&p.MFAInitSkipLifetime,
 					&p.SecondFactorCheckLifetime,
 					&p.MultiFactorCheckLifetime,
-					&idpID,
-					&idpName,
-					&idpType,
 				)
 				if err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
-				}
-				var link IDPLoginPolicyLink
-				if idpID.Valid {
-					link = IDPLoginPolicyLink{IDPID: idpID.String}
-
-					link.IDPName = idpName.String
-					//IDPType 0 is oidc so we have to set unspecified manually
-					if idpType.Valid {
-						link.IDPType = domain.IDPConfigType(idpType.Int16)
-					} else {
-						link.IDPType = domain.IDPConfigTypeUnspecified
-					}
-					links = append(links, &link)
 				}
 			}
 			if p.OrgID == "" {
 				return nil, errors.ThrowNotFound(nil, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
 			}
 			p.DefaultRedirectURI = defaultRedirectURI.String
-			p.IDPLinks = links
 			return p, nil
 		}
 }

@@ -31,6 +31,8 @@
     background: none;
     cursor: pointer;
     font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+    box-sizing: border-box;
+    height: 27px;
 
     .c_label {
       display: flex;
@@ -38,8 +40,19 @@
       text-align: center;
 
       .count {
-        display: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 17px;
+        width: 17px;
+        border-radius: 50%;
+        padding: 2px;
+        margin: -2px -9px -2px 8px;
         margin-left: 6px;
+        background-color: if($is-dark-theme, #ffffff20, #00000020);
+        line-height: 18px;
+        font-size: 11px;
+        transition: background 0.2s ease;
       }
     }
 
@@ -63,7 +76,7 @@
 
       .c_label {
         .count {
-          display: inline-block;
+          background-color: if($is-dark-theme, #00000020, #ffffff20);
         }
       }
     }
