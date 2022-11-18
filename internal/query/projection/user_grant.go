@@ -185,14 +185,15 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 		return nil, err
 	}
 
-	projectOwner, err := getResourceOwnerOfProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.ProjectID)
-	if err != nil {
-		return nil, err
-	}
-
+	projectOwner := ""
 	grantOwner := ""
 	if e.ProjectGrantID != "" {
 		grantOwner, err = getGrantedOrgOfGrantedProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.ProjectID, e.ProjectGrantID)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		projectOwner, err = getResourceOwnerOfProject(ctx, p.Eventstore, e.Aggregate().InstanceID, e.ProjectID)
 		if err != nil {
 			return nil, err
 		}

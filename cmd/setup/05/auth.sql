@@ -43,7 +43,7 @@ CREATE TABLE auth.users2 (
     instance_id TEXT NOT NULL,
     owner_removed BOOL DEFAULT false,
 
-    PRIMARY KEY (id, instance_id)
+    PRIMARY KEY (instance_id, id)
 );
 CREATE INDEX owner_removed_idx ON auth.users2 (owner_removed);
 
@@ -60,7 +60,7 @@ CREATE TABLE auth.user_external_idps2 (
     instance_id TEXT NOT NULL,
     owner_removed BOOL DEFAULT false,
 
-    PRIMARY KEY (external_user_id, idp_config_id, instance_id)
+    PRIMARY KEY (instance_id, external_user_id, idp_config_id)
 );
 CREATE INDEX owner_removed_idx ON auth.user_external_idps2 (owner_removed);
 
@@ -71,7 +71,7 @@ CREATE TABLE auth.org_project_mapping2 (
     instance_id TEXT NOT NULL,
     owner_removed BOOL DEFAULT false,
 
-    PRIMARY KEY (org_id, project_id, instance_id)
+    PRIMARY KEY (instance_id, org_id, project_id)
 );
 CREATE INDEX owner_removed_idx ON auth.org_project_mapping2 (owner_removed);
 
@@ -89,7 +89,7 @@ CREATE TABLE auth.idp_providers2 (
     instance_id TEXT NOT NULL,
     owner_removed BOOL DEFAULT false,
 
-    PRIMARY KEY (aggregate_id, idp_config_id, instance_id)
+    PRIMARY KEY (instance_id, aggregate_id, idp_config_id)
 );
 CREATE INDEX owner_removed_idx ON auth.idp_providers2 (owner_removed);
 
@@ -119,6 +119,6 @@ CREATE TABLE auth.idp_configs2 (
     instance_id TEXT NOT NULL,
     owner_removed BOOL DEFAULT false,
 
-    PRIMARY KEY (idp_config_id, instance_id)
+    PRIMARY KEY (instance_id, idp_config_id)
 );
 CREATE INDEX owner_removed_idx ON auth.idp_configs2 (owner_removed);

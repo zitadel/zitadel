@@ -24,7 +24,7 @@ CREATE TABLE adminapi.styling2 (
     instance_id TEXT NOT NULL,
     owner_removed BOOL DEFAULT false,
 
-    PRIMARY KEY (aggregate_id, label_policy_state, instance_id)
+    PRIMARY KEY (instance_id, aggregate_id, label_policy_state)
 );
 
 CREATE INDEX owner_removed_idx ON adminapi.styling2 (owner_removed);
