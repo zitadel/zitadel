@@ -1,6 +1,8 @@
 package view
 
 import (
+	"time"
+
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -24,7 +26,7 @@ func TokenByIDs(db *gorm.DB, table, tokenID, userID, instanceID string) (*usr_mo
 	return token, err
 }
 
-func TokensByUserID(db *gorm.DB, table, userID, instanceID string) ([]*usr_model.TokenView, error) {
+func TokensByUserID(db *gorm.DB, table, userID, instanceID string, expiration time.Time) ([]*usr_model.TokenView, error) {
 	tokens := make([]*usr_model.TokenView, 0)
 	userIDQuery := &model.TokenSearchQuery{
 		Key:    model.TokenSearchKeyUserID,
@@ -36,8 +38,13 @@ func TokensByUserID(db *gorm.DB, table, userID, instanceID string) ([]*usr_model
 		Method: domain.SearchMethodEquals,
 		Value:  instanceID,
 	}
+	expirationQuery := &model.TokenSearchQuery{
+		Key:    model.TokenSearchKeyExpiration,
+		Method: domain.SearchMethodGreaterThan,
+		Value:  expiration,
+	}
 	query := repository.PrepareSearchQuery(table, usr_model.TokenSearchRequest{
-		Queries: []*model.TokenSearchQuery{userIDQuery, instanceIDQuery},
+		Queries: []*model.TokenSearchQuery{userIDQuery, instanceIDQuery, expirationQuery},
 	})
 	_, err := query(db, &tokens)
 	return tokens, err
