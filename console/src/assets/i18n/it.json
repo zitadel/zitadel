@@ -743,6 +743,7 @@
       "DATABASE": "Database",
       "FAILEDSEQUENCE": "Sequenza fallita",
       "FAILURECOUNT": "Conteggio dei fallimenti",
+      "LASTFAILED": "L'ultimo fallimento a",
       "ERRORMESSAGE": "Messaggio di errore",
       "ACTIONS": "Azioni",
       "DELETE": "Rimuovi",

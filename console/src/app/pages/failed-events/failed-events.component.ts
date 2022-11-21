@@ -22,6 +22,7 @@ export class FailedEventsComponent implements AfterViewInit {
     'database',
     'failedSequence',
     'failureCount',
+    'lastFailed',
     'errorMessage',
     'actions',
   ];
