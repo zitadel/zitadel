@@ -44,11 +44,11 @@ func newUserSession(ctx context.Context, handler handler, queries *query2.Querie
 	return h
 }
 
-func (k *UserSession) subscribe(ctx context.Context) {
-	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+func (u *UserSession) subscribe(ctx context.Context) {
+	u.subscription = u.es.Subscribe(u.AggregateTypes()...)
 	go func() {
-		for event := range k.subscription.Events {
-			query.ReduceEvent(ctx, k, event)
+		for event := range u.subscription.Events {
+			query.ReduceEvent(ctx, u, event)
 		}
 	}()
 }
@@ -73,8 +73,8 @@ func (u *UserSession) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (u *UserSession) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
-	sequences, err := u.view.GetLatestUserSessionSequences(instanceIDs...)
+func (u *UserSession) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
+	sequences, err := u.view.GetLatestUserSessionSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -162,12 +162,12 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 }
 
 func (u *UserSession) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-sdfw3s", "id", event.AggregateID).WithError(err).Warn("something went wrong in user session handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in user session handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserSessionFailedEvent, u.view.ProcessedUserSessionFailedEvent, u.view.ProcessedUserSessionSequence, u.errorCountUntilSkip)
 }
 
-func (u *UserSession) OnSuccess() error {
-	return spooler.HandleSuccess(u.view.UpdateUserSessionSpoolerRunTimestamp)
+func (u *UserSession) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(u.view.UpdateUserSessionSpoolerRunTimestamp, instanceIDs)
 }
 
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event *models.Event) error {

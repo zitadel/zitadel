@@ -17,10 +17,10 @@ const (
 
 type Handler interface {
 	ViewModel() string
-	EventQuery(instanceIDs ...string) (*models.SearchQuery, error)
+	EventQuery(instanceIDs []string) (*models.SearchQuery, error)
 	Reduce(*models.Event) error
 	OnError(event *models.Event, err error) error
-	OnSuccess() error
+	OnSuccess(instanceIDs []string) error
 	MinimumCycleDuration() time.Duration
 	LockDuration() time.Duration
 	QueryLimit() uint64

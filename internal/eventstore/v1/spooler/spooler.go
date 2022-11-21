@@ -149,7 +149,7 @@ func (s *spooledHandler) load(workerID string) {
 				if max > len(ids) {
 					max = len(ids)
 				}
-				err = s.processInstances(ctx, workerID, ids[i:max]...)
+				err = s.processInstances(ctx, workerID, ids[i:max])
 				if err != nil {
 					errs <- err
 				}
@@ -167,16 +167,16 @@ func (s *spooledHandler) load(workerID string) {
 	<-ctx.Done()
 }
 
-func (s *spooledHandler) processInstances(ctx context.Context, workerID string, ids ...string) error {
+func (s *spooledHandler) processInstances(ctx context.Context, workerID string, ids []string) error {
 	for {
-		events, err := s.query(ctx, ids...)
+		events, err := s.query(ctx, ids)
 		if err != nil {
 			return err
 		}
 		if len(events) == 0 {
 			return nil
 		}
-		err = s.process(ctx, events, workerID)
+		err = s.process(ctx, events, workerID, ids)
 		if err != nil {
 			return err
 		}
@@ -195,7 +195,7 @@ func (s *spooledHandler) awaitError(cancel func(), errs chan error, workerID str
 	}
 }
 
-func (s *spooledHandler) process(ctx context.Context, events []*models.Event, workerID string) error {
+func (s *spooledHandler) process(ctx context.Context, events []*models.Event, workerID string, instanceIDs []string) error {
 	for i, event := range events {
 		select {
 		case <-ctx.Done():
@@ -208,17 +208,17 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 					continue
 				}
 				time.Sleep(100 * time.Millisecond)
-				return s.process(ctx, events[i:], workerID)
+				return s.process(ctx, events[i:], workerID, instanceIDs)
 			}
 		}
 	}
-	err := s.OnSuccess()
+	err := s.OnSuccess(instanceIDs)
 	logging.WithFields("view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("could not process on success func")
 	return err
 }
 
-func (s *spooledHandler) query(ctx context.Context, instanceIDs ...string) ([]*models.Event, error) {
-	query, err := s.EventQuery(instanceIDs...)
+func (s *spooledHandler) query(ctx context.Context, instanceIDs []string) ([]*models.Event, error) {
+	query, err := s.EventQuery(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -283,6 +283,6 @@ func HandleError(event *models.Event, failedErr error,
 	return failedErr
 }
 
-func HandleSuccess(updateSpoolerRunTimestamp func() error) error {
-	return updateSpoolerRunTimestamp()
+func HandleSuccess(updateSpoolerRunTimestamp func([]string) error, instanceIDs []string) error {
+	return updateSpoolerRunTimestamp(instanceIDs)
 }

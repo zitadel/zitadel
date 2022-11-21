@@ -69,8 +69,8 @@ func (t *RefreshToken) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (t *RefreshToken) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
-	sequences, err := t.view.GetLatestRefreshTokenSequences(instanceIDs...)
+func (t *RefreshToken) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := t.view.GetLatestRefreshTokenSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -124,6 +124,6 @@ func (t *RefreshToken) OnError(event *es_models.Event, err error) error {
 	return spooler.HandleError(event, err, t.view.GetLatestRefreshTokenFailedEvent, t.view.ProcessedRefreshTokenFailedEvent, t.view.ProcessedRefreshTokenSequence, t.errorCountUntilSkip)
 }
 
-func (t *RefreshToken) OnSuccess() error {
-	return spooler.HandleSuccess(t.view.UpdateRefreshTokenSpoolerRunTimestamp)
+func (t *RefreshToken) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(t.view.UpdateRefreshTokenSpoolerRunTimestamp, instanceIDs)
 }

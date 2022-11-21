@@ -77,8 +77,8 @@ func (i *IDPProvider) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPProvider) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
-	sequences, err := i.view.GetLatestIDPProviderSequences(instanceIDs...)
+func (i *IDPProvider) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := i.view.GetLatestIDPProviderSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -189,14 +189,14 @@ func (i *IDPProvider) OnError(event *es_models.Event, err error) error {
 	return spooler.HandleError(event, err, i.view.GetLatestIDPProviderFailedEvent, i.view.ProcessedIDPProviderFailedEvent, i.view.ProcessedIDPProviderSequence, i.errorCountUntilSkip)
 }
 
-func (i *IDPProvider) OnSuccess() error {
-	return spooler.HandleSuccess(i.view.UpdateIDPProviderSpoolerRunTimestamp)
+func (i *IDPProvider) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(i.view.UpdateIDPProviderSpoolerRunTimestamp, instanceIDs)
 }
 
 func (i *IDPProvider) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
 	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID)
 }
 
-func (u *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
-	return u.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID)
+func (i *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID)
 }

@@ -78,8 +78,8 @@ func (i *ExternalIDP) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *ExternalIDP) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
-	sequences, err := i.view.GetLatestExternalIDPSequences(instanceIDs...)
+func (i *ExternalIDP) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := i.view.GetLatestExternalIDPSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -179,8 +179,8 @@ func (i *ExternalIDP) OnError(event *es_models.Event, err error) error {
 	return spooler.HandleError(event, err, i.view.GetLatestExternalIDPFailedEvent, i.view.ProcessedExternalIDPFailedEvent, i.view.ProcessedExternalIDPSequence, i.errorCountUntilSkip)
 }
 
-func (i *ExternalIDP) OnSuccess() error {
-	return spooler.HandleSuccess(i.view.UpdateExternalIDPSpoolerRunTimestamp)
+func (i *ExternalIDP) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(i.view.UpdateExternalIDPSpoolerRunTimestamp, instanceIDs)
 }
 
 func (i *ExternalIDP) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {

@@ -48,11 +48,11 @@ func newUser(
 	return h
 }
 
-func (k *User) subscribe(ctx context.Context) {
-	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+func (u *User) subscribe(ctx context.Context) {
+	u.subscription = u.es.Subscribe(u.AggregateTypes()...)
 	go func() {
-		for event := range k.subscription.Events {
-			query.ReduceEvent(ctx, k, event)
+		for event := range u.subscription.Events {
+			query.ReduceEvent(ctx, u, event)
 		}
 	}()
 }
@@ -76,8 +76,8 @@ func (u *User) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (u *User) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
-	sequences, err := u.view.GetLatestUserSequences(instanceIDs...)
+func (u *User) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := u.view.GetLatestUserSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -276,12 +276,12 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
 }
 
 func (u *User) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-is8aAWima", "id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in user handler")
 	return spooler.HandleError(event, err, u.view.GetLatestUserFailedEvent, u.view.ProcessedUserFailedEvent, u.view.ProcessedUserSequence, u.errorCountUntilSkip)
 }
 
-func (u *User) OnSuccess() error {
-	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp)
+func (u *User) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(u.view.UpdateUserSpoolerRunTimestamp, instanceIDs)
 }
 
 func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {

@@ -73,8 +73,8 @@ func (m *Styling) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
-	sequences, err := m.view.GetLatestStylingSequences(instanceIDs...)
+func (m *Styling) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
+	sequences, err := m.view.GetLatestStylingSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -166,12 +166,12 @@ func (m *Styling) processLabelPolicy(event *models.Event) (err error) {
 }
 
 func (m *Styling) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-2m9fs", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestStylingFailedEvent, m.view.ProcessedStylingFailedEvent, m.view.ProcessedStylingSequence, m.errorCountUntilSkip)
 }
 
-func (m *Styling) OnSuccess() error {
-	return spooler.HandleSuccess(m.view.UpdateStylingSpoolerRunTimestamp)
+func (m *Styling) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(m.view.UpdateStylingSpoolerRunTimestamp, instanceIDs)
 }
 
 func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {

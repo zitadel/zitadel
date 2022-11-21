@@ -64,8 +64,8 @@ func (i *IDPConfig) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPConfig) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
-	sequences, err := i.view.GetLatestIDPConfigSequences(instanceIDs...)
+func (i *IDPConfig) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
+	sequences, err := i.view.GetLatestIDPConfigSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -131,10 +131,10 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 }
 
 func (i *IDPConfig) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-Ejf8s", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
 	return spooler.HandleError(event, err, i.view.GetLatestIDPConfigFailedEvent, i.view.ProcessedIDPConfigFailedEvent, i.view.ProcessedIDPConfigSequence, i.errorCountUntilSkip)
 }
 
-func (i *IDPConfig) OnSuccess() error {
-	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp)
+func (i *IDPConfig) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp, instanceIDs)
 }
