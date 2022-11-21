@@ -7,22 +7,19 @@ import (
 )
 
 var (
-	//go:embed 05/adminapi.sql
-	createAdminViews05 string
-	//go:embed 05/auth.sql
-	createAuthViews05 string
+	//go:embed 05.sql
+	lastFailedStmts string
 )
 
-type ProjectionTable05 struct {
+type LastFailed struct {
 	dbClient *sql.DB
 }
 
-func (mig *ProjectionTable05) Execute(ctx context.Context) error {
-	stmt := createAdminViews05 + createAuthViews05
-	_, err := mig.dbClient.ExecContext(ctx, stmt)
+func (mig *LastFailed) Execute(ctx context.Context) error {
+	_, err := mig.dbClient.ExecContext(ctx, lastFailedStmts)
 	return err
 }
 
-func (mig *ProjectionTable05) String() string {
-	return "05_tables"
+func (mig *LastFailed) String() string {
+	return "05_last_failed"
 }

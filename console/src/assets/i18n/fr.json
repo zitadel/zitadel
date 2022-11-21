@@ -743,6 +743,7 @@
       "DATABASE": "Base de données",
       "FAILEDSEQUENCE": "Séquence échouée",
       "FAILURECOUNT": "Nombre d'échecs",
+      "LASTFAILED": "Dernier échec à",
       "ERRORMESSAGE": "Message d'erreur",
       "ACTIONS": "Actions",
       "DELETE": "Supprimer",

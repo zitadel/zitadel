@@ -743,6 +743,7 @@
       "DATABASE": "Datenbank",
       "FAILEDSEQUENCE": "betroffene Sequenz",
       "FAILURECOUNT": "Fehleranzahl",
+      "LASTFAILED": "Zuletzt gescheitert um",
       "ERRORMESSAGE": "Meldung",
       "ACTIONS": "Aktionen",
       "DELETE": "Entfernen",

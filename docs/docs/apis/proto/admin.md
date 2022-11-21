@@ -2020,6 +2020,7 @@ This is an empty request
 | failed_sequence |  uint64 | - |  |
 | failure_count |  uint64 | - |  |
 | error_message |  string | - |  |
+| last_failed |  google.protobuf.Timestamp | - |  |
 
 
 
@@ -4633,7 +4634,7 @@ this is en empty request
 | database |  string | - |  |
 | view_name |  string | - |  |
 | processed_sequence |  uint64 | - |  |
-| event_timestamp |  google.protobuf.Timestamp | The timestamp the event occured |  |
+| event_timestamp |  google.protobuf.Timestamp | The timestamp the event occurred |  |
 | last_successful_spooler_run |  google.protobuf.Timestamp | - |  |
 
 
