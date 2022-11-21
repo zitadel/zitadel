@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/zitadel/logging"
@@ -27,22 +28,23 @@ type RefreshToken struct {
 }
 
 func newRefreshToken(
+	ctx context.Context,
 	handler handler,
 ) *RefreshToken {
 	h := &RefreshToken{
 		handler: handler,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (t *RefreshToken) subscribe() {
+func (t *RefreshToken) subscribe(ctx context.Context) {
 	t.subscription = t.es.Subscribe(t.AggregateTypes()...)
 	go func() {
 		for event := range t.subscription.Events {
-			query.ReduceEvent(t, event)
+			query.ReduceEvent(ctx, t, event)
 		}
 	}()
 }

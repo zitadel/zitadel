@@ -1,5 +1,5 @@
 issues:
-  new: true
+  new-from-rev: b248e390da482e7d686e91cdb8fc5f3da5da0709
   fix: false
 
 run:

@@ -34,21 +34,21 @@ type Styling struct {
 	subscription *v1.Subscription
 }
 
-func newStyling(handler handler, static static.Storage) *Styling {
+func newStyling(ctx context.Context, handler handler, static static.Storage) *Styling {
 	h := &Styling{
 		handler: handler,
 		static:  static,
 	}
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (m *Styling) subscribe() {
+func (m *Styling) subscribe(ctx context.Context) {
 	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
 	go func() {
 		for event := range m.subscription.Events {
-			query.ReduceEvent(m, event)
+			query.ReduceEvent(ctx, m, event)
 		}
 	}()
 }

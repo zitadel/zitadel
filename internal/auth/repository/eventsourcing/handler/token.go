@@ -33,22 +33,23 @@ type Token struct {
 }
 
 func newToken(
+	ctx context.Context,
 	handler handler,
 ) *Token {
 	h := &Token{
 		handler: handler,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (t *Token) subscribe() {
+func (t *Token) subscribe(ctx context.Context) {
 	t.subscription = t.es.Subscribe(t.AggregateTypes()...)
 	go func() {
 		for event := range t.subscription.Events {
-			query.ReduceEvent(t, event)
+			query.ReduceEvent(ctx, t, event)
 		}
 	}()
 }

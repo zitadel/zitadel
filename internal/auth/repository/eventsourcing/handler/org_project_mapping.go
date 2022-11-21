@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -23,22 +25,23 @@ type OrgProjectMapping struct {
 }
 
 func newOrgProjectMapping(
+	ctx context.Context,
 	handler handler,
 ) *OrgProjectMapping {
 	h := &OrgProjectMapping{
 		handler: handler,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (k *OrgProjectMapping) subscribe() {
+func (k *OrgProjectMapping) subscribe(ctx context.Context) {
 	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
 	go func() {
 		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+			query.ReduceEvent(ctx, k, event)
 		}
 	}()
 }

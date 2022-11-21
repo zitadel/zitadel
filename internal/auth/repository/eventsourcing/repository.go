@@ -34,7 +34,7 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, esV2 *eventstore2.Eventstore, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 
 	authReq := cache.Start(dbClient)
 
-	spool := spooler.StartSpooler(conf.Spooler, es, esV2, view, dbClient, systemDefaults, queries)
+	spool := spooler.StartSpooler(ctx, conf.Spooler, es, esV2, view, dbClient, systemDefaults, queries)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,

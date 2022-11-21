@@ -34,6 +34,7 @@ type User struct {
 }
 
 func newUser(
+	ctx context.Context,
 	handler handler,
 	queries *query2.Queries,
 ) *User {
@@ -42,16 +43,16 @@ func newUser(
 		queries: queries,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (k *User) subscribe() {
+func (k *User) subscribe(ctx context.Context) {
 	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
 	go func() {
 		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+			query.ReduceEvent(ctx, k, event)
 		}
 	}()
 }

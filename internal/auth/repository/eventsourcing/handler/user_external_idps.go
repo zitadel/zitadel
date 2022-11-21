@@ -33,6 +33,7 @@ type ExternalIDP struct {
 }
 
 func newExternalIDP(
+	ctx context.Context,
 	handler handler,
 	defaults systemdefaults.SystemDefaults,
 	queries *query2.Queries,
@@ -43,16 +44,16 @@ func newExternalIDP(
 		queries:        queries,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (i *ExternalIDP) subscribe() {
+func (i *ExternalIDP) subscribe(ctx context.Context) {
 	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
 	go func() {
 		for event := range i.subscription.Events {
-			query.ReduceEvent(i, event)
+			query.ReduceEvent(ctx, i, event)
 		}
 	}()
 }

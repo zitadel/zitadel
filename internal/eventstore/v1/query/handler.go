@@ -32,7 +32,7 @@ type Handler interface {
 	Subscription() *v1.Subscription
 }
 
-func ReduceEvent(handler Handler, event *models.Event) {
+func ReduceEvent(ctx context.Context, handler Handler, event *models.Event) {
 	defer func() {
 		err := recover()
 
@@ -60,7 +60,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		SearchQuery().
 		SetLimit(eventLimit)
 
-	unprocessedEvents, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
+	unprocessedEvents, err := handler.Eventstore().FilterEvents(ctx, searchQuery)
 	if err != nil {
 		logging.WithFields("sequence", event.Sequence).Warn("filter failed")
 		return

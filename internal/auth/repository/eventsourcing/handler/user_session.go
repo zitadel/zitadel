@@ -33,22 +33,22 @@ type UserSession struct {
 	queries      *query2.Queries
 }
 
-func newUserSession(handler handler, queries *query2.Queries) *UserSession {
+func newUserSession(ctx context.Context, handler handler, queries *query2.Queries) *UserSession {
 	h := &UserSession{
 		handler: handler,
 		queries: queries,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (k *UserSession) subscribe() {
+func (k *UserSession) subscribe(ctx context.Context) {
 	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
 	go func() {
 		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+			query.ReduceEvent(ctx, k, event)
 		}
 	}()
 }

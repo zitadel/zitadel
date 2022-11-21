@@ -32,6 +32,7 @@ type IDPProvider struct {
 }
 
 func newIDPProvider(
+	ctx context.Context,
 	h handler,
 	defaults systemdefaults.SystemDefaults,
 	queries *query2.Queries,
@@ -42,16 +43,16 @@ func newIDPProvider(
 		queries:        queries,
 	}
 
-	idpProvider.subscribe()
+	idpProvider.subscribe(ctx)
 
 	return idpProvider
 }
 
-func (i *IDPProvider) subscribe() {
+func (i *IDPProvider) subscribe(ctx context.Context) {
 	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
 	go func() {
 		for event := range i.subscription.Events {
-			query.ReduceEvent(i, event)
+			query.ReduceEvent(ctx, i, event)
 		}
 	}()
 }

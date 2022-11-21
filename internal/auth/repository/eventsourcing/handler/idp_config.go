@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -23,21 +25,21 @@ type IDPConfig struct {
 	subscription *v1.Subscription
 }
 
-func newIDPConfig(h handler) *IDPConfig {
+func newIDPConfig(ctx context.Context, h handler) *IDPConfig {
 	idpConfig := &IDPConfig{
 		handler: h,
 	}
 
-	idpConfig.subscribe()
+	idpConfig.subscribe(ctx)
 
 	return idpConfig
 }
 
-func (i *IDPConfig) subscribe() {
+func (i *IDPConfig) subscribe(ctx context.Context) {
 	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
 	go func() {
 		for event := range i.subscription.Events {
-			query.ReduceEvent(i, event)
+			query.ReduceEvent(ctx, i, event)
 		}
 	}()
 }
