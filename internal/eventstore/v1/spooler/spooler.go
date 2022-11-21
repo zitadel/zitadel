@@ -169,14 +169,18 @@ func (s *spooledHandler) load(workerID string) {
 
 func (s *spooledHandler) processInstances(ctx context.Context, workerID string, ids []string) error {
 	for {
-		events, err := s.query(ctx, ids)
+		processCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		events, err := s.query(processCtx, ids)
 		if err != nil {
+			cancel()
 			return err
 		}
 		if len(events) == 0 {
+			cancel()
 			return nil
 		}
-		err = s.process(ctx, events, workerID, ids)
+		err = s.process(processCtx, events, workerID, ids)
+		cancel()
 		if err != nil {
 			return err
 		}

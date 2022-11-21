@@ -42,7 +42,7 @@ func ReduceEvent(ctx context.Context, handler Handler, event *models.Event) {
 				"cause", err,
 				"stack", string(debug.Stack()),
 				"sequence", event.Sequence,
-				"instnace", event.InstanceID,
+				"instance", event.InstanceID,
 			).Error("reduce panicked")
 		}
 	}()
