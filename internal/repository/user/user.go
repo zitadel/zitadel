@@ -396,7 +396,7 @@ type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	OldUserName           string `json:"-"`
+	oldUserName           string `json:"-"`
 	userLoginMustBeDomain bool   `json:"-"`
 }
 
@@ -406,7 +406,7 @@ func (e *UsernameChangedEvent) Data() interface{} {
 
 func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.OldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
 }
@@ -425,7 +425,7 @@ func NewUsernameChangedEvent(
 			UserUserNameChangedType,
 		),
 		UserName:              newUserName,
-		OldUserName:           oldUserName,
+		oldUserName:           oldUserName,
 		userLoginMustBeDomain: userLoginMustBeDomain,
 	}
 }
