@@ -89,7 +89,7 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 	case user.HumanRefreshTokenRenewedType:
 		e := new(user.HumanRefreshTokenRenewedEvent)
 		if err := json.Unmarshal(event.Data, e); err != nil {
-			logging.Log("EVEN-DBbn4").WithError(err).Error("could not unmarshal event data")
+			logging.WithError(err).Error("could not unmarshal event data")
 			return caos_errs.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
 		}
 		token, err := t.view.RefreshTokenByID(e.TokenID, event.InstanceID)
@@ -104,7 +104,7 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 	case user.HumanRefreshTokenRemovedType:
 		e := new(user.HumanRefreshTokenRemovedEvent)
 		if err := json.Unmarshal(event.Data, e); err != nil {
-			logging.Log("EVEN-BDbh3").WithError(err).Error("could not unmarshal event data")
+			logging.WithError(err).Error("could not unmarshal event data")
 			return caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
 		}
 		return t.view.DeleteRefreshToken(e.TokenID, event.InstanceID, event)
@@ -120,10 +120,10 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 }
 
 func (t *RefreshToken) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-3jkl4", "id", event.AggregateID).WithError(err).Warn("something went wrong in token handler")
-	return spooler.HandleError(event, err, t.view.GetLatestTokenFailedEvent, t.view.ProcessedTokenFailedEvent, t.view.ProcessedTokenSequence, t.errorCountUntilSkip)
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in token handler")
+	return spooler.HandleError(event, err, t.view.GetLatestRefreshTokenFailedEvent, t.view.ProcessedRefreshTokenFailedEvent, t.view.ProcessedRefreshTokenSequence, t.errorCountUntilSkip)
 }
 
 func (t *RefreshToken) OnSuccess() error {
-	return spooler.HandleSuccess(t.view.UpdateTokenSpoolerRunTimestamp)
+	return spooler.HandleSuccess(t.view.UpdateRefreshTokenSpoolerRunTimestamp)
 }
