@@ -17,13 +17,12 @@ import (
 )
 
 var (
-	loginNamesQuery = `SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames, login_names.instance_id` +
+	loginNamesQuery = `SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames, login_names.instance_id, login_names.user_owner_removed, login_names.policy_owner_removed, login_names.domain_owner_removed` +
 		` FROM projections.login_names2 AS login_names` +
-		` WHERE login_names.domain_owner_removed = $1 AND login_names.policy_owner_removed = $2 AND login_names.user_owner_removed = $3` +
-		` GROUP BY login_names.user_id, login_names.instance_id`
-	preferredLoginNameQuery = `SELECT preferred_login_name.user_id, preferred_login_name.login_name, preferred_login_name.instance_id` +
+		` GROUP BY login_names.user_id, login_names.instance_id, login_names.user_owner_removed, login_names.policy_owner_removed, login_names.domain_owner_removed`
+	preferredLoginNameQuery = `SELECT preferred_login_name.user_id, preferred_login_name.login_name, preferred_login_name.instance_id, preferred_login_name.user_owner_removed, preferred_login_name.policy_owner_removed, preferred_login_name.domain_owner_removed` +
 		` FROM projections.login_names2 AS preferred_login_name` +
-		` WHERE preferred_login_name.domain_owner_removed = $4 AND preferred_login_name.is_primary = $5 AND preferred_login_name.policy_owner_removed = $6 AND preferred_login_name.user_owner_removed = $7`
+		` WHERE  preferred_login_name.is_primary = $1`
 	userQuery = `SELECT projections.users6.id,` +
 		` projections.users6.creation_date,` +
 		` projections.users6.change_date,` +
@@ -319,7 +318,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery(false)
+				return prepareUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -339,7 +338,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery human found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery(false)
+				return prepareUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -406,7 +405,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery machine found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery(false)
+				return prepareUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -464,7 +463,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUserQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-				return prepareUserQuery(false)
+				return prepareUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -831,7 +830,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery(false)
+				return prepareNotifyUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -851,7 +850,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery notify found",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery(false)
+				return prepareNotifyUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -916,7 +915,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery not notify found (error)",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery(false)
+				return prepareNotifyUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -963,7 +962,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareNotifyUserQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*NotifyUser, error)) {
-				return prepareNotifyUserQuery(false)
+				return prepareNotifyUserQuery()
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -982,7 +981,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUsersQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(false)
+				return prepareUsersQuery()
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1002,7 +1001,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUsersQuery one result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(false)
+				return prepareUsersQuery()
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1077,7 +1076,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUsersQuery multiple results",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(false)
+				return prepareUsersQuery()
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -1197,7 +1196,7 @@ func Test_UserPrepares(t *testing.T) {
 		{
 			name: "prepareUsersQuery sql err",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
-				return prepareUsersQuery(false)
+				return prepareUsersQuery()
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
