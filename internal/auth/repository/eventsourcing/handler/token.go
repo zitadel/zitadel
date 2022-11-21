@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"time"
 
 	"github.com/zitadel/logging"
 
@@ -100,7 +99,7 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		tokens, err := t.view.TokensByUserID(event.AggregateID, event.InstanceID, time.Now())
+		tokens, err := t.view.TokensByUserID(event.AggregateID, event.InstanceID)
 		if err != nil {
 			return err
 		}
