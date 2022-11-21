@@ -58,7 +58,7 @@ type Steps struct {
 	s2AssetsTable        *AssetTable
 	FirstInstance        *FirstInstance
 	s4EventstoreIndexes  *EventstoreIndexes
-	s5OwnerRemoveColumns *ProjectionTable05
+	s6OwnerRemoveColumns *OwnerRemoveColumns
 }
 
 type encryptionKeyConfig struct {
