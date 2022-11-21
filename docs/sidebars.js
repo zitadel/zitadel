@@ -249,12 +249,13 @@ module.exports = {
     {
       type: "category",
       label: "Actions",
-      collapsed: true,
+      collapsed: false,
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
         "apis/actions/login-flow",
         "apis/actions/register-flow",
+        "apis/actions/objects",
       ]
     },
     {
