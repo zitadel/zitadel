@@ -761,6 +761,7 @@ func PasswordlessRegistrationDoneScreenTextPbToDomain(text *text_pb.Passwordless
 		Description:      text.Description,
 		DescriptionClose: text.DescriptionClose,
 		NextButtonText:   text.NextButtonText,
+		CancelButtonText: text.CancelButtonText,
 	}
 }
 

@@ -377,6 +377,9 @@ func CustomTextsToLoginDomain(instanceID, aggregateID, lang string, texts *Custo
 		if strings.HasPrefix(text.Key, domain.LoginKeyRegistrationUser) {
 			registrationUserKeyToDomain(text, result)
 		}
+		if strings.HasPrefix(text.Key, domain.LoginKeyExternalRegistrationUserOverview) {
+			externalRegistrationUserKeyToDomain(text, result)
+		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyRegistrationOrg) {
 			registrationOrgKeyToDomain(text, result)
 		}
@@ -912,6 +915,60 @@ func registrationOptionKeyToDomain(text *CustomText, result *domain.CustomLoginT
 	}
 	if text.Key == domain.LoginKeyRegistrationOptionUserNameButtonText {
 		result.RegisterOption.RegisterUsernamePasswordButtonText = text.Text
+	}
+}
+
+func externalRegistrationUserKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewBackButtonText {
+		result.ExternalRegistrationUserOverview.BackButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewDescription {
+		result.ExternalRegistrationUserOverview.Description = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewEmailLabel {
+		result.ExternalRegistrationUserOverview.EmailLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel {
+		result.ExternalRegistrationUserOverview.FirstnameLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel {
+		result.ExternalRegistrationUserOverview.LanguageLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel {
+		result.ExternalRegistrationUserOverview.LastnameLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewNextButtonText {
+		result.ExternalRegistrationUserOverview.NextButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel {
+		result.ExternalRegistrationUserOverview.NicknameLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel {
+		result.ExternalRegistrationUserOverview.NicknameLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel {
+		result.ExternalRegistrationUserOverview.PhoneLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText {
+		result.ExternalRegistrationUserOverview.PrivacyLinkText = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewTitle {
+		result.ExternalRegistrationUserOverview.Title = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel {
+		result.ExternalRegistrationUserOverview.TOSAndPrivacyLabel = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm {
+		result.ExternalRegistrationUserOverview.TOSConfirm = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd {
+		result.ExternalRegistrationUserOverview.TOSConfirmAnd = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText {
+		result.ExternalRegistrationUserOverview.TOSLinkText = text.Text
+	}
+	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel {
+		result.ExternalRegistrationUserOverview.UsernameLabel = text.Text
 	}
 }
 
