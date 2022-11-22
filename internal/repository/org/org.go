@@ -180,13 +180,14 @@ type OrgRemovedEvent struct {
 }
 
 func (e *OrgRemovedEvent) Data() interface{} {
-	return e
+	return nil
 }
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	constraints := []*eventstore.EventUniqueConstraint{}
+	constraints := []*eventstore.EventUniqueConstraint{
+		NewRemoveOrgNameUniqueConstraint(e.name),
+	}
 	for _, name := range e.usernames {
-		// username already contains resourceowner is necessary
 		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.loginMustBeDomain))
 	}
 	for _, domain := range e.domains {

@@ -339,22 +339,15 @@ func createIndexStatement(index *Index, tableName string) string {
 func foreignKeyName(name, tableName, suffix string) string {
 	if name == "" {
 		key := "fk" + suffix + "_ref_" + tableNameWithoutSchema(tableName)
-		fmt.Println(key)
 		return key
 	}
-	key := "fk_" + tableNameWithoutSchema(tableName+suffix) + "_" + name
-	fmt.Println(key)
-	return key
+	return "fk_" + tableNameWithoutSchema(tableName+suffix) + "_" + name
 }
 func constraintName(name, tableName, suffix string) string {
-	constr := tableNameWithoutSchema(tableName+suffix) + "_" + name + "_unique"
-	fmt.Println(constr)
-	return constr
+	return tableNameWithoutSchema(tableName+suffix) + "_" + name + "_unique"
 }
 func indexName(name, tableName string) string {
-	index := tableNameWithoutSchema(tableName) + "_" + name + "_idx"
-	fmt.Println(index)
-	return index
+	return tableNameWithoutSchema(tableName) + "_" + name + "_idx"
 }
 
 func tableNameWithoutSchema(name string) string {

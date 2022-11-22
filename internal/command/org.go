@@ -338,6 +338,7 @@ func OrgUserIDPLinks(ctx context.Context, filter preparation.FilterToQueryReduce
 				if links[i].ExternalUserID == eventTyped.ExternalUserID &&
 					links[i].IDPConfigID == eventTyped.IDPConfigID {
 					links[i] = links[len(links)-1]
+					links[len(links)-1] = nil
 					links = links[:len(links)-1]
 					break
 				}
@@ -348,6 +349,7 @@ func OrgUserIDPLinks(ctx context.Context, filter preparation.FilterToQueryReduce
 				if links[i].ExternalUserID == eventTyped.ExternalUserID &&
 					links[i].IDPConfigID == eventTyped.IDPConfigID {
 					links[i] = links[len(links)-1]
+					links[len(links)-1] = nil
 					links = links[:len(links)-1]
 					break
 				}

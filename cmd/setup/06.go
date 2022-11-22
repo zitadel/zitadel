@@ -8,9 +8,9 @@ import (
 
 var (
 	//go:embed 06/adminapi.sql
-	createAdminViews05 string
+	createAdminViews06 string
 	//go:embed 06/auth.sql
-	createAuthViews05 string
+	createAuthViews06 string
 )
 
 type OwnerRemoveColumns struct {
@@ -18,7 +18,7 @@ type OwnerRemoveColumns struct {
 }
 
 func (mig *OwnerRemoveColumns) Execute(ctx context.Context) error {
-	stmt := createAdminViews05 + createAuthViews05
+	stmt := createAdminViews06 + createAuthViews06
 	_, err := mig.dbClient.ExecContext(ctx, stmt)
 	return err
 }

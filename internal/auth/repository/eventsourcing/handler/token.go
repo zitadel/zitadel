@@ -149,6 +149,9 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 	case instance.InstanceRemovedEventType:
 		return t.view.DeleteInstanceTokens(event)
 	case org.OrgRemovedEventType:
+		// deletes all tokens including PATs, which is expected for now
+		// if there is an undo of the org deletion in the future,
+		// we will need to have a look on how to handle the deleted PATs
 		return t.view.DeleteOrgTokens(event)
 	default:
 		return t.view.ProcessedTokenSequence(event)
