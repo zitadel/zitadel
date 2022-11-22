@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { EnvironmentContext } from "../utils/environment";
 import styles from "../css/environment.module.css";
+import Interpolate from "@docusaurus/Interpolate";
 
 export function SetEnvironment() {
   const {
@@ -13,12 +14,25 @@ export function SetEnvironment() {
     const clientId = params.get("clientId");
     const instance = params.get("instance");
 
-    setClientId(clientId);
-    setInstance(instance);
+    const localClientId = localStorage.getItem("clientId");
+    const localInstance = localStorage.getItem("instance");
+
+    setClientId(clientId ?? localClientId ?? "");
+    setInstance(instance ?? localInstance ?? "");
   }, []);
 
   function setAndSaveInstance(value) {
-    setInstance(value);
+    if (instance !== value) {
+      localStorage.setItem("instance", value);
+      setInstance(value);
+    }
+  }
+
+  function setAndSaveClientId(value) {
+    if (clientId !== value) {
+      localStorage.setItem("clientId", value);
+      setClientId(value);
+    }
   }
 
   return (
@@ -34,7 +48,7 @@ export function SetEnvironment() {
             if (value) {
               setAndSaveInstance(value);
             } else {
-              setInstance("");
+              localStorage.removeItem("instance");
             }
           }}
         />
@@ -51,9 +65,9 @@ export function SetEnvironment() {
           onChange={(event) => {
             const value = event.target.value;
             if (value) {
-              setClientId(value);
+              setAndSaveClientId(value);
             } else {
-              setClientId("");
+              localStorage.removeItem("clientId");
             }
           }}
         />
@@ -66,5 +80,23 @@ export function Env({ name }) {
   const env = useContext(EnvironmentContext);
   const variable = env[name];
 
-  return variable ? <span>{variable}</span> : null;
+  return <div>{variable}</div>;
+}
+
+export function EnvInterpolate({ children }) {
+  const {
+    instance: [instance],
+    clientId: [clientId],
+  } = useContext(EnvironmentContext);
+
+  return (
+    <Interpolate
+      values={{
+        clientId,
+        instance,
+      }}
+    >
+      {children}
+    </Interpolate>
+  );
 }
