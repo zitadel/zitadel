@@ -3,9 +3,6 @@ import { EnvironmentContext } from "../utils/environment";
 import styles from "../css/environment.module.css";
 
 export function SetEnvironment() {
-  //   const { [type]: [data, setData] } =
-  //     useContext(EnvironmentContext);
-
   const {
     instance: [instance, setInstance],
     clientId: [clientId, setClientId],
@@ -20,8 +17,8 @@ export function SetEnvironment() {
     setInstance(instance);
   }, []);
 
-  setAndSaveInstance(value) {
-
+  function setAndSaveInstance(value) {
+    setInstance(value);
   }
 
   return (
@@ -35,7 +32,7 @@ export function SetEnvironment() {
           onChange={(event) => {
             const value = event.target.value;
             if (value) {
-              setAndSavbeInstance(value);
+              setAndSaveInstance(value);
             } else {
               setInstance("");
             }
