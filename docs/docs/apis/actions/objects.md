@@ -23,3 +23,9 @@ title: Objects
 
 - key: `string`
 - value: Array of `byte`
+
+## user grant
+
+- `projectId`: Required. Id of the project to be granted
+- `projectGrantId`: If the grant is for a project grant
+- `roles`: Array of `string` containing the roles
