@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -1631,7 +1632,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						CancelButtonText: "CancelButtonText",
 						NextButtonText:   "NextButtonText",
 					},
-					ExternalNotFoundOption: domain.ExternalUserNotFoundScreenText{
+					ExternalNotFound: domain.ExternalUserNotFoundScreenText{
 						Title:                  "Title",
 						Description:            "Description",
 						LinkButtonText:         "LinkButtonText",
@@ -4329,7 +4330,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					ExternalRegistrationUserOverview: domain.ExternalRegistrationUserOverviewScreenText{},
 					RegistrationOrg:                  domain.RegistrationOrgScreenText{},
 					LinkingUsersDone:                 domain.LinkingUserDoneScreenText{},
-					ExternalNotFoundOption:           domain.ExternalUserNotFoundScreenText{},
+					ExternalNotFound:                 domain.ExternalUserNotFoundScreenText{},
 					LoginSuccess:                     domain.SuccessLoginScreenText{},
 					LogoutDone:                       domain.LogoutDoneScreenText{},
 					Footer:                           domain.FooterText{},
@@ -8543,7 +8544,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						CancelButtonText: "CancelButtonText",
 						NextButtonText:   "NextButtonText",
 					},
-					ExternalNotFoundOption: domain.ExternalUserNotFoundScreenText{
+					ExternalNotFound: domain.ExternalUserNotFoundScreenText{
 						Title:                  "Title",
 						Description:            "Description",
 						LinkButtonText:         "LinkButtonText",

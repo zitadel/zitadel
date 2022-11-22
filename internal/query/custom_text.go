@@ -943,9 +943,6 @@ func externalRegistrationUserKeyToDomain(text *CustomText, result *domain.Custom
 	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel {
 		result.ExternalRegistrationUserOverview.NicknameLabel = text.Text
 	}
-	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel {
-		result.ExternalRegistrationUserOverview.NicknameLabel = text.Text
-	}
 	if text.Key == domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel {
 		result.ExternalRegistrationUserOverview.PhoneLabel = text.Text
 	}
@@ -1094,31 +1091,31 @@ func linkingUserKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 
 func externalUserNotFoundKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyExternalNotFoundTitle {
-		result.ExternalNotFoundOption.Title = text.Text
+		result.ExternalNotFound.Title = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundDescription {
-		result.ExternalNotFoundOption.Description = text.Text
+		result.ExternalNotFound.Description = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundLinkButtonText {
-		result.ExternalNotFoundOption.LinkButtonText = text.Text
+		result.ExternalNotFound.LinkButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundAutoRegisterButtonText {
-		result.ExternalNotFoundOption.AutoRegisterButtonText = text.Text
+		result.ExternalNotFound.AutoRegisterButtonText = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel {
-		result.ExternalNotFoundOption.TOSAndPrivacyLabel = text.Text
+		result.ExternalNotFound.TOSAndPrivacyLabel = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundTOSConfirm {
-		result.ExternalNotFoundOption.TOSConfirm = text.Text
+		result.ExternalNotFound.TOSConfirm = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundTOSLinkText {
-		result.ExternalNotFoundOption.TOSLinkText = text.Text
+		result.ExternalNotFound.TOSLinkText = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundTOSConfirmAnd {
-		result.ExternalNotFoundOption.TOSConfirmAnd = text.Text
+		result.ExternalNotFound.TOSConfirmAnd = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundPrivacyLinkText {
-		result.ExternalNotFoundOption.PrivacyLinkText = text.Text
+		result.ExternalNotFound.PrivacyLinkText = text.Text
 	}
 }
 
