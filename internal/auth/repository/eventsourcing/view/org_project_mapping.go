@@ -60,16 +60,16 @@ func (v *View) GetLatestOrgProjectMappingSequence(instanceID string) (*repositor
 	return v.latestSequence(orgProjectMappingTable, instanceID)
 }
 
-func (v *View) GetLatestOrgProjectMappingSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(orgProjectMappingTable, instanceIDs...)
+func (v *View) GetLatestOrgProjectMappingSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(orgProjectMappingTable, instanceIDs)
 }
 
 func (v *View) ProcessedOrgProjectMappingSequence(event *models.Event) error {
 	return v.saveCurrentSequence(orgProjectMappingTable, event)
 }
 
-func (v *View) UpdateOrgProjectMappingSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(orgProjectMappingTable)
+func (v *View) UpdateOrgProjectMappingSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(orgProjectMappingTable, instanceIDs)
 }
 
 func (v *View) GetLatestOrgProjectMappingFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {

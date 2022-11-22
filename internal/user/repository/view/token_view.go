@@ -36,8 +36,13 @@ func TokensByUserID(db *gorm.DB, table, userID, instanceID string) ([]*usr_model
 		Method: domain.SearchMethodEquals,
 		Value:  instanceID,
 	}
+	expirationQuery := &model.TokenSearchQuery{
+		Key:    model.TokenSearchKeyExpiration,
+		Method: domain.SearchMethodGreaterThan,
+		Value:  "now()",
+	}
 	query := repository.PrepareSearchQuery(table, usr_model.TokenSearchRequest{
-		Queries: []*model.TokenSearchQuery{userIDQuery, instanceIDQuery},
+		Queries: []*model.TokenSearchQuery{userIDQuery, instanceIDQuery, expirationQuery},
 	})
 	_, err := query(db, &tokens)
 	return tokens, err

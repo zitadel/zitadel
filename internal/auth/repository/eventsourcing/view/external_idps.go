@@ -76,16 +76,16 @@ func (v *View) GetLatestExternalIDPSequence(instanceID string) (*global_view.Cur
 	return v.latestSequence(externalIDPTable, instanceID)
 }
 
-func (v *View) GetLatestExternalIDPSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(externalIDPTable, instanceIDs...)
+func (v *View) GetLatestExternalIDPSequences(instanceIDs []string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(externalIDPTable, instanceIDs)
 }
 
 func (v *View) ProcessedExternalIDPSequence(event *models.Event) error {
 	return v.saveCurrentSequence(externalIDPTable, event)
 }
 
-func (v *View) UpdateExternalIDPSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(externalIDPTable)
+func (v *View) UpdateExternalIDPSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(externalIDPTable, instanceIDs)
 }
 
 func (v *View) GetLatestExternalIDPFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {

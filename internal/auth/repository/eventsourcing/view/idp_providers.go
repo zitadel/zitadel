@@ -81,16 +81,16 @@ func (v *View) GetLatestIDPProviderSequence(instanceID string) (*global_view.Cur
 	return v.latestSequence(idpProviderTable, instanceID)
 }
 
-func (v *View) GetLatestIDPProviderSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(idpProviderTable, instanceIDs...)
+func (v *View) GetLatestIDPProviderSequences(instanceIDs []string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(idpProviderTable, instanceIDs)
 }
 
 func (v *View) ProcessedIDPProviderSequence(event *models.Event) error {
 	return v.saveCurrentSequence(idpProviderTable, event)
 }
 
-func (v *View) UpdateIDPProviderSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(idpProviderTable)
+func (v *View) UpdateIDPProviderSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(idpProviderTable, instanceIDs)
 }
 
 func (v *View) GetLatestIDPProviderFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {

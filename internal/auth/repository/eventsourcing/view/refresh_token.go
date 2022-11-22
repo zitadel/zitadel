@@ -85,16 +85,16 @@ func (v *View) GetLatestRefreshTokenSequence(instanceID string) (*repository.Cur
 	return v.latestSequence(refreshTokenTable, instanceID)
 }
 
-func (v *View) GetLatestRefreshTokenSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(refreshTokenTable, instanceIDs...)
+func (v *View) GetLatestRefreshTokenSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(refreshTokenTable, instanceIDs)
 }
 
 func (v *View) ProcessedRefreshTokenSequence(event *models.Event) error {
 	return v.saveCurrentSequence(refreshTokenTable, event)
 }
 
-func (v *View) UpdateRefreshTokenSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(refreshTokenTable)
+func (v *View) UpdateRefreshTokenSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(refreshTokenTable, instanceIDs)
 }
 
 func (v *View) GetLatestRefreshTokenFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
