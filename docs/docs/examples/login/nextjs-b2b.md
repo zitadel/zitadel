@@ -1,10 +1,12 @@
 ---
-title: Next.js
+title: Next.js B2B Scenario
 ---
 
-This is our Zitadel [Next.js](https://nextjs.org/) template. It shows how to authenticate as a user and retrieve user information from the OIDC endpoint.
+This is our Zitadel [Next.js](https://nextjs.org/) B2B template. It shows how to authenticate as a user with multiple organizations. The application shows your users roles on the selected organizations, other projects your organization is allowed to use and other users having a grant to use the application.
 
-> The template code is part of our zitadel-nextjs repo. Take a look [here](https://github.com/zitadel/zitadel-nextjs).
+> The template code is part of our zitadel-nextjs repo. Take a look [here](https://github.com/zitadel/zitadel-nextjs-b2b).
+
+![B2B Application](/img/nextjs-b2b/home.png)
 
 ## Getting Started
 
@@ -31,8 +33,6 @@ You will need to provide some information about your app.
 Navigate to your Project, then add a new application at the top of the page.
 Select Web application type and continue.
 We recommend you use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
-
-![Create app in console](/img/nextjs/app-create.png)
 
 ### Redirect URIs
 
