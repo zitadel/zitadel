@@ -13,28 +13,46 @@ A user has authenticated externally. ZITADEL retrieved and mapped the external i
 
 #### Parameters of post authentication action
 
-- `ctx`: The first parameter contains the following fields:
-  - `accessToken`: `string` The access token which will be returned to the user. This can be an opaque token or a JWT
-  - `claimsJSON()` [`idTokenClaims`](../openidoauth/claims): returns all claims of the id token
-  - `getClaim(key) Object)`: returns the requested [id token claim](../openidoauth/claims)
-  - `idToken`: `string` The id token which will be returned to the user
+- `ctx`  
+The first parameter contains the following fields:
+  - `accessToken` `string`  
+    The access token which will be returned to the user. This can be an opaque token or a JWT
+  - `claimsJSON()` [`idTokenClaims`](../openidoauth/claims)  
+    Returns all claims of the id token
+  - `getClaim(key)` `Object`  
+    Returns the requested [id token claim](../openidoauth/claims)
+  - `idToken` `string`  
+    The id token which will be returned to the user
   - `v1`:
-    - `externalUser()`: [`externalUser`](./objects#external-user)
-- `api`: The second parameter contains the following fields:
+    - `externalUser()` [`externalUser`](./objects#external-user)
+- `api`:  
+  The second parameter contains the following fields:
   - `v1`
     - `user`
-      - `appendMetadata(string, Object)`: the first parameter represents the key and the second a value which will be stored
-  - `setFirstName(string)`: sets the first name
-  - `setLastName(string)`: sets the last name
-  - `setNickName(string)`: sets the nickname
-  - `setDisplayName(string)`: sets the display name
-  - `setPreferredLanguage(string)`: sets the preferred language. Please use the format defined in [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646)
-  - `setPreferredUsername(string)`: sets the preferred username
-  - `setEmail(string)`: sets the email address of the user
-  - `setEmailVerified(boolean)`: sets the email address verified or unverified
-  - `setPhone(string)`: sets the phone number of the user
-  - `setPhoneVerified(boolean)`: sets the phone number verified or unverified
-  - `metadata` Array of [`metadata`](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
+      - `appendMetadata(string, Object)`  
+        The first parameter represents the key and the second a value which will be stored
+  - `setFirstName(string)`  
+    Sets the first name
+  - `setLastName(string)`  
+    Sets the last name
+  - `setNickName(string)`  
+    Sets the nickname
+  - `setDisplayName(string)`  
+    Sets the display name
+  - `setPreferredLanguage(string)`  
+    Sets the preferred language. Please use the format defined in [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646)
+  - `setPreferredUsername(string)`  
+    Sets the preferred username
+  - `setEmail(string)`  
+    Sets the email address of the user
+  - `setEmailVerified(boolean)`  
+    Sets the email address verified or unverified
+  - `setPhone(string)`  
+    Sets the phone number of the user
+  - `setPhoneVerified(boolean)`  
+    Sets the phone number verified or unverified
+  - `metadata`  
+    Array of [`metadata`](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
 
 ### Pre Creation
 
@@ -42,25 +60,41 @@ A user selected **Register** on the overview page after external authentication.
 
 #### Parameters of Pre Creation
 
-- `ctx`: The first parameter contains the following fields:
+- `ctx`  
+  The first parameter contains the following fields:
   - `v1`
     - `user`
-- `api`: The second parameter contains the following fields:
-  - `metadata` Array of [`metadata`](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
-  - `setFirstName(string)`: sets the first name
-  - `setLastName(string)`: sets the last name
-  - `setNickName(string)`: sets the nick name
-  - `setDisplayName(string)`: sets the display name
-  - `setPreferredLanguage(string)`: sets the preferred language, the string has to be a valid language tag
-  - `setGender(int)`: sets the gender. <br/><ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul>
-  - `setUsername(string)`: sets the username
-  - `setEmail(string)`: sets the email
-  - `setEmailVerified(bool)`: if true the email set is verified without user interaction
-  - `setPhone(string)`: sets the phone number
-  - `setPhoneVerified(bool)`: if true the phone number set is verified without user interaction
+- `api`  
+  The second parameter contains the following fields:
+  - `metadata`  
+    Array of [`metadata`](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
+  - `setFirstName(string)`  
+    Sets the first name
+  - `setLastName(string)`  
+    Sets the last name
+  - `setNickName(string)`  
+    Sets the nick name
+  - `setDisplayName(string)`  
+    Sets the display name
+  - `setPreferredLanguage(string)`  
+    Sets the preferred language, the string has to be a valid language tag
+  - `setGender(int)`  
+    Sets the gender.  
+    <ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul>
+  - `setUsername(string)`  
+    Sets the username
+  - `setEmail(string)`  
+    Sets the email
+  - `setEmailVerified(bool)`  
+    If true the email set is verified without user interaction
+  - `setPhone(string)`  
+    Sets the phone number
+  - `setPhoneVerified(bool)`  
+    If true the phone number set is verified without user interaction
   - `v1`
     - `user`
-      - `appendMetadata(string, Object)`: the first parameter represents the key and the second a value which will be stored
+      - `appendMetadata(string, Object)`  
+        The first parameter represents the key and the second a value which will be stored
 
 ### Post Creation
 
@@ -68,10 +102,12 @@ A user selected **Register** on the overview page after external authentication 
 
 #### Parameters of Post Creation
 
-- `ctx`: The first parameter contains the following fields:
+- `ctx`:  
+  The first parameter contains the following fields:
   - `v1`
-    - `getUser()` [`user`](./objects#user)
-- `api`: The second parameter contains the following fields:
-  - `userGrants`: Array of [`userGrant`](./objects#user-grant)
+    - `getUser()`: [`user`](./objects#user)
+- `api`:  
+  The second parameter contains the following fields:
+  - `userGrants`: Array of [`userGrant`](./objects#user-grant)'s
   - `v1`:
-    - `appendUserGrant(`[`userGrant`](./objects#user-grant)`)`:
+    - `appendUserGrant(`[`userGrant`](./objects#user-grant)`)`
