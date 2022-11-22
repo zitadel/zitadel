@@ -12,23 +12,16 @@ This trigger is called before userinfo are set in the token or response.
 
 #### Parameters of Pre Userinfo creation
 
-`ctx`: is always `null`
-
-`api`:
-
-**Fields**: None
-
-**Methods**
-
-| name | description | parameter types | response |
-|---|---|---|---|
-| setClaim(key, value) | sets an additional claim in user info. The claim can be set once and the key must not be a reserved key | `string`, `any` | none |
-| appendLogIntoClaims(entry) | appends the entry into the claim `urn:zitadel:action:{action.name}:log` the value of the claim is an `array` | `string` | none |
-
-#### Available modules of Pre Userinfo creation
-
-- [zitadel/http](#zitadelhttp)
-- [zitadel/metadata/user](#zitadelmetadatauser)
+- `ctx`: The first parameter contains the following fields:
+  - `v1`
+    - `user`
+      - `getMetadata()` [`metadataResult`](./objects#metadata-result)
+- `api`: The second parameter contains the following fields:
+  - `v1`
+    - `userinfo`
+      - `setClaim(string, Object)`: key of the claim and an object as value
+    - `user`
+      - `setMetadata(string, Object)`: key of the metadata and an object as value
 
 ### Pre access token creation
 
@@ -36,15 +29,14 @@ This trigger is called before the claims are set in the access token and the tok
 
 #### Parameters of Pre access token creation
 
-`ctx`: is always `null`
-
-`api`:
-
-**Fields**: None
-
-**Methods**
-
-| name | description | parameter types | response |
-|---|---|---|---|
-| setClaim(key, value) | sets an additional claim in access token. The claim can be set once and the key must not be a reserved key. | `string`, `any` | none |
-| appendLogIntoClaims(entry) | appends the entry into the claim `urn:zitadel:action:{action.name}:log` the value of the claim is an `array` | `string` | none |
+- `ctx`: The first parameter contains the following fields:
+  - `v1`
+    - `user`
+      - `getMetadata()` [`metadataResult`](./objects#metadata-result)
+- `api`: The second parameter contains the following fields:
+  - `v1`
+    - `claims`
+      - `setClaim(string, Object)`: sets the value if the key is not already present
+      - `appendLogIntoClaims(string)`: Appends the entry into the claim `urn:zitadel:action:{action.name}:log` the value of the claim is an Array of `string`
+    - `user`
+      - `setMetadata(string, Object)`: key of the metadata and an object as value
