@@ -84,19 +84,21 @@ module.exports = {
           position: "left",
         },
         {
-          href: "https://github.com/zitadel/zitadel",
-          label: "GitHub",
-          position: "right",
-        },
-        {
-          href: "https://zitadel.com/chat",
-          label: "Chat",
-          position: "right",
-        },
-        {
           label: "Discussions",
           position: "right",
           href: "https://github.com/zitadel/zitadel/discussions",
+        },
+        {
+          type: "html",
+          position: "right",
+          value:
+            '<a href="https://github.com/zitadel/zitadel" style="text-decoration: none; width: 24px; height: 24px; display: flex"><i class="lab la-github"></i></a>',
+        },
+        {
+          type: "html",
+          position: "right",
+          value:
+            '<a href="https://zitadel.com/chat" style="text-decoration: none; width: 24px; height: 24px; display: flex"><i class="lab la-discord"></i></a>',
         },
         {
           type: "html",
@@ -198,10 +200,7 @@ module.exports = {
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
-          remarkPlugins: [
-            require("mdx-mermaid"),
-            // require("./src/plugin/environmentvars/index.js"),
-          ],
+          remarkPlugins: [require("mdx-mermaid")],
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -209,14 +208,6 @@ module.exports = {
       },
     ],
   ],
-  plugins: [
-    require.resolve("docusaurus-plugin-image-zoom"),
-    // [
-    //   "./src/plugin/environmentvars/index.js",
-    //   {
-    //     instance: "hello",
-    //   },
-    // ],
-  ],
+  plugins: [require.resolve("docusaurus-plugin-image-zoom")],
   themes: ["@saucelabs/theme-github-codeblock"],
 };
