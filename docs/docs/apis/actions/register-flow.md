@@ -14,7 +14,7 @@ A user has authenticated externally. ZITADEL retrieved and mapped the external i
 #### Parameters of post authentication action
 
 - `ctx`  
-The first parameter contains the following fields:
+The first parameter contains the following fields
   - `accessToken` `string`  
     The access token which will be returned to the user. This can be an opaque token or a JWT
   - `claimsJSON()` [`idTokenClaims`](../openidoauth/claims)  
@@ -23,10 +23,10 @@ The first parameter contains the following fields:
     Returns the requested [id token claim](../openidoauth/claims)
   - `idToken` `string`  
     The id token which will be returned to the user
-  - `v1`:
+  - `v1`
     - `externalUser()` [`externalUser`](./objects#external-user)
-- `api`:  
-  The second parameter contains the following fields:
+- `api`  
+  The second parameter contains the following fields
   - `v1`
     - `user`
       - `appendMetadata(string, Object)`  
@@ -40,7 +40,7 @@ The first parameter contains the following fields:
   - `setDisplayName(string)`  
     Sets the display name
   - `setPreferredLanguage(string)`  
-    Sets the preferred language. Please use the format defined in [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646)
+    Sets the preferred language. Please use the format defined in [RFC 5646](https//www.rfc-editor.org/rfc/rfc5646)
   - `setPreferredUsername(string)`  
     Sets the preferred username
   - `setEmail(string)`  
@@ -61,11 +61,11 @@ A user selected **Register** on the overview page after external authentication.
 #### Parameters of Pre Creation
 
 - `ctx`  
-  The first parameter contains the following fields:
+  The first parameter contains the following fields
   - `v1`
-    - `user`
+    - `user` [`Human`](./objects#human-user)
 - `api`  
-  The second parameter contains the following fields:
+  The second parameter contains the following fields
   - `metadata`  
     Array of [`metadata`](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
   - `setFirstName(string)`  
@@ -102,12 +102,12 @@ A user selected **Register** on the overview page after external authentication 
 
 #### Parameters of Post Creation
 
-- `ctx`:  
-  The first parameter contains the following fields:
+- `ctx`  
+  The first parameter contains the following fields
   - `v1`
-    - `getUser()`: [`user`](./objects#user)
-- `api`:  
-  The second parameter contains the following fields:
-  - `userGrants`: Array of [`userGrant`](./objects#user-grant)'s
-  - `v1`:
+    - `getUser()` [`user`](./objects#user)
+- `api`  
+  The second parameter contains the following fields
+  - `userGrants` Array of [`userGrant`](./objects#user-grant)'s
+  - `v1`
     - `appendUserGrant(`[`userGrant`](./objects#user-grant)`)`
