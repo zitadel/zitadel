@@ -186,7 +186,7 @@ func (e *OrgRemovedEvent) Data() interface{} {
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	constraints := []*eventstore.EventUniqueConstraint{}
 	for _, name := range e.usernames {
-		//username already contains resourceowner is necessary
+		// username already contains resourceowner is necessary
 		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.loginMustBeDomain))
 	}
 	for _, domain := range e.domains {

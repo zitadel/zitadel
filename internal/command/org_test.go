@@ -1012,15 +1012,13 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
-		iamDomain   string
 	}
 	type args struct {
 		ctx   context.Context
 		orgID string
 	}
 	type res struct {
-		want *domain.Org
-		err  func(error) bool
+		err func(error) bool
 	}
 	tests := []struct {
 		name   string

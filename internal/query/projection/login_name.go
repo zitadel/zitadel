@@ -114,7 +114,7 @@ var (
 			),
 		)
 
-	viewStmt, _, err = sq.Select(
+	viewStmt, _ = sq.Select(
 		LoginNameUserCol,
 		alias(
 			whenThenElse(
@@ -128,7 +128,7 @@ var (
 		LoginNameOwnerRemovedUserCol,
 		LoginNameOwnerRemovedPolicyCol,
 		LoginNameOwnerRemovedDomainCol,
-	).FromSelect(loginNamesTable, LoginNameTableAlias).ToSql()
+	).FromSelect(loginNamesTable, LoginNameTableAlias).MustSql()
 )
 
 func col(table, name string) string {

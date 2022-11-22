@@ -59,8 +59,8 @@ func PutTokens(db *gorm.DB, table string, tokens ...*usr_model.TokenView) error 
 
 func DeleteToken(db *gorm.DB, table, tokenID, instanceID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyTokenID), tokenID},
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyTokenID), Value: tokenID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
 }
@@ -76,24 +76,24 @@ func DeleteSessionTokens(db *gorm.DB, table, agentID, userID, instanceID string)
 
 func DeleteUserTokens(db *gorm.DB, table, userID, instanceID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyUserID), userID},
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyUserID), Value: userID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
 }
 
 func DeleteTokensFromRefreshToken(db *gorm.DB, table, refreshTokenID, instanceID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyRefreshTokenID), refreshTokenID},
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyRefreshTokenID), Value: refreshTokenID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
 }
 
 func DeleteApplicationTokens(db *gorm.DB, table, instanceID string, appIDs []string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyApplicationID), appIDs},
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyApplicationID), Value: appIDs},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
 }
@@ -108,8 +108,8 @@ func DeleteInstanceTokens(db *gorm.DB, table, instanceID string) error {
 
 func DeleteOrgTokens(db *gorm.DB, table, instanceID, orgID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyResourceOwner), orgID},
-		repository.Key{usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), instanceID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyResourceOwner), Value: orgID},
+		repository.Key{Key: usr_model.TokenSearchKey(model.TokenSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
 }
