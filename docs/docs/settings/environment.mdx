@@ -5,9 +5,11 @@ title: Environment Variables
 import {
   SetEnvironment,
   EnvInterpolate,
+  EnvCode,
 } from "../../src/components/environment";
 import EnvironmentContext from "../../src/utils/environment";
 import { useContext } from "react";
+import CodeBlock from "@theme/CodeBlock";
 
 export const Instance = () => {
   const { instance } = useContext(EnvironmentContext);
@@ -20,16 +22,25 @@ Enter your environment variables which are prefilled in docs here or use the doc
 
 ## Demo:
 
-<pre>
-  <code>
-    console.log('
-    <Env name="clientId" />
-    ') console.log('
-    <Env name="instance" />
-    ')
-  </code>
-</pre>
+<CodeBlock language="ts">console.log('clientId');</CodeBlock>
+
+<CodeBlock language="ts">
+  {`
+  console.log('hello')
+  ${(<EnvInterpolate>{"console.log('{clientId}')"}</EnvInterpolate>)}
+  `}
+</CodeBlock>
 
 <EnvInterpolate>
   {"Hello, {clientId}! How are you? Take a look at my {instance}"}
 </EnvInterpolate>
+
+<EnvCode language="dart">
+  {`
+    var _busy = false;
+    var _authenticated = false;
+    var _username = '';
+    final storage = const FlutterSecureStorage();
+    final clientId = {clientId};
+    `}
+</EnvCode>

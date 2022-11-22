@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { EnvironmentContext } from "../utils/environment";
 import styles from "../css/environment.module.css";
 import Interpolate from "@docusaurus/Interpolate";
+import CodeBlock from "@theme/CodeBlock";
 
 export function SetEnvironment() {
   const {
@@ -98,5 +99,35 @@ export function EnvInterpolate({ children }) {
     >
       {children}
     </Interpolate>
+  );
+}
+
+export function EnvCode({
+  language,
+  title,
+  code,
+  showLineNumbers = false,
+  children,
+}) {
+  const {
+    instance: [instance],
+    clientId: [clientId],
+  } = useContext(EnvironmentContext);
+
+  return (
+    <CodeBlock
+      language={language}
+      title={title}
+      showLineNumbers={showLineNumbers}
+    >
+      <Interpolate
+        values={{
+          clientId,
+          instance,
+        }}
+      >
+        {children}
+      </Interpolate>
+    </CodeBlock>
   );
 }
