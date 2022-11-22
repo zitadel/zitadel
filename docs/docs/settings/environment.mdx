@@ -6,7 +6,6 @@ import {
   SetEnvironment,
   EnvInterpolate,
   EnvCode,
-  Env,
 } from "../../src/components/environment";
 import EnvironmentContext from "../../src/utils/environment";
 import { useContext } from "react";
@@ -35,6 +34,6 @@ Enter your environment variables which are prefilled in docs here or use the doc
     var _authenticated = false;
     var _username = '';
     final storage = const FlutterSecureStorage();
-    final clientId = {clientId};
+    final clientId = "{clientId}";
     `}
 </EnvCode>
