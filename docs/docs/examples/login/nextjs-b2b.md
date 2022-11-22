@@ -4,12 +4,11 @@ title: Next.js B2B Scenario
 
 This is our Zitadel [Next.js](https://nextjs.org/) B2B template. It shows how to authenticate as a user with multiple organizations. The application shows your users roles on the selected organizations, other projects your organization is allowed to use and other users having a grant to use the application.
 
-> The template code is part of our zitadel-nextjs repo. Take a look [here](https://github.com/zitadel/zitadel-nextjs-b2b).
+If you need more info on B2B use cases consider reading our guide for the [B2B solution scenario](../../guides/solution-scenarios/b2b.mdx).
+
+> You can follow along with the template code in our [zitadel-nextjs-b2b](https://github.com/zitadel/zitadel-nextjs-b2b) repo.
 
 ![B2B Application](/img/nextjs-b2b/home.png)
-
-- A user of the customer should see all granted projects in the portal ("Service discovery")
-- A admin user of the customers sees a list of customer's users (could be expanded to make roles editable)
 
 ## What does it do?
 
@@ -176,4 +175,3 @@ You could also build out the code (PRs welcome :wink:) for this application, for
 
 - Create a mock `datacube-web` application and show how SSO between the portal and the application works with ZITADEL.
 - Implement a feature in the Authorization tab to assign roles directly from the customer portal.
-- ...
