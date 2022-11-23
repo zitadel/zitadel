@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -73,6 +74,15 @@ func (p *orgMetadataProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(OrgMetadataColumnInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -111,6 +121,7 @@ func (p *orgMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*
 		[]handler.Condition{
 			handler.NewCond(OrgMetadataColumnOrgID, e.Aggregate().ID),
 			handler.NewCond(OrgMetadataColumnKey, e.Key),
+			handler.NewCond(OrgMetadataColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -127,6 +138,7 @@ func (p *orgMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event)
 		event,
 		[]handler.Condition{
 			handler.NewCond(OrgMetadataColumnOrgID, event.Aggregate().ID),
+			handler.NewCond(OrgMetadataColumnInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }

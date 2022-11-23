@@ -17,6 +17,10 @@ import (
 	"github.com/zitadel/zitadel/internal/view/repository"
 )
 
+var (
+	testNow = time.Now()
+)
+
 type testHandler struct {
 	cycleDuration time.Duration
 	processSleep  time.Duration
@@ -429,6 +433,7 @@ func TestHandleError(t *testing.T) {
 						FailureCount:   6,
 						ViewName:       "super.table",
 						InstanceID:     instanceID,
+						LastFailed:     testNow,
 					}, nil
 				},
 				errorCountUntilSkip: 5,
@@ -449,6 +454,7 @@ func TestHandleError(t *testing.T) {
 						FailureCount:   5,
 						ViewName:       "super.table",
 						InstanceID:     instanceID,
+						LastFailed:     testNow,
 					}, nil
 				},
 				errorCountUntilSkip: 6,
@@ -469,6 +475,7 @@ func TestHandleError(t *testing.T) {
 						FailureCount:   3,
 						ViewName:       "super.table",
 						InstanceID:     instanceID,
+						LastFailed:     testNow,
 					}, nil
 				},
 				errorCountUntilSkip: 5,

@@ -536,9 +536,9 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		if org.HumanUsers != nil {
 			for _, user := range org.GetHumanUsers() {
 				logging.Debugf("import user: %s", user.GetUserId())
-				human, passwordless := management.ImportHumanUserRequestToDomain(user.User)
+				human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 				human.AggregateID = user.UserId
-				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 					if isCtxTimeout(ctx) {
@@ -566,7 +566,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		if org.MachineUsers != nil {
 			for _, user := range org.GetMachineUsers() {
 				logging.Debugf("import user: %s", user.GetUserId())
-				_, err := s.command.AddMachineWithID(ctx, org.GetOrgId(), user.GetUserId(), management.AddMachineUserRequestToDomain(user.GetUser()))
+				_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()))
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
 					if isCtxTimeout(ctx) {

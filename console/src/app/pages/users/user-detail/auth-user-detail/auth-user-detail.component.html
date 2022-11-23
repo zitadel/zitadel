@@ -12,7 +12,9 @@
 </cnsl-top-view>
 
 <div *ngIf="loading" class="max-width-container">
-  <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
+  <div class="user-spinner-wrapper">
+    <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
+  </div>
 </div>
 
 <div class="max-width-container">
@@ -57,6 +59,7 @@
           <cnsl-contact
             *ngIf="user.human"
             [human]="user.human"
+            [username]="user.preferredLoginName"
             [state]="user.state"
             [canWrite]="true"
             (editType)="openEditDialog($event)"
@@ -97,7 +100,12 @@
               </div>
 
               <div class="right">
-                <a matTooltip="{{ 'USER.PASSWORD.SET' | translate }}" [routerLink]="['password']" mat-icon-button>
+                <a
+                  matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
+                  [routerLink]="['password']"
+                  [queryParams]="{ username: user.preferredLoginName }"
+                  mat-icon-button
+                >
                   <i class="las la-pen"></i>
                 </a>
               </div>

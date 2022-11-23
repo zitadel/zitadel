@@ -24,11 +24,10 @@ func TestCommandSide_AddMachine(t *testing.T) {
 	}
 	type args struct {
 		ctx     context.Context
-		orgID   string
-		machine *domain.Machine
+		machine *Machine
 	}
 	type res struct {
-		want *domain.Machine
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -38,18 +37,41 @@ func TestCommandSide_AddMachine(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "user invalid, invalid argument error",
+			name: "user invalid, invalid argument error name",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "username"),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 					Username: "username",
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "user invalid, invalid argument error username",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name: "name",
 				},
 			},
 			res: res{
@@ -65,14 +87,16 @@ func TestCommandSide_AddMachine(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "username"),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
-					Username: "username",
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 					Name:     "name",
+					Username: "username",
 				},
 			},
 			res: res{
@@ -113,24 +137,19 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
-					Username:    "username",
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 					Description: "description",
 					Name:        "name",
+					Username:    "username",
 				},
 			},
 			res: res{
-				want: &domain.Machine{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "user1",
-						ResourceOwner: "org1",
-					},
-					Username:    "username",
-					Name:        "name",
-					Description: "description",
-					State:       domain.UserStateUnspecified,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -141,7 +160,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddMachine(tt.args.ctx, tt.args.orgID, tt.args.machine)
+			got, err := r.AddMachine(tt.args.ctx, tt.args.machine)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -161,11 +180,10 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 	}
 	type args struct {
 		ctx     context.Context
-		orgID   string
-		machine *domain.Machine
+		machine *Machine
 	}
 	type res struct {
-		want *domain.Machine
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -182,9 +200,11 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
 					Username: "username",
 				},
 			},
@@ -200,10 +220,12 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
-					Name: "name",
+				ctx: context.Background(),
+				machine: &Machine{
+					ObjectRoot: models.ObjectRoot{
+						ResourceOwner: "org1",
+					},
+					Name: "username",
 				},
 			},
 			res: res{
@@ -219,14 +241,14 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
+				ctx: context.Background(),
+				machine: &Machine{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "user1",
+						ResourceOwner: "org1",
+						AggregateID:   "user1",
 					},
-					Username: "username",
 					Name:     "name",
+					Username: "username",
 				},
 			},
 			res: res{
@@ -262,11 +284,11 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
+				ctx: context.Background(),
+				machine: &Machine{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID: "user1",
+						ResourceOwner: "org1",
+						AggregateID:   "user1",
 					},
 					Username:    "username",
 					Name:        "name",
@@ -313,28 +335,19 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				machine: &domain.Machine{
+				ctx: context.Background(),
+				machine: &Machine{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "user1",
 						ResourceOwner: "org1",
+						AggregateID:   "user1",
 					},
-					Username:    "username",
-					Description: "description1",
 					Name:        "name1",
+					Description: "description1",
 				},
 			},
 			res: res{
-				want: &domain.Machine{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "user1",
-						ResourceOwner: "org1",
-					},
-					Username:    "username",
-					Name:        "name1",
-					Description: "description1",
-					State:       domain.UserStateUnspecified,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},

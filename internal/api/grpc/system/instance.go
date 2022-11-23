@@ -76,6 +76,7 @@ func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstan
 }
 
 func (s *Server) RemoveInstance(ctx context.Context, req *system_pb.RemoveInstanceRequest) (*system_pb.RemoveInstanceResponse, error) {
+	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 	details, err := s.command.RemoveInstance(ctx, req.InstanceId)
 	if err != nil {
 		return nil, err

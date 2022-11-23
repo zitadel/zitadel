@@ -99,7 +99,7 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 		l.handleIDP(w, r, authReq, authReq.AllowedExternalIDPs[0].IDPConfigID)
 		return
 	}
-	data := l.getUserData(r, authReq, "Login", errID, errMessage)
+	data := l.getUserData(r, authReq, "Login.Title", "Login.Description", errID, errMessage)
 	funcs := map[string]interface{}{
 		"hasUsernamePasswordLogin": func() bool {
 			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword

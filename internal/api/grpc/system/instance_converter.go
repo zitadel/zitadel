@@ -31,7 +31,7 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 
 	if user := req.GetMachine(); user != nil {
 		defaultInstance.Org.Machine = &command.AddMachine{
-			Machine: &domain.Machine{},
+			Machine: &command.Machine{},
 		}
 		if user.UserName != "" {
 			defaultInstance.Org.Machine.Machine.Username = user.UserName

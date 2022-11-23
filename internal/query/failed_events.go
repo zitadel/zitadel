@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -15,13 +15,15 @@ const (
 	failedEventsColumnProjectionName = "projection_name"
 	failedEventsColumnFailedSequence = "failed_sequence"
 	failedEventsColumnFailureCount   = "failure_count"
+	failedEventsColumnLastFailed     = "last_failed"
 	failedEventsColumnError          = "error"
 	failedEventsColumnInstanceID     = "instance_id"
 )
 
 var (
 	failedEventsTable = table{
-		name: projection.FailedEventsTable,
+		name:          projection.FailedEventsTable,
+		instanceIDCol: failedEventsColumnInstanceID,
 	}
 	FailedEventsColumnProjectionName = Column{
 		name:  failedEventsColumnProjectionName,
@@ -33,6 +35,10 @@ var (
 	}
 	FailedEventsColumnFailureCount = Column{
 		name:  failedEventsColumnFailureCount,
+		table: failedEventsTable,
+	}
+	FailedEventsColumnLastFailed = Column{
+		name:  failedEventsColumnLastFailed,
 		table: failedEventsTable,
 	}
 	FailedEventsColumnError = Column{
@@ -55,6 +61,7 @@ type FailedEvent struct {
 	FailedSequence uint64
 	FailureCount   uint64
 	Error          string
+	LastFailed     time.Time
 }
 
 type FailedEventSearchQueries struct {
@@ -76,26 +83,27 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 	return scan(rows)
 }
 
-func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName string, sequence uint64) (err error) {
+func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName, instanceID string, sequence uint64) (err error) {
 	stmt, args, err := sq.Delete(projection.FailedEventsTable).
 		Where(sq.Eq{
 			failedEventsColumnProjectionName: projectionName,
 			failedEventsColumnFailedSequence: sequence,
+			failedEventsColumnInstanceID:     instanceID,
 		}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-DGgh3", "Errors.RemoveFailed")
 	}
-	_, err = q.client.Exec(stmt, args...)
+	_, err = q.client.ExecContext(ctx, stmt, args...)
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
 	}
 	return nil
 }
 
-func NewFailedEventProjectionNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(FailedEventsColumnProjectionName, value, method)
+func NewFailedEventInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
+	return NewTextQuery(FailedEventsColumnInstanceID, instanceID, TextEquals)
 }
 
 func (r *ProjectSearchQueries) AppendProjectionNameQuery(projectionName string) error {
@@ -115,36 +123,12 @@ func (q *FailedEventSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuil
 	return query
 }
 
-func prepareFailedEventQuery(instanceIDs ...string) (sq.SelectBuilder, func(*sql.Row) (*FailedEvent, error)) {
-	return sq.Select(
-			FailedEventsColumnProjectionName.identifier(),
-			FailedEventsColumnFailedSequence.identifier(),
-			FailedEventsColumnFailureCount.identifier(),
-			FailedEventsColumnError.identifier()).
-			From(failedEventsTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*FailedEvent, error) {
-			p := new(FailedEvent)
-			err := row.Scan(
-				&p.ProjectionName,
-				&p.FailedSequence,
-				&p.FailureCount,
-				&p.Error,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-5N00f", "Errors.FailedEvents.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-0oJf3", "Errors.Internal")
-			}
-			return p, nil
-		}
-}
-
 func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvents, error)) {
 	return sq.Select(
 			FailedEventsColumnProjectionName.identifier(),
 			FailedEventsColumnFailedSequence.identifier(),
 			FailedEventsColumnFailureCount.identifier(),
+			FailedEventsColumnLastFailed.identifier(),
 			FailedEventsColumnError.identifier(),
 			countColumn.identifier()).
 			From(failedEventsTable.identifier()).PlaceholderFormat(sq.Dollar),
@@ -153,16 +137,19 @@ func prepareFailedEventsQuery() (sq.SelectBuilder, func(*sql.Rows) (*FailedEvent
 			var count uint64
 			for rows.Next() {
 				failedEvent := new(FailedEvent)
+				var lastFailed sql.NullTime
 				err := rows.Scan(
 					&failedEvent.ProjectionName,
 					&failedEvent.FailedSequence,
 					&failedEvent.FailureCount,
+					&lastFailed,
 					&failedEvent.Error,
 					&count,
 				)
 				if err != nil {
 					return nil, err
 				}
+				failedEvent.LastFailed = lastFailed.Time
 				failedEvents = append(failedEvents, failedEvent)
 			}
 

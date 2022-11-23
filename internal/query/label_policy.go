@@ -130,7 +130,8 @@ func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (*LabelPolicy, 
 
 var (
 	labelPolicyTable = table{
-		name: projection.LabelPolicyTable,
+		name:          projection.LabelPolicyTable,
+		instanceIDCol: projection.LabelPolicyInstanceIDCol,
 	}
 	LabelPolicyColCreationDate = Column{
 		name: projection.LabelPolicyCreationDateCol,

@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -75,10 +76,11 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (key = $2)",
+							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (key = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
+								"instance-id",
 							},
 						},
 					},
@@ -102,9 +104,10 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -128,7 +131,34 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_metadata WHERE (org_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(MemberInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.org_metadata WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

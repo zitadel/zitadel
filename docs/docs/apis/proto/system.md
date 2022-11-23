@@ -506,6 +506,7 @@ This is an empty response
 | failed_sequence |  uint64 | - |  |
 | failure_count |  uint64 | - |  |
 | error_message |  string | - |  |
+| last_failed |  google.protobuf.Timestamp | - |  |
 
 
 
@@ -687,6 +688,7 @@ This is an empty request
 | database |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | view_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | failed_sequence |  uint64 | - |  |
+| instance_id |  string | - |  |
 
 
 

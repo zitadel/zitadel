@@ -256,6 +256,7 @@
       "DELETE_SELF_DESCRIPTION": "Stai per eliminare definitivamente il tuo account. Questo ti disconnetterà ed eliminerà il tuo utente. Questa azione non può essere annullata!",
       "DELETE_AUTH_DESCRIPTION": "Stai per eleminare il tuo account personale in modo permanente. Vuoi continuare?",
       "TYPEUSERNAME": "Ripeti '{{value}}' per confermare ed eliminare l'utente.",
+      "USERNAME": "Nome utente",
       "DELETE_BTN": "Elimina"
     },
     "SENDEMAILDIALOG": {
@@ -742,6 +743,7 @@
       "DATABASE": "Database",
       "FAILEDSEQUENCE": "Sequenza fallita",
       "FAILURECOUNT": "Conteggio dei fallimenti",
+      "LASTFAILED": "L'ultimo fallimento a",
       "ERRORMESSAGE": "Messaggio di errore",
       "ACTIONS": "Azioni",
       "DELETE": "Rimuovi",
@@ -868,7 +870,7 @@
       "GENERAL": "Generale",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
-      "COMPLEXITY": "complessità della password",
+      "COMPLEXITY": "Complessità della password",
       "NOTIFICATIONS": "Notifiche",
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",

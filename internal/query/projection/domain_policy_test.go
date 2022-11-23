@@ -23,7 +23,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceAdded",
+			name: "org reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.DomainPolicyAddedEventType),
@@ -63,7 +63,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceChanged",
+			name:   "org reduceChanged",
 			reduce: (&domainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -83,7 +83,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -91,6 +91,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -98,7 +99,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceRemoved",
+			name:   "org reduceRemoved",
 			reduce: (&domainPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -114,9 +115,10 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.domain_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.domain_policies WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -124,12 +126,12 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
 					instance.AggregateType,
-					[]byte(`{"name": "Name"}`),
+					nil,
 				), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(DomainPolicyInstanceIDCol),
@@ -150,7 +152,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceAdded",
+			name:   "instance reduceAdded",
 			reduce: (&domainPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -190,7 +192,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceChanged",
+			name:   "instance reduceChanged",
 			reduce: (&domainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -210,7 +212,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain, validate_org_domains, smtp_sender_address_matches_instance_domain) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -218,6 +220,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},

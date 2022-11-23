@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
 
-//Eventstore abstracts all functions needed to store valid events
+// Eventstore abstracts all functions needed to store valid events
 // and filters the stored events
 type Eventstore struct {
 	repo              repository.Repository
@@ -32,13 +32,13 @@ func NewEventstore(repo repository.Repository) *Eventstore {
 	}
 }
 
-//Health checks if the eventstore can properly work
+// Health checks if the eventstore can properly work
 // It checks if the repository can serve load
 func (es *Eventstore) Health(ctx context.Context) error {
 	return es.repo.Health(ctx)
 }
 
-//Push pushes the events in a single transaction
+// Push pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
 	events, constraints, err := commandsToRepository(authz.GetInstance(ctx).InstanceID(), cmds)
@@ -119,7 +119,7 @@ func uniqueConstraintsToRepository(instanceID string, constraints []*EventUnique
 	return uniqueConstraints
 }
 
-//Filter filters the stored events based on the searchQuery
+// Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
 	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
@@ -165,7 +165,7 @@ type reducer interface {
 	AppendEvents(...Event)
 }
 
-//FilterToReducer filters the events based on the search query, appends all events to the reducer and calls it's reduce function
+// FilterToReducer filters the events based on the search query, appends all events to the reducer and calls it's reduce function
 func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r reducer) error {
 	events, err := es.Filter(ctx, searchQuery)
 	if err != nil {
@@ -177,7 +177,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 	return r.Reduce()
 }
 
-//LatestSequence filters the latest sequence for the given search query
+// LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
 	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
 	if err != nil {
@@ -186,7 +186,7 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 	return es.repo.LatestSequence(ctx, query)
 }
 
-//InstanceIDs returns the instance ids found by the search query
+// InstanceIDs returns the instance ids found by the search query
 func (es *Eventstore) InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error) {
 	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
 	if err != nil {
@@ -201,7 +201,7 @@ type QueryReducer interface {
 	Query() *SearchQueryBuilder
 }
 
-//FilterToQueryReducer filters the events based on the search query of the query function,
+// FilterToQueryReducer filters the events based on the search query of the query function,
 // appends all events to the reducer and calls it's reduce function
 func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r QueryReducer) error {
 	events, err := es.Filter(ctx, r.Query())
@@ -213,7 +213,7 @@ func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r QueryReducer) 
 	return r.Reduce()
 }
 
-//RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
+// RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
 func (es *Eventstore) RegisterFilterEventMapper(eventType EventType, mapper func(*repository.Event) (Event, error)) *Eventstore {
 	if mapper == nil || eventType == "" {
 		return es
@@ -258,6 +258,8 @@ func uniqueConstraintActionToRepository(action UniqueConstraintAction) repositor
 		return repository.UniqueConstraintAdd
 	case UniqueConstraintRemove:
 		return repository.UniqueConstraintRemoved
+	case UniqueConstraintInstanceRemove:
+		return repository.UniqueConstraintInstanceRemoved
 	default:
 		return repository.UniqueConstraintAdd
 	}

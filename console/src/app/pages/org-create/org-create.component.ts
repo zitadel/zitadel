@@ -73,7 +73,6 @@ export class OrgCreateComponent {
     private _location: Location,
     private fb: UntypedFormBuilder,
     private mgmtService: ManagementService,
-    private authService: GrpcAuthService,
     breadcrumbService: BreadcrumbService,
   ) {
     const instanceBread = new Breadcrumb({
@@ -83,16 +82,6 @@ export class OrgCreateComponent {
     });
 
     breadcrumbService.setBreadcrumb([instanceBread]);
-
-    this.authService
-      .isAllowed(['iam.write'])
-      .pipe(take(1))
-      .subscribe((allowed) => {
-        if (allowed) {
-          this.forSelf = false;
-        }
-      });
-
     this.initForm();
 
     this.adminService.getSupportedLanguages().then((supportedResp) => {

@@ -16,11 +16,12 @@
     <input type="hidden" name="userID" value="{{ .UserID }}" />
     <input type="hidden" name="passwordSet" value="{{ .PasswordSet }}" />
     <input type="hidden" name="orgID" value="{{ .OrgID }}" />
+    <input type="hidden" name="loginname" value="{{ .LoginName }}" autocomplete="username" />
 
     <div class="fields">
         <div class="field">
             <label class="lgn-label" for="code">{{t "InitUser.CodeLabel"}}</label>
-            <input class="lgn-input" {{if .ErrMessage}}shake {{end}} type="text" id="code" name="code" value="{{.Code}}" autocomplete="off" autofocus
+            <input class="lgn-input" {{if .ErrMessage}}shake {{end}} type="text" id="code" name="code" value="{{.Code}}" autocomplete="one-time-code" autofocus
                 required>
         </div>
 

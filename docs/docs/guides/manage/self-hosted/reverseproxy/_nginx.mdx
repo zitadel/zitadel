@@ -1,6 +1,6 @@
 ## TLS mode external
 
-```bash
+```
 worker_processes  1;
 events {
     worker_connections  1024;
@@ -12,7 +12,7 @@ http {
 
         ssl_certificate     ssl/certificate.pem;
         ssl_certificate_key ssl/key.pem;
- 
+
         location / {
             grpc_pass grpc://localhost:8080;
             grpc_set_header Host $host;
@@ -33,7 +33,7 @@ with
 
 ## TLS mode enabled
 
-```bash
+```
 worker_processes  1;
 events {
     worker_connections  1024;
@@ -45,7 +45,7 @@ http {
 
         ssl_certificate     ssl/certificate.pem;
         ssl_certificate_key ssl/key.pem;
- 
+
         location / {
             grpc_pass grpcs://localhost:8080;
             grpc_set_header Host $host;
@@ -66,7 +66,7 @@ with
 
 ## TLS mode disabled
 
-```bash
+```
 worker_processes  1;
 events {
     worker_connections  1024;
@@ -75,7 +75,7 @@ events {
 http {
     server {
         listen 80;
- 
+
         location / {
             grpc_pass grpc://localhost:8080;
             grpc_set_header Host $host;

@@ -103,6 +103,7 @@
               <cnsl-contact
                 [disablePhoneCode]="true"
                 [state]="user.state"
+                [username]="user.preferredLoginName"
                 [canWrite]="['user.write:' + user.id, 'user.write$'] | hasRole | async"
                 *ngIf="user?.human"
                 [human]="user.human"
@@ -186,6 +187,7 @@
                     matTooltip="{{ 'USER.PASSWORD.SET' | translate }}"
                     [disabled]="(['user.write:' + user.id, 'user.write$'] | hasRole | async) === false"
                     [routerLink]="['password']"
+                    [queryParams]="{ username: user.preferredLoginName }"
                     mat-icon-button
                   >
                     <i class="las la-pen"></i>

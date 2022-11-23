@@ -53,7 +53,8 @@ type MessageText struct {
 
 var (
 	messageTextTable = table{
-		name: projection.MessageTextTable,
+		name:          projection.MessageTextTable,
+		instanceIDCol: projection.MessageTextInstanceIDCol,
 	}
 	MessageTextColAggregateID = Column{
 		name:  projection.MessageTextAggregateIDCol,

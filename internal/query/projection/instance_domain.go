@@ -41,6 +41,7 @@ func newInstanceDomainProjection(ctx context.Context, config crdb.StatementHandl
 			crdb.NewColumn(InstanceDomainIsPrimaryCol, crdb.ColumnTypeBool),
 		},
 			crdb.NewPrimaryKey(InstanceDomainInstanceIDCol, InstanceDomainDomainCol),
+			crdb.WithIndex(crdb.NewIndex("instance_domain", []string{InstanceDomainDomainCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

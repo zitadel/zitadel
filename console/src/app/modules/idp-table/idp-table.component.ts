@@ -284,6 +284,7 @@ export class IdpTableComponent implements OnInit {
         if (this.isDefault) {
           return this.addLoginPolicy()
             .then(() => {
+              this.loginPolicy.isDefault = false;
               return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, idp.owner).then(() => {
                 this.toast.showInfo('IDP.TOAST.ADDED', true);
 
@@ -339,6 +340,7 @@ export class IdpTableComponent implements OnInit {
         if (this.isDefault) {
           return this.addLoginPolicy()
             .then(() => {
+              this.loginPolicy.isDefault = false;
               return (this.service as ManagementService)
                 .removeIDPFromLoginPolicy(idp.id)
                 .then(() => {

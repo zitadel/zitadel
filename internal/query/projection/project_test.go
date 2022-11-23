@@ -39,9 +39,10 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.projects2 WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.projects2 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -49,12 +50,12 @@ func TestProjectProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
 					instance.AggregateType,
-					[]byte(`{"name": "Name"}`),
+					nil,
 				), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(ProjectColumnInstanceID),
@@ -91,12 +92,13 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.projects2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.ProjectStateActive,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -120,12 +122,13 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.projects2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.ProjectStateInactive,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -149,7 +152,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects2 SET (change_date, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8)",
+							expectedStmt: "UPDATE projections.projects2 SET (change_date, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -159,6 +162,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 								true,
 								domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},

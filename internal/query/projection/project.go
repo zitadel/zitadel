@@ -155,6 +155,7 @@ func (p *projectProjection) reduceProjectChanged(event eventstore.Event) (*handl
 		columns,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -173,6 +174,7 @@ func (p *projectProjection) reduceProjectDeactivated(event eventstore.Event) (*h
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -191,6 +193,7 @@ func (p *projectProjection) reduceProjectReactivated(event eventstore.Event) (*h
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -204,6 +207,7 @@ func (p *projectProjection) reduceProjectRemoved(event eventstore.Event) (*handl
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

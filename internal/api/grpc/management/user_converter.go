@@ -120,7 +120,7 @@ func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human
 	return h
 }
 
-func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool) {
+func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human *domain.Human, passwordless bool, links []*domain.UserIDPLink) {
 	human = &domain.Human{
 		Username: req.UserName,
 	}
@@ -153,12 +153,23 @@ func ImportHumanUserRequestToDomain(req *mgmt_pb.ImportHumanUserRequest) (human 
 	if req.HashedPassword != nil && req.HashedPassword.Value != "" && req.HashedPassword.Algorithm != "" {
 		human.HashedPassword = domain.NewHashedPassword(req.HashedPassword.Value, req.HashedPassword.Algorithm)
 	}
+	links = make([]*domain.UserIDPLink, len(req.Idps))
+	for i, idp := range req.Idps {
+		links[i] = &domain.UserIDPLink{
+			IDPConfigID:    idp.ConfigId,
+			ExternalUserID: idp.ExternalUserId,
+			DisplayName:    idp.DisplayName,
+		}
+	}
 
-	return human, req.RequestPasswordlessRegistration
+	return human, req.RequestPasswordlessRegistration, links
 }
 
-func AddMachineUserRequestToDomain(req *mgmt_pb.AddMachineUserRequest) *domain.Machine {
-	return &domain.Machine{
+func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resourceowner string) *command.Machine {
+	return &command.Machine{
+		ObjectRoot: models.ObjectRoot{
+			ResourceOwner: resourceowner,
+		},
 		Username:    req.UserName,
 		Name:        req.Name,
 		Description: req.Description,
@@ -209,11 +220,11 @@ func notifyTypeToDomain(state mgmt_pb.SendHumanResetPasswordNotificationRequest_
 	}
 }
 
-func UpdateMachineRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateMachineRequest) *domain.Machine {
-	return &domain.Machine{
+func UpdateMachineRequestToCommand(req *mgmt_pb.UpdateMachineRequest, orgID string) *command.Machine {
+	return &command.Machine{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID:   req.UserId,
-			ResourceOwner: authz.GetCtxData(ctx).OrgID,
+			ResourceOwner: orgID,
 		},
 		Name:        req.Name,
 		Description: req.Description,

@@ -34,7 +34,8 @@ type OrgMetadataSearchQueries struct {
 
 var (
 	orgMetadataTable = table{
-		name: projection.OrgMetadataProjectionTable,
+		name:          projection.OrgMetadataProjectionTable,
+		instanceIDCol: projection.OrgMetadataColumnInstanceID,
 	}
 	OrgMetadataOrgIDCol = Column{
 		name:  projection.OrgMetadataColumnOrgID,

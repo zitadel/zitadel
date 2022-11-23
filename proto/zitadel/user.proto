@@ -168,6 +168,7 @@ message SearchQuery {
         EmailQuery email_query = 6;
         StateQuery state_query = 7;
         TypeQuery type_query = 8;
+        LoginNameQuery login_name_query = 9;
     }
 }
 
@@ -252,6 +253,22 @@ message EmailQuery {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
             max_length: 200;
             example: "\"gigi@caos.ch\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+message LoginNameQuery {
+    string login_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"gigi@zitadel.cloud\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [

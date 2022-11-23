@@ -13,7 +13,7 @@ import (
 )
 
 type AddMachine struct {
-	Machine                  *domain.Machine
+	Machine                  *Machine
 	Pat                      bool
 	PatExpirationDate        time.Time
 	PatScopes                []string
@@ -22,9 +22,26 @@ type AddMachine struct {
 	MachineKeyExpirationDate time.Time
 }
 
-func AddMachineCommand(a *user.Aggregate, machine *domain.Machine) preparation.Validation {
+type Machine struct {
+	models.ObjectRoot
+
+	Username    string
+	Name        string
+	Description string
+}
+
+func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if !machine.IsValid() {
+		if a.ResourceOwner == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-xiown2", "Errors.ResourceOwnerMissing")
+		}
+		if a.ID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-p0p2mi", "Errors.User.UserIDMissing")
+		}
+		if machine.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bs9Ds", "Errors.User.Invalid")
+		}
+		if machine.Username == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -39,10 +56,6 @@ func AddMachineCommand(a *user.Aggregate, machine *domain.Machine) preparation.V
 			if err != nil {
 				return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotFound")
 			}
-			if !domainPolicy.UserLoginMustBeDomain {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0dd", "Errors.User.Invalid")
-			}
-
 			return []eventstore.Command{
 				user.NewMachineAddedEvent(ctx, &a.Aggregate, machine.Username, machine.Name, machine.Description, domainPolicy.UserLoginMustBeDomain),
 			}, nil
@@ -50,20 +63,16 @@ func AddMachineCommand(a *user.Aggregate, machine *domain.Machine) preparation.V
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain.Machine) (*domain.Machine, error) {
-	userID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (*domain.ObjectDetails, error) {
+	if machine.AggregateID == "" {
+		userID, err := c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+		machine.AggregateID = userID
 	}
-	return c.addMachineWithID(ctx, orgID, userID, machine)
-}
 
-func (c *Commands) AddMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine) (*domain.Machine, error) {
-	return c.addMachineWithID(ctx, orgID, userID, machine)
-}
-
-func (c *Commands) addMachineWithID(ctx context.Context, orgID string, userID string, machine *domain.Machine) (*domain.Machine, error) {
-	agg := user.NewAggregate(userID, orgID)
+	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, AddMachineCommand(agg, machine))
 	if err != nil {
 		return nil, err
@@ -74,22 +83,14 @@ func (c *Commands) addMachineWithID(ctx context.Context, orgID string, userID st
 		return nil, err
 	}
 
-	return &domain.Machine{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID:   agg.ID,
-			Sequence:      events[len(events)-1].Sequence(),
-			CreationDate:  events[len(events)-1].CreationDate(),
-			ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-			InstanceID:    events[len(events)-1].Aggregate().InstanceID,
-		},
-		Username:    machine.Username,
-		Name:        machine.Name,
-		Description: machine.Description,
-		State:       machine.State,
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
 
-func (c *Commands) ChangeMachine(ctx context.Context, machine *domain.Machine) (*domain.Machine, error) {
+func (c *Commands) ChangeMachine(ctx context.Context, machine *Machine) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(machine.AggregateID, machine.ResourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, changeMachineCommand(agg, machine))
 	if err != nil {
@@ -101,24 +102,20 @@ func (c *Commands) ChangeMachine(ctx context.Context, machine *domain.Machine) (
 		return nil, err
 	}
 
-	return &domain.Machine{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID:   agg.ID,
-			Sequence:      events[len(events)-1].Sequence(),
-			CreationDate:  events[len(events)-1].CreationDate(),
-			ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-			InstanceID:    events[len(events)-1].Aggregate().InstanceID,
-		},
-		Username:    machine.Username,
-		Name:        machine.Name,
-		Description: machine.Description,
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
 
-func changeMachineCommand(a *user.Aggregate, machine *domain.Machine) preparation.Validation {
+func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if !machine.IsValid() {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
+		if a.ResourceOwner == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-xiown3", "Errors.ResourceOwnerMissing")
+		}
+		if a.ID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-p0p3mi", "Errors.User.UserIDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
@@ -128,15 +125,6 @@ func changeMachineCommand(a *user.Aggregate, machine *domain.Machine) preparatio
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 			}
-
-			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
-			if err != nil {
-				return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotFound")
-			}
-			if !domainPolicy.UserLoginMustBeDomain {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0dd", "Errors.User.Invalid")
-			}
-
 			changedEvent, hasChanged, err := writeModel.NewChangedEvent(ctx, &a.Aggregate, machine.Name, machine.Description)
 			if err != nil {
 				return nil, err
