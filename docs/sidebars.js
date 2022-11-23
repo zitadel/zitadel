@@ -9,6 +9,7 @@ module.exports = {
         "examples/login/react",
         "examples/login/flutter",
         "examples/login/nextjs",
+        "examples/login/nextjs-b2b",
       ],
       collapsed: false,
     },
