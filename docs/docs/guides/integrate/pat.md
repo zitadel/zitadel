@@ -40,6 +40,6 @@ In this example we read the organization of the service user.
 
 ```bash
 curl --request GET \
-  --url https://acme-gzoe4x.zitadel.cloud/management/v1/orgs/me \
+  --url {your-domain}/management/v1/orgs/me \
   --header 'Authorization: Bearer al2Xh0raASbuv1kWpqx0Gc1bnd7L_5NpixakTuyhobAfg44UNNfxDdwXM5tig0ZELwrl7gk' 
 ```
