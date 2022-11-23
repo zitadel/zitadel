@@ -4,8 +4,7 @@ title: Register flows
 
 ## External Authentication
 
-<!-- link idp and jwt -->
-This flow is executed if the user logs in using an identity provider or using a jwt token.
+This flow is executed if the user logs in using an [identity provider](../../guides/integrate/identity-brokering) or using a [jwt token](../../concepts/structure/jwt_idp).
 
 ### Post Authentication
 
@@ -19,7 +18,7 @@ The first parameter contains the following fields
     The access token which will be returned to the user. This can be an opaque token or a JWT
   - `claimsJSON()` [`idTokenClaims`](../openidoauth/claims)  
     Returns all claims of the id token
-  - `getClaim(key)` `Object`  
+  - `getClaim(key)` `Any`  
     Returns the requested [id token claim](../openidoauth/claims)
   - `idToken` `string`  
     The id token which will be returned to the user
@@ -29,7 +28,7 @@ The first parameter contains the following fields
   The second parameter contains the following fields
   - `v1`
     - `user`
-      - `appendMetadata(string, Object)`  
+      - `appendMetadata(string, Any)`  
         The first parameter represents the key and the second a value which will be stored
   - `setFirstName(string)`  
     Sets the first name
@@ -93,7 +92,7 @@ A user selected **Register** on the overview page after external authentication.
     If true the phone number set is verified without user interaction
   - `v1`
     - `user`
-      - `appendMetadata(string, Object)`  
+      - `appendMetadata(string, Any)`  
         The first parameter represents the key and the second a value which will be stored
 
 ### Post Creation

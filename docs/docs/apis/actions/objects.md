@@ -38,7 +38,7 @@ title: Objects
 - `resourceOwner` `string`
 - `sequence` `number`
 - `key` `string`
-- `value` `Object`
+- `value` `Any`
 
 ## user grant
 

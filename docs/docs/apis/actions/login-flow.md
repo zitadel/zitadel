@@ -21,11 +21,11 @@ This trigger is called before userinfo are set in the token or response.
   The second parameter contains the following fields:
   - `v1`
     - `userinfo`
-      - `setClaim(string, Object)`  
-        Key of the claim and an object as value
+      - `setClaim(string, Any)`  
+        Key of the claim and any value
     - `user`
-      - `setMetadata(string, Object)`  
-        Key of the metadata and an object as value
+      - `setMetadata(string, Any)`  
+        Key of the metadata and any value
 
 ### Pre access token creation
 
@@ -42,10 +42,10 @@ This trigger is called before the claims are set in the access token and the tok
   The second parameter contains the following fields:
   - `v1`
     - `claims`
-      - `setClaim(string, Object)`  
-        Sets the value if the key is not already present
+      - `setClaim(string, Any)`  
+        Sets any value if the key is not already present
       - `appendLogIntoClaims(string)`  
         Appends the entry into the claim `urn:zitadel:action:{action.name}:log` the value of the claim is an Array of `string`
     - `user`
-      - `setMetadata(string, Object)`  
-        Key of the metadata and an object as value
+      - `setMetadata(string, Any)`  
+        Key of the metadata and any value

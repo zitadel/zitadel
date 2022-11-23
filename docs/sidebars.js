@@ -225,7 +225,6 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
-        "apis/actions",
       ],
     },
     {
