@@ -12,6 +12,8 @@ Go to the [goja GitHub page](https://github.com/dop251/goja) for detailed refere
 
 Actions provide a defined set of libraries. The provided libraries vary depending on trigger types.
 
+You can find great snippets and examples which show how you can use actions in [this repository](https://github.com/zitadel/actions).
+
 Actions are a key feature to extend the functionality of ZITADEL and continuously improve the feature and expand the use cases. Check out our [roadmap](https://zitadel.com/roadmap) for more details.
 
 ## Action
