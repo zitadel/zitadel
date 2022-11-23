@@ -68,16 +68,16 @@ func (v *View) GetLatestUserSessionSequence(instanceID string) (*repository.Curr
 	return v.latestSequence(userSessionTable, instanceID)
 }
 
-func (v *View) GetLatestUserSessionSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(userSessionTable, instanceIDs...)
+func (v *View) GetLatestUserSessionSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(userSessionTable, instanceIDs)
 }
 
 func (v *View) ProcessedUserSessionSequence(event *models.Event) error {
 	return v.saveCurrentSequence(userSessionTable, event)
 }
 
-func (v *View) UpdateUserSessionSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(userSessionTable)
+func (v *View) UpdateUserSessionSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(userSessionTable, instanceIDs)
 }
 
 func (v *View) GetLatestUserSessionFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
