@@ -1,5 +1,5 @@
 name: Bug Report
-description: Create a bug report to help us improve ZITADEL. See [here](https://github.com/zitadel/zitadel#product-management) how we process your issue.
+description: Create a bug report to help us improve ZITADEL. See [here](../CONTIBUTING.md#product-management) how we process your issue.
 title: "[Bug]: "
 labels: ["type: bug", "state: triage"]
 body:
