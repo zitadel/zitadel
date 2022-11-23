@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "zitadel/idp.proto";
+import "zitadel/instance.proto";
+import "zitadel/user.proto";
+import "zitadel/object.proto";
+import "zitadel/options.proto";
+import "zitadel/org.proto";
+import "zitadel/policy.proto";
+import "zitadel/settings.proto";
+import "zitadel/text.proto";
+import "zitadel/member.proto";
+import "zitadel/management.proto";
+import "zitadel/v1.proto";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/any.proto";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "validate/validate.proto";
+
+package zitadel.admin.v1;
+
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/admin";
+
+service LoginService {
+    //Indicates if ZITADEL is running.
+    // It respondes as soon as ZITADEL started
+    rpc Healthz(HealthzRequest) returns (HealthzResponse) {
+        option (google.api.http) = {
+            get: "/healthz";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "probes";
+            responses: {
+                key: "200";
+                value: {
+                    description: "ZITADEL started";
+                };
+            }
+            responses: {
+                key: "default";
+                value: {
+                    description: "ZITADEL NOT started yet";
+                };
+            }
+        };
+    }
+
+    rpc Login(LoginRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            put: "/login";
+        };
+    }
+}
+
+message LoginRequest {
+    map<LoginField, google.protobuf.Any> setter = 1;
+}
+
+message LoginResponse {
+    repeated LoginField required = 1;
+    repeated LoginField optional = 2;
+    repeated LoginField successful = 3;
+}
+
+enum LoginFields {
+    LOGIN_FIELD_UNSPECIFIED = 0;
+}
