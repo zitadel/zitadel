@@ -35,7 +35,7 @@ To be able to access the ZITADEL APIs your service user needs permissions to ZIT
 
 ## Call ZITADEL API with PAT
 
-Because the PAT is a ready to use Token, you can add it as Authorization Header and send it in your request to the ZITADEL API.
+Because the PAT is a ready to use Token, you can add it as Authorization Header and send it in your requests to the ZITADEL API.
 In this example we read the organization of the service user.
 
 ```bash
