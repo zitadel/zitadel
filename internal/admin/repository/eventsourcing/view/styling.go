@@ -35,16 +35,16 @@ func (v *View) GetLatestStylingSequence(instanceID string) (*global_view.Current
 	return v.latestSequence(stylingTyble, instanceID)
 }
 
-func (v *View) GetLatestStylingSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(stylingTyble, instanceIDs...)
+func (v *View) GetLatestStylingSequences(instanceIDs []string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(stylingTyble, instanceIDs)
 }
 
 func (v *View) ProcessedStylingSequence(event *models.Event) error {
 	return v.saveCurrentSequence(stylingTyble, event)
 }
 
-func (v *View) UpdateStylingSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(stylingTyble)
+func (v *View) UpdateStylingSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(stylingTyble, instanceIDs)
 }
 
 func (v *View) GetLatestStylingFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {

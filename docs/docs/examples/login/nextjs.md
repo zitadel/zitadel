@@ -8,25 +8,15 @@ This is our Zitadel [Next.js](https://nextjs.org/) template. It shows how to aut
 
 ## Getting Started
 
-First, we start by creating a new NextJS app with `npx create-next-app`, which sets up everything automatically for you. To create a project, run:
+### Install dependencies
+
+To install the dependencies type:
 
 ```bash
-npx create-next-app --typescript
-# or
-yarn create next-app --typescript
+yarn install
 ```
 
-### Install Authentication library
-
-To keep the template as easy as possible we use [next-auth](https://next-auth.js.org/) as our main authentication library. To install, run:
-
-```bash
-npm i next-auth
-# or
-yarn add next-auth
-```
-
-To run the app, type:
+then to run the app:
 
 ```bash
 npm run dev
