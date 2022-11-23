@@ -139,6 +139,8 @@ the error will be display directly to the user on the auth server
 | unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Console that the requested `response_type` is allowed in your application configuration. |
 | unsupported_response_type | The authorization server does not support the requested response_type.                                                                                                       |
 | server_error              | The authorization server encountered an unexpected condition that prevented it from fulfilling the request.                                                                  |
+| interaction_required      | The authorization server requires end-user interaction of some form to proceed. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for end-user interaction.                                                                  |
+
 
 ## token_endpoint
 
