@@ -38,6 +38,16 @@ Tracing:
 
 ## Database
 
+### Prefer CockroachDB
+
+ZITADEL supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/).
+We highly recommend using CockroachDB,
+as horizontal scaling is much easier than with PostgreSQL.
+Also, if you are concerned about multi-regional data locality,
+[the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
+
+### Configure ZITADEL
+
 Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database).
 
 ```yaml
@@ -69,7 +79,24 @@ Projections:
       BulkLimit: 2000
 ```
 
-For maintaining the database management system in production, please refer to the corresponding docs [for CockroachDB](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html) or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
+### Manage your Data
+
+When designing your backup strategy,
+it is worth knowing that
+[ZITADEL is event sourced](/docs/concepts/eventstore/overview).
+That means, ZITADEL itself is able to recompute its
+whole state from the records in the table eventstore.events.
+The timestamp of your last record in the events table
+defines up to which point in time ZITADEL can restore its state.
+
+The ZITADEL binary itself is stateless,
+so there is no need for a special backup job.
+
+Generally, for maintaining your database management system in production,
+please refer to the corresponding docs
+[for CockroachDB](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html)
+or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
+
 
 ## Data Initialization
 
