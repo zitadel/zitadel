@@ -6,11 +6,12 @@ This page describes the options you have when writing ZITADEL actions scripts.
 
 ## Language
 
-ZITADEL interpretes the scripts as JavaScript.
+ZITADEL interprets the scripts as JavaScript.
 Make sure your scripts are ECMAScript 5.1(+) compliant.
 Go to the [goja GitHub page](https://github.com/dop251/goja) for detailed reference about the underlying library features and limitations.
 
-Actions provide a defined set of libraries. The provided libraries vary depending on trigger types.
+Actions provide a defined set of libraries.
+The provided libraries vary depending on trigger types.
 
 Actions do not have access to any libraries yet.
 Also, sending HTTP requests is not supported yet.
@@ -195,11 +196,11 @@ A user selected **Register** on the overview page after external authentication 
 
 This flow is executed during the creation of tokens and token introspection.
 
-#### Pre Userinfo creation
+#### Pre Userinfo Creation
 
 This trigger is called before userinfo are set in the token or response.
 
-##### Parameters of Pre Userinfo creation
+##### Parameters of Pre Userinfo Creation
 
 `ctx`: is always `null`
 
@@ -214,16 +215,16 @@ This trigger is called before userinfo are set in the token or response.
 | setClaim(key, value) | sets an additional claim in user info. The claim can be set once and the key must not be a reserved key | `string`, `any` | none |
 | appendLogIntoClaims(entry) | appends the entry into the claim `urn:zitadel:action:{action.name}:log` the value of the claim is an `array` | `string` | none |
 
-##### Available modules of Pre Userinfo creation
+##### Available Modules of Pre Userinfo Creation
 
 - [zitadel/http](#zitadelhttp)
 - [zitadel/metadata/user](#zitadelmetadatauser)
 
-#### Pre access token creation
+#### Pre Access Token Creation
 
 This trigger is called before the claims are set in the access token and the token type is `jwt`.
 
-##### Parameters of Pre access token creation
+##### Parameters of Pre Access Token Creation
 
 `ctx`: is always `null`
 

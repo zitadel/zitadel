@@ -26,7 +26,7 @@ This function allows to call HTTP servers. The function does NOT fulfil the [Fet
   - `headers`  
     Overwrites the default headers. One of the following types
     - `map[string] string`  
-      The value is splitted into seperate values after each comma `,`.
+      The value is split into separate values after each comma `,`.
     - `map[string] Array of string`  
       The value is a string array
     - default:
@@ -39,7 +39,7 @@ This function allows to call HTTP servers. The function does NOT fulfil the [Fet
 
 #### Response
 
-If the request was valid, an error will be thrown, otherwise a Reponse object will be returned.
+If the request was valid, an error will be thrown, otherwise a Response object will be returned.
 
 The object has the following fields and methods:
 
