@@ -3,7 +3,7 @@ title: PAT (Personal Access Token)
 ---
 
 
-A Personal Access Token (PAT) is basically a ready to use token which can be used as Authorization Header.
+A Personal Access Token (PAT) is a ready to use token which can be used as _Authorization_ header.
 At the moment ZITADEL only allows PATs for machine accounts (service users).
 
 It is an alternative to the JWT profile authentication where the service user has a key to authenticate. Read more about that [here](serviceusers)
