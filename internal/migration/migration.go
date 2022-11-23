@@ -65,7 +65,7 @@ func checkExec(ctx context.Context, es *eventstore.Eventstore, migration Migrati
 	for {
 		select {
 		case <-ctx.Done():
-			return false, nil
+			return false, errors.ThrowInternal(nil, "MIGR-as3f7", "Errors.Internal")
 		case <-timer.C:
 			should, err := shouldExec(ctx, es, migration)
 			if err != nil {
