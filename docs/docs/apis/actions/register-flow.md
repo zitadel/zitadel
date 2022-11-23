@@ -14,16 +14,16 @@ A user has authenticated externally. ZITADEL retrieved and mapped the external i
 
 - `ctx`  
 The first parameter contains the following fields
-  - `accessToken` `string`  
+  - `accessToken` *string*  
     The access token which will be returned to the user. This can be an opaque token or a JWT
-  - `claimsJSON()` [`idTokenClaims`](../openidoauth/claims)  
+  - `claimsJSON()` [*idTokenClaims*](../openidoauth/claims)  
     Returns all claims of the id token
-  - `getClaim(key)` `Any`  
+  - `getClaim(key)` *Any*  
     Returns the requested [id token claim](../openidoauth/claims)
-  - `idToken` `string`  
+  - `idToken` *string*  
     The id token which will be returned to the user
   - `v1`
-    - `externalUser()` [`externalUser`](./objects#external-user)
+    - `externalUser()` [*externalUser*](./objects#external-user)
 - `api`  
   The second parameter contains the following fields
   - `v1`
@@ -51,7 +51,7 @@ The first parameter contains the following fields
   - `setPhoneVerified(boolean)`  
     Sets the phone number verified or unverified
   - `metadata`  
-    Array of [`metadata`](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
+    Array of [*metadata*](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
 
 ### Pre Creation
 
@@ -62,11 +62,11 @@ A user selected **Register** on the overview page after external authentication.
 - `ctx`  
   The first parameter contains the following fields
   - `v1`
-    - `user` [`Human`](./objects#human-user)
+    - `user` [*human*](./objects#human-user)
 - `api`  
   The second parameter contains the following fields
   - `metadata`  
-    Array of [`metadata`](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
+    Array of [*metadata*](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
   - `setFirstName(string)`  
     Sets the first name
   - `setLastName(string)`  
@@ -76,7 +76,7 @@ A user selected **Register** on the overview page after external authentication.
   - `setDisplayName(string)`  
     Sets the display name
   - `setPreferredLanguage(string)`  
-    Sets the preferred language, the string has to be a valid language tag
+    Sets the preferred language, the string has to be a valid language tag as defined in [RFC 5646](https//www.rfc-editor.org/rfc/rfc5646)
   - `setGender(int)`  
     Sets the gender.  
     <ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul>
@@ -104,9 +104,9 @@ A user selected **Register** on the overview page after external authentication 
 - `ctx`  
   The first parameter contains the following fields
   - `v1`
-    - `getUser()` [`user`](./objects#user)
+    - `getUser()` [*user*](./objects#user)
 - `api`  
   The second parameter contains the following fields
-  - `userGrants` Array of [`userGrant`](./objects#user-grant)'s
+  - `userGrants` Array of [*userGrant*](./objects#user-grant)'s
   - `v1`
     - `appendUserGrant(`[`userGrant`](./objects#user-grant)`)`

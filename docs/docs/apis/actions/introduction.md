@@ -12,9 +12,7 @@ Go to the [goja GitHub page](https://github.com/dop251/goja) for detailed refere
 
 Actions provide a defined set of libraries. The provided libraries vary depending on trigger types.
 
-Actions do not have access to any libraries yet.
-Also, sending HTTP requests is not supported yet.
-[We plan to add such features in the future](https://zitadel.com/roadmap).
+[Planned features in the future](https://zitadel.com/roadmap).
 
 ## Action
 
@@ -52,3 +50,5 @@ Currently ZITADEL provides the following flows:
 - [Register](./register-flow.md)
 
 ## Available Modules inside Javascript
+
+- [HTTP module](./modules#http) to call API's

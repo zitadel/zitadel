@@ -20,21 +20,21 @@ This function allows to call HTTP servers. The function does NOT fulfil the [Fet
 
 #### Parameters
 
-- `url` `string`
+- `url` *string*
 - `options`  
   **Optional**, containing custom settings that you want to apply to the request.
   - `headers`  
     Overwrites the default headers. One of the following types
-    - `map[string] string`  
+    - *map[string] string*  
       The value is split into separate values after each comma `,`.
-    - `map[string] Array of string`  
+    - *map[string] Array of string*  
       The value is a string array
     - default:
       - `Content-Type`: `application/json`
       - `Accept`: `application/json`
   - `method`  
     The request method. Allowed values are `GET`, `POST`, `PUT`, `DELETE`
-  - `body` `Object`  
+  - `body` *Object*  
     JSON representation
 
 #### Response
@@ -43,11 +43,11 @@ If the request was valid, an error will be thrown, otherwise a Response object w
 
 The object has the following fields and methods:
 
-- `status` `number`  
+- `status` *number*  
   Status code of response
-- `body` `string`  
+- `body` *string*  
   Return value
-- `json()` `Object`  
+- `json()` *Object*  
   Returns the body as JSON object, or throws an error if the body is not a json object.
-- `text()` `string`  
+- `text()` *string*  
   Returns the body
