@@ -14,7 +14,7 @@ title: Objects
   - `nickName` *string*
   - `displayName` *string*
   - `preferredLanguage` *string*  
-    In [RFC 5646](https//www.rfc-editor.org/rfc/rfc5646) fromat
+    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
   - `email` *string*
   - `isEmailVerified` *boolean*
   - `phone` *string*
@@ -71,7 +71,7 @@ title: Objects
   - `displayName` *string*
   - `avatarKey` *string*
   - `preferredLanguage` *string*  
-    In [RFC 5646](https//www.rfc-editor.org/rfc/rfc5646) fromat
+    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
   - `gender` *number*  
     <ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul>
   - `email` *string*
@@ -101,7 +101,7 @@ title: Objects
   - `nickName` *string*
   - `displayName` *string*
   - `preferredLanguage` *string*  
-    In [RFC 5646](https//www.rfc-editor.org/rfc/rfc5646) fromat
+    In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
 - `email`
   - `email` *string*
   - `isEmailVerified` *boolean*

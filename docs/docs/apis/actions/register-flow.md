@@ -39,7 +39,7 @@ The first parameter contains the following fields
   - `setDisplayName(string)`  
     Sets the display name
   - `setPreferredLanguage(string)`  
-    Sets the preferred language. Please use the format defined in [RFC 5646](https//www.rfc-editor.org/rfc/rfc5646)
+    Sets the preferred language. Please use the format defined in [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646)
   - `setPreferredUsername(string)`  
     Sets the preferred username
   - `setEmail(string)`  
@@ -76,7 +76,7 @@ A user selected **Register** on the overview page after external authentication.
   - `setDisplayName(string)`  
     Sets the display name
   - `setPreferredLanguage(string)`  
-    Sets the preferred language, the string has to be a valid language tag as defined in [RFC 5646](https//www.rfc-editor.org/rfc/rfc5646)
+    Sets the preferred language, the string has to be a valid language tag as defined in [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646)
   - `setGender(int)`  
     Sets the gender.  
     <ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul>
