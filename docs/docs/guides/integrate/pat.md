@@ -3,7 +3,7 @@ title: PAT (Personal Access Token)
 ---
 
 
-A Personal Access Token (PAT) is basically a ready to use token which can be used as Authorization Header.
+A Personal Access Token (PAT) is a ready to use token which can be used as _Authorization_ header.
 At the moment ZITADEL only allows PATs for machine accounts (service users).
 
 It is an alternative to the JWT profile authentication where the service user has a key to authenticate. Read more about that [here](serviceusers)
@@ -26,7 +26,7 @@ It is an alternative to the JWT profile authentication where the service user ha
 To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
 
 1. Go to the detail page of your organization
-2. Click in the top right corner th "+" button
+2. Click in the top right corner the "+" button
 3. Search for your service user
 4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](../manage/console/managers))
 
@@ -35,7 +35,7 @@ To be able to access the ZITADEL APIs your service user needs permissions to ZIT
 
 ## Call ZITADEL API with PAT
 
-Because the PAT is a ready to use Token, you can add it as Authorization Header and send it in your request to the ZITADEL API.
+Because the PAT is a ready to use Token, you can add it as Authorization Header and send it in your requests to the ZITADEL API.
 In this example we read the organization of the service user.
 
 ```bash
