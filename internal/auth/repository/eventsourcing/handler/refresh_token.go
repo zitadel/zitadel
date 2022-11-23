@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/zitadel/logging"
@@ -27,22 +28,23 @@ type RefreshToken struct {
 }
 
 func newRefreshToken(
+	ctx context.Context,
 	handler handler,
 ) *RefreshToken {
 	h := &RefreshToken{
 		handler: handler,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (t *RefreshToken) subscribe() {
+func (t *RefreshToken) subscribe(ctx context.Context) {
 	t.subscription = t.es.Subscribe(t.AggregateTypes()...)
 	go func() {
 		for event := range t.subscription.Events {
-			query.ReduceEvent(t, event)
+			query.ReduceEvent(ctx, t, event)
 		}
 	}()
 }
@@ -67,8 +69,8 @@ func (t *RefreshToken) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (t *RefreshToken) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
-	sequences, err := t.view.GetLatestRefreshTokenSequences(instanceIDs...)
+func (t *RefreshToken) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := t.view.GetLatestRefreshTokenSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +89,7 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 	case user.HumanRefreshTokenRenewedType:
 		e := new(user.HumanRefreshTokenRenewedEvent)
 		if err := json.Unmarshal(event.Data, e); err != nil {
-			logging.Log("EVEN-DBbn4").WithError(err).Error("could not unmarshal event data")
+			logging.WithError(err).Error("could not unmarshal event data")
 			return caos_errs.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
 		}
 		token, err := t.view.RefreshTokenByID(e.TokenID, event.InstanceID)
@@ -102,7 +104,7 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 	case user.HumanRefreshTokenRemovedType:
 		e := new(user.HumanRefreshTokenRemovedEvent)
 		if err := json.Unmarshal(event.Data, e); err != nil {
-			logging.Log("EVEN-BDbh3").WithError(err).Error("could not unmarshal event data")
+			logging.WithError(err).Error("could not unmarshal event data")
 			return caos_errs.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
 		}
 		return t.view.DeleteRefreshToken(e.TokenID, event.InstanceID, event)
@@ -118,10 +120,10 @@ func (t *RefreshToken) Reduce(event *es_models.Event) (err error) {
 }
 
 func (t *RefreshToken) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-3jkl4", "id", event.AggregateID).WithError(err).Warn("something went wrong in token handler")
-	return spooler.HandleError(event, err, t.view.GetLatestTokenFailedEvent, t.view.ProcessedTokenFailedEvent, t.view.ProcessedTokenSequence, t.errorCountUntilSkip)
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in token handler")
+	return spooler.HandleError(event, err, t.view.GetLatestRefreshTokenFailedEvent, t.view.ProcessedRefreshTokenFailedEvent, t.view.ProcessedRefreshTokenSequence, t.errorCountUntilSkip)
 }
 
-func (t *RefreshToken) OnSuccess() error {
-	return spooler.HandleSuccess(t.view.UpdateTokenSpoolerRunTimestamp)
+func (t *RefreshToken) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(t.view.UpdateRefreshTokenSpoolerRunTimestamp, instanceIDs)
 }

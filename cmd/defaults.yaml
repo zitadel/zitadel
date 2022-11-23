@@ -160,7 +160,7 @@ Auth:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
-    ConcurrentInstances: 10
+    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -168,7 +168,7 @@ Admin:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
-    ConcurrentInstances: 10
+    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -225,8 +225,6 @@ SAML:
     #  ContactType: "technical"
     #  Company: ZITADEL
     #  EmailAddress: hi@zitadel.com
-
-
 
 Login:
   LanguageCookieName: zitadel.login.lang
@@ -318,7 +316,7 @@ Actions:
     # wildcard sub domains are currently unsupported
     DenyList:
       - localhost
-      - '127.0.0.1'
+      - "127.0.0.1"
 
 DefaultInstance:
   InstanceName:
@@ -429,7 +427,7 @@ DefaultInstance:
     BackgroundColor: "#fafafa"
     WarnColor: "#cd3d56"
     FontColor: "#000000"
-    PrimaryColorDark: "#bbbafa"
+    PrimaryColorDark: "#2073c4"
     BackgroundColorDark: "#111827"
     WarnColorDark: "#ff3b5b"
     FontColorDark: "#ffffff"
