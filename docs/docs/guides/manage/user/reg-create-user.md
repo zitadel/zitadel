@@ -33,7 +33,7 @@ If you already have a user in ZITADEL, it is possible to add passworless later.
 [Add Passwordless Registration ](../../../apis/proto/management#addpasswordlessregistration)
 
 Send the user_id in the request and you will get a link and an expiration as response.
-This works the same as described above in the creation process.
+You can then customize the link the same as described above in the creation process.
 
 The second possibility is to send the link directly to the user per email.
 Use the following request in that case:
