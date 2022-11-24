@@ -28,7 +28,7 @@ If nothing is requested, the type will not be restricted and all possibilities o
 
 ### Add passwordless to existing user
 
-If you already have a user in ZITADEL it is possible to add passworless later.
+If you already have a user in ZITADEL, it is possible to add passworless later.
 
 [Add Passwordless Registration ](../../../apis/proto/management#addpasswordlessregistration)
 
