@@ -41,19 +41,19 @@ We accept contributions through pull requests. You need a github account for tha
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
 2. On your fork, commit your changes to a new branch
 
-`git checkout -b my-fix-branch main`
+    `git checkout -b my-fix-branch main`
 
 3. Make your changes following the [guidelines](#contribute) in this guide. Make sure that all tests pass.
 
 4. Commit the changes on the new branch
 
-`git commit --all`
+    `git commit --all`
 
 5. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the latest commit of the `main`-branch
 
 6. Push the changes to your branch on Github
 
-`git push origin my-fix-branch`
+    `git push origin my-fix-branch`
 
 7. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request [correct tagging](#commit-messages) is required and will be requested by the reviewers.
 
@@ -212,7 +212,7 @@ When the backend is ready, you have the latest zitadel exposed at http://localho
 You can now run a local development server with live code reloading at http://localhost:4200.
 To allow console access via http://localhost:4200, you have to configure the ZITADEL backend.
 
-1. Navigate to http://localhost:8080/ui/console/projects.
+1. Navigate to <http://localhost:8080/ui/console/projects>.
 2. When prompted, login with _zitadel-admin@<span because="breaks the mailto"></span>zitadel.localhost_ and _Password1!_
 3. Select the _ZITADEL_ project.
 4. Select the _Console_ application.
@@ -295,3 +295,71 @@ You can find an installation guide for all the different environments here:
 ## **Did you find a security flaw?**
 
 - Please read [Security Policy](./SECURITY.md).
+
+## Product Management
+
+The ZITADEL Team works with an agile product management methodology.
+You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/1/views/2).
+
+Every two weeks the team goes through all the new issues and decided about the priority, effort and if it is ready to start or in the backlog.
+If it is something critical or urgent we will have a look at it earlier.
+To show the community the needed information, each issue gets labels.
+
+## About the Labels
+
+There are a few general labels that don't belong to a specific category.
+
+- **good first issue**: This label shows contibuters, that it is an easy entry point to start developing on ZITADEL.
+- **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
+
+### Priority
+
+Priority shows you the priority the ZITADEL team has given this issue. In general the more customers want a feature the higher the priority gets.
+
+- **priority: critical**: This is a security issue or something that has to be fixed urgently, because customers can't work anymore.
+- **priority: high**: These are the issues the ZITADEL Team is currently focusing on and will be implemented as soon as possible.
+- **priority: medium**: After all the high issues are done these will be next.
+- **priority: low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
+
+### State
+
+The state should reflect the progress of the issue and what is going on right now.
+
+- **state: triage**: Each issue gets this state automatically on creating and it means the ZITADEL team should have a look at it, prioritize and sort into categories or ask for more information if needed.
+- **state: tbd**: If the issue has the state tbd (to be defined) it means the team does need more information either from the author or internal.
+- **state: backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be processed in the future. Issues with this state do not have to be completely defined yet.
+- **state: ready**: An issue with the state ready is ready to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
+- **state: in progress**: Someone is working on this issue right now.
+- **state: waiting**: For some reason, this issue will have to wait. This can be a feedback that is being waited for, a dependent issue or anything else.
+- **state: duplicate**: The same issue already exists. This issue will probably be closed with a reference to the other issue.
+
+### Category
+
+The category shows which part of ZITADEL is affected.
+
+- **category: backend**: The backend includes the APIs, event store, command and query side. This is developed in golang.
+- **category: ci**: ci is all about continues integration and pipelines.
+- **category: design**: All about the ux/ui of ZITADEL
+- **category: docs**: Adjustments or new documentations, this can be found in the docs folder.
+- **category: frontend**: The frontend concerns on the one hand the ZITADEL management console (Angular) and on the other hand the login (gohtml)
+- **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
+- **category: translation**: Everything concerning translations or new languages
+
+### Language
+
+The language shows you in which programming language the affected part is written
+
+- **lang: angular**
+- **lang: go**
+- **lang: javascript**
+
+### Effort
+
+The effort should give you an indication how much work it takes. This is based on a rough estimation.
+Everything that is higher than 8 should be split in smaller parts.
+
+- **effort: 1**
+- **effort: 2**
+- **effort: 3**
+- **effort: 5**
+- **effort: 8**
