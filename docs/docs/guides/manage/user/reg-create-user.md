@@ -24,7 +24,7 @@ If you add `requestPlatformType` as query parameter to the link you can define w
 - **crossPlatform** A hardware token e.g SoloKey
 - **unspecified** The user is free to choose
 
-If nothing is requested the type will not be restricted and all possibilities of the device will be taken into account.
+If nothing is requested, the type will not be restricted and all possibilities of the device will be taken into account.
 
 ### Add passwordless to existing user
 
