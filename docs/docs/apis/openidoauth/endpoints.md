@@ -34,7 +34,7 @@ authenticate the user in exchange for an authorization_code (authorization code 
 ### Required request parameters
 
 | Parameter     | Description                                                                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | client_id     | The id of your client as shown in Console.                                                                                                        |
 | redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
@@ -69,7 +69,7 @@ no additional parameters required
 <TabItem value="none">
 
 | Parameter             | Description                                           |
-| --------------------- | ----------------------------------------------------- |
+|-----------------------|-------------------------------------------------------|
 | code_challenge        | The SHA-256 value of the generated `code_verifier`    |
 | code_challenge_method | Method used to generate the challenge, must be `S256` |
 
@@ -84,7 +84,7 @@ no additional parameters required
 ### Additional parameters
 
 | Parameter     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | id_token_hint | Valid `id_token` (of an existing session) used to identity the subject. **SHOULD** be provided when using prompt `none`.                                                                                                                                                                                                                                                                                                                                                                       |
 | login_hint    | A valid logon name of a user. Will be used for username inputs or preselecting a user on `select_account`. Be sure to encode the hint correctly using url encoding (especially when using `+` or alike in the loginname)                                                                                                                                                                                                                                                                       |
 | max_age       | Seconds since the last active successful authentication of the user                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -98,7 +98,7 @@ no additional parameters required
 When your `response_type` was `code` and no error occurred, the following response will be returned: 
 
 | Property | Description                                                                   |
-| -------- | ----------------------------------------------------------------------------- |
+|----------|-------------------------------------------------------------------------------|
 | code     | Opaque string which will be necessary to request tokens on the token endpoint |
 | state    | Unmodified `state` parameter from the request                                 |
 
@@ -107,7 +107,7 @@ When your `response_type` was `code` and no error occurred, the following respon
 When your `response_type` was either `it_token` or `id_token token` and no error occurred, the following response will be returned:
 
 | Property     | Description                                                                           |
-| ------------ | ------------------------------------------------------------------------------------- |
+|--------------|---------------------------------------------------------------------------------------|
 | access_token | Only returned if `response_type` included `token`                                     |
 | expires_in   | Number of second until the expiration of the `access_token`                           |
 | id_token     | An `id_token` of the authorized user                                                  |
@@ -125,21 +125,22 @@ the error will be display directly to the user on the auth server
 :::
 
 | Property          | Description                                                          |
-| ----------------- | -------------------------------------------------------------------- |
+|-------------------|----------------------------------------------------------------------|
 | error             | An OAuth / OIDC [error_type](#authorize-errors)                      |
 | error_description | Description of the error type or additional information of the error |
 | state             | Unmodified `state` parameter from the request                        |
 
 #### Possible errors {#authorize-errors}
 
-| error_type                | Possible reason                                                                                                                                                              |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| invalid_request           | The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.                            |
-| invalid_scope             | The requested scope is invalid. Typically the required `openid` value is missing.                                                                                            |
-| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Console that the requested `response_type` is allowed in your application configuration. |
-| unsupported_response_type | The authorization server does not support the requested response_type.                                                                                                       |
-| server_error              | The authorization server encountered an unexpected condition that prevented it from fulfilling the request.                                                                  |
-| interaction_required      | The authorization server requires end-user interaction of some form to proceed. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for end-user interaction.                                                                  |
+| error_type                | Possible reason                                                                                                                                                                                                                                                                                    |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| invalid_request           | The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.                                                                                                                                                  |
+| invalid_scope             | The requested scope is invalid. Typically the required `openid` value is missing.                                                                                                                                                                                                                  |
+| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Console that the requested `response_type` is allowed in your application configuration.                                                                                                                       |
+| unsupported_response_type | The authorization server does not support the requested response_type.                                                                                                                                                                                                                             |
+| server_error              | The authorization server encountered an unexpected condition that prevented it from fulfilling the request.                                                                                                                                                                                        |
+| interaction_required      | The authorization server requires end-user interaction of some form to proceed. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for end-user interaction. |
+| login_required            | The authorization server requires end-user authentication. This error MAY be returned when the prompt parameter value in the Authentication Request is none, but the Authentication Request cannot be completed without displaying a user interface for end-user authentication.                   |
 
 
 ## token_endpoint
@@ -157,7 +158,7 @@ As mention above, when using `authorization_code` grant, this endpoint will be y
 #### Required request Parameters
 
 | Parameter    | Description                                                                                                   |
-| ------------ | ------------------------------------------------------------------------------------------------------------- |
+|--------------|---------------------------------------------------------------------------------------------------------------|
 | code         | Code that was issued from the authorization request.                                                          |
 | grant_type   | Must be `authorization_code`                                                                                  |
 | redirect_uri | Callback uri where the code was be sent to. Must match exactly the redirect_uri of the authorization request. |
@@ -184,7 +185,7 @@ Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Se
 Send your `client_id` and `client_secret` as parameters in the body:
 
 | Parameter     | Description                      |
-| ------------- | -------------------------------- |
+|---------------|----------------------------------|
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
@@ -194,7 +195,7 @@ Send your `client_id` and `client_secret` as parameters in the body:
 Send your `code_verifier` for us to recompute the `code_challenge` of the authorization request.
 
 | Parameter     | Description                                                  |
-| ------------- | ------------------------------------------------------------ |
+|---------------|--------------------------------------------------------------|
 | code_verifier | code_verifier previously used to generate the code_challenge |
 
 </TabItem>
@@ -203,7 +204,7 @@ Send your `code_verifier` for us to recompute the `code_challenge` of the author
 Send a client assertion as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                  |
-| --------------------- |--------------------------------------------------------------------------------------------------------------|
+|-----------------------|--------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
@@ -213,7 +214,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 #### Successful code response {#token-code-response}
 
 | Property      | Description                                                                           |
-| ------------- | ------------------------------------------------------------------------------------- |
+|---------------|---------------------------------------------------------------------------------------|
 | access_token  | An `access_token` as JWT or opaque token                                              |
 | expires_in    | Number of second until the expiration of the `access_token`                           |
 | id_token      | An `id_token` of the authorized user                                                  |
@@ -226,7 +227,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 #### Required request Parameters
 
 | Parameter  | Description                                                                                                             |
-| ---------- |-------------------------------------------------------------------------------------------------------------------------|
+|------------|-------------------------------------------------------------------------------------------------------------------------|
 | grant_type | Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`                                                                   |
 | assertion  | JWT built and signed according to [Using JWTs for Authorization Grants](grant-types#using-jwts-as-authorization-grants) |
 | scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid email profile`        |
@@ -241,13 +242,13 @@ curl --request POST \
 
 #### Successful JWT Profile response {#token-jwt-response}
 
-| Property      | Description                                                                           |
-| ------------- | ------------------------------------------------------------------------------------- |
-| access_token  | An `access_token` as JWT or opaque token                                              |
-| expires_in    | Number of second until the expiration of the `access_token`                           |
-| id_token      | An `id_token` of the authorized service user                                          |
-| scope         | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
-| token_type    | Type of the `access_token`. Value is always `Bearer`                                  |
+| Property     | Description                                                                           |
+|--------------|---------------------------------------------------------------------------------------|
+| access_token | An `access_token` as JWT or opaque token                                              |
+| expires_in   | Number of second until the expiration of the `access_token`                           |
+| id_token     | An `id_token` of the authorized service user                                          |
+| scope        | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
+| token_type   | Type of the `access_token`. Value is always `Bearer`                                  |
 
 ### Refresh Token Grant
 
@@ -256,10 +257,10 @@ See [offline_access Scope](scopes#standard-scopes) for how to request a `refresh
 
 #### Required request Parameters
 
-| Parameter     | Description                                                                                  |
-| ------------- | -------------------------------------------------------------------------------------------- |
-| grant_type    | Must be `refresh_token`                                                                      |
-| refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request. |
+| Parameter     | Description                                                                                                                                                                                                                                                                                                     |
+|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| grant_type    | Must be `refresh_token`                                                                                                                                                                                                                                                                                         |
+| refresh_token | The refresh_token previously issued in the last authorization_code or refresh_token request.                                                                                                                                                                                                                    |
 | scope         | [Scopes](scopes) you would like to request from ZITADEL for the new access_token. Must be a subset of the scope originally requested by the corresponding auth request. When omitted, the scopes requested by the original auth request will be reused. Scopes are space delimited, e.g. `openid email profile` |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
@@ -284,7 +285,7 @@ Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Se
 Send your `client_id` and `client_secret` as parameters in the body:
 
 | Parameter     | Description                      |
-| ------------- | -------------------------------- |
+|---------------|----------------------------------|
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
@@ -299,7 +300,7 @@ Send your `client_id` as parameter in the body. No authentication is required.
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                  |
-| --------------------- |--------------------------------------------------------------------------------------------------------------|
+|-----------------------|--------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
 | client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
 
@@ -309,7 +310,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 #### Successful refresh token response {#token-refresh-response}
 
 | Property      | Description                                                                           |
-| ------------- | ------------------------------------------------------------------------------------- |
+|---------------|---------------------------------------------------------------------------------------|
 | access_token  | An `access_token` as JWT or opaque token                                              |
 | expires_in    | Number of second until the expiration of the `access_token`                           |
 | id_token      | An `id_token` of the authorized user                                                  |
@@ -319,7 +320,15 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 ### Error response
 
-> //TODO: errors
+| error_type             | Possible reason                                                                                                                                                                                                                                              |
+|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| invalid_request        | The request is missing a required parameter, includes an unsupported parameter value (other than grant type), repeats a parameter, includes multiple credentials, utilizes more than one mechanism for authenticating the client, or is otherwise malformed. |
+| invalid_scope          | The requested scope is invalid, unknown, malformed, or exceeds the scope granted by the resource owner.                                                                                                                                                      |
+| unauthorized_client    | The authenticated client is not authorized to use this authorization grant type.                                                                                                                                                                             |
+| unsupported_grant_type | The authorization grant type is not supported by the authorization server.                                                                                                                                                                                   |
+| server_error           | The authorization server encountered an unexpected condition that prevented it from fulfilling the request.                                                                                                                                                  |
+| invalid_grant          | The provided authorization grant (e.g., authorization code, resource owner credentials) or refresh token is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.                |
+| invalid_client         | Client authentication failed (e.g., unknown client, no client authentication included, or unsupported authentication method).                                                                                                                                |
 
 ## introspection_endpoint
 
@@ -329,7 +338,7 @@ This endpoint enables clients to validate an `acccess_token`, either opaque or J
 this endpoint will check if the token is not revoked (by client or logout).
 
 | Parameter | Description     |
-| --------- | --------------- |
+|-----------|-----------------|
 | token     | An access token |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
@@ -361,7 +370,7 @@ curl --request POST \
 Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
 
 | Parameter             | Description                                                                                                 |
-| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+|-----------------------|-------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                            |
 
@@ -439,7 +448,7 @@ the corresponding `access_token` will be revoked as well.
 
 
 | Parameter | Description                      |
-| --------- | -------------------------------- |
+|-----------|----------------------------------|
 | token     | An access token or refresh token |
 
 Depending on your authorization method you will have to provide additional parameters or headers:
@@ -464,7 +473,7 @@ Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Se
 Send your `client_id` and `client_secret` as parameters in the body:
 
 | Parameter     | Description                      |
-| ------------- | -------------------------------- |
+|---------------|----------------------------------|
 | client_id     | client_id of the application     |
 | client_secret | client_secret of the application |
 
@@ -474,7 +483,7 @@ Send your `client_id` and `client_secret` as parameters in the body:
 Send your `client_id` as parameters in the body:
 
 | Parameter | Description                  |
-| --------- | ---------------------------- |
+|-----------|------------------------------|
 | client_id | client_id of the application |
 
 </TabItem>
@@ -483,7 +492,7 @@ Send your `client_id` as parameters in the body:
 Send a `client_assertion` as JWT for ZITADEL to verify the signature against the registered public key.
 
 | Parameter             | Description                                                                                                   |
-| --------------------- |---------------------------------------------------------------------------------------------------------------|
+|-----------------------|---------------------------------------------------------------------------------------------------------------|
 | client_assertion      | JWT created and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                              |
 
