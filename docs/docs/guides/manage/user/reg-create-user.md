@@ -16,7 +16,7 @@ This might make sense if an administrator created the user.
 ## With passwordless
 
 You can directly ask for a link to create the passwordless registration for the user. 
-Fill the user data and set the attribute "request_passwordless_registration" to true.
+Fill the user data and set the attribute `request_passwordless_registration` to true.
 You will get a link for the registration and an expiration time in the response.
 
 If you add `requestPlatformType` as query parameter to the link you can define what type the platform should be.
