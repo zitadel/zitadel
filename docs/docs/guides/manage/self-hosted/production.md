@@ -19,6 +19,8 @@ Read [on the configure page](/docs/guides/manage/self-hosted/configure) about th
 - To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/docs/guides/manage/self-hosted/tls_modes).
 - If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/docs/guides/manage/self-hosted/http2)**.
 - You can also refer to some **[example reverse proxy configurations](/docs/guides/manage/self-hosted/reverseproxy/reverse_proxy)**.
+- The ZITADEL Console web GUI uses many gRPC-Web stubs. This results in a fairly big JavaScript bundle. You might want to compress it using [Gzip](https://www.gnu.org/software/gzip/) or [Brotli](https://github.com/google/brotli).
+- Serving and caching the assets using a content delivery network could improve network latencies and shield your ZITADEL runtime.
 
 ## Monitoring
 
@@ -35,6 +37,16 @@ Tracing:
 ```
 
 ## Database
+
+### Prefer CockroachDB
+
+ZITADEL supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/).
+We highly recommend using CockroachDB,
+as horizontal scaling is much easier than with PostgreSQL.
+Also, if you are concerned about multi-regional data locality,
+[the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
+
+### Configure ZITADEL
 
 Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database).
 
@@ -66,6 +78,25 @@ Projections:
     projects:
       BulkLimit: 2000
 ```
+
+### Manage your Data
+
+When designing your backup strategy,
+it is worth knowing that
+[ZITADEL is event sourced](/docs/concepts/eventstore/overview).
+That means, ZITADEL itself is able to recompute its
+whole state from the records in the table eventstore.events.
+The timestamp of your last record in the events table
+defines up to which point in time ZITADEL can restore its state.
+
+The ZITADEL binary itself is stateless,
+so there is no need for a special backup job.
+
+Generally, for maintaining your database management system in production,
+please refer to the corresponding docs
+[for CockroachDB](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html)
+or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
+
 
 ## Data Initialization
 
