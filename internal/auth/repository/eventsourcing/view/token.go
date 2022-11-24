@@ -88,16 +88,16 @@ func (v *View) GetLatestTokenSequence(instanceID string) (*repository.CurrentSeq
 	return v.latestSequence(tokenTable, instanceID)
 }
 
-func (v *View) GetLatestTokenSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(tokenTable, instanceIDs...)
+func (v *View) GetLatestTokenSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(tokenTable, instanceIDs)
 }
 
 func (v *View) ProcessedTokenSequence(event *models.Event) error {
 	return v.saveCurrentSequence(tokenTable, event)
 }
 
-func (v *View) UpdateTokenSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(tokenTable)
+func (v *View) UpdateTokenSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(tokenTable, instanceIDs)
 }
 
 func (v *View) GetLatestTokenFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
