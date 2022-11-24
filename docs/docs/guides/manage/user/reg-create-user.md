@@ -19,10 +19,10 @@ You can directly ask for a link to create the passwordless registration for you 
 Fill the user data and set the attribute "request_passwordless_registration" to true.
 You will get a link for the registration and an expiration time in the response.
 
-If you add "requestPlatformType" as query parameter to the link you can define what type the platform should be.
-**platform**: Device itself e.g. FaceID, Fingerprint etc.
-**crossPlatform** A hardware token e.g SoloKey
-**unspecified** The user is free to choose
+If you add `requestPlatformType` as query parameter to the link you can define what type the platform should be.
+- **platform**: Device itself e.g. FaceID, Fingerprint etc.
+- **crossPlatform** A hardware token e.g SoloKey
+- **unspecified** The user is free to choose
 
 If nothing is requested the type will not be restricted and all possibilities of the device will be taken into account.
 
