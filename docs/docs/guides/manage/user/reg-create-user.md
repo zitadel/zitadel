@@ -10,7 +10,7 @@ This can be used, if you are building your own registration page.
 ## With Username and Password
 
 If you are collecting all the user information and a password, you can directly create the user with the password.
-With the password_change_required flag you can choose if the user has to change the password on the first login or not.
+With the `password_change_required` flag you can choose if the user has to change the password on the first login or not.
 This might make sense if an administrator created the user.
 
 ## With passwordless
