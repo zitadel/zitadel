@@ -35,7 +35,7 @@ describe('applications', () => {
       const expectClientId = new RegExp(`^.*[0-9]+\\@${testProjectName}.*$`);
       cy.get('[data-e2e="client-id-copy"]').click();
       cy.contains('[data-e2e="client-id"]', expectClientId);
-      cy.clipboardMatches(expectClientId);
+      //      cy.clipboardMatches(expectClientId);
       cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
   });

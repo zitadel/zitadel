@@ -47,7 +47,12 @@ export function ensureProjectResourceDoesntExist(
   );
 }
 
-export function ensureApplicationExists(api: API, projectId: number, appName: string): Cypress.Chainable<number> {
+export function ensureApplicationExists(
+  api: API,
+  projectId: number,
+  appName: string,
+  redirectUris: string[] = ['https://e2eredirecturl.org'],
+): Cypress.Chainable<number> {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/projects/${projectId}/${Apps.resourcePath}/_search`,
@@ -55,7 +60,7 @@ export function ensureApplicationExists(api: API, projectId: number, appName: st
     `${api.mgmtBaseURL}/projects/${projectId}/${Apps.resourcePath}/oidc`,
     {
       name: appName,
-      redirectUris: ['https://e2eredirecturl.org'],
+      redirectUris: redirectUris,
       responseTypes: ['OIDC_RESPONSE_TYPE_CODE'],
       grantTypes: ['OIDC_GRANT_TYPE_AUTHORIZATION_CODE'],
       authMethodType: 'OIDC_AUTH_METHOD_TYPE_NONE',

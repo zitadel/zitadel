@@ -1,12 +1,12 @@
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
 
-export function ensureHumanUserExists(api: API, username: string): Cypress.Chainable<number> {
+export function ensureHumanUserExists(api: API, username: string, password?: string): Cypress.Chainable<number> {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/users/_search`,
     (user: any) => user.userName === username,
-    `${api.mgmtBaseURL}/users/human`,
+    `${api.mgmtBaseURL}/users/human/_import`,
     {
       user_name: username,
       profile: {
@@ -15,10 +15,12 @@ export function ensureHumanUserExists(api: API, username: string): Cypress.Chain
       },
       email: {
         email: 'e2e@email.ch',
+        is_email_verified: true,
       },
       phone: {
         phone: '+41 123456789',
       },
+      password: password,
     },
     undefined,
     'userId',
