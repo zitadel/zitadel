@@ -117,6 +117,7 @@ module.exports = {
           label: "Terraform",
           items: ["guides/manage/terraform/basics"],
         },
+        "guides/manage/user/reg-create-user",
       ],
     },
     {
