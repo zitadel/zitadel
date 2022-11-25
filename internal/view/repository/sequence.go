@@ -169,7 +169,7 @@ func LatestSequence(db *gorm.DB, table, viewName, instanceID string) (*CurrentSe
 	return nil, caos_errs.ThrowInternalf(err, "VIEW-9LyCB", "unable to get latest sequence of %s", viewName)
 }
 
-func LatestSequences(db *gorm.DB, table, viewName string, instanceIDs ...string) ([]*CurrentSequence, error) {
+func LatestSequences(db *gorm.DB, table, viewName string, instanceIDs []string) ([]*CurrentSequence, error) {
 	searchQueries := []sequenceSearchQuery{
 		{key: sequenceSearchKey(SequenceSearchKeyViewName), value: viewName, method: domain.SearchMethodEquals},
 	}
@@ -192,9 +192,13 @@ func LatestSequences(db *gorm.DB, table, viewName string, instanceIDs ...string)
 	return sequences, nil
 }
 
-func AllCurrentSequences(db *gorm.DB, table string) ([]*CurrentSequence, error) {
+func AllCurrentSequences(db *gorm.DB, table, instanceID string) ([]*CurrentSequence, error) {
+	queries := make([]sequenceSearchQuery, 0, 1)
+	if instanceID != "" {
+		queries = append(queries, sequenceSearchQuery{key: sequenceSearchKey(SequenceSearchKeyInstanceID), value: instanceID})
+	}
 	sequences := make([]*CurrentSequence, 0)
-	query := PrepareSearchQuery(table, GeneralSearchRequest{})
+	query := PrepareSearchQuery(table, &sequenceSearchRequest{queries: queries})
 	_, err := query(db, &sequences)
 	if err != nil {
 		return nil, err

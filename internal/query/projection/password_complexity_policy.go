@@ -92,6 +92,10 @@ func (p *passwordComplexityProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.PasswordComplexityPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(ComplexityPolicyInstanceIDCol),
+				},
 			},
 		},
 	}
@@ -163,6 +167,7 @@ func (p *passwordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 		cols,
 		[]handler.Condition{
 			handler.NewCond(ComplexityPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(ComplexityPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -175,5 +180,6 @@ func (p *passwordComplexityProjection) reduceRemoved(event eventstore.Event) (*h
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(ComplexityPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(ComplexityPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }

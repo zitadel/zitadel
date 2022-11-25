@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -74,6 +75,15 @@ func (p *personalAccessTokenProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(PersonalAccessTokenColumnInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -107,6 +117,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 		e,
 		[]handler.Condition{
 			handler.NewCond(PersonalAccessTokenColumnID, e.TokenID),
+			handler.NewCond(PersonalAccessTokenColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -120,6 +131,7 @@ func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event
 		e,
 		[]handler.Condition{
 			handler.NewCond(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
+			handler.NewCond(PersonalAccessTokenColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

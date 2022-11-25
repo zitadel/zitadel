@@ -18,6 +18,22 @@
   margin: 1rem 0;
 }
 
+.is-initial-info-section {
+  margin-top: 1rem;
+  display: block;
+
+  .is-initial-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    button {
+      display: block;
+      flex-shrink: 0;
+    }
+  }
+}
+
 .icon-button {
   .icon {
     font-size: 1.2rem;
@@ -37,10 +53,6 @@
 
 .side-padding {
   padding-top: 1rem;
-}
-
-.resendemail {
-  margin-top: 0.5rem;
 }
 
 .sp-wrapper {

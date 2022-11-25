@@ -98,7 +98,7 @@ func memberWriteModelToProjectGrantMember(writeModel *ProjectGrantMemberWriteMod
 	}
 }
 
-func applicationKeyWriteModelToKey(wm *ApplicationKeyWriteModel, privateKey []byte) *domain.ApplicationKey {
+func applicationKeyWriteModelToKey(wm *ApplicationKeyWriteModel) *domain.ApplicationKey {
 	return &domain.ApplicationKey{
 		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
 		ApplicationID:  wm.AppID,
@@ -106,6 +106,5 @@ func applicationKeyWriteModelToKey(wm *ApplicationKeyWriteModel, privateKey []by
 		KeyID:          wm.KeyID,
 		Type:           wm.KeyType,
 		ExpirationDate: wm.ExpirationDate,
-		PrivateKey:     privateKey,
 	}
 }

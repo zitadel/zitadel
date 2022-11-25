@@ -76,6 +76,10 @@ func (p *secretGeneratorProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.SecretGeneratorRemovedEventType,
 					Reduce: p.reduceSecretGeneratorRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(SecretGeneratorColumnInstanceID),
+				},
 			},
 		},
 	}
@@ -139,6 +143,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 		[]handler.Condition{
 			handler.NewCond(SecretGeneratorColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SecretGeneratorColumnGeneratorType, e.GeneratorType),
+			handler.NewCond(SecretGeneratorColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -153,6 +158,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstor
 		[]handler.Condition{
 			handler.NewCond(SecretGeneratorColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SecretGeneratorColumnGeneratorType, e.GeneratorType),
+			handler.NewCond(SecretGeneratorColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

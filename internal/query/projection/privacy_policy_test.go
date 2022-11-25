@@ -23,7 +23,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceAdded",
+			name: "org reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.PrivacyPolicyAddedEventType),
@@ -40,7 +40,6 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PrivacyPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -64,7 +63,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceChanged",
+			name:   "org reduceChanged",
 			reduce: (&privacyPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -81,11 +80,10 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PrivacyPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link, help_link) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link, help_link) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -93,6 +91,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 								"http://tos.link",
 								"http://help.link",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -100,7 +99,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceRemoved",
+			name:   "org reduceRemoved",
 			reduce: (&privacyPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -113,11 +112,36 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PrivacyPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.privacy_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.privacy_policies WHERE (id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		}, {
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(PrivacyPolicyInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.privacy_policies WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -127,7 +151,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceAdded",
+			name:   "instance reduceAdded",
 			reduce: (&privacyPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -144,7 +168,6 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PrivacyPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -168,7 +191,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceChanged",
+			name:   "instance reduceChanged",
 			reduce: (&privacyPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -185,11 +208,10 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       PrivacyPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link, help_link) = ($1, $2, $3, $4, $5) WHERE (id = $6)",
+							expectedStmt: "UPDATE projections.privacy_policies SET (change_date, sequence, privacy_link, tos_link, help_link) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -197,6 +219,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 								"http://tos.link",
 								"http://help.link",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -214,7 +237,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, PrivacyPolicyTable, tt.want)
 		})
 	}
 }

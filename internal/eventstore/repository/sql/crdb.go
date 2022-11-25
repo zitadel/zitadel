@@ -92,6 +92,8 @@ const (
 
 	uniqueDelete = `DELETE FROM eventstore.unique_constraints
 					WHERE unique_type = $1 and unique_field = $2 and instance_id = $3`
+	uniqueDeleteInstance = `DELETE FROM eventstore.unique_constraints
+					WHERE instance_id = $1`
 )
 
 type CRDB struct {
@@ -193,7 +195,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 					return caos_errs.ThrowAlreadyExists(err, "SQL-M0dsf", uniqueConstraint.ErrorMessage)
 				}
 
-				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
+				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint")
 			}
 		case repository.UniqueConstraintRemoved:
 			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
@@ -201,7 +203,14 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
-				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint ")
+				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint")
+			}
+		case repository.UniqueConstraintInstanceRemoved:
+			_, err := tx.ExecContext(ctx, uniqueDeleteInstance, uniqueConstraint.InstanceID)
+			if err != nil {
+				logging.WithFields(
+					"instance_id", uniqueConstraint.InstanceID).WithError(err).Info("delete instance unique constraints failed")
+				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraints of instance")
 			}
 		}
 	}

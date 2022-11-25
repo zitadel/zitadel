@@ -18,6 +18,7 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
@@ -66,6 +67,7 @@ func New(
 	api.routeGRPC()
 
 	api.RegisterHandler("/debug", api.healthHandler())
+	api.router.Handle("/", http.RedirectHandler(login.HandlerPrefix, http.StatusFound))
 
 	return api
 }

@@ -1,6 +1,6 @@
 ## TLS mode external
 
-```bash
+```
 https://localhost {
         reverse_proxy h2c://localhost:8080
         tls internal #only non production
@@ -9,7 +9,7 @@ https://localhost {
 
 ## TLS mode enabled
 
-```bash
+```
 https://localhost {
         reverse_proxy https://localhost:8080
         tls internal #only non production
@@ -18,7 +18,7 @@ https://localhost {
 
 ## TLS mode disabled
 
-```bash
+```
 http://localhost {
         reverse_proxy h2c://localhost:8080
 }

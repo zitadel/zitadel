@@ -48,6 +48,7 @@ type AuthRequestRepo struct {
 	LockoutPolicyViewProvider lockoutPolicyViewProvider
 	PrivacyPolicyProvider     privacyPolicyProvider
 	IDPProviderViewProvider   idpProviderViewProvider
+	IDPUserLinksProvider      idpUserLinksProvider
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
@@ -81,6 +82,10 @@ type lockoutPolicyViewProvider interface {
 
 type idpProviderViewProvider interface {
 	IDPProvidersByAggregateIDAndState(string, string, iam_model.IDPConfigState) ([]*iam_view_model.IDPProviderView, error)
+}
+
+type idpUserLinksProvider interface {
+	IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery) (*query.IDPUserLinks, error)
 }
 
 type userEventProvider interface {
@@ -469,11 +474,15 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
+	emailCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, repo.UserCodeAlg)
+	if err != nil {
+		return err
+	}
 	phoneCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, repo.UserCodeAlg)
 	if err != nil {
 		return err
 	}
-	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, phoneCodeGenerator)
+	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return err
 	}
@@ -659,7 +668,15 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if repo.checkDomainDiscovery(ctx, request, loginName) {
 		return nil
 	}
-	// let's just check for if unknown usernames are ignored
+	// let's once again check if the user was just inactive
+	if user != nil && user.State == int32(domain.UserStateInactive) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
+	}
+	// or locked
+	if user != nil && user.State == int32(domain.UserStateLocked) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
+	}
+	// let's just check if unknown usernames are ignored
 	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
 		if request.LabelPolicy != nil && request.LabelPolicy.HideLoginNameSuffix {
 			preferredLoginName = loginName
@@ -675,14 +692,6 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	// let's check if it was a machine user
 	if !user.MachineView.IsZero() {
 		return errors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
-	}
-	// let's once again check if the user was just inactive
-	if user != nil && user.State == int32(domain.UserStateInactive) {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
-	}
-	// or locked
-	if user != nil && user.State == int32(domain.UserStateLocked) {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
 	}
 	// everything should be handled by now
 	logging.WithFields("authRequest", request.ID, "loginName", loginName).Error("unhandled state for checkLoginName")
@@ -909,10 +918,17 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 
 	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
-	if !isInternalLogin && len(request.LinkingUsers) == 0 && !checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
+	idps, err := checkExternalIDPsOfUser(ctx, repo.IDPUserLinksProvider, user.ID)
+	if err != nil {
+		return nil, err
+	}
+	if (!isInternalLogin || len(idps.Links) > 0) && len(request.LinkingUsers) == 0 && !checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
 		selectedIDPConfigID := request.SelectedIDPConfigID
 		if selectedIDPConfigID == "" {
 			selectedIDPConfigID = userSession.SelectedIDPConfigID
+		}
+		if selectedIDPConfigID == "" {
+			selectedIDPConfigID = idps.Links[0].IDPID
 		}
 		return append(steps, &domain.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
 	}
@@ -974,6 +990,14 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		steps = append(steps, &domain.LoginSucceededStep{})
 	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
+}
+
+func checkExternalIDPsOfUser(ctx context.Context, idpUserLinksProvider idpUserLinksProvider, userID string) (*query.IDPUserLinks, error) {
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery}})
 }
 
 func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) ([]domain.UserSelection, error) {
@@ -1080,6 +1104,9 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 
 func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, request *domain.AuthRequest) bool {
 	if user.MFAMaxSetUp > domain.MFALevelNotSetUp {
+		return true
+	}
+	if request.LoginPolicy.MFAInitSkipLifetime == 0 {
 		return true
 	}
 	return checkVerificationTime(user.MFAInitSkipped, request.LoginPolicy.MFAInitSkipLifetime)

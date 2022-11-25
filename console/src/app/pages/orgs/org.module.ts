@@ -19,6 +19,7 @@ import { InfoSectionModule } from 'src/app/modules/info-section/info-section.mod
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
+import { NameDialogModule } from 'src/app/modules/name-dialog/name-dialog.module';
 import { SettingsGridModule } from 'src/app/modules/settings-grid/settings-grid.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
@@ -52,6 +53,7 @@ import { OrgRoutingModule } from './org-routing.module';
     WarnDialogModule,
     MemberCreateDialogModule,
     MatMenuModule,
+    NameDialogModule,
     ChangesModule,
     MatProgressSpinnerModule,
     MetadataModule,

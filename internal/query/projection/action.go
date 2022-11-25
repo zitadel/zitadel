@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/action"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 const (
@@ -83,6 +84,15 @@ func (p *actionProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(ActionInstanceIDCol),
+				},
+			},
+		},
 	}
 }
 
@@ -135,6 +145,7 @@ func (p *actionProjection) reduceActionChanged(event eventstore.Event) (*handler
 		values,
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+			handler.NewCond(ActionInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -153,6 +164,7 @@ func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 		},
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+			handler.NewCond(ActionInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -171,6 +183,7 @@ func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*han
 		},
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+			handler.NewCond(ActionInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -178,12 +191,13 @@ func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*han
 func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type% s", action.RemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type %s", action.RemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ActionIDCol, e.Aggregate().ID),
+			handler.NewCond(ActionInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }

@@ -145,6 +145,10 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.LoginPolicySecondFactorRemovedEventType,
 					Reduce: p.reduce2FARemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(LoginPolicyInstanceIDCol),
+				},
 			},
 		},
 	}
@@ -259,6 +263,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 		cols,
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -283,6 +288,7 @@ func (p *loginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -307,6 +313,7 @@ func (p *loginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -320,6 +327,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event)
 		e,
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -344,6 +352,7 @@ func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -368,6 +377,7 @@ func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handl
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }

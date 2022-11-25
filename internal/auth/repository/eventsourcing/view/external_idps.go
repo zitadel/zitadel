@@ -56,20 +56,28 @@ func (v *View) DeleteExternalIDPsByUserID(userID, instanceID string, event *mode
 	return v.ProcessedExternalIDPSequence(event)
 }
 
+func (v *View) DeleteInstanceExternalIDPs(event *models.Event) error {
+	err := view.DeleteInstanceExternalIDPs(v.Db, externalIDPTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedExternalIDPSequence(event)
+}
+
 func (v *View) GetLatestExternalIDPSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(externalIDPTable, instanceID)
 }
 
-func (v *View) GetLatestExternalIDPSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(externalIDPTable, instanceIDs...)
+func (v *View) GetLatestExternalIDPSequences(instanceIDs []string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(externalIDPTable, instanceIDs)
 }
 
 func (v *View) ProcessedExternalIDPSequence(event *models.Event) error {
 	return v.saveCurrentSequence(externalIDPTable, event)
 }
 
-func (v *View) UpdateExternalIDPSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(externalIDPTable)
+func (v *View) UpdateExternalIDPSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(externalIDPTable, instanceIDs)
 }
 
 func (v *View) GetLatestExternalIDPFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {

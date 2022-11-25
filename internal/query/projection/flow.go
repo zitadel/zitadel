@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -63,6 +64,15 @@ func (p *flowProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(FlowInstanceIDCol),
+				},
+			},
+		},
 	}
 }
 
@@ -77,6 +87,7 @@ func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 			handler.NewCond(FlowTypeCol, e.FlowType),
 			handler.NewCond(FlowTriggerTypeCol, e.TriggerType),
 			handler.NewCond(FlowResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(FlowInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	)
 	for i, id := range e.ActionIDs {
@@ -106,6 +117,7 @@ func (p *flowProjection) reduceFlowClearedEventType(event eventstore.Event) (*ha
 		[]handler.Condition{
 			handler.NewCond(FlowTypeCol, e.FlowType),
 			handler.NewCond(FlowResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(FlowInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }

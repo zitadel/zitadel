@@ -18,7 +18,8 @@ import (
 
 var (
 	smtpConfigsTable = table{
-		name: projection.SMTPConfigProjectionTable,
+		name:          projection.SMTPConfigProjectionTable,
+		instanceIDCol: projection.SMTPConfigColumnInstanceID,
 	}
 	SMTPConfigColumnAggregateID = Column{
 		name:  projection.SMTPConfigColumnAggregateID,

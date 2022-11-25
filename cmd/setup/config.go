@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 type Config struct {
@@ -28,6 +29,7 @@ type Config struct {
 	EncryptionKeys  *encryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
+	Projections     projection.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -56,6 +58,7 @@ type Steps struct {
 	s2AssetsTable       *AssetTable
 	FirstInstance       *FirstInstance
 	s4EventstoreIndexes *EventstoreIndexes
+	s5LastFailed        *LastFailed
 }
 
 type encryptionKeyConfig struct {

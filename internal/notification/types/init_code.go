@@ -7,7 +7,7 @@ import (
 )
 
 func (notify Notify) SendUserInitCode(user *query.NotifyUser, origin, code string) error {
-	url := login.InitUserLink(origin, user.ID, code, user.ResourceOwner, user.PasswordSet)
+	url := login.InitUserLink(origin, user.ID, user.PreferredLoginName, code, user.ResourceOwner, user.PasswordSet)
 	args := make(map[string]interface{})
 	args["Code"] = code
 	return notify(url, args, domain.InitCodeMessageType, true)
