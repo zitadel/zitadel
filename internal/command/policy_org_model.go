@@ -77,14 +77,7 @@ func (wm *DomainPolicyUsernamesWriteModel) Reduce() error {
 		case *org.DomainVerifiedEvent:
 			wm.VerifiedDomains = append(wm.VerifiedDomains, e.Domain)
 		case *org.DomainRemovedEvent:
-			for i, verifiedDomain := range wm.VerifiedDomains {
-				if verifiedDomain == e.Domain {
-					wm.VerifiedDomains[i] = wm.VerifiedDomains[len(wm.VerifiedDomains)-1]
-					wm.VerifiedDomains[len(wm.VerifiedDomains)-1] = ""
-					wm.VerifiedDomains = wm.VerifiedDomains[:len(wm.VerifiedDomains)-1]
-					break
-				}
-			}
+			wm.removeDomain(e.Domain)
 		case *org.DomainPrimarySetEvent:
 			wm.PrimaryDomain = e.Domain
 		case *user.HumanAddedEvent:
@@ -108,17 +101,32 @@ func (wm *DomainPolicyUsernamesWriteModel) Reduce() error {
 				}
 			}
 		case *user.UserRemovedEvent:
-			for i, user := range wm.Users {
-				if user.id == e.Aggregate().ID {
-					wm.Users[i] = wm.Users[len(wm.Users)-1]
-					wm.Users[len(wm.Users)-1] = nil
-					wm.Users = wm.Users[len(wm.Users)-1:]
-					break
-				}
-			}
+			wm.removeUser(e.Aggregate().ID)
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func (wm *DomainPolicyUsernamesWriteModel) removeDomain(domain string) {
+	for i, verifiedDomain := range wm.VerifiedDomains {
+		if verifiedDomain != domain {
+			continue
+		}
+		wm.VerifiedDomains[i] = wm.VerifiedDomains[len(wm.VerifiedDomains)-1]
+		wm.VerifiedDomains[len(wm.VerifiedDomains)-1] = ""
+		wm.VerifiedDomains = wm.VerifiedDomains[:len(wm.VerifiedDomains)-1]
+	}
+}
+
+func (wm *DomainPolicyUsernamesWriteModel) removeUser(userID string) {
+	for i, user := range wm.Users {
+		if user.id != userID {
+			continue
+		}
+		wm.Users[i] = wm.Users[len(wm.Users)-1]
+		wm.Users[len(wm.Users)-1] = nil
+		wm.Users = wm.Users[len(wm.Users)-1:]
+	}
 }
 
 func (wm *DomainPolicyUsernamesWriteModel) Query() *eventstore.SearchQueryBuilder {
