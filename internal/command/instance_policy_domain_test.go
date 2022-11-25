@@ -231,6 +231,13 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 					// org1
 					expectFilter(
 						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org1.com",
+							),
+						),
+						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
 								"org1.com",
@@ -253,6 +260,13 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 					),
 					// org3
 					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								"org3.com",
+							),
+						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(context.Background(),
 								&org.NewAggregate("org3").Aggregate,

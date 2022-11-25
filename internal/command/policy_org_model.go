@@ -48,8 +48,9 @@ func (wm *PolicyDomainWriteModel) Reduce() error {
 type DomainPolicyUsernamesWriteModel struct {
 	eventstore.WriteModel
 
-	Domain string
-	Users  map[string]string
+	PrimaryDomain   string
+	VerifiedDomains []string
+	Users           map[string]string
 }
 
 func NewDomainPolicyUsernamesWriteModel(orgID string) *DomainPolicyUsernamesWriteModel {
@@ -68,8 +69,19 @@ func (wm *DomainPolicyUsernamesWriteModel) AppendEvents(events ...eventstore.Eve
 func (wm *DomainPolicyUsernamesWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *org.DomainVerifiedEvent:
+			wm.VerifiedDomains = append(wm.VerifiedDomains, e.Domain)
+		case *org.DomainRemovedEvent:
+			for i, verifiedDomain := range wm.VerifiedDomains {
+				if verifiedDomain == e.Domain {
+					wm.VerifiedDomains[i] = wm.VerifiedDomains[len(wm.VerifiedDomains)-1]
+					wm.VerifiedDomains[len(wm.VerifiedDomains)-1] = ""
+					wm.VerifiedDomains = wm.VerifiedDomains[:len(wm.VerifiedDomains)-1]
+					break
+				}
+			}
 		case *org.DomainPrimarySetEvent:
-			wm.Domain = e.Domain
+			wm.PrimaryDomain = e.Domain
 		case *user.HumanAddedEvent:
 			wm.Users[e.Aggregate().ID] = e.UserName
 		case *user.HumanRegisteredEvent:
@@ -93,6 +105,8 @@ func (wm *DomainPolicyUsernamesWriteModel) Query() *eventstore.SearchQueryBuilde
 		AddQuery().
 		AggregateTypes(org.AggregateType, user.AggregateType).
 		EventTypes(
+			org.OrgDomainVerifiedEventType,
+			org.OrgDomainRemovedEventType,
 			org.OrgDomainPrimarySetEventType,
 			user.HumanAddedType,
 			user.HumanRegisteredType,
@@ -107,25 +121,31 @@ func (wm *DomainPolicyUsernamesWriteModel) Query() *eventstore.SearchQueryBuilde
 func (wm *DomainPolicyUsernamesWriteModel) NewUsernameChangedEvents(ctx context.Context, userLoginMustBeDomain bool) []eventstore.Command {
 	events := make([]eventstore.Command, 0, len(wm.Users))
 	for id, name := range wm.Users {
-		var newName string
-		if userLoginMustBeDomain {
-			// if the UserLoginMustBeDomain will be true, then it's currently false
-			// which means the usernames might already be suffixed by the domain
-			// so let's remove a potential duplicate suffix
-			newName = strings.TrimSuffix(name, "@"+wm.Domain)
-		} else {
-			// the UserLoginMustBeDomain is currently true
-			// which means the usernames must be suffixed to ensure their uniqueness
-			// and the preferred login name remains the same
-			newName = name + "@" + wm.Domain
-		}
 		events = append(events, user.NewUsernameChangedEvent(ctx,
 			&user.NewAggregate(id, wm.ResourceOwner).Aggregate,
 			name,
-			newName,
+			wm.newUsername(name, userLoginMustBeDomain),
 			userLoginMustBeDomain,
 			user.UsernameChangedEventWithPolicyChange()),
 		)
 	}
 	return events
+}
+
+func (wm *DomainPolicyUsernamesWriteModel) newUsername(username string, userLoginMustBeDomain bool) string {
+	if !userLoginMustBeDomain {
+		// if the UserLoginMustBeDomain will be false, then it's currently true
+		// which means the usernames must be suffixed to ensure their uniqueness
+		// and the preferred login name remains the same
+		return username + "@" + wm.PrimaryDomain
+	}
+	// the UserLoginMustBeDomain is currently false
+	// which means the usernames might already be suffixed by a verified domain
+	// so let's remove a potential duplicate suffix
+	for _, verifiedDomain := range wm.VerifiedDomains {
+		if index := strings.LastIndex(username, "@"+verifiedDomain); index > 0 {
+			return username[:index]
+		}
+	}
+	return username
 }

@@ -144,6 +144,28 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.com",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainVerifiedEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"test.com",
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainRemovedEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"test.com",
+								true,
+							),
+						),
+						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(
 								context.Background(),
 								&org.NewAggregate("org1").Aggregate,
@@ -390,6 +412,13 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.com",
+							),
+						),
+						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
 								"org.com",
@@ -586,6 +615,13 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 						),
 					),
 					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPrimarySetEvent(
+								context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"org.com",
+							),
+						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
