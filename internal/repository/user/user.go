@@ -315,8 +315,8 @@ type DomainClaimedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	oldUserName           string `json:"-"`
-	userLoginMustBeDomain bool   `json:"-"`
+	oldUserName           string
+	userLoginMustBeDomain bool
 }
 
 func (e *DomainClaimedEvent) Data() interface{} {
@@ -396,9 +396,9 @@ type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName                 string `json:"userName"`
-	oldUserName              string `json:"-"`
-	userLoginMustBeDomain    bool   `json:"-"`
-	oldUserLoginMustBeDomain bool   `json:"-"`
+	oldUserName              string
+	userLoginMustBeDomain    bool
+	oldUserLoginMustBeDomain bool
 }
 
 func (e *UsernameChangedEvent) Data() interface{} {
@@ -439,6 +439,8 @@ func NewUsernameChangedEvent(
 
 type UsernameChangedEventOption func(*UsernameChangedEvent)
 
+// UsernameChangedEventWithPolicyChange signals that the change occurs because of / during a domain policy change
+// (will ensure the unique constraint change is handled correctly)
 func UsernameChangedEventWithPolicyChange() UsernameChangedEventOption {
 	return func(e *UsernameChangedEvent) {
 		e.oldUserLoginMustBeDomain = !e.userLoginMustBeDomain
