@@ -9,6 +9,7 @@ module.exports = {
         "examples/login/react",
         "examples/login/flutter",
         "examples/login/nextjs",
+        "examples/login/nextjs-b2b",
       ],
       collapsed: false,
     },
@@ -116,6 +117,7 @@ module.exports = {
           label: "Terraform",
           items: ["guides/manage/terraform/basics"],
         },
+        "guides/manage/user/reg-create-user",
       ],
     },
     {
@@ -132,6 +134,7 @@ module.exports = {
           items: [
             "guides/integrate/serviceusers",
             "guides/integrate/access-zitadel-apis",
+            "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/export-and-import",
           ],

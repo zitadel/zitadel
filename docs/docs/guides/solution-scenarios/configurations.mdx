@@ -46,3 +46,31 @@ This will have the following impacts:
 
 To request the organization send either the the organization id (`urn:zitadel:iam:org:id:{id}`) or organization primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authentication request from your application.
 More about the [scopes](../../apis/openidoauth/scopes#reserved-scopes)
+
+## Use email to login
+
+There are two different possibilities to achieve login with an email.
+
+1. Use an email address as username
+2. Use the email field of the user as additional login to the username
+
+![Domain Policy: Organization domain as suffix](/img/guides/scenarios/domain_policy_org_domain_disabled.png)
+
+### Use an email address as username
+
+To be able to use the email as username you have to disable the attribute "User Loginname must contain orgdomain" on your domain settings.
+This means that all your users will not be suffixed with the domain of your organization and you can enter the email as username.
+All usernames will then be globally unique within your instance.
+
+You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
+
+### Use the email field of the user as additional login to the username
+
+No matter how the username of your user does look like.
+You can additionally allow login with the email attribute of the user.
+
+You can find this in the "Login Behaviour and Security" Setting of your instance or organizations.
+Go to the "Advanced" section, per default login with email address should be allowed. It is possible to disable it.
+
+![Login Policy Advanced Setting: Disable email for login](/img/guides/scenarios/login_policy_advanced.png)
+

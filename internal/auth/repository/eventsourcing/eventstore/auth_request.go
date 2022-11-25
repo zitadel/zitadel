@@ -668,7 +668,15 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	if repo.checkDomainDiscovery(ctx, request, loginName) {
 		return nil
 	}
-	// let's just check for if unknown usernames are ignored
+	// let's once again check if the user was just inactive
+	if user != nil && user.State == int32(domain.UserStateInactive) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
+	}
+	// or locked
+	if user != nil && user.State == int32(domain.UserStateLocked) {
+		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
+	}
+	// let's just check if unknown usernames are ignored
 	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
 		if request.LabelPolicy != nil && request.LabelPolicy.HideLoginNameSuffix {
 			preferredLoginName = loginName
@@ -684,14 +692,6 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	// let's check if it was a machine user
 	if !user.MachineView.IsZero() {
 		return errors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
-	}
-	// let's once again check if the user was just inactive
-	if user != nil && user.State == int32(domain.UserStateInactive) {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
-	}
-	// or locked
-	if user != nil && user.State == int32(domain.UserStateLocked) {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
 	}
 	// everything should be handled by now
 	logging.WithFields("authRequest", request.ID, "loginName", loginName).Error("unhandled state for checkLoginName")
