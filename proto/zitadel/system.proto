@@ -122,7 +122,8 @@ service SystemService {
     };
   }
 
-  //deprecated:  Creates a new instance with all needed setup data
+  // Deprecated: Use CreateInstance instead
+  // Creates a new instance with all needed setup data
   // This might take some time
   rpc AddInstance(AddInstanceRequest) returns (AddInstanceResponse) {
     option (google.api.http) = {
@@ -430,7 +431,7 @@ message CreateInstanceRequest {
     string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
   }
   message Email {
-    string email = 1[(validate.rules).string = {min_len: 1, max_len: 200}];
+    string email = 1[(validate.rules).string = {min_len: 1, max_len: 200, email: true}];
     bool is_email_verified = 2;
   }
   message Password {
@@ -438,10 +439,10 @@ message CreateInstanceRequest {
     bool password_change_required = 2;
   }
   message Human {
-    Email email = 1 [(validate.rules).message.required = true];
-    Profile profile = 2 [(validate.rules).message.required = false];
-    Password password = 3 [(validate.rules).message.required = false];
-    string user_name = 4 [(validate.rules).string = {max_len: 200}];
+    string user_name = 1 [(validate.rules).string = {max_len: 200}];
+    Email email = 2 [(validate.rules).message.required = true];
+    Profile profile = 3 [(validate.rules).message.required = false];
+    Password password = 4 [(validate.rules).message.required = false];
   }
   message PersonalAccessToken {
     google.protobuf.Timestamp expiration_date = 1 [

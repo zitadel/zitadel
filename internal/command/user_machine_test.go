@@ -271,16 +271,6 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								true,
-								true,
-								true,
-							),
-						),
-					),
 				),
 			},
 			args: args{
@@ -311,16 +301,6 @@ func TestCommandSide_ChangeMachine(t *testing.T) {
 								"username",
 								"name",
 								"description",
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								true,
-								true,
 								true,
 							),
 						),

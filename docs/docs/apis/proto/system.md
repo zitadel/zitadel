@@ -49,7 +49,8 @@ Returns the detail of an instance
 > **rpc** AddInstance([AddInstanceRequest](#addinstancerequest))
 [AddInstanceResponse](#addinstanceresponse)
 
-deprecated:  Creates a new instance with all needed setup data
+Deprecated: Use CreateInstance instead
+Creates a new instance with all needed setup data
 This might take some time
 
 
@@ -377,7 +378,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| email |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| email |  string | - | string.min_len: 1<br /> string.max_len: 200<br /> string.email: true<br />  |
 | is_email_verified |  bool | - |  |
 
 
@@ -389,10 +390,10 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.max_len: 200<br />  |
 | email |  CreateInstanceRequest.Email | - | message.required: true<br />  |
 | profile |  CreateInstanceRequest.Profile | - | message.required: false<br />  |
 | password |  CreateInstanceRequest.Password | - | message.required: false<br />  |
-| user_name |  string | - | string.max_len: 200<br />  |
 
 
 
