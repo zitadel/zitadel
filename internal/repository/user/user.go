@@ -395,9 +395,10 @@ func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.Event, er
 type UsernameChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserName              string `json:"userName"`
-	oldUserName           string `json:"-"`
-	userLoginMustBeDomain bool   `json:"-"`
+	UserName                 string `json:"userName"`
+	oldUserName              string `json:"-"`
+	userLoginMustBeDomain    bool   `json:"-"`
+	oldUserLoginMustBeDomain bool   `json:"-"`
 }
 
 func (e *UsernameChangedEvent) Data() interface{} {
@@ -406,7 +407,7 @@ func (e *UsernameChangedEvent) Data() interface{} {
 
 func (e *UsernameChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return []*eventstore.EventUniqueConstraint{
-		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
+		NewRemoveUsernameUniqueConstraint(e.oldUserName, e.Aggregate().ResourceOwner, e.oldUserLoginMustBeDomain),
 		NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain),
 	}
 }
@@ -417,16 +418,30 @@ func NewUsernameChangedEvent(
 	oldUserName,
 	newUserName string,
 	userLoginMustBeDomain bool,
+	opts ...UsernameChangedEventOption,
 ) *UsernameChangedEvent {
-	return &UsernameChangedEvent{
+	event := &UsernameChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			UserUserNameChangedType,
 		),
-		UserName:              newUserName,
-		oldUserName:           oldUserName,
-		userLoginMustBeDomain: userLoginMustBeDomain,
+		UserName:                 newUserName,
+		oldUserName:              oldUserName,
+		userLoginMustBeDomain:    userLoginMustBeDomain,
+		oldUserLoginMustBeDomain: userLoginMustBeDomain,
+	}
+	for _, opt := range opts {
+		opt(event)
+	}
+	return event
+}
+
+type UsernameChangedEventOption func(*UsernameChangedEvent)
+
+func UsernameChangedEventWithPolicyChange() UsernameChangedEventOption {
+	return func(e *UsernameChangedEvent) {
+		e.oldUserLoginMustBeDomain = !e.userLoginMustBeDomain
 	}
 }
 
