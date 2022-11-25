@@ -27,8 +27,7 @@ func NewInstanceSecurityPolicyWriteModel(ctx context.Context) *InstanceSecurityP
 
 func (wm *InstanceSecurityPolicyWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *instance.SecurityPolicySetEvent:
+		if e, ok := event.(*instance.SecurityPolicySetEvent); ok {
 			if e.Enabled != nil {
 				wm.Enabled = *e.Enabled
 			}

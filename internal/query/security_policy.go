@@ -88,11 +88,7 @@ func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPo
 				&securityPolicy.Enabled,
 				&securityPolicy.AllowedOrigins,
 			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					//return nil, errors.ThrowNotFound(err, "QUERY-S6u63", "Errors.SecurityPolicy.NotFound")
-					return securityPolicy, nil
-				}
+			if err != nil && !errs.Is(err, sql.ErrNoRows) { // ignore not found errors
 				return nil, errors.ThrowInternal(err, "QUERY-Dfrt2", "Errors.Internal")
 			}
 			return securityPolicy, nil
