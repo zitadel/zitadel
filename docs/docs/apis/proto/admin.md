@@ -1889,6 +1889,8 @@ This is an empty request
 | jwt_idps | repeated zitadel.v1.v1.DataJWTIDP | - |  |
 | user_links | repeated zitadel.idp.v1.IDPUserLink | - |  |
 | domains | repeated zitadel.org.v1.Domain | - |  |
+| app_keys | repeated zitadel.v1.v1.DataAppKey | - |  |
+| machine_keys | repeated zitadel.v1.v1.DataMachineKey | - |  |
 
 
 
@@ -2018,6 +2020,7 @@ This is an empty request
 | failed_sequence |  uint64 | - |  |
 | failure_count |  uint64 | - |  |
 | error_message |  string | - |  |
+| last_failed |  google.protobuf.Timestamp | - |  |
 
 
 
@@ -2909,6 +2912,8 @@ This is an empty response
 | user_links | repeated ImportDataSuccessUserLinks | - |  |
 | user_metadata | repeated ImportDataSuccessUserMetadata | - |  |
 | domains | repeated string | - |  |
+| app_keys | repeated string | - |  |
+| machine_keys | repeated string | - |  |
 
 
 
@@ -4629,7 +4634,7 @@ this is en empty request
 | database |  string | - |  |
 | view_name |  string | - |  |
 | processed_sequence |  uint64 | - |  |
-| event_timestamp |  google.protobuf.Timestamp | The timestamp the event occured |  |
+| event_timestamp |  google.protobuf.Timestamp | The timestamp the event occurred |  |
 | last_successful_spooler_run |  google.protobuf.Timestamp | - |  |
 
 

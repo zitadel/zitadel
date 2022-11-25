@@ -212,10 +212,9 @@
       "TITLE": "Settings",
       "GENERAL": "General",
       "IDP": "Identity Providers",
-      "MFA": "Multifactor Authentication",
+      "SECURITY": "Password and Security",
       "KEYS": "Keys",
       "PAT": "Personal Access Tokens",
-      "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
       "MEMBERSHIPS": "Memberships",
       "METADATA": "Metadata"
@@ -257,6 +256,7 @@
       "DELETE_SELF_DESCRIPTION": "You are about to permanently delete your personal account. This will log you out and delete your user. This action cannot be undone!",
       "DELETE_AUTH_DESCRIPTION": "You are about to permanently delete your personal account. Are you sure?",
       "TYPEUSERNAME": "Type '{{value}}', to confirm and delete the user.",
+      "USERNAME": "Loginname",
       "DELETE_BTN": "Delete permanently"
     },
     "SENDEMAILDIALOG": {
@@ -461,6 +461,7 @@
     },
     "PASSWORD": {
       "TITLE": "Password",
+      "LABEL": "A secure password helps to protect the account",
       "DESCRIPTION": "Enter the new password according to the policy below.",
       "OLD": "Current Password",
       "NEW": "New Password",
@@ -482,6 +483,7 @@
     "EMAILVERIFIED": "Email verified",
     "NOTVERIFIED": "not verified",
     "PREFERRED_LOGINNAME": "Preferred Loginname",
+    "ISINITIAL": "This users email is not verified yet.",
     "LOGINMETHODS": {
       "TITLE": "Contact Information",
       "DESCRIPTION": "The provided information is used to send important information, like password reset e-mails to you.",
@@ -565,7 +567,7 @@
       "SAVED": "Profile saved successfully.",
       "USERNAMECHANGED": "Username changed.",
       "EMAILSAVED": "E-mail saved successfully.",
-      "INITEMAILSENT": "Initializing mail sent.",
+      "INITEMAILSENT": "Initialization mail sent.",
       "PHONESAVED": "Phone saved successfully.",
       "PHONEREMOVED": "Phone has been removed.",
       "PHONEVERIFIED": "Phone verified successfully.",
@@ -741,6 +743,7 @@
       "DATABASE": "Database",
       "FAILEDSEQUENCE": "Failed Sequence",
       "FAILURECOUNT": "Failure Count",
+      "LASTFAILED": "Last failed at",
       "ERRORMESSAGE": "Error Message",
       "ACTIONS": "Actions",
       "DELETE": "Remove",
@@ -776,6 +779,12 @@
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
       "ORGDETAILUSER_TITLE": "Configure Organization Owner",
+      "RENAME": {
+        "ACTION": "Rename",
+        "TITLE": "Rename Organization",
+        "DESCRIPTION": "Enter the new name for your organization",
+        "BTN": "Rename"
+      },
       "ORGDOMAIN": {
         "TITLE": "Organization Domain Ownership Verification",
         "VERIFICATION": "To verify the ownership of your domain, you need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
@@ -827,6 +836,7 @@
       "DESCRIPTION": "Define the users who can change your organizations preferences."
     },
     "TOAST": {
+      "UPDATED": "Organization updated successfully.",
       "DEACTIVATED": "Organization deactivated.",
       "REACTIVATED": "Organization reactivated.",
       "DOMAINADDED": "Added domain.",
@@ -1169,6 +1179,7 @@
       "HIDEPASSWORDRESET": "Hide Password reset",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
+      "HIDELOGINNAMESUFFIX_DESC": "Hides the login name suffix in the login interface",
       "IGNOREUNKNOWNUSERNAMES": "Ignore unknown usernames",
       "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
       "ALLOWDOMAINDISCOVERY": "Domain discovery allowed",
@@ -1179,6 +1190,7 @@
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark",
+      "DISABLEWATERMARK_DESC": "Hide Powered by ZITADEL watermark in the login interface",
       "PASSWORDCHECKLIFETIME": "Password Check Lifetime",
       "EXTERNALLOGINCHECKLIFETIME": "External Login Check Lifetime",
       "MFAINITSKIPLIFETIME": "Multifactor Init Lifetime",

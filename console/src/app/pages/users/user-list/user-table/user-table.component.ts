@@ -256,8 +256,10 @@ export class UserTableComponent implements OnInit {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
       titleKey: 'USER.DIALOG.DELETE_SELF_TITLE',
-      descriptionKey: 'USER.DIALOG.DELETE_SELF_DESCRIPTION',
-      confirmationKey: 'USER.DIALOG.TYPEUSERNAME',
+      warnSectionKey: 'USER.DIALOG.DELETE_SELF_DESCRIPTION',
+      hintKey: 'USER.DIALOG.TYPEUSERNAME',
+      hintParam: 'USER.DIALOG.DELETE_DESCRIPTION',
+      confirmationKey: 'USER.DIALOG.USERNAME',
       confirmation: user.preferredLoginName,
     };
 
@@ -265,8 +267,10 @@ export class UserTableComponent implements OnInit {
       confirmKey: 'ACTIONS.DELETE',
       cancelKey: 'ACTIONS.CANCEL',
       titleKey: 'USER.DIALOG.DELETE_TITLE',
-      descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
-      confirmationKey: 'USER.DIALOG.TYPEUSERNAME',
+      warnSectionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
+      hintKey: 'USER.DIALOG.TYPEUSERNAME',
+      hintParam: 'USER.DIALOG.DELETE_DESCRIPTION',
+      confirmationKey: 'USER.DIALOG.USERNAME',
       confirmation: user.preferredLoginName,
     };
 

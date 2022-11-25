@@ -88,6 +88,10 @@ func (p *privacyPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.PrivacyPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(PrivacyPolicyInstanceIDCol),
+				},
 			},
 		},
 	}
@@ -151,6 +155,7 @@ func (p *privacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 		cols,
 		[]handler.Condition{
 			handler.NewCond(PrivacyPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(PrivacyPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -163,5 +168,6 @@ func (p *privacyPolicyProjection) reduceRemoved(event eventstore.Event) (*handle
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(PrivacyPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(PrivacyPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }

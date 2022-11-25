@@ -16,16 +16,15 @@
     {{ range $provider := .MFAProviders}} {{ $providerName := (t (printf
     "InitMFAPrompt.Provider%v" $provider)) }}
     <div class="mfa">
-      <input
-        id="{{ $provider }}"
-        type="radio"
-        name="provider"
-        value="{{ $provider }}"
-        required
-      />
-
-      <label for="{{ $provider }}"
-        >{{ if eq $provider 0 }}
+      <label>
+        <input
+          id="{{ $provider }}"
+          type="radio"
+          name="provider"
+          value="{{ $provider }}"
+          required
+        />
+        {{ if eq $provider 0 }}
         <div class="mfa-img">
           <img width="100px" height="100px" alt="OTP" src="{{ resourceUrl
           "images/mfa/mfa-otp.svg" }}" />
@@ -65,5 +64,7 @@
     </button>
   </div>
 </form>
+
+<script src="{{ resourceUrl "scripts/mfa.js" }}"></script>
 
 {{template "main-bottom" .}}

@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -74,6 +75,15 @@ func (p *projectRoleProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(ProjectRoleColumnInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -121,6 +131,7 @@ func (p *projectRoleProjection) reduceProjectRoleChanged(event eventstore.Event)
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -135,6 +146,7 @@ func (p *projectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event)
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -148,6 +160,7 @@ func (p *projectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*h
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

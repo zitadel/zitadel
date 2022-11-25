@@ -80,9 +80,9 @@ var (
 			", members.grant_id" +
 			" FROM projections.project_grant_members2 AS members" +
 			") AS memberships" +
-			" LEFT JOIN projections.projects2 ON memberships.project_id = projections.projects2.id" +
-			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id" +
-			" LEFT JOIN projections.project_grants2 ON memberships.grant_id = projections.project_grants2.grant_id")
+			" LEFT JOIN projections.projects2 ON memberships.project_id = projections.projects2.id AND memberships.instance_id = projections.projects2.instance_id" +
+			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
+			" LEFT JOIN projections.project_grants2 ON memberships.grant_id = projections.project_grants2.grant_id AND memberships.instance_id = projections.project_grants2.instance_id")
 	membershipCols = []string{
 		"user_id",
 		"roles",

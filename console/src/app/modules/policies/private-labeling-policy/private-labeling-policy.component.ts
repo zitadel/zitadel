@@ -20,7 +20,15 @@ import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
-import { ThemeService } from 'src/app/services/theme.service';
+import {
+  BACKGROUND,
+  DARK_BACKGROUND,
+  DARK_PRIMARY,
+  DARK_WARN,
+  PRIMARY,
+  ThemeService,
+  WARN,
+} from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -238,17 +246,38 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         }
         break;
       case PolicyComponentServiceType.MGMT:
-        if (type === AssetType.LOGO) {
-          if (theme === Theme.DARK) {
-            return previewHandler(this.service.removeLabelPolicyLogoDark());
-          } else if (theme === Theme.LIGHT) {
-            return previewHandler(this.service.removeLabelPolicyLogo());
-          }
-        } else if (type === AssetType.ICON) {
-          if (theme === Theme.DARK) {
-            return previewHandler(this.service.removeLabelPolicyIconDark());
-          } else if (theme === Theme.LIGHT) {
-            return previewHandler(this.service.removeLabelPolicyIcon());
+        if ((this.previewData as LabelPolicy.AsObject).isDefault) {
+          const req0 = new AddCustomLabelPolicyRequest();
+          this.overwriteValues(req0);
+
+          return (this.service as ManagementService)
+            .addCustomLabelPolicy(req0)
+            .then(() => {
+              if (this.previewData) {
+                this.previewData.isDefault = false;
+              }
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+
+              setTimeout(() => {
+                this.fetchData();
+              }, 1000);
+            })
+            .catch((error: HttpErrorResponse) => {
+              this.toast.showError(error);
+            });
+        } else {
+          if (type === AssetType.LOGO) {
+            if (theme === Theme.DARK) {
+              return previewHandler(this.service.removeLabelPolicyLogoDark());
+            } else if (theme === Theme.LIGHT) {
+              return previewHandler(this.service.removeLabelPolicyLogo());
+            }
+          } else if (type === AssetType.ICON) {
+            if (theme === Theme.DARK) {
+              return previewHandler(this.service.removeLabelPolicyIconDark());
+            } else if (theme === Theme.LIGHT) {
+              return previewHandler(this.service.removeLabelPolicyIcon());
+            }
           }
         }
         break;
@@ -616,14 +645,14 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   }
 
   private applyToConsole(labelpolicy: LabelPolicy.AsObject): void {
-    const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
-    const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
+    const darkPrimary = labelpolicy?.primaryColorDark || DARK_PRIMARY;
+    const lightPrimary = labelpolicy?.primaryColor || PRIMARY;
 
-    const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
-    const lightWarn = labelpolicy?.warnColor || '#cd3d56';
+    const darkWarn = labelpolicy?.warnColorDark || DARK_WARN;
+    const lightWarn = labelpolicy?.warnColor || WARN;
 
-    const darkBackground = labelpolicy?.backgroundColorDark || '#111827';
-    const lightBackground = labelpolicy?.backgroundColor || '#fafafa';
+    const darkBackground = labelpolicy?.backgroundColorDark || DARK_BACKGROUND;
+    const lightBackground = labelpolicy?.backgroundColor || BACKGROUND;
 
     this.themeService.savePrimaryColor(darkPrimary, true);
     this.themeService.savePrimaryColor(lightPrimary, false);

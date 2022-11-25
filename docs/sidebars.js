@@ -9,6 +9,7 @@ module.exports = {
         "examples/login/react",
         "examples/login/flutter",
         "examples/login/nextjs",
+        "examples/login/nextjs-b2b",
       ],
       collapsed: false,
     },
@@ -77,8 +78,9 @@ module.exports = {
           type: "category",
           label: "Self-Hosted",
           items: [
+            "guides/manage/self-hosted/production",
             "guides/manage/self-hosted/configure/configure",
-            "guides/manage/self-hosted/proxy/proxy",
+            "guides/manage/self-hosted/reverseproxy/reverse_proxy",
             "guides/manage/self-hosted/custom-domain",
             "guides/manage/self-hosted/http2",
             "guides/manage/self-hosted/tls_modes",
@@ -115,6 +117,7 @@ module.exports = {
           label: "Terraform",
           items: ["guides/manage/terraform/basics"],
         },
+        "guides/manage/user/reg-create-user",
       ],
     },
     {
@@ -131,6 +134,7 @@ module.exports = {
           items: [
             "guides/integrate/serviceusers",
             "guides/integrate/access-zitadel-apis",
+            "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/export-and-import",
           ],
@@ -169,6 +173,7 @@ module.exports = {
         "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
+        "guides/solution-scenarios/configurations",
       ],
     },
     {

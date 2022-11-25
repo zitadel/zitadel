@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -92,6 +93,15 @@ func (p *projectGrantProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(ProjectGrantColumnInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -132,6 +142,7 @@ func (p *projectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -151,6 +162,7 @@ func (p *projectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -170,6 +182,7 @@ func (p *projectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -189,6 +202,7 @@ func (p *projectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -203,6 +217,7 @@ func (p *projectGrantProjection) reduceProjectGrantRemoved(event eventstore.Even
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnGrantID, e.GrantID),
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -216,6 +231,7 @@ func (p *projectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnProjectID, e.Aggregate().ID),
+			handler.NewCond(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

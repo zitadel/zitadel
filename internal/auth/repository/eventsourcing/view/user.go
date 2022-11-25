@@ -181,20 +181,28 @@ func (v *View) DeleteUser(userID, instanceID string, event *models.Event) error 
 	return v.ProcessedUserSequence(event)
 }
 
+func (v *View) DeleteInstanceUsers(event *models.Event) error {
+	err := view.DeleteInstanceUsers(v.Db, userTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedUserSequence(event)
+}
+
 func (v *View) GetLatestUserSequence(instanceID string) (*repository.CurrentSequence, error) {
 	return v.latestSequence(userTable, instanceID)
 }
 
-func (v *View) GetLatestUserSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(userTable, instanceIDs...)
+func (v *View) GetLatestUserSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(userTable, instanceIDs)
 }
 
 func (v *View) ProcessedUserSequence(event *models.Event) error {
 	return v.saveCurrentSequence(userTable, event)
 }
 
-func (v *View) UpdateUserSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(userTable)
+func (v *View) UpdateUserSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(userTable, instanceIDs)
 }
 
 func (v *View) GetLatestUserFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {

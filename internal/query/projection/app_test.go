@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -24,7 +25,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "project.reduceAppAdded",
+			name: "project reduceAppAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationAddedType),
@@ -40,7 +41,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -62,7 +62,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAppChanged",
+			name: "project reduceAppChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationChangedType),
@@ -78,7 +78,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -96,7 +95,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAppDeactivated",
+			name: "project reduceAppDeactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationDeactivatedType),
@@ -111,7 +110,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -129,7 +127,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAppReactivated",
+			name: "project reduceAppReactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationReactivatedType),
@@ -144,7 +142,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -162,7 +159,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAppRemoved",
+			name: "project reduceAppRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationRemovedType),
@@ -177,7 +174,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -192,7 +188,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceProjectRemoved",
+			name: "project reduceProjectRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ProjectRemovedType),
@@ -205,7 +201,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -220,7 +215,33 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAPIConfigAdded",
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(AppColumnInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.apps3 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project reduceAPIConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.APIConfigAddedType),
@@ -238,7 +259,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -265,7 +285,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAPIConfigChanged",
+			name: "project reduceAPIConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.APIConfigChangedType),
@@ -283,7 +303,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -309,7 +328,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAPIConfigChanged noop",
+			name: "project reduceAPIConfigChanged noop",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.APIConfigChangedType),
@@ -324,14 +343,13 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
 			},
 		},
 		{
-			name: "project.reduceAPIConfigSecretChanged",
+			name: "project reduceAPIConfigSecretChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.APIConfigSecretChangedType),
@@ -347,7 +365,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -372,7 +389,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceOIDCConfigAdded",
+			name: "project reduceOIDCConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.OIDCConfigAddedType),
@@ -403,7 +420,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -443,7 +459,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceOIDCConfigChanged",
+			name: "project reduceOIDCConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.OIDCConfigChangedType),
@@ -472,7 +488,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -510,7 +525,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceOIDCConfigChanged noop",
+			name: "project reduceOIDCConfigChanged noop",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.OIDCConfigChangedType),
@@ -525,14 +540,13 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
 			},
 		},
 		{
-			name: "project.reduceOIDCConfigSecretChanged",
+			name: "project reduceOIDCConfigSecretChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.OIDCConfigSecretChangedType),
@@ -548,7 +562,6 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -583,7 +596,7 @@ func TestAppProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, AppProjectionTable, tt.want)
 		})
 	}
 }

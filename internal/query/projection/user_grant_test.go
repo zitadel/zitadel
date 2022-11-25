@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -42,7 +43,6 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -81,16 +81,16 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								database.StringArray{"role"},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -113,16 +113,16 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								database.StringArray{"role"},
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -143,13 +143,39 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								anyArg{},
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
 							},
 						},
 					},
@@ -170,13 +196,13 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								anyArg{},
+								"instance-id",
 							},
 						},
 					},
@@ -197,16 +223,16 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserGrantStateInactive,
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -227,16 +253,16 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    usergrant.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.user_grants2 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserGrantStateActive,
 								uint64(15),
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -257,13 +283,13 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								anyArg{},
+								"instance-id",
 							},
 						},
 					},
@@ -284,13 +310,13 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (project_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								anyArg{},
+								"instance-id",
 							},
 						},
 					},
@@ -311,13 +337,13 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (grant_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants2 WHERE (grant_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"grantID",
+								"instance-id",
 							},
 						},
 					},
@@ -338,14 +364,14 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET roles = array_remove(roles, $1) WHERE (project_id = $2)",
+							expectedStmt: "UPDATE projections.user_grants2 SET roles = array_remove(roles, $1) WHERE (project_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"key",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -366,14 +392,14 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				aggregateType:    project.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserGrantProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants2 SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::TEXT[]))) WHERE (grant_id = $2)",
+							expectedStmt: "UPDATE projections.user_grants2 SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::TEXT[]))) WHERE (grant_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								database.StringArray{"key"},
 								"grantID",
+								"instance-id",
 							},
 						},
 					},
@@ -391,7 +417,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, UserGrantProjectionTable, tt.want)
 		})
 	}
 }

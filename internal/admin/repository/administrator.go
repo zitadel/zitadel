@@ -7,8 +7,8 @@ import (
 )
 
 type AdministratorRepository interface {
-	GetFailedEvents(context.Context) ([]*model.FailedEvent, error)
+	GetFailedEvents(ctx context.Context, instanceID string) ([]*model.FailedEvent, error)
 	RemoveFailedEvent(context.Context, *model.FailedEvent) error
-	GetViews() ([]*model.View, error)
+	GetViews(instanceID string) ([]*model.View, error)
 	ClearView(ctx context.Context, db, viewName string) error
 }

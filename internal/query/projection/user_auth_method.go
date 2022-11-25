@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -98,6 +99,15 @@ func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(UserAuthMethodInstanceIDCol),
+				},
+			},
+		},
 	}
 }
 
@@ -174,6 +184,7 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 			handler.NewCond(UserAuthMethodTypeCol, methodType),
 			handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
 			handler.NewCond(UserAuthMethodTokenIDCol, tokenID),
+			handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -198,6 +209,7 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),
 		handler.NewCond(UserAuthMethodTypeCol, methodType),
 		handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+		handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 	}
 	if tokenID != "" {
 		conditions = append(conditions, handler.NewCond(UserAuthMethodTokenIDCol, tokenID))

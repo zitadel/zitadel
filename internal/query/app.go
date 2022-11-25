@@ -83,7 +83,8 @@ func (q *AppSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 var (
 	appsTable = table{
-		name: projection.AppProjectionTable,
+		name:          projection.AppProjectionTable,
+		instanceIDCol: projection.AppColumnInstanceID,
 	}
 	AppColumnID = Column{
 		name:  projection.AppColumnID,
@@ -125,7 +126,8 @@ var (
 
 var (
 	appSAMLConfigsTable = table{
-		name: projection.AppSAMLTable,
+		name:          projection.AppSAMLTable,
+		instanceIDCol: projection.AppSAMLConfigColumnInstanceID,
 	}
 	AppSAMLConfigColumnAppID = Column{
 		name:  projection.AppSAMLConfigColumnAppID,
@@ -147,7 +149,8 @@ var (
 
 var (
 	appAPIConfigsTable = table{
-		name: projection.AppAPITable,
+		name:          projection.AppAPITable,
+		instanceIDCol: projection.AppAPIConfigColumnInstanceID,
 	}
 	AppAPIConfigColumnAppID = Column{
 		name:  projection.AppAPIConfigColumnAppID,
@@ -165,7 +168,8 @@ var (
 
 var (
 	appOIDCConfigsTable = table{
-		name: projection.AppOIDCTable,
+		name:          projection.AppOIDCTable,
+		instanceIDCol: projection.AppOIDCConfigColumnInstanceID,
 	}
 	AppOIDCConfigColumnAppID = Column{
 		name:  projection.AppOIDCConfigColumnAppID,
@@ -275,6 +279,7 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (*App,
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppSAMLConfigColumnEntityID.identifier(): entityID,
+			AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -288,10 +293,13 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (*App,
 func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (*Project, error) {
 	stmt, scan := prepareProjectByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
-			sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
-			sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
-			sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
+		sq.And{
+			sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+			sq.Or{
+				sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+				sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+				sq.Eq{AppSAMLConfigColumnAppID.identifier(): appID},
+			},
 		},
 	).ToSql()
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -86,6 +87,15 @@ func (p *projectProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(ProjectColumnInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -145,6 +155,7 @@ func (p *projectProjection) reduceProjectChanged(event eventstore.Event) (*handl
 		columns,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -163,6 +174,7 @@ func (p *projectProjection) reduceProjectDeactivated(event eventstore.Event) (*h
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -181,6 +193,7 @@ func (p *projectProjection) reduceProjectReactivated(event eventstore.Event) (*h
 		},
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -194,6 +207,7 @@ func (p *projectProjection) reduceProjectRemoved(event eventstore.Event) (*handl
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectColumnID, e.Aggregate().ID),
+			handler.NewCond(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

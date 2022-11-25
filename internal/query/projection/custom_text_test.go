@@ -22,7 +22,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceSet",
+			name: "org reduceSet",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.CustomTextSetEventType),
@@ -40,7 +40,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -63,7 +62,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceRemoved",
+			name:   "org reduceRemoved",
 			reduce: (&customTextProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -80,16 +79,16 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4)",
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
 								"Text",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -97,7 +96,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceTemplateRemoved",
+			name:   "org reduceTemplateRemoved",
 			reduce: (&customTextProjection{}).reduceTemplateRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -114,15 +113,15 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3)",
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -130,7 +129,33 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(CustomTextInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "instance reduceAdded",
 			reduce: (&customTextProjection{}).reduceSet,
 			args: args{
 				event: getEvent(testEvent(
@@ -148,7 +173,6 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -171,7 +195,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceRemoved",
+			name:   "instance reduceRemoved",
 			reduce: (&customTextProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -188,16 +212,16 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4)",
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
 								"Text",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -205,7 +229,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceTemplateRemoved",
+			name:   "instance reduceTemplateRemoved",
 			reduce: (&customTextProjection{}).reduceTemplateRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -222,15 +246,15 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       CustomTextTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3)",
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
 								"en",
+								"instance-id",
 							},
 						},
 					},
@@ -248,7 +272,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, CustomTextTable, tt.want)
 		})
 	}
 }

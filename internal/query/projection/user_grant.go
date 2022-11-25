@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -131,6 +132,15 @@ func (p *userGrantProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),
+				},
+			},
+		},
 	}
 }
 
@@ -178,6 +188,7 @@ func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.St
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -194,6 +205,7 @@ func (p *userGrantProjection) reduceRemoved(event eventstore.Event) (*handler.St
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -212,6 +224,7 @@ func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -230,6 +243,7 @@ func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -243,6 +257,7 @@ func (p *userGrantProjection) reduceUserRemoved(event eventstore.Event) (*handle
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantUserID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -256,6 +271,7 @@ func (p *userGrantProjection) reduceProjectRemoved(event eventstore.Event) (*han
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantProjectID, event.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -270,6 +286,7 @@ func (p *userGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) 
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, e.GrantID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -287,6 +304,7 @@ func (p *userGrantProjection) reduceRoleRemoved(event eventstore.Event) (*handle
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantProjectID, e.Aggregate().ID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -312,6 +330,7 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, grantID),
+			handler.NewCond(UserGrantInstanceID, event.Aggregate().InstanceID),
 		},
 	), nil
 }
