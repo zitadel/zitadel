@@ -63,3 +63,24 @@ Then('user is redirected to {string}', (expectedUrl: string) => {
     expect(actualUrl.startsWith(expectedUrl)).to.be.true;
   });
 });
+
+Given('min password length is {int}', (minlength: number) => {
+  cy.wrap(minlength).as('minlength');
+});
+Given('max password length is {int}', (maxlength: number) => {
+  cy.wrap(maxlength).as('maxlength');
+});
+
+When('I enter {string}', (input: string) => {
+  cy.wrap(input).as('input');
+});
+Then('password is {string}', (expectValid: string) => {
+  cy.get('@minlength').then((minlength: unknown) => {
+    cy.get('@maxlength').then((maxlength: unknown) => {
+      cy.get('@input').then((input: unknown) => {
+        const valid = ((<string>input).length >= minlength && (<string>input).length <= maxlength).toString();
+        expect(valid).to.equal(expectValid);
+      });
+    });
+  });
+});

@@ -18,3 +18,14 @@ Feature: Users can login via ZITADEL
             And user enters password "Password1!"
 
             Then user is redirected to "http://localhost:8080/redirect-to-here"
+
+        Scenario Outline: password validation
+            Given min password length is <minlength>
+            Given max password length is <maxlength>
+            When I enter <input>
+            Then password is <valid>
+
+            Examples:
+                | minlength | maxlength | input            | valid   |
+                | 12        | 20        | "notenough"      | "false" |
+                | 12        | 20        | "morethanenough" | "true"  |
