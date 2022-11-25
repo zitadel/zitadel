@@ -50,7 +50,12 @@ type DomainPolicyUsernamesWriteModel struct {
 
 	PrimaryDomain   string
 	VerifiedDomains []string
-	Users           map[string]string
+	Users           []*domainPolicyUsers
+}
+
+type domainPolicyUsers struct {
+	id       string
+	username string
 }
 
 func NewDomainPolicyUsernamesWriteModel(orgID string) *DomainPolicyUsernamesWriteModel {
@@ -58,7 +63,7 @@ func NewDomainPolicyUsernamesWriteModel(orgID string) *DomainPolicyUsernamesWrit
 		WriteModel: eventstore.WriteModel{
 			ResourceOwner: orgID,
 		},
-		Users: make(map[string]string),
+		Users: make([]*domainPolicyUsers, 0),
 	}
 }
 
@@ -83,17 +88,34 @@ func (wm *DomainPolicyUsernamesWriteModel) Reduce() error {
 		case *org.DomainPrimarySetEvent:
 			wm.PrimaryDomain = e.Domain
 		case *user.HumanAddedEvent:
-			wm.Users[e.Aggregate().ID] = e.UserName
+			wm.Users = append(wm.Users, &domainPolicyUsers{id: e.Aggregate().ID, username: e.UserName})
 		case *user.HumanRegisteredEvent:
-			wm.Users[e.Aggregate().ID] = e.UserName
+			wm.Users = append(wm.Users, &domainPolicyUsers{id: e.Aggregate().ID, username: e.UserName})
 		case *user.MachineAddedEvent:
-			wm.Users[e.Aggregate().ID] = e.UserName
+			wm.Users = append(wm.Users, &domainPolicyUsers{id: e.Aggregate().ID, username: e.UserName})
 		case *user.UsernameChangedEvent:
-			wm.Users[e.Aggregate().ID] = e.UserName
+			for _, user := range wm.Users {
+				if user.id == e.Aggregate().ID {
+					user.username = e.UserName
+					break
+				}
+			}
 		case *user.DomainClaimedEvent:
-			wm.Users[e.Aggregate().ID] = e.UserName
+			for _, user := range wm.Users {
+				if user.id == e.Aggregate().ID {
+					user.username = e.UserName
+					break
+				}
+			}
 		case *user.UserRemovedEvent:
-			delete(wm.Users, e.Aggregate().ID)
+			for i, user := range wm.Users {
+				if user.id == e.Aggregate().ID {
+					wm.Users[i] = wm.Users[len(wm.Users)-1]
+					wm.Users[len(wm.Users)-1] = nil
+					wm.Users = wm.Users[len(wm.Users)-1:]
+					break
+				}
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -120,11 +142,11 @@ func (wm *DomainPolicyUsernamesWriteModel) Query() *eventstore.SearchQueryBuilde
 
 func (wm *DomainPolicyUsernamesWriteModel) NewUsernameChangedEvents(ctx context.Context, userLoginMustBeDomain bool) []eventstore.Command {
 	events := make([]eventstore.Command, 0, len(wm.Users))
-	for id, name := range wm.Users {
+	for _, changeUser := range wm.Users {
 		events = append(events, user.NewUsernameChangedEvent(ctx,
-			&user.NewAggregate(id, wm.ResourceOwner).Aggregate,
-			name,
-			wm.newUsername(name, userLoginMustBeDomain),
+			&user.NewAggregate(changeUser.id, wm.ResourceOwner).Aggregate,
+			changeUser.username,
+			wm.newUsername(changeUser.username, userLoginMustBeDomain),
 			userLoginMustBeDomain,
 			user.UsernameChangedEventWithPolicyChange()),
 		)
