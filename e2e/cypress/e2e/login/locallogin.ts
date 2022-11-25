@@ -11,7 +11,7 @@ const testProject = 'testProject';
 const testApp = 'testApp';
 
 // TODO: Make this dynamic somehow
-const testAppClientID = '189165202854445059@testproject';
+const testAppClientID = '189371933857480707@testproject';
 
 Before(() => {
   apiAuth().as('api');
