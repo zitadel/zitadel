@@ -106,3 +106,30 @@ func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.Upd
 			details.ResourceOwner),
 	}, nil
 }
+
+func (s *Server) GetSecurityPolicy(ctx context.Context, req *admin_pb.GetSecurityPolicyRequest) (*admin_pb.GetSecurityPolicyResponse, error) {
+	policy, err := s.query.SecurityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetSecurityPolicyResponse{
+		Policy: SecurityPolicyToPb(policy),
+	}, nil
+}
+
+func (s *Server) SetSecurityPolicy(ctx context.Context, req *admin_pb.SetSecurityPolicyRequest) (*admin_pb.SetSecurityPolicyResponse, error) {
+	var enabled bool
+	var origins []string
+	if e, ok := req.Setting.(*admin_pb.SetSecurityPolicyRequest_Enabled); ok {
+		enabled = true
+		origins = e.Enabled.Origins
+	}
+
+	details, err := s.command.SetSecurityPolicy(ctx, enabled, origins)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetSecurityPolicyResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}

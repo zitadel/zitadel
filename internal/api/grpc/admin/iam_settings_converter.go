@@ -149,3 +149,18 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 	}
 	return mapped
 }
+
+func SecurityPolicyToPb(policy *query.SecurityPolicy) *settings_pb.SecurityPolicy {
+	if !policy.Enabled {
+		return &settings_pb.SecurityPolicy{
+			Setting: &settings_pb.SecurityPolicy_Disabled{},
+		}
+	}
+	return &settings_pb.SecurityPolicy{
+		Setting: &settings_pb.SecurityPolicy_Enabled{
+			Enabled: &settings_pb.Origins{
+				Origins: policy.AllowedOrigins,
+			},
+		},
+	}
+}

@@ -332,6 +332,30 @@ Get log notification provider
     GET: /notification/provider/log
 
 
+### GetSecurityPolicy
+
+> **rpc** GetSecurityPolicy([GetSecurityPolicyRequest](#getsecuritypolicyrequest))
+[GetSecurityPolicyResponse](#getsecuritypolicyresponse)
+
+Get the security policy
+
+
+
+    GET: /policies/security
+
+
+### SetSecurityPolicy
+
+> **rpc** SetSecurityPolicy([SetSecurityPolicyRequest](#setsecuritypolicyrequest))
+[SetSecurityPolicyResponse](#setsecuritypolicyresponse)
+
+set the security policy
+
+
+
+    PUT: /policies/security
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -2739,6 +2763,23 @@ This is an empty request
 
 
 
+### GetSecurityPolicyRequest
+This is an empty request
+
+
+
+
+### GetSecurityPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.settings.v1.SecurityPolicy | - |  |
+
+
+
+
 ### GetSupportedLanguagesRequest
 This is an empty request
 
@@ -4015,6 +4056,35 @@ this is en empty request
 
 
 ### SetDefaultVerifyPhoneMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetSecurityPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) setting.disabled |  SetSecurityPolicyRequest.Disabled | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) setting.enabled |  zitadel.settings.v1.Origins | - |  |
+
+
+
+
+### SetSecurityPolicyRequest.Disabled
+
+
+
+
+
+### SetSecurityPolicyResponse
 
 
 

@@ -448,6 +448,29 @@ service AdminService {
         };
     }
 
+    // Get the security policy
+    rpc GetSecurityPolicy(GetSecurityPolicyRequest) returns (GetSecurityPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/security";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    // set the security policy
+    rpc SetSecurityPolicy(SetSecurityPolicyRequest) returns (SetSecurityPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/security";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
@@ -2926,6 +2949,27 @@ message UpdateOIDCSettingsRequest {
 }
 
 message UpdateOIDCSettingsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+// This is an empty request
+message GetSecurityPolicyRequest{}
+
+message GetSecurityPolicyResponse{
+    zitadel.settings.v1.SecurityPolicy policy = 1;
+}
+
+message SetSecurityPolicyRequest{
+    message Disabled{}
+    oneof setting {
+        option (validate.required) = true;
+
+        Disabled disabled = 1;
+        zitadel.settings.v1.Origins enabled = 2;
+    }
+}
+
+message SetSecurityPolicyResponse{
     zitadel.v1.ObjectDetails details = 1;
 }
 

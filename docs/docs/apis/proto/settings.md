@@ -36,6 +36,17 @@ title: zitadel/settings.proto
 
 
 
+### Origins
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| origins | repeated string | - |  |
+
+
+
+
 ### SMSProvider
 
 
@@ -102,6 +113,19 @@ title: zitadel/settings.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | generator_type |  SecretGeneratorType | - |  |
+
+
+
+
+### SecurityPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) setting.disabled |  bool | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) setting.enabled |  Origins | - |  |
 
 
 

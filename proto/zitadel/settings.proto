@@ -83,3 +83,18 @@ message OIDCSettings {
   google.protobuf.Duration  refresh_token_idle_expiration = 4;
   google.protobuf.Duration  refresh_token_expiration = 5;
 }
+
+message SecurityPolicy {
+  zitadel.v1.ObjectDetails details = 1;
+
+  oneof setting {
+    option (validate.required) = true;
+
+    bool disabled = 2;
+    Origins enabled = 3;
+  }
+}
+
+message Origins {
+  repeated string origins = 1;
+}
