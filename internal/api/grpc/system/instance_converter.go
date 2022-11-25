@@ -30,62 +30,11 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 	}
 
 	if user := req.GetMachine(); user != nil {
-		defaultInstance.Org.Machine = &command.AddMachine{
-			Machine: &command.Machine{},
-		}
-		if user.UserName != "" {
-			defaultInstance.Org.Machine.Machine.Username = user.UserName
-		}
-		if user.Name != "" {
-			defaultInstance.Org.Machine.Machine.Name = user.Name
-		}
-		if user.PersonalAccessToken != nil {
-			defaultInstance.Org.Machine.Pat = true
-			defaultInstance.Org.Machine.PatScopes = []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
-			if user.PersonalAccessToken.ExpirationDate != nil {
-				defaultInstance.Org.Machine.PatExpirationDate = user.PersonalAccessToken.ExpirationDate.AsTime()
-			}
-		}
-		if user.MachineKey != nil {
-			defaultInstance.Org.Machine.MachineKey = true
-			defaultInstance.Org.Machine.MachineKeyType = authn.KeyTypeToDomain(user.MachineKey.Type)
-			if user.MachineKey.ExpirationDate != nil {
-				defaultInstance.Org.Machine.MachineKeyExpirationDate = user.MachineKey.ExpirationDate.AsTime()
-			}
-		}
+		defaultInstance.Org.Machine = createInstancePbToAddMachine(user)
 		defaultInstance.Org.Human = nil
 	}
 	if user := req.GetHuman(); user != nil {
-		if user.Email != nil {
-			defaultInstance.Org.Human.Email.Address = user.Email.Email
-			defaultInstance.Org.Human.Email.Verified = user.Email.IsEmailVerified
-		}
-		if user.Profile != nil {
-			if user.Profile.FirstName != "" {
-				defaultInstance.Org.Human.FirstName = user.Profile.FirstName
-			}
-			if user.Profile.LastName != "" {
-				defaultInstance.Org.Human.LastName = user.Profile.LastName
-			}
-			if user.Profile.PreferredLanguage != "" {
-				lang, err := language.Parse(user.Profile.PreferredLanguage)
-				if err == nil {
-					defaultInstance.Org.Human.PreferredLanguage = lang
-				}
-			}
-		}
-		// check if default username is email style or else append @<orgname>.<custom-domain>
-		// this way we have the same value as before changing `UserLoginMustBeDomain` to false
-		if !defaultInstance.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(defaultInstance.Org.Human.Username, "@") {
-			defaultInstance.Org.Human.Username = defaultInstance.Org.Human.Username + "@" + domain.NewIAMDomainName(defaultInstance.Org.Name, externalDomain)
-		}
-		if user.UserName != "" {
-			defaultInstance.Org.Human.Username = user.UserName
-		}
-		if user.Password != nil {
-			defaultInstance.Org.Human.Password = user.Password.Password
-			defaultInstance.Org.Human.PasswordChangeRequired = user.Password.PasswordChangeRequired
-		}
+		defaultInstance.Org.Human = createInstancePbToAddHuman(user, defaultInstance.DomainPolicy.UserLoginMustBeDomain, defaultInstance.Org.Name, externalDomain)
 		defaultInstance.Org.Machine = nil
 	}
 
@@ -94,6 +43,67 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 	}
 
 	return &defaultInstance
+}
+func createInstancePbToAddHuman(user *system_pb.CreateInstanceRequest_Human, userLoginMustBeDomain bool, org, externalDomain string) *command.AddHuman {
+	human := &command.AddHuman{}
+	if user.Email != nil {
+		human.Email.Address = user.Email.Email
+		human.Email.Verified = user.Email.IsEmailVerified
+	}
+	if user.Profile != nil {
+		if user.Profile.FirstName != "" {
+			human.FirstName = user.Profile.FirstName
+		}
+		if user.Profile.LastName != "" {
+			human.LastName = user.Profile.LastName
+		}
+		if user.Profile.PreferredLanguage != "" {
+			lang, err := language.Parse(user.Profile.PreferredLanguage)
+			if err == nil {
+				human.PreferredLanguage = lang
+			}
+		}
+	}
+	// check if default username is email style or else append @<orgname>.<custom-domain>
+	// this way we have the same value as before changing `UserLoginMustBeDomain` to false
+	if !userLoginMustBeDomain && !strings.Contains(human.Username, "@") {
+		human.Username = human.Username + "@" + domain.NewIAMDomainName(org, externalDomain)
+	}
+	if user.UserName != "" {
+		human.Username = user.UserName
+	}
+	if user.Password != nil {
+		human.Password = user.Password.Password
+		human.PasswordChangeRequired = user.Password.PasswordChangeRequired
+	}
+	return human
+}
+
+func createInstancePbToAddMachine(user *system_pb.CreateInstanceRequest_Machine) *command.AddMachine {
+	machine := &command.AddMachine{
+		Machine: &command.Machine{},
+	}
+	if user.UserName != "" {
+		machine.Machine.Username = user.UserName
+	}
+	if user.Name != "" {
+		machine.Machine.Name = user.Name
+	}
+	if user.PersonalAccessToken != nil {
+		machine.Pat = true
+		machine.PatScopes = []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
+		if user.PersonalAccessToken.ExpirationDate != nil {
+			machine.PatExpirationDate = user.PersonalAccessToken.ExpirationDate.AsTime()
+		}
+	}
+	if user.MachineKey != nil {
+		machine.MachineKey = true
+		machine.MachineKeyType = authn.KeyTypeToDomain(user.MachineKey.Type)
+		if user.MachineKey.ExpirationDate != nil {
+			machine.MachineKeyExpirationDate = user.MachineKey.ExpirationDate.AsTime()
+		}
+	}
+	return machine
 }
 
 func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {

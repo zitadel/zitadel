@@ -286,7 +286,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
 	)
-	//only a human or a machine user should be created as owner
+	// only a human or a machine user should be created as owner
 	if setup.Org.Human != nil {
 		validations = append(validations,
 			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
