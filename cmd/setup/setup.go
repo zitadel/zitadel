@@ -64,6 +64,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 
 	eventstoreClient, err := eventstore.Start(dbClient)
 	logging.OnError(err).Fatal("unable to start eventstore")
+
 	migration.RegisterMappers(eventstoreClient)
 
 	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient}

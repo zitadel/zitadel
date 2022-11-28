@@ -25,13 +25,13 @@ const (
 	redacted                 = "[REDACTED]"
 )
 
-func newStorageBulkSink(dbClient *sql.DB) logstore.BulkSinkFunc {
+func newStorageBulkSink(dbClient *sql.DB, storedHandler logstore.StoredAccessLogsReducer) logstore.BulkSinkFunc {
 	return func(ctx context.Context, bulk []any) error {
-		return storeAccessLogs(ctx, dbClient, bulk)
+		return storeAccessLogs(ctx, dbClient, bulk, storedHandler)
 	}
 }
 
-func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
+func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any, storedHandler logstore.StoredAccessLogsReducer) error {
 
 	builder := squirrel.Insert(accessLogsTable).
 		Columns(
@@ -44,6 +44,7 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 		).
 		PlaceholderFormat(squirrel.Dollar)
 
+	accessLogs := make([]*logstore.AccessLogRecord, len(bulk))
 	for idx := range bulk {
 		item := bulk[idx].(*logstore.AccessLogRecord)
 		builder = builder.Values(
@@ -54,6 +55,7 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 			pruneHeaders(item.RequestHeaders),
 			pruneHeaders(item.ResponseHeaders),
 		)
+		accessLogs[idx] = item
 	}
 
 	stmt, args, err := builder.ToSql()
@@ -72,6 +74,7 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 	}
 
 	logging.Debugf("successfully stored %d acccess logs", rows)
+	storedHandler.Reduce(ctx, accessLogs)
 	return nil
 }
 

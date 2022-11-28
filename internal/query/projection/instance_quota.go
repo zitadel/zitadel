@@ -2,15 +2,18 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 	"math"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/errors"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 const (
@@ -43,15 +46,83 @@ const (
 	QuotaNotificationRepeatCol     = "repeat"
 )
 
+type Quota struct {
+	Amount       int64
+	UsedAbsolute int64
+}
+
+func UpdateInstanceQuotaUsage(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit, used int64) (bool, error) {
+	quota, err := GetInstanceQuotaAmount(ctx, client, instanceID, unit)
+	if err != nil {
+		return false, err
+	}
+
+	newUsed := quota.UsedAbsolute + used
+	doLimit := newUsed > quota.Amount
+
+	stmt, args, err := squirrel.Update(QuotaTable).SetMap(map[string]interface{}{
+		QuotaUsedAbsoluteCol: newUsed,
+		QuotaUsedRelativeCol: int64(math.Floor(float64(newUsed * 100 / quota.Amount))),
+		QuotaLimitingCol:     doLimit,
+	}).
+		Where(squirrel.Eq{
+			QuotaInstanceIDCol: instanceID,
+			QuotaUnitCol:       unit,
+		}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return doLimit, caos_errors.ThrowInternal(err, "QUOTA-4mSo3", "Errors.Internal")
+	}
+
+	_, err = client.ExecContext(ctx, stmt, args...)
+	if err != nil {
+		return doLimit, caos_errors.ThrowInternal(err, "QUOTA-dGK7q", "Errors.UpdateFailed")
+	}
+	return doLimit, nil
+}
+
+func GetInstanceQuotaAmount(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit) (*Quota, error) {
+	stmt, args, err := squirrel.Select(QuotaAmountCol, QuotaUsedAbsoluteCol).
+		From(QuotaTable).
+		Where(squirrel.Eq{
+			QuotaInstanceIDCol: instanceID,
+			QuotaUnitCol:       unit,
+		}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, caos_errors.ThrowInternal(err, "QUOTA-V9Sde", "Errors.Internal")
+	}
+
+	result, err := client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, caos_errors.ThrowInternal(err, "QUOTA-BnBSL", "Errors.Quota.QueryFailed")
+	}
+	defer result.Close()
+
+	quota := Quota{}
+
+	result.Next()
+	if err := result.Scan(&quota.Amount, &quota.UsedAbsolute); err != nil {
+		return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
+	}
+
+	return &quota, nil
+}
+
+// TODO: Why not return *StatementHandler?
 type quotaProjection struct {
 	crdb.StatementHandler
 }
 
-func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig) *quotaProjection {
+func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandlerConfig) *quotaProjection {
 	p := new(quotaProjection)
-	config.ProjectionName = QuotaTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
+	esHandlerConfig.ProjectionName = QuotaTable
+	esHandlerConfig.Reducers = esReducers()
+	esHandlerConfig.InitCheck = crdb.NewMultiTableCheck(
 		crdb.NewTable(
 			[]*crdb.Column{
 				crdb.NewColumn(QuotaCreationDateCol, crdb.ColumnTypeTimestamp),
@@ -69,7 +140,7 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 				crdb.NewColumn(QuotaLimitationCookieValCol, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaLimitationRedirectURLCol, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaUsedAbsoluteCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(QuotaUsedRelativeCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(QuotaUsedRelativeCol, crdb.ColumnTypeInt64), // TODO: Float?
 				crdb.NewColumn(QuotaLimitingCol, crdb.ColumnTypeBool),
 			},
 			crdb.NewPrimaryKey(QuotaInstanceIDCol, QuotaUnitCol),
@@ -95,18 +166,18 @@ func newQuotaProjection(ctx context.Context, config crdb.StatementHandlerConfig)
 			),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	p.StatementHandler = crdb.NewStatementHandler(ctx, esHandlerConfig)
 	return p
 }
 
-func (p *quotaProjection) reducers() []handler.AggregateReducer {
+func esReducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.QuotaAddedEventType,
-					Reduce: p.reduceQuotaAdded,
+					Reduce: reduceQuotaAdded,
 				},
 			},
 		},
@@ -122,7 +193,7 @@ func (p *quotaProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *quotaProjection) reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
+func reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.QuotaAddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff21", "reduce.wrong.event.type% s", quota.AddedEventType)

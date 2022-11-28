@@ -5,6 +5,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+
 	"github.com/zitadel/zitadel/internal/logstore/access"
 
 	"github.com/zitadel/logging"
@@ -33,13 +35,20 @@ func (a *AccessInterceptor) Handler(next http.Handler) http.Handler {
 			logging.Warningf("failed to unescape request url %s", requestURL)
 		}
 
-		a.svc.Handle(request.Context(), &logstore.AccessLogRecord{
+		ctx := request.Context()
+		instance := authz.GetInstance(ctx)
+
+		a.svc.Handle(ctx, &logstore.AccessLogRecord{
 			Timestamp:       time.Now(),
 			Protocol:        logstore.HTTP,
 			RequestURL:      unescapedURL,
 			ResponseStatus:  uint32(wrappedWriter.status),
 			RequestHeaders:  request.Header,
 			ResponseHeaders: writer.Header(),
+			InstanceID:      instance.InstanceID(),
+			ProjectID:       instance.ProjectID(),
+			RequestedDomain: instance.RequestedDomain(),
+			RequestedHost:   instance.RequestedHost(),
 		})
 	})
 }

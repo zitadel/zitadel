@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+
 	"google.golang.org/grpc/status"
 
 	"google.golang.org/grpc"
@@ -26,6 +28,8 @@ func AccessInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 
 		md, _ := metadata.FromIncomingContext(ctx)
 
+		instance := authz.GetInstance(ctx)
+
 		svc.Handle(ctx, &logstore.AccessLogRecord{
 			Timestamp:       time.Now(),
 			Protocol:        logstore.GRPC,
@@ -33,6 +37,10 @@ func AccessInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 			ResponseStatus:  respStatus,
 			RequestHeaders:  nil,
 			ResponseHeaders: http.Header(md),
+			InstanceID:      instance.InstanceID(),
+			ProjectID:       instance.ProjectID(),
+			RequestedDomain: instance.RequestedDomain(),
+			RequestedHost:   instance.RequestedHost(),
 		})
 		return resp, err
 	}
