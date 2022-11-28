@@ -107,7 +107,7 @@
                 [canWrite]="['user.write:' + user.id, 'user.write$'] | hasRole | async"
                 *ngIf="user?.human"
                 [human]="user.human"
-                (editType)="openEditDialog($event)"
+                (editType)="user.state !== UserState.USER_STATE_INITIAL ? openEditDialog($event) : resendInitEmail()"
                 (deletedPhone)="deletePhone()"
                 (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()"
