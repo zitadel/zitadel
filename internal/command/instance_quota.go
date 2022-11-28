@@ -71,14 +71,16 @@ type QuotaNotification struct {
 
 type QuotaNotifications []*QuotaNotification
 
-func (q *QuotaNotifications) toAddedEventNotifications() []*quota.AddedEventNotification {
+func (q *QuotaNotifications) toAddedEventNotifications(genID func() string) []*quota.AddedEventNotification {
 	if q == nil {
 		return nil
 	}
 
 	notifications := make([]*quota.AddedEventNotification, len(*q))
 	for idx, notification := range *q {
+
 		notifications[idx] = &quota.AddedEventNotification{
+			ID:      genID(),
 			Percent: notification.Percent,
 			Repeat:  notification.Repeat,
 			CallURL: notification.CallURL,
@@ -142,15 +144,23 @@ func (c *Commands) AddInstanceQuotaCommand(
 			return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument") // TODO: Better error message?
 		}
 
-		from, err := time.Parse(time.RFC3339, q.From)
+		from, err := time.Parse("2006-01-02 15:04:05", q.From)
 		if err != nil {
 			return nil, errors.ThrowInvalidArgument(err, "INSTA-H2Poe", "Errors.Invalid.Argument") // TODO: Better error message?
 		}
 
 		// TODO: More validations without side effects
 
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
 				// TODO: Validations with side effects
+				genID := func() string {
+					id, genErr := c.idGenerator.Next()
+					if genErr != nil {
+						err = genErr
+					}
+					return id
+				}
+
 				return []eventstore.Command{instance.NewQuotaAddedEvent(
 					ctx,
 					&a.Aggregate,
@@ -159,8 +169,8 @@ func (c *Commands) AddInstanceQuotaCommand(
 					q.Interval,
 					q.Amount,
 					q.Limitations.toAddedEventLimitations(),
-					q.Notifications.toAddedEventNotifications(),
-				)}, nil
+					q.Notifications.toAddedEventNotifications(genID),
+				)}, err
 			},
 			nil
 	}

@@ -12,10 +12,11 @@ import (
 type Unit uint
 
 const (
-	UniqueQuotaNameType = "quota_units"
-	eventTypePrefix     = eventstore.EventType("quota.")
-	AddedEventType      = eventTypePrefix + "added"
-	RemovedEventType    = eventTypePrefix + "removed"
+	UniqueQuotaNameType           = "quota_units"
+	UniqueQuotaNotificationIDType = "quota_notification"
+	eventTypePrefix               = eventstore.EventType("quota.")
+	AddedEventType                = eventTypePrefix + "added"
+	RemovedEventType              = eventTypePrefix + "removed"
 )
 
 const (
@@ -24,11 +25,12 @@ const (
 	ActionsAllRunsSeconds
 )
 
-func NewAddQuotaNameUniqueConstraint(unit Unit) *eventstore.EventUniqueConstraint {
+func NewAddQuotaUnitUniqueConstraint(unit Unit) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueQuotaNameType,
 		string(unit),
-		"Errors.Quota.AlreadyExists")
+		"Errors.Quota.AlreadyExists",
+	)
 }
 
 func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.EventUniqueConstraint {
@@ -49,6 +51,7 @@ type AddedEvent struct {
 }
 
 type AddedEventNotification struct {
+	ID      string `json:"id"`
 	Percent uint32 `json:"percent"`
 	Repeat  bool   `json:"repeat,omitempty"`
 	CallURL string `json:"callUrl,omitempty"`
@@ -71,7 +74,7 @@ func (e *AddedEvent) Data() interface{} {
 }
 
 func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddQuotaNameUniqueConstraint(e.Unit)}
+	return []*eventstore.EventUniqueConstraint{NewAddQuotaUnitUniqueConstraint(e.Unit)}
 }
 
 func NewAddedEvent(

@@ -13,12 +13,12 @@ func instanceQuotaPbToQuota(req *system_pb.AddQuotaRequest) *command.Quota {
 		From:          req.From.AsTime().Format(time.RFC3339),
 		Interval:      req.Interval.AsDuration(),
 		Amount:        req.Amount,
-		Limitations:   instanceQuotaLimitationsPbToQuotaLimitations(req.Actions),
+		Limitations:   instanceQuotaLimitationsPbToQuotaLimitations(req.Limitations),
 		Notifications: instanceQuotaNotificationsPbToQuotaNotifications(req.Notifications),
 	}
 }
 
-func instanceQuotaLimitationsPbToQuotaLimitations(req *system_pb.AddQuotaRequest_Actions) *command.QuotaLimitations {
+func instanceQuotaLimitationsPbToQuotaLimitations(req *system_pb.AddQuotaRequest_Limitations) *command.QuotaLimitations {
 	return &command.QuotaLimitations{
 		Block:       command.QuotaLimitationBlock{},
 		CookieValue: req.CookieValue,

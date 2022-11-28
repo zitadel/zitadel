@@ -334,21 +334,8 @@ Removes a quota
 | from |  google.protobuf.Timestamp | - |  |
 | interval |  google.protobuf.Duration | - |  |
 | amount |  uint64 | - |  |
-| actions |  AddQuotaRequest.Actions | - |  |
+| limitations |  AddQuotaRequest.Limitations | - |  |
 | notifications | repeated AddQuotaRequest.Notification | - |  |
-
-
-
-
-### AddQuotaRequest.Actions
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| block |  AddQuotaRequest.Block | - |  |
-| cookie_value |  string | - |  |
-| redirect_url |  string | - |  |
 
 
 
@@ -362,6 +349,19 @@ Removes a quota
 | message |  string | - |  |
 | http_status |  uint32 | - |  |
 | grpc_status |  uint32 | - |  |
+
+
+
+
+### AddQuotaRequest.Limitations
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| block |  AddQuotaRequest.Block | - |  |
+| cookie_value |  string | - |  |
+| redirect_url |  string | - |  |
 
 
 

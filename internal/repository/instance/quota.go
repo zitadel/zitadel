@@ -16,7 +16,7 @@ var (
 )
 
 type QuotaAddedEvent struct {
-	quota.AddedEvent
+	quota.AddedEvent `json:",inline"`
 }
 
 func NewQuotaAddedEvent(

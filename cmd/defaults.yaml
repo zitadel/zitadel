@@ -553,8 +553,7 @@ DefaultInstance:
     Items:
       - Unit: "requests.all.authenticated"
         # Start Time for the quota periods
-        # Format is RFC3339
-        From: "2022-10-24T00:00:00Z"
+        From: "2022-10-24 00:00:00"
         Interval: 720h # 1 week
         Amount: 25000
         Limitations:
@@ -575,8 +574,7 @@ DefaultInstance:
 
       - Unit: "actions.all.runs.seconds"
         # Start Time for the quota periods
-        # Format is RFC3339
-        From: "2022-10-24T00:00:00Z"
+        From: "2022-10-24 00:00:00"
         Interval: 720h # 1 week
         Amount: 3600
         Limitations:
