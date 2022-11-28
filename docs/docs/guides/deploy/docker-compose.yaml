@@ -1,42 +1,36 @@
-version: "3.8"
+version: '3.8'
 
 services:
   zitadel:
-    restart: "always"
+    restart: 'always'
     networks:
-      - "zitadel"
-    image: "ghcr.io/zitadel/zitadel:v2.11.0"
+      - 'zitadel'
+    image: 'ghcr.io/zitadel/zitadel:stable'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
-      - "ZITADEL_DATABASE_POSTGRES_HOST=pg"
-      - "ZITADEL_DATABASE_POSTGRES_PORT=5432"
-      - "ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=postgres"
-      - "ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=pw"
-      - "ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable"
-      - "ZITADEL_DATABASE_POSTGRES_USER_USERNAME=postgres"
-      - "ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=pw"
-      - "ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable"
-      - "ZITADEL_EXTERNALSECURE=false"
+      - 'ZITADEL_DATABASE_COCKROACH_HOST=crdb'
+      - 'ZITADEL_EXTERNALSECURE=false'
     depends_on:
-      pg:
-        condition: "service_healthy"
+      crdb:
+        condition: 'service_healthy'
     ports:
-      - "8080:8080"
+      - '8080:8080'
 
-  pg:
-    restart: "always"
+  crdb:
+    restart: 'always'
     networks:
-      - "zitadel"
-    image: "postgres"
-    environment:
-      POSTGRES_PASSWORD: pw
+      - 'zitadel'
+    image: 'cockroachdb/cockroach:v22.1.3'
+    command: 'start-single-node --insecure'
     healthcheck:
-      test: pg_isready -U postgres
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
     ports:
-      - "5432:5432"
+      - '9090:8080'
+      - '26257:26257'
 
 networks:
   zitadel:
