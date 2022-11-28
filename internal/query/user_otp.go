@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
@@ -10,7 +11,10 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner string) (string, error) {
+func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner string) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if userID == "" {
 		return "", caos_errs.ThrowPreconditionFailed(nil, "QUERY-8N9ds", "Errors.User.UserIDMissing")
 	}

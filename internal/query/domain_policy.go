@@ -9,10 +9,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type DomainPolicy struct {
@@ -81,7 +81,10 @@ var (
 	}
 )
 
-func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*DomainPolicy, error) {
+func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (_ *DomainPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.DomainPolicyProjection.Trigger(ctx)
 	}
@@ -111,7 +114,10 @@ func (q *Queries) DomainPolicyByOrg(ctx context.Context, shouldTriggerBulk bool,
 	return scan(row)
 }
 
-func (q *Queries) DefaultDomainPolicy(ctx context.Context) (*DomainPolicy, error) {
+func (q *Queries) DefaultDomainPolicy(ctx context.Context) (_ *DomainPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareDomainPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		DomainPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),

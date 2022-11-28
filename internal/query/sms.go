@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type SMSConfigs struct {
@@ -113,7 +114,10 @@ var (
 	}
 )
 
-func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (*SMSConfig, error) {
+func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (_ *SMSConfig, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareSMSConfigQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
@@ -129,7 +133,10 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (*SMSCon
 	return scan(row)
 }
 
-func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery) (*SMSConfig, error) {
+func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery) (_ *SMSConfig, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareSMSConfigQuery()
 	for _, searchQuery := range queries {
 		query = searchQuery.toQuery(query)
@@ -147,7 +154,10 @@ func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery)
 	return scan(row)
 }
 
-func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (*SMSConfigs, error) {
+func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (_ *SMSConfigs, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareSMSConfigsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{

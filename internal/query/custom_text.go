@@ -13,11 +13,11 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type CustomTexts struct {
@@ -81,6 +81,9 @@ var (
 )
 
 func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, language string) (texts *CustomTexts, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareCustomTextsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -107,6 +110,9 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 }
 
 func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, template string) (texts *CustomTexts, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareCustomTextsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -131,7 +137,10 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 	return texts, err
 }
 
-func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (_ *domain.CustomLoginText, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	contents, err := q.readLoginTranslationFile(ctx, lang)
 	if err != nil {
 		return nil, err
@@ -145,7 +154,10 @@ func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (*domai
 	return loginText, nil
 }
 
-func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang string) (*domain.CustomLoginText, error) {
+func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang string) (_ *domain.CustomLoginText, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	texts, err := q.CustomTextList(ctx, aggregateID, domain.LoginCustomText, lang)
 	if err != nil {
 		return nil, err
@@ -153,7 +165,10 @@ func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang str
 	return CustomTextsToLoginDomain(authz.GetInstance(ctx).InstanceID(), aggregateID, lang, texts), err
 }
 
-func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (_ *domain.CustomLoginText, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	contents, err := q.readLoginTranslationFile(ctx, lang)
 	if err != nil {
 		return nil, err

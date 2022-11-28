@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Apps struct {
@@ -237,7 +238,10 @@ var (
 	}
 )
 
-func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bool, projectID, appID string) (*App, error) {
+func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bool, projectID, appID string) (_ *App, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.AppProjection.Trigger(ctx)
 	}
@@ -258,7 +262,10 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	return scan(row)
 }
 
-func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
+func (q *Queries) AppByID(ctx context.Context, appID string) (_ *App, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -274,7 +281,10 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 	return scan(row)
 }
 
-func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (*App, error) {
+func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (_ *App, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -290,7 +300,10 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (*App,
 	return scan(row)
 }
 
-func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (*Project, error) {
+func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (_ *Project, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareProjectByAppQuery()
 	query, args, err := stmt.Where(
 		sq.And{
@@ -310,7 +323,10 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (*Project
 	return scan(row)
 }
 
-func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (string, error) {
+func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -326,7 +342,10 @@ func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (
 	return scan(row)
 }
 
-func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (string, error) {
+func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
 		sq.And{
@@ -346,7 +365,10 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (stri
 	return scan(row)
 }
 
-func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (*Project, error) {
+func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (_ *Project, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareProjectByAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -362,7 +384,10 @@ func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (*Projec
 	return scan(row)
 }
 
-func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (*App, error) {
+func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (_ *App, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -378,7 +403,10 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (*App,
 	return scan(row)
 }
 
-func (q *Queries) AppByClientID(ctx context.Context, clientID string) (*App, error) {
+func (q *Queries) AppByClientID(ctx context.Context, clientID string) (_ *App, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.And{
@@ -397,7 +425,10 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (*App, err
 	return scan(row)
 }
 
-func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries) (*Apps, error) {
+func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries) (_ *Apps, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareAppsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(
@@ -419,7 +450,10 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries) (*A
 	return apps, err
 }
 
-func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries) ([]string, error) {
+func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries) (_ []string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareClientIDsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(

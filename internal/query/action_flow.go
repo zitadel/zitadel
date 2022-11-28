@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -61,7 +62,10 @@ type Flow struct {
 	TriggerActions map[domain.TriggerType][]*Action
 }
 
-func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string) (*Flow, error) {
+func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string) (_ *Flow, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareFlowQuery(flowType)
 	stmt, args, err := query.Where(
 		sq.Eq{
@@ -80,7 +84,10 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	return scan(rows)
 }
 
-func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string) ([]*Action, error) {
+func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string) (_ []*Action, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareTriggerActionsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
@@ -102,7 +109,10 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 	return scan(rows)
 }
 
-func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) ([]domain.FlowType, error) {
+func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) (_ []domain.FlowType, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareFlowTypesQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{

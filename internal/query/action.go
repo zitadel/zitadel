@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -109,6 +110,9 @@ func (q *ActionSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries) (actions *Actions, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareActionsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
@@ -131,7 +135,10 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	return actions, err
 }
 
-func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (*Action, error) {
+func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (_ *Action, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareActionQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{

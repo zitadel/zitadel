@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -78,6 +79,9 @@ type ProjectRoleSearchQueries struct {
 }
 
 func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.ProjectRoleProjection.Trigger(ctx)
 	}
@@ -104,6 +108,9 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 }
 
 func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	grant, err := q.ProjectGrantByIDAndGrantedOrg(ctx, grantID, grantedOrg)
 	if err != nil {
 		return nil, err

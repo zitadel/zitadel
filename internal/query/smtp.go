@@ -9,11 +9,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/query/projection"
-
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -91,7 +90,10 @@ type SMTPConfig struct {
 	Password      *crypto.CryptoValue
 }
 
-func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*SMTPConfig, error) {
+func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (_ *SMTPConfig, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareSMTPConfigQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnAggregateID.identifier(): aggregateID,
