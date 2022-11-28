@@ -13,7 +13,7 @@ require (
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1
-	github.com/cockroachdb/cockroach-go/v2 v2.2.4
+	github.com/cockroachdb/cockroach-go/v2 v2.2.18
 	github.com/dop251/goja v0.0.0-20220815083517-0c74f9139fd6
 	github.com/dop251/goja_nodejs v0.0.0-20220905124449-678b33ca5009
 	github.com/duo-labs/webauthn v0.0.0-20211216225436-9a12cd078b8a
@@ -35,7 +35,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/k3a/html2text v1.0.8
 	github.com/kevinburke/twilio-go v0.0.0-20210327194925-1623146bcf73
-	github.com/lib/pq v1.10.4
+	github.com/lib/pq v1.10.6
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/minio/minio-go/v7 v7.0.20
 	github.com/mitchellh/mapstructure v1.4.3
