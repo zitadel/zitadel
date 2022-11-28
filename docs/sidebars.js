@@ -228,7 +228,6 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
-        "apis/actions",
       ],
     },
     {
@@ -248,6 +247,18 @@ module.exports = {
       label: "SAML",
       collapsed: false,
       items: ["apis/saml/endpoints"],
+    },
+    {
+      type: "category",
+      label: "Actions",
+      collapsed: false,
+      items: [
+        "apis/actions/introduction",
+        "apis/actions/modules",
+        "apis/actions/login-flow",
+        "apis/actions/register-flow",
+        "apis/actions/objects",
+      ]
     },
     {
       type: "category",
