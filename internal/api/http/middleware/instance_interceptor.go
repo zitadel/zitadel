@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/service"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -46,6 +47,8 @@ func (a *instanceInterceptor) HandlerFunc(next http.HandlerFunc) http.HandlerFun
 }
 
 func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Request, next http.Handler) {
+	r = r.WithContext(service.WithCallTimeNow(r.Context()))
+
 	for _, prefix := range a.ignoredPrefixes {
 		if strings.HasPrefix(r.URL.Path, prefix) {
 			next.ServeHTTP(w, r)

@@ -28,6 +28,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, querie
 	serverOptions := []grpc.ServerOption{
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
+				middleware.CallTimeHandler(),
 				middleware.DefaultTracingServer(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
