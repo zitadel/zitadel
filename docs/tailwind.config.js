@@ -3,6 +3,9 @@ module.exports = {
   darkMode: ["class", '[data-theme="dark"]'],
   content: ["./docs/**/*.{js,ts,jsx,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    fontFamily: {
+      sans: ["Lato", "serif"],
+    },
     extend: {
       colors: {
         primary: {
