@@ -1,45 +1,133 @@
-import React, { useContext, useEffect } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import { AuthRequestContext } from "../utils/authrequest";
 import styles from "../css/authrequest.module.css";
 import CodeBlock from "@theme/CodeBlock";
+import { Listbox } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
+import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
 
 export function SetAuthRequest() {
   const {
+    instance: [instance, setInstance],
     clientId: [clientId, setClientId],
     redirectUri: [redirectUri, setRedirectUri],
     responseType: [responseType, setResponseType],
     scope: [scope, setScope],
-    idTokenHint: [idTokenHint, setIdTokenHint],
+    prompt: [prompt, setPrompt],
+    // idTokenHint: [idTokenHint, setIdTokenHint],
+    // organizationId: [organizationId, setOrganizationId],
   } = useContext(AuthRequestContext);
 
   //   useEffect(() => {
   //     const params = new URLSearchParams(window.location.search);
 
-  //     // required authorize parameters
-  //     const client_id = params.get("client_id");
-  //     const redirect_uri = params.get("redirect_uri");
+  //     const instance_param = params.get("instance");
+  //     const client_id = params.get("client-id");
+  //     const redirect_uri = params.get("redirect-uri");
   //     const response_type = params.get("response_type");
   //     const scope_param = params.get("scope");
 
   //     // optional parameters
-  //     const id_token_hint = params.get("id_token_hint");
+  //     const prompt_param = params.get("prompt");
+  //     // const id_token_hint = params.get("id_token_hint");
+  //     // const organization_id = params.get("organization_id");
 
-  //     setClientId(client_id ?? "[your-client-id]");
-  //     setRedirectUri(redirect_uri ?? "[your-redirect-uri]");
-  //     setResponseType(response_type ?? "[your-response-type]");
-  //     setScope(scope_param ?? "[your-scope]");
-  //     setIdTokenHint(id_token_hint ?? "[your-id-token-hint]");
+  //     setInstance(instance_param ?? "https://mydomain-xyza.zitadel.cloud/");
+  //     setClientId(client_id ?? "170086824411201793@yourapp");
+  //     setRedirectUri(
+  //       redirect_uri ?? "http://localhost:8080/api/auth/callback/zitadel"
+  //     );
+  //     setResponseType(response_type ?? "code");
+  //     setScope(scope_param ?? "openid email profile");
+  //     setPrompt(prompt_param ?? "none");
+
+  //     // optional parameters
+  //     // setIdTokenHint(id_token_hint ?? "[your-id-token-hint]");
+  //     // setOrganizationId(organization_id ?? "168811945419506433");
+
+  //     console.log(instance_param);
+  //   }, []);
+
+  const inputClasses = (error) =>
+    clsx({
+      "w-full sm:text-sm h-10 mb-2px rounded-md p-2 bg-input-light-background dark:bg-input-dark-background transition-colors duration-300": true,
+      "border border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500": true,
+      "focus:outline-none focus:ring-0 text-base text-black dark:text-white placeholder:italic placeholder-gray-700 dark:placeholder-gray-700": true,
+      "border border-warn-light-500 dark:border-warn-dark-500 hover:border-warn-light-500 hover:dark:border-warn-dark-500 focus:border-warn-light-500 focus:dark:border-warn-dark-500":
+        error,
+    });
+
+  const labelClasses = "text-sm";
+
+  const allResponseTypes = ["code", "id_token", "id_token token"];
+
+  const allPrompts = ["none", "login", "select_account", "create"];
+
+  const CodeSnipped = ({ cname, children }) => {
+    return <span className={cname}>{children}</span>;
+  };
+
+  const allScopes = [
+    "openid",
+    "email",
+    "profile",
+    "address",
+    "offline_access",
+    "urn:zitadel:iam:org:project:id:zitadel:aud",
+    "urn:zitadel:iam:user:metadata",
+    "urn:zitadel:iam:user:resourceowner",
+  ];
+
+  const [scopeState, setScopeState] = useState(
+    [true, true, true, false, false, false, false, false]
+    // new Array(allScopes.length).fill(false)
+  );
+
+  function toggleScope(position) {
+    const updatedCheckedState = scopeState.map((item, index) =>
+      index === position ? !item : item
+    );
+
+    setScopeState(updatedCheckedState);
+
+    setScope(
+      updatedCheckedState
+        .map((checked, i) => (checked ? allScopes[i] : ""))
+        .filter((s) => !!s)
+        .join(" ")
+    );
+  }
+
+  //   useEffect(() => {
+  //     setScopeState(allScopes.map((s) => scope.includes(s)));
   //   }, []);
 
   return (
-    <>
-      <h5>Required Parameters</h5>
+    <div className="bg-white/5 rounded-md p-6 shadow">
+      <h5 className="text-lg mt-0 mb-4 font-semibold">Your Domain</h5>
+      <div className="flex flex-col">
+        <label className={`${labelClasses} text-yellow-500`}>
+          Instance Domain
+        </label>
+        <input
+          className={inputClasses(false)}
+          id="instance"
+          value={instance}
+          onChange={(event) => {
+            const value = event.target.value;
+            setInstance(value);
+          }}
+        />
+      </div>
 
-      <div className="grid grid-cols-4">
-        <div className={styles.inputwrapper}>
-          <label className={styles.label}>Client ID</label>
+      <h5 className="text-lg mt-6 mb-2 font-semibold">Required Parameters</h5>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="flex flex-col">
+          <label className={`${labelClasses} text-green-500`}>Client ID</label>
           <input
-            className={styles.input}
+            className={inputClasses(false)}
             id="client_id"
             value={clientId}
             onChange={(event) => {
@@ -49,10 +137,12 @@ export function SetAuthRequest() {
           />
         </div>
 
-        <div className={styles.inputwrapper}>
-          <label className={styles.label}>Redirect URI</label>
+        <div className="flex flex-col">
+          <label className={`${labelClasses} text-blue-500`}>
+            Redirect URI
+          </label>
           <input
-            className={styles.input}
+            className={inputClasses(false)}
             id="redirect_uri"
             value={redirectUri}
             onChange={(event) => {
@@ -62,34 +152,153 @@ export function SetAuthRequest() {
           />
         </div>
 
-        <div className={styles.inputwrapper}>
-          <label className={styles.label}>Response Type</label>
-          <input
-            className={styles.input}
-            id="response_type"
-            value={responseType}
-            onChange={(event) => {
-              const value = event.target.value;
-              setResponseType(value);
-            }}
-          />
-        </div>
-
-        <div className={styles.inputwrapper}>
-          <label className={styles.label}>Scope</label>
-          <input
-            className={styles.input}
-            id="scope"
-            value={scope}
-            onChange={(event) => {
-              const value = event.target.value;
-              setScope(value);
-            }}
-          />
+        <div className="flex flex-col">
+          <label className={`${labelClasses} text-orange-500`}>
+            ResponseType
+          </label>
+          <Listbox value={responseType} onChange={setResponseType}>
+            <div className="relative">
+              <Listbox.Button className="text-black dark:text-white border border-input-light-border dark:border-input-dark-border h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                <span className="block truncate">{responseType}</span>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </span>
+              </Listbox.Button>
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  {allResponseTypes.map((type, typeIdx) => (
+                    <Listbox.Option
+                      key={typeIdx}
+                      className={({ active }) =>
+                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                          active ? "bg-black/20 dark:bg-white/20" : ""
+                        }`
+                      }
+                      value={type}
+                    >
+                      {({ selected }) => (
+                        <>
+                          <span
+                            className={`block truncate ${
+                              selected ? "font-medium" : "font-normal"
+                            }`}
+                          >
+                            {type}
+                          </span>
+                          {selected ? (
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-orange-500 dark:text-orange-400">
+                              <CheckIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </Transition>
+            </div>
+          </Listbox>
         </div>
       </div>
 
-      <h5>Optional Parameters</h5>
+      <h5 className="text-lg mt-6 mb-2 font-semibold">Additional Parameters</h5>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <div className="flex flex-col">
+            <label className={`${labelClasses} text-emerald-500`}>Prompt</label>
+            <Listbox value={prompt} onChange={setPrompt}>
+              <div className="relative">
+                <Listbox.Button className="text-black dark:text-white border border-input-light-border dark:border-input-dark-border h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                  <span className="block truncate">{prompt}</span>
+                  <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <ChevronUpDownIcon
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </Listbox.Button>
+                <Transition
+                  as={Fragment}
+                  leave="transition ease-in duration-100"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    {allPrompts.map((type, typeIdx) => (
+                      <Listbox.Option
+                        key={typeIdx}
+                        className={({ active }) =>
+                          `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                            active ? "bg-black/20 dark:bg-white/20" : ""
+                          }`
+                        }
+                        value={type}
+                      >
+                        {({ selected }) => (
+                          <>
+                            <span
+                              className={`block truncate ${
+                                selected ? "font-medium" : "font-normal"
+                              }`}
+                            >
+                              {type}
+                            </span>
+                            {selected ? (
+                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-500 dark:text-emerald-400">
+                                <CheckIcon
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                />
+                              </span>
+                            ) : null}
+                          </>
+                        )}
+                      </Listbox.Option>
+                    ))}
+                  </Listbox.Options>
+                </Transition>
+              </div>
+            </Listbox>
+          </div>
+        </div>
+      </div>
+
+      <div className="py-4">
+        <p className="text-sm mt-0 mb-0 text-purple-500">Scopes</p>
+        {allScopes.map((scope, scopeIndex) => {
+          return (
+            <div key={`scope-${scope}`} className="flex flex-row items-center">
+              <input
+                type="checkbox"
+                id={`scope_${scope}`}
+                name="scopes"
+                value={`${scope}`}
+                checked={scopeState[scopeIndex]}
+                onChange={() => {
+                  toggleScope(scopeIndex);
+                }}
+              />
+              <label className="ml-4" htmlFor={`scope_${scope}`}>
+                {scope}
+              </label>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* <h5>Optional Parameters</h5>
 
       <div className={styles.grid}>
         <div className={styles.inputwrapper}>
@@ -104,11 +313,39 @@ export function SetAuthRequest() {
             }}
           />
         </div>
-      </div>
+      </div> */}
 
       <br />
 
-      <CodeBlock language="ts"></CodeBlock>
-    </>
+      <div className="rounded-md bg-gray-200 shadow dark:bg-white/10 p-2 flex flex-col items-center">
+        <code className="text-sm w-full mb-4">
+          <span className="text-yellow-500">{instance}</span>
+          <CodeSnipped cname="text-green-500">{`?client_id=${encodeURIComponent(
+            clientId
+          )}`}</CodeSnipped>
+          <CodeSnipped cname="text-blue-500">{`&redirect_uri=${encodeURIComponent(
+            redirectUri
+          )}`}</CodeSnipped>
+          <CodeSnipped cname="text-orange-500">
+            {`&response_type=${encodeURIComponent(responseType)}`}
+          </CodeSnipped>
+          <CodeSnipped cname="text-purple-500">{`&scope=${encodeURIComponent(
+            scope
+          )}`}</CodeSnipped>
+          <CodeSnipped cname="text-emerald-500">{`&prompt=${encodeURIComponent(
+            prompt
+          )}`}</CodeSnipped>
+        </code>
+
+        <a
+          target="_blank"
+          className="flex flex-row items-center py-2 px-4 bg-green-500 dark:bg-green-600 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
+          href={`${instance}?client_id=${clientId}&redirect_uri=${redirectUri}&reponse_type=${responseType}&scope=${scope}&prompt=${prompt}`}
+        >
+          <span>Try it out</span>
+          <i className="text-md ml-2 las la-external-link-alt"></i>
+        </a>
+      </div>
+    </div>
   );
 }

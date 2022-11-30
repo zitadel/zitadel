@@ -1,9 +1,7 @@
-/* stylelint-disable docusaurus/copyright-header */
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import "../../static/icons/line-awesome/css/line-awesome.min.css";
 
 @font-face {
@@ -331,7 +329,7 @@ main .container img {
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
 }
 
-.rounded {
+.custom-rounded {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,13 +340,13 @@ main .container img {
   height: 40px;
 }
 
-.rounded svg {
+.custom-rounded svg {
   fill: white;
   height: 1.5rem;
   width: 1.5rem;
 }
 
-.rounded i {
+.custom-rounded i {
   color: white;
 }
 
