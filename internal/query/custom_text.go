@@ -958,8 +958,8 @@ func registrationUserKeyToDomain(text *CustomText, result *domain.CustomLoginTex
 	if text.Key == domain.LoginKeyRegistrationUserTOSLinkText {
 		result.RegistrationUser.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegistrationUserTOSConfirmAnd {
-		result.RegistrationUser.TOSConfirmAnd = text.Text
+	if text.Key == domain.LoginKeyRegistrationUserPrivacyConfirm {
+		result.RegistrationUser.PrivacyConfirm = text.Text
 	}
 	if text.Key == domain.LoginKeyRegistrationUserPrivacyLinkText {
 		result.RegistrationUser.PrivacyLinkText = text.Text
@@ -1009,8 +1009,8 @@ func registrationOrgKeyToDomain(text *CustomText, result *domain.CustomLoginText
 	if text.Key == domain.LoginKeyRegisterOrgTOSLinkText {
 		result.RegistrationOrg.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyRegisterOrgTosConfirmAnd {
-		result.RegistrationOrg.TOSConfirmAnd = text.Text
+	if text.Key == domain.LoginKeyRegisterOrgPrivacyConfirm {
+		result.RegistrationOrg.PrivacyConfirm = text.Text
 	}
 	if text.Key == domain.LoginKeyRegisterOrgPrivacyLinkText {
 		result.RegistrationOrg.PrivacyLinkText = text.Text
@@ -1057,8 +1057,8 @@ func externalUserNotFoundKeyToDomain(text *CustomText, result *domain.CustomLogi
 	if text.Key == domain.LoginKeyExternalNotFoundTOSLinkText {
 		result.ExternalNotFoundOption.TOSLinkText = text.Text
 	}
-	if text.Key == domain.LoginKeyExternalNotFoundTOSConfirmAnd {
-		result.ExternalNotFoundOption.TOSConfirmAnd = text.Text
+	if text.Key == domain.LoginKeyExternalNotFoundPrivacyConfirm {
+		result.ExternalNotFoundOption.PrivacyConfirm = text.Text
 	}
 	if text.Key == domain.LoginKeyExternalNotFoundPrivacyLinkText {
 		result.ExternalNotFoundOption.PrivacyLinkText = text.Text

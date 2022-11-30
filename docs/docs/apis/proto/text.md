@@ -57,10 +57,10 @@ title: zitadel/text.proto
 | tos_and_privacy_label |  string | - | string.max_len: 200<br />  |
 | tos_confirm |  string | - | string.max_len: 200<br />  |
 | tos_link_text |  string | - | string.max_len: 200<br />  |
-| tos_confirm_and |  string | - | string.max_len: 200<br />  |
 | privacy_link_text |  string | - | string.max_len: 200<br />  |
 | back_button_text |  string | - | string.max_len: 200<br />  |
 | next_button_text |  string | - | string.max_len: 200<br />  |
+| privacy_confirm |  string | - | string.max_len: 200<br />  |
 
 
 
@@ -79,7 +79,7 @@ title: zitadel/text.proto
 | tos_confirm |  string | - | string.max_len: 200<br />  |
 | tos_link_text |  string | - | string.max_len: 200<br />  |
 | privacy_link_text |  string | - | string.max_len: 200<br />  |
-| tos_confirm_and |  string | - | string.max_len: 200<br />  |
+| privacy_confirm |  string | - | string.max_len: 200<br />  |
 
 
 
@@ -508,9 +508,9 @@ title: zitadel/text.proto
 | tos_and_privacy_label |  string | - | string.max_len: 200<br />  |
 | tos_confirm |  string | - | string.max_len: 200<br />  |
 | tos_link_text |  string | - | string.max_len: 200<br />  |
+| privacy_confirm |  string | - | string.max_len: 200<br />  |
 | privacy_link_text |  string | - | string.max_len: 200<br />  |
 | save_button_text |  string | - | string.max_len: 200<br />  |
-| tos_confirm_and |  string | - | string.max_len: 200<br />  |
 
 
 
@@ -535,10 +535,10 @@ title: zitadel/text.proto
 | tos_and_privacy_label |  string | - | string.max_len: 200<br />  |
 | tos_confirm |  string | - | string.max_len: 200<br />  |
 | tos_link_text |  string | - | string.max_len: 200<br />  |
+| privacy_confirm |  string | - | string.max_len: 200<br />  |
 | privacy_link_text |  string | - | string.max_len: 200<br />  |
 | next_button_text |  string | - | string.max_len: 200<br />  |
 | back_button_text |  string | - | string.max_len: 200<br />  |
-| tos_confirm_and |  string | - | string.max_len: 200<br />  |
 
 
 

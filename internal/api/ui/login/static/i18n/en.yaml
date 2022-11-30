@@ -219,7 +219,7 @@ RegistrationUser:
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
-  TosConfirmAnd: and the
+  PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   ExternalLogin: or register with an external user
   BackButtonText: back
@@ -243,7 +243,7 @@ ExternalRegistrationUserOverview:
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
-  TosConfirmAnd: and the
+  PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   ExternalLogin: or register with an external user
   BackButtonText: back
@@ -262,7 +262,7 @@ RegistrationOrg:
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
-  TosConfirmAnd: and the
+  PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   SaveButtonText: Create organization
 
@@ -291,7 +291,7 @@ ExternalNotFound:
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
-  TosConfirmAnd: and the
+  PrivacyConfirm: I accept the
   PrivacyLinkText: privacy policy
   German: Deutsch
   English: English
