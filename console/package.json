@@ -65,7 +65,7 @@
     "@types/jsonwebtoken": "^8.5.5",
     "@types/node": "^18.8.1",
     "@typescript-eslint/parser": "5.42.0",
-    "@typescript-eslint/eslint-plugin": "5.42.0",
+    "@typescript-eslint/eslint-plugin": "5.45.0",
     "codelyzer": "^6.0.0",
     "eslint": "^8.26.0",
     "jasmine-core": "~4.4.0",
