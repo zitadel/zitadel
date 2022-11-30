@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	externalIDPTable = "auth.user_external_idps"
+	externalIDPTable = "auth.user_external_idps2"
 )
 
 func (v *View) ExternalIDPByExternalUserIDAndIDPConfigID(externalUserID, idpConfigID, instanceID string) (*model.ExternalIDPView, error) {
@@ -58,6 +58,14 @@ func (v *View) DeleteExternalIDPsByUserID(userID, instanceID string, event *mode
 
 func (v *View) DeleteInstanceExternalIDPs(event *models.Event) error {
 	err := view.DeleteInstanceExternalIDPs(v.Db, externalIDPTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedExternalIDPSequence(event)
+}
+
+func (v *View) UpdateOrgOwnerRemovedExternalIDPs(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedExternalIDPs(v.Db, externalIDPTable, event.InstanceID, event.ResourceOwner)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
