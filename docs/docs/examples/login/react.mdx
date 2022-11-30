@@ -2,8 +2,6 @@
 title: React
 ---
 
-import { EnvInterpolate } from "../../../src/components/environment";
-
 This Integration guide shows you the recommended way to integrate **ZITADEL** into your React Application.
 It demonstrates how to add a user login to your application and fetch some data from the user info endpoint.
 
@@ -57,12 +55,7 @@ With the installed oidc pakage you will need an AuthProvider which should contai
 
 The oidc configuration should contain **openid**, **profile** and **email** as scope and **code** as responseType.
 In the code below make sure to change the issuer to your instance url. You can find this in the ZITADEL Console on you application.
-
-<EnvInterpolate>
-  {
-    "Replace the clientId value 'YOUR-CLIENT-ID' with the generated client id of you application in ZITADEL Console ({clientId})"
-  }
-</EnvInterpolate>
+Replace the clientId value 'YOUR-CLIENT-ID' with the generated client id of you application in ZITADEL Console.
 
 ```ts
 import React from "react";

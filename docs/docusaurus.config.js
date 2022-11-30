@@ -101,12 +101,6 @@ module.exports = {
           value:
             '<a href="https://zitadel.com/chat" style="text-decoration: none; width: 20px; height: 24px; display: flex; margin: 0 .5rem 0 0"><i class="lab la-discord"></i></a>',
         },
-        // {
-        //   type: "html",
-        //   position: "right",
-        //   value:
-        //     '<a href="/docs/settings/environment" style="text-decoration: none; width: 20px; height: 20px; display: flex"><i class="las la-cog"></i></a>',
-        // },
       ],
     },
     footer: {
