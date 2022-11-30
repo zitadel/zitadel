@@ -15,10 +15,11 @@ import (
 )
 
 const (
-	IDPProviderKeyAggregateID = "aggregate_id"
-	IDPProviderKeyIdpConfigID = "idp_config_id"
-	IDPProviderKeyState       = "idp_state"
-	IDPProviderKeyInstanceID  = "instance_id"
+	IDPProviderKeyAggregateID  = "aggregate_id"
+	IDPProviderKeyIdpConfigID  = "idp_config_id"
+	IDPProviderKeyState        = "idp_state"
+	IDPProviderKeyInstanceID   = "instance_id"
+	IDPProviderKeyOwnerRemoved = "owner_removed"
 )
 
 type IDPProviderView struct {

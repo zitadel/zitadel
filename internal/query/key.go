@@ -183,12 +183,8 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (*PublicKey
 	}
 	stmt, args, err := query.Where(
 		sq.And{
-			sq.Eq{
-				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
-			sq.Gt{
-				KeyPublicColExpiry.identifier(): t,
-			},
+			sq.Eq{KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+			sq.Gt{KeyPublicColExpiry.identifier(): t},
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDFfg", "Errors.Query.SQLStatement")
@@ -220,9 +216,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*Pr
 				KeyColUse.identifier():        domain.KeyUsageSigning,
 				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
-			sq.Gt{
-				KeyPrivateColExpiry.identifier(): t,
-			},
+			sq.Gt{KeyPrivateColExpiry.identifier(): t},
 		}).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDff2", "Errors.Query.SQLStatement")

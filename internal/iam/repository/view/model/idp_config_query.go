@@ -61,6 +61,8 @@ func (key IDPConfigSearchKey) ToColumnName() string {
 		return IDPConfigKeyProviderType
 	case iam_model.IDPConfigSearchKeyInstanceID:
 		return IDPConfigKeyInstanceID
+	case iam_model.IDPConfigSearchKeyOwnerRemoved:
+		return IDPConfigKeyOwnerRemoved
 	default:
 		return ""
 	}

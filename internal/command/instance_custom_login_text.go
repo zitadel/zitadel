@@ -42,6 +42,9 @@ func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang lang
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, domain.LoginCustomText, lang))
+	if err != nil {
+		return nil, err
+	}
 	err = AppendAndReduce(customText, pushedEvents...)
 	if err != nil {
 		return nil, err

@@ -841,6 +841,18 @@ service ManagementService {
         };
     }
 
+    // Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+    // Users of this organisation will not be able login
+    rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.delete"
+        };
+    }
+
     // Sets a org metadata by key
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
         option (google.api.http) = {
@@ -3675,6 +3687,12 @@ message DeactivateOrgResponse {
 message ReactivateOrgRequest {}
 
 message ReactivateOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveOrgRequest {}
+
+message RemoveOrgResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
