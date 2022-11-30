@@ -254,8 +254,13 @@ Errors:
       NotInactive: 应用不是停用状态
       OIDCConfigInvalid: OIDC 配置无效
       APIConfigInvalid: API 配置无效
+      SAMLConfigInvalid: SAML 配置无效
       IsNotOIDC: 应用不是 OIDC 类型
       IsNotAPI: 应用不是 API 类型
+      IsNotSAML: 应用不是 SAML 类型
+      SAMLMetadataMissing: SAML 元数据丢失
+      SAMLMetadataFormat: SAML 元数据格式化错误
+      SAMLEntityIDAlreadyExisting: SAML EntityID 已经存在
       OIDCAuthMethodNoSecret: 选择的 OIDC 身份验证方法不需要秘钥
       APIAuthMethodNoSecret: 选择的 API 身份验证方法不需要秘钥
       AuthMethodNoPrivateKeyJWT: 选择的身份验证方法不需要 Key
@@ -273,6 +278,7 @@ Errors:
       NotActive: 项目授权不是启用状态
       NotInactive: 项目授权不是停用状态
   IAM:
+    NotFound: 实例未找到
     Member:
       RolesNotChanged: 角色没有改变
     MemberInvalid: 成员无效
@@ -628,7 +634,7 @@ EventTypes:
       changed: 更改组织成员
       removed: 删除组织成员
       cascade:
-        removeD: 已删除组织成员
+        removeD: 已删除组织级联成员
     iam:
       policy:
         added: 添加系统策略
@@ -915,11 +921,11 @@ Action:
     Type:
       Unspecified: 未指定的
       ExternalAuthentication: 外部认证
-      CustomiseToken: Complement Token
+      CustomiseToken: 自定义令牌
   TriggerType:
     Unspecified: 未指定的
     PostAuthentication: 后期认证
     PreCreation: 创建前
     PostCreation: 创建后
-    PreUserinfoCreation: Pre Userinfo creation
-    PreAccessTokenCreation: Pre access token creation
+    PreUserinfoCreation: 用户信息创建前
+    PreAccessTokenCreation: access 令牌创建前
