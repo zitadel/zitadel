@@ -1,6 +1,8 @@
 package projection
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -111,7 +113,7 @@ func (ln *LoginNames) reduceUserEvents(events []eventstore.Event) {
 	}
 }
 
-func (ln *LoginNames) SearchQuery() *eventstore.SearchQueryBuilder {
+func (ln *LoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(ln.instanceID).
 		OrderAsc().
@@ -162,10 +164,11 @@ func (ln *LoginNames) generate() {
 	if ln.ownerPolicy.active {
 		mustBeDomain = ln.ownerPolicy.mustBeDomain
 	}
-	if mustBeDomain {
+	if !mustBeDomain {
 		ln.LoginNames = append(ln.LoginNames, &LoginName{
 			Name: ln.username,
 		})
+		return
 	}
 
 	for _, domain := range ln.domains {
@@ -249,7 +252,7 @@ func (ln *LoginNames) reduceInstanceDomainPolicyChangedEvent(event *instance.Dom
 	if event.UserLoginMustBeDomain == nil {
 		return
 	}
-	ln.ownerPolicy.mustBeDomain = *event.UserLoginMustBeDomain
+	ln.instancePolicy.mustBeDomain = *event.UserLoginMustBeDomain
 }
 
 func (ln *LoginNames) reduceInstanceRemovedEvent(event *instance.InstanceRemovedEvent) {

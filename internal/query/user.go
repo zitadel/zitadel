@@ -13,7 +13,8 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/projection"
+	projection_old "github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -123,44 +124,44 @@ type UserSearchQueries struct {
 
 var (
 	userTable = table{
-		name:          projection.UserTable,
-		instanceIDCol: projection.UserInstanceIDCol,
+		name:          projection_old.UserTable,
+		instanceIDCol: projection_old.UserInstanceIDCol,
 	}
 	UserIDCol = Column{
-		name:  projection.UserIDCol,
+		name:  projection_old.UserIDCol,
 		table: userTable,
 	}
 	UserCreationDateCol = Column{
-		name:  projection.UserCreationDateCol,
+		name:  projection_old.UserCreationDateCol,
 		table: userTable,
 	}
 	UserChangeDateCol = Column{
-		name:  projection.UserChangeDateCol,
+		name:  projection_old.UserChangeDateCol,
 		table: userTable,
 	}
 	UserResourceOwnerCol = Column{
-		name:  projection.UserResourceOwnerCol,
+		name:  projection_old.UserResourceOwnerCol,
 		table: userTable,
 	}
 	UserInstanceIDCol = Column{
-		name:  projection.UserInstanceIDCol,
+		name:  projection_old.UserInstanceIDCol,
 		table: userTable,
 	}
 	UserStateCol = Column{
-		name:  projection.UserStateCol,
+		name:  projection_old.UserStateCol,
 		table: userTable,
 	}
 	UserSequenceCol = Column{
-		name:  projection.UserSequenceCol,
+		name:  projection_old.UserSequenceCol,
 		table: userTable,
 	}
 	UserUsernameCol = Column{
-		name:           projection.UserUsernameCol,
+		name:           projection_old.UserUsernameCol,
 		table:          userTable,
 		isOrderByLower: true,
 	}
 	UserTypeCol = Column{
-		name:  projection.UserTypeCol,
+		name:  projection_old.UserTypeCol,
 		table: userTable,
 	}
 
@@ -181,118 +182,118 @@ var (
 
 var (
 	humanTable = table{
-		name:          projection.UserHumanTable,
-		instanceIDCol: projection.HumanUserInstanceIDCol,
+		name:          projection_old.UserHumanTable,
+		instanceIDCol: projection_old.HumanUserInstanceIDCol,
 	}
 	// profile
 	HumanUserIDCol = Column{
-		name:  projection.HumanUserIDCol,
+		name:  projection_old.HumanUserIDCol,
 		table: humanTable,
 	}
 	HumanFirstNameCol = Column{
-		name:           projection.HumanFirstNameCol,
+		name:           projection_old.HumanFirstNameCol,
 		table:          humanTable,
 		isOrderByLower: true,
 	}
 	HumanLastNameCol = Column{
-		name:           projection.HumanLastNameCol,
+		name:           projection_old.HumanLastNameCol,
 		table:          humanTable,
 		isOrderByLower: true,
 	}
 	HumanNickNameCol = Column{
-		name:           projection.HumanNickNameCol,
+		name:           projection_old.HumanNickNameCol,
 		table:          humanTable,
 		isOrderByLower: true,
 	}
 	HumanDisplayNameCol = Column{
-		name:           projection.HumanDisplayNameCol,
+		name:           projection_old.HumanDisplayNameCol,
 		table:          humanTable,
 		isOrderByLower: true,
 	}
 	HumanPreferredLanguageCol = Column{
-		name:  projection.HumanPreferredLanguageCol,
+		name:  projection_old.HumanPreferredLanguageCol,
 		table: humanTable,
 	}
 	HumanGenderCol = Column{
-		name:  projection.HumanGenderCol,
+		name:  projection_old.HumanGenderCol,
 		table: humanTable,
 	}
 	HumanAvatarURLCol = Column{
-		name:  projection.HumanAvatarURLCol,
+		name:  projection_old.HumanAvatarURLCol,
 		table: humanTable,
 	}
 
 	// email
 	HumanEmailCol = Column{
-		name:           projection.HumanEmailCol,
+		name:           projection_old.HumanEmailCol,
 		table:          humanTable,
 		isOrderByLower: true,
 	}
 	HumanIsEmailVerifiedCol = Column{
-		name:  projection.HumanIsEmailVerifiedCol,
+		name:  projection_old.HumanIsEmailVerifiedCol,
 		table: humanTable,
 	}
 
 	// phone
 	HumanPhoneCol = Column{
-		name:  projection.HumanPhoneCol,
+		name:  projection_old.HumanPhoneCol,
 		table: humanTable,
 	}
 	HumanIsPhoneVerifiedCol = Column{
-		name:  projection.HumanIsPhoneVerifiedCol,
+		name:  projection_old.HumanIsPhoneVerifiedCol,
 		table: humanTable,
 	}
 )
 
 var (
 	machineTable = table{
-		name:          projection.UserMachineTable,
-		instanceIDCol: projection.MachineUserInstanceIDCol,
+		name:          projection_old.UserMachineTable,
+		instanceIDCol: projection_old.MachineUserInstanceIDCol,
 	}
 	MachineUserIDCol = Column{
-		name:  projection.MachineUserIDCol,
+		name:  projection_old.MachineUserIDCol,
 		table: machineTable,
 	}
 	MachineNameCol = Column{
-		name:           projection.MachineNameCol,
+		name:           projection_old.MachineNameCol,
 		table:          machineTable,
 		isOrderByLower: true,
 	}
 	MachineDescriptionCol = Column{
-		name:  projection.MachineDescriptionCol,
+		name:  projection_old.MachineDescriptionCol,
 		table: machineTable,
 	}
 )
 
 var (
 	notifyTable = table{
-		name:          projection.UserNotifyTable,
-		instanceIDCol: projection.NotifyInstanceIDCol,
+		name:          projection_old.UserNotifyTable,
+		instanceIDCol: projection_old.NotifyInstanceIDCol,
 	}
 	NotifyUserIDCol = Column{
-		name:  projection.NotifyUserIDCol,
+		name:  projection_old.NotifyUserIDCol,
 		table: notifyTable,
 	}
 	NotifyEmailCol = Column{
-		name:           projection.NotifyLastEmailCol,
+		name:           projection_old.NotifyLastEmailCol,
 		table:          notifyTable,
 		isOrderByLower: true,
 	}
 	NotifyVerifiedEmailCol = Column{
-		name:           projection.NotifyVerifiedEmailCol,
+		name:           projection_old.NotifyVerifiedEmailCol,
 		table:          notifyTable,
 		isOrderByLower: true,
 	}
 	NotifyPhoneCol = Column{
-		name:  projection.NotifyLastPhoneCol,
+		name:  projection_old.NotifyLastPhoneCol,
 		table: notifyTable,
 	}
 	NotifyVerifiedPhoneCol = Column{
-		name:  projection.NotifyVerifiedPhoneCol,
+		name:  projection_old.NotifyVerifiedPhoneCol,
 		table: notifyTable,
 	}
 	NotifyPasswordSetCol = Column{
-		name:  projection.NotifyPasswordSetCol,
+		name:  projection_old.NotifyPasswordSetCol,
 		table: notifyTable,
 	}
 )
@@ -302,8 +303,8 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserProjection.Trigger(ctx)
-		projection.LoginNameProjection.Trigger(ctx)
+		projection_old.UserProjection.Trigger(ctx)
+		// projection_old.LoginNameProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserQuery()
@@ -319,7 +320,25 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	u, err := scan(row)
+	if err != nil {
+		return nil, err
+	}
+
+	loginNames := projection.NewLoginNamesWithOwner(u.ID, authz.GetInstance(ctx).InstanceID(), u.ResourceOwner)
+	events, err := q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))
+	if err != nil {
+		return nil, err
+	}
+	loginNames.Reduce(events)
+	for _, loginName := range loginNames.LoginNames {
+		u.LoginNames = append(u.LoginNames, loginName.Name)
+		if loginName.IsPrimary {
+			u.PreferredLoginName = loginName.Name
+		}
+	}
+
+	return u, nil
 }
 
 func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (_ *User, err error) {
@@ -327,8 +346,8 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries .
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.UserProjection.Trigger(ctx)
-		projection.LoginNameProjection.Trigger(ctx)
+		projection_old.UserProjection.Trigger(ctx)
+		// projection_old.LoginNameProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareUserQuery()
@@ -343,7 +362,25 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries .
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	u, err := scan(row)
+	if err != nil {
+		return nil, err
+	}
+
+	loginNames := projection.NewLoginNamesWithOwner(u.ID, authz.GetInstance(ctx).InstanceID(), u.ResourceOwner)
+	events, err := q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))
+	if err != nil {
+		return nil, err
+	}
+	loginNames.Reduce(events)
+	for _, loginName := range loginNames.LoginNames {
+		u.LoginNames = append(u.LoginNames, loginName.Name)
+		if loginName.IsPrimary {
+			u.PreferredLoginName = loginName.Name
+		}
+	}
+
+	return u, nil
 }
 
 func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (_ *Profile, err error) {
@@ -411,8 +448,8 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		projection.UserProjection.Trigger(ctx)
-		projection.LoginNameProjection.Trigger(ctx)
+		projection_old.UserProjection.Trigger(ctx)
+		projection_old.LoginNameProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareNotifyUserQuery()
@@ -436,8 +473,8 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		projection.UserProjection.Trigger(ctx)
-		projection.LoginNameProjection.Trigger(ctx)
+		projection_old.UserProjection.Trigger(ctx)
+		projection_old.LoginNameProjection.Trigger(ctx)
 	}
 
 	query, scan := prepareNotifyUserQuery()
@@ -623,29 +660,29 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 }
 
 func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
-	loginNamesQuery, _, err := sq.Select(
-		userLoginNamesUserIDCol.identifier(),
-		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+") AS "+userLoginNamesListCol.name,
-		userLoginNamesInstanceIDCol.identifier()).
-		From(userLoginNamesTable.identifier()).
-		GroupBy(userLoginNamesUserIDCol.identifier(), userLoginNamesInstanceIDCol.identifier()).
-		ToSql()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
-	preferredLoginNameQuery, preferredLoginNameArgs, err := sq.Select(
-		userPreferredLoginNameUserIDCol.identifier(),
-		userPreferredLoginNameCol.identifier(),
-		userPreferredLoginNameInstanceIDCol.identifier()).
-		From(userPreferredLoginNameTable.identifier()).
-		Where(
-			sq.Eq{
-				userPreferredLoginNameIsPrimaryCol.identifier(): true,
-			}).
-		ToSql()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
+	// loginNamesQuery, _, err := sq.Select(
+	// 	userLoginNamesUserIDCol.identifier(),
+	// 	"ARRAY_AGG("+userLoginNamesNameCol.identifier()+") AS "+userLoginNamesListCol.name,
+	// 	userLoginNamesInstanceIDCol.identifier()).
+	// 	From(userLoginNamesTable.identifier()).
+	// 	GroupBy(userLoginNamesUserIDCol.identifier(), userLoginNamesInstanceIDCol.identifier()).
+	// 	ToSql()
+	// if err != nil {
+	// 	return sq.SelectBuilder{}, nil
+	// }
+	// preferredLoginNameQuery, preferredLoginNameArgs, err := sq.Select(
+	// 	userPreferredLoginNameUserIDCol.identifier(),
+	// 	userPreferredLoginNameCol.identifier(),
+	// 	userPreferredLoginNameInstanceIDCol.identifier()).
+	// 	From(userPreferredLoginNameTable.identifier()).
+	// 	Where(
+	// 		sq.Eq{
+	// 			userPreferredLoginNameIsPrimaryCol.identifier(): true,
+	// 		}).
+	// 	ToSql()
+	// if err != nil {
+	// 	return sq.SelectBuilder{}, nil
+	// }
 	return sq.Select(
 			UserIDCol.identifier(),
 			UserCreationDateCol.identifier(),
@@ -655,8 +692,8 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			UserStateCol.identifier(),
 			UserTypeCol.identifier(),
 			UserUsernameCol.identifier(),
-			userLoginNamesListCol.identifier(),
-			userPreferredLoginNameCol.identifier(),
+			// userLoginNamesListCol.identifier(),
+			// userPreferredLoginNameCol.identifier(),
 			HumanUserIDCol.identifier(),
 			HumanFirstNameCol.identifier(),
 			HumanLastNameCol.identifier(),
@@ -677,18 +714,18 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
-			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
-				userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userLoginNamesInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()).
-			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
-				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
-				preferredLoginNameArgs...).
+			// LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
+			// 	userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
+			// 	userLoginNamesInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()).
+			// LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
+			// 	userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
+			// 	userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+			// 	preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*User, error) {
 			u := new(User)
 			var count int
-			preferredLoginName := sql.NullString{}
+			// preferredLoginName := sql.NullString{}
 
 			humanID := sql.NullString{}
 			firstName := sql.NullString{}
@@ -716,8 +753,8 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				&u.State,
 				&u.Type,
 				&u.Username,
-				&u.LoginNames,
-				&preferredLoginName,
+				// &u.LoginNames,
+				// &preferredLoginName,
 				&humanID,
 				&firstName,
 				&lastName,
@@ -743,7 +780,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				return nil, errors.ThrowInternal(err, "QUERY-Bgah2", "Errors.Internal")
 			}
 
-			u.PreferredLoginName = preferredLoginName.String
+			// u.PreferredLoginName = preferredLoginName.String
 
 			if humanID.Valid {
 				u.Human = &Human{
