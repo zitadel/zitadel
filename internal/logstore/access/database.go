@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc/codes"
 
@@ -96,7 +97,7 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 	return nil
 }
 
-func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instanceId string) (uint64, error) {
+func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instanceId string, start, end time.Time) (uint64, error) {
 
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("count(%s)", accessInstanceIdCol),
@@ -104,6 +105,8 @@ func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instan
 		From(accessLogsTable + " AS OF SYSTEM TIME '-20s'").
 		Where(squirrel.And{
 			squirrel.Eq{accessInstanceIdCol: instanceId},
+			squirrel.GtOrEq{accessTimestampCol: start},
+			squirrel.LtOrEq{accessTimestampCol: end},
 			squirrel.Or{
 				squirrel.And{
 					squirrel.Eq{accessProtocolCol: logstore.HTTP},

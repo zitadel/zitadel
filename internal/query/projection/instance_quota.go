@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"math"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 
@@ -26,7 +27,7 @@ const (
 	QuotaInstanceIDCol    = "instance_id"
 	QuotaSequenceCol      = "sequence"
 	QuotaUnitCol          = "unit"
-	QuotaFromCol          = "from"
+	QuotaFromCol          = "active_from"
 	QuotaIntervalCol      = "interval"
 	QuotaAmountCol        = "amount"
 	QuotaLimitCol         = "do_limit"
@@ -40,13 +41,37 @@ const (
 )
 
 type Quota struct {
-	Amount int64
-	Limit  bool
+	Amount      int64
+	Limit       bool
+	from        time.Time
+	interval    time.Duration
+	PeriodStart time.Time
+	PeriodEnd   time.Time
+}
+
+func (q *Quota) refreshPeriod() *Quota {
+	periodStart := pushFrom(q.from, q.interval, time.Now())
+	return &Quota{
+		Amount:      q.Amount,
+		Limit:       q.Limit,
+		from:        q.from,
+		interval:    q.interval,
+		PeriodStart: periodStart,
+		PeriodEnd:   periodStart.Add(q.interval),
+	}
+}
+
+func pushFrom(from time.Time, interval time.Duration, now time.Time) time.Time {
+	next := from.Add(interval)
+	if next.After(now) {
+		return from
+	}
+	return pushFrom(next, interval, now)
 }
 
 func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit) (*Quota, error) {
 
-	stmt, args, err := squirrel.Select(QuotaAmountCol, QuotaLimitCol).
+	stmt, args, err := squirrel.Select(QuotaAmountCol, QuotaLimitCol, QuotaFromCol, QuotaIntervalCol).
 		From(QuotaTable + " AS OF SYSTEM TIME '-20s'").
 		Where(squirrel.Eq{
 			QuotaInstanceIDCol: instanceID,
@@ -62,11 +87,11 @@ func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, un
 	quota := Quota{}
 	if err = client.
 		QueryRowContext(ctx, stmt, args...).
-		Scan(&quota.Amount, &quota.Limit); err != nil {
+		Scan(&quota.Amount, &quota.Limit, &quota.from, &quota.interval); err != nil {
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
 	}
 
-	return &quota, nil
+	return quota.refreshPeriod(), nil
 }
 
 // TODO: Why not return *StatementHandler?
@@ -87,8 +112,8 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 				crdb.NewColumn(QuotaInstanceIDCol, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaSequenceCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaUnitCol, crdb.ColumnTypeEnum),
-				//			crdb.NewColumn(QuotaFromCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(QuotaIntervalCol, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaFromCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(QuotaIntervalCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaAmountCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaLimitCol, crdb.ColumnTypeBool),
 			},
@@ -156,7 +181,7 @@ func reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
 			handler.NewCol(QuotaInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCol(QuotaSequenceCol, e.Sequence()),
 			handler.NewCol(QuotaUnitCol, e.Unit),
-			//			handler.NewCol(QuotaFromCol, e.From), TODO: Why is it not working?
+			handler.NewCol(QuotaFromCol, e.From),
 			handler.NewCol(QuotaIntervalCol, e.Interval),
 			handler.NewCol(QuotaAmountCol, e.Amount),
 			handler.NewCol(QuotaLimitCol, e.Limit),

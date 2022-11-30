@@ -554,7 +554,7 @@ DefaultInstance:
       - Unit: "requests.all.authenticated"
         # Start Time for the quota periods
         From: "2022-10-24 00:00:00"
-        Interval: 720h # 1 week
+        Interval: 120s
         Amount: 20
         Limit: true
         Notifications:

@@ -48,7 +48,7 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (bool, error) {
 		return false, err
 	}
 
-	usage, err := authenticatedInstanceRequests(ctx, s.dbClient, instanceID)
+	usage, err := authenticatedInstanceRequests(ctx, s.dbClient, instanceID, quota.PeriodStart, quota.PeriodEnd)
 	return int64(usage) > quota.Amount, err
 }
 
