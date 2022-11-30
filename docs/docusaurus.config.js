@@ -84,28 +84,29 @@ module.exports = {
           position: "left",
         },
         {
-          label: "Discussions",
+          type: "html",
           position: "right",
-          href: "https://github.com/zitadel/zitadel/discussions",
+          value:
+            '<a href="https://github.com/zitadel/zitadel/discussions" style="text-decoration: none; width: 20px; height: 24px; display: flex"><i class="las la-comments"></i></a>',
         },
         {
           type: "html",
           position: "right",
           value:
-            '<a href="https://github.com/zitadel/zitadel" style="text-decoration: none; width: 24px; height: 24px; display: flex"><i class="lab la-github"></i></a>',
+            '<a href="https://github.com/zitadel/zitadel" style="text-decoration: none; width: 20px; height: 24px; display: flex"><i class="lab la-github"></i></a>',
         },
         {
           type: "html",
           position: "right",
           value:
-            '<a href="https://zitadel.com/chat" style="text-decoration: none; width: 24px; height: 24px; display: flex"><i class="lab la-discord"></i></a>',
+            '<a href="https://zitadel.com/chat" style="text-decoration: none; width: 20px; height: 24px; display: flex; margin: 0 .5rem 0 0"><i class="lab la-discord"></i></a>',
         },
-        {
-          type: "html",
-          position: "right",
-          value:
-            '<a href="/docs/settings/environment" style="text-decoration: none; width: 24px; height: 24px; display: flex"><i class="las la-cog"></i></a>',
-        },
+        // {
+        //   type: "html",
+        //   position: "right",
+        //   value:
+        //     '<a href="/docs/settings/environment" style="text-decoration: none; width: 20px; height: 20px; display: flex"><i class="las la-cog"></i></a>',
+        // },
       ],
     },
     footer: {
