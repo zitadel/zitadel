@@ -95,42 +95,8 @@ type Quota struct {
 	From          string
 	Interval      time.Duration
 	Amount        uint64
-	Limitations   *QuotaLimitations
+	Limit         bool
 	Notifications QuotaNotifications
-}
-
-type QuotaLimitations struct {
-	Block       QuotaLimitationBlock
-	CookieValue string
-	RedirectURL string
-}
-
-func (q *QuotaLimitations) toAddedEventLimitations() *quota.AddedEventLimitations {
-	if q == nil {
-		return nil
-	}
-	return &quota.AddedEventLimitations{
-		Block:       q.Block.toAddedEventLimitationsBlock(),
-		CookieValue: q.CookieValue,
-		RedirectURL: q.RedirectURL,
-	}
-}
-
-type QuotaLimitationBlock struct {
-	Message    string
-	HTTPStatus uint16
-	GRPCStatus uint8
-}
-
-func (q *QuotaLimitationBlock) toAddedEventLimitationsBlock() *quota.AddedEventLimitationBlock {
-	if q == nil {
-		return nil
-	}
-	return &quota.AddedEventLimitationBlock{
-		Message:    q.Message,
-		HTTPStatus: q.HTTPStatus,
-		GRPCStatus: q.GRPCStatus,
-	}
 }
 
 func (c *Commands) AddInstanceQuotaCommand(
@@ -168,7 +134,7 @@ func (c *Commands) AddInstanceQuotaCommand(
 					from,
 					q.Interval,
 					q.Amount,
-					q.Limitations.toAddedEventLimitations(),
+					q.Limit,
 					q.Notifications.toAddedEventNotifications(genID),
 				)}, err
 			},

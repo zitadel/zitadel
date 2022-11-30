@@ -20,23 +20,16 @@ const (
 	QuotaTable                    = "projections.instance_quotas"
 	QuotaNotificationsTableSuffix = "notifications"
 
-	QuotaCreationDateCol              = "creation_date"
-	QuotaChangeDateCol                = "change_date"
-	QuotaResourceOwnerCol             = "resource_owner"
-	QuotaInstanceIDCol                = "instance_id"
-	QuotaSequenceCol                  = "sequence"
-	QuotaUnitCol                      = "unit"
-	QuotaFromCol                      = "from"
-	QuotaIntervalCol                  = "interval"
-	QuotaAmountCol                    = "amount"
-	QuotaLimitationBlockMessageCol    = "limitation_block_message"
-	QuotaLimitationBlockHTTPStatusCol = "limitation_block_http_status"
-	QuotaLimitationBlockGRPCStatusCol = "limitation_block_grpc_status"
-	QuotaLimitationCookieValCol       = "limitation_cookie_val"
-	QuotaLimitationRedirectURLCol     = "limitation_redirect_url"
-	QuotaUsedAbsoluteCol              = "used_absolute"
-	QuotaUsedRelativeCol              = "used_relative"
-	QuotaLimitingCol                  = "limiting"
+	QuotaCreationDateCol  = "creation_date"
+	QuotaChangeDateCol    = "change_date"
+	QuotaResourceOwnerCol = "resource_owner"
+	QuotaInstanceIDCol    = "instance_id"
+	QuotaSequenceCol      = "sequence"
+	QuotaUnitCol          = "unit"
+	QuotaFromCol          = "from"
+	QuotaIntervalCol      = "interval"
+	QuotaAmountCol        = "amount"
+	QuotaLimitCol         = "do_limit"
 
 	QuotaNotificationIdCol         = "id"
 	QuotaNotificationInstanceIDCol = "instance_id"
@@ -47,45 +40,14 @@ const (
 )
 
 type Quota struct {
-	Amount       int64
-	UsedAbsolute int64
+	Amount int64
+	Limit  bool
 }
 
-func UpdateInstanceQuotaUsage(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit, used int64) (bool, error) {
-	quota, err := GetInstanceQuotaAmount(ctx, client, instanceID, unit)
-	if err != nil {
-		return false, err
-	}
+func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit) (*Quota, error) {
 
-	newUsed := quota.UsedAbsolute + used
-	doLimit := newUsed > quota.Amount
-
-	stmt, args, err := squirrel.Update(QuotaTable).SetMap(map[string]interface{}{
-		QuotaUsedAbsoluteCol: newUsed,
-		QuotaUsedRelativeCol: int64(math.Floor(float64(newUsed * 100 / quota.Amount))),
-		QuotaLimitingCol:     doLimit,
-	}).
-		Where(squirrel.Eq{
-			QuotaInstanceIDCol: instanceID,
-			QuotaUnitCol:       unit,
-		}).
-		PlaceholderFormat(squirrel.Dollar).
-		ToSql()
-
-	if err != nil {
-		return doLimit, caos_errors.ThrowInternal(err, "QUOTA-4mSo3", "Errors.Internal")
-	}
-
-	_, err = client.ExecContext(ctx, stmt, args...)
-	if err != nil {
-		return doLimit, caos_errors.ThrowInternal(err, "QUOTA-dGK7q", "Errors.UpdateFailed")
-	}
-	return doLimit, nil
-}
-
-func GetInstanceQuotaAmount(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit) (*Quota, error) {
-	stmt, args, err := squirrel.Select(QuotaAmountCol, QuotaUsedAbsoluteCol).
-		From(QuotaTable).
+	stmt, args, err := squirrel.Select(QuotaAmountCol, QuotaLimitCol).
+		From(QuotaTable + " AS OF SYSTEM TIME '-20s'").
 		Where(squirrel.Eq{
 			QuotaInstanceIDCol: instanceID,
 			QuotaUnitCol:       unit,
@@ -97,16 +59,10 @@ func GetInstanceQuotaAmount(ctx context.Context, client *sql.DB, instanceID stri
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-V9Sde", "Errors.Internal")
 	}
 
-	result, err := client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, caos_errors.ThrowInternal(err, "QUOTA-BnBSL", "Errors.Quota.QueryFailed")
-	}
-	defer result.Close()
-
 	quota := Quota{}
-
-	result.Next()
-	if err := result.Scan(&quota.Amount, &quota.UsedAbsolute); err != nil {
+	if err = client.
+		QueryRowContext(ctx, stmt, args...).
+		Scan(&quota.Amount, &quota.Limit); err != nil {
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
 	}
 
@@ -134,14 +90,7 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 				//			crdb.NewColumn(QuotaFromCol, crdb.ColumnTypeTimestamp),
 				crdb.NewColumn(QuotaIntervalCol, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaAmountCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(QuotaLimitationBlockMessageCol, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaLimitationBlockHTTPStatusCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(QuotaLimitationBlockGRPCStatusCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(QuotaLimitationCookieValCol, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaLimitationRedirectURLCol, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaUsedAbsoluteCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(QuotaUsedRelativeCol, crdb.ColumnTypeInt64), // TODO: Float?
-				crdb.NewColumn(QuotaLimitingCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(QuotaLimitCol, crdb.ColumnTypeBool),
 			},
 			crdb.NewPrimaryKey(QuotaInstanceIDCol, QuotaUnitCol),
 			crdb.WithIndex(crdb.NewIndex("quotas_ro_idx", []string{QuotaResourceOwnerCol})),
@@ -210,14 +159,7 @@ func reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
 			//			handler.NewCol(QuotaFromCol, e.From), TODO: Why is it not working?
 			handler.NewCol(QuotaIntervalCol, e.Interval),
 			handler.NewCol(QuotaAmountCol, e.Amount),
-			handler.NewCol(QuotaLimitationBlockMessageCol, e.Limitations.Block.Message),
-			handler.NewCol(QuotaLimitationBlockHTTPStatusCol, e.Limitations.Block.HTTPStatus),
-			handler.NewCol(QuotaLimitationBlockGRPCStatusCol, e.Limitations.Block.GRPCStatus),
-			handler.NewCol(QuotaLimitationCookieValCol, e.Limitations.CookieValue),
-			handler.NewCol(QuotaLimitationRedirectURLCol, e.Limitations.RedirectURL),
-			handler.NewCol(QuotaUsedAbsoluteCol, 0),
-			handler.NewCol(QuotaUsedRelativeCol, 0),
-			handler.NewCol(QuotaLimitingCol, false),
+			handler.NewCol(QuotaLimitCol, e.Limit),
 		}),
 	}
 

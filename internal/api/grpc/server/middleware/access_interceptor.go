@@ -5,6 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zitadel/logging"
+
+	"google.golang.org/grpc/codes"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 
 	"google.golang.org/grpc/status"
@@ -18,6 +22,18 @@ import (
 
 func AccessInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+
+		instance := authz.GetInstance(ctx)
+		limit, err := svc.Limit(ctx, instance.InstanceID())
+		if err != nil {
+			logging.Warnf("failed to check whether requests should be limited: %s", err.Error())
+			err = nil
+		}
+
+		if limit {
+			return nil, status.Error(codes.ResourceExhausted, "quota for authenticated requests exceeded")
+		}
+
 		resp, err := handler(ctx, req)
 
 		var respStatus uint32
@@ -28,9 +44,7 @@ func AccessInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 
 		md, _ := metadata.FromIncomingContext(ctx)
 
-		instance := authz.GetInstance(ctx)
-
-		svc.Handle(ctx, &logstore.AccessLogRecord{
+		record := &logstore.AccessLogRecord{
 			Timestamp:       time.Now(),
 			Protocol:        logstore.GRPC,
 			RequestURL:      info.FullMethod,
@@ -41,7 +55,13 @@ func AccessInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 			ProjectID:       instance.ProjectID(),
 			RequestedDomain: instance.RequestedDomain(),
 			RequestedHost:   instance.RequestedHost(),
-		})
+		}
+
+		if err = svc.Handle(ctx, record); err != nil {
+			logging.Warnf("failed to handle access log: %s", err.Error())
+			err = nil
+		}
+
 		return resp, err
 	}
 }

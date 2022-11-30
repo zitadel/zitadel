@@ -26,7 +26,7 @@ func NewQuotaAddedEvent(
 	from time.Time,
 	interval time.Duration,
 	amount uint64,
-	limitations *quota.AddedEventLimitations,
+	limit bool,
 	notifications []*quota.AddedEventNotification,
 ) *QuotaAddedEvent {
 
@@ -41,7 +41,7 @@ func NewQuotaAddedEvent(
 			from,
 			interval,
 			amount,
-			limitations,
+			limit,
 			notifications,
 		),
 	}

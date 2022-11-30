@@ -556,13 +556,7 @@ DefaultInstance:
         From: "2022-10-24 00:00:00"
         Interval: 720h # 1 week
         Amount: 20
-        Limitations:
-          Block:
-            Message: "quota for authenticated requests exceeded"
-            HTTPStatus: 429
-            GRPCStatus: 8
-          CookieValue: "authenticated_requests_exceeded"
-          RedirectURL: "/ui/quotas"
+        Limit: true
         Notifications:
           - Percent: 100
             Repeat: false
@@ -577,13 +571,7 @@ DefaultInstance:
         From: "2022-10-24 00:00:00"
         Interval: 720h # 1 week
         Amount: 3600
-        Limitations:
-          Block:
-            Message: "quota for action seconds exceeded"
-            HTTPStatus: 429
-            GRPCStatus: 8
-          CookieValue: "action_seconds_exceeded"
-          RedirectURL: "/ui/quotas"
+        Limit: true
         Notifications:
           - Percent: 100
             CallURL: ""

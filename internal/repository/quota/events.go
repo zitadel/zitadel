@@ -46,7 +46,7 @@ type AddedEvent struct {
 	From          time.Time                 `json:"from"`
 	Interval      time.Duration             `json:"interval,omitempty"`
 	Amount        uint64                    `json:"amount"`
-	Limitations   *AddedEventLimitations    `json:"limitations,omitempty"`
+	Limit         bool                      `json:"limit"`
 	Notifications []*AddedEventNotification `json:"notifications,omitempty"`
 }
 
@@ -55,18 +55,6 @@ type AddedEventNotification struct {
 	Percent uint32 `json:"percent"`
 	Repeat  bool   `json:"repeat,omitempty"`
 	CallURL string `json:"callUrl,omitempty"`
-}
-
-type AddedEventLimitations struct {
-	Block       *AddedEventLimitationBlock `json:"block,omitempty"`
-	CookieValue string                     `json:"cookieValue,omitempty"`
-	RedirectURL string                     `json:"redirectUrl,omitempty"`
-}
-
-type AddedEventLimitationBlock struct {
-	Message    string `json:"message"`
-	HTTPStatus uint16 `json:"httpStatus"`
-	GRPCStatus uint8  `json:"grpcStatus"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -83,7 +71,7 @@ func NewAddedEvent(
 	from time.Time,
 	interval time.Duration,
 	amount uint64,
-	limitations *AddedEventLimitations, // todo: receive properties and create struct here?
+	limit bool,
 	notifications []*AddedEventNotification, // todo: redefine struct to receive here and convert to AddedEventNotification slice?
 ) *AddedEvent {
 	return &AddedEvent{
@@ -92,7 +80,7 @@ func NewAddedEvent(
 		From:          from,
 		Interval:      interval,
 		Amount:        amount,
-		Limitations:   limitations,
+		Limit:         limit,
 		Notifications: notifications,
 	}
 }

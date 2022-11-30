@@ -27,7 +27,6 @@ func (a *AccessInterceptor) Handler(next http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
-		next.ServeHTTP(wrappedWriter, request)
 
 		requestURL := request.RequestURI
 		unescapedURL, err := url.QueryUnescape(requestURL)
@@ -37,8 +36,19 @@ func (a *AccessInterceptor) Handler(next http.Handler) http.Handler {
 
 		ctx := request.Context()
 		instance := authz.GetInstance(ctx)
+		limit, err := a.svc.Limit(ctx, instance.InstanceID())
+		if err != nil {
+			logging.Warnf("failed to check whether requests should be limited: %s", err.Error())
+			err = nil
+		}
 
-		a.svc.Handle(ctx, &logstore.AccessLogRecord{
+		if limit {
+			wrappedWriter.WriteHeader(http.StatusTooManyRequests)
+		}
+
+		next.ServeHTTP(wrappedWriter, request)
+
+		err = a.svc.Handle(ctx, &logstore.AccessLogRecord{
 			Timestamp:       time.Now(),
 			Protocol:        logstore.HTTP,
 			RequestURL:      unescapedURL,
@@ -50,6 +60,11 @@ func (a *AccessInterceptor) Handler(next http.Handler) http.Handler {
 			RequestedDomain: instance.RequestedDomain(),
 			RequestedHost:   instance.RequestedHost(),
 		})
+
+		if err != nil {
+			logging.Warnf("failed to handle access log: %s", err.Error())
+			err = nil
+		}
 	})
 }
 

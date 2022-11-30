@@ -8,5 +8,9 @@ CREATE TABLE IF NOT EXISTS logstore.access (
     request_url TEXT,
     response_status INT,
     request_headers JSONB,
-    response_headers JSONB
+    response_headers JSONB,
+    instance_id      TEXT,
+    project_id       TEXT,
+    requested_domain TEXT,
+    requested_host   TEXT
 )

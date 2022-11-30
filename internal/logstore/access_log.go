@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/grpc/codes"
+
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 )
 
@@ -33,13 +35,17 @@ type AccessLogRecord struct {
 }
 
 func (a *AccessLogRecord) IsAuthenticated() bool {
+
+	// TODO: Filter unauthorized
 	// TODO: tripplecheck
 	return a.Protocol == GRPC &&
-		len(a.ResponseHeaders[strings.ToLower(zitadel_http.Authorization)]) > 0 ||
+		len(a.ResponseHeaders[strings.ToLower(zitadel_http.Authorization)]) > 0 &&
+		a.ResponseStatus != uint32(codes.ResourceExhausted) ||
 		a.Protocol == HTTP &&
 			a.RequestHeaders.Get(textproto.CanonicalMIMEHeaderKey(zitadel_http.Authorization)) != "" &&
-			a.ResponseStatus != 401 &&
-			a.ResponseStatus != 500
+			a.ResponseStatus != http.StatusForbidden &&
+			a.ResponseStatus != http.StatusInternalServerError &&
+			a.ResponseStatus != http.StatusTooManyRequests
 }
 
 type StoredAccessLogsReducer interface {
