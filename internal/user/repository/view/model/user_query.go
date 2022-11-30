@@ -77,6 +77,8 @@ func (key UserSearchKey) ToColumnName() string {
 		return UserKeyType
 	case usr_model.UserSearchKeyInstanceID:
 		return UserKeyInstanceID
+	case usr_model.UserSearchOwnerRemoved:
+		return UserKeyOwnerRemoved
 	default:
 		return ""
 	}

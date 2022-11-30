@@ -43,7 +43,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.custom_texts (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (creation_date, change_date, sequence, is_default, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.is_default, EXCLUDED.text)",
+							expectedStmt: "INSERT INTO projections.custom_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (creation_date, change_date, sequence, is_default, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.is_default, EXCLUDED.text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -82,7 +82,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4) AND (instance_id = $5)",
+							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
@@ -116,7 +116,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3) AND (instance_id = $4)",
+							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
@@ -145,7 +145,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -176,7 +176,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.custom_texts (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (creation_date, change_date, sequence, is_default, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.is_default, EXCLUDED.text)",
+							expectedStmt: "INSERT INTO projections.custom_texts2 (aggregate_id, instance_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, aggregate_id, template, key, language) DO UPDATE SET (creation_date, change_date, sequence, is_default, text) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.is_default, EXCLUDED.text)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -215,7 +215,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4) AND (instance_id = $5)",
+							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
@@ -249,12 +249,42 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3) AND (instance_id = $4)",
+							expectedStmt: "DELETE FROM projections.custom_texts2 WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
 								"en",
 								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&customTextProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.custom_texts2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (aggregate_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
 							},
 						},
 					},

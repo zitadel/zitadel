@@ -7,7 +7,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -50,6 +49,14 @@ var (
 		name:  projection.InstanceMemberIAMIDCol,
 		table: instanceMemberTable,
 	}
+	InstanceMemberOwnerRemoved = Column{
+		name:  projection.MemberOwnerRemoved,
+		table: instanceMemberTable,
+	}
+	InstanceMemberOwnerRemovedUser = Column{
+		name:  projection.MemberUserOwnerRemoved,
+		table: instanceMemberTable,
+	}
 )
 
 type IAMMembersQuery struct {
@@ -61,12 +68,19 @@ func (q *IAMMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		toQuery(query)
 }
 
-func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery) (*Members, error) {
+func addIamMemberWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[InstanceMemberOwnerRemoved.identifier()] = false
+	eq[InstanceMemberOwnerRemovedUser.identifier()] = false
+}
+
+func (q *Queries) IAMMembers(ctx context.Context, queries *IAMMembersQuery, withOwnerRemoved bool) (*Members, error) {
 	query, scan := prepareInstanceMembersQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{InstanceMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		addIamMemberWithoutOwnerRemoved(eq)
+		addLoginNameWithoutOwnerRemoved(eq)
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")
 	}

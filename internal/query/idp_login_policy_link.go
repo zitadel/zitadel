@@ -73,16 +73,22 @@ var (
 		name:  projection.IDPLoginPolicyLinkProviderTypeCol,
 		table: idpLoginPolicyLinkTable,
 	}
+	IDPLoginPolicyLinkOwnerRemovedCol = Column{
+		name:  projection.IDPLoginPolicyLinkOwnerRemovedCol,
+		table: idpLoginPolicyLinkTable,
+	}
 )
 
-func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string, queries *IDPLoginPolicyLinksSearchQuery) (idps *IDPLoginPolicyLinks, err error) {
+func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string, queries *IDPLoginPolicyLinksSearchQuery, withOwnerRemoved bool) (idps *IDPLoginPolicyLinks, err error) {
 	query, scan := prepareIDPLoginPolicyLinksQuery()
-	stmt, args, err := queries.toQuery(query).Where(
-		sq.Eq{
-			IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
-			IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
-		},
-	).ToSql()
+	eq := sq.Eq{
+		IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
+		IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[IDPLoginPolicyLinkOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
 	}
