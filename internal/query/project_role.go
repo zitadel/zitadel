@@ -54,6 +54,10 @@ var (
 		name:  projection.ProjectRoleColumnGroupName,
 		table: projectRolesTable,
 	}
+	ProjectRoleColumnOwnerRemoved = Column{
+		name:  projection.ProjectRoleColumnOwnerRemoved,
+		table: projectRolesTable,
+	}
 )
 
 type ProjectRoles struct {
@@ -78,7 +82,7 @@ type ProjectRoleSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
+func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (projects *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -86,11 +90,13 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 		projection.ProjectRoleProjection.Trigger(ctx)
 	}
 
+	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[ProjectRoleColumnOwnerRemoved.identifier()] = false
+	}
+
 	query, scan := prepareProjectRolesQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
@@ -107,11 +113,11 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 	return projects, err
 }
 
-func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
+func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (projects *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	grant, err := q.ProjectGrantByIDAndGrantedOrg(ctx, grantID, grantedOrg)
+	grant, err := q.ProjectGrantByIDAndGrantedOrg(ctx, grantID, grantedOrg, withOwnerRemoved)
 	if err != nil {
 		return nil, err
 	}
@@ -119,11 +125,14 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	if err != nil {
 		return nil, err
 	}
+
+	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[ProjectRoleColumnOwnerRemoved.identifier()] = false
+	}
+
 	query, scan := prepareProjectRolesQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}

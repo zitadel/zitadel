@@ -79,33 +79,33 @@ var (
 		name:  projection.PrivacyPolicyStateCol,
 		table: privacyTable,
 	}
+	PrivacyColOwnerRemoved = Column{
+		name:  projection.PrivacyPolicyOwnerRemovedCol,
+		table: privacyTable,
+	}
 )
 
-func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (_ *PrivacyPolicy, err error) {
+func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (_ *PrivacyPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
 		projection.PrivacyPolicyProjection.Trigger(ctx)
 	}
-
+	eq := sq.Eq{PrivacyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[PrivacyColOwnerRemoved.identifier()] = false
+	}
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				PrivacyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					PrivacyColID.identifier(): orgID,
-				},
-				sq.Eq{
-					PrivacyColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{PrivacyColID.identifier(): orgID},
+				sq.Eq{PrivacyColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
-		OrderBy(PrivacyColIsDefault.identifier()).
-		Limit(1).ToSql()
+		OrderBy(PrivacyColIsDefault.identifier()).Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-UXuPI", "Errors.Query.SQLStatement")
 	}

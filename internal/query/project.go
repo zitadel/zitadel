@@ -68,6 +68,10 @@ var (
 		name:  projection.ProjectColumnState,
 		table: projectsTable,
 	}
+	ProjectColumnOwnerRemoved = Column{
+		name:  projection.ProjectColumnOwnerRemoved,
+		table: projectsTable,
+	}
 )
 
 type Projects struct {
@@ -95,7 +99,7 @@ type ProjectSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Project, err error) {
+func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (_ *Project, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -104,10 +108,14 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	}
 
 	stmt, scan := prepareProjectQuery()
-	query, args, err := stmt.Where(sq.Eq{
+	eq := sq.Eq{
 		ProjectColumnID.identifier():         id,
 		ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[ProjectColumnOwnerRemoved.identifier()] = false
+	}
+	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
 	}
@@ -116,15 +124,16 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	return scan(row)
 }
 
-func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries) (projects *Projects, err error) {
+func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries, withOwnerRemoved bool) (projects *Projects, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareProjectsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[ProjectColumnOwnerRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
 	}

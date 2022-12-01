@@ -76,9 +76,7 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 	query, scan := prepareDebugNotificationProviderQuery()
 	stmt, args, err := query.Where(
 		sq.And{
-			sq.Eq{
-				NotificationProviderColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			sq.Eq{NotificationProviderColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			sq.Or{
 				sq.Eq{
 					NotificationProviderColumnAggID.identifier(): aggID,

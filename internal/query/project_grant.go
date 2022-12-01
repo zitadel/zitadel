@@ -74,6 +74,14 @@ var (
 		name:  projection.OrgColumnName,
 		table: orgsTable.setAlias(ProjectGrantResourceOwnerTableAlias),
 	}
+	ProjectGrantColumnOwnerRemoved = Column{
+		name:  projection.ProjectGrantColumnOwnerRemoved,
+		table: projectGrantsTable,
+	}
+	ProjectGrantColumnGrantGrantedOrgRemoved = Column{
+		name:  projection.ProjectGrantColumnGrantedOrgRemoved,
+		table: projectGrantsTable,
+	}
 )
 
 type ProjectGrants struct {
@@ -102,7 +110,7 @@ type ProjectGrantSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *ProjectGrant, err error) {
+func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (_ *ProjectGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -111,10 +119,15 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	}
 
 	stmt, scan := prepareProjectGrantQuery()
-	query, args, err := stmt.Where(sq.Eq{
+	eq := sq.Eq{
 		ProjectGrantColumnGrantID.identifier():    id,
 		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[ProjectGrantColumnOwnerRemoved.identifier()] = false
+		eq[ProjectGrantColumnGrantGrantedOrgRemoved.identifier()] = false
+	}
+	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
 	}
@@ -123,16 +136,21 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	return scan(row)
 }
 
-func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, grantedOrg string) (_ *ProjectGrant, err error) {
+func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, grantedOrg string, withOwnerRemoved bool) (_ *ProjectGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareProjectGrantQuery()
-	query, args, err := stmt.Where(sq.Eq{
+	eq := sq.Eq{
 		ProjectGrantColumnGrantID.identifier():      id,
 		ProjectGrantColumnGrantedOrgID.identifier(): grantedOrg,
 		ProjectGrantColumnInstanceID.identifier():   authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[ProjectGrantColumnOwnerRemoved.identifier()] = false
+		eq[ProjectGrantColumnGrantGrantedOrgRemoved.identifier()] = false
+	}
+	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
 	}
@@ -141,15 +159,19 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	return scan(row)
 }
 
-func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries) (projects *ProjectGrants, err error) {
+func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrantSearchQueries, withOwnerRemoved bool) (projects *ProjectGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareProjectGrantsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[ProjectGrantColumnOwnerRemoved.identifier()] = false
+		eq[ProjectGrantColumnGrantGrantedOrgRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.Query.InvalidRequest")
 	}
@@ -166,7 +188,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	return projects, err
 }
 
-func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) (projects *ProjectGrants, err error) {
+func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string, withOwnerRemoved bool) (projects *ProjectGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -182,7 +204,7 @@ func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	return q.SearchProjectGrants(ctx, searchQuery)
+	return q.SearchProjectGrants(ctx, searchQuery, withOwnerRemoved)
 }
 
 func NewProjectGrantProjectIDSearchQuery(value string) (SearchQuery, error) {

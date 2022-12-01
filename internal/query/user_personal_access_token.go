@@ -56,6 +56,10 @@ var (
 		name:  projection.PersonalAccessTokenColumnSequence,
 		table: personalAccessTokensTable,
 	}
+	PersonalAccessTokenColumnOwnerRemoved = Column{
+		name:  projection.PersonalAccessTokenColumnOwnerRemoved,
+		table: personalAccessTokensTable,
+	}
 )
 
 type PersonalAccessTokens struct {
@@ -80,7 +84,7 @@ type PersonalAccessTokenSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (_ *PersonalAccessToken, err error) {
+func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (_ *PersonalAccessToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -92,10 +96,14 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
+	eq := sq.Eq{
 		PersonalAccessTokenColumnID.identifier():         id,
 		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	}
+	if !withOwnerRemoved {
+		eq[PersonalAccessTokenColumnOwnerRemoved.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgfb4", "Errors.Query.SQLStatment")
 	}
@@ -104,15 +112,18 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 	return scan(row)
 }
 
-func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries) (personalAccessTokens *PersonalAccessTokens, err error) {
+func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries, withOwnerRemoved bool) (personalAccessTokens *PersonalAccessTokens, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := preparePersonalAccessTokensQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[PersonalAccessTokenColumnOwnerRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-Hjw2w", "Errors.Query.InvalidRequest")
 	}
