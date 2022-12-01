@@ -400,8 +400,8 @@ export function SetAuthRequest() {
       <div className="rounded-md bg-gray-700 shadow dark:bg-black/10 p-2 flex flex-col items-center">
         <code className="text-sm w-full mb-4 bg-transparent border-none">
           <span className="text-yellow-500">{instance}</span>
-          <span className="text-white">oauth/v2/authorize</span>
-          <CodeSnipped cname="text-green-500">{`?client_id=${encodeURIComponent(
+          <span className="text-white">oauth/v2/authorize?</span>
+          <CodeSnipped cname="text-green-500">{`client_id=${encodeURIComponent(
             clientId
           )}`}</CodeSnipped>
           <CodeSnipped cname="text-blue-500">{`&redirect_uri=${encodeURIComponent(
