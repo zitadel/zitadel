@@ -74,26 +74,30 @@ var (
 		name:  projection.LockoutPolicyStateCol,
 		table: lockoutTable,
 	}
+	LockoutPolicyOwnerRemoved = Column{
+		name:  projection.LockoutPolicyOwnerRemovedCol,
+		table: lockoutTable,
+	}
 )
 
-func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (*LockoutPolicy, error) {
+func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*LockoutPolicy, error) {
 	if shouldTriggerBulk {
 		projection.LockoutPolicyProjection.Trigger(ctx)
+	}
+	eq := sq.Eq{
+		LockoutColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[LockoutPolicyOwnerRemoved.identifier()] = false
 	}
 
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				LockoutColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					LockoutColID.identifier(): orgID,
-				},
-				sq.Eq{
-					LockoutColID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{LockoutColID.identifier(): orgID},
+				sq.Eq{LockoutColID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
 		OrderBy(LockoutColIsDefault.identifier()).

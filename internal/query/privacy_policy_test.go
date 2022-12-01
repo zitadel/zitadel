@@ -28,17 +28,17 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 			prepare: preparePrivacyPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.privacy_policies.id,`+
-						` projections.privacy_policies.sequence,`+
-						` projections.privacy_policies.creation_date,`+
-						` projections.privacy_policies.change_date,`+
-						` projections.privacy_policies.resource_owner,`+
-						` projections.privacy_policies.privacy_link,`+
-						` projections.privacy_policies.tos_link,`+
-						` projections.privacy_policies.help_link,`+
-						` projections.privacy_policies.is_default,`+
-						` projections.privacy_policies.state`+
-						` FROM projections.privacy_policies`),
+					regexp.QuoteMeta(`SELECT projections.privacy_policies2.id,`+
+						` projections.privacy_policies2.sequence,`+
+						` projections.privacy_policies2.creation_date,`+
+						` projections.privacy_policies2.change_date,`+
+						` projections.privacy_policies2.resource_owner,`+
+						` projections.privacy_policies2.privacy_link,`+
+						` projections.privacy_policies2.tos_link,`+
+						` projections.privacy_policies2.help_link,`+
+						` projections.privacy_policies2.is_default,`+
+						` projections.privacy_policies2.state`+
+						` FROM projections.privacy_policies2`),
 					nil,
 					nil,
 				),
@@ -56,17 +56,17 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 			prepare: preparePrivacyPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.privacy_policies.id,`+
-						` projections.privacy_policies.sequence,`+
-						` projections.privacy_policies.creation_date,`+
-						` projections.privacy_policies.change_date,`+
-						` projections.privacy_policies.resource_owner,`+
-						` projections.privacy_policies.privacy_link,`+
-						` projections.privacy_policies.tos_link,`+
-						` projections.privacy_policies.help_link,`+
-						` projections.privacy_policies.is_default,`+
-						` projections.privacy_policies.state`+
-						` FROM projections.privacy_policies`),
+					regexp.QuoteMeta(`SELECT projections.privacy_policies2.id,`+
+						` projections.privacy_policies2.sequence,`+
+						` projections.privacy_policies2.creation_date,`+
+						` projections.privacy_policies2.change_date,`+
+						` projections.privacy_policies2.resource_owner,`+
+						` projections.privacy_policies2.privacy_link,`+
+						` projections.privacy_policies2.tos_link,`+
+						` projections.privacy_policies2.help_link,`+
+						` projections.privacy_policies2.is_default,`+
+						` projections.privacy_policies2.state`+
+						` FROM projections.privacy_policies2`),
 					[]string{
 						"id",
 						"sequence",
@@ -111,17 +111,17 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 			prepare: preparePrivacyPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.privacy_policies.id,`+
-						` projections.privacy_policies.sequence,`+
-						` projections.privacy_policies.creation_date,`+
-						` projections.privacy_policies.change_date,`+
-						` projections.privacy_policies.resource_owner,`+
-						` projections.privacy_policies.privacy_link,`+
-						` projections.privacy_policies.tos_link,`+
-						` projections.privacy_policies.help_link,`+
-						` projections.privacy_policies.is_default,`+
-						` projections.privacy_policies.state`+
-						` FROM projections.privacy_policies`),
+					regexp.QuoteMeta(`SELECT projections.privacy_policies2.id,`+
+						` projections.privacy_policies2.sequence,`+
+						` projections.privacy_policies2.creation_date,`+
+						` projections.privacy_policies2.change_date,`+
+						` projections.privacy_policies2.resource_owner,`+
+						` projections.privacy_policies2.privacy_link,`+
+						` projections.privacy_policies2.tos_link,`+
+						` projections.privacy_policies2.help_link,`+
+						` projections.privacy_policies2.is_default,`+
+						` projections.privacy_policies2.state`+
+						` FROM projections.privacy_policies2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

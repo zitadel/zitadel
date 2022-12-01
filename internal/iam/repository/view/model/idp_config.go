@@ -23,6 +23,7 @@ const (
 	IDPConfigKeyName         = "name"
 	IDPConfigKeyProviderType = "idp_provider_type"
 	IDPConfigKeyInstanceID   = "instance_id"
+	IDPConfigKeyOwnerRemoved = "owner_removed"
 )
 
 type IDPConfigView struct {

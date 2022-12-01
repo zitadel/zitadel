@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	userTable = "auth.users"
+	userTable = "auth.users2"
 )
 
 func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
@@ -97,7 +97,7 @@ func (v *View) UserByPhoneAndResourceOwner(phone, resourceOwner, instanceID stri
 func (v *View) userByID(instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
 	ctx := authz.WithInstanceID(context.Background(), instanceID)
 
-	queriedUser, err := v.query.GetNotifyUser(ctx, true, queries...)
+	queriedUser, err := v.query.GetNotifyUser(ctx, true, false, queries...)
 	if err != nil {
 		return nil, err
 	}
@@ -183,6 +183,14 @@ func (v *View) DeleteUser(userID, instanceID string, event *models.Event) error 
 
 func (v *View) DeleteInstanceUsers(event *models.Event) error {
 	err := view.DeleteInstanceUsers(v.Db, userTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedUserSequence(event)
+}
+
+func (v *View) UpdateOrgOwnerRemovedUsers(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.InstanceID, event.AggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

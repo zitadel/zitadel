@@ -69,9 +69,13 @@ var (
 		name:  projection.OrgMetadataColumnValue,
 		table: orgMetadataTable,
 	}
+	OrgMetadataOwnerRemovedCol = Column{
+		name:  projection.OrgMetadataColumnOwnerRemoved,
+		table: orgMetadataTable,
+	}
 )
 
-func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk bool, orgID string, key string, queries ...SearchQuery) (*OrgMetadata, error) {
+func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk bool, orgID string, key string, withOwnerRemoved bool, queries ...SearchQuery) (*OrgMetadata, error) {
 	if shouldTriggerBulk {
 		projection.OrgMetadataProjection.Trigger(ctx)
 	}
@@ -80,12 +84,15 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			OrgMetadataOrgIDCol.identifier():      orgID,
-			OrgMetadataKeyCol.identifier():        key,
-			OrgMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		OrgMetadataOrgIDCol.identifier():      orgID,
+		OrgMetadataKeyCol.identifier():        key,
+		OrgMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[OrgMetadataOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-aDaG2", "Errors.Query.SQLStatment")
 	}
@@ -94,18 +101,19 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	return scan(row)
 }
 
-func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool, orgID string, queries *OrgMetadataSearchQueries) (*OrgMetadataList, error) {
+func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool, orgID string, queries *OrgMetadataSearchQueries, withOwnerRemoved bool) (*OrgMetadataList, error) {
 	if shouldTriggerBulk {
 		projection.OrgMetadataProjection.Trigger(ctx)
 	}
-
+	eq := sq.Eq{
+		OrgMetadataOrgIDCol.identifier():      orgID,
+		OrgMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[OrgMetadataOwnerRemovedCol.identifier()] = false
+	}
 	query, scan := prepareOrgMetadataListQuery()
-	stmt, args, err := queries.toQuery(query).Where(
-		sq.Eq{
-			OrgMetadataOrgIDCol.identifier():      orgID,
-			OrgMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).
-		ToSql()
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatment")
 	}

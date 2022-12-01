@@ -28,6 +28,10 @@ var (
 		name:  projection.AuthNKeyCreationDateCol,
 		table: authNKeyTable,
 	}
+	AuthNKeyColumnChangeDate = Column{
+		name:  projection.AuthNKeyChangeDateCol,
+		table: authNKeyTable,
+	}
 	AuthNKeyColumnResourceOwner = Column{
 		name:  projection.AuthNKeyResourceOwnerCol,
 		table: authNKeyTable,
@@ -68,6 +72,10 @@ var (
 		name:  projection.AuthNKeyEnabledCol,
 		table: authNKeyTable,
 	}
+	AuthNKeyOwnerRemovedCol = Column{
+		name:  projection.AuthNKeyOwnerRemovedCol,
+		table: authNKeyTable,
+	}
 )
 
 type AuthNKeys struct {
@@ -78,6 +86,7 @@ type AuthNKeys struct {
 type AuthNKey struct {
 	ID            string
 	CreationDate  time.Time
+	ChangeDate    time.Time
 	ResourceOwner string
 	Sequence      uint64
 
@@ -93,6 +102,7 @@ type AuthNKeysData struct {
 type AuthNKeyData struct {
 	ID            string
 	CreationDate  time.Time
+	ChangeDate    time.Time
 	ResourceOwner string
 	Sequence      uint64
 
@@ -115,15 +125,17 @@ func (q *AuthNKeySearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries) (authNKeys *AuthNKeys, err error) {
+func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQueries, withOwnerRemoved bool) (authNKeys *AuthNKeys, err error) {
 	query, scan := prepareAuthNKeysQuery()
 	query = queries.toQuery(query)
-	stmt, args, err := query.Where(
-		sq.Eq{
-			AuthNKeyColumnEnabled.identifier():    true,
-			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		},
-	).ToSql()
+	eq := sq.Eq{
+		AuthNKeyColumnEnabled.identifier():    true,
+		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[AuthNKeyOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SAf3f", "Errors.Query.InvalidRequest")
 	}
@@ -140,14 +152,17 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	return authNKeys, err
 }
 
-func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySearchQueries) (authNKeys *AuthNKeysData, err error) {
+func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySearchQueries, withOwnerRemoved bool) (authNKeys *AuthNKeysData, err error) {
 	query, scan := prepareAuthNKeysDataQuery()
 	query = queries.toQuery(query)
-	stmt, args, err := query.Where(
-		sq.Eq{
-			AuthNKeyColumnEnabled.identifier(): true,
-		},
-	).ToSql()
+	eq := sq.Eq{
+		AuthNKeyColumnEnabled.identifier():    true,
+		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[AuthNKeyOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SAg3f", "Errors.Query.InvalidRequest")
 	}
@@ -164,7 +179,7 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	return authNKeys, err
 }
 
-func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (*AuthNKey, error) {
+func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (*AuthNKey, error) {
 	if shouldTriggerBulk {
 		projection.AuthNKeyProjection.Trigger(ctx)
 	}
@@ -173,12 +188,15 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			AuthNKeyColumnID.identifier():         id,
-			AuthNKeyColumnEnabled.identifier():    true,
-			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		AuthNKeyColumnID.identifier():         id,
+		AuthNKeyColumnEnabled.identifier():    true,
+		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[AuthNKeyOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AGhg4", "Errors.Query.SQLStatement")
 	}
@@ -187,21 +205,34 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 	return scan(row)
 }
 
-func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id string, identifier string) ([]byte, error) {
+func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id string, identifier string, withOwnerRemoved bool) ([]byte, error) {
 	stmt, scan := prepareAuthNKeyPublicKeyQuery()
-	query, args, err := stmt.Where(
-		sq.And{
+	eq := sq.And{
+		sq.Eq{
+			AuthNKeyColumnID.identifier():         id,
+			AuthNKeyColumnIdentifier.identifier(): identifier,
+			AuthNKeyColumnEnabled.identifier():    true,
+			AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		},
+		sq.Gt{
+			AuthNKeyColumnExpiration.identifier(): time.Now(),
+		},
+	}
+	if !withOwnerRemoved {
+		eq = sq.And{
 			sq.Eq{
 				AuthNKeyColumnID.identifier():         id,
 				AuthNKeyColumnIdentifier.identifier(): identifier,
 				AuthNKeyColumnEnabled.identifier():    true,
 				AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				AuthNKeyOwnerRemovedCol.identifier():  false,
 			},
 			sq.Gt{
 				AuthNKeyColumnExpiration.identifier(): time.Now(),
 			},
-		},
-	).ToSql()
+		}
+	}
+	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-DAb32", "Errors.Query.SQLStatement")
 	}
@@ -226,6 +257,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
+			AuthNKeyColumnChangeDate.identifier(),
 			AuthNKeyColumnResourceOwner.identifier(),
 			AuthNKeyColumnSequence.identifier(),
 			AuthNKeyColumnExpiration.identifier(),
@@ -240,6 +272,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 				err := rows.Scan(
 					&authNKey.ID,
 					&authNKey.CreationDate,
+					&authNKey.ChangeDate,
 					&authNKey.ResourceOwner,
 					&authNKey.Sequence,
 					&authNKey.Expiration,
@@ -269,6 +302,7 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
+			AuthNKeyColumnChangeDate.identifier(),
 			AuthNKeyColumnResourceOwner.identifier(),
 			AuthNKeyColumnSequence.identifier(),
 			AuthNKeyColumnExpiration.identifier(),
@@ -279,6 +313,7 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 			err := row.Scan(
 				&authNKey.ID,
 				&authNKey.CreationDate,
+				&authNKey.ChangeDate,
 				&authNKey.ResourceOwner,
 				&authNKey.Sequence,
 				&authNKey.Expiration,
@@ -317,6 +352,7 @@ func prepareAuthNKeysDataQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthN
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
+			AuthNKeyColumnChangeDate.identifier(),
 			AuthNKeyColumnResourceOwner.identifier(),
 			AuthNKeyColumnSequence.identifier(),
 			AuthNKeyColumnExpiration.identifier(),
@@ -333,6 +369,7 @@ func prepareAuthNKeysDataQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthN
 				err := rows.Scan(
 					&authNKey.ID,
 					&authNKey.CreationDate,
+					&authNKey.ChangeDate,
 					&authNKey.ResourceOwner,
 					&authNKey.Sequence,
 					&authNKey.Expiration,

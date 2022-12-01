@@ -44,19 +44,19 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.projects2.id,`+
-						` projections.projects2.creation_date,`+
-						` projections.projects2.change_date,`+
-						` projections.projects2.resource_owner,`+
-						` projections.projects2.state,`+
-						` projections.projects2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.projects2.project_role_assertion,`+
-						` projections.projects2.project_role_check,`+
-						` projections.projects2.has_project_check,`+
-						` projections.projects2.private_labeling_setting,`+
+					regexp.QuoteMeta(`SELECT projections.projects3.id,`+
+						` projections.projects3.creation_date,`+
+						` projections.projects3.change_date,`+
+						` projections.projects3.resource_owner,`+
+						` projections.projects3.state,`+
+						` projections.projects3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.projects3.project_role_assertion,`+
+						` projections.projects3.project_role_check,`+
+						` projections.projects3.has_project_check,`+
+						` projections.projects3.private_labeling_setting,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.projects2`),
+						` FROM projections.projects3`),
 					nil,
 					nil,
 				),
@@ -68,19 +68,19 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.projects2.id,`+
-						` projections.projects2.creation_date,`+
-						` projections.projects2.change_date,`+
-						` projections.projects2.resource_owner,`+
-						` projections.projects2.state,`+
-						` projections.projects2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.projects2.project_role_assertion,`+
-						` projections.projects2.project_role_check,`+
-						` projections.projects2.has_project_check,`+
-						` projections.projects2.private_labeling_setting,`+
+					regexp.QuoteMeta(`SELECT projections.projects3.id,`+
+						` projections.projects3.creation_date,`+
+						` projections.projects3.change_date,`+
+						` projections.projects3.resource_owner,`+
+						` projections.projects3.state,`+
+						` projections.projects3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.projects3.project_role_assertion,`+
+						` projections.projects3.project_role_check,`+
+						` projections.projects3.has_project_check,`+
+						` projections.projects3.private_labeling_setting,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.projects2`),
+						` FROM projections.projects3`),
 					[]string{
 						"id",
 						"creation_date",
@@ -138,19 +138,19 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.projects2.id,`+
-						` projections.projects2.creation_date,`+
-						` projections.projects2.change_date,`+
-						` projections.projects2.resource_owner,`+
-						` projections.projects2.state,`+
-						` projections.projects2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.projects2.project_role_assertion,`+
-						` projections.projects2.project_role_check,`+
-						` projections.projects2.has_project_check,`+
-						` projections.projects2.private_labeling_setting,`+
+					regexp.QuoteMeta(`SELECT projections.projects3.id,`+
+						` projections.projects3.creation_date,`+
+						` projections.projects3.change_date,`+
+						` projections.projects3.resource_owner,`+
+						` projections.projects3.state,`+
+						` projections.projects3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.projects3.project_role_assertion,`+
+						` projections.projects3.project_role_check,`+
+						` projections.projects3.has_project_check,`+
+						` projections.projects3.private_labeling_setting,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.projects2`),
+						` FROM projections.projects3`),
 					[]string{
 						"id",
 						"creation_date",
@@ -234,19 +234,19 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.projects2.id,`+
-						` projections.projects2.creation_date,`+
-						` projections.projects2.change_date,`+
-						` projections.projects2.resource_owner,`+
-						` projections.projects2.state,`+
-						` projections.projects2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.projects2.project_role_assertion,`+
-						` projections.projects2.project_role_check,`+
-						` projections.projects2.has_project_check,`+
-						` projections.projects2.private_labeling_setting,`+
+					regexp.QuoteMeta(`SELECT projections.projects3.id,`+
+						` projections.projects3.creation_date,`+
+						` projections.projects3.change_date,`+
+						` projections.projects3.resource_owner,`+
+						` projections.projects3.state,`+
+						` projections.projects3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.projects3.project_role_assertion,`+
+						` projections.projects3.project_role_check,`+
+						` projections.projects3.has_project_check,`+
+						` projections.projects3.private_labeling_setting,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.projects2`),
+						` FROM projections.projects3`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -263,18 +263,18 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					`SELECT projections.projects2.id,`+
-						` projections.projects2.creation_date,`+
-						` projections.projects2.change_date,`+
-						` projections.projects2.resource_owner,`+
-						` projections.projects2.state,`+
-						` projections.projects2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.projects2.project_role_assertion,`+
-						` projections.projects2.project_role_check,`+
-						` projections.projects2.has_project_check,`+
-						` projections.projects2.private_labeling_setting`+
-						` FROM projections.projects2`,
+					`SELECT projections.projects3.id,`+
+						` projections.projects3.creation_date,`+
+						` projections.projects3.change_date,`+
+						` projections.projects3.resource_owner,`+
+						` projections.projects3.state,`+
+						` projections.projects3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.projects3.project_role_assertion,`+
+						` projections.projects3.project_role_check,`+
+						` projections.projects3.has_project_check,`+
+						` projections.projects3.private_labeling_setting`+
+						` FROM projections.projects3`,
 					nil,
 					nil,
 				),
@@ -292,18 +292,18 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.projects2.id,`+
-						` projections.projects2.creation_date,`+
-						` projections.projects2.change_date,`+
-						` projections.projects2.resource_owner,`+
-						` projections.projects2.state,`+
-						` projections.projects2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.projects2.project_role_assertion,`+
-						` projections.projects2.project_role_check,`+
-						` projections.projects2.has_project_check,`+
-						` projections.projects2.private_labeling_setting`+
-						` FROM projections.projects2`),
+					regexp.QuoteMeta(`SELECT projections.projects3.id,`+
+						` projections.projects3.creation_date,`+
+						` projections.projects3.change_date,`+
+						` projections.projects3.resource_owner,`+
+						` projections.projects3.state,`+
+						` projections.projects3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.projects3.project_role_assertion,`+
+						` projections.projects3.project_role_check,`+
+						` projections.projects3.has_project_check,`+
+						` projections.projects3.private_labeling_setting`+
+						` FROM projections.projects3`),
 					[]string{
 						"id",
 						"creation_date",
@@ -351,18 +351,18 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.projects2.id,`+
-						` projections.projects2.creation_date,`+
-						` projections.projects2.change_date,`+
-						` projections.projects2.resource_owner,`+
-						` projections.projects2.state,`+
-						` projections.projects2.sequence,`+
-						` projections.projects2.name,`+
-						` projections.projects2.project_role_assertion,`+
-						` projections.projects2.project_role_check,`+
-						` projections.projects2.has_project_check,`+
-						` projections.projects2.private_labeling_setting`+
-						` FROM projections.projects2`),
+					regexp.QuoteMeta(`SELECT projections.projects3.id,`+
+						` projections.projects3.creation_date,`+
+						` projections.projects3.change_date,`+
+						` projections.projects3.resource_owner,`+
+						` projections.projects3.state,`+
+						` projections.projects3.sequence,`+
+						` projections.projects3.name,`+
+						` projections.projects3.project_role_assertion,`+
+						` projections.projects3.project_role_check,`+
+						` projections.projects3.has_project_check,`+
+						` projections.projects3.private_labeling_setting`+
+						` FROM projections.projects3`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
