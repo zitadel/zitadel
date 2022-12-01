@@ -212,7 +212,7 @@ export function SetAuthRequest() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <div className="flex flex-col">
-            <label className={`${labelClasses} text-emerald-500`}>Prompt</label>
+            <label className={`${labelClasses} text-cyan-500`}>Prompt</label>
             <Listbox value={prompt} onChange={setPrompt}>
               <div className="relative">
                 <Listbox.Button className="transition-colors duration-300 text-black dark:text-white h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-solid border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500">
@@ -254,7 +254,7 @@ export function SetAuthRequest() {
                               {type}
                             </span>
                             {selected ? (
-                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-emerald-500 dark:text-emerald-400">
+                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-cyan-500 dark:text-cyan-400">
                                 <CheckIcon
                                   className="h-5 w-5"
                                   aria-hidden="true"
@@ -289,7 +289,7 @@ export function SetAuthRequest() {
             <span className={hintClasses}>
               This in combination with a{" "}
               <span className="text-black dark:text-white">select_account</span>{" "}
-              <span className="text-emerald-500">prompt</span> the login will
+              <span className="text-cyan-500">prompt</span> the login will
               preselect a user.
             </span>
           </div>
@@ -416,7 +416,7 @@ export function SetAuthRequest() {
             scope
           )}`}</CodeSnipped>
           {prompt && (
-            <CodeSnipped cname="text-emerald-500">{`&prompt=${encodeURIComponent(
+            <CodeSnipped cname="text-cyan-500">{`&prompt=${encodeURIComponent(
               prompt
             )}`}</CodeSnipped>
           )}
@@ -429,7 +429,7 @@ export function SetAuthRequest() {
 
         <a
           target="_blank"
-          className="flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
+          className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
           href={`${instance}oauth/v2/authorize?client_id=${encodeURIComponent(
             clientId
           )}&redirect_uri=${encodeURIComponent(
