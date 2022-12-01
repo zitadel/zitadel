@@ -420,13 +420,11 @@ export function SetAuthRequest() {
               prompt
             )}`}</CodeSnipped>
           )}
-          {loginHint &&
-            prompt ===
-              "select_account"(
-                <CodeSnipped cname="text-rose-500">{`&login_hint=${encodeURIComponent(
-                  loginHint
-                )}`}</CodeSnipped>
-              )}
+          {loginHint && prompt === "select_account" && (
+            <CodeSnipped cname="text-rose-500">{`&login_hint=${encodeURIComponent(
+              loginHint
+            )}`}</CodeSnipped>
+          )}
         </code>
 
         <a
@@ -447,7 +445,7 @@ export function SetAuthRequest() {
           }`}
         >
           <span>Try it out</span>
-          <i className="text-md ml-2 las la-external-link-alt"></i>
+          <i className="text-white text-md ml-2 las la-external-link-alt"></i>
         </a>
       </div>
     </div>
