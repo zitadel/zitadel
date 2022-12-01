@@ -2,12 +2,14 @@
 module.exports = {
   darkMode: ["class", '[data-theme="dark"]'],
   content: ["./docs/**/*.{js,ts,jsx,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
+  corePlugins: { preflight: false },
   theme: {
     fontFamily: {
       sans: ["Lato", "serif"],
     },
     extend: {
       colors: {
+        zitadelpink: "#ff2069",
         primary: {
           dark: {
             100: "#afd1f2",
