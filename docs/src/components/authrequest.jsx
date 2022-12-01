@@ -159,8 +159,7 @@ export function SetAuthRequest() {
                 </span>
               </Listbox.Button>
               <span className={`${hintClasses} flex`}>
-                This is the resource id of an application. It's the application
-                where you want your users to login.
+                Determines whether a code, id_token token or just id_token will be returned. Most use cases will need code.
               </span>
               <Transition
                 as={Fragment}
