@@ -19,36 +19,6 @@ export function SetAuthRequest() {
     // organizationId: [organizationId, setOrganizationId],
   } = useContext(AuthRequestContext);
 
-  //   useEffect(() => {
-  //     const params = new URLSearchParams(window.location.search);
-
-  //     const instance_param = params.get("instance");
-  //     const client_id = params.get("client-id");
-  //     const redirect_uri = params.get("redirect-uri");
-  //     const response_type = params.get("response_type");
-  //     const scope_param = params.get("scope");
-
-  //     // optional parameters
-  //     const prompt_param = params.get("prompt");
-  //     // const id_token_hint = params.get("id_token_hint");
-  //     // const organization_id = params.get("organization_id");
-
-  //     setInstance(instance_param ?? "https://mydomain-xyza.zitadel.cloud/");
-  //     setClientId(client_id ?? "170086824411201793@yourapp");
-  //     setRedirectUri(
-  //       redirect_uri ?? "http://localhost:8080/api/auth/callback/zitadel"
-  //     );
-  //     setResponseType(response_type ?? "code");
-  //     setScope(scope_param ?? "openid email profile");
-  //     setPrompt(prompt_param ?? "none");
-
-  //     // optional parameters
-  //     // setIdTokenHint(id_token_hint ?? "[your-id-token-hint]");
-  //     // setOrganizationId(organization_id ?? "168811945419506433");
-
-  //     console.log(instance_param);
-  //   }, []);
-
   const inputClasses = (error) =>
     clsx({
       "w-full sm:text-sm h-10 mb-2px rounded-md p-2 bg-input-light-background dark:bg-input-dark-background transition-colors duration-300": true,
@@ -59,6 +29,7 @@ export function SetAuthRequest() {
     });
 
   const labelClasses = "text-sm";
+  const hintClasses = "mt-1 text-xs text-black/50 dark:text-white/50";
 
   const allResponseTypes = ["code", "id_token", "id_token token"];
 
@@ -99,9 +70,12 @@ export function SetAuthRequest() {
     );
   }
 
-  //   useEffect(() => {
-  //     setScopeState(allScopes.map((s) => scope.includes(s)));
-  //   }, []);
+  useEffect(() => {
+    const newScopeState = allScopes.map((s) => scope.includes(s));
+    if (scopeState !== newScopeState) {
+      setScopeState(newScopeState);
+    }
+  }, [scope]);
 
   return (
     <div className="bg-white/5 rounded-md p-6 shadow">
@@ -119,6 +93,10 @@ export function SetAuthRequest() {
             setInstance(value);
           }}
         />
+        <span className={hintClasses}>
+          This is the resource id of an application. It's the application where
+          you want your users to login.
+        </span>
       </div>
 
       <h5 className="text-lg mt-6 mb-2 font-semibold">Required Parameters</h5>
@@ -135,6 +113,10 @@ export function SetAuthRequest() {
               setClientId(value);
             }}
           />
+          <span className={hintClasses}>
+            This is the resource id of an application. It's the application
+            where you want your users to login.
+          </span>
         </div>
 
         <div className="flex flex-col">
@@ -150,6 +132,10 @@ export function SetAuthRequest() {
               setRedirectUri(value);
             }}
           />
+          <span className={hintClasses}>
+            Must be one of the pre-configured redirect uris for your
+            application.
+          </span>
         </div>
 
         <div className="flex flex-col">
@@ -167,13 +153,17 @@ export function SetAuthRequest() {
                   />
                 </span>
               </Listbox.Button>
+              <span className={`${hintClasses} flex`}>
+                This is the resource id of an application. It's the application
+                where you want your users to login.
+              </span>
               <Transition
                 as={Fragment}
                 leave="transition ease-in duration-100"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                <Listbox.Options className="z-10 top-10 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                   {allResponseTypes.map((type, typeIdx) => (
                     <Listbox.Option
                       key={typeIdx}
@@ -229,13 +219,16 @@ export function SetAuthRequest() {
                     />
                   </span>
                 </Listbox.Button>
+                <span className={`${hintClasses} flex`}>
+                  Define if and how the user should be prompted on login.
+                </span>
                 <Transition
                   as={Fragment}
                   leave="transition ease-in duration-100"
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  <Listbox.Options className="z-10 absolute top-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                     {allPrompts.map((type, typeIdx) => (
                       <Listbox.Option
                         key={typeIdx}
@@ -277,6 +270,11 @@ export function SetAuthRequest() {
 
       <div className="py-4">
         <p className="text-sm mt-0 mb-0 text-purple-500">Scopes</p>
+        <span className={`${hintClasses} flex mb-2`}>
+          Request additional information about the user with scopes. The claims
+          (results of scopes) will be returned on the userinfo_endpoint or in
+          the token (when configured).
+        </span>
         {allScopes.map((scope, scopeIndex) => {
           return (
             <div key={`scope-${scope}`} className="flex flex-row items-center">

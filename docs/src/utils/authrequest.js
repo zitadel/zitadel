@@ -17,8 +17,8 @@ export default ({ children }) => {
     const params = new URLSearchParams(window.location.search);
 
     const instance_param = params.get("instance");
-    const client_id = params.get("client-id");
-    const redirect_uri = params.get("redirect-uri");
+    const client_id = params.get("client_id");
+    const redirect_uri = params.get("redirect_uri");
     const response_type = params.get("response_type");
     const scope_param = params.get("scope");
 
@@ -35,6 +35,20 @@ export default ({ children }) => {
     setResponseType(response_type ?? "code");
     setScope(scope_param ?? "openid email profile");
     setPrompt(prompt_param ?? "none");
+
+    if (
+      instance_param ||
+      client_id ||
+      redirect_uri ||
+      response_type ||
+      scope_param ||
+      prompt_param
+    ) {
+      const example = document.getElementById("example");
+      if (example) {
+        example.scrollIntoView();
+      }
+    }
 
     // optional parameters
     // setIdTokenHint(id_token_hint ?? "[your-id-token-hint]");
