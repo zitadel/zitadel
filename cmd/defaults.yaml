@@ -160,7 +160,7 @@ Auth:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
-    ConcurrentInstances: 10
+    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -168,7 +168,7 @@ Admin:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
-    ConcurrentInstances: 10
+    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -566,6 +566,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -639,6 +640,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -710,6 +712,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"

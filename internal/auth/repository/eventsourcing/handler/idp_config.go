@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -15,7 +17,7 @@ import (
 )
 
 const (
-	idpConfigTable = "auth.idp_configs"
+	idpConfigTable = "auth.idp_configs2"
 )
 
 type IDPConfig struct {
@@ -23,21 +25,21 @@ type IDPConfig struct {
 	subscription *v1.Subscription
 }
 
-func newIDPConfig(h handler) *IDPConfig {
+func newIDPConfig(ctx context.Context, h handler) *IDPConfig {
 	idpConfig := &IDPConfig{
 		handler: h,
 	}
 
-	idpConfig.subscribe()
+	idpConfig.subscribe(ctx)
 
 	return idpConfig
 }
 
-func (i *IDPConfig) subscribe() {
+func (i *IDPConfig) subscribe(ctx context.Context) {
 	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
 	go func() {
 		for event := range i.subscription.Events {
-			query.ReduceEvent(i, event)
+			query.ReduceEvent(ctx, i, event)
 		}
 	}()
 }
@@ -62,8 +64,8 @@ func (i *IDPConfig) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPConfig) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
-	sequences, err := i.view.GetLatestIDPConfigSequences(instanceIDs...)
+func (i *IDPConfig) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
+	sequences, err := i.view.GetLatestIDPConfigSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +121,8 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 		return i.view.DeleteIDPConfig(idp.IDPConfigID, event)
 	case instance.InstanceRemovedEventType:
 		return i.view.DeleteInstanceIDPs(event)
+	case org.OrgRemovedEventType:
+		return i.view.UpdateOrgOwnerRemovedIDPs(event)
 	default:
 		return i.view.ProcessedIDPConfigSequence(event)
 	}
@@ -129,10 +133,10 @@ func (i *IDPConfig) processIdpConfig(providerType iam_model.IDPProviderType, eve
 }
 
 func (i *IDPConfig) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-Ejf8s", "id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in idp config handler")
 	return spooler.HandleError(event, err, i.view.GetLatestIDPConfigFailedEvent, i.view.ProcessedIDPConfigFailedEvent, i.view.ProcessedIDPConfigSequence, i.errorCountUntilSkip)
 }
 
-func (i *IDPConfig) OnSuccess() error {
-	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp)
+func (i *IDPConfig) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(i.view.UpdateIDPConfigSpoolerRunTimestamp, instanceIDs)
 }

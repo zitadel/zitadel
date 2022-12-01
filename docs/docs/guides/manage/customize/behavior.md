@@ -36,13 +36,13 @@ https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js
 
 ## Run the action when a user registers
 
-Now, make the action hook into the [external authentication flow](../../../apis/actions#external-authentication-flow).
+Now, make the action hook into the [external authentication flow](../../../apis/actions/register-flow#external-authentication).
 
 1. In the **Flows <i class="las la-exchange-alt"></i>** section, select the **+ New** button.
-1. Select the **Flow Type** *External Authentication*.
-1. Select the **Trigger Type** *Post Creation*.
-1. In the **Actions** dropdown, check *addGrant*.
-1. Select the **Save** button.
+2. Select the **Flow Type** *External Authentication*.
+3. Select the **Trigger Type** *Post Creation*.
+4. In the **Actions** dropdown, check *addGrant*.
+5. Select the **Save** button.
 
 <!-- TODO: ## Test if your action works -->
 
@@ -51,4 +51,4 @@ New users automatically are assiged a role now if they register by authenticatin
 ## What's next?
 
 - [Read more about the concepts around actions](../../../concepts/features/actions)
-- [Read more about all the options you have with actions](../../../apis/actions)
+- [Read more about all the options you have with actions](../../../apis/actions/introduction)

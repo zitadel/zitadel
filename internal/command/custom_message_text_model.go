@@ -168,9 +168,7 @@ func (wm *CustomMessageTemplatesReadModel) Reduce() error {
 				wm.CustomMessageTemplate[e.Template+e.Language.String()].FooterText = ""
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
-			if _, ok := wm.CustomMessageTemplate[e.Template+e.Language.String()]; ok {
-				delete(wm.CustomMessageTemplate, e.Template+e.Language.String())
-			}
+			delete(wm.CustomMessageTemplate, e.Template+e.Language.String())
 		}
 	}
 	return wm.WriteModel.Reduce()

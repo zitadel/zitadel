@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -141,6 +142,9 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 }
 
 func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	filter, query, scan := prepareInstancesQuery()
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
@@ -158,7 +162,10 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 	return instances, err
 }
 
-func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (*Instance, error) {
+func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Instance, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.InstanceProjection.Trigger(ctx)
 	}
@@ -178,7 +185,10 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (*Instan
 	return scan(row)
 }
 
-func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
+func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Instance, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareInstanceDomainQuery(host)
 	host = strings.Split(host, ":")[0] //remove possible port
 	query, args, err := stmt.Where(sq.Eq{

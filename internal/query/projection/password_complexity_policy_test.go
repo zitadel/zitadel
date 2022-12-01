@@ -45,7 +45,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.password_complexity_policies2 (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -89,7 +89,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.password_complexity_policies2 SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -123,7 +123,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.password_complexity_policies WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.password_complexity_policies2 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -150,7 +150,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.password_complexity_policies WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.password_complexity_policies2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -182,7 +182,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.password_complexity_policies2 (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -226,7 +226,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.password_complexity_policies SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.password_complexity_policies2 SET (change_date, sequence, min_length, has_lowercase, has_uppercase, has_symbol, has_number) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -237,6 +237,36 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								"agg-id",
 								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&passwordComplexityProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.password_complexity_policies2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
 							},
 						},
 					},
