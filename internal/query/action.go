@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -113,6 +114,9 @@ func (q *ActionSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries, withOwnerRemoved bool) (actions *Actions, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareActionsQuery()
 	eq := sq.Eq{
 		ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -137,7 +141,10 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	return actions, err
 }
 
-func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, withOwnerRemoved bool) (*Action, error) {
+func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, withOwnerRemoved bool) (_ *Action, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareActionQuery()
 	eq := sq.Eq{
 		ActionColumnID.identifier():            id,

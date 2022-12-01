@@ -16,10 +16,10 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type MessageTexts struct {
@@ -122,7 +122,10 @@ var (
 	}
 )
 
-func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) {
+func (q *Queries) DefaultMessageText(ctx context.Context) (_ *MessageText, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		MessageTextColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -137,7 +140,10 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) 
 	return scan(row)
 }
 
-func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx context.Context, messageType, language string) (*MessageText, error) {
+func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx context.Context, messageType, language string) (_ *MessageText, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	contents, err := q.readNotificationTextMessages(ctx, language)
 	if err != nil {
 		return nil, err
@@ -149,7 +155,10 @@ func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx context.
 	return messageTexts.GetMessageTextByType(messageType), nil
 }
 
-func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string, withOwnerRemoved bool) (*MessageText, error) {
+func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string, withOwnerRemoved bool) (_ *MessageText, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareMessageTextQuery()
 	eq := sq.Eq{
 		MessageTextColLanguage.identifier():    language,
@@ -174,7 +183,10 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 	return msg, err
 }
 
-func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (*MessageText, error) {
+func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (_ *MessageText, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	contents, err := q.readNotificationTextMessages(ctx, language)
 	if err != nil {
 		return nil, err
