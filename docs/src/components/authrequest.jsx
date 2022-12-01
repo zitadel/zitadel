@@ -415,16 +415,18 @@ export function SetAuthRequest() {
           <CodeSnipped cname="text-purple-500">{`&scope=${encodeURIComponent(
             scope
           )}`}</CodeSnipped>
-          {prompt && prompt === "select_account" && (
+          {prompt && (
             <CodeSnipped cname="text-emerald-500">{`&prompt=${encodeURIComponent(
               prompt
             )}`}</CodeSnipped>
           )}
-          {loginHint && (
-            <CodeSnipped cname="text-rose-500">{`&login_hint=${encodeURIComponent(
-              loginHint
-            )}`}</CodeSnipped>
-          )}
+          {loginHint &&
+            prompt ===
+              "select_account"(
+                <CodeSnipped cname="text-rose-500">{`&login_hint=${encodeURIComponent(
+                  loginHint
+                )}`}</CodeSnipped>
+              )}
         </code>
 
         <a
