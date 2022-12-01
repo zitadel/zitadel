@@ -34,7 +34,7 @@ export function SetAuthRequest() {
 
   const allResponseTypes = ["code", "id_token", "id_token token"];
 
-  const allPrompts = ["none", "login", "select_account", "create"];
+  const allPrompts = ["", "login", "select_account", "create"];
 
   const CodeSnipped = ({ cname, children }) => {
     return <span className={cname}>{children}</span>;
@@ -238,7 +238,7 @@ export function SetAuthRequest() {
                       <Listbox.Option
                         key={typeIdx}
                         className={({ active }) =>
-                          `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                          `h-10 relative cursor-default select-none py-2 pl-10 pr-4 ${
                             active ? "bg-black/20 dark:bg-white/20" : ""
                           }`
                         }
@@ -272,24 +272,28 @@ export function SetAuthRequest() {
           </div>
         </div>
 
-        <div className="flex flex-col">
-          <label className={`${labelClasses} text-rose-500`}>Login hint</label>
-          <input
-            className={inputClasses(false)}
-            id="login_hint"
-            value={loginHint}
-            onChange={(event) => {
-              const value = event.target.value;
-              setLoginHint(value);
-            }}
-          />
-          <span className={hintClasses}>
-            This in combination with a{" "}
-            <span className="text-black dark:text-white">select_account</span>{" "}
-            <span className="text-emerald-500">prompt</span> the login will
-            preselect a user.
-          </span>
-        </div>
+        {prompt === "select_account" && (
+          <div className="flex flex-col">
+            <label className={`${labelClasses} text-rose-500`}>
+              Login hint
+            </label>
+            <input
+              className={inputClasses(false)}
+              id="login_hint"
+              value={loginHint}
+              onChange={(event) => {
+                const value = event.target.value;
+                setLoginHint(value);
+              }}
+            />
+            <span className={hintClasses}>
+              This in combination with a{" "}
+              <span className="text-black dark:text-white">select_account</span>{" "}
+              <span className="text-emerald-500">prompt</span> the login will
+              preselect a user.
+            </span>
+          </div>
+        )}
 
         {/* <div className="flex flex-col">
           <label className={`${labelClasses} text-blue-500`}>
@@ -411,12 +415,16 @@ export function SetAuthRequest() {
           <CodeSnipped cname="text-purple-500">{`&scope=${encodeURIComponent(
             scope
           )}`}</CodeSnipped>
-          <CodeSnipped cname="text-emerald-500">{`&prompt=${encodeURIComponent(
-            prompt
-          )}`}</CodeSnipped>
-          <CodeSnipped cname="text-rose-500">{`&login_hint=${encodeURIComponent(
-            loginHint
-          )}`}</CodeSnipped>
+          {prompt && (
+            <CodeSnipped cname="text-emerald-500">{`&prompt=${encodeURIComponent(
+              prompt
+            )}`}</CodeSnipped>
+          )}
+          {loginHint && (
+            <CodeSnipped cname="text-rose-500">{`&login_hint=${encodeURIComponent(
+              loginHint
+            )}`}</CodeSnipped>
+          )}
         </code>
 
         <a
@@ -428,9 +436,9 @@ export function SetAuthRequest() {
             redirectUri
           )}&response_type=${encodeURIComponent(
             responseType
-          )}&scope=${encodeURIComponent(scope)}&prompt=${encodeURIComponent(
-            prompt
-          )}&login_hint=${encodeURIComponent(loginHint)}`}
+          )}&scope=${encodeURIComponent(scope)}${
+            prompt ? `&prompt=${encodeURIComponent(prompt)}` : ""
+          }${loginHint ? `&login_hint=${encodeURIComponent(loginHint)}` : ""}`}
         >
           <span>Try it out</span>
           <i className="text-md ml-2 las la-external-link-alt"></i>

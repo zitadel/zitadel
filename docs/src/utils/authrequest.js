@@ -36,7 +36,7 @@ export default ({ children }) => {
     );
     setResponseType(response_type ?? "code");
     setScope(scope_param ?? "openid email profile");
-    setPrompt(prompt_param ?? "none");
+    setPrompt(prompt_param ?? "");
 
     // optional parameters
     setLoginHint(login_hint ?? "johndoe@example.zitadel.cloud");
