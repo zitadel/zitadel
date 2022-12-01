@@ -35,7 +35,7 @@ Open the Console (`https://{YourDomain}.zitadel.cloud/ui/console/projects`) and 
 Then on the project detail page click on new application and enter a name for this app.
 Let's call this one `portal-web`.
 Select `Web`, continue, `CODE`, then enter `http://localhost:3000/api/auth/callback/zitadel` for the redirect, and `http://localhost:3000` for the post redirect. Then press on `create`.
-As the requests from your application to ZITADEL are made on NextJS serverside, you can safely select `CODE`. This makes sure you still get a secret which is then used in combination with PKCE. Note that the secret never gets exposed on the browser and is kept in a confidential environment.
+Because the requests from your NextJS application to ZITADEL are made on the server side, you can safely select `CODE`. With this you still get a secret which is then usable alongside PKCE. Your secret never gets exposed on the browser since it is kept in your NextJS server.
 
 Copy the "Resource Id" of the project `Portal` as you will need this in your environment configuration file later.
 
