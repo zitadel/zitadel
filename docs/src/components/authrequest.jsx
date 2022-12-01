@@ -101,7 +101,9 @@ export function SetAuthRequest() {
             setInstance(value);
           }}
         />
-        <span className={hintClasses}>The domain of your zitadel instance with trailing slash.</span>
+        <span className={hintClasses}>
+          The domain of your zitadel instance with trailing slash.
+        </span>
       </div>
 
       <h5 className="text-lg mt-6 mb-2 font-semibold">Required Parameters</h5>
@@ -159,7 +161,8 @@ export function SetAuthRequest() {
                 </span>
               </Listbox.Button>
               <span className={`${hintClasses} flex`}>
-                Determines whether a code, id_token token or just id_token will be returned. Most use cases will need code.
+                Determines whether a code, id_token token or just id_token will
+                be returned. Most use cases will need code.
               </span>
               <Transition
                 as={Fragment}
@@ -339,7 +342,8 @@ export function SetAuthRequest() {
             }}
           />
           <span className={hintClasses}>
-            Enforce organization policies and user membership by requesting the <span className="text-purple-500">scope</span>{" "}
+            Enforce organization policies and user membership by requesting the{" "}
+            <span className="text-purple-500">scope</span>{" "}
             <code>urn:zitadel:iam:org:id:{organizationId}</code>
           </span>
         </div>
@@ -348,7 +352,9 @@ export function SetAuthRequest() {
       <div className="py-4">
         <p className="text-sm mt-0 mb-0 text-purple-500">Scopes</p>
         <span className={`${hintClasses} flex mb-2`}>
-          Request additional information about the user with scopes. The claims will be returned on the userinfo_endpoint or in the token (when configured).
+          Request additional information about the user with scopes. The claims
+          will be returned on the userinfo_endpoint or in the token (when
+          configured).
         </span>
         {allScopes.map((scope, scopeIndex) => {
           return (
@@ -393,7 +399,9 @@ export function SetAuthRequest() {
         </div>
       </div> */}
 
-      <br />
+      <h5 className="text-lg mt-6 mb-2 font-semibold">
+        Your authorization request
+      </h5>
 
       <div className="rounded-md bg-gray-700 shadow dark:bg-black/10 p-2 flex flex-col items-center">
         <code className="text-sm w-full mb-4 bg-transparent border-none">
@@ -424,6 +432,11 @@ export function SetAuthRequest() {
         </code>
 
         <a
+          onClick={() => {
+            window.plausible("OIDC Playground", {
+              props: { method: "Try it out", pageloc: "Authorize" },
+            });
+          }}
           target="_blank"
           className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
           href={`${instance}oauth/v2/authorize?client_id=${encodeURIComponent(
