@@ -93,10 +93,7 @@ export function SetAuthRequest() {
             setInstance(value);
           }}
         />
-        <span className={hintClasses}>
-          This is the resource id of an application. It's the application where
-          you want your users to login.
-        </span>
+        <span className={hintClasses}>The domain of your zitadel instance</span>
       </div>
 
       <h5 className="text-lg mt-6 mb-2 font-semibold">Required Parameters</h5>
