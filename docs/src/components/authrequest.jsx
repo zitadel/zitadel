@@ -348,9 +348,7 @@ export function SetAuthRequest() {
       <div className="py-4">
         <p className="text-sm mt-0 mb-0 text-purple-500">Scopes</p>
         <span className={`${hintClasses} flex mb-2`}>
-          Request additional information about the user with scopes. The claims
-          (results of scopes) will be returned on the userinfo_endpoint or in
-          the token (when configured).
+          Request additional information about the user with scopes. The claims will be returned on the userinfo_endpoint or in the token (when configured).
         </span>
         {allScopes.map((scope, scopeIndex) => {
           return (
