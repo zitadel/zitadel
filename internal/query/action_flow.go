@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -65,7 +66,10 @@ type Flow struct {
 	TriggerActions map[domain.TriggerType][]*Action
 }
 
-func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string, withOwnerRemoved bool) (*Flow, error) {
+func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string, withOwnerRemoved bool) (_ *Flow, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareFlowQuery(flowType)
 	eq := sq.Eq{
 		FlowsTriggersColumnFlowType.identifier():      flowType,
@@ -87,7 +91,10 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	return scan(rows)
 }
 
-func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string, withOwnerRemoved bool) ([]*Action, error) {
+func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string, withOwnerRemoved bool) (_ []*Action, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareTriggerActionsQuery()
 	eq := sq.Eq{
 		FlowsTriggersColumnFlowType.identifier():      flowType,
@@ -111,7 +118,10 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 	return scan(rows)
 }
 
-func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, withOwnerRemoved bool) ([]domain.FlowType, error) {
+func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, withOwnerRemoved bool) (_ []domain.FlowType, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareFlowTypesQuery()
 	eq := sq.Eq{
 		FlowsTriggersColumnActionID.identifier():   actionID,

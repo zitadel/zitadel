@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type MailTemplate struct {
@@ -68,7 +69,10 @@ var (
 	}
 )
 
-func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*MailTemplate, error) {
+func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (_ *MailTemplate, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareMailTemplateQuery()
 	eq := sq.Eq{MailTemplateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -92,7 +96,10 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwner
 	return scan(row)
 }
 
-func (q *Queries) DefaultMailTemplate(ctx context.Context) (*MailTemplate, error) {
+func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareMailTemplateQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),

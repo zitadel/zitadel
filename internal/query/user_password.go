@@ -2,13 +2,14 @@ package query
 
 import (
 	"context"
+	"time"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"time"
 )
 
 type HumanPasswordWriteModel struct {
@@ -26,15 +27,18 @@ type HumanPasswordWriteModel struct {
 }
 
 func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (passwordHash []byte, algorithm string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if userID == "" {
-		return nil, "", caos_errs.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
+		return nil, "", errors.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
 	}
 	existingPassword, err := q.passwordWriteModel(ctx, userID, orgID)
 	if err != nil {
-		return nil, "", caos_errs.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
+		return nil, "", errors.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return nil, "", caos_errs.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
+		return nil, "", errors.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
 	}
 
 	if existingPassword.Secret != nil && existingPassword.Secret.Crypted != nil {

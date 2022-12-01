@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type PrivacyPolicy struct {
@@ -84,7 +85,10 @@ var (
 	}
 )
 
-func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*PrivacyPolicy, error) {
+func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (_ *PrivacyPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.PrivacyPolicyProjection.Trigger(ctx)
 	}
@@ -110,7 +114,10 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 	return scan(row)
 }
 
-func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bool) (*PrivacyPolicy, error) {
+func (q *Queries) DefaultPrivacyPolicy(ctx context.Context, shouldTriggerBulk bool) (_ *PrivacyPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.PrivacyPolicyProjection.Trigger(ctx)
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type LabelPolicy struct {
@@ -40,7 +41,10 @@ type Theme struct {
 	IconURL         string
 }
 
-func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*LabelPolicy, error) {
+func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (_ *LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareLabelPolicyQuery()
 	eq := sq.Eq{
 		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
@@ -67,7 +71,10 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, with
 	return scan(row)
 }
 
-func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*LabelPolicy, error) {
+func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (_ *LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.And{
@@ -94,7 +101,10 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 	return scan(row)
 }
 
-func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
+func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (_ *LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		LabelPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),
@@ -111,7 +121,10 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, e
 	return scan(row)
 }
 
-func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
+func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (_ *LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		LabelPolicyColID.identifier():         authz.GetInstance(ctx).InstanceID(),

@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Users struct {
@@ -316,7 +317,10 @@ func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
 }
 
-func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*User, error) {
+func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (_ *User, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
@@ -342,7 +346,10 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	return scan(row)
 }
 
-func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (*User, error) {
+func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (_ *User, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
@@ -367,7 +374,10 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	return scan(row)
 }
 
-func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*Profile, error) {
+func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (_ *Profile, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareProfileQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
@@ -388,7 +398,10 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerR
 	return scan(row)
 }
 
-func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*Email, error) {
+func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (_ *Email, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareEmailQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
@@ -409,7 +422,10 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRem
 	return scan(row)
 }
 
-func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*Phone, error) {
+func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (_ *Phone, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := preparePhoneQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
@@ -430,7 +446,10 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRem
 	return scan(row)
 }
 
-func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (*NotifyUser, error) {
+func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (_ *NotifyUser, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggered {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
@@ -456,7 +475,10 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	return scan(row)
 }
 
-func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withOwnerRemoved bool, queries ...SearchQuery) (*NotifyUser, error) {
+func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withOwnerRemoved bool, queries ...SearchQuery) (_ *NotifyUser, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggered {
 		projection.UserProjection.Trigger(ctx)
 		projection.LoginNameProjection.Trigger(ctx)
@@ -481,7 +503,10 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	return scan(row)
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, withOwnerRemoved bool) (*Users, error) {
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, withOwnerRemoved bool) (_ *Users, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareUsersQuery()
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -505,7 +530,10 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, w
 	return users, err
 }
 
-func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwner string, withOwnerRemoved bool) (bool, error) {
+func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwner string, withOwnerRemoved bool) (_ bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareUserUniqueQuery()
 	queries := make([]SearchQuery, 0, 3)
 	if username != "" {

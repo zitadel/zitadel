@@ -9,10 +9,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/query/projection"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -99,7 +99,10 @@ type ProjectSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (*Project, error) {
+func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (_ *Project, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.ProjectProjection.Trigger(ctx)
 	}
@@ -122,6 +125,9 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 }
 
 func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries, withOwnerRemoved bool) (projects *Projects, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareProjectsQuery()
 	eq := sq.Eq{ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {

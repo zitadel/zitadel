@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type UserGrant struct {
@@ -216,7 +217,10 @@ func addUserGrantWithoutOwnerRemoved(eq map[string]interface{}) {
 	addLoginNameWithoutOwnerRemoved(eq)
 }
 
-func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (*UserGrant, error) {
+func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (_ *UserGrant, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.UserGrantProjection.Trigger(ctx)
 	}
@@ -238,7 +242,10 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 	return scan(row)
 }
 
-func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, withOwnerRemoved bool) (*UserGrants, error) {
+func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, withOwnerRemoved bool) (_ *UserGrants, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareUserGrantsQuery()
 	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
