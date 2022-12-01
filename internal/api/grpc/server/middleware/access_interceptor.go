@@ -20,7 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore/access"
 )
 
-func AccessInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
+func AccessLimitInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 
 		instance := authz.GetInstance(ctx)
@@ -30,38 +30,47 @@ func AccessInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 			err = nil
 		}
 
-		if limit {
-			return nil, status.Error(codes.ResourceExhausted, "quota for authenticated requests exceeded")
-		}
-
 		resp, err := handler(ctx, req)
+		if limit {
+			err = status.Error(codes.ResourceExhausted, "quota for authenticated requests exceeded")
+		}
+		return resp, err
+	}
+}
+func AccessStorageInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 
+		reqMd, _ := metadata.FromIncomingContext(ctx)
+
+		resp, handlerErr := handler(ctx, req)
 		var respStatus uint32
-		grpcErr, ok := status.FromError(err)
+		grpcErr, ok := status.FromError(handlerErr)
 		if ok {
 			respStatus = uint32(grpcErr.Code())
 		}
 
-		md, _ := metadata.FromIncomingContext(ctx)
+		resMd, _ := metadata.FromOutgoingContext(ctx)
+		instance := authz.GetInstance(ctx)
 
+		// TODO: Why is the instance missing at some paths like /oauth, /.well-known and /ui? Should we fix that for the access logs?
 		record := &logstore.AccessLogRecord{
 			Timestamp:       time.Now(),
 			Protocol:        logstore.GRPC,
 			RequestURL:      info.FullMethod,
 			ResponseStatus:  respStatus,
-			RequestHeaders:  nil,
-			ResponseHeaders: http.Header(md),
+			RequestHeaders:  http.Header(reqMd),
+			ResponseHeaders: http.Header(resMd),
 			InstanceID:      instance.InstanceID(),
 			ProjectID:       instance.ProjectID(),
 			RequestedDomain: instance.RequestedDomain(),
 			RequestedHost:   instance.RequestedHost(),
 		}
 
-		if err = svc.Handle(ctx, record); err != nil {
+		if err := svc.Handle(ctx, record); err != nil {
 			logging.Warnf("failed to handle access log: %s", err.Error())
 			err = nil
 		}
 
-		return resp, err
+		return resp, handlerErr
 	}
 }

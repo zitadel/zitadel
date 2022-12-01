@@ -21,20 +21,17 @@ func NewAccessInterceptor(svc *access.Service) *AccessInterceptor {
 	return &AccessInterceptor{svc: svc}
 }
 
-func (a *AccessInterceptor) Handler(next http.Handler) http.Handler {
+func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 	if !a.svc.Enabled() {
 		return next
 	}
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
-
-		requestURL := request.RequestURI
-		unescapedURL, err := url.QueryUnescape(requestURL)
-		if err != nil {
-			logging.Warningf("failed to unescape request url %s", requestURL)
-		}
+		next.ServeHTTP(wrappedWriter, request)
 
 		ctx := request.Context()
+
+		// TODO: Why is the instance always empty?
 		instance := authz.GetInstance(ctx)
 		limit, err := a.svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
@@ -46,8 +43,11 @@ func (a *AccessInterceptor) Handler(next http.Handler) http.Handler {
 			wrappedWriter.WriteHeader(http.StatusTooManyRequests)
 		}
 
-		next.ServeHTTP(wrappedWriter, request)
-
+		requestURL := request.RequestURI
+		unescapedURL, err := url.QueryUnescape(requestURL)
+		if err != nil {
+			logging.Warningf("failed to unescape request url %s", requestURL)
+		}
 		err = a.svc.Handle(ctx, &logstore.AccessLogRecord{
 			Timestamp:       time.Now(),
 			Protocol:        logstore.HTTP,

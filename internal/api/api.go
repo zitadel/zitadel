@@ -84,7 +84,7 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) erro
 }
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
-	handler = a.accessInterceptor.Handler(handler)
+	handler = a.accessInterceptor.Handle(handler)
 	prefix = strings.TrimSuffix(prefix, "/")
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))

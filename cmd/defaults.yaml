@@ -323,7 +323,7 @@ LogStore:
     Enabled: true
     Debounce:
       MinFrequency: 2m
-      MaxBulkSize: 1000
+      MaxBulkSize: 0
 
 DefaultInstance:
   InstanceName:
@@ -554,7 +554,7 @@ DefaultInstance:
       - Unit: "requests.all.authenticated"
         # Start Time for the quota periods
         From: "2022-10-24 00:00:00"
-        Interval: 120s
+        Interval: 720h
         Amount: 20
         Limit: true
         Notifications:

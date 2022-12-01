@@ -69,8 +69,8 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 			item.Protocol,
 			item.RequestURL,
 			item.ResponseStatus,
-			pruneHeaders(item.RequestHeaders),
-			pruneHeaders(item.ResponseHeaders),
+			pruneRequestHeaders(item.RequestHeaders), // TODO: Do we have to redact more secrets
+			item.ResponseHeaders,
 			item.InstanceID,
 			item.ProjectID,
 			item.RequestedDomain,
@@ -107,17 +107,16 @@ func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instan
 			squirrel.Eq{accessInstanceIdCol: instanceId},
 			squirrel.GtOrEq{accessTimestampCol: start},
 			squirrel.LtOrEq{accessTimestampCol: end},
+			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, zitadel_http.Authorization)),
 			squirrel.Or{
 				squirrel.And{
 					squirrel.Eq{accessProtocolCol: logstore.HTTP},
-					squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, zitadel_http.Authorization)),
 					squirrel.NotEq{accessResponseStatusCol: http.StatusForbidden},
 					squirrel.NotEq{accessResponseStatusCol: http.StatusInternalServerError},
 					squirrel.NotEq{accessResponseStatusCol: http.StatusTooManyRequests},
 				},
 				squirrel.And{
 					squirrel.Eq{accessProtocolCol: logstore.GRPC},
-					squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessResponseHeadersCol, zitadel_http.Authorization)),
 					squirrel.NotEq{accessResponseStatusCol: codes.ResourceExhausted},
 				},
 			},
@@ -139,7 +138,7 @@ func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instan
 	return count, nil
 }
 
-func pruneHeaders(header http.Header) http.Header {
+func pruneRequestHeaders(header http.Header) http.Header {
 	clonedHeader := header.Clone()
 	for key := range clonedHeader {
 		if strings.ToLower(key) == strings.ToLower(zitadel_http.Authorization) {

@@ -38,15 +38,16 @@ func CreateServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.DefaultTracingServer(),
+				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_MethodPrefix),
+				middleware.AccessStorageInterceptor(accessSvc),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
-				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_MethodPrefix),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
-				middleware.AccessInterceptor(accessSvc),
+				middleware.AccessLimitInterceptor(accessSvc),
 			),
 		),
 	}
