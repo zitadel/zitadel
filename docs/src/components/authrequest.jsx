@@ -224,7 +224,7 @@ export function SetAuthRequest() {
                   </span>
                 </Listbox.Button>
                 <span className={`${hintClasses} flex`}>
-                  Define if and how the user should be prompted on login.
+                  Define how the user should be prompted on login and register.
                 </span>
                 <Transition
                   as={Fragment}
