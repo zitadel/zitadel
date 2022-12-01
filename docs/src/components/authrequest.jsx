@@ -101,7 +101,7 @@ export function SetAuthRequest() {
             setInstance(value);
           }}
         />
-        <span className={hintClasses}>The domain of your zitadel instance</span>
+        <span className={hintClasses}>The domain of your zitadel instance with trailing slash.</span>
       </div>
 
       <h5 className="text-lg mt-6 mb-2 font-semibold">Required Parameters</h5>
