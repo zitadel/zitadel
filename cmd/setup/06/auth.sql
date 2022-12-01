@@ -45,7 +45,7 @@ CREATE TABLE auth.users2 (
 
     PRIMARY KEY (instance_id, id)
 );
-CREATE INDEX owner_removed_idx ON auth.users2 (owner_removed);
+CREATE INDEX IF NOT EXISTS owner_removed_idx ON auth.users2 (owner_removed);
 
 CREATE TABLE auth.user_external_idps2 (
     external_user_id TEXT NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE auth.user_external_idps2 (
 
     PRIMARY KEY (instance_id, external_user_id, idp_config_id)
 );
-CREATE INDEX owner_removed_idx ON auth.user_external_idps2 (owner_removed);
+CREATE INDEX IF NOT EXISTS owner_removed_idx ON auth.user_external_idps2 (owner_removed);
 
 CREATE TABLE auth.org_project_mapping2 (
     org_id TEXT NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE auth.org_project_mapping2 (
 
     PRIMARY KEY (instance_id, org_id, project_id)
 );
-CREATE INDEX owner_removed_idx ON auth.org_project_mapping2 (owner_removed);
+CREATE INDEX IF NOT EXISTS owner_removed_idx ON auth.org_project_mapping2 (owner_removed);
 
 CREATE TABLE auth.idp_providers2 (
     aggregate_id TEXT NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE auth.idp_providers2 (
 
     PRIMARY KEY (instance_id, aggregate_id, idp_config_id)
 );
-CREATE INDEX owner_removed_idx ON auth.idp_providers2 (owner_removed);
+CREATE INDEX IF NOT EXISTS owner_removed_idx ON auth.idp_providers2 (owner_removed);
 
 CREATE TABLE auth.idp_configs2 (
     idp_config_id TEXT NOT NULL,
@@ -121,4 +121,4 @@ CREATE TABLE auth.idp_configs2 (
 
     PRIMARY KEY (instance_id, idp_config_id)
 );
-CREATE INDEX owner_removed_idx ON auth.idp_configs2 (owner_removed);
+CREATE INDEX IF NOT EXISTS owner_removed_idx ON auth.idp_configs2 (owner_removed);
