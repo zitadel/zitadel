@@ -15,8 +15,9 @@ export function SetAuthRequest() {
     responseType: [responseType, setResponseType],
     scope: [scope, setScope],
     prompt: [prompt, setPrompt],
-    // idTokenHint: [idTokenHint, setIdTokenHint],
-    // organizationId: [organizationId, setOrganizationId],
+    loginHint: [loginHint, setLoginHint],
+    idTokenHint: [idTokenHint, setIdTokenHint],
+    organizationId: [organizationId, setOrganizationId],
   } = useContext(AuthRequestContext);
 
   const inputClasses = (error) =>
@@ -48,6 +49,9 @@ export function SetAuthRequest() {
     "urn:zitadel:iam:org:project:id:zitadel:aud",
     "urn:zitadel:iam:user:metadata",
     "urn:zitadel:iam:user:resourceowner",
+    `urn:zitadel:iam:org:id:${
+      organizationId ? organizationId : "[organizationId]"
+    }`,
   ];
 
   const [scopeState, setScopeState] = useState(
@@ -55,10 +59,14 @@ export function SetAuthRequest() {
     // new Array(allScopes.length).fill(false)
   );
 
-  function toggleScope(position) {
+  function toggleScope(position, forceChecked = false) {
     const updatedCheckedState = scopeState.map((item, index) =>
       index === position ? !item : item
     );
+
+    if (forceChecked) {
+      updatedCheckedState[position] = true;
+    }
 
     setScopeState(updatedCheckedState);
 
@@ -263,6 +271,76 @@ export function SetAuthRequest() {
             </Listbox>
           </div>
         </div>
+
+        <div className="flex flex-col">
+          <label className={`${labelClasses} text-rose-500`}>Login hint</label>
+          <input
+            className={inputClasses(false)}
+            id="login_hint"
+            value={loginHint}
+            onChange={(event) => {
+              const value = event.target.value;
+              setLoginHint(value);
+            }}
+          />
+          <span className={hintClasses}>
+            This in combination with a{" "}
+            <span className="text-black dark:text-white">select_account</span>{" "}
+            <span className="text-emerald-500">prompt</span> the login will
+            preselect a user.
+          </span>
+        </div>
+
+        {/* <div className="flex flex-col">
+          <label className={`${labelClasses} text-blue-500`}>
+            ID Token hint
+          </label>
+          <input
+            className={inputClasses(false)}
+            id="id_token_hint"
+            value={idTokenHint}
+            onChange={(event) => {
+              const value = event.target.value;
+              setIdTokenHint(value);
+            }}
+          />
+          <span className={hintClasses}>
+            This in combination with a{" "}
+            <span className="text-black dark:text-white">select_account</span>{" "}
+            <span className="text-emerald-500">prompt</span> the login will
+            preselect a user.
+          </span>
+        </div> */}
+
+        <div className="flex flex-col">
+          <label className={`${labelClasses} text-purple-500`}>
+            Organization ID
+          </label>
+          <input
+            className={inputClasses(false)}
+            id="organization_id"
+            value={organizationId}
+            onChange={(event) => {
+              const value = event.target.value;
+              setOrganizationId(value);
+              allScopes[8] = `urn:zitadel:iam:org:id:${
+                value ? value : "[organizationId]"
+              }`;
+              toggleScope(8, true);
+              setScope(
+                scopeState
+                  .map((checked, i) => (checked ? allScopes[i] : ""))
+                  .filter((s) => !!s)
+                  .join(" ")
+              );
+            }}
+          />
+          <span className={hintClasses}>
+            When requesting the <span className="text-purple-500">scope</span>{" "}
+            <code>urn:zitadel:iam:org:id:{organizationId}`</code>, ZITADEL will
+            enforce that the user is a member of the selected organization
+          </span>
+        </div>
       </div>
 
       <div className="py-4">
@@ -286,7 +364,12 @@ export function SetAuthRequest() {
                 }}
               />
               <label className="ml-4" htmlFor={`scope_${scope}`}>
-                {scope}
+                {scope}{" "}
+                {scopeIndex === 8 && scopeState[8] && !organizationId ? (
+                  <strong className="text-red-500">
+                    Organization ID missing!
+                  </strong>
+                ) : null}
               </label>
             </div>
           );
@@ -331,12 +414,23 @@ export function SetAuthRequest() {
           <CodeSnipped cname="text-emerald-500">{`&prompt=${encodeURIComponent(
             prompt
           )}`}</CodeSnipped>
+          <CodeSnipped cname="text-rose-500">{`&login_hint=${encodeURIComponent(
+            loginHint
+          )}`}</CodeSnipped>
         </code>
 
         <a
           target="_blank"
           className="flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
-          href={`${instance}oauth/v2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&reponse_type=${responseType}&scope=${scope}&prompt=${prompt}`}
+          href={`${instance}oauth/v2/authorize?client_id=${encodeURIComponent(
+            clientId
+          )}&redirect_uri=${encodeURIComponent(
+            redirectUri
+          )}&response_type=${encodeURIComponent(
+            responseType
+          )}&scope=${encodeURIComponent(scope)}&prompt=${encodeURIComponent(
+            prompt
+          )}&login_hint=${encodeURIComponent(loginHint)}`}
         >
           <span>Try it out</span>
           <i className="text-md ml-2 las la-external-link-alt"></i>

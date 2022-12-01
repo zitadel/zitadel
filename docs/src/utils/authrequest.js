@@ -10,6 +10,7 @@ export default ({ children }) => {
   const [scope, setScope] = useState("your-scope");
 
   const [prompt, setPrompt] = useState("your-prompt");
+  const [loginHint, setLoginHint] = useState("your-login-hint");
   const [idTokenHint, setIdTokenHint] = useState("your-id-token-hint");
   const [organizationId, setOrganizationId] = useState("your-organization-id");
 
@@ -24,8 +25,9 @@ export default ({ children }) => {
 
     // optional parameters
     const prompt_param = params.get("prompt");
-    // const id_token_hint = params.get("id_token_hint");
-    // const organization_id = params.get("organization_id");
+    const login_hint = params.get("login_hint");
+    const id_token_hint = params.get("id_token_hint");
+    const organization_id = params.get("organization_id");
 
     setInstance(instance_param ?? "https://mydomain-xyza.zitadel.cloud/");
     setClientId(client_id ?? "170086824411201793@yourapp");
@@ -36,23 +38,27 @@ export default ({ children }) => {
     setScope(scope_param ?? "openid email profile");
     setPrompt(prompt_param ?? "none");
 
+    // optional parameters
+    setLoginHint(login_hint ?? "johndoe@example.zitadel.cloud");
+    setIdTokenHint(id_token_hint ?? "[your-id-token]");
+    setOrganizationId(organization_id ?? "168811945419506433");
+
     if (
       instance_param ||
       client_id ||
       redirect_uri ||
       response_type ||
       scope_param ||
-      prompt_param
+      prompt_param ||
+      organization_id ||
+      login_hint ||
+      id_token_hint
     ) {
       const example = document.getElementById("example");
       if (example) {
         example.scrollIntoView();
       }
     }
-
-    // optional parameters
-    // setIdTokenHint(id_token_hint ?? "[your-id-token-hint]");
-    // setOrganizationId(organization_id ?? "168811945419506433");
   }, []);
 
   const authRequest = {
@@ -62,8 +68,9 @@ export default ({ children }) => {
     responseType: [responseType, setResponseType],
     scope: [scope, setScope],
     prompt: [prompt, setPrompt],
-    // idTokenHint: [idTokenHint, setIdTokenHint],
-    // organizationId: [organizationId, setOrganizationId],
+    loginHint: [loginHint, setLoginHint],
+    idTokenHint: [idTokenHint, setIdTokenHint],
+    organizationId: [organizationId, setOrganizationId],
   };
 
   return (
