@@ -339,9 +339,8 @@ export function SetAuthRequest() {
             }}
           />
           <span className={hintClasses}>
-            When requesting the <span className="text-purple-500">scope</span>{" "}
-            <code>urn:zitadel:iam:org:id:{organizationId}`</code>, ZITADEL will
-            enforce that the user is a member of the selected organization
+            Enforce organization policies and user membership by requesting the <span className="text-purple-500">scope</span>{" "}
+            <code>urn:zitadel:iam:org:id:{organizationId}</code>
           </span>
         </div>
       </div>
