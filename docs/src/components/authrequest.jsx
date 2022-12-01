@@ -415,7 +415,7 @@ export function SetAuthRequest() {
           <CodeSnipped cname="text-purple-500">{`&scope=${encodeURIComponent(
             scope
           )}`}</CodeSnipped>
-          {prompt && (
+          {prompt && prompt === "select_account" && (
             <CodeSnipped cname="text-emerald-500">{`&prompt=${encodeURIComponent(
               prompt
             )}`}</CodeSnipped>
@@ -438,7 +438,11 @@ export function SetAuthRequest() {
             responseType
           )}&scope=${encodeURIComponent(scope)}${
             prompt ? `&prompt=${encodeURIComponent(prompt)}` : ""
-          }${loginHint ? `&login_hint=${encodeURIComponent(loginHint)}` : ""}`}
+          }${
+            loginHint && prompt === "select_account"
+              ? `&login_hint=${encodeURIComponent(loginHint)}`
+              : ""
+          }`}
         >
           <span>Try it out</span>
           <i className="text-md ml-2 las la-external-link-alt"></i>
