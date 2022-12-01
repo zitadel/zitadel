@@ -350,41 +350,41 @@ main .container img {
   color: white;
 }
 
-.rounded-start {
+.custom-rounded-start {
   background: linear-gradient(40deg, #059669 30%, #047857);
 }
 
-.rounded-password {
+.custom-rounded-password {
   background: linear-gradient(40deg, #f59e0b 30%, #b45309);
 }
 
-.rounded-login,
-.rounded-register {
+.custom-rounded-login,
+.custom-rounded-register {
   background: linear-gradient(40deg, #059669 30%, #047857);
 }
 
-.rounded-privatelabel,
-.rounded-phone,
-.rounded-email,
-.rounded-storage,
-.rounded-service {
+.custom-rounded-privatelabel,
+.custom-rounded-phone,
+.custom-rounded-email,
+.custom-rounded-storage,
+.custom-rounded-service {
   background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
 }
 
-.rounded-split {
+.custom-rounded-split {
   background: linear-gradient(40deg, #3b82f6, #4f46e5);
 }
 
-.rounded-texts,
-.rounded-help,
-.rounded-architecture {
+.custom-rounded-texts,
+.custom-rounded-help,
+.custom-rounded-architecture {
   background: linear-gradient(40deg, #dc2626 30%, #db2777);
 }
 
-.rounded-system,
-.rounded-apis,
-.rounded-policy,
-.rounded-instance {
+.custom-rounded-system,
+.custom-rounded-apis,
+.custom-rounded-policy,
+.custom-rounded-instance {
   background: linear-gradient(40deg, #1f2937, #111827);
 }
 

@@ -12,26 +12,3 @@ h5 {
   font-size: 14px;
   margin: 0;
 }
-
-.fillspace {
-  flex: 1;
-}
-
-.bottom {
-  display: flex;
-  align-items: center;
-}
-
-.bottomicon {
-  width: 24px;
-  margin-right: 0.5rem;
-  color: var(--ifm-font-color-base);
-}
-
-.bottomspan {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ifm-font-color-base);
-  text-transform: uppercase;
-  margin: 0;
-}

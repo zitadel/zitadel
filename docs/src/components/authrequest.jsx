@@ -22,7 +22,7 @@ export function SetAuthRequest() {
   const inputClasses = (error) =>
     clsx({
       "w-full sm:text-sm h-10 mb-2px rounded-md p-2 bg-input-light-background dark:bg-input-dark-background transition-colors duration-300": true,
-      "border border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500": true,
+      "border border-solid border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500": true,
       "focus:outline-none focus:ring-0 text-base text-black dark:text-white placeholder:italic placeholder-gray-700 dark:placeholder-gray-700": true,
       "border border-warn-light-500 dark:border-warn-dark-500 hover:border-warn-light-500 hover:dark:border-warn-dark-500 focus:border-warn-light-500 focus:dark:border-warn-dark-500":
         error,
@@ -141,7 +141,7 @@ export function SetAuthRequest() {
           </label>
           <Listbox value={responseType} onChange={setResponseType}>
             <div className="relative">
-              <Listbox.Button className="transition-colors duration-300 text-black dark:text-white h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500">
+              <Listbox.Button className="transition-colors duration-300 text-black dark:text-white h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-solid border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500">
                 <span className="block truncate">{responseType}</span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                   <ChevronUpDownIcon
@@ -160,7 +160,7 @@ export function SetAuthRequest() {
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Listbox.Options className="z-10 top-10 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                <Listbox.Options className="pl-0 list-none z-10 top-10 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                   {allResponseTypes.map((type, typeIdx) => (
                     <Listbox.Option
                       key={typeIdx}
@@ -207,7 +207,7 @@ export function SetAuthRequest() {
             <label className={`${labelClasses} text-emerald-500`}>Prompt</label>
             <Listbox value={prompt} onChange={setPrompt}>
               <div className="relative">
-                <Listbox.Button className="transition-colors duration-300 text-black dark:text-white h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500">
+                <Listbox.Button className="transition-colors duration-300 text-black dark:text-white h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-solid border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500">
                   <span className="block truncate">{prompt}</span>
                   <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                     <ChevronUpDownIcon
@@ -225,7 +225,7 @@ export function SetAuthRequest() {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <Listbox.Options className="z-10 absolute top-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  <Listbox.Options className="pl-0 list-none z-10 absolute top-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                     {allPrompts.map((type, typeIdx) => (
                       <Listbox.Option
                         key={typeIdx}
@@ -312,10 +312,10 @@ export function SetAuthRequest() {
 
       <br />
 
-      <div className="rounded-md bg-gray-200 shadow dark:bg-white/10 p-2 flex flex-col items-center">
-        <code className="text-sm w-full mb-4">
+      <div className="rounded-md bg-gray-700 shadow dark:bg-black/10 p-2 flex flex-col items-center">
+        <code className="text-sm w-full mb-4 bg-transparent border-none">
           <span className="text-yellow-500">{instance}</span>
-          <span>oauth/v2/authorize</span>
+          <span className="text-white">oauth/v2/authorize</span>
           <CodeSnipped cname="text-green-500">{`?client_id=${encodeURIComponent(
             clientId
           )}`}</CodeSnipped>
@@ -335,7 +335,7 @@ export function SetAuthRequest() {
 
         <a
           target="_blank"
-          className="flex flex-row items-center py-2 px-4 bg-green-500 dark:bg-green-600 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
+          className="flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
           href={`${instance}oauth/v2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&reponse_type=${responseType}&scope=${scope}&prompt=${prompt}`}
         >
           <span>Try it out</span>
