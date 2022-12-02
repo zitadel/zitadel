@@ -8,7 +8,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
@@ -75,7 +74,7 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     MatSelectModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatDialogModule,
     MatCheckboxModule,
     CardModule,

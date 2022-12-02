@@ -7,7 +7,7 @@
   <div class="idp-create-content">
     <h1>{{ 'IDP.CREATE.TITLE' | translate }}</h1>
 
-    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+    <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
 
     <ng-container *ngIf="currentCreateStep === 1">
       <p class="desc cnsl-secondary-text">{{ 'IDP.CREATE.DESCRIPTION' | translate }}</p>

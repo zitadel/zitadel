@@ -20,7 +20,7 @@
 
   <button (click)="editUserProfile()" mat-stroked-button>{{ 'USER.EDITACCOUNT' | translate }}</button>
   <div class="l-accounts">
-    <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
+    <mat-spinner *ngIf="loadingUsers" diameter="20"></mat-spinner>
     <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
       <cnsl-avatar
         *ngIf="session && session.displayName"

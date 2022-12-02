@@ -4,8 +4,7 @@
   [currentCreateStep]="1"
   (closed)="close()"
 >
-  <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
-
+  <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
   <div class="machine-create-main-content">
     <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="machine-create-form">
       <div class="machine-create-content">

@@ -15,8 +15,7 @@
   (closed)="close()"
 >
   <h1>{{ 'APP.PAGES.CREATE_DESC_TITLE' | translate }}</h1>
-  <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-
+  <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
   <mat-checkbox class="proswitch" color="primary" [(ngModel)]="devmode">
     {{ 'APP.PROSWITCH' | translate }}
   </mat-checkbox>

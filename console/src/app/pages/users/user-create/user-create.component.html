@@ -5,8 +5,7 @@
   (closed)="close()"
 >
   <div class="user-create-main-content">
-    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
-
+    <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
     <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="user-create-form">
       <div class="user-create-content">
         <p class="user-create-section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>

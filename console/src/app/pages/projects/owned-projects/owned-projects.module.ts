@@ -6,7 +6,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
@@ -49,7 +48,7 @@ import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
     WarnDialogModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatCheckboxModule,
     CardModule,
     MatTooltipModule,
