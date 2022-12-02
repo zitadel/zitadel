@@ -82,7 +82,7 @@ export class OwnedProjectDetailComponent implements OnInit {
     });
   }
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     const projectId = this.route.snapshot.paramMap.get(ROUTEPARAM);
     if (projectId) {
       this.projectId = projectId;
