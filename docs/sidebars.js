@@ -234,6 +234,7 @@ module.exports = {
       collapsed: false,
       items: [
         "apis/openidoauth/endpoints",
+        "apis/openidoauth/authrequest",
         "apis/openidoauth/scopes",
         "apis/openidoauth/claims",
         "apis/openidoauth/authn-methods",

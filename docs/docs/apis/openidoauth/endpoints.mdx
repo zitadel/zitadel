@@ -2,8 +2,6 @@
 title: Endpoints
 ---
 
-import { SetAuthRequest } from "../../../src/components/authrequest";
-
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
@@ -103,9 +101,6 @@ no additional parameters required
 | state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well, therefore highly **recommended**.                                                                                                                                                                                                                                                                                                                     |
 | ui_locales    | Spaces delimited list of preferred locales for the login UI, e.g. `de-CH de en`. If none is provided or matches the possible locales provided by the login UI, the `accept-language` header of the browser will be taken into account.                                                                                                                                                                                                                                                         |
 
-#### Example
-
-<SetAuthRequest />
 
 ### Successful Code Response
 
