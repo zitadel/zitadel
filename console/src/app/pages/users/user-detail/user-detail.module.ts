@@ -12,7 +12,6 @@ import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-t
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { QrCodeModule } from 'ng-qrcode';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
@@ -57,6 +56,7 @@ import { PasswordlessComponent } from './user-detail/passwordless/passwordless.c
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
+import { QRCodeModule } from 'angularx-qrcode';
 
 @NgModule({
   declarations: [
@@ -88,7 +88,7 @@ import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
     DetailFormMachineModule,
     WarnDialogModule,
     MatDialogModule,
-    QrCodeModule,
+    QRCodeModule,
     ShowTokenDialogModule,
     MetaLayoutModule,
     MatCheckboxModule,
