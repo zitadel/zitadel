@@ -17,7 +17,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
-import { QuicklinkModule } from 'ngx-quicklink';
 import { from, Observable } from 'rxjs';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
@@ -105,7 +104,6 @@ const authConfig: AuthConfig = {
     }),
     NavModule,
     MatNativeDateModule,
-    QuicklinkModule,
     HasRoleModule,
     InfoOverlayModule,
     BrowserAnimationsModule,
