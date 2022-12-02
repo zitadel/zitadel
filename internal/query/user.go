@@ -302,35 +302,77 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if shouldTriggerBulk {
-		projection_old.UserProjection.Trigger(ctx)
-		// projection_old.LoginNameProjection.Trigger(ctx)
-	}
+	// if shouldTriggerBulk {
+	// projection_old.UserProjection.Trigger(ctx)
+	// projection_old.LoginNameProjection.Trigger(ctx)
+	// }
 
-	query, scan := prepareUserQuery()
-	for _, q := range queries {
-		query = q.toQuery(query)
-	}
-	stmt, args, err := query.Where(sq.Eq{
-		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-FBg21", "Errors.Query.SQLStatment")
-	}
+	// query, scan := prepareUserQuery()
+	// for _, q := range queries {
+	// 	query = q.toQuery(query)
+	// }
+	// stmt, args, err := query.Where(sq.Eq{
+	// 	UserIDCol.identifier():         userID,
+	// 	UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	// }).ToSql()
+	// if err != nil {
+	// 	return nil, errors.ThrowInternal(err, "QUERY-FBg21", "Errors.Query.SQLStatment")
+	// }
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	u, err := scan(row)
+	// row := q.client.QueryRowContext(ctx, stmt, args...)
+	// u, err := scan(row)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	user := projection.NewUser(userID, authz.GetInstance(ctx).InstanceID())
+	events, err := q.eventstore.Filter(ctx, user.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
 	}
+	user.Reduce(events)
 
-	loginNames := projection.NewLoginNamesWithOwner(u.ID, authz.GetInstance(ctx).InstanceID(), u.ResourceOwner)
-	events, err := q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))
+	loginNames := projection.NewUserLoginNamesWithOwner(user.ID, authz.GetInstance(ctx).InstanceID(), user.ResourceOwner)
+	events, err = q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
 	}
 	loginNames.Reduce(events)
+
+	return mapUser(user, loginNames), nil
+}
+
+func mapUser(user *projection.User, loginNames *projection.UserLoginNames) *User {
+	u := &User{
+		ID:            user.ID,
+		CreationDate:  user.CreationDate,
+		ChangeDate:    user.ChangeDate,
+		ResourceOwner: user.ResourceOwner,
+		Sequence:      user.Sequence,
+		State:         user.State,
+		Type:          user.Type,
+		Username:      user.Username,
+	}
+
+	if user.Human != nil {
+		u.Human = new(Human)
+		u.Human.FirstName = user.Human.Profile.FirstName
+		u.Human.LastName = user.Human.Profile.LastName
+		u.Human.NickName = user.Human.Profile.NickName
+		u.Human.DisplayName = user.Human.Profile.DisplayName
+		u.Human.AvatarKey = user.Human.Profile.AvatarKey
+		u.Human.PreferredLanguage = user.Human.Profile.PreferredLanguage
+		u.Human.Gender = user.Human.Profile.Gender
+		u.Human.Email = user.Human.Email.Address
+		u.Human.IsEmailVerified = user.Human.Email.IsVerified
+		u.Human.Phone = user.Human.Phone.Number
+		u.Human.IsPhoneVerified = user.Human.Phone.IsVerified
+	} else if user.Machine != nil {
+		u.Machine = new(Machine)
+		u.Machine.Description = user.Machine.Description
+		u.Machine.Name = user.Machine.Name
+	}
+
 	for _, loginName := range loginNames.LoginNames {
 		u.LoginNames = append(u.LoginNames, loginName.Name)
 		if loginName.IsPrimary {
@@ -338,49 +380,50 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		}
 	}
 
-	return u, nil
+	return u
 }
 
 func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (_ *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if shouldTriggerBulk {
-		projection_old.UserProjection.Trigger(ctx)
-		// projection_old.LoginNameProjection.Trigger(ctx)
-	}
+	// if shouldTriggerBulk {
+	// projection_old.UserProjection.Trigger(ctx)
+	// projection_old.LoginNameProjection.Trigger(ctx)
+	// }
 
-	query, scan := prepareUserQuery()
-	for _, q := range queries {
-		query = q.toQuery(query)
-	}
-	stmt, args, err := query.Where(sq.Eq{
-		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
-	}
+	// query, scan := prepareUserQuery()
+	// for _, q := range queries {
+	// 	query = q.toQuery(query)
+	// }
+	// stmt, args, err := query.Where(sq.Eq{
+	// 	UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	// }).ToSql()
+	// if err != nil {
+	// 	return nil, errors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
+	// }
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	u, err := scan(row)
+	// row := q.client.QueryRowContext(ctx, stmt, args...)
+	// u, err := scan(row)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	user := projection.NewUser(userID, authz.GetInstance(ctx).InstanceID())
+	events, err := q.eventstore.Filter(ctx, user.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
 	}
+	user.Reduce(events)
 
-	loginNames := projection.NewLoginNamesWithOwner(u.ID, authz.GetInstance(ctx).InstanceID(), u.ResourceOwner)
-	events, err := q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))
+	loginNames := projection.NewUserLoginNamesWithOwner(u.ID, authz.GetInstance(ctx).InstanceID(), u.ResourceOwner)
+	events, err = q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
 	}
 	loginNames.Reduce(events)
-	for _, loginName := range loginNames.LoginNames {
-		u.LoginNames = append(u.LoginNames, loginName.Name)
-		if loginName.IsPrimary {
-			u.PreferredLoginName = loginName.Name
-		}
-	}
 
-	return u, nil
+	return mapUser(user, loginNames), nil
 }
 
 func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (_ *Profile, err error) {
