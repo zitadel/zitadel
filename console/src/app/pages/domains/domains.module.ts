@@ -37,4 +37,4 @@ import { DomainsComponent } from './domains.component';
     MatProgressSpinnerModule,
   ],
 })
-export class DomainsModule {}
+export default class DomainsModule {}

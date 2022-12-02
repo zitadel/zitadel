@@ -31,4 +31,4 @@ import { UserGrantCreateComponent } from './user-grant-create.component';
     ProjectRolesTableModule,
   ],
 })
-export class UserGrantCreateModule {}
+export default class UserGrantCreateModule {}

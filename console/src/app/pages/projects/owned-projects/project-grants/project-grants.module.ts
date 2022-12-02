@@ -46,4 +46,4 @@ import { ProjectGrantsComponent } from './project-grants.component';
   ],
   exports: [ProjectGrantsComponent],
 })
-export class ProjectGrantsModule {}
+export default class ProjectGrantsModule {}

@@ -36,4 +36,4 @@ import { UserCreateMachineComponent } from './user-create-machine.component';
     InputModule,
   ],
 })
-export class UserCreateMachineModule {}
+export default class UserCreateMachineModule {}

@@ -46,4 +46,4 @@ import { IamViewsComponent } from './iam-views.component';
   ],
   exports: [],
 })
-export class IamViewsModule {}
+export default class IamViewsModule {}

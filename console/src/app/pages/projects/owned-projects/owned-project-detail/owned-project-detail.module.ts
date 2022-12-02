@@ -32,13 +32,12 @@ import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
-
-import { ProjectGrantsModule } from '../project-grants/project-grants.module';
-import { ProjectRolesModule } from '../project-roles/project-roles.module';
 import { ApplicationGridComponent } from './application-grid/application-grid.component';
 import { ApplicationsComponent } from './applications/applications.component';
 import { OwnedProjectDetailRoutingModule } from './owned-project-detail-routing.module';
 import { OwnedProjectDetailComponent } from './owned-project-detail.component';
+import ProjectGrantsModule from '../project-grants/project-grants.module';
+import ProjectRolesModule from '../project-roles/project-roles.module';
 
 @NgModule({
   declarations: [OwnedProjectDetailComponent, ApplicationGridComponent, ApplicationsComponent],
@@ -58,7 +57,6 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     WarnDialogModule,
     MatTooltipModule,
     ProjectRolesTableModule,
-    ProjectRolesModule,
     HasRolePipeModule,
     UserGrantsModule,
     TimestampToDatePipeModule,
@@ -67,8 +65,9 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     InputModule,
     CardModule,
     PaginatorModule,
-    MatRippleModule,
     ProjectGrantsModule,
+    ProjectRolesModule,
+    MatRippleModule,
     TopViewModule,
     MatCheckboxModule,
     MatSelectModule,
@@ -82,4 +81,4 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     LocalizedDatePipeModule,
   ],
 })
-export class OwnedProjectDetailModule {}
+export default class OwnedProjectDetailModule {}

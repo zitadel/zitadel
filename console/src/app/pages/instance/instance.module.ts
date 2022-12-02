@@ -65,4 +65,4 @@ import { InstanceComponent } from './instance.component';
     SettingsGridModule,
   ],
 })
-export class InstanceModule {}
+export default class InstanceModule {}

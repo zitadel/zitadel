@@ -48,4 +48,4 @@ import { IdpComponent } from './idp.component';
     DetailLayoutModule,
   ],
 })
-export class IdpModule {}
+export default class IdpModule {}

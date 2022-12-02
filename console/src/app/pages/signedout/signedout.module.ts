@@ -10,4 +10,4 @@ import { SignedoutComponent } from './signedout.component';
   declarations: [SignedoutComponent],
   imports: [CommonModule, SignedoutRoutingModule, MatButtonModule, MatTooltipModule, TranslateModule],
 })
-export class SignedoutModule {}
+export default class SignedoutModule {}

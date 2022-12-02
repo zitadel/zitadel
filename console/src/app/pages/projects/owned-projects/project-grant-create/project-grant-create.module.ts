@@ -40,4 +40,4 @@ import { ProjectGrantCreateComponent } from './project-grant-create.component';
     TranslateModule,
   ],
 })
-export class ProjectGrantCreateModule {}
+export default class ProjectGrantCreateModule {}

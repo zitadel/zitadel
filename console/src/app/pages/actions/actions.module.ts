@@ -65,4 +65,4 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
     CodemirrorModule,
   ],
 })
-export class ActionsModule {}
+export default class ActionsModule {}

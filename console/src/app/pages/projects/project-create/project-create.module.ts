@@ -25,4 +25,4 @@ import { ProjectCreateComponent } from './project-create.component';
     TranslateModule,
   ],
 })
-export class ProjectCreateModule {}
+export default class ProjectCreateModule {}

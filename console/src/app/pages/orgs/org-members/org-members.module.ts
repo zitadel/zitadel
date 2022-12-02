@@ -35,4 +35,4 @@ import { OrgMembersComponent } from './org-members.component';
     MemberCreateDialogModule,
   ],
 })
-export class OrgMembersModule {}
+export default class OrgMembersModule {}

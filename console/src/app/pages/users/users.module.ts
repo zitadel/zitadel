@@ -9,4 +9,4 @@ import { UsersRoutingModule } from './users-routing.module';
   declarations: [],
   imports: [UsersRoutingModule, UserListModule, UserDetailModule, ChangesModule, CommonModule],
 })
-export class UsersModule {}
+export default class UsersModule {}

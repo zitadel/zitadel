@@ -62,4 +62,4 @@ import { OrgRoutingModule } from './org-routing.module';
     CopyToClipboardModule,
   ],
 })
-export class OrgModule {}
+export default class OrgModule {}

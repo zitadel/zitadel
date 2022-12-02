@@ -26,4 +26,4 @@ import { ProjectRoleCreateComponent } from './project-role-create.component';
     TranslateModule,
   ],
 })
-export class ProjectRoleCreateModule {}
+export default class ProjectRoleCreateModule {}

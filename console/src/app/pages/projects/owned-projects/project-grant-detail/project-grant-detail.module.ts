@@ -57,4 +57,4 @@ import { ProjectGrantIllustrationComponent } from './project-grant-illustration/
     MatDialogModule,
   ],
 })
-export class ProjectGrantDetailModule {}
+export default class ProjectGrantDetailModule {}

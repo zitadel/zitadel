@@ -38,4 +38,4 @@ import { OrgCreateComponent } from './org-create.component';
     MatSlideToggleModule,
   ],
 })
-export class OrgCreateModule {}
+export default class OrgCreateModule {}

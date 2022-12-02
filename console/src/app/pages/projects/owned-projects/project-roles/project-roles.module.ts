@@ -25,4 +25,4 @@ import { ProjectRolesComponent } from './project-roles.component';
   ],
   exports: [ProjectRolesComponent],
 })
-export class ProjectRolesModule {}
+export default class ProjectRolesModule {}

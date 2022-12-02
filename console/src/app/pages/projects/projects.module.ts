@@ -57,4 +57,4 @@ import { ProjectsComponent } from './projects.component';
     NavToggleModule,
   ],
 })
-export class ProjectsModule {}
+export default class ProjectsModule {}

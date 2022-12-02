@@ -27,4 +27,4 @@ import { HomeComponent } from './home.component';
     MatRippleModule,
   ],
 })
-export class HomeModule {}
+export default class HomeModule {}

@@ -31,4 +31,4 @@ import { InstanceMembersComponent } from './instance-members.component';
     MemberCreateDialogModule,
   ],
 })
-export class InstanceMembersModule {}
+export default class InstanceMembersModule {}

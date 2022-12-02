@@ -11,4 +11,4 @@ import { OrgSettingsComponent } from './org-settings.component';
   declarations: [OrgSettingsComponent],
   imports: [CommonModule, OrgSettingsRoutingModule, SettingsListModule, HasRolePipeModule, TranslateModule],
 })
-export class OrgSettingsModule {}
+export default class OrgSettingsModule {}

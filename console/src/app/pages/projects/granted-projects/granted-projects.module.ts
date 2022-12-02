@@ -70,4 +70,4 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
     RefreshTableModule,
   ],
 })
-export class GrantedProjectsModule {}
+export default class GrantedProjectsModule {}

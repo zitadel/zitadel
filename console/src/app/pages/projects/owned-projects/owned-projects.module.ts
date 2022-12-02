@@ -61,4 +61,4 @@ import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
     MatRippleModule,
   ],
 })
-export class OwnedProjectsModule {}
+export default class OwnedProjectsModule {}

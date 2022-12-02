@@ -33,4 +33,4 @@ import { ProjectMembersComponent } from './project-members.component';
     MemberCreateDialogModule,
   ],
 })
-export class ProjectMembersModule {}
+export default class ProjectMembersModule {}

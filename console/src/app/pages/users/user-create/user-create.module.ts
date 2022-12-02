@@ -42,4 +42,4 @@ import { UserCreateComponent } from './user-create.component';
     MatRippleModule,
   ],
 })
-export class UserCreateModule {}
+export default class UserCreateModule {}

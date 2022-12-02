@@ -45,4 +45,4 @@ import { FailedEventsComponent } from './failed-events.component';
     MatSortModule,
   ],
 })
-export class FailedEventsModule {}
+export default class FailedEventsModule {}

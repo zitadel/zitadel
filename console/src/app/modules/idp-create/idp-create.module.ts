@@ -39,4 +39,4 @@ import { IdpTypeRadioComponent } from './idp-type-radio/idp-type-radio.component
     MatProgressBarModule,
   ],
 })
-export class IdpCreateModule {}
+export default class IdpCreateModule {}
