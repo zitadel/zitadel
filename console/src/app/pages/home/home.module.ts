@@ -7,7 +7,6 @@ import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@ang
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
 import { HomeRoutingModule } from './home-routing.module';
@@ -23,7 +22,6 @@ import { HomeComponent } from './home.component';
     MatButtonModule,
     TranslateModule,
     MatTooltipModule,
-    SharedModule,
     MatProgressSpinnerModule,
     ShortcutsModule,
     MatRippleModule,

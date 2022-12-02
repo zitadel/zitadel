@@ -12,7 +12,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
-import { SharedModule } from '../shared/shared.module';
 import { NavComponent } from './nav.component';
 
 @NgModule({
@@ -30,7 +29,6 @@ import { NavComponent } from './nav.component';
     MatMenuModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    SharedModule,
     OverlayModule,
   ],
   exports: [NavComponent],

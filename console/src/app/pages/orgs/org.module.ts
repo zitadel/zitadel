@@ -21,7 +21,6 @@ import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
 import { NameDialogModule } from 'src/app/modules/name-dialog/name-dialog.module';
 import { SettingsGridModule } from 'src/app/modules/settings-grid/settings-grid.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -58,7 +57,6 @@ import { OrgRoutingModule } from './org-routing.module';
     MatProgressSpinnerModule,
     MetadataModule,
     TranslateModule,
-    SharedModule,
     SettingsGridModule,
     ContributorsModule,
     CopyToClipboardModule,

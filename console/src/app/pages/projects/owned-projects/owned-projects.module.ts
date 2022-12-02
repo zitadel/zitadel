@@ -18,7 +18,6 @@ import { CardModule } from 'src/app/modules/card/card.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -58,7 +57,6 @@ import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
     HasRolePipeModule,
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
-    SharedModule,
     RefreshTableModule,
     MatRippleModule,
   ],

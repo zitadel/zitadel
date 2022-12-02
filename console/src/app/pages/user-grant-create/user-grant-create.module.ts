@@ -10,7 +10,6 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
 import { SearchProjectAutocompleteModule } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.module';
 import { SearchUserAutocompleteModule } from 'src/app/modules/search-user-autocomplete/search-user-autocomplete.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 
 import { UserGrantCreateRoutingModule } from './user-grant-create-routing.module';
 import { UserGrantCreateComponent } from './user-grant-create.component';
@@ -30,7 +29,6 @@ import { UserGrantCreateComponent } from './user-grant-create.component';
     SearchProjectAutocompleteModule,
     SearchUserAutocompleteModule,
     ProjectRolesTableModule,
-    SharedModule,
   ],
 })
 export class UserGrantCreateModule {}

@@ -10,7 +10,6 @@ import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module
 import { CardModule } from 'src/app/modules/card/card.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AddDomainDialogModule } from './add-domain-dialog/add-domain-dialog.module';
@@ -23,7 +22,6 @@ import { DomainsComponent } from './domains.component';
   imports: [
     DomainsRoutingModule,
     AddDomainDialogModule,
-    SharedModule,
     CommonModule,
     MatIconModule,
     CardModule,
