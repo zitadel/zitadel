@@ -1,13 +1,13 @@
 @use '@angular/material' as mat;
 
-@import '~codemirror/lib/codemirror';
+@import 'codemirror/lib/codemirror.css';
 @import './component-themes';
 @import './styles/lato-font.scss';
 @import '@angular/material/theming';
 
 $material-design-icons-font-directory-path: '~material-design-icons-iconfont/dist/fonts/';
 
-@import '~material-design-icons-iconfont/src/material-design-icons';
+@import 'material-design-icons-iconfont/src/material-design-icons.scss';
 
 // Plus imports for other components in your app.
 
@@ -434,7 +434,6 @@ $custom-typography: mat.define-legacy-typography-config(
   $background: map-get($caos-light-app-theme, background);
   $foreground: map-get($caos-light-app-theme, foreground);
 
-  --color-main: var(--theme-light-primary-500);
   --warn: #cd3d56;
   --success: #10b981;
   $border-color: map-get($foreground, divider);
@@ -502,7 +501,6 @@ $custom-typography: mat.define-legacy-typography-config(
   $background: map-get($caos-dark-app-theme, background);
   $foreground: map-get($caos-dark-app-theme, foreground);
 
-  --color-main: var(--theme-dark-primary-500);
   --warn: #ff3b5b;
   --success: #10b981;
   $border-color: map-get($foreground, divider);
