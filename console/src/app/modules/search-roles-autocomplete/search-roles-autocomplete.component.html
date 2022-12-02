@@ -11,17 +11,11 @@
       [matAutocomplete]="auto"
     />
 
-    <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="name selection">
-      <mat-chip
-        class="chip"
-        *ngFor="let selectedRole of roles"
-        [selectable]="selectable"
-        [removable]="removable"
-        (removed)="remove(selectedRole)"
-      >
+    <mat-chip-grid *ngIf="!singleOutput" #chipList aria-label="name selection">
+      <mat-chip-row class="chip" *ngFor="let selectedRole of roles" [removable]="removable" (removed)="remove(selectedRole)">
         {{ selectedRole.displayName }}
         <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-      </mat-chip>
+      </mat-chip-row>
       <input
         cnslInput
         placeholder="Role Name"
@@ -33,7 +27,7 @@
         [matChipInputAddOnBlur]="addOnBlur"
         (matChipInputTokenEnd)="add($event)"
       />
-    </mat-chip-list>
+    </mat-chip-grid>
 
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
       <mat-option *ngIf="isLoading" class="is-loading">

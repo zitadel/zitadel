@@ -65,8 +65,8 @@
         <th mat-header-cell *matHeaderCellDef class="role-row">{{ 'ROLESLABEL' | translate }}</th>
         <td mat-cell *matCellDef="let membership">
           <div class="membership-line">
-            <mat-chip-list class="cnsl-chip-list" aria-label="role selection">
-              <mat-chip
+            <mat-chip-listbox class="cnsl-chip-list" aria-label="role selection">
+              <mat-chip-option
                 class="cnsl-chip"
                 *ngFor="let role of membership.rolesList"
                 [removable]="!!userId"
@@ -78,8 +78,8 @@
                 <button *ngIf="!!userId" matChipRemove>
                   <mat-icon>cancel</mat-icon>
                 </button>
-              </mat-chip>
-            </mat-chip-list>
+              </mat-chip-option>
+            </mat-chip-listbox>
             <button
               matTooltip="{{ 'ACTIONS.EDIT' | translate }}"
               (click)="goto(membership)"

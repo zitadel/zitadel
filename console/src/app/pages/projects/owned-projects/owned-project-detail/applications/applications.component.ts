@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MatLegacyTable as MatTable } from '@angular/material/legacy-table';
+import { MatTable } from '@angular/material/table';
 import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';

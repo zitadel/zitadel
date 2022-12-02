@@ -108,8 +108,8 @@
       <ng-container matColumnDef="roles">
         <th mat-header-cell *matHeaderCellDef class="role-row">{{ 'ROLESLABEL' | translate }}</th>
         <td mat-cell *matCellDef="let member" class="role-row">
-          <mat-chip-list class="cnsl-chip-list" aria-label="role selection">
-            <mat-chip
+          <mat-chip-listbox class="cnsl-chip-list" aria-label="role selection">
+            <mat-chip-option
               class="cnsl-chip"
               *ngFor="let role of member.rolesList"
               [removable]="canWrite"
@@ -122,8 +122,8 @@
               <button *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
                 <mat-icon>cancel</mat-icon>
               </button>
-            </mat-chip>
-          </mat-chip-list>
+            </mat-chip-option>
+          </mat-chip-listbox>
         </td>
       </ng-container>
 

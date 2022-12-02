@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Request, UnaryInterceptor, UnaryResponse } from 'grpc-web';
 import { Subject } from 'rxjs';
 import { debounceTime, filter, first, take } from 'rxjs/operators';

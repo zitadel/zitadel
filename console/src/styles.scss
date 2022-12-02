@@ -369,7 +369,7 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
-$custom-typography: mat.define-legacy-typography-config(
+$custom-typography: mat.define-typography-config(
   $font-family: 'Lato',
 );
 
@@ -381,16 +381,16 @@ $custom-typography: mat.define-legacy-typography-config(
 //  If you don't need the default component typographies but still want the hierarchy styles,
 //  you can delete this line and instead use:
 //    `@include mat.legacy-typography-hierarchy($custom-typography);`
-@include mat.all-legacy-component-typographies($custom-typography);
-@include mat.legacy-core();
+@include mat.all-component-typographies($custom-typography);
+@include mat.core();
 
-.mat-dialog-container,
-.mat-raised-button,
-.mat-stroked-button {
+.mat-mdc-dialog-container,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button {
   border-radius: 6px !important;
 }
 
-.mat-menu-item {
+.mat-mdc-menu-item {
   line-height: 35px !important;
   height: 35px !important;
 }
@@ -399,11 +399,11 @@ $custom-typography: mat.define-legacy-typography-config(
   display: flex;
   align-items: center;
 
-  &.mat-raised-button,
-  &.mat-stroked-button {
+  &.mat-mdc-raised-button,
+  &.mat-mdc-outlined-button {
     padding-left: 0.5rem;
     height: 36px;
-
+    /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
     .mat-button-wrapper {
       display: flex;
       align-items: center;
@@ -425,11 +425,11 @@ $custom-typography: mat.define-legacy-typography-config(
 }
 
 @include component-themes($caos-dark-app-theme);
-@include mat.all-legacy-component-themes($caos-dark-app-theme);
+@include mat.all-component-themes($caos-dark-app-theme);
 
 .light-theme {
   @include component-themes($caos-light-app-theme);
-  @include mat.all-legacy-component-themes($caos-light-app-theme);
+  @include mat.all-component-themes($caos-light-app-theme);
 
   $background: map-get($caos-light-app-theme, background);
   $foreground: map-get($caos-light-app-theme, foreground);
@@ -438,36 +438,37 @@ $custom-typography: mat.define-legacy-typography-config(
   --success: #10b981;
   $border-color: map-get($foreground, divider);
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
   }
 
-  .mat-option {
+  .mat-mdc-option {
     background-color: map-get($background, cards);
 
     &:hover {
       background-color: map-get($background, cardhovered);
     }
   }
-
+  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
   .mat-button-toggle-group-appearance-standard {
     border-color: map-get($foreground, divider);
   }
-
+  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
+  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
   .mat-button-toggle {
     background-color: mat.get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-
+    /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
     &.mat-button-toggle-checked {
       background-color: #00000010;
     }
   }
 
   .main-container,
-  .mat-dialog-container,
+  .mat-mdc-dialog-container,
   .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -509,36 +510,37 @@ $custom-typography: mat.define-legacy-typography-config(
     color: map-get($foreground, text);
   }
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     background-color: map-get($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border-radius: 6px;
   }
 
-  .mat-option {
+  .mat-mdc-option {
     background-color: map-get($background, cards);
 
     &:hover {
       background-color: map-get($background, cardhovered);
     }
   }
-
+  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
   .mat-button-toggle-group-appearance-standard {
     border-color: map-get($foreground, divider);
   }
-
+  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
+  /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
   .mat-button-toggle {
     background-color: mat.get-color-from-palette($background, cards);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     transition: border-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-
+    /* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
     &.mat-button-toggle-checked {
       background-color: mat.get-color-from-palette($background, background);
     }
   }
 
   .main-container,
-  .mat-dialog-container,
+  .mat-mdc-dialog-container,
   .mat-calendar {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
@@ -598,7 +600,7 @@ h2 {
   opacity: 0;
 }
 
-.mat-paginator .mat-select {
+.mat-mdc-paginator .mat-mdc-select {
   border: none;
 }
 
@@ -619,10 +621,12 @@ i {
   font-size: 1.5rem;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of checkbox that may no longer apply for the MDC version.*/
 .mat-checkbox-inner-container.mat-checkbox-inner-container-no-side-margin {
   margin-right: 0.5rem !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
 .mat-button-toggle-button {
   display: flex;
   height: 36px;
@@ -631,6 +635,7 @@ i {
   font-size: 14px !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version.*/
 .mat-button-toggle-label-content {
   line-height: 36px;
 }
