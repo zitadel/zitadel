@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -73,7 +72,7 @@ func prepareAddSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGen
 
 func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
 	if generatorType == domain.SecretGeneratorTypeUnspecified {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-33k9f", "Errors.SecretGenerator.TypeMissing")
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-33k9f", "Errors.SecretGenerator.TypeMissing")
 	}
 
 	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)
@@ -81,7 +80,7 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 		return nil, err
 	}
 	if generatorWriteModel.State == domain.SecretGeneratorStateUnspecified || generatorWriteModel.State == domain.SecretGeneratorStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SecretGenerator.NotFound")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SecretGenerator.NotFound")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&generatorWriteModel.WriteModel)
 
@@ -99,7 +98,7 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
@@ -114,7 +113,7 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 
 func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType) (*domain.ObjectDetails, error) {
 	if generatorType == domain.SecretGeneratorTypeUnspecified {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2j9lw", "Errors.SecretGenerator.TypeMissing")
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2j9lw", "Errors.SecretGenerator.TypeMissing")
 	}
 
 	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)
@@ -122,7 +121,7 @@ func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorTyp
 		return nil, err
 	}
 	if generatorWriteModel.State == domain.SecretGeneratorStateUnspecified || generatorWriteModel.State == domain.SecretGeneratorStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-b8les", "Errors.SecretGenerator.NotFound")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-b8les", "Errors.SecretGenerator.NotFound")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&generatorWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSecretGeneratorRemovedEvent(ctx, instanceAgg, generatorType))

@@ -5,9 +5,13 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string) (*domain.Permissions, error) {
+func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string) (_ *domain.Permissions, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	userIDQuery, err := NewMembershipUserIDQuery(userID)
 	if err != nil {
 		return nil, err
@@ -22,7 +26,7 @@ func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string
 	}
 	memberships, err := q.Memberships(ctx, &MembershipSearchQuery{
 		Queries: []SearchQuery{userIDQuery, Or(orgIDsQuery, grantedOrgIDQuery)},
-	})
+	}, false)
 	if err != nil {
 		return nil, err
 	}

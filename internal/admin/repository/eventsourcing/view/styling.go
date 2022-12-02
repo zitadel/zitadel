@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	stylingTyble = "adminapi.styling"
+	stylingTyble = "adminapi.styling2"
 )
 
 func (v *View) StylingByAggregateIDAndState(aggregateID, instanceID string, state int32) (*model.LabelPolicyView, error) {
@@ -25,6 +25,14 @@ func (v *View) PutStyling(policy *model.LabelPolicyView, event *models.Event) er
 
 func (v *View) DeleteInstanceStyling(event *models.Event) error {
 	err := view.DeleteInstanceStyling(v.Db, stylingTyble, event.InstanceID)
+	if err != nil {
+		return err
+	}
+	return v.ProcessedStylingSequence(event)
+}
+
+func (v *View) UpdateOrgOwnerRemovedStyling(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedStyling(v.Db, stylingTyble, event.InstanceID, event.AggregateID)
 	if err != nil {
 		return err
 	}

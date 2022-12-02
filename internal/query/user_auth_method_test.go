@@ -27,17 +27,17 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			prepare: prepareUserAuthMethodsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.user_auth_methods3.token_id,`+
-						` projections.user_auth_methods3.creation_date,`+
-						` projections.user_auth_methods3.change_date,`+
-						` projections.user_auth_methods3.resource_owner,`+
-						` projections.user_auth_methods3.user_id,`+
-						` projections.user_auth_methods3.sequence,`+
-						` projections.user_auth_methods3.name,`+
-						` projections.user_auth_methods3.state,`+
-						` projections.user_auth_methods3.method_type,`+
+					regexp.QuoteMeta(`SELECT projections.user_auth_methods4.token_id,`+
+						` projections.user_auth_methods4.creation_date,`+
+						` projections.user_auth_methods4.change_date,`+
+						` projections.user_auth_methods4.resource_owner,`+
+						` projections.user_auth_methods4.user_id,`+
+						` projections.user_auth_methods4.sequence,`+
+						` projections.user_auth_methods4.name,`+
+						` projections.user_auth_methods4.state,`+
+						` projections.user_auth_methods4.method_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.user_auth_methods3`),
+						` FROM projections.user_auth_methods4`),
 					nil,
 					nil,
 				),
@@ -49,17 +49,17 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			prepare: prepareUserAuthMethodsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.user_auth_methods3.token_id,`+
-						` projections.user_auth_methods3.creation_date,`+
-						` projections.user_auth_methods3.change_date,`+
-						` projections.user_auth_methods3.resource_owner,`+
-						` projections.user_auth_methods3.user_id,`+
-						` projections.user_auth_methods3.sequence,`+
-						` projections.user_auth_methods3.name,`+
-						` projections.user_auth_methods3.state,`+
-						` projections.user_auth_methods3.method_type,`+
+					regexp.QuoteMeta(`SELECT projections.user_auth_methods4.token_id,`+
+						` projections.user_auth_methods4.creation_date,`+
+						` projections.user_auth_methods4.change_date,`+
+						` projections.user_auth_methods4.resource_owner,`+
+						` projections.user_auth_methods4.user_id,`+
+						` projections.user_auth_methods4.sequence,`+
+						` projections.user_auth_methods4.name,`+
+						` projections.user_auth_methods4.state,`+
+						` projections.user_auth_methods4.method_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.user_auth_methods3`),
+						` FROM projections.user_auth_methods4`),
 					[]string{
 						"token_id",
 						"creation_date",
@@ -111,17 +111,17 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			prepare: prepareUserAuthMethodsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.user_auth_methods3.token_id,`+
-						` projections.user_auth_methods3.creation_date,`+
-						` projections.user_auth_methods3.change_date,`+
-						` projections.user_auth_methods3.resource_owner,`+
-						` projections.user_auth_methods3.user_id,`+
-						` projections.user_auth_methods3.sequence,`+
-						` projections.user_auth_methods3.name,`+
-						` projections.user_auth_methods3.state,`+
-						` projections.user_auth_methods3.method_type,`+
+					regexp.QuoteMeta(`SELECT projections.user_auth_methods4.token_id,`+
+						` projections.user_auth_methods4.creation_date,`+
+						` projections.user_auth_methods4.change_date,`+
+						` projections.user_auth_methods4.resource_owner,`+
+						` projections.user_auth_methods4.user_id,`+
+						` projections.user_auth_methods4.sequence,`+
+						` projections.user_auth_methods4.name,`+
+						` projections.user_auth_methods4.state,`+
+						` projections.user_auth_methods4.method_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.user_auth_methods3`),
+						` FROM projections.user_auth_methods4`),
 					[]string{
 						"token_id",
 						"creation_date",
@@ -195,17 +195,17 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			prepare: prepareUserAuthMethodsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.user_auth_methods3.token_id,`+
-						` projections.user_auth_methods3.creation_date,`+
-						` projections.user_auth_methods3.change_date,`+
-						` projections.user_auth_methods3.resource_owner,`+
-						` projections.user_auth_methods3.user_id,`+
-						` projections.user_auth_methods3.sequence,`+
-						` projections.user_auth_methods3.name,`+
-						` projections.user_auth_methods3.state,`+
-						` projections.user_auth_methods3.method_type,`+
+					regexp.QuoteMeta(`SELECT projections.user_auth_methods4.token_id,`+
+						` projections.user_auth_methods4.creation_date,`+
+						` projections.user_auth_methods4.change_date,`+
+						` projections.user_auth_methods4.resource_owner,`+
+						` projections.user_auth_methods4.user_id,`+
+						` projections.user_auth_methods4.sequence,`+
+						` projections.user_auth_methods4.name,`+
+						` projections.user_auth_methods4.state,`+
+						` projections.user_auth_methods4.method_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.user_auth_methods3`),
+						` FROM projections.user_auth_methods4`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

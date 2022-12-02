@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	IDPUserLinkTable             = "projections.idp_user_links2"
+	IDPUserLinkTable             = "projections.idp_user_links3"
 	IDPUserLinkIDPIDCol          = "idp_id"
 	IDPUserLinkUserIDCol         = "user_id"
 	IDPUserLinkExternalUserIDCol = "external_user_id"
@@ -23,6 +23,7 @@ const (
 	IDPUserLinkResourceOwnerCol  = "resource_owner"
 	IDPUserLinkInstanceIDCol     = "instance_id"
 	IDPUserLinkDisplayNameCol    = "display_name"
+	IDPUserLinkOwnerRemovedCol   = "owner_removed"
 )
 
 type idpUserLinkProjection struct {
@@ -44,9 +45,11 @@ func newIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(IDPUserLinkResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPUserLinkInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPUserLinkDisplayNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(IDPUserLinkInstanceIDCol, IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("idp_user_idx", []string{IDPUserLinkUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("user_id", []string{IDPUserLinkUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{IDPUserLinkOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -85,7 +88,7 @@ func (p *idpUserLinkProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRemoved,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -158,13 +161,19 @@ func (p *idpUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*h
 	), nil
 }
 
-func (p *idpUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *idpUserLinkProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-PGiAY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(e,
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
+			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
+			handler.NewCol(IDPUserLinkOwnerRemovedCol, true),
+		},
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkResourceOwnerCol, e.Aggregate().ID),
 			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),

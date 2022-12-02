@@ -829,7 +829,8 @@
     "STATE": {
       "0": "Nicht definiert",
       "1": "Aktiv",
-      "2": "Inaktiv"
+      "2": "Inaktiv",
+      "3": "Entfernt"
     },
     "MEMBER": {
       "TITLE": "Manager der Organisation verwalten",
