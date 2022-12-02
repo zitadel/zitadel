@@ -45,6 +45,17 @@ type OrgLoginNames struct {
 	domains []*loginNameDomain
 }
 
+func (ln *InstanceLoginNames) Build(ctx context.Context, es *eventstore.Eventstore) error {
+	instanceQuery := ln.instanceQuery(ctx)
+	events, err := es.Filter(ctx, instanceQuery)
+	if err != nil {
+		return err
+	}
+	ln.reduceInstanceEvents(events)
+
+	return nil
+}
+
 func (ln *InstanceLoginNames) Reduce(events []eventstore.Event) {}
 
 func (ln *InstanceLoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQueryBuilder {
@@ -86,6 +97,43 @@ func (ln *InstanceLoginNames) SearchQuery(ctx context.Context) *eventstore.Searc
 			instance.InstanceRemovedEventType,
 		).
 		Builder()
+}
+
+func (ln *InstanceLoginNames) instanceQuery(ctx context.Context) *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		InstanceID(ln.instance).
+		OrderAsc().
+		// ResourceOwner(ln.owner).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(ln.instance).
+		EventTypes(
+			instance.DomainPolicyAddedEventType,
+			instance.DomainPolicyChangedEventType,
+			instance.InstanceRemovedEventType,
+		).
+		Builder()
+}
+
+func (ln *InstanceLoginNames) usernameQuery(ctx context.Context) *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+	InstanceID(ln.instance).
+	OrderAsc().
+	AddQuery().
+	AggregateTypes(user.AggregateType).
+	EventTypes(
+		user.UserV1AddedType,
+		user.HumanAddedType,
+		user.HumanRegisteredType,
+		user.UserV1RegisteredType,
+		user.MachineAddedEventType,
+		user.UserRemovedType,
+		user.UserUserNameChangedType,
+		user.UserDomainClaimedType,
+	).EventData(map[string]interface{}{
+		"userName":
+	}).
+	Builder()
 }
 
 func (ln *InstanceLoginNames) reduceInstanceEvents(events []eventstore.Event) {
