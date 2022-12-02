@@ -15,6 +15,7 @@ export function SetAuthRequest() {
     responseType: [responseType, setResponseType],
     scope: [scope, setScope],
     prompt: [prompt, setPrompt],
+    authMethod: [authMethod, setAuthMethod],
     loginHint: [loginHint, setLoginHint],
     idTokenHint: [idTokenHint, setIdTokenHint],
     organizationId: [organizationId, setOrganizationId],
@@ -35,6 +36,9 @@ export function SetAuthRequest() {
   const allResponseTypes = ["code", "id_token", "id_token token"];
 
   const allPrompts = ["", "login", "select_account", "create"];
+
+  const allAuthMethods = ["Basic Auth", "PKCE"];
+
 
   const CodeSnipped = ({ cname, children }) => {
     return <span className={cname}>{children}</span>;
@@ -399,6 +403,70 @@ export function SetAuthRequest() {
         </div>
       </div> */}
 
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <div className="flex flex-col">
+            <label className={`${labelClasses} text-teal-600`}>Authentication method</label>
+            <Listbox value={authMethod} onChange={setAuthMethod}>
+              <div className="relative">
+                <Listbox.Button className="transition-colors duration-300 text-black dark:text-white h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-solid border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500">
+                  <span className="block truncate">{authMethod}</span>
+                  <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <ChevronUpDownIcon
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </Listbox.Button>
+                <span className={`${hintClasses} flex`}>
+                  Authentication method
+                </span>
+                <Transition
+                  as={Fragment}
+                  leave="transition ease-in duration-100"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <Listbox.Options className="pl-0 list-none z-10 absolute top-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    {allAuthMethods.map((type, typeIdx) => (
+                      <Listbox.Option
+                        key={typeIdx}
+                        className={({ active }) =>
+                          `h-10 relative cursor-default select-none py-2 pl-10 pr-4 ${
+                            active ? "bg-black/20 dark:bg-white/20" : ""
+                          }`
+                        }
+                        value={type}
+                      >
+                        {({ selected }) => (
+                          <>
+                            <span
+                              className={`block truncate ${
+                                selected ? "font-medium" : "font-normal"
+                              }`}
+                            >
+                              {type}
+                            </span>
+                            {selected ? (
+                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-cyan-500 dark:text-cyan-400">
+                                <CheckIcon
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                />
+                              </span>
+                            ) : null}
+                          </>
+                        )}
+                      </Listbox.Option>
+                    ))}
+                  </Listbox.Options>
+                </Transition>
+              </div>
+            </Listbox>
+          </div>
+        </div>
+      </div>
+
       <h5 className="text-lg mt-6 mb-2 font-semibold">
         Your authorization request
       </h5>
@@ -429,6 +497,11 @@ export function SetAuthRequest() {
               loginHint
             )}`}</CodeSnipped>
           )}
+          {authMethod === "PKCE" && (
+            <CodeSnipped cname="text-teal-600">{`&code_challenge=${encodeURIComponent(
+              "9az09PjcfuENS7oDK7jUd2xAWRb-B3N7Sr3kDoWECOY"
+            )}&code_challenge_method=S256`}</CodeSnipped>
+          )}
         </code>
 
         <a
@@ -450,6 +523,10 @@ export function SetAuthRequest() {
           }${
             loginHint && prompt === "select_account"
               ? `&login_hint=${encodeURIComponent(loginHint)}`
+              : ""
+          }${
+            authMethod === "PKCE"
+              ? `&code_challenge=${encodeURIComponent("9az09PjcfuENS7oDK7jUd2xAWRb-B3N7Sr3kDoWECOY")}&code_challenge_method=S256`
               : ""
           }`}
         >

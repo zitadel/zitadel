@@ -10,6 +10,7 @@ export default ({ children }) => {
   const [scope, setScope] = useState("your-scope");
 
   const [prompt, setPrompt] = useState("your-prompt");
+  const [authMethod, setAuthMethod] = useState("your-prompt");
   const [loginHint, setLoginHint] = useState("your-login-hint");
   const [idTokenHint, setIdTokenHint] = useState("your-id-token-hint");
   const [organizationId, setOrganizationId] = useState("your-organization-id");
@@ -25,6 +26,7 @@ export default ({ children }) => {
 
     // optional parameters
     const prompt_param = params.get("prompt");
+    const auth_method_param = params.get("auth_method");
     const login_hint = params.get("login_hint");
     const id_token_hint = params.get("id_token_hint");
     const organization_id = params.get("organization_id");
@@ -37,6 +39,7 @@ export default ({ children }) => {
     setResponseType(response_type ?? "code");
     setScope(scope_param ?? "openid email profile");
     setPrompt(prompt_param ?? "");
+    setAuthMethod(auth_method_param ?? "Basic Auth");
 
     // optional parameters
     setLoginHint(login_hint ?? "johndoe@example.zitadel.cloud");
@@ -68,6 +71,7 @@ export default ({ children }) => {
     responseType: [responseType, setResponseType],
     scope: [scope, setScope],
     prompt: [prompt, setPrompt],
+    authMethod: [authMethod, setAuthMethod],
     loginHint: [loginHint, setLoginHint],
     idTokenHint: [idTokenHint, setIdTokenHint],
     organizationId: [organizationId, setOrganizationId],
