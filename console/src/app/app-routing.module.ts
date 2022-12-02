@@ -181,9 +181,9 @@ const routes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
-    preloadingStrategy: QuicklinkStrategy,
-    scrollPositionRestoration: 'enabled'
-}),
+      preloadingStrategy: QuicklinkStrategy,
+      scrollPositionRestoration: 'enabled',
+    }),
   ],
   exports: [RouterModule],
 })
