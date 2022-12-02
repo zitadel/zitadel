@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	OIDCSettingsProjectionTable = "projections.oidc_settings"
+	OIDCSettingsProjectionTable = "projections.oidc_settings2"
 
 	OIDCSettingsColumnAggregateID                = "aggregate_id"
 	OIDCSettingsColumnCreationDate               = "creation_date"
