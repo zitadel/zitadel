@@ -84,6 +84,8 @@ export function SetAuthRequest() {
     );
   }
 
+  // Encoding functions for code_challenge
+
   async function string_to_sha256(message) {
     // encode as UTF-8
     const msgBuffer = new TextEncoder().encode(message);                    
@@ -94,8 +96,9 @@ export function SetAuthRequest() {
   }
   async function encodeCodeChallenge(codeChallenge) {
       let arrayBuffer = await string_to_sha256(codeChallenge)
-      // https://stackoverflow.com/a/11562550
-      let base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      // https://stackoverflow.com/a/60321567
+      let buffer = Buffer.from(arrayBuffer);
+      let base64 = buffer.toString('base64')
       let base54url = base64_to_base64url(base64)
       return base54url
       
