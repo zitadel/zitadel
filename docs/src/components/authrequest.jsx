@@ -97,8 +97,14 @@ export function SetAuthRequest() {
   async function encodeCodeChallenge(codeChallenge) {
       let arrayBuffer = await string_to_sha256(codeChallenge)
       // https://stackoverflow.com/a/60321567
-      let buffer = Buffer.from(arrayBuffer);
-      let base64 = buffer.toString('base64')
+      // requires an
+      // import { Buffer } from 'node:buffer';
+      // throws an error on webpack
+      // using deprecated method for now
+      // should be replaced by: 
+      // let buffer = Buffer.from(arrayBuffer);
+      // let base64 = buffer.toString('base64')
+      let base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
       let base54url = base64_to_base64url(base64)
       return base54url
       
