@@ -145,7 +145,7 @@ export function SetAuthRequest() {
           }}
         />
         <span className={hintClasses}>
-          The domain of your zitadel instance with trailing slash.
+          The domain of your zitadel instance.
         </span>
       </div>
 
@@ -529,7 +529,7 @@ export function SetAuthRequest() {
 
       <div className="rounded-md bg-gray-700 shadow dark:bg-black/10 p-2 flex flex-col items-center">
         <code className="text-sm w-full mb-4 bg-transparent border-none">
-          <span className="text-yellow-500">{instance}</span>
+          <span className="text-yellow-500">{instance.endsWith('/') ? instance : instance+'/'}</span>
           <span className="text-white">oauth/v2/authorize?</span>
           <CodeSnipped cname="text-green-500">{`client_id=${encodeURIComponent(
             clientId
@@ -568,7 +568,7 @@ export function SetAuthRequest() {
           }}
           target="_blank"
           className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
-          href={`${instance}oauth/v2/authorize?client_id=${encodeURIComponent(
+          href={`${instance.endsWith('/') ? instance : instance+'/'}oauth/v2/authorize?client_id=${encodeURIComponent(
             clientId
           )}&redirect_uri=${encodeURIComponent(
             redirectUri
