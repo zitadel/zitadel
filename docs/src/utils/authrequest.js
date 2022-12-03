@@ -42,7 +42,7 @@ export default ({ children }) => {
     setResponseType(response_type ?? "code");
     setScope(scope_param ?? "openid email profile");
     setPrompt(prompt_param ?? "");
-    setAuthMethod(auth_method_param ?? "Basic Auth");
+    setAuthMethod(auth_method_param ?? "(none) PKCE");
     setCodeVerifier(code_verifier_param ?? "random-string");
     // optional parameters
     setLoginHint(login_hint ?? "johndoe@example.zitadel.cloud");
