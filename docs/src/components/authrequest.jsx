@@ -16,6 +16,8 @@ export function SetAuthRequest() {
     scope: [scope, setScope],
     prompt: [prompt, setPrompt],
     authMethod: [authMethod, setAuthMethod],
+    codeVerifier: [codeVerifier, setCodeVerifier],
+    codeChallenge: [codeChallenge, setCodeChallenge],
     loginHint: [loginHint, setLoginHint],
     idTokenHint: [idTokenHint, setIdTokenHint],
     organizationId: [organizationId, setOrganizationId],
@@ -81,6 +83,34 @@ export function SetAuthRequest() {
         .join(" ")
     );
   }
+
+  async function string_to_sha256(message) {
+    // encode as UTF-8
+    const msgBuffer = new TextEncoder().encode(message);                    
+    // hash the message
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    // return ArrayBuffer
+    return hashBuffer;
+  }
+  async function encodeCodeChallenge(codeChallenge) {
+      let arrayBuffer = await string_to_sha256(codeChallenge)
+      // https://stackoverflow.com/a/11562550
+      let base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      let base54url = base64_to_base64url(base64)
+      return base54url
+      
+  }
+  var base64_to_base64url = function(input) {
+      input = input
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/g, '');
+      return input;
+  }
+  
+  useEffect(async () => {
+    setCodeChallenge(await encodeCodeChallenge(codeVerifier))
+  }, [codeVerifier])
 
   useEffect(() => {
     const newScopeState = allScopes.map((s) => scope.includes(s));
@@ -403,8 +433,7 @@ export function SetAuthRequest() {
         </div>
       </div> */}
 
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div>
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="flex flex-col">
             <label className={`${labelClasses} text-teal-600`}>Authentication method</label>
             <Listbox value={authMethod} onChange={setAuthMethod}>
@@ -464,7 +493,25 @@ export function SetAuthRequest() {
               </div>
             </Listbox>
           </div>
-        </div>
+          {authMethod === "PKCE" && (
+            <div className="flex flex-col">
+              <label className={`${labelClasses} text-teal-600`}>
+                Code Verifier
+              </label>
+              <input
+                className={inputClasses(false)}
+                id="code_verifier"
+                value={codeVerifier}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setCodeVerifier(value);
+                }}
+              />
+              <span className={hintClasses}>
+              <span className="text-teal-600">Authentication method</span> PKCE requires a random string used to generate a <code>code_challenge</code>
+              </span>
+            </div>
+          )}
       </div>
 
       <h5 className="text-lg mt-6 mb-2 font-semibold">
@@ -499,7 +546,7 @@ export function SetAuthRequest() {
           )}
           {authMethod === "PKCE" && (
             <CodeSnipped cname="text-teal-600">{`&code_challenge=${encodeURIComponent(
-              "9az09PjcfuENS7oDK7jUd2xAWRb-B3N7Sr3kDoWECOY"
+              codeChallenge
             )}&code_challenge_method=S256`}</CodeSnipped>
           )}
         </code>
@@ -526,7 +573,7 @@ export function SetAuthRequest() {
               : ""
           }${
             authMethod === "PKCE"
-              ? `&code_challenge=${encodeURIComponent("9az09PjcfuENS7oDK7jUd2xAWRb-B3N7Sr3kDoWECOY")}&code_challenge_method=S256`
+              ? `&code_challenge=${encodeURIComponent(codeChallenge)}&code_challenge_method=S256`
               : ""
           }`}
         >

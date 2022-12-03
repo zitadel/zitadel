@@ -10,7 +10,9 @@ export default ({ children }) => {
   const [scope, setScope] = useState("your-scope");
 
   const [prompt, setPrompt] = useState("your-prompt");
-  const [authMethod, setAuthMethod] = useState("your-prompt");
+  const [authMethod, setAuthMethod] = useState("your-auth-method");
+  const [codeChallenge, setCodeChallenge] = useState("your-code-challenge");
+  const [codeVerifier, setCodeVerifier] = useState("your-code-verifier");
   const [loginHint, setLoginHint] = useState("your-login-hint");
   const [idTokenHint, setIdTokenHint] = useState("your-id-token-hint");
   const [organizationId, setOrganizationId] = useState("your-organization-id");
@@ -27,6 +29,7 @@ export default ({ children }) => {
     // optional parameters
     const prompt_param = params.get("prompt");
     const auth_method_param = params.get("auth_method");
+    const code_verifier_param = params.get("code_verifier");
     const login_hint = params.get("login_hint");
     const id_token_hint = params.get("id_token_hint");
     const organization_id = params.get("organization_id");
@@ -40,7 +43,7 @@ export default ({ children }) => {
     setScope(scope_param ?? "openid email profile");
     setPrompt(prompt_param ?? "");
     setAuthMethod(auth_method_param ?? "Basic Auth");
-
+    setCodeVerifier(code_verifier_param ?? "random-string");
     // optional parameters
     setLoginHint(login_hint ?? "johndoe@example.zitadel.cloud");
     setIdTokenHint(id_token_hint ?? "[your-id-token]");
@@ -72,6 +75,8 @@ export default ({ children }) => {
     scope: [scope, setScope],
     prompt: [prompt, setPrompt],
     authMethod: [authMethod, setAuthMethod],
+    codeChallenge: [codeChallenge, setCodeChallenge],
+    codeVerifier: [codeVerifier, setCodeVerifier],
     loginHint: [loginHint, setLoginHint],
     idTokenHint: [idTokenHint, setIdTokenHint],
     organizationId: [organizationId, setOrganizationId],
