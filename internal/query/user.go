@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -383,9 +384,45 @@ func mapUser(user *projection.User, loginNames *projection.UserLoginNames) *User
 	return u
 }
 
-func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (_ *User, err error) {
+func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, query SearchQuery) (_ *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	var loginName string
+	if q, ok := query.(*TextQuery); ok {
+		if q.Column != userPreferredLoginNameCol {
+			panic("wrong query")
+		}
+		loginName = q.Text
+	}
+
+	instanceLoginNames := projection.NewInstanceLoginNamesWithOwner(
+		authz.GetInstance(ctx).InstanceID(),
+		authz.GetCtxData(ctx).OrgID,
+		loginName,
+	)
+	loginNames, err := instanceLoginNames.Build(ctx, q.eventstore)
+	if err != nil {
+		return nil, err
+	}
+	if len(loginNames) == 0 {
+		return nil, errors.ThrowNotFound(err, "QUERY-fVWE4", "Errors.User.NotFound")
+	}
+	if len(loginNames) > 1 {
+		logging.Error("more than one userfound")
+		return nil, errors.ThrowNotFound(err, "QUERY-fVWE4", "Errors.User.NotFound")
+	}
+
+	user := projection.NewUserWithOwner(
+		loginNames[0].UserID,
+		loginNames[0].InstanceID,
+		loginNames[0].OwnerID,
+	)
+	events, err := q.eventstore.Filter(ctx, user.SearchQuery(ctx))
+	if err != nil {
+		return nil, err
+	}
+	user.Reduce(events)
 
 	// if shouldTriggerBulk {
 	// projection_old.UserProjection.Trigger(ctx)
@@ -409,21 +446,22 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries .
 	// 	return nil, err
 	// }
 
-	user := projection.NewUser(userID, authz.GetInstance(ctx).InstanceID())
-	events, err := q.eventstore.Filter(ctx, user.SearchQuery(ctx))
-	if err != nil {
-		return nil, err
-	}
-	user.Reduce(events)
+	// user := projection.NewUser(userID, authz.GetInstance(ctx).InstanceID())
+	// events, err := q.eventstore.Filter(ctx, user.SearchQuery(ctx))
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// user.Reduce(events)
 
-	loginNames := projection.NewUserLoginNamesWithOwner(u.ID, authz.GetInstance(ctx).InstanceID(), u.ResourceOwner)
-	events, err = q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))
-	if err != nil {
-		return nil, err
-	}
-	loginNames.Reduce(events)
+	// loginNames := projection.NewUserLoginNamesWithOwner(u.ID, authz.GetInstance(ctx).InstanceID(), u.ResourceOwner)
+	// events, err = q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// loginNames.Reduce(events)
 
-	return mapUser(user, loginNames), nil
+	return mapUser(user, loginNames[0]), nil
+	// return nil, nil
 }
 
 func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (_ *Profile, err error) {

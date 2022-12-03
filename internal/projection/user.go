@@ -179,29 +179,50 @@ func (u *User) SearchQuery(context.Context) *eventstore.SearchQueryBuilder {
 
 func (u *User) reduceHumanAdded(event *user.HumanAddedEvent) {
 	u.Username = event.UserName
-	u.Human.Profile.FirstName = event.FirstName
-	u.Human.Profile.LastName = event.LastName
-	u.Human.Profile.NickName = event.NickName
-	u.Human.Profile.DisplayName = event.DisplayName
-	u.Human.Profile.PreferredLanguage = event.PreferredLanguage
-	u.Human.Profile.Gender = event.Gender
-	u.Human.Email.Address = event.EmailAddress
-	u.Human.Phone.Number = event.PhoneNumber
 	u.CreationDate = event.CreationDate()
-	// u.Human. = event.Secret
-	// u.Human.ChangeRequired = event.ChangeRequired
+	u.Type = domain.UserTypeHuman
+	u.ResourceOwner = event.Aggregate().ResourceOwner
+
+	u.Human = &Human{
+		Profile: Profile{
+			FirstName:         event.FirstName,
+			LastName:          event.LastName,
+			NickName:          event.NickName,
+			DisplayName:       event.DisplayName,
+			PreferredLanguage: event.PreferredLanguage,
+			Gender:            event.Gender,
+		},
+		Email: Email{
+			Address: event.EmailAddress,
+		},
+		Phone: Phone{
+			Number: event.PhoneNumber,
+		},
+	}
 }
 
 func (u *User) reduceHumanRegistered(event *user.HumanRegisteredEvent) {
 	u.Username = event.UserName
-	u.Human.Profile.FirstName = event.FirstName
-	u.Human.Profile.LastName = event.LastName
-	u.Human.Profile.NickName = event.NickName
-	u.Human.Profile.DisplayName = event.DisplayName
-	u.Human.Profile.PreferredLanguage = event.PreferredLanguage
-	u.Human.Profile.Gender = event.Gender
-	u.Human.Email.Address = event.EmailAddress
-	u.Human.Phone.Number = event.PhoneNumber
+	u.CreationDate = event.CreationDate()
+	u.Type = domain.UserTypeHuman
+	u.ResourceOwner = event.Aggregate().ResourceOwner
+
+	u.Human = &Human{
+		Profile: Profile{
+			FirstName:         event.FirstName,
+			LastName:          event.LastName,
+			NickName:          event.NickName,
+			DisplayName:       event.DisplayName,
+			PreferredLanguage: event.PreferredLanguage,
+			Gender:            event.Gender,
+		},
+		Email: Email{
+			Address: event.EmailAddress,
+		},
+		Phone: Phone{
+			Number: event.PhoneNumber,
+		},
+	}
 }
 
 func (u *User) reduceStateChange(state domain.UserState) {
@@ -258,6 +279,7 @@ func (u *User) reduceHumanEmailChanged(event *user.HumanEmailChangedEvent) {
 
 func (u *User) reduceHumanEmailVerified(event *user.HumanEmailVerifiedEvent) {
 	u.Human.Email.IsVerified = true
+	u.reduceStateChange(domain.UserStateActive)
 }
 
 func (u *User) reduceHumanAvatarAdded(event *user.HumanAvatarAddedEvent) {
@@ -269,8 +291,12 @@ func (u *User) reduceHumanAvatarRemoved(event *user.HumanAvatarRemovedEvent) {
 }
 
 func (u *User) reduceMachineAdded(event *user.MachineAddedEvent) {
-	u.Machine.Description = event.Description
-	u.Machine.Name = event.Name
+	u.Type = domain.UserTypeMachine
+	u.ResourceOwner = event.Aggregate().ResourceOwner
+	u.Machine = &Machine{
+		Description: event.Description,
+		Name:        event.Name,
+	}
 }
 
 func (u *User) reduceMachineChanged(event *user.MachineChangedEvent) {

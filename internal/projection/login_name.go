@@ -12,25 +12,25 @@ import (
 
 func NewUserLoginNames(userID, instance string) *UserLoginNames {
 	return &UserLoginNames{
-		userID:     userID,
-		instanceID: instance,
+		UserID:     userID,
+		InstanceID: instance,
 	}
 }
 
 func NewUserLoginNamesWithOwner(userID, instance, owner string) *UserLoginNames {
 	return &UserLoginNames{
-		userID:     userID,
-		instanceID: instance,
-		ownerID:    owner,
+		UserID:     userID,
+		InstanceID: instance,
+		OwnerID:    owner,
 	}
 }
 
 var _ Projection = (*UserLoginNames)(nil)
 
 type UserLoginNames struct {
-	userID     string
-	instanceID string
-	ownerID    string
+	UserID     string
+	InstanceID string
+	OwnerID    string
 
 	LoginNames []*LoginName
 
@@ -66,7 +66,7 @@ func (ln *UserLoginNames) Reduce(events []eventstore.Event) {
 
 	for _, event := range events {
 		// only apply events from the instance or owner of the user
-		if event.Aggregate().ResourceOwner != ln.ownerID && event.Aggregate().ResourceOwner != ln.instanceID {
+		if event.Aggregate().ResourceOwner != ln.OwnerID && event.Aggregate().ResourceOwner != ln.InstanceID {
 			continue
 		}
 
@@ -121,14 +121,14 @@ func (ln *UserLoginNames) reduceUserEvents(events []eventstore.Event) {
 
 func (ln *UserLoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		InstanceID(ln.instanceID).
+		InstanceID(ln.InstanceID).
 		OrderAsc().
 		// ResourceOwner(ln.ownerID).
 		AddQuery().
 		AggregateTypes(
 			user.AggregateType,
 		).
-		AggregateIDs(ln.userID).
+		AggregateIDs(ln.UserID).
 		EventTypes(
 			user.UserV1AddedType,
 			user.HumanAddedType,
@@ -141,7 +141,7 @@ func (ln *UserLoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQue
 		).
 		Or().
 		AggregateTypes(org.AggregateType).
-		AggregateIDs(ln.ownerID).
+		AggregateIDs(ln.OwnerID).
 		EventTypes(
 			org.DomainPolicyAddedEventType,
 			org.DomainPolicyChangedEventType,
@@ -152,7 +152,7 @@ func (ln *UserLoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQue
 		).
 		Or().
 		AggregateTypes(instance.AggregateType).
-		AggregateIDs(ln.instanceID).
+		AggregateIDs(ln.InstanceID).
 		EventTypes(
 			instance.DomainPolicyAddedEventType,
 			instance.DomainPolicyChangedEventType,
@@ -187,17 +187,17 @@ func (ln *UserLoginNames) generate() {
 
 func (ln *UserLoginNames) reduceHumanAdded(event *user.HumanAddedEvent) {
 	ln.username = event.UserName
-	ln.ownerID = event.Aggregate().ResourceOwner
+	ln.OwnerID = event.Aggregate().ResourceOwner
 }
 
 func (ln *UserLoginNames) reduceHumanRegistered(event *user.HumanRegisteredEvent) {
 	ln.username = event.UserName
-	ln.ownerID = event.Aggregate().ResourceOwner
+	ln.OwnerID = event.Aggregate().ResourceOwner
 }
 
 func (ln *UserLoginNames) reduceMachineAddedEvent(event *user.MachineAddedEvent) {
 	ln.username = event.UserName
-	ln.ownerID = event.Aggregate().ResourceOwner
+	ln.OwnerID = event.Aggregate().ResourceOwner
 }
 
 func (ln *UserLoginNames) reduceUserRemoved(event *user.UserRemovedEvent) {
