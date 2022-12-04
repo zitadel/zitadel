@@ -1,8 +1,122 @@
 ---
-title: OIDC Authrequest Playground
-sidebar_label: Authrequest Playground
+title: OIDC Authentication Request Playground
+sidebar_label: OIDC Playground
 ---
 
 import { SetAuthRequest } from "../../../src/components/authrequest";
 
+The OIDC Playground is for testing OpenID Authentication Requests, giving you more insight how OpenID Connect works and how you can customize ZITADEL behavior with different parameters.
+
+An Open ID Connect (OIDC) [authentication request](https://openid.net/specs/openid-connect-core-1_0.html) is an OAuth 2.0 Authorization Request using additional parameters and scopes to request that the end-user be authenticated by ZITADEL.
+
 <SetAuthRequest />
+
+## Why this OIDC playground?
+
+In this version of ZITADEL, human end-users need to authenticate trough a hosted login page.
+Your application should initiate a login by issuing an authentication request and redirecting the user to the login page. You can also customize the behavior of ZITADEL by providing additional parameters and scopes in the request.
+
+This playground should help you to initialially craft an authentication request to explore the behavior of ZITADEL in more detail. 
+
+## Request parameters explained
+
+Not all request parameters are available in the playground. Please refer to the full documentation of the [authorization endpoint](/docs/apis/openidoauth/endpoints#authorization_endpoint).
+
+### Your Domain
+
+The <span class="text-yellow-500">Instance Domain</span> to your ZITADEL instance. Use the base-path, the playground will add the required path to the request.
+
+### Required Parameters
+
+<p>
+    <span class="text-green-500">Client ID</span> is the resource id of an application. 
+    It's the application where you want your users to login. 
+    You can find the resource id in the Console. When using organization grants, use the client id from the origin organization.
+</p>
+
+<p>
+    <span class="text-blue-500">Redirect URI</span> be one of the pre-configured redirect uris for your application. You must add the redirect uri for your application, else you will receive an error.
+</p>
+
+<p>
+    <span class="text-orange-500">Response Type</span> termines whether a code, id_token token or just id_token will be returned. Most use cases will need code.
+</p>
+
+More in the <a href="/docs/apis/openidoauth/endpoints#required-request-parameters">documentation</a> about required Parameters.
+
+### Authentication methods
+
+Depending on the authentication and authorization flow of your application you might need to append some information to the authentication request.
+
+<span class="text-teal-600">Authentication method</span> "(none) PKCE" is recommended for most application types.
+The playground appends automatically a code challenge for PKCE flows.
+
+You need to append a "Code Challenge" by providing a random <span class="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/docs/guides/integrate/login-users#token-request) for more details. 
+
+More in the [documentation](/docs/apis/openidoauth/authn-methods) about authentication methods.
+
+### Additional Parameters
+
+<p>
+    <span class="text-cyan-500">Prompt</span> defines if and how the user should be prompted on login. For example you can pre-select a login name or present the register form to users directly. More details the <a target="_blank" href="/docs/apis/openidoauth/endpoints#additional-parameters">documentation</a>.
+</p>
+
+<p>
+    <span class="text-rose-500">Login hint</span> must be a valid logon name of a user. Will be used for username inputs or preselecting a user on select_account.
+</p>
+
+There are many more additional parameters. Please refer to the [documentation](/docs/apis/openidoauth/endpoints#additional-parameters) about additional parameters.
+
+## Scopes
+
+Not all scopes are available in the playground. Please refer to the full [documentation](/docs/apis/openidoauth/scopes) for the exhaustive list of available standard and reserved scopes.
+
+### Standard Scopes
+
+Used to request additional information from ZITADEL. 
+These scopes are defined in the OpenID Connect specification.
+The `openid` scope is mandatory.
+
+### Reserved Scopes
+
+<span class="text-purple-500">Organization ID</span>¨
+
+- Code Flow: https://docs.zitadel.com/docs/guides/integrate/login-users
+- Branding: https://docs.zitadel.com/docs/guides/manage/customize/branding
+- Metadata: https://docs.zitadel.com/docs/guides/manage/customize/user-metadata
+
+
+Additional Parameters
+
+All parameters: https://docs.zitadel.com/docs/apis/openidoauth/endpoints#additional-parameters
+Auth methods: https://docs.zitadel.com/docs/apis/openidoauth/authn-methods
+
+Scopes
+
+- https://docs.zitadel.com/docs/apis/openidoauth/scopes#standard-scopes
+- https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes
+
+## How to use in your project
+
+### Integration
+
+- Libraries / Examples: adjust with the parameters
+- Complete the code Flow: https://docs.zitadel.com/docs/guides/integrate/login-users
+
+### Organization branding
+
+### Enforce organization policies
+
+### Skip account picker
+
+### Prompt to register
+
+### Get user metadata
+
+### Access core apis
+
+However for ZITADEL to accept the token it also must contain ZITADELs projectID in its [audience claim](https://www.rfc-editor.org/rfc/rfc7519#section-4.1.3) (called aud). Otherwise it will not accept the token with “invalid audience”.
+
+> The "aud" (audience) claim identifies the recipients that the JWT is intended for.  Each principal intended to process the JWT MUST identify itself with a value in the audience claim.
+
+This can be achieved by adding the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your applications authorization request.
