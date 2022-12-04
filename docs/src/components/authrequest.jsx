@@ -441,7 +441,11 @@ export function SetAuthRequest() {
             preselect a user.
           </span>
         </div> */}
+      </div>
 
+      <h5 className="text-lg mt-6 mb-2 font-semibold">Scopes</h5>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <div className="flex flex-col">
           <label className={`${labelClasses} text-purple-500`}>
             Organization ID
@@ -472,7 +476,6 @@ export function SetAuthRequest() {
           </span>
         </div>
       </div>
-
       <div className="py-4">
         <p className="text-sm mt-0 mb-0 text-purple-500">Scopes</p>
         <span className={`${hintClasses} flex mb-2`}>
