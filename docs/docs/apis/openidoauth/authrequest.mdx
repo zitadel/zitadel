@@ -58,65 +58,50 @@ More in the [documentation](/docs/apis/openidoauth/authn-methods) about authenti
 ### Additional Parameters
 
 <p>
-    <span class="text-cyan-500">Prompt</span> defines if and how the user should be prompted on login. For example you can pre-select a login name or present the register form to users directly. More details the <a target="_blank" href="/docs/apis/openidoauth/endpoints#additional-parameters">documentation</a>.
+    <span class="text-cyan-500">Prompt</span> defines if and how the user should be prompted on login. 
+    For example you can pre-select a login name (<code>select_account</code>) or present the register form (<code>create</code>) to users directly.
+    The value  <code>login</code> requires the user to re-authenticate.
 </p>
 
 <p>
-    <span class="text-rose-500">Login hint</span> must be a valid logon name of a user. Will be used for username inputs or preselecting a user on select_account.
+    <span class="text-rose-500">Login hint</span> must be a valid logon name of a user.
+    You can skip the account picker by providing the Login hint.
 </p>
 
 There are many more additional parameters. Please refer to the [documentation](/docs/apis/openidoauth/endpoints#additional-parameters) about additional parameters.
 
-## Scopes
+## Standard Scopes
 
 Not all scopes are available in the playground. Please refer to the full [documentation](/docs/apis/openidoauth/scopes) for the exhaustive list of available standard and reserved scopes.
-
-### Standard Scopes
 
 Used to request additional information from ZITADEL. 
 These scopes are defined in the OpenID Connect specification.
 The `openid` scope is mandatory.
 
-### Reserved Scopes
+## Reserved Scopes
 
-<span class="text-purple-500">Organization ID</span>¨
+You can request additional information that is specific to ZITADEL or customize the behavior of ZITADEL by including reserved scopes.
+Please refer to the documentation for a full list of available reserved scopes.
 
-- Code Flow: https://docs.zitadel.com/docs/guides/integrate/login-users
-- Branding: https://docs.zitadel.com/docs/guides/manage/customize/branding
-- Metadata: https://docs.zitadel.com/docs/guides/manage/customize/user-metadata
+### Organization policies and branding
 
+Enforce a organization's policies and branding as well as membership of the user by passing the scope `urn:zitadel:iam:org:id:{id}` with the required <span class="text-purple-500">Organization ID</span>.
 
-Additional Parameters
-
-All parameters: https://docs.zitadel.com/docs/apis/openidoauth/endpoints#additional-parameters
-Auth methods: https://docs.zitadel.com/docs/apis/openidoauth/authn-methods
-
-Scopes
-
-- https://docs.zitadel.com/docs/apis/openidoauth/scopes#standard-scopes
-- https://docs.zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes
-
-## How to use in your project
-
-### Integration
-
-- Libraries / Examples: adjust with the parameters
-- Complete the code Flow: https://docs.zitadel.com/docs/guides/integrate/login-users
-
-### Organization branding
-
-### Enforce organization policies
-
-### Skip account picker
-
-### Prompt to register
+Please refer to the full [guide on user metadata](/docs/guides/manage/customize/branding).
 
 ### Get user metadata
 
+Pass the scope `urn:zitadel:iam:user:metadata` to get a user's metadata.
+Please refer to the full [guide on branding](/docs/guides/manage/customize/user-metadata) for further details.
+
 ### Access core apis
 
-However for ZITADEL to accept the token it also must contain ZITADELs projectID in its [audience claim](https://www.rfc-editor.org/rfc/rfc7519#section-4.1.3) (called aud). Otherwise it will not accept the token with “invalid audience”.
-
-> The "aud" (audience) claim identifies the recipients that the JWT is intended for.  Each principal intended to process the JWT MUST identify itself with a value in the audience claim.
+Calling the [core API](/docs/apis/introduction) with the authenticated user, requires that the project ID is included in the audience claim.
 
 This can be achieved by adding the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your applications authorization request.
+
+## How to use in your project
+
+Please refer to our [guide](/docs/guides/integrate/login-users) on how to login users.
+
+OpenID Connect certified libraries should allow you to customize the parameters and define scopes for the authorization request. You can also continue by using one of our [example applications](/docs/examples/introduction).

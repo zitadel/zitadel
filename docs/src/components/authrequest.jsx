@@ -456,7 +456,7 @@ export function SetAuthRequest() {
             onChange={(event) => {
               const value = event.target.value;
               setOrganizationId(value);
-              allScopes[8] = `urn:zitadel:iam:org:id:${
+              allScopes[7] = `urn:zitadel:iam:org:id:${
                 value ? value : "[organizationId]"
               }`;
               toggleScope(8, true);
