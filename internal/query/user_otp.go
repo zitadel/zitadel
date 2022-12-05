@@ -2,24 +2,28 @@ package query
 
 import (
 	"context"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner string) (string, error) {
+func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner string) (_ string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if userID == "" {
-		return "", caos_errs.ThrowPreconditionFailed(nil, "QUERY-8N9ds", "Errors.User.UserIDMissing")
+		return "", errors.ThrowPreconditionFailed(nil, "QUERY-8N9ds", "Errors.User.UserIDMissing")
 	}
 	existingOTP, err := q.otpWriteModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return "", err
 	}
 	if existingOTP.State != domain.MFAStateReady {
-		return "", caos_errs.ThrowNotFound(nil, "QUERY-01982h", "Errors.User.NotFound")
+		return "", errors.ThrowNotFound(nil, "QUERY-01982h", "Errors.User.NotFound")
 	}
 
 	return crypto.DecryptString(existingOTP.Secret, q.multifactors.OTP.CryptoMFA)

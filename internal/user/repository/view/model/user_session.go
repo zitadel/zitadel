@@ -21,6 +21,7 @@ const (
 	UserSessionKeyState         = "state"
 	UserSessionKeyResourceOwner = "resource_owner"
 	UserSessionKeyInstanceID    = "instance_id"
+	UserSessionKeyOwnerRemoved  = "owner_removed"
 )
 
 type UserSessionView struct {

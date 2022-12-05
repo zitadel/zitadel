@@ -30,7 +30,7 @@ func (s *Server) ListMyPasswordless(ctx context.Context, _ *auth_pb.ListMyPasswo
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}

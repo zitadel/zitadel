@@ -58,7 +58,7 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "","", errID, errMessage)
+	data := l.getUserData(r, authReq, "", "", errID, errMessage)
 	if verificationStep == nil {
 		l.renderError(w, r, authReq, err)
 		return

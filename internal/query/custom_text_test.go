@@ -29,16 +29,16 @@ func Test_CustomTextPrepares(t *testing.T) {
 			prepare: prepareCustomTextsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.custom_texts.aggregate_id,`+
-						` projections.custom_texts.sequence,`+
-						` projections.custom_texts.creation_date,`+
-						` projections.custom_texts.change_date,`+
-						` projections.custom_texts.language,`+
-						` projections.custom_texts.template,`+
-						` projections.custom_texts.key,`+
-						` projections.custom_texts.text,`+
+					regexp.QuoteMeta(`SELECT projections.custom_texts2.aggregate_id,`+
+						` projections.custom_texts2.sequence,`+
+						` projections.custom_texts2.creation_date,`+
+						` projections.custom_texts2.change_date,`+
+						` projections.custom_texts2.language,`+
+						` projections.custom_texts2.template,`+
+						` projections.custom_texts2.key,`+
+						` projections.custom_texts2.text,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.custom_texts`),
+						` FROM projections.custom_texts2`),
 					nil,
 					nil,
 				),
@@ -56,16 +56,16 @@ func Test_CustomTextPrepares(t *testing.T) {
 			prepare: prepareCustomTextsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.custom_texts.aggregate_id,`+
-						` projections.custom_texts.sequence,`+
-						` projections.custom_texts.creation_date,`+
-						` projections.custom_texts.change_date,`+
-						` projections.custom_texts.language,`+
-						` projections.custom_texts.template,`+
-						` projections.custom_texts.key,`+
-						` projections.custom_texts.text,`+
+					regexp.QuoteMeta(`SELECT projections.custom_texts2.aggregate_id,`+
+						` projections.custom_texts2.sequence,`+
+						` projections.custom_texts2.creation_date,`+
+						` projections.custom_texts2.change_date,`+
+						` projections.custom_texts2.language,`+
+						` projections.custom_texts2.template,`+
+						` projections.custom_texts2.key,`+
+						` projections.custom_texts2.text,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.custom_texts`),
+						` FROM projections.custom_texts2`),
 					[]string{
 						"aggregate_id",
 						"sequence",
@@ -114,16 +114,16 @@ func Test_CustomTextPrepares(t *testing.T) {
 			prepare: prepareCustomTextsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.custom_texts.aggregate_id,`+
-						` projections.custom_texts.sequence,`+
-						` projections.custom_texts.creation_date,`+
-						` projections.custom_texts.change_date,`+
-						` projections.custom_texts.language,`+
-						` projections.custom_texts.template,`+
-						` projections.custom_texts.key,`+
-						` projections.custom_texts.text,`+
+					regexp.QuoteMeta(`SELECT projections.custom_texts2.aggregate_id,`+
+						` projections.custom_texts2.sequence,`+
+						` projections.custom_texts2.creation_date,`+
+						` projections.custom_texts2.change_date,`+
+						` projections.custom_texts2.language,`+
+						` projections.custom_texts2.template,`+
+						` projections.custom_texts2.key,`+
+						` projections.custom_texts2.text,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.custom_texts`),
+						` FROM projections.custom_texts2`),
 					[]string{
 						"aggregate_id",
 						"sequence",
@@ -192,16 +192,16 @@ func Test_CustomTextPrepares(t *testing.T) {
 			prepare: prepareCustomTextsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.custom_texts.aggregate_id,`+
-						` projections.custom_texts.sequence,`+
-						` projections.custom_texts.creation_date,`+
-						` projections.custom_texts.change_date,`+
-						` projections.custom_texts.language,`+
-						` projections.custom_texts.template,`+
-						` projections.custom_texts.key,`+
-						` projections.custom_texts.text,`+
+					regexp.QuoteMeta(`SELECT projections.custom_texts2.aggregate_id,`+
+						` projections.custom_texts2.sequence,`+
+						` projections.custom_texts2.creation_date,`+
+						` projections.custom_texts2.change_date,`+
+						` projections.custom_texts2.language,`+
+						` projections.custom_texts2.template,`+
+						` projections.custom_texts2.key,`+
+						` projections.custom_texts2.text,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.custom_texts`),
+						` FROM projections.custom_texts2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
