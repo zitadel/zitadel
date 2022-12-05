@@ -20,7 +20,7 @@ const features = [
     title: "Guides",
     darkImageUrl: "img/index/Guides-dark.svg",
     lightImageUrl: "img/index/Guides-light.svg",
-    link: "docs/guides/overview",
+    link: "/guides/overview",
     description: (
       <>
         Read our guides on how to manage your data and role associations in
@@ -32,25 +32,25 @@ const features = [
         <Column>
           <div>
             <ListElement
-              link="docs/guides/start/quickstart"
+              link="guides/start/quickstart"
               type={ICONTYPE.START}
               title="Get started"
               description=""
             />
             <ListElement
-              link="docs/guides/manage/cloud/overview"
+              link="guides/manage/cloud/overview"
               type={ICONTYPE.LOGIN}
               title="ZITADEL Cloud"
               description=""
             />
             <ListElement
-              link="docs/guides/integrate/login-users"
+              link="guides/integrate/login-users"
               type={ICONTYPE.LOGIN}
               title="Login Users"
               description=""
             />
             <ListElement
-              link="docs/guides/integrate/access-zitadel-apis"
+              link="guides/integrate/access-zitadel-apis"
               type={ICONTYPE.APIS}
               title="Access APIs"
               description=""
@@ -58,7 +58,7 @@ const features = [
           </div>
           <div>
             <ListElement
-              link="docs/guides/solution-scenarios/introduction"
+              link="guides/solution-scenarios/introduction"
               iconClasses="las la-paragraph"
               roundClasses="rounded rounded-split"
               label="B2C"
@@ -66,19 +66,19 @@ const features = [
               description=""
             />
             <ListElement
-              link="docs/guides/manage/customize/branding"
+              link="guides/manage/customize/branding"
               type={ICONTYPE.PRIVATELABELING}
               title="Customization"
               description=""
             />
             <ListElement
-              link="docs/guides/deploy/overview"
+              link="guides/deploy/overview"
               type={ICONTYPE.SYSTEM}
               title="Deploy"
               description=""
             />
             <ListElement
-              link="docs/guides/trainings/introduction"
+              link="guides/trainings/introduction"
               type={ICONTYPE.STORAGE}
               title="Trainings"
               description=""
@@ -92,7 +92,7 @@ const features = [
     title: "Quickstarts",
     darkImageUrl: "img/index/Quickstarts-dark.svg",
     lightImageUrl: "img/index/Quickstarts-light.svg",
-    link: "docs/examples/introduction",
+    link: "examples/introduction",
     description: (
       <>
         Learn how to integrate your applications and build secure workflows and
@@ -102,26 +102,26 @@ const features = [
     content: (
       <div className={styles.quickstartcontainer}>
         <QuickstartLink
-          link="/docs/examples/login/angular"
-          imageSource="/img/tech/angular.svg"
+          link="examples/login/angular"
+          imageSource="img/tech/angular.svg"
           title="Angular"
           description="Add the user login to your application and query some data from the userinfo endpoint"
         />
         <QuickstartLink
-          link="/docs/examples/login/react"
-          imageSource="/img/tech/react.png"
+          link="examples/login/react"
+          imageSource="img/tech/react.png"
           title="React"
           description="Logs into your application and queries some data from the userinfo endpoint"
         />
         <QuickstartLink
-          link="/docs/examples/login/flutter"
-          imageSource="/img/tech/flutter.svg"
+          link="examples/login/flutter"
+          imageSource="img/tech/flutter.svg"
           title="Flutter"
           description="Mobile Application working for iOS and Android that authenticates your user."
         />
         <QuickstartLink
-          link="/docs/examples/login/nextjs"
-          imageSource="/img/tech/nextjslight.svg"
+          link="examples/login/nextjs"
+          imageSource="img/tech/nextjslight.svg"
           lightImageSource="/img/tech/nextjs.svg"
           title="NextJS"
           description="A simple application to log into your user account and query some data from User endpoint."
@@ -131,9 +131,9 @@ const features = [
   },
   {
     title: "APIs",
-    darkImageUrl: "img/index/APIs-dark.svg",
-    lightImageUrl: "img/index/APIs-light.svg",
-    link: "/docs/apis/introduction",
+    darkImageUrl: "/img/index/APIs-dark.svg",
+    lightImageUrl: "/img/index/APIs-light.svg",
+    link: "/apis/introduction",
     description: (
       <>Learn more about our APIs and how to integrate them in your apps.</>
     ),
@@ -141,13 +141,13 @@ const features = [
       <div className={styles.apilinks}>
         <ListWrapper>
           <ListElement
-            link="./docs/apis/proto/auth"
+            link=".apis/proto/auth"
             type={ICONTYPE.APIS}
             title="Proto Definitions"
             description=""
           />
           <ListElement
-            link="./docs/apis/openidoauth/endpoints"
+            link="apis/openidoauth/endpoints"
             type={ICONTYPE.APIS}
             title="OpenID Connect and OAuth"
             description="Scopes, Claims, Authentication Methods, Grant Types"
@@ -160,7 +160,7 @@ const features = [
     title: "Concepts",
     darkImageUrl: "img/index/Concepts-dark.svg",
     lightImageUrl: "img/index/Concepts-light.svg",
-    link: "docs/concepts/introduction",
+    link: "/concepts/introduction",
     description: (
       <>
         Learn more about engineering and design principles, ZITADELs
@@ -170,19 +170,19 @@ const features = [
     content: (
       <ListWrapper>
         <ListElement
-          link="./docs/concepts/principles"
+          link="concepts/principles"
           type={ICONTYPE.TASKS}
           title="Principles"
           description="Design and engineering principles"
         />
         <ListElement
-          link="./docs/concepts/architecture/software"
+          link="concepts/architecture/software"
           type={ICONTYPE.ARCHITECTURE}
           title="Architecture"
           description="Sotware-, Cluster- and Multi Cluster Architecture"
         />
         <ListElement
-          link="./docs/concepts/structure/overview"
+          link="concepts/structure/overview"
           type={ICONTYPE.ARCHITECTURE}
           title="Structure"
           description="Object structure of ZITADEL"
@@ -255,14 +255,12 @@ function Feature({
 
 const Gigi = () => {
   return (
-    
-      <div className={styles.gigiwrapper}>
-        <div className={styles.gigiwrapperrelative}>
-          <img height="151px" width="256px" src="/img/gigi.svg" />
-          <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
-        </div>
+    <div className={styles.gigiwrapper}>
+      <div className={styles.gigiwrapperrelative}>
+        <img height="151px" width="256px" src="img/gigi.svg" />
+        <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
       </div>
-    
+    </div>
   );
 };
 
@@ -270,9 +268,7 @@ export default function Home() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
   return (
-    <Layout
-      description={`${siteConfig.customFields.description}`}
-    >
+    <Layout description={`${siteConfig.customFields.description}`}>
       <header className={clsx("hero", styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
@@ -283,7 +279,7 @@ export default function Home() {
                 "button button--outline button--lg get-started",
                 styles.getStarted
               )}
-              to={useBaseUrl("docs/guides/start/quickstart")}
+              to={useBaseUrl("/guides/start/quickstart")}
             >
               Get Started
             </Link>

@@ -11,20 +11,20 @@ We recommend running ZITADEL highly available using an orchestrator that schedul
 
 ## Configuration
 
-Read [on the configure page](/docs/guides/manage/self-hosted/configure) about the available options you have to configure ZITADEL.
+Read [on the configure page](/guides/manage/self-hosted/configure) about the available options you have to configure ZITADEL.
 
 ## Networking
 
-- To make ZITADEL available at the domain of your choice, [you need to configure the ExternalDomain property](/docs/guides/manage/self-hosted/custom-domain).
-- To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/docs/guides/manage/self-hosted/tls_modes).
-- If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/docs/guides/manage/self-hosted/http2)**.
-- You can also refer to some **[example reverse proxy configurations](/docs/guides/manage/self-hosted/reverseproxy/reverse_proxy)**.
+- To make ZITADEL available at the domain of your choice, [you need to configure the ExternalDomain property](/guides/manage/self-hosted/custom-domain).
+- To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/guides/manage/self-hosted/tls_modes).
+- If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/guides/manage/self-hosted/http2)**.
+- You can also refer to some **[example reverse proxy configurations](/guides/manage/self-hosted/reverseproxy/reverse_proxy)**.
 - The ZITADEL Console web GUI uses many gRPC-Web stubs. This results in a fairly big JavaScript bundle. You might want to compress it using [Gzip](https://www.gnu.org/software/gzip/) or [Brotli](https://github.com/google/brotli).
 - Serving and caching the assets using a content delivery network could improve network latencies and shield your ZITADEL runtime.
 
 ## Monitoring
 
-By default, [**metrics**](docs/apis/observability/metrics) are exposed at /debug/metrics in OpenTelemetry (otel) format.
+By default, [**metrics**](/apis/observability/metrics) are exposed at /debug/metrics in OpenTelemetry (otel) format.
 
 Also, you can enable **tracing** in the ZITADEL configuration.
 
@@ -96,7 +96,6 @@ Generally, for maintaining your database management system in production,
 please refer to the corresponding docs
 [for CockroachDB](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html)
 or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
-
 
 ## Data Initialization
 
