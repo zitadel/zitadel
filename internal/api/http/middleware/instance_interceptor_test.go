@@ -76,7 +76,12 @@ func Test_instanceInterceptor_Handler(t *testing.T) {
 			rr := httptest.NewRecorder()
 			got.ServeHTTP(rr, tt.args.request)
 			assert.Equal(t, tt.res.statusCode, rr.Code)
-			assert.Equal(t, tt.res.context, next.context)
+
+			if tt.res.context == nil {
+				assert.Nil(t, next.context)
+				return
+			}
+			assert.Equal(t, authz.GetInstance(tt.res.context), authz.GetInstance(next.context))
 		})
 	}
 }
@@ -143,7 +148,12 @@ func Test_instanceInterceptor_HandlerFunc(t *testing.T) {
 			rr := httptest.NewRecorder()
 			got.ServeHTTP(rr, tt.args.request)
 			assert.Equal(t, tt.res.statusCode, rr.Code)
-			assert.Equal(t, tt.res.context, next.context)
+
+			if tt.res.context == nil {
+				assert.Nil(t, next.context)
+				return
+			}
+			assert.Equal(t, authz.GetInstance(tt.res.context), authz.GetInstance(next.context))
 		})
 	}
 }
