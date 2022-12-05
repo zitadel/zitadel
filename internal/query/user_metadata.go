@@ -70,9 +70,13 @@ var (
 		name:  projection.UserMetadataColumnValue,
 		table: userMetadataTable,
 	}
+	UserMetadataOwnerRemovedCol = Column{
+		name:  projection.UserMetadataColumnOwnerRemoved,
+		table: userMetadataTable,
+	}
 )
 
-func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, queries ...SearchQuery) (_ *UserMetadata, err error) {
+func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, withOwnerRemoved bool, queries ...SearchQuery) (_ *UserMetadata, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -84,12 +88,15 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			UserMetadataUserIDCol.identifier():     userID,
-			UserMetadataKeyCol.identifier():        key,
-			UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		UserMetadataUserIDCol.identifier():     userID,
+		UserMetadataKeyCol.identifier():        key,
+		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[UserMetadataOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-aDGG2", "Errors.Query.SQLStatment")
 	}
@@ -98,7 +105,7 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 	return scan(row)
 }
 
-func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries) (_ *UserMetadataList, err error) {
+func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool, userID string, queries *UserMetadataSearchQueries, withOwnerRemoved bool) (_ *UserMetadataList, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -107,12 +114,14 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	}
 
 	query, scan := prepareUserMetadataListQuery()
-	stmt, args, err := queries.toQuery(query).Where(
-		sq.Eq{
-			UserMetadataUserIDCol.identifier():     userID,
-			UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).
-		ToSql()
+	eq := sq.Eq{
+		UserMetadataUserIDCol.identifier():     userID,
+		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[UserMetadataOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Egbgd", "Errors.Query.SQLStatment")
 	}

@@ -68,6 +68,10 @@ var (
 		name:  projection.ActionAllowedToFailCol,
 		table: actionTable,
 	}
+	ActionColumnOwnerRemoved = Column{
+		name:  projection.ActionOwnerRemovedCol,
+		table: actionTable,
+	}
 )
 
 type Actions struct {
@@ -109,16 +113,18 @@ func (q *ActionSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries) (actions *Actions, err error) {
+func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries, withOwnerRemoved bool) (actions *Actions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareActionsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).
-		ToSql()
+	eq := sq.Eq{
+		ActionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[ActionColumnOwnerRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SDgwg", "Errors.Query.InvalidRequest")
 	}
@@ -135,17 +141,20 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	return actions, err
 }
 
-func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (_ *Action, err error) {
+func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, withOwnerRemoved bool) (_ *Action, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareActionQuery()
-	query, args, err := stmt.Where(
-		sq.Eq{
-			ActionColumnID.identifier():            id,
-			ActionColumnResourceOwner.identifier(): orgID,
-			ActionColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		ActionColumnID.identifier():            id,
+		ActionColumnResourceOwner.identifier(): orgID,
+		ActionColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[ActionColumnOwnerRemoved.identifier()] = false
+	}
+	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}

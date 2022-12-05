@@ -82,17 +82,22 @@ var (
 		name:  projection.IDPUserLinkDisplayNameCol,
 		table: idpUserLinkTable,
 	}
+	IDPUserLinkOwnerRemovedCol = Column{
+		name:  projection.IDPUserLinkOwnerRemovedCol,
+		table: idpUserLinkTable,
+	}
 )
 
-func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery) (idps *IDPUserLinks, err error) {
+func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, withOwnerRemoved bool) (idps *IDPUserLinks, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareIDPUserLinksQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			IDPUserLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{IDPUserLinkInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[IDPUserLinkOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
 	}

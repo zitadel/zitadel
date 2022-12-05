@@ -118,7 +118,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   req.setInitPasswordDoneText(r8);
 
   const r9 = new InitPasswordScreenText();
-  r9.setCodeLabel(map.initPasswordText?.description ?? '');
+  r9.setCodeLabel(map.initPasswordText?.codeLabel ?? '');
   r9.setDescription(map.initPasswordText?.description ?? '');
   r9.setNewPasswordConfirmLabel(map.initPasswordText?.newPasswordConfirmLabel ?? '');
   r9.setNewPasswordLabel(map.initPasswordText?.newPasswordLabel ?? '');

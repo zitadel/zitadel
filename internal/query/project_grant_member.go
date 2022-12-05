@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -54,6 +53,18 @@ var (
 		name:  projection.ProjectGrantMemberGrantIDCol,
 		table: projectGrantMemberTable,
 	}
+	ProjectGrantMemberOwnerRemoved = Column{
+		name:  projection.MemberOwnerRemoved,
+		table: projectGrantMemberTable,
+	}
+	ProjectGrantMemberUserOwnerRemoved = Column{
+		name:  projection.MemberUserOwnerRemoved,
+		table: projectGrantMemberTable,
+	}
+	ProjectGrantMemberGrantedOrgRemoved = Column{
+		name:  projection.ProjectGrantMemberGrantedOrgRemoved,
+		table: projectGrantMemberTable,
+	}
 )
 
 type ProjectGrantMembersQuery struct {
@@ -76,15 +87,20 @@ func (q *ProjectGrantMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuil
 		})
 }
 
-func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrantMembersQuery) (_ *Members, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+func addProjectGrantMemberWithoutOwnerRemoved(eq map[string]interface{}) {
+	eq[ProjectGrantMemberOwnerRemoved.identifier()] = false
+	eq[ProjectGrantMemberUserOwnerRemoved.identifier()] = false
+	eq[ProjectGrantMemberGrantedOrgRemoved.identifier()] = false
+}
 
+func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrantMembersQuery, withOwnerRemoved bool) (*Members, error) {
 	query, scan := prepareProjectGrantMembersQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			ProjectGrantMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{ProjectGrantMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		addProjectGrantMemberWithoutOwnerRemoved(eq)
+		addLoginNameWithoutOwnerRemoved(eq)
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-USNwM", "Errors.Query.InvalidRequest")
 	}

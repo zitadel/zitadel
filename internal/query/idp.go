@@ -110,6 +110,10 @@ var (
 		name:  projection.IDPTypeCol,
 		table: idpTable,
 	}
+	IDPOwnerRemovedCol = Column{
+		name:  projection.IDPOwnerRemovedCol,
+		table: idpTable,
+	}
 )
 
 var (
@@ -183,7 +187,7 @@ var (
 )
 
 // IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
-func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string) (_ *IDP, err error) {
+func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string, withOwnerRemoved bool) (_ *IDP, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -191,23 +195,22 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 		projection.IDPProjection.Trigger(ctx)
 	}
 
-	stmt, scan := prepareIDPByIDQuery()
-	query, args, err := stmt.Where(
-		sq.And{
-			sq.Eq{
-				IDPIDCol.identifier():         id,
-				IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
-			sq.Or{
-				sq.Eq{
-					IDPResourceOwnerCol.identifier(): resourceOwner,
-				},
-				sq.Eq{
-					IDPResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
-			},
+	eq := sq.Eq{
+		IDPIDCol.identifier():         id,
+		IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[IDPOwnerRemovedCol.identifier()] = false
+	}
+	where := sq.And{
+		eq,
+		sq.Or{
+			sq.Eq{IDPResourceOwnerCol.identifier(): resourceOwner},
+			sq.Eq{IDPResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID()},
 		},
-	).ToSql()
+	}
+	stmt, scan := prepareIDPByIDQuery()
+	query, args, err := stmt.Where(where).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
 	}
@@ -217,15 +220,18 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 }
 
 // IDPs searches idps matching the query
-func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries) (idps *IDPs, err error) {
+func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwnerRemoved bool) (idps *IDPs, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareIDPsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{
+		IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[IDPOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
 	}
@@ -512,11 +518,11 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 		}
 }
 
-func (q *Queries) GetOIDCIDPClientSecret(ctx context.Context, shouldRealTime bool, resourceowner, idpID string) (_ string, err error) {
+func (q *Queries) GetOIDCIDPClientSecret(ctx context.Context, shouldRealTime bool, resourceowner, idpID string, withOwnerRemoved bool) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	idp, err := q.IDPByIDAndResourceOwner(ctx, shouldRealTime, idpID, resourceowner)
+	idp, err := q.IDPByIDAndResourceOwner(ctx, shouldRealTime, idpID, resourceowner, withOwnerRemoved)
 	if err != nil {
 		return "", err
 	}

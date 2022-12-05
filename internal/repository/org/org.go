@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
@@ -169,24 +172,49 @@ func OrgReactivatedEventMapper(event *repository.Event) (eventstore.Event, error
 type OrgRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	name                 string
+	usernames            []string
+	loginMustBeDomain    bool
+	domains              []string
+	externalIDPs         []*domain.UserIDPLink
+	samlEntityIDs        []string
 }
 
 func (e *OrgRemovedEvent) Data() interface{} {
-	return e
+	return nil
 }
 
 func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveOrgNameUniqueConstraint(e.name)}
+	constraints := []*eventstore.EventUniqueConstraint{
+		NewRemoveOrgNameUniqueConstraint(e.name),
+	}
+	for _, name := range e.usernames {
+		constraints = append(constraints, user.NewRemoveUsernameUniqueConstraint(name, e.Aggregate().ID, e.loginMustBeDomain))
+	}
+	for _, domain := range e.domains {
+		constraints = append(constraints, NewRemoveOrgDomainUniqueConstraint(domain))
+	}
+	for _, idp := range e.externalIDPs {
+		constraints = append(constraints, user.NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
+	}
+	for _, entityID := range e.samlEntityIDs {
+		constraints = append(constraints, project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID))
+	}
+	return constraints
 }
 
-func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgRemovedEvent {
+func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, loginMustBeDomain bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			OrgRemovedEventType,
 		),
-		name: name,
+		name:              name,
+		usernames:         usernames,
+		domains:           domains,
+		externalIDPs:      externalIDPs,
+		samlEntityIDs:     samlEntityIDs,
+		loginMustBeDomain: loginMustBeDomain,
 	}
 }
 

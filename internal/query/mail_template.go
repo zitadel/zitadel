@@ -63,25 +63,27 @@ var (
 		name:  projection.MailTemplateStateCol,
 		table: mailTemplateTable,
 	}
+	MailTemplateColOwnerRemoved = Column{
+		name:  projection.MailTemplateOwnerRemovedCol,
+		table: mailTemplateTable,
+	}
 )
 
-func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string) (_ *MailTemplate, err error) {
+func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (_ *MailTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareMailTemplateQuery()
+	eq := sq.Eq{MailTemplateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[MailTemplateColOwnerRemoved.identifier()] = false
+	}
 	query, args, err := stmt.Where(
 		sq.And{
-			sq.Eq{
-				MailTemplateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-			},
+			eq,
 			sq.Or{
-				sq.Eq{
-					MailTemplateColAggregateID.identifier(): orgID,
-				},
-				sq.Eq{
-					MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				},
+				sq.Eq{MailTemplateColAggregateID.identifier(): orgID},
+				sq.Eq{MailTemplateColAggregateID.identifier(): authz.GetInstance(ctx).InstanceID()},
 			},
 		}).
 		OrderBy(MailTemplateColIsDefault.identifier()).

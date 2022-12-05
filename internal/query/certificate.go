@@ -79,13 +79,10 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				KeyColUse.identifier():        usage,
 			},
-			sq.Gt{
-				CertificateColExpiry.identifier(): t,
-			},
-			sq.Gt{
-				KeyPrivateColExpiry.identifier(): t,
-			},
-		}).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
+			sq.Gt{CertificateColExpiry.identifier(): t},
+			sq.Gt{KeyPrivateColExpiry.identifier(): t},
+		},
+	).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
 	}

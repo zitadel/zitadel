@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	idpProviderTable = "auth.idp_providers"
+	idpProviderTable = "auth.idp_providers2"
 )
 
 func (v *View) IDPProviderByAggregateAndIDPConfigID(aggregateID, idpConfigID, instanceID string) (*model.IDPProviderView, error) {
@@ -63,6 +63,14 @@ func (v *View) DeleteIDPProvidersByAggregateID(aggregateID, instanceID string, e
 
 func (v *View) DeleteInstanceIDPProviders(event *models.Event) error {
 	err := view.DeleteInstanceIDPProviders(v.Db, idpProviderTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedIDPProviderSequence(event)
+}
+
+func (v *View) UpdateOrgOwnerRemovedIDPProviders(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedIDPProviders(v.Db, idpProviderTable, event.InstanceID, event.AggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}
