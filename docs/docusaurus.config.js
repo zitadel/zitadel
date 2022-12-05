@@ -2,8 +2,8 @@
 module.exports = {
   title: "ZITADEL Docs",
   trailingSlash: false,
-  url: "https://docs.zitadel.com",
-  baseUrl: "/",
+  url: "https://zitadel.com",
+  baseUrl: "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
