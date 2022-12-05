@@ -1682,6 +1682,7 @@
     "TITLEFIRST": "Nome dell' applicazione",
     "TYPETITLE": "Che tipo di applicazione vuoi creare?",
     "OIDC": {
+      "WELLKNOWN": "Per ulteriori informazioni, consultare il sito <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client ID"

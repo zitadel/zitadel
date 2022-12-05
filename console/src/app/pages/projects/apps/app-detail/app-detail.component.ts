@@ -79,6 +79,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public app?: App.AsObject;
 
   public environmentMap: { [key: string]: string } = {};
+  public wellKnownMap: { [key: string]: string } = {};
 
   public oidcResponseTypes: OIDCResponseType[] = [
     OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
@@ -180,6 +181,16 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         mgmtServiceUrl: env.api,
         authServiceUrl: env.api,
       };
+
+      this.http.get(`${env.issuer}/.well-known/openid-configuration`).subscribe((wellKnown: any) => {
+        this.wellKnownMap = {
+          authorization_endpoint: wellKnown.authorization_endpoint,
+          end_session_endpoint: wellKnown.end_session_endpoint,
+          introspection_endpoint: wellKnown.introspection_endpoint,
+          token_endpoint: wellKnown.token_endpoint,
+          userinfo_endpoint: wellKnown.userinfo_endpoint,
+        };
+      });
     });
   }
 

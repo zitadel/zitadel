@@ -1677,6 +1677,7 @@
     "ORIGINS": "其他来源",
     "NOTANORIGIN": "输入的值不是有效来源",
     "OIDC": {
+      "WELLKNOWN": "欲了解更多信息，请看<a href='{url}}' title='发现端点' target='_blank'>发现端点</a>。",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"
