@@ -281,9 +281,9 @@ func (h *AddHuman) ensureDisplayName() {
 //   - have no authentication method (password / passwordless)
 func (h *AddHuman) shouldAddInitCode() bool {
 	return !h.ExternalIDP &&
-		!h.Email.Verified &&
+		!h.Email.Verified ||
 		!h.Passwordless &&
-		h.Password == ""
+			h.Password == ""
 }
 
 func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
