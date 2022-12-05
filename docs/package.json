@@ -71,6 +71,7 @@
     "body-parser": "1.20.0",
     "bonjour-service": "1.0.12",
     "boxen": "6.2.1",
+    "buffer": "^6.0.3",
     "clean-css": "5.3.0",
     "cli-boxes": "3.0.0",
     "cli-table3": "0.6.2",

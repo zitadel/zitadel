@@ -16,7 +16,7 @@ An Open ID Connect (OIDC) [authentication request](https://openid.net/specs/open
 In this version of ZITADEL, human end-users need to authenticate trough a hosted login page.
 Your application should initiate a login by issuing an authentication request and redirecting the user to the login page. You can also customize the behavior of ZITADEL by providing additional parameters and scopes in the request.
 
-This playground should help you to initialially craft an authentication request to explore the behavior of ZITADEL in more detail. 
+This playground should help you to initialially craft an authentication request to explore the behavior of ZITADEL in more detail.
 
 ## Request parameters explained
 
@@ -24,22 +24,27 @@ Not all request parameters are available in the playground. Please refer to the 
 
 ### Your Domain
 
-The <span class="text-yellow-500">Instance Domain</span> to your ZITADEL instance. Use the base-path, the playground will add the required path to the request.
+The <span className="text-yellow-500">Instance Domain</span> to your ZITADEL instance. Use the base-path, the playground will add the required path to the request.
 
 ### Required Parameters
 
 <p>
-    <span class="text-green-500">Client ID</span> is the resource id of an application. 
-    It's the application where you want your users to login. 
-    You can find the resource id in the Console. When using organization grants, use the client id from the origin organization.
+  <span className="text-green-500">Client ID</span> is the resource id of an
+  application. It's the application where you want your users to login. You can
+  find the resource id in the Console. When using organization grants, use the
+  client id from the origin organization.
 </p>
 
 <p>
-    <span class="text-blue-500">Redirect URI</span> be one of the pre-configured redirect uris for your application. You must add the redirect uri for your application, else you will receive an error.
+  <span className="text-blue-500">Redirect URI</span> be one of the
+  pre-configured redirect uris for your application. You must add the redirect
+  uri for your application, else you will receive an error.
 </p>
 
 <p>
-    <span class="text-orange-500">Response Type</span> termines whether a code, id_token token or just id_token will be returned. Most use cases will need code.
+  <span className="text-orange-500">Response Type</span> termines whether a
+  code, id_token token or just id_token will be returned. Most use cases will
+  need code.
 </p>
 
 More in the <a href="/docs/apis/openidoauth/endpoints#required-request-parameters">documentation</a> about required Parameters.
@@ -48,24 +53,27 @@ More in the <a href="/docs/apis/openidoauth/endpoints#required-request-parameter
 
 Depending on the authentication and authorization flow of your application you might need to append some information to the authentication request.
 
-<span class="text-teal-600">Authentication method</span> "(none) PKCE" is recommended for most application types.
-The playground appends automatically a code challenge for PKCE flows.
+<span className="text-teal-600">Authentication method</span> "(none) PKCE" is recommended
+for most application types. The playground appends automatically a code challenge
+for PKCE flows.
 
-You need to append a "Code Challenge" by providing a random <span class="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/docs/guides/integrate/login-users#token-request) for more details. 
+You need to append a "Code Challenge" by providing a random <span className="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/docs/guides/integrate/login-users#token-request) for more details.
 
 More in the [documentation](/docs/apis/openidoauth/authn-methods) about authentication methods.
 
 ### Additional Parameters
 
 <p>
-    <span class="text-cyan-500">Prompt</span> defines if and how the user should be prompted on login. 
-    For example you can pre-select a login name (<code>select_account</code>) or present the register form (<code>create</code>) to users directly.
-    The value  <code>login</code> requires the user to re-authenticate.
+  <span className="text-cyan-500">Prompt</span> defines if and how the user
+  should be prompted on login. For example you can pre-select a login name (
+  <code>select_account</code>) or present the register form (<code>create</code>
+  ) to users directly. The value <code>login</code> requires the user to
+  re-authenticate.
 </p>
 
 <p>
-    <span class="text-rose-500">Login hint</span> must be a valid logon name of a user.
-    You can skip the account picker by providing the Login hint.
+  <span className="text-rose-500">Login hint</span> must be a valid logon name
+  of a user. You can skip the account picker by providing the Login hint.
 </p>
 
 There are many more additional parameters. Please refer to the [documentation](/docs/apis/openidoauth/endpoints#additional-parameters) about additional parameters.
@@ -74,7 +82,7 @@ There are many more additional parameters. Please refer to the [documentation](/
 
 Not all scopes are available in the playground. Please refer to the full [documentation](/docs/apis/openidoauth/scopes) for the exhaustive list of available standard and reserved scopes.
 
-Used to request additional information from ZITADEL. 
+Used to request additional information from ZITADEL.
 These scopes are defined in the OpenID Connect specification.
 The `openid` scope is mandatory.
 
@@ -85,7 +93,7 @@ Please refer to the documentation for a full list of available reserved scopes.
 
 ### Organization policies and branding
 
-Enforce a organization's policies and branding as well as membership of the user by passing the scope `urn:zitadel:iam:org:id:{id}` with the required <span class="text-purple-500">Organization ID</span>.
+Enforce a organization's policies and branding as well as membership of the user by passing the scope `urn:zitadel:iam:org:id:{id}` with the required <span className="text-purple-500">Organization ID</span>.
 
 Please refer to the full [guide on user metadata](/docs/guides/manage/customize/branding).
 

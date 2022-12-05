@@ -1,11 +1,10 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
 import { AuthRequestContext } from "../utils/authrequest";
-import styles from "../css/authrequest.module.css";
-import CodeBlock from "@theme/CodeBlock";
 import { Listbox } from "@headlessui/react";
 import { Transition } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
+import { Buffer } from "buffer";
 
 export function SetAuthRequest() {
   const {
@@ -40,7 +39,6 @@ export function SetAuthRequest() {
   const allPrompts = ["", "login", "select_account", "create"];
 
   const allAuthMethods = ["(none) PKCE", "Client Secret Basic"];
-
 
   const CodeSnipped = ({ cname, children }) => {
     return <span className={cname}>{children}</span>;
@@ -87,38 +85,27 @@ export function SetAuthRequest() {
 
   async function string_to_sha256(message) {
     // encode as UTF-8
-    const msgBuffer = new TextEncoder().encode(message);                    
+    const msgBuffer = new TextEncoder().encode(message);
     // hash the message
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
     // return ArrayBuffer
     return hashBuffer;
   }
   async function encodeCodeChallenge(codeChallenge) {
-      let arrayBuffer = await string_to_sha256(codeChallenge)
-      // https://stackoverflow.com/a/60321567
-      // requires an
-      // import { Buffer } from 'node:buffer';
-      // throws an error on webpack
-      // using deprecated method for now
-      // should be replaced by: 
-      // let buffer = Buffer.from(arrayBuffer);
-      // let base64 = buffer.toString('base64')
-      let base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-      let base54url = base64_to_base64url(base64)
-      return base54url
-      
+    let arrayBuffer = await string_to_sha256(codeChallenge);
+    let buffer = Buffer.from(arrayBuffer);
+    let base64 = buffer.toString("base64");
+    let base54url = base64_to_base64url(base64);
+    return base54url;
   }
-  var base64_to_base64url = function(input) {
-      input = input
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_')
-          .replace(/=+$/g, '');
-      return input;
-  }
-  
+  var base64_to_base64url = function (input) {
+    input = input.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    return input;
+  };
+
   useEffect(async () => {
-    setCodeChallenge(await encodeCodeChallenge(codeVerifier))
-  }, [codeVerifier])
+    setCodeChallenge(await encodeCodeChallenge(codeVerifier));
+  }, [codeVerifier]);
 
   useEffect(() => {
     const newScopeState = allScopes.map((s) => scope.includes(s));
@@ -251,85 +238,89 @@ export function SetAuthRequest() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4  mt-6">
-          <div className="flex flex-col">
-            <label className={`${labelClasses} text-teal-600`}>Authentication method</label>
-            <Listbox value={authMethod} onChange={setAuthMethod}>
-              <div className="relative">
-                <Listbox.Button className="transition-colors duration-300 text-black dark:text-white h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-solid border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500">
-                  <span className="block truncate">{authMethod}</span>
-                  <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                    <ChevronUpDownIcon
-                      className="h-5 w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                  </span>
-                </Listbox.Button>
-                <span className={`${hintClasses} flex`}>
-                  Authentication method
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        <div className="flex flex-col">
+          <label className={`${labelClasses} text-teal-600`}>
+            Authentication method
+          </label>
+          <Listbox value={authMethod} onChange={setAuthMethod}>
+            <div className="relative">
+              <Listbox.Button className="transition-colors duration-300 text-black dark:text-white h-10 relative w-full cursor-default rounded-md bg-white dark:bg-input-dark-background py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-solid border-input-light-border dark:border-input-dark-border hover:border-black hover:dark:border-white focus:border-primary-light-500 focus:dark:border-primary-dark-500">
+                <span className="block truncate">{authMethod}</span>
+                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
                 </span>
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Listbox.Options className="pl-0 list-none z-10 absolute top-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {allAuthMethods.map((type, typeIdx) => (
-                      <Listbox.Option
-                        key={typeIdx}
-                        className={({ active }) =>
-                          `h-10 relative cursor-default select-none py-2 pl-10 pr-4 ${
-                            active ? "bg-black/20 dark:bg-white/20" : ""
-                          }`
-                        }
-                        value={type}
-                      >
-                        {({ selected }) => (
-                          <>
-                            <span
-                              className={`block truncate ${
-                                selected ? "font-medium" : "font-normal"
-                              }`}
-                            >
-                              {type}
-                            </span>
-                            {selected ? (
-                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-cyan-500 dark:text-cyan-400">
-                                <CheckIcon
-                                  className="h-5 w-5"
-                                  aria-hidden="true"
-                                />
-                              </span>
-                            ) : null}
-                          </>
-                        )}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
-              </div>
-            </Listbox>
-          </div>
-          {authMethod === "(none) PKCE" && (
-            <div className="flex flex-col">
-              <label className={`${labelClasses} text-teal-600`}>
-                Code Verifier
-              </label>
-              <input
-                className={inputClasses(false)}
-                id="code_verifier"
-                value={codeVerifier}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  setCodeVerifier(value);
-                }}
-              />
-              <span className={hintClasses}>
-              <span className="text-teal-600">Authentication method</span> PKCE requires a random string used to generate a <code>code_challenge</code>
+              </Listbox.Button>
+              <span className={`${hintClasses} flex`}>
+                Authentication method
               </span>
+              <Transition
+                as={Fragment}
+                leave="transition ease-in duration-100"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Listbox.Options className="pl-0 list-none z-10 absolute top-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-background-dark-300 text-black dark:text-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                  {allAuthMethods.map((type, typeIdx) => (
+                    <Listbox.Option
+                      key={typeIdx}
+                      className={({ active }) =>
+                        `h-10 relative cursor-default select-none py-2 pl-10 pr-4 ${
+                          active ? "bg-black/20 dark:bg-white/20" : ""
+                        }`
+                      }
+                      value={type}
+                    >
+                      {({ selected }) => (
+                        <>
+                          <span
+                            className={`block truncate ${
+                              selected ? "font-medium" : "font-normal"
+                            }`}
+                          >
+                            {type}
+                          </span>
+                          {selected ? (
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-cyan-500 dark:text-cyan-400">
+                              <CheckIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </Transition>
             </div>
-          )}
+          </Listbox>
+        </div>
+        {authMethod === "(none) PKCE" && (
+          <div className="flex flex-col">
+            <label className={`${labelClasses} text-teal-600`}>
+              Code Verifier
+            </label>
+            <input
+              className={inputClasses(false)}
+              id="code_verifier"
+              value={codeVerifier}
+              onChange={(event) => {
+                const value = event.target.value;
+                setCodeVerifier(value);
+              }}
+            />
+            <span className={hintClasses}>
+              <span className="text-teal-600">Authentication method</span> PKCE
+              requires a random string used to generate a{" "}
+              <code>code_challenge</code>
+            </span>
+          </div>
+        )}
       </div>
 
       <h5 className="text-lg mt-6 mb-2 font-semibold">Additional Parameters</h5>
@@ -443,7 +434,7 @@ export function SetAuthRequest() {
       </div>
 
       <h5 className="text-lg mt-6 mb-2 font-semibold">Scopes</h5>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         <div className="flex flex-col">
           <label className={`${labelClasses} text-purple-500`}>
@@ -531,7 +522,9 @@ export function SetAuthRequest() {
 
       <div className="rounded-md bg-gray-700 shadow dark:bg-black/10 p-2 flex flex-col items-center">
         <code className="text-sm w-full mb-4 bg-transparent border-none">
-          <span className="text-yellow-500">{instance.endsWith('/') ? instance : instance+'/'}</span>
+          <span className="text-yellow-500">
+            {instance.endsWith("/") ? instance : instance + "/"}
+          </span>
           <span className="text-white">oauth/v2/authorize?</span>
           <CodeSnipped cname="text-green-500">{`client_id=${encodeURIComponent(
             clientId
@@ -570,7 +563,9 @@ export function SetAuthRequest() {
           }}
           target="_blank"
           className="mt-2 flex flex-row items-center py-2 px-4 text-white bg-green-500 dark:bg-green-600 hover:dark:bg-green-500 hover:text-white rounded-md hover:no-underline font-semibold text-sm"
-          href={`${instance.endsWith('/') ? instance : instance+'/'}oauth/v2/authorize?client_id=${encodeURIComponent(
+          href={`${
+            instance.endsWith("/") ? instance : instance + "/"
+          }oauth/v2/authorize?client_id=${encodeURIComponent(
             clientId
           )}&redirect_uri=${encodeURIComponent(
             redirectUri
@@ -584,7 +579,9 @@ export function SetAuthRequest() {
               : ""
           }${
             authMethod === "(none) PKCE"
-              ? `&code_challenge=${encodeURIComponent(codeChallenge)}&code_challenge_method=S256`
+              ? `&code_challenge=${encodeURIComponent(
+                  codeChallenge
+                )}&code_challenge_method=S256`
               : ""
           }`}
         >
