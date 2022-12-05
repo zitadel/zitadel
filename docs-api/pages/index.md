@@ -63,6 +63,10 @@ pater, et cum et [mea](http://grates-miserarum.org/cognitus.php). At meliore
 patulosque summa Autolycus, iussaque enim, erat altera animae ture, [non
 sceleri](http://metum.org/illum.html).
 
+{% column .striped title="auth request" language="html" %}
+This is content
+{% /column %}
+
 ### Organizations
 
 Est artus et pisa, **famem** Sparserat gradus calorem: fratre album liquidumque
@@ -142,8 +146,6 @@ sceleri](http://metum.org/illum.html).
 ## Auth
 
 ## Management
-
-### Actions
 
 ## Admin
 
