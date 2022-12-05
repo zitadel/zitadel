@@ -107,33 +107,7 @@ Export the result to the environment variable `BASIC_AUTH`.
 
 ### Create Auth Request
 
-You need to create a valid auth request, including the reserved scope `urn:zitadel:iam:user:metadata`. Please refer to our API documentation for more information about [reserved scopes](../../../apis/openidoauth/scopes#reserved-scopes).
-
-<Tabs>
-
-<TabItem value="default" label="Default" default>
-
-```bash
-echo "${ZITADEL_DOMAIN}/oauth/v2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=openid email profile urn:zitadel:iam:user:metadata"
-```
-
-</TabItem>
-
-<TabItem value="macos" label="MacOS">
-
-```zsh
-open "${ZITADEL_DOMAIN}/oauth/v2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=openid email profile urn:zitadel:iam:user:metadata"
-```
-</TabItem>
-
-<TabItem value="WSL" label="WSL">
-
-```bash
-wslview "${ZITADEL_DOMAIN}/oauth/v2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=openid email profile urn:zitadel:iam:user:metadata"
-```
-</TabItem>
-
-</Tabs>
+You need to create a valid auth request, including the reserved scope `urn:zitadel:iam:user:metadata`. Please refer to our API documentation for more information about [reserved scopes](../../../apis/openidoauth/scopes#reserved-scopes) or try it out in our [OIDC Authrequest Playground](/docs/apis/openidoauth/authrequest?scope=openid%20email%20profile%20urn%3Azitadel%3Aiam%3Auser%3Ametadata).
 
 Login with the user to which you have added the metadata. After the login you will be redirected.
 

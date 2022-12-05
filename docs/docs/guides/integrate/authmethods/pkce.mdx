@@ -29,18 +29,7 @@ the hash as well and to verify it's correct. In order to do so you're required t
 
 For example for `random-string` the code_challenge would be `9az09PjcfuENS7oDK7jUd2xAWRb-B3N7Sr3kDoWECOY`
 
-The request would finally look like (linebreaks and whitespace for display reasons):
-
-```curl
-curl --request GET \
-  --url '{your-domain}/oauth/v2/authorize
-    ?client_id=${client_id}
-    &redirect_uri=${redirect_uri}
-    &response_type=code
-    &scope=openid%20email%20profile
-    &code_challenge=${code_challenge}
-    &code_challenge_method=S256'
-```
+Try out the request in our [OIDC Authentication Request Playground](/docs/apis/openidoauth/authrequest).
 
 ### Additional parameters and customization
 
