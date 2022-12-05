@@ -120,8 +120,6 @@ func (u *User) Reduce(events []eventstore.Event) {
 			u.reduceMachineAdded(e)
 		case *user.MachineChangedEvent:
 			u.reduceMachineChanged(e)
-		// case *user.HumanPasswordChangedEvent:
-		// 	u.reduceHumanPasswordChanged(e)
 		default:
 			logging.WithFields("type", e.Type()).Debug("event not handeled")
 		}
@@ -172,7 +170,6 @@ func (u *User) SearchQuery(context.Context) *eventstore.SearchQueryBuilder {
 			user.HumanAvatarRemovedType,
 			user.MachineAddedEventType,
 			user.MachineChangedEventType,
-			user.HumanPasswordChangedType,
 		).
 		Builder()
 }
