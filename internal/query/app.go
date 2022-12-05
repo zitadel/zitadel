@@ -429,18 +429,17 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string, withOwnerR
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareAppQuery()
-	var eq []sq.Sqlizer
-	eq = append(eq, sq.And{
-		sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()},
+	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[AppColumnOwnerRemoved.identifier()] = false
+	}
+	query, args, err := stmt.Where(sq.And{
+		eq,
 		sq.Or{
 			sq.Eq{AppOIDCConfigColumnClientID.identifier(): clientID},
 			sq.Eq{AppAPIConfigColumnClientID.identifier(): clientID},
 		},
-	})
-	if !withOwnerRemoved {
-		eq = append(eq, sq.Eq{AppColumnOwnerRemoved.identifier(): false})
-	}
-	query, args, err := stmt.Where(eq).ToSql()
+	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
 	}
