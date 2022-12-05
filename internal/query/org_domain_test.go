@@ -27,16 +27,16 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.org_domains.creation_date,`+
-						` projections.org_domains.change_date,`+
-						` projections.org_domains.sequence,`+
-						` projections.org_domains.domain,`+
-						` projections.org_domains.org_id,`+
-						` projections.org_domains.is_verified,`+
-						` projections.org_domains.is_primary,`+
-						` projections.org_domains.validation_type,`+
+					regexp.QuoteMeta(`SELECT projections.org_domains2.creation_date,`+
+						` projections.org_domains2.change_date,`+
+						` projections.org_domains2.sequence,`+
+						` projections.org_domains2.domain,`+
+						` projections.org_domains2.org_id,`+
+						` projections.org_domains2.is_verified,`+
+						` projections.org_domains2.is_primary,`+
+						` projections.org_domains2.validation_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.org_domains`),
+						` FROM projections.org_domains2`),
 					nil,
 					nil,
 				),
@@ -48,16 +48,16 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.org_domains.creation_date,`+
-						` projections.org_domains.change_date,`+
-						` projections.org_domains.sequence,`+
-						` projections.org_domains.domain,`+
-						` projections.org_domains.org_id,`+
-						` projections.org_domains.is_verified,`+
-						` projections.org_domains.is_primary,`+
-						` projections.org_domains.validation_type,`+
+					regexp.QuoteMeta(`SELECT projections.org_domains2.creation_date,`+
+						` projections.org_domains2.change_date,`+
+						` projections.org_domains2.sequence,`+
+						` projections.org_domains2.domain,`+
+						` projections.org_domains2.org_id,`+
+						` projections.org_domains2.is_verified,`+
+						` projections.org_domains2.is_primary,`+
+						` projections.org_domains2.validation_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.org_domains`),
+						` FROM projections.org_domains2`),
 					[]string{
 						"id",
 						"creation_date",
@@ -106,16 +106,16 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.org_domains.creation_date,`+
-						` projections.org_domains.change_date,`+
-						` projections.org_domains.sequence,`+
-						` projections.org_domains.domain,`+
-						` projections.org_domains.org_id,`+
-						` projections.org_domains.is_verified,`+
-						` projections.org_domains.is_primary,`+
-						` projections.org_domains.validation_type,`+
+					regexp.QuoteMeta(`SELECT projections.org_domains2.creation_date,`+
+						` projections.org_domains2.change_date,`+
+						` projections.org_domains2.sequence,`+
+						` projections.org_domains2.domain,`+
+						` projections.org_domains2.org_id,`+
+						` projections.org_domains2.is_verified,`+
+						` projections.org_domains2.is_primary,`+
+						` projections.org_domains2.validation_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.org_domains`),
+						` FROM projections.org_domains2`),
 					[]string{
 						"id",
 						"creation_date",
@@ -184,16 +184,16 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.org_domains.creation_date,`+
-						` projections.org_domains.change_date,`+
-						` projections.org_domains.sequence,`+
-						` projections.org_domains.domain,`+
-						` projections.org_domains.org_id,`+
-						` projections.org_domains.is_verified,`+
-						` projections.org_domains.is_primary,`+
-						` projections.org_domains.validation_type,`+
+					regexp.QuoteMeta(`SELECT projections.org_domains2.creation_date,`+
+						` projections.org_domains2.change_date,`+
+						` projections.org_domains2.sequence,`+
+						` projections.org_domains2.domain,`+
+						` projections.org_domains2.org_id,`+
+						` projections.org_domains2.is_verified,`+
+						` projections.org_domains2.is_primary,`+
+						` projections.org_domains2.validation_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.org_domains`),
+						` FROM projections.org_domains2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

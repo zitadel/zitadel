@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	idpProviderTable = "auth.idp_providers"
+	idpProviderTable = "auth.idp_providers2"
 )
 
 func (v *View) IDPProviderByAggregateAndIDPConfigID(aggregateID, idpConfigID, instanceID string) (*model.IDPProviderView, error) {
@@ -69,20 +69,28 @@ func (v *View) DeleteInstanceIDPProviders(event *models.Event) error {
 	return v.ProcessedIDPProviderSequence(event)
 }
 
+func (v *View) UpdateOrgOwnerRemovedIDPProviders(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedIDPProviders(v.Db, idpProviderTable, event.InstanceID, event.AggregateID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedIDPProviderSequence(event)
+}
+
 func (v *View) GetLatestIDPProviderSequence(instanceID string) (*global_view.CurrentSequence, error) {
 	return v.latestSequence(idpProviderTable, instanceID)
 }
 
-func (v *View) GetLatestIDPProviderSequences(instanceIDs ...string) ([]*global_view.CurrentSequence, error) {
-	return v.latestSequences(idpProviderTable, instanceIDs...)
+func (v *View) GetLatestIDPProviderSequences(instanceIDs []string) ([]*global_view.CurrentSequence, error) {
+	return v.latestSequences(idpProviderTable, instanceIDs)
 }
 
 func (v *View) ProcessedIDPProviderSequence(event *models.Event) error {
 	return v.saveCurrentSequence(idpProviderTable, event)
 }
 
-func (v *View) UpdateIDPProviderSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(idpProviderTable)
+func (v *View) UpdateIDPProviderSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(idpProviderTable, instanceIDs)
 }
 
 func (v *View) GetLatestIDPProviderFailedEvent(sequence uint64, instanceID string) (*global_view.FailedEvent, error) {

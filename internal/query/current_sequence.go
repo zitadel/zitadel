@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -42,6 +43,10 @@ type CurrentSequencesSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func NewCurrentSequencesInstanceIDSearchQuery(instanceID string) (SearchQuery, error) {
+	return NewTextQuery(CurrentSequenceColInstanceID, instanceID, TextEquals)
+}
+
 func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
@@ -51,6 +56,9 @@ func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.Selec
 }
 
 func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSequencesSearchQueries) (failedEvents *CurrentSequences, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareCurrentSequencesQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
@@ -64,7 +72,10 @@ func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSe
 	return scan(rows)
 }
 
-func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*LatestSequence, error) {
+func (q *Queries) latestSequence(ctx context.Context, projections ...table) (_ *LatestSequence, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareLatestSequence()
 	or := make(sq.Or, len(projections))
 	for i, projection := range projections {

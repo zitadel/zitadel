@@ -42,7 +42,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_login_policy_links3 (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_login_policy_links4 (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -78,7 +78,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -109,7 +109,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -140,7 +140,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_login_policy_links3 (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.idp_login_policy_links4 (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -176,7 +176,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -204,7 +204,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -233,36 +233,9 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (idp_id = $1) AND (aggregate_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
-								"agg-id",
-								"instance-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceOrgRemoved",
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					[]byte(`{}`),
-				), org.OrgRemovedEventMapper),
-			},
-			reduce: (&idpLoginPolicyLinkProjection{}).reduceOrgRemoved,
-			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (resource_owner = $1) AND (instance_id = $2)",
-							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
 							},
@@ -288,7 +261,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (aggregate_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (aggregate_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -317,7 +290,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
@@ -347,11 +320,41 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.idp_login_policy_links3 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links4 WHERE (idp_id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
 								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&idpLoginPolicyLinkProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_login_policy_links4 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
 							},
 						},
 					},

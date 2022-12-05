@@ -4648,12 +4648,12 @@ message View {
     google.protobuf.Timestamp event_timestamp = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2019-04-01T08:45:00.000000Z\"";
-            description: "The timestamp the event occured";
+            description: "The timestamp the event occurred";
         }
-    ]; // The timestamp the event occured
+    ]; // The timestamp the event occurred
     google.protobuf.Timestamp last_successful_spooler_run = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The timestamp the event occured";
+            description: "The timestamp the event occurred";
         }
     ];
 }
@@ -4682,6 +4682,11 @@ message FailedEvent {
     string error_message = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ID=EXAMP-ID3ER Message=Example message\"";
+        }
+    ];
+    google.protobuf.Timestamp last_failed = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The timestamp the failure last occurred";
         }
     ];
 }

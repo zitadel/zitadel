@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
@@ -28,10 +29,10 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, static static.Storage) []query.Handler {
+func Register(ctx context.Context, configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, static static.Storage) []query.Handler {
 	handlers := []query.Handler{}
 	if static != nil {
-		handlers = append(handlers, newStyling(
+		handlers = append(handlers, newStyling(ctx,
 			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},
 			static))
 	}

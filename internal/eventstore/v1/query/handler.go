@@ -17,10 +17,10 @@ const (
 
 type Handler interface {
 	ViewModel() string
-	EventQuery(instanceIDs ...string) (*models.SearchQuery, error)
+	EventQuery(instanceIDs []string) (*models.SearchQuery, error)
 	Reduce(*models.Event) error
 	OnError(event *models.Event, err error) error
-	OnSuccess() error
+	OnSuccess(instanceIDs []string) error
 	MinimumCycleDuration() time.Duration
 	LockDuration() time.Duration
 	QueryLimit() uint64
@@ -32,7 +32,7 @@ type Handler interface {
 	Subscription() *v1.Subscription
 }
 
-func ReduceEvent(handler Handler, event *models.Event) {
+func ReduceEvent(ctx context.Context, handler Handler, event *models.Event) {
 	defer func() {
 		err := recover()
 
@@ -42,7 +42,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 				"cause", err,
 				"stack", string(debug.Stack()),
 				"sequence", event.Sequence,
-				"instnace", event.InstanceID,
+				"instance", event.InstanceID,
 			).Error("reduce panicked")
 		}
 	}()
@@ -60,7 +60,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 		SearchQuery().
 		SetLimit(eventLimit)
 
-	unprocessedEvents, err := handler.Eventstore().FilterEvents(context.Background(), searchQuery)
+	unprocessedEvents, err := handler.Eventstore().FilterEvents(ctx, searchQuery)
 	if err != nil {
 		logging.WithFields("sequence", event.Sequence).Warn("filter failed")
 		return
