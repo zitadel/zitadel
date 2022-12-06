@@ -1,11 +1,13 @@
 package eventstore
 
 import (
+	"context"
 	"math"
 	"reflect"
 	"testing"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -234,9 +236,9 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 func TestSearchQuerybuilderBuild(t *testing.T) {
 	testNow := time.Now()
 	type args struct {
-		columns    Columns
-		setters    []func(*SearchQueryBuilder) *SearchQueryBuilder
-		instanceID string
+		columns Columns
+		setters []func(*SearchQueryBuilder) *SearchQueryBuilder
+		ctx     context.Context
 	}
 	type res struct {
 		isErr func(err error) bool
@@ -291,6 +293,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testAddQuery(testSetAggregateTypes("user")),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -313,6 +316,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
 					testAddQuery(testSetAggregateTypes("user", "org")),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -340,6 +344,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateTypes("user"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -368,6 +373,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateTypes("user"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -397,6 +403,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateTypes("user"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -423,6 +430,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateIDs("1234"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -453,6 +461,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -483,6 +492,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateIDs("1234", "0815"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -509,6 +519,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetSequenceGreater(8),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -535,6 +546,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetEventTypes("user.created"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -561,6 +573,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetEventTypes("user.created", "user.changed"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -587,6 +600,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateTypes("user"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -614,6 +628,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetSequenceLess(16),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: nil,
@@ -640,7 +655,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateTypes("user"),
 					),
 				},
-				instanceID: "instanceID",
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 			},
 			res: res{
 				isErr: nil,
@@ -667,7 +682,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetCreationDateAfter(testNow),
 					),
 				},
-				instanceID: "instanceID",
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 			},
 			res: res{
 				isErr: nil,
@@ -694,6 +709,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateTypes("user"),
 					),
 				},
+				ctx: context.Background(),
 			},
 			res: res{
 				isErr: errors.IsPreconditionFailed,
@@ -706,7 +722,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 			for _, f := range tt.args.setters {
 				builder = f(builder)
 			}
-			query, err := builder.build(tt.args.instanceID)
+			query, err := builder.build(tt.args.ctx)
 			if tt.res.isErr != nil && !tt.res.isErr(err) {
 				t.Errorf("wrong error(%T): %v", err, err)
 				return

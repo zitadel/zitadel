@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -123,8 +122,7 @@ func uniqueConstraintsToRepository(instanceID string, constraints []*EventUnique
 // Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
-	queryFactory.CreationDateBefore(service.CallTimeFromContext(ctx))
-	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
+	query, err := queryFactory.build(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +179,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 
 // LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
-	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
+	query, err := queryFactory.build(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -190,7 +188,7 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 
 // InstanceIDs returns the instance ids found by the search query
 func (es *Eventstore) InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error) {
-	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
+	query, err := queryFactory.build(ctx)
 	if err != nil {
 		return nil, err
 	}

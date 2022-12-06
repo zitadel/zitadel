@@ -1,9 +1,12 @@
 package eventstore
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -229,13 +232,14 @@ func (query *SearchQuery) matches(event Event) bool {
 	return true
 }
 
-func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQuery, error) {
+func (builder *SearchQueryBuilder) build(ctx context.Context) (*repository.SearchQuery, error) {
 	if builder == nil ||
 		len(builder.queries) < 1 ||
 		builder.columns.Validate() != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
-	builder.instanceID = instanceID
+	builder.instanceID = authz.GetInstance(ctx).InstanceID()
+	builder.creationDateBefore = service.CallTimeFromContext(ctx)
 	filters := make([][]*repository.Filter, len(builder.queries))
 
 	for i, query := range builder.queries {
