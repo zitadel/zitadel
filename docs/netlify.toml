@@ -1,6 +1,14 @@
 [build]
   command = "npm run build"
 
+# This is a workaround to address the problem around the baseUrl from docusaurus
+# Be aware that this prevents the usage of the path /docs/docs
+[[redirects]]
+  from = "/docs/*"
+  to = "/:splat"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/proxy/js/script.js"
   to = "https://plausible.io/js/script.outbound-links.js"
@@ -22,6 +30,6 @@
 	  preload'''
     
 [[redirects]]
-  from = "/docs/quickstarts/introduction"
-  to = "/docs/examples/introduction"
+  from = "/quickstarts/introduction"
+  to = "/examples/introduction"
   status = 301
