@@ -501,8 +501,12 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		projection_old.UserProjection.Trigger(ctx)
-		projection_old.LoginNameProjection.Trigger(ctx)
+		logging.OnError(
+			projection_old.UserProjection.Trigger(ctx),
+		).Debug("unable to trigger")
+		logging.OnError(
+			projection_old.LoginNameProjection.Trigger(ctx),
+		).Debug("unable to trigger")
 	}
 
 	query, scan := prepareNotifyUserQuery()
@@ -530,8 +534,12 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		projection_old.UserProjection.Trigger(ctx)
-		projection_old.LoginNameProjection.Trigger(ctx)
+		logging.OnError(
+			projection_old.UserProjection.Trigger(ctx),
+		).Debug("unable to trigger")
+		logging.OnError(
+			projection_old.LoginNameProjection.Trigger(ctx),
+		).Debug("unable to trigger")
 	}
 
 	query, scan := prepareNotifyUserQuery()

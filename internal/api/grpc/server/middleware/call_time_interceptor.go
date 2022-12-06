@@ -3,9 +3,10 @@ package middleware
 import (
 	"context"
 
+	"google.golang.org/grpc"
+
 	"github.com/zitadel/zitadel/internal/api/service"
 	_ "github.com/zitadel/zitadel/internal/statik"
-	"google.golang.org/grpc"
 )
 
 func CallTimeHandler() grpc.UnaryServerInterceptor {
