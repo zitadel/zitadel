@@ -32,25 +32,25 @@ const features = [
         <Column>
           <div>
             <ListElement
-              link="/guides/start/quickstart"
+              link="/docs/guides/start/quickstart"
               type={ICONTYPE.START}
               title="Get started"
               description=""
             />
             <ListElement
-              link="/guides/manage/cloud/overview"
+              link="/docs/guides/manage/cloud/overview"
               type={ICONTYPE.LOGIN}
               title="ZITADEL Cloud"
               description=""
             />
             <ListElement
-              link="/guides/integrate/login-users"
+              link="/docs/guides/integrate/login-users"
               type={ICONTYPE.LOGIN}
               title="Login Users"
               description=""
             />
             <ListElement
-              link="/guides/integrate/access-zitadel-apis"
+              link="/docs/guides/integrate/access-zitadel-apis"
               type={ICONTYPE.APIS}
               title="Access APIs"
               description=""
@@ -58,7 +58,7 @@ const features = [
           </div>
           <div>
             <ListElement
-              link="/guides/solution-scenarios/introduction"
+              link="/docs/guides/solution-scenarios/introduction"
               iconClasses="las la-paragraph"
               roundClasses="custom-rounded custom-rounded-split"
               label="B2C"
@@ -66,19 +66,19 @@ const features = [
               description=""
             />
             <ListElement
-              link="/guides/manage/customize/branding"
+              link="/docs/guides/manage/customize/branding"
               type={ICONTYPE.PRIVATELABELING}
               title="Customization"
               description=""
             />
             <ListElement
-              link="/guides/deploy/overview"
+              link="/docs/guides/deploy/overview"
               type={ICONTYPE.SYSTEM}
               title="Deploy"
               description=""
             />
             <ListElement
-              link="/guides/trainings/introduction"
+              link="/docs/guides/trainings/introduction"
               type={ICONTYPE.STORAGE}
               title="Trainings"
               description=""
@@ -141,13 +141,13 @@ const features = [
       <div className={styles.apilinks}>
         <ListWrapper>
           <ListElement
-            link="/apis/proto/auth"
+            link="/docs/apis/proto/auth"
             type={ICONTYPE.APIS}
             title="Proto Definitions"
             description=""
           />
           <ListElement
-            link="/apis/openidoauth/endpoints"
+            link="/docs/apis/openidoauth/endpoints"
             type={ICONTYPE.APIS}
             title="OpenID Connect and OAuth"
             description="Scopes, Claims, Authentication Methods, Grant Types"
@@ -170,19 +170,19 @@ const features = [
     content: (
       <ListWrapper>
         <ListElement
-          link="/concepts/principles"
+          link="/docs/concepts/principles"
           type={ICONTYPE.TASKS}
           title="Principles"
           description="Design and engineering principles"
         />
         <ListElement
-          link="/concepts/architecture/software"
+          link="/docs/concepts/architecture/software"
           type={ICONTYPE.ARCHITECTURE}
           title="Architecture"
           description="Sotware-, Cluster- and Multi Cluster Architecture"
         />
         <ListElement
-          link="/concepts/structure/overview"
+          link="/docs/concepts/structure/overview"
           type={ICONTYPE.ARCHITECTURE}
           title="Structure"
           description="Object structure of ZITADEL"
