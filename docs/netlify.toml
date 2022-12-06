@@ -4,15 +4,15 @@
 # This is a workaround to address the problem around the baseUrl from docusaurus
 # Be aware that this prevents the usage of the path /docs/docs
 [[redirects]]
-  from = "https://*docs-zitadel-com.netlify.app/docs/*"
-  to = "/:splat"
-  status = 200
+  from = "https://*--docs-zitadel-com.netlify.app/"
+  to = "/docs/"
+  status = 301
   force = true
 
 [[redirects]]
-  from = "https://*docs-zitadel-com.netlify.app/"
-  to = "docs/"
-  status = 301
+  from = "https://*--docs-zitadel-com.netlify.app/docs/*"
+  to = "/:splat"
+  status = 200
   force = true
 
 [[redirects]]
