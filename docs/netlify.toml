@@ -2,6 +2,12 @@
   command = "npm run build"
 
 [[redirects]]
+  from = "/docs/*"
+  to = "/"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/proxy/js/script.js"
   to = "https://plausible.io/js/script.outbound-links.js"
   status = 200
