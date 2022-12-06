@@ -10,13 +10,13 @@
   force = true
 
 [[redirects]]
-  from = "/proxy/js/script.js"
+  from = "/docs/proxy/js/script.js"
   to = "https://plausible.io/js/script.outbound-links.js"
   status = 200
   force = true
 
 [[redirects]]
-  from = "/proxy/api/event"
+  from = "/docs/proxy/api/event"
   to = "https://plausible.io/api/event"
   status = 202
   force = true
