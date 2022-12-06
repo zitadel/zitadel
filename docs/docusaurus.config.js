@@ -2,7 +2,7 @@
 module.exports = {
   title: "ZITADEL Docs",
   trailingSlash: false,
-  url: "https://docs-zitadel-com.netlify.app",
+  url: "https://zitadel.com",
   baseUrl: "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -11,11 +11,11 @@ module.exports = {
   projectName: "zitadel",
   scripts: [
     {
-      src: "/proxy/js/script.js",
+      src: "/docs/proxy/js/script.js",
       async: true,
       defer: true,
       "data-domain": "zitadel.com",
-      "data-api": "/proxy/api/event",
+      "data-api": "/docs/proxy/api/event",
     },
   ],
   customFields: {
