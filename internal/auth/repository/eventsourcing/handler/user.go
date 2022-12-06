@@ -147,6 +147,10 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 		user_repo.HumanMFAInitSkippedType,
 		user_repo.MachineChangedEventType,
 		user_repo.HumanPasswordChangedType,
+		user_repo.HumanInitialCodeAddedType,
+		user_repo.UserV1InitialCodeAddedType,
+		user_repo.UserV1InitializedCheckSucceededType,
+		user_repo.HumanInitializedCheckSucceededType,
 		user_repo.HumanPasswordlessInitCodeAddedType,
 		user_repo.HumanPasswordlessInitCodeRequestedType:
 		user, err = u.view.UserByID(event.AggregateID, event.InstanceID)
