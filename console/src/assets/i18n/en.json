@@ -779,6 +779,7 @@
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
       "ORGDETAILUSER_TITLE": "Configure Organization Owner",
+      "DELETE": "Delete organization",
       "RENAME": {
         "ACTION": "Rename",
         "TITLE": "Rename Organization",
@@ -845,7 +846,9 @@
       "MEMBERADDED": "Manager added.",
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
-      "SETPRIMARY": "Primary domain set."
+      "SETPRIMARY": "Primary domain set.",
+      "DELETED": "Organisation deleted successfully",
+      "ORG_WAS_DELETED": "Organisation has been deleted."
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -855,6 +858,13 @@
       "REACTIVATE": {
         "TITLE": "Reactivate organization",
         "DESCRIPTION": "You are about to reactivate your organization. Users will be able to login again. Are you sure to proceed?"
+      },
+      "DELETE": {
+        "TITLE": "Delete organization",
+        "DESCRIPTION": "You are about to delete your organization. This initiates a process where all organization related data will be deleted. You can not revert this action as for now.",
+        "TYPENAME": "Type '{{value}}', to delete your organization.",
+        "ORGNAME": "Name",
+        "BTN": "Delete"
       }
     }
   },
