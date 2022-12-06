@@ -17,7 +17,7 @@ func (s *Server) GetDomainPolicy(ctx context.Context, _ *admin_pb.GetDomainPolic
 }
 
 func (s *Server) GetCustomDomainPolicy(ctx context.Context, req *admin_pb.GetCustomDomainPolicyRequest) (*admin_pb.GetCustomDomainPolicyResponse, error) {
-	policy, err := s.query.DomainPolicyByOrg(ctx, true, req.OrgId)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, req.OrgId, false)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *admin_pb.GetOrgIAMPolic
 }
 
 func (s *Server) GetCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.GetCustomOrgIAMPolicyRequest) (*admin_pb.GetCustomOrgIAMPolicyResponse, error) {
-	policy, err := s.query.DomainPolicyByOrg(ctx, true, req.OrgId)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, req.OrgId, false)
 	if err != nil {
 		return nil, err
 	}

@@ -34,7 +34,7 @@ The easiest way to have a look at them is, to import them in the [Swagger Editor
 The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.
 
 </div>
-<div class="apicard-right">
+<div className="apicard-right">
 
 ### GRPC
 
@@ -70,7 +70,7 @@ The management API is as the name states the interface where systems can mutate 
 To identify the current organization you can send a header `x-zitadel-orgid` or if no header is set, the organization of the authenticated user is set.
 
 </div>
-<div class="apicard-right">
+<div className="apicard-right">
 
 ### GRPC
 
@@ -104,7 +104,7 @@ Definition:
 This API is intended to configure and manage one ZITADEL instance itself.
 
 </div>
-<div class="apicard-right">
+<div className="apicard-right">
 
 ### GRPC
 
@@ -140,7 +140,7 @@ This API is intended to manage the different ZITADEL instances within the system
 Checkout the guide how to [access the ZITADEL System API](/docs/guides/integrate/access-zitadel-system-api).
 
 </div>
-<div class="apicard-right">
+<div className="apicard-right">
 
 ### GRPC
 
@@ -209,9 +209,9 @@ As you can see the `GetMyUser` function is also available as a REST service unde
 
 In the table below you can see the URI of those calls.
 
-| Service | URI                                                                                                                                            |
-| :------ | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| REST    | {your_domain}/auth/v1/users/me                                               |
+| Service | URI                                                 |
+| :------ | :-------------------------------------------------- |
+| REST    | {your_domain}/auth/v1/users/me                      |
 | GRPC    | {your_domain}/zitadel.auth.v1.AuthService/GetMyUser |
 
 ## Domains

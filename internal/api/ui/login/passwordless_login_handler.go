@@ -38,7 +38,7 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 	}
 	data := &passwordlessData{
 		webAuthNData{
-			userData:               l.getUserData(r, authReq, "Passwordless.Title","Passwordless.Description", errID, errMessage),
+			userData:               l.getUserData(r, authReq, "Passwordless.Title", "Passwordless.Description", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		passwordSet,

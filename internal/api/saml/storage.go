@@ -49,7 +49,7 @@ type Storage struct {
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
+	app, err := p.query.AppBySAMLEntityID(ctx, entityID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 }
 
 func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
-	app, err := p.query.AppByID(ctx, appID)
+	app, err := p.query.AppByID(ctx, appID, false)
 	if err != nil {
 		return "", err
 	}
@@ -121,7 +121,7 @@ func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.Auth
 func (p *Storage) SetUserinfoWithUserID(ctx context.Context, userinfo models.AttributeSetter, userID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := p.query.GetUserByID(ctx, true, userID)
+	user, err := p.query.GetUserByID(ctx, true, userID, false)
 	if err != nil {
 		return err
 	}
@@ -138,7 +138,7 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	if err != nil {
 		return err
 	}
-	user, err := p.query.GetUser(ctx, true, loginNameSQ)
+	user, err := p.query.GetUser(ctx, true, false, loginNameSQ)
 	if err != nil {
 		return err
 	}

@@ -37,6 +37,7 @@ const (
 	IDPProviderSearchKeyIdpConfigID
 	IDPProviderSearchKeyState
 	IDPProviderSearchKeyInstanceID
+	IDPProviderSearchKeyOwnerRemoved
 )
 
 type IDPProviderSearchQuery struct {

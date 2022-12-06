@@ -60,7 +60,7 @@ const features = [
             <ListElement
               link="docs/guides/solution-scenarios/introduction"
               iconClasses="las la-paragraph"
-              roundClasses="rounded rounded-split"
+              roundClasses="custom-rounded custom-rounded-split"
               label="B2C"
               title="Solution Scenarios"
               description=""
@@ -255,14 +255,12 @@ function Feature({
 
 const Gigi = () => {
   return (
-    
-      <div className={styles.gigiwrapper}>
-        <div className={styles.gigiwrapperrelative}>
-          <img height="151px" width="256px" src="/img/gigi.svg" />
-          <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
-        </div>
+    <div className={styles.gigiwrapper}>
+      <div className={styles.gigiwrapperrelative}>
+        <img height="151px" width="256px" src="/img/gigi.svg" />
+        <div className={styles.gigibanner}>ZITADEL Cloud OUT NOW! 🚀</div>
       </div>
-    
+    </div>
   );
 };
 
@@ -270,9 +268,7 @@ export default function Home() {
   const context = useDocusaurusContext();
   const { siteConfig = {} } = context;
   return (
-    <Layout
-      description={`${siteConfig.customFields.description}`}
-    >
+    <Layout description={`${siteConfig.customFields.description}`}>
       <header className={clsx("hero", styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
