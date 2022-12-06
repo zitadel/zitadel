@@ -22,6 +22,6 @@
 	  preload'''
     
 [[redirects]]
-  from = "/docs/quickstarts/introduction"
-  to = "/docs/examples/introduction"
+  from = "/quickstarts/introduction"
+  to = "/examples/introduction"
   status = 301

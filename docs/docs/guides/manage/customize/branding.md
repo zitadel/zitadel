@@ -46,7 +46,7 @@ If you like to trigger your settings for your applications you have different po
 Send a [reserved scope](../../../apis/openidoauth/scopes) with your [authorization request](../../integrate/login-users#auth-request) to trigger your organization.
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login.
 
-You can use our [OpenID Authentication Request Playground](/docs/apis/openidoauth/authrequest) to learn more about how to trigger an [organization's policies and branding](/docs/apis/openidoauth/authrequest#organization-policies-and-branding).
+You can use our [OpenID Authentication Request Playground](/apis/openidoauth/authrequest) to learn more about how to trigger an [organization's policies and branding](/apis/openidoauth/authrequest#organization-policies-and-branding).
 
 ### 2. Setting on your Project
 

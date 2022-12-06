@@ -2,8 +2,8 @@
 module.exports = {
   title: "ZITADEL Docs",
   trailingSlash: false,
-  url: "https://docs.zitadel.com",
-  baseUrl: "/",
+  url: "https://zitadel.com",
+  baseUrl: "/docs",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
@@ -135,11 +135,11 @@ module.exports = {
           items: [
             {
               label: "Terms and Conditions",
-              href: "/docs/legal/terms-of-service",
+              href: "/legal/terms-of-service",
             },
             {
               label: "Privacy Policy",
-              href: "/docs/legal/privacy-policy",
+              href: "/legal/privacy-policy",
             },
           ],
         },
@@ -191,6 +191,7 @@ module.exports = {
       "@docusaurus/preset-classic",
       {
         docs: {
+          routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
