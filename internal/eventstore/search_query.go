@@ -12,13 +12,14 @@ import (
 // SearchQueryBuilder represents the builder for your filter
 // if invalid data are set the filter will fail
 type SearchQueryBuilder struct {
-	columns       repository.Columns
-	limit         uint64
-	desc          bool
-	resourceOwner string
-	instanceID    string
-	queries       []*SearchQuery
-	tx            *sql.Tx
+	columns            repository.Columns
+	limit              uint64
+	desc               bool
+	resourceOwner      string
+	instanceID         string
+	queries            []*SearchQuery
+	tx                 *sql.Tx
+	creationDateBefore time.Time
 }
 
 type SearchQuery struct {
@@ -121,6 +122,11 @@ func (builder *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
 // SetTx ensures that the eventstore library uses the existing transaction
 func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
 	builder.tx = tx
+	return builder
+}
+
+func (builder *SearchQueryBuilder) CreationDateBefore(time time.Time) *SearchQueryBuilder {
+	builder.creationDateBefore = time
 	return builder
 }
 
@@ -257,11 +263,12 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 	}
 
 	return &repository.SearchQuery{
-		Columns: builder.columns,
-		Limit:   builder.limit,
-		Desc:    builder.desc,
-		Filters: filters,
-		Tx:      builder.tx,
+		Columns:            builder.columns,
+		Limit:              builder.limit,
+		Desc:               builder.desc,
+		Filters:            filters,
+		Tx:                 builder.tx,
+		CreationDateBefore: builder.creationDateBefore,
 	}, nil
 }
 

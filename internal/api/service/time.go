@@ -20,11 +20,9 @@ func WithCallTimeNow(parent context.Context) context.Context {
 	return WithCallTime(parent, time.Now())
 }
 
-func CallTimeFromContext(ctx context.Context) string {
+func CallTimeFromContext(ctx context.Context) (callTime time.Time) {
 	value := ctx.Value(callKey)
-	if name, ok := value.(string); ok {
-		return name
-	}
+	callTime, _ = value.(time.Time)
 
-	return ""
+	return callTime
 }

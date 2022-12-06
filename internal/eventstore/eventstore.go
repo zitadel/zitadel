@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -122,6 +123,7 @@ func uniqueConstraintsToRepository(instanceID string, constraints []*EventUnique
 // Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
+	queryFactory.CreationDateBefore(service.CallTimeFromContext(ctx))
 	query, err := queryFactory.build(authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err

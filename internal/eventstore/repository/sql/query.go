@@ -28,11 +28,17 @@ type querier interface {
 
 type scan func(dest ...interface{}) error
 
+// 2022-11-24 16:00:23.33129+00
+var sqlTimeLayout = "2006-01-02 15:04:05.999999-07"
+
 func query(ctx context.Context, criteria querier, searchQuery *repository.SearchQuery, dest interface{}) error {
 	query, rowScanner := prepareColumns(criteria, searchQuery.Columns)
 	where, values := prepareCondition(criteria, searchQuery.Filters)
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+	}
+	if !searchQuery.CreationDateBefore.IsZero() && searchQuery.Tx == nil {
+		query += " AS OF SYSTEM TIME '" + searchQuery.CreationDateBefore.Format(sqlTimeLayout) + "'"
 	}
 	query += where
 

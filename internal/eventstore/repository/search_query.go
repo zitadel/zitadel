@@ -2,17 +2,19 @@ package repository
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
 // SearchQuery defines the which and how data are queried
 type SearchQuery struct {
-	Columns Columns
-	Limit   uint64
-	Desc    bool
-	Filters [][]*Filter
-	Tx      *sql.Tx
+	Columns            Columns
+	Limit              uint64
+	Desc               bool
+	CreationDateBefore time.Time
+	Filters            [][]*Filter
+	Tx                 *sql.Tx
 }
 
 // Columns defines which fields of the event are needed for the query

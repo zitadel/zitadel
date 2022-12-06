@@ -2,7 +2,6 @@ package projection
 
 import (
 	"context"
-	"strings"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -18,10 +17,10 @@ func NewInstanceLoginNames(instance string) *InstanceLoginNames {
 	}
 }
 
-func NewInstanceLoginNamesWithOwner(instance, owner, loginName string) *InstanceLoginNames {
+func NewInstanceLoginNamesWithOwner(instance, owner, username string) *InstanceLoginNames {
 	return &InstanceLoginNames{
-		instance:  instance,
-		loginName: loginName,
+		instance: instance,
+		username: username,
 		Orgs: []*OrgLoginNames{
 			{
 				org:        owner,
@@ -32,9 +31,9 @@ func NewInstanceLoginNamesWithOwner(instance, owner, loginName string) *Instance
 }
 
 type InstanceLoginNames struct {
-	instance  string
-	loginName string
-	owner     string
+	instance string
+	username string
+	owner    string
 
 	policy  loginNamePolicy
 	removed bool
@@ -149,9 +148,9 @@ func (ln *InstanceLoginNames) reduceInstanceEvents(events []eventstore.Event) {
 
 func (ln *InstanceLoginNames) usernameQuery(ctx context.Context) *eventstore.SearchQueryBuilder {
 	var username map[string]interface{}
-	if ln.loginName != "" {
+	if ln.username != "" {
 		username = map[string]interface{}{
-			"userName": strings.Split(ln.loginName, "@")[0],
+			"userName": ln.username,
 		}
 	}
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
