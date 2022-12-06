@@ -2,7 +2,7 @@
 module.exports = {
   title: "ZITADEL Docs",
   trailingSlash: false,
-  url: "docs-zitadel-com.netlify.app",
+  url: "https://docs-zitadel-com.netlify.app",
   baseUrl: "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
