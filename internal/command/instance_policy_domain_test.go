@@ -226,6 +226,19 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 								"org3",
 							),
 						),
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+								false,
+								false,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewDomainPolicyRemovedEvent(context.Background(),
+								&org.NewAggregate("org3").Aggregate,
+							),
+						),
 					),
 					// domainPolicyUsernames for each org
 					// org1
