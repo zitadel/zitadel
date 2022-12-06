@@ -1,6 +1,4 @@
 [build]
-  base = "/docs"
-  publish = "/docs/build"
   command = "npm run build"
 
 # This is a workaround to address the problem around the baseUrl from docusaurus
