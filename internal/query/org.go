@@ -97,8 +97,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	events, err := q.eventstore.Filter(ctx, org.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
-	}
-	if len(events) == 0 {
+	} else if len(events) == 0 {
 		return nil, errors.ThrowNotFound(err, "QUERY-iTTGJ", "Errors.Org.NotFound")
 	}
 	org.Reduce(events)
