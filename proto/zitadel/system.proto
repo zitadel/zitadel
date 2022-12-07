@@ -569,6 +569,11 @@ message RemoveFailedEventRequest {
       example: "\"9823758\"";
     }
   ];
+  string instance_id = 4  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"840498034930840\"";
+    }
+  ];
 }
 
 //This is an empty response
@@ -632,6 +637,11 @@ message FailedEvent {
   string error_message = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"ID=EXAMP-ID3ER Message=Example message\"";
+    }
+  ];
+  google.protobuf.Timestamp last_failed = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The timestamp the failure last occurred";
     }
   ];
 }

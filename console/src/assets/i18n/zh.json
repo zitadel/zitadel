@@ -743,6 +743,7 @@
       "DATABASE": "数据库",
       "FAILEDSEQUENCE": "失败的序列",
       "FAILURECOUNT": "失败计数",
+      "LASTFAILED": "最后一次失败是在",
       "ERRORMESSAGE": "错误消息",
       "ACTIONS": "操作",
       "DELETE": "删除",
@@ -828,7 +829,8 @@
     "STATE": {
       "0": "未定义",
       "1": "启用",
-      "2": "停用"
+      "2": "停用",
+      "3": "移除"
     },
     "MEMBER": {
       "TITLE": "组织管理者",

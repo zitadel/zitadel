@@ -8,25 +8,15 @@ This is our Zitadel [Next.js](https://nextjs.org/) template. It shows how to aut
 
 ## Getting Started
 
-First, we start by creating a new NextJS app with `npx create-next-app`, which sets up everything automatically for you. To create a project, run:
+### Install dependencies
+
+To install the dependencies type:
 
 ```bash
-npx create-next-app --typescript
-# or
-yarn create next-app --typescript
+yarn install
 ```
 
-### Install Authentication library
-
-To keep the template as easy as possible we use [next-auth](https://next-auth.js.org/) as our main authentication library. To install, run:
-
-```bash
-npm i next-auth
-# or
-yarn add next-auth
-```
-
-To run the app, type:
+then to run the app:
 
 ```bash
 npm run dev
@@ -41,6 +31,7 @@ You will need to provide some information about your app.
 Navigate to your Project, then add a new application at the top of the page.
 Select Web application type and continue.
 We recommend you use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
+As the requests from your application to ZITADEL are made on NextJS serverside, you can select `CODE` in the next step. This makes sure you still get a secret which is then used in combination with PKCE. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment.
 
 ![Create app in console](/img/nextjs/app-create.png)
 
@@ -48,7 +39,7 @@ We recommend you use [Authorization Code](../../apis/openidoauth/grant-types#aut
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
-> If you are following along with the [example](https://github.com/zitadel/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:300/api/auth/callback/zitadel>.
+> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true` and the Redirect URIs to <http://localhost:300/api/auth/callback/zitadel>.
 
 If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.
 

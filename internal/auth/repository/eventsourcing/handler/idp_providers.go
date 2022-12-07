@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	idpProviderTable = "auth.idp_providers"
+	idpProviderTable = "auth.idp_providers2"
 )
 
 type IDPProvider struct {
@@ -32,6 +32,7 @@ type IDPProvider struct {
 }
 
 func newIDPProvider(
+	ctx context.Context,
 	h handler,
 	defaults systemdefaults.SystemDefaults,
 	queries *query2.Queries,
@@ -42,16 +43,16 @@ func newIDPProvider(
 		queries:        queries,
 	}
 
-	idpProvider.subscribe()
+	idpProvider.subscribe(ctx)
 
 	return idpProvider
 }
 
-func (i *IDPProvider) subscribe() {
+func (i *IDPProvider) subscribe(ctx context.Context) {
 	i.subscription = i.es.Subscribe(i.AggregateTypes()...)
 	go func() {
 		for event := range i.subscription.Events {
-			query.ReduceEvent(i, event)
+			query.ReduceEvent(ctx, i, event)
 		}
 	}()
 }
@@ -76,8 +77,8 @@ func (i *IDPProvider) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (i *IDPProvider) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
-	sequences, err := i.view.GetLatestIDPProviderSequences(instanceIDs...)
+func (i *IDPProvider) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := i.view.GetLatestIDPProviderSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +140,9 @@ func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 	case org.LoginPolicyRemovedEventType:
 		return i.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event.InstanceID, event)
 	case instance.InstanceRemovedEventType:
-		return i.view.DeleteInstanceIDPs(event)
+		return i.view.DeleteInstanceIDPProviders(event)
+	case org.OrgRemovedEventType:
+		return i.view.UpdateOrgOwnerRemovedIDPProviders(event)
 	default:
 		return i.view.ProcessedIDPProviderSequence(event)
 	}
@@ -188,14 +191,14 @@ func (i *IDPProvider) OnError(event *es_models.Event, err error) error {
 	return spooler.HandleError(event, err, i.view.GetLatestIDPProviderFailedEvent, i.view.ProcessedIDPProviderFailedEvent, i.view.ProcessedIDPProviderSequence, i.errorCountUntilSkip)
 }
 
-func (i *IDPProvider) OnSuccess() error {
-	return spooler.HandleSuccess(i.view.UpdateIDPProviderSpoolerRunTimestamp)
+func (i *IDPProvider) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(i.view.UpdateIDPProviderSpoolerRunTimestamp, instanceIDs)
 }
 
 func (i *IDPProvider) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID, false)
 }
 
-func (u *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
-	return u.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID)
+func (i *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID, false)
 }

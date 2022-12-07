@@ -21,7 +21,7 @@ func Test_customDomainPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *PolicyDomainWriteModel
+		want    *OrgDomainPolicyWriteModel
 		wantErr bool
 	}{
 		{
@@ -41,7 +41,12 @@ func Test_customDomainPolicy(t *testing.T) {
 					return []eventstore.Event{}, nil
 				},
 			},
-			want:    nil,
+			want: &OrgDomainPolicyWriteModel{
+				PolicyDomainWriteModel: PolicyDomainWriteModel{
+					WriteModel: eventstore.WriteModel{},
+					State:      domain.PolicyStateUnspecified,
+				},
+			},
 			wantErr: false,
 		},
 		{
@@ -59,16 +64,18 @@ func Test_customDomainPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &PolicyDomainWriteModel{
-				WriteModel: eventstore.WriteModel{
-					AggregateID:   "id",
-					ResourceOwner: "id",
-					Events:        []eventstore.Event{},
+			want: &OrgDomainPolicyWriteModel{
+				PolicyDomainWriteModel: PolicyDomainWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "id",
+						ResourceOwner: "id",
+						Events:        []eventstore.Event{},
+					},
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
+					State:                                  domain.PolicyStateActive,
 				},
-				UserLoginMustBeDomain:                  true,
-				ValidateOrgDomains:                     true,
-				SMTPSenderAddressMatchesInstanceDomain: true,
-				State:                                  domain.PolicyStateActive,
 			},
 			wantErr: false,
 		},
@@ -94,7 +101,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *PolicyDomainWriteModel
+		want    *InstanceDomainPolicyWriteModel
 		wantErr bool
 	}{
 		{
@@ -114,7 +121,15 @@ func Test_defaultDomainPolicy(t *testing.T) {
 					return []eventstore.Event{}, nil
 				},
 			},
-			want:    nil,
+			want: &InstanceDomainPolicyWriteModel{
+				PolicyDomainWriteModel: PolicyDomainWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
+					},
+					State: domain.PolicyStateUnspecified,
+				},
+			},
 			wantErr: false,
 		},
 		{
@@ -132,17 +147,19 @@ func Test_defaultDomainPolicy(t *testing.T) {
 					}, nil
 				},
 			},
-			want: &PolicyDomainWriteModel{
-				WriteModel: eventstore.WriteModel{
-					AggregateID:   "INSTANCE",
-					ResourceOwner: "INSTANCE",
-					Events:        []eventstore.Event{},
-					InstanceID:    "INSTANCE",
+			want: &InstanceDomainPolicyWriteModel{
+				PolicyDomainWriteModel: PolicyDomainWriteModel{
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
+						Events:        []eventstore.Event{},
+						InstanceID:    "INSTANCE",
+					},
+					UserLoginMustBeDomain:                  true,
+					ValidateOrgDomains:                     true,
+					SMTPSenderAddressMatchesInstanceDomain: true,
+					State:                                  domain.PolicyStateActive,
 				},
-				UserLoginMustBeDomain:                  true,
-				ValidateOrgDomains:                     true,
-				SMTPSenderAddressMatchesInstanceDomain: true,
-				State:                                  domain.PolicyStateActive,
 			},
 			wantErr: false,
 		},

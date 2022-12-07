@@ -19,16 +19,16 @@ func (v *View) latestSequence(viewName, instanceID string) (*repository.CurrentS
 	return repository.LatestSequence(v.Db, sequencesTable, viewName, instanceID)
 }
 
-func (v *View) latestSequences(viewName string, instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return repository.LatestSequences(v.Db, sequencesTable, viewName, instanceIDs...)
+func (v *View) latestSequences(viewName string, instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return repository.LatestSequences(v.Db, sequencesTable, viewName, instanceIDs)
 }
 
-func (v *View) AllCurrentSequences(db string) ([]*repository.CurrentSequence, error) {
-	return repository.AllCurrentSequences(v.Db, db+".current_sequences")
+func (v *View) AllCurrentSequences(db, instanceID string) ([]*repository.CurrentSequence, error) {
+	return repository.AllCurrentSequences(v.Db, db+".current_sequences", instanceID)
 }
 
-func (v *View) updateSpoolerRunSequence(viewName string) error {
-	currentSequences, err := repository.LatestSequences(v.Db, sequencesTable, viewName)
+func (v *View) updateSpoolerRunSequence(viewName string, instanceIDs []string) error {
+	currentSequences, err := repository.LatestSequences(v.Db, sequencesTable, viewName, instanceIDs)
 	if err != nil {
 		return err
 	}
@@ -39,12 +39,6 @@ func (v *View) updateSpoolerRunSequence(viewName string) error {
 		currentSequence.LastSuccessfulSpoolerRun = time.Now()
 	}
 	return repository.UpdateCurrentSequences(v.Db, sequencesTable, currentSequences)
-}
-
-func (v *View) GetCurrentSequence(db, viewName string) ([]*repository.CurrentSequence, error) {
-	sequenceTable := db + ".current_sequences"
-	fullView := db + "." + viewName
-	return repository.LatestSequences(v.Db, sequenceTable, fullView)
 }
 
 func (v *View) ClearView(db, viewName string) error {

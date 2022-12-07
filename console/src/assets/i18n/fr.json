@@ -743,6 +743,7 @@
       "DATABASE": "Base de données",
       "FAILEDSEQUENCE": "Séquence échouée",
       "FAILURECOUNT": "Nombre d'échecs",
+      "LASTFAILED": "Dernier échec à",
       "ERRORMESSAGE": "Message d'erreur",
       "ACTIONS": "Actions",
       "DELETE": "Supprimer",
@@ -828,7 +829,8 @@
     "STATE": {
       "0": "Non défini",
       "1": "Actif",
-      "2": "Désactivé"
+      "2": "Désactivé",
+      "3": "Supprimé"
     },
     "MEMBER": {
       "TITLE": "Gestionnaires de l'organisation",

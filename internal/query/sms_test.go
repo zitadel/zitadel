@@ -14,37 +14,37 @@ import (
 )
 
 var (
-	expectedSMSConfigQuery = regexp.QuoteMeta(`SELECT projections.sms_configs.id,` +
-		` projections.sms_configs.aggregate_id,` +
-		` projections.sms_configs.creation_date,` +
-		` projections.sms_configs.change_date,` +
-		` projections.sms_configs.resource_owner,` +
-		` projections.sms_configs.state,` +
-		` projections.sms_configs.sequence,` +
+	expectedSMSConfigQuery = regexp.QuoteMeta(`SELECT projections.sms_configs2.id,` +
+		` projections.sms_configs2.aggregate_id,` +
+		` projections.sms_configs2.creation_date,` +
+		` projections.sms_configs2.change_date,` +
+		` projections.sms_configs2.resource_owner,` +
+		` projections.sms_configs2.state,` +
+		` projections.sms_configs2.sequence,` +
 
 		// twilio config
-		` projections.sms_configs_twilio.sms_id,` +
-		` projections.sms_configs_twilio.sid,` +
-		` projections.sms_configs_twilio.token,` +
-		` projections.sms_configs_twilio.sender_number` +
-		` FROM projections.sms_configs` +
-		` LEFT JOIN projections.sms_configs_twilio ON projections.sms_configs.id = projections.sms_configs_twilio.sms_id`)
-	expectedSMSConfigsQuery = regexp.QuoteMeta(`SELECT projections.sms_configs.id,` +
-		` projections.sms_configs.aggregate_id,` +
-		` projections.sms_configs.creation_date,` +
-		` projections.sms_configs.change_date,` +
-		` projections.sms_configs.resource_owner,` +
-		` projections.sms_configs.state,` +
-		` projections.sms_configs.sequence,` +
+		` projections.sms_configs2_twilio.sms_id,` +
+		` projections.sms_configs2_twilio.sid,` +
+		` projections.sms_configs2_twilio.token,` +
+		` projections.sms_configs2_twilio.sender_number` +
+		` FROM projections.sms_configs2` +
+		` LEFT JOIN projections.sms_configs2_twilio ON projections.sms_configs2.id = projections.sms_configs2_twilio.sms_id`)
+	expectedSMSConfigsQuery = regexp.QuoteMeta(`SELECT projections.sms_configs2.id,` +
+		` projections.sms_configs2.aggregate_id,` +
+		` projections.sms_configs2.creation_date,` +
+		` projections.sms_configs2.change_date,` +
+		` projections.sms_configs2.resource_owner,` +
+		` projections.sms_configs2.state,` +
+		` projections.sms_configs2.sequence,` +
 
 		// twilio config
-		` projections.sms_configs_twilio.sms_id,` +
-		` projections.sms_configs_twilio.sid,` +
-		` projections.sms_configs_twilio.token,` +
-		` projections.sms_configs_twilio.sender_number,` +
+		` projections.sms_configs2_twilio.sms_id,` +
+		` projections.sms_configs2_twilio.sid,` +
+		` projections.sms_configs2_twilio.token,` +
+		` projections.sms_configs2_twilio.sender_number,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.sms_configs` +
-		` LEFT JOIN projections.sms_configs_twilio ON projections.sms_configs.id = projections.sms_configs_twilio.sms_id`)
+		` FROM projections.sms_configs2` +
+		` LEFT JOIN projections.sms_configs2_twilio ON projections.sms_configs2.id = projections.sms_configs2_twilio.sms_id`)
 
 	smsConfigCols = []string{
 		"id",

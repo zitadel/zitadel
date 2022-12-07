@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest) (*mgmt_pb.GetAppByIDResponse, error) {
-	app, err := s.query.AppByProjectAndAppID(ctx, true, req.ProjectId, req.AppId)
+	app, err := s.query.AppByProjectAndAppID(ctx, true, req.ProjectId, req.AppId, false)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	if err != nil {
 		return nil, err
 	}
-	apps, err := s.query.SearchApps(ctx, queries)
+	apps, err := s.query.SearchApps(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (
 	if err != nil {
 		return nil, err
 	}
-	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, resourceOwner, aggregateID, objectID)
+	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, false, resourceOwner, aggregateID, objectID)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +242,7 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 	if err != nil {
 		return nil, err
 	}
-	keys, err := s.query.SearchAuthNKeys(ctx, queries)
+	keys, err := s.query.SearchAuthNKeys(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
