@@ -742,7 +742,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      machineKey.KeyID,
 		KeyDetails: keyDetails,
-		Details:    obj_grpc.DomainToChangeDetailsPb(details),
+		Details:    obj_grpc.DomainToAddDetailsPb(details),
 	}, nil
 }
 
@@ -799,7 +799,7 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPer
 	return &mgmt_pb.AddPersonalAccessTokenResponse{
 		TokenId: pat.TokenID,
 		Token:   pat.Token,
-		Details: obj_grpc.DomainToChangeDetailsPb(details),
+		Details: obj_grpc.DomainToAddDetailsPb(details),
 	}, nil
 }
 
