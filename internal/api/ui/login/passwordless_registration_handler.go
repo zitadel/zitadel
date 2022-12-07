@@ -114,7 +114,7 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 		disabled,
 	}
 	if authReq == nil {
-		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID)
+		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID, false)
 		logging.Log("HANDL-XjWKE").OnError(err).Error("unable to get active label policy")
 		data.LabelPolicy = labelPolicyToDomain(policy)
 

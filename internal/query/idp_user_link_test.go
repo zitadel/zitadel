@@ -12,16 +12,16 @@ import (
 )
 
 var (
-	idpUserLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_user_links2.idp_id,` +
-		` projections.idp_user_links2.user_id,` +
-		` projections.idps2.name,` +
-		` projections.idp_user_links2.external_user_id,` +
-		` projections.idp_user_links2.display_name,` +
-		` projections.idps2.type,` +
-		` projections.idp_user_links2.resource_owner,` +
+	idpUserLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_user_links3.idp_id,` +
+		` projections.idp_user_links3.user_id,` +
+		` projections.idps3.name,` +
+		` projections.idp_user_links3.external_user_id,` +
+		` projections.idp_user_links3.display_name,` +
+		` projections.idps3.type,` +
+		` projections.idp_user_links3.resource_owner,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.idp_user_links2` +
-		` LEFT JOIN projections.idps2 ON projections.idp_user_links2.idp_id = projections.idps2.id`)
+		` FROM projections.idp_user_links3` +
+		` LEFT JOIN projections.idps3 ON projections.idp_user_links3.idp_id = projections.idps3.id`)
 	idpUserLinksCols = []string{
 		"idp_id",
 		"user_id",

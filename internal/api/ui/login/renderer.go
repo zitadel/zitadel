@@ -384,7 +384,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 		}
 		privacyPolicy = authReq.PrivacyPolicy
 	} else {
-		labelPolicy, _ := l.query.ActiveLabelPolicyByOrg(r.Context(), baseData.PrivateLabelingOrgID)
+		labelPolicy, _ := l.query.ActiveLabelPolicyByOrg(r.Context(), baseData.PrivateLabelingOrgID, false)
 		if labelPolicy != nil {
 			baseData.LabelPolicy = labelPolicy.ToDomain()
 		}
@@ -549,7 +549,7 @@ func (l *Login) addLoginTranslations(translator *i18n.Translator, customTexts []
 
 func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, orgID string) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	instanceTexts, err := l.query.CustomTextListByTemplate(ctx, instanceID, domain.LoginCustomText)
+	instanceTexts, err := l.query.CustomTextListByTemplate(ctx, instanceID, domain.LoginCustomText, false)
 	if err != nil {
 		logging.WithFields("instanceID", instanceID).Warn("unable to load custom texts for instance")
 		return
@@ -558,7 +558,7 @@ func (l *Login) customTexts(ctx context.Context, translator *i18n.Translator, or
 	if orgID == "" {
 		return
 	}
-	orgTexts, err := l.query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText)
+	orgTexts, err := l.query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText, false)
 	if err != nil {
 		logging.WithFields("instanceID", instanceID, "org", orgID).Warn("unable to load custom texts for org")
 		return
