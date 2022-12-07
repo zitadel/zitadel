@@ -881,7 +881,8 @@
       "BRANDING": "品牌标识",
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
-      "SECRETS": "验证码外观"
+      "SECRETS": "验证码外观",
+      "SECURITY": "安全设置"
     },
     "GROUPS": {
       "NOTIFICATIONS": "通知",
@@ -969,6 +970,10 @@
       "INCLUDEUPPERLETTERS": "包含大写字母",
       "LENGTH": "长度",
       "UPDATED": "设置已更新。"
+    },
+    "SECURITY": {
+      "IFRAMEENABLED": "允许 iFrame",
+      "ALLOWEDORIGINS": "允许的来源 URL"
     },
     "DIALOG": {
       "RESET": {

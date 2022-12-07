@@ -881,7 +881,8 @@
       "BRANDING": "Image de marque",
       "PRIVACYPOLICY": "Politique de confidentialité",
       "OIDC": "Durée de vie et expiration des jetons OIDC",
-      "SECRETS": "Apparence secrète"
+      "SECRETS": "Apparence secrète",
+      "SECURITY": "Paramètres de sécurité"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
@@ -969,6 +970,10 @@
       "INCLUDEUPPERLETTERS": "Inclure les lettres majuscules",
       "LENGTH": "Longueur",
       "UPDATED": "Paramètres mis à jour."
+    },
+    "SECURITY": {
+      "IFRAMEENABLED": "Autoriser iFrame",
+      "ALLOWEDORIGINS": "URL d'origine autorisées"
     },
     "DIALOG": {
       "RESET": {

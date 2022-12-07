@@ -881,7 +881,8 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
-      "SECRETS": "Secret Appearance"
+      "SECRETS": "Secret Appearance",
+      "SECURITY": "Security settings"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
@@ -969,6 +970,10 @@
       "INCLUDEUPPERLETTERS": "Include Upper letters",
       "LENGTH": "Length",
       "UPDATED": "Settings updated."
+    },
+    "SECURITY": {
+      "IFRAMEENABLED": "iFrame enabled",
+      "ALLOWEDORIGINS": "Allowed URLs"
     },
     "DIALOG": {
       "RESET": {
