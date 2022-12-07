@@ -3,6 +3,7 @@ import { UntypedFormControl } from '@angular/forms';
 import { SetDefaultLanguageResponse, SetSecurityPolicyRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { InfoSectionType } from '../../info-section/info-section.component';
 
 @Component({
   selector: 'cnsl-security-policy',
@@ -10,10 +11,11 @@ import { ToastService } from 'src/app/services/toast.service';
   styleUrls: ['./security-policy.component.scss'],
 })
 export class SecurityPolicyComponent implements OnInit {
-  public originsList: string[] = ['asdf', 'asdf'];
+  public originsList: string[] = [];
   public enabled: boolean = false;
 
   public loading: boolean = false;
+  public InfoSectionType: any = InfoSectionType;
 
   @Input() public originsControl: UntypedFormControl = new UntypedFormControl({ value: [], disabled: false });
 

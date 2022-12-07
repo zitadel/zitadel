@@ -972,6 +972,7 @@
       "UPDATED": "Paramètres mis à jour."
     },
     "SECURITY": {
+      "DESCRIPTION": "Ce paramètre permet au CSP d'autoriser les iFrames à partir d'un ensemble de domaines autorisés. Notez qu'en autorisant l'utilisation des iFrames, vous courez le risque d'autoriser le clickjacking.",
       "IFRAMEENABLED": "Autoriser iFrame",
       "ALLOWEDORIGINS": "URL d'origine autorisées"
     },

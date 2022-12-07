@@ -12,6 +12,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
+import { InfoSectionModule } from '../../info-section/info-section.module';
 import { InputModule } from '../../input/input.module';
 import { SecurityPolicyComponent } from './security-policy.component';
 
@@ -21,6 +22,7 @@ import { SecurityPolicyComponent } from './security-policy.component';
     CommonModule,
     CardModule,
     FormsModule,
+    InfoSectionModule,
     MatCheckboxModule,
     FormsModule,
     ReactiveFormsModule,

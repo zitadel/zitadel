@@ -972,6 +972,7 @@
       "UPDATED": "Impostazioni aggiornati"
     },
     "SECURITY": {
+      "DESCRIPTION": "Questa impostazione consente al CSP di consentire il framing da un insieme di domini consentiti. Si noti che abilitando l'uso di iFrames, si corre il rischio di consentire il clickjacking.",
       "IFRAMEENABLED": "I Frame enabled",
       "ALLOWEDORIGINS": "URL consentiti"
     },

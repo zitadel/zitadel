@@ -4,18 +4,20 @@
   <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
 </div>
 
-<mat-checkbox
-  card-actions
-  class="security-policy-toggle"
-  color="primary"
-  ngDefaultControl
-  [(ngModel)]="enabled"
-  [disabled]="(['iam.policy.write'] | hasRole | async) === false"
->
-  {{ 'SETTING.SECURITY.IFRAMEENABLED' | translate }}
-</mat-checkbox>
-
 <div class="security-wrapper">
+  <cnsl-info-section [type]="InfoSectionType.ALERT">{{ 'SETTING.SECURITY.DESCRIPTION' | translate }}</cnsl-info-section>
+
+  <mat-checkbox
+    card-actions
+    class="security-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    [(ngModel)]="enabled"
+    [disabled]="(['iam.policy.write'] | hasRole | async) === false"
+  >
+    {{ 'SETTING.SECURITY.IFRAMEENABLED' | translate }}
+  </mat-checkbox>
+
   <form class="security-allowed-originsform" (ngSubmit)="add(redInput)">
     <cnsl-form-field class="formfield">
       <cnsl-label>{{ 'SETTING.SECURITY.ALLOWEDORIGINS' | translate }}</cnsl-label>
