@@ -54,10 +54,12 @@ func MustNewConfig(v *viper.Viper) *Config {
 }
 
 type Steps struct {
-	s1ProjectionTable   *ProjectionTable
-	s2AssetsTable       *AssetTable
-	FirstInstance       *FirstInstance
-	s4EventstoreIndexes *EventstoreIndexes
+	s1ProjectionTable    *ProjectionTable
+	s2AssetsTable        *AssetTable
+	FirstInstance        *FirstInstance
+	s4EventstoreIndexes  *EventstoreIndexes
+	s5LastFailed         *LastFailed
+	s6OwnerRemoveColumns *OwnerRemoveColumns
 }
 
 type encryptionKeyConfig struct {

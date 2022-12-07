@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "projections.login_policies3"
+	LoginPolicyTable = "projections.login_policies4"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyInstanceIDCol            = "instance_id"
@@ -39,6 +39,7 @@ const (
 	MFAInitSkipLifetimeCol              = "mfa_init_skip_lifetime"
 	SecondFactorCheckLifetimeCol        = "second_factor_check_lifetime"
 	MultiFactorCheckLifetimeCol         = "multi_factor_check_lifetime"
+	LoginPolicyOwnerRemovedCol          = "owner_removed"
 )
 
 type loginPolicyProjection struct {
@@ -75,8 +76,10 @@ func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(MFAInitSkipLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SecondFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(MultiFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LoginPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -115,6 +118,10 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LoginPolicySecondFactorRemovedEventType,
 					Reduce: p.reduce2FARemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -263,6 +270,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 		cols,
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -287,6 +295,7 @@ func (p *loginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -311,6 +320,7 @@ func (p *loginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -324,6 +334,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event)
 		e,
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -348,6 +359,7 @@ func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -372,6 +384,27 @@ func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handl
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *loginPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-B8NZW", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(LoginPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(LoginPolicySequenceCol, e.Sequence()),
+			handler.NewCol(LoginPolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(LoginPolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(LoginPolicyIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

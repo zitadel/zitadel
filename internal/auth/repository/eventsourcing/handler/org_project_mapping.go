@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -10,11 +12,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/spooler"
 	view_model "github.com/zitadel/zitadel/internal/project/repository/view/model"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 const (
-	orgProjectMappingTable = "auth.org_project_mapping"
+	orgProjectMappingTable = "auth.org_project_mapping2"
 )
 
 type OrgProjectMapping struct {
@@ -23,22 +26,23 @@ type OrgProjectMapping struct {
 }
 
 func newOrgProjectMapping(
+	ctx context.Context,
 	handler handler,
 ) *OrgProjectMapping {
 	h := &OrgProjectMapping{
 		handler: handler,
 	}
 
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (k *OrgProjectMapping) subscribe() {
-	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
+func (p *OrgProjectMapping) subscribe(ctx context.Context) {
+	p.subscription = p.es.Subscribe(p.AggregateTypes()...)
 	go func() {
-		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+		for event := range p.subscription.Events {
+			query.ReduceEvent(ctx, p, event)
 		}
 	}()
 }
@@ -63,8 +67,8 @@ func (p *OrgProjectMapping) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (p *OrgProjectMapping) EventQuery(instanceIDs ...string) (*es_models.SearchQuery, error) {
-	sequences, err := p.view.GetLatestOrgProjectMappingSequences(instanceIDs...)
+func (p *OrgProjectMapping) EventQuery(instanceIDs []string) (*es_models.SearchQuery, error) {
+	sequences, err := p.view.GetLatestOrgProjectMappingSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -85,20 +89,28 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 		}
 	case project.GrantAddedType:
 		projectGrant := new(view_model.ProjectGrant)
-		projectGrant.SetData(event)
+		err := projectGrant.SetData(event)
+		if err != nil {
+			return err
+		}
 		mapping.OrgID = projectGrant.GrantedOrgID
 		mapping.ProjectID = event.AggregateID
 		mapping.ProjectGrantID = projectGrant.GrantID
 		mapping.InstanceID = event.InstanceID
 	case project.GrantRemovedType:
 		projectGrant := new(view_model.ProjectGrant)
-		projectGrant.SetData(event)
-		err := p.view.DeleteOrgProjectMappingsByProjectGrantID(event.AggregateID, event.InstanceID)
+		err := projectGrant.SetData(event)
+		if err != nil {
+			return err
+		}
+		err = p.view.DeleteOrgProjectMappingsByProjectGrantID(event.AggregateID, event.InstanceID)
 		if err == nil {
 			return p.view.ProcessedOrgProjectMappingSequence(event)
 		}
 	case instance.InstanceRemovedEventType:
 		return p.view.DeleteInstanceOrgProjectMappings(event)
+	case org.OrgRemovedEventType:
+		return p.view.UpdateOwnerRemovedOrgProjectMappings(event)
 	default:
 		return p.view.ProcessedOrgProjectMappingSequence(event)
 	}
@@ -109,10 +121,10 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 }
 
 func (p *OrgProjectMapping) OnError(event *es_models.Event, err error) error {
-	logging.LogWithFields("SPOOL-2k0fS", "id", event.AggregateID).WithError(err).Warn("something went wrong in org project mapping handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in org project mapping handler")
 	return spooler.HandleError(event, err, p.view.GetLatestOrgProjectMappingFailedEvent, p.view.ProcessedOrgProjectMappingFailedEvent, p.view.ProcessedOrgProjectMappingSequence, p.errorCountUntilSkip)
 }
 
-func (p *OrgProjectMapping) OnSuccess() error {
-	return spooler.HandleSuccess(p.view.UpdateOrgProjectMappingSpoolerRunTimestamp)
+func (p *OrgProjectMapping) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(p.view.UpdateOrgProjectMappingSpoolerRunTimestamp, instanceIDs)
 }

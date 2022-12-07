@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	MailTemplateTable = "projections.mail_templates"
+	MailTemplateTable = "projections.mail_templates2"
 
 	MailTemplateAggregateIDCol  = "aggregate_id"
 	MailTemplateInstanceIDCol   = "instance_id"
@@ -24,6 +24,7 @@ const (
 	MailTemplateStateCol        = "state"
 	MailTemplateIsDefaultCol    = "is_default"
 	MailTemplateTemplateCol     = "template"
+	MailTemplateOwnerRemovedCol = "owner_removed"
 )
 
 type mailTemplateProjection struct {
@@ -44,8 +45,10 @@ func newMailTemplateProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(MailTemplateStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(MailTemplateIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(MailTemplateTemplateCol, crdb.ColumnTypeBytes),
+			crdb.NewColumn(MailTemplateOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(MailTemplateInstanceIDCol, MailTemplateAggregateIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{MailTemplateOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -68,6 +71,10 @@ func (p *mailTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.MailTemplateRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -140,6 +147,7 @@ func (p *mailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 		cols,
 		[]handler.Condition{
 			handler.NewCond(MailTemplateAggregateIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(MailTemplateInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -152,5 +160,26 @@ func (p *mailTemplateProjection) reduceRemoved(event eventstore.Event) (*handler
 		policyEvent,
 		[]handler.Condition{
 			handler.NewCond(MailTemplateAggregateIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(MailTemplateInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
+}
+
+func (p *mailTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CThXR", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(MailTemplateChangeDateCol, e.CreationDate()),
+			handler.NewCol(MailTemplateSequenceCol, e.Sequence()),
+			handler.NewCol(MailTemplateOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(MailTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(MailTemplateAggregateIDCol, e.Aggregate().ID),
+		},
+	), nil
 }

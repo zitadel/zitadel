@@ -92,6 +92,7 @@ func (o *OPStorage) KeySet(ctx context.Context) (keys []op.Key, err error) {
 func (o *OPStorage) SignatureAlgorithms(ctx context.Context) ([]jose.SignatureAlgorithm, error) {
 	key, err := o.SigningKey(ctx)
 	if err != nil {
+		logging.WithError(err).Warn("unable to fetch signing key")
 		return nil, err
 	}
 	return []jose.SignatureAlgorithm{key.SignatureAlgorithm()}, nil

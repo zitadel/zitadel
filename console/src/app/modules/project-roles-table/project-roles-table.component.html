@@ -41,8 +41,8 @@
             color="primary"
             [disabled]="disabled"
             (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)"
+            (change)="$event ? selection.toggle(row.key) : null"
+            [checked]="selection.isSelected(row.key)"
           >
           </mat-checkbox>
         </td>

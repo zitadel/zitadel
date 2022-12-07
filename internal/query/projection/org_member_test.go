@@ -1,9 +1,13 @@
 package projection
 
 import (
+	"context"
 	"testing"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -24,7 +28,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.MemberAddedType",
+			name: "org MemberAddedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.MemberAddedEventType),
@@ -35,7 +39,21 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				}`),
 				), org.MemberAddedEventMapper),
 			},
-			reduce: (&orgMemberProjection{}).reduceAdded,
+			reduce: (&orgMemberProjection{
+				StatementHandler: getStatementHandlerWithFilters(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
+				)(t)}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    org.AggregateType,
 				sequence:         15,
@@ -43,15 +61,18 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_members2 (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.org_members3 (user_id, user_resource_owner, user_owner_removed, roles, creation_date, change_date, sequence, resource_owner, instance_id, owner_removed, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"user-id",
+								"org1",
+								false,
 								database.StringArray{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
 								"instance-id",
+								false,
 								"agg-id",
 							},
 						},
@@ -60,7 +81,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.MemberChangedType",
+			name: "org MemberChangedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.MemberChangedEventType),
@@ -79,11 +100,12 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_members2 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (org_id = $5)",
+							expectedStmt: "UPDATE projections.org_members3 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5) AND (org_id = $6)",
 							expectedArgs: []interface{}{
 								database.StringArray{"role", "changed"},
 								anyArg{},
 								uint64(15),
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -93,7 +115,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.MemberCascadeRemovedType",
+			name: "org MemberCascadeRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.MemberCascadeRemovedEventType),
@@ -111,8 +133,9 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1) AND (org_id = $2)",
+							expectedStmt: "DELETE FROM projections.org_members3 WHERE (instance_id = $1) AND (user_id = $2) AND (org_id = $3)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -122,7 +145,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.MemberRemovedType",
+			name: "org MemberRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.MemberRemovedEventType),
@@ -140,8 +163,9 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1) AND (org_id = $2)",
+							expectedStmt: "DELETE FROM projections.org_members3 WHERE (instance_id = $1) AND (user_id = $2) AND (org_id = $3)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"user-id",
 								"agg-id",
 							},
@@ -151,7 +175,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.UserRemovedEventType",
+			name: "user UserRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.UserRemovedType),
@@ -167,8 +191,9 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_members3 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -177,7 +202,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgRemovedEventType",
+			name: "org OrgRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgRemovedEventType),
@@ -193,8 +218,22 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (org_id = $1)",
+							expectedStmt: "UPDATE projections.org_members3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
 							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.org_members3 SET (change_date, sequence, user_owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -203,7 +242,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -219,7 +258,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_members2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.org_members3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

@@ -1,0 +1,76 @@
+---
+title: How to configure ZITADEL for your scenario
+---
+
+Each customer does have different needs and use-cases. In ZITADEL you are able to configure your settings depending on your needs.
+In this section we show you the different use-cases we have already experienced, that could interest you.
+
+
+## Automatically redirect users if the organization has only one identity provider
+
+You have different customers (organizations) in your ZITADEL instance and they have different needs on how to authenticate their users. One of your customers does only allow login with an external identity provider like Google, Azure AD, and so on.
+If a user of this organization wants to login, you don't want them to enter their username in the ZITADEL Login UI, they should be redirected directly to the identity provider without their interaction.
+
+### Settings
+
+1. Go to the "Identity Providers" Settings of the organization
+2. Configure the needed identity provider: Read this [guide](../integrate/identity-brokering.md) if you don't know how
+3. Go to the "Login Behavior and Security" settings of the organization
+4. Disable "Username Password Allowed" and enable "External IDP allowed" in the Advanced Section
+
+Now your application can send either the organizations id (`urn:zitadel:iam:org:id:{id}`) or organizations primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authorization request to identify on which organization the users should be logged in.
+
+More about the [scopes](../../apis/openidoauth/scopes#reserved-scopes)
+
+## Custom Application Domain per Organization
+
+If you have an application that runs a dedicated domain for each customer you need to instruct ZITADEL to allow redirection for each domain specifically to safeguard against phishing attacks.
+
+Example:
+MyApplication: customer-a.app.com
+ZITADEL Login: login.app.com
+
+In the OIDC Authorization request you always have to send the redirect URI to where you like to be redirected after login.
+To handle this scenario it is possible to register multiple URIs on each application in ZITADEL, the only criteria is that the requested URI has to match one of the registered URIs.
+
+Read more about [applications](../manage/console/applications) and the [redirect urls](../manage/console/applications#redirect-uris)
+
+### Trigger organization in ZITADEL login
+
+It is possible to trigger the organization directly with the authorization request to ZITADEL.
+
+This will have the following impacts:
+- Trigger organization login behaviour settings
+- Trigger organization branding
+- Only allow users from selected organization to login
+
+To request the organization send either the the organization id (`urn:zitadel:iam:org:id:{id}`) or organization primary domain (`urn:zitadel:iam:org:domain:primary:{domainname}`) scope on your authentication request from your application.
+More about the [scopes](../../apis/openidoauth/scopes#reserved-scopes)
+
+## Use email to login
+
+There are two different possibilities to achieve login with an email.
+
+1. Use an email address as username
+2. Use the email field of the user as additional login to the username
+
+![Domain Policy: Organization domain as suffix](/img/guides/scenarios/domain_policy_org_domain_disabled.png)
+
+### Use an email address as username
+
+To be able to use the email as username you have to disable the attribute "User Loginname must contain orgdomain" on your domain settings.
+This means that all your users will not be suffixed with the domain of your organization and you can enter the email as username.
+All usernames will then be globally unique within your instance.
+
+You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
+
+### Use the email field of the user as additional login to the username
+
+No matter how the username of your user does look like.
+You can additionally allow login with the email attribute of the user.
+
+You can find this in the "Login Behaviour and Security" Setting of your instance or organizations.
+Go to the "Advanced" section, per default login with email address should be allowed. It is possible to disable it.
+
+![Login Policy Advanced Setting: Disable email for login](/img/guides/scenarios/login_policy_advanced.png)
+

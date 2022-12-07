@@ -28,6 +28,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 					regexp.QuoteMeta(`SELECT projections.failed_events.projection_name,`+
 						` projections.failed_events.failed_sequence,`+
 						` projections.failed_events.failure_count,`+
+						` projections.failed_events.last_failed,`+
 						` projections.failed_events.error,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.failed_events`),
@@ -45,6 +46,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 					regexp.QuoteMeta(`SELECT projections.failed_events.projection_name,`+
 						` projections.failed_events.failed_sequence,`+
 						` projections.failed_events.failure_count,`+
+						` projections.failed_events.last_failed,`+
 						` projections.failed_events.error,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.failed_events`),
@@ -52,6 +54,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 						"projection_name",
 						"failed_sequence",
 						"failure_count",
+						"last_failed",
 						"error",
 						"count",
 					},
@@ -60,6 +63,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 							"projection-name",
 							uint64(20211108),
 							uint64(2),
+							testNow,
 							"error",
 						},
 					},
@@ -74,6 +78,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 						ProjectionName: "projection-name",
 						FailedSequence: 20211108,
 						FailureCount:   2,
+						LastFailed:     testNow,
 						Error:          "error",
 					},
 				},
@@ -87,6 +92,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 					regexp.QuoteMeta(`SELECT projections.failed_events.projection_name,`+
 						` projections.failed_events.failed_sequence,`+
 						` projections.failed_events.failure_count,`+
+						` projections.failed_events.last_failed,`+
 						` projections.failed_events.error,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.failed_events`),
@@ -94,6 +100,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 						"projection_name",
 						"failed_sequence",
 						"failure_count",
+						"last_failed",
 						"error",
 						"count",
 					},
@@ -102,12 +109,14 @@ func Test_FailedEventsPrepares(t *testing.T) {
 							"projection-name",
 							uint64(20211108),
 							2,
+							testNow,
 							"error",
 						},
 						{
 							"projection-name-2",
 							uint64(20211108),
 							2,
+							nil,
 							"error",
 						},
 					},
@@ -122,6 +131,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 						ProjectionName: "projection-name",
 						FailedSequence: 20211108,
 						FailureCount:   2,
+						LastFailed:     testNow,
 						Error:          "error",
 					},
 					{
@@ -141,6 +151,7 @@ func Test_FailedEventsPrepares(t *testing.T) {
 					regexp.QuoteMeta(`SELECT projections.failed_events.projection_name,`+
 						` projections.failed_events.failed_sequence,`+
 						` projections.failed_events.failure_count,`+
+						` projections.failed_events.last_failed,`+
 						` projections.failed_events.error,`+
 						` COUNT(*) OVER ()`+
 						` FROM projections.failed_events`),

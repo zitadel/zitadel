@@ -84,20 +84,28 @@ func (v *View) DeleteInstanceTokens(event *models.Event) error {
 	return v.ProcessedTokenSequence(event)
 }
 
+func (v *View) DeleteOrgTokens(event *models.Event) error {
+	err := usr_view.DeleteOrgTokens(v.Db, tokenTable, event.InstanceID, event.ResourceOwner)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedTokenSequence(event)
+}
+
 func (v *View) GetLatestTokenSequence(instanceID string) (*repository.CurrentSequence, error) {
 	return v.latestSequence(tokenTable, instanceID)
 }
 
-func (v *View) GetLatestTokenSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(tokenTable, instanceIDs...)
+func (v *View) GetLatestTokenSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(tokenTable, instanceIDs)
 }
 
 func (v *View) ProcessedTokenSequence(event *models.Event) error {
 	return v.saveCurrentSequence(tokenTable, event)
 }
 
-func (v *View) UpdateTokenSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(tokenTable)
+func (v *View) UpdateTokenSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(tokenTable, instanceIDs)
 }
 
 func (v *View) GetLatestTokenFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {

@@ -921,6 +921,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		orgID                string
 		human                *domain.Human
 		passwordless         bool
+		links                []*domain.UserIDPLink
 		secretGenerator      crypto.Generator
 		passwordlessInitCode crypto.Generator
 	}
@@ -1670,6 +1671,135 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "add human (with idp), ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"idpID",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIdentityProviderAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								domain.IdentityProviderTypeOrg,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newAddHumanEvent("", false, ""),
+							),
+							eventFromEventPusher(
+								user.NewUserIDPLinkAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"idpID",
+									"name",
+									"externalID",
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("idpID", "externalID")),
+					),
+				),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+				},
+				links: []*domain.UserIDPLink{
+					{
+						IDPConfigID:    "idpID",
+						ExternalUserID: "externalID",
+						DisplayName:    "name",
+					},
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.English,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateActive,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1678,7 +1808,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
+			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.links, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -2806,6 +2936,158 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						PhoneNumber: "+41711234567",
 					},
 					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
+			name: "add with idp link, email verified, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("org1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIDPOIDCConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"clientID",
+								"idpID",
+								"issuer",
+								"authEndpoint",
+								"tokenEndpoint",
+								nil,
+								domain.OIDCMappingFieldUnspecified,
+								domain.OIDCMappingFieldUnspecified,
+							),
+						),
+						eventFromEventPusher(
+							org.NewIdentityProviderAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								domain.IdentityProviderTypeOrg,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newRegisterHumanEvent("username", "password", false, ""),
+							),
+							eventFromEventPusher(
+								user.NewUserIDPLinkAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"idpID",
+									"displayName",
+									"externalID",
+								),
+							),
+							eventFromEventPusher(
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+						},
+						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
+						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("idpID", "externalID")),
+					),
+				),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+				},
+				link: &domain.UserIDPLink{
+					IDPConfigID:    "idpID",
+					ExternalUserID: "externalID",
+					DisplayName:    "displayName",
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.Und,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateActive,
 				},
 			},
 		},

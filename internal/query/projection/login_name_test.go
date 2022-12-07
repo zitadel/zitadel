@@ -23,7 +23,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "user.HumanAddedType",
+			name: "user HumanAddedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.HumanAddedType),
@@ -41,7 +41,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names2_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-added",
@@ -54,7 +54,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.HumanRegisteredType",
+			name: "user HumanRegisteredType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.HumanRegisteredType),
@@ -72,7 +72,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names2_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-registered",
@@ -85,7 +85,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.MachineAddedEventType",
+			name: "user MachineAddedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.MachineAddedEventType),
@@ -103,7 +103,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names2_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"machine-added",
@@ -116,7 +116,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.UserRemovedType",
+			name: "user UserRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.UserRemovedType),
@@ -132,9 +132,10 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names_users WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names2_users WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -142,7 +143,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.UserUserNameChangedType",
+			name: "user UserUserNameChangedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.UserUserNameChangedType),
@@ -160,10 +161,11 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_users SET user_name = $1 WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.login_names2_users SET user_name = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"changed",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -171,7 +173,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "user.UserDomainClaimedType",
+			name: "user UserDomainClaimedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.UserDomainClaimedType),
@@ -189,10 +191,11 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_users SET user_name = $1 WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.login_names2_users SET user_name = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"claimed",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -200,7 +203,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgDomainPolicyAddedEventType",
+			name: "org OrgDomainPolicyAddedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.DomainPolicyAddedEventType),
@@ -218,7 +221,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names2_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								true,
 								false,
@@ -231,7 +234,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgDomainPolicyChangedEventType",
+			name: "org OrgDomainPolicyChangedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.DomainPolicyChangedEventType),
@@ -249,10 +252,11 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_policies SET must_be_domain = $1 WHERE (resource_owner = $2)",
+							expectedStmt: "UPDATE projections.login_names2_policies SET must_be_domain = $1 WHERE (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -260,7 +264,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgDomainPolicyChangedEventType no change",
+			name: "org OrgDomainPolicyChangedEventType no change",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.DomainPolicyChangedEventType),
@@ -279,7 +283,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgDomainPolicyRemovedEventType",
+			name: "org OrgDomainPolicyRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.DomainPolicyRemovedEventType),
@@ -295,9 +299,10 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names_policies WHERE (resource_owner = $1)",
+							expectedStmt: "DELETE FROM projections.login_names2_policies WHERE (resource_owner = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -305,7 +310,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgDomainVerifiedEventType",
+			name: "org OrgDomainVerifiedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgDomainVerifiedEventType),
@@ -323,7 +328,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_domains (name, resource_owner, instance_id) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names2_domains (name, resource_owner, instance_id) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"verified",
 								"ro-id",
@@ -335,7 +340,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgDomainRemovedEventType",
+			name: "org OrgDomainRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgDomainRemovedEventType),
@@ -353,10 +358,11 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names_domains WHERE (name = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.login_names2_domains WHERE (name = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"remove",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -364,7 +370,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org.OrgDomainPrimarySetEventType",
+			name: "org OrgDomainPrimarySetEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgDomainPrimarySetEventType),
@@ -382,19 +388,21 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_domains SET is_primary = $1 WHERE (resource_owner = $2) AND (is_primary = $3)",
+							expectedStmt: "UPDATE projections.login_names2_domains SET is_primary = $1 WHERE (resource_owner = $2) AND (is_primary = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
 								true,
+								"instance-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.login_names_domains SET is_primary = $1 WHERE (name = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.login_names2_domains SET is_primary = $1 WHERE (name = $2) AND (resource_owner = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								true,
 								"primary",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -402,7 +410,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.OrgDomainPolicyAddedEventType",
+			name: "iam OrgDomainPolicyAddedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DomainPolicyAddedEventType),
@@ -420,7 +428,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names2_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								true,
 								true,
@@ -433,7 +441,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.OrgDomainPolicyChangedEventType",
+			name: "iam OrgDomainPolicyChangedEventType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DomainPolicyChangedEventType),
@@ -451,10 +459,11 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names_policies SET must_be_domain = $1 WHERE (resource_owner = $2)",
+							expectedStmt: "UPDATE projections.login_names2_policies SET must_be_domain = $1 WHERE (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -462,7 +471,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.OrgDomainPolicyChangedEventType no change",
+			name: "iam OrgDomainPolicyChangedEventType no change",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.DomainPolicyChangedEventType),
@@ -481,7 +490,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "instance.reduceInstanceRemoved",
+			name: "instance reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.InstanceRemovedEventType),
@@ -497,20 +506,64 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names_domains WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names2_domains WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "DELETE FROM projections.login_names_policies WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names2_policies WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "DELETE FROM projections.login_names_users WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names2_users WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance.reduceOwnerRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					[]byte(`{"name": "Name"}`),
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&loginNameProjection{}).reduceOwnerRemoved,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.login_names2_domains SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.login_names2_policies SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.login_names2_users SET owner_removed = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"instance-id",
 								"agg-id",
 							},
 						},

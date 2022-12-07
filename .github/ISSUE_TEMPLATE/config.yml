@@ -6,3 +6,5 @@ contact_links:
   - name: ❓ Questions
     url: https://github.com/zitadel/zitadel/discussions/categories/q-a
     about: Ask for help in our Q&A discussions
+  - name: 💬 ZITADEL Chat
+    url: https://zitadel.com/chat

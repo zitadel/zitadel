@@ -14,7 +14,7 @@ func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsReques
 	if err != nil {
 		return nil, err
 	}
-	actions, err := s.query.SearchActions(ctx, query)
+	actions, err := s.query.SearchActions(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsReques
 }
 
 func (s *Server) GetAction(ctx context.Context, req *mgmt_pb.GetActionRequest) (*mgmt_pb.GetActionResponse, error) {
-	action, err := s.query.GetActionByID(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	action, err := s.query.GetActionByID(ctx, req.Id, authz.GetCtxData(ctx).OrgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (s *Server) ReactivateAction(ctx context.Context, req *mgmt_pb.ReactivateAc
 }
 
 func (s *Server) DeleteAction(ctx context.Context, req *mgmt_pb.DeleteActionRequest) (*mgmt_pb.DeleteActionResponse, error) {
-	flowTypes, err := s.query.GetFlowTypesOfActionID(ctx, req.Id)
+	flowTypes, err := s.query.GetFlowTypesOfActionID(ctx, req.Id, false)
 	if err != nil {
 		return nil, err
 	}

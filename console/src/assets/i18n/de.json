@@ -256,6 +256,7 @@
       "DELETE_SELF_DESCRIPTION": "Sie sind im Begriff Ihren eigenen Benutzer endgültig zu löschen. Dadurch werden Sie ausgeloggt und Ihr Account wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden!",
       "DELETE_AUTH_DESCRIPTION": "Sie sind im Begriff Ihren Account endgültig zu löschen. Wollen Sie dies wirklich tun?",
       "TYPEUSERNAME": "Wiederholen Sie '{{value}}', um den Benutzer zu löschen.",
+      "USERNAME": "Loginname",
       "DELETE_BTN": "Endgültig löschen"
     },
     "SENDEMAILDIALOG": {
@@ -742,6 +743,7 @@
       "DATABASE": "Datenbank",
       "FAILEDSEQUENCE": "betroffene Sequenz",
       "FAILURECOUNT": "Fehleranzahl",
+      "LASTFAILED": "Zuletzt gescheitert um",
       "ERRORMESSAGE": "Meldung",
       "ACTIONS": "Aktionen",
       "DELETE": "Entfernen",
@@ -827,7 +829,8 @@
     "STATE": {
       "0": "Nicht definiert",
       "1": "Aktiv",
-      "2": "Inaktiv"
+      "2": "Inaktiv",
+      "3": "Entfernt"
     },
     "MEMBER": {
       "TITLE": "Manager der Organisation verwalten",

@@ -9,6 +9,7 @@ module.exports = {
         "examples/login/react",
         "examples/login/flutter",
         "examples/login/nextjs",
+        "examples/login/nextjs-b2b",
       ],
       collapsed: false,
     },
@@ -116,6 +117,7 @@ module.exports = {
           label: "Terraform",
           items: ["guides/manage/terraform/basics"],
         },
+        "guides/manage/user/reg-create-user",
       ],
     },
     {
@@ -132,6 +134,7 @@ module.exports = {
           items: [
             "guides/integrate/serviceusers",
             "guides/integrate/access-zitadel-apis",
+            "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/export-and-import",
           ],
@@ -170,6 +173,7 @@ module.exports = {
         "guides/solution-scenarios/introduction",
         "guides/solution-scenarios/b2c",
         "guides/solution-scenarios/b2b",
+        "guides/solution-scenarios/configurations",
       ],
     },
     {
@@ -224,7 +228,6 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
-        "apis/actions",
       ],
     },
     {
@@ -233,6 +236,7 @@ module.exports = {
       collapsed: false,
       items: [
         "apis/openidoauth/endpoints",
+        "apis/openidoauth/authrequest",
         "apis/openidoauth/scopes",
         "apis/openidoauth/claims",
         "apis/openidoauth/authn-methods",
@@ -244,6 +248,18 @@ module.exports = {
       label: "SAML",
       collapsed: false,
       items: ["apis/saml/endpoints"],
+    },
+    {
+      type: "category",
+      label: "Actions",
+      collapsed: false,
+      items: [
+        "apis/actions/introduction",
+        "apis/actions/modules",
+        "apis/actions/login-flow",
+        "apis/actions/register-flow",
+        "apis/actions/objects",
+      ]
     },
     {
       type: "category",

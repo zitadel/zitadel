@@ -2,7 +2,9 @@ package projection
 
 import (
 	"context"
-	"fmt"
+	"strings"
+
+	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -15,75 +17,159 @@ import (
 )
 
 const (
-	LoginNameProjectionTable       = "projections.login_names"
+	LoginNameTableAlias            = "login_names2"
+	LoginNameProjectionTable       = "projections." + LoginNameTableAlias
 	LoginNameUserProjectionTable   = LoginNameProjectionTable + "_" + loginNameUserSuffix
 	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
 	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix
 
-	LoginNameCol = "login_name"
+	LoginNameCol                   = "login_name"
+	LoginNameUserCol               = "user_id"
+	LoginNameIsPrimaryCol          = "is_primary"
+	LoginNameInstanceIDCol         = "instance_id"
+	LoginNameOwnerRemovedUserCol   = "user_owner_removed"
+	LoginNameOwnerRemovedPolicyCol = "policy_owner_removed"
+	LoginNameOwnerRemovedDomainCol = "domain_owner_removed"
+
+	usersAlias         = "users"
+	policyCustomAlias  = "policy_custom"
+	policyDefaultAlias = "policy_default"
+	policyUsersAlias   = "policy_users"
+	domainsAlias       = "domains"
+	domainAlias        = "domain"
 
 	loginNameUserSuffix           = "users"
 	LoginNameUserIDCol            = "id"
 	LoginNameUserUserNameCol      = "user_name"
 	LoginNameUserResourceOwnerCol = "resource_owner"
 	LoginNameUserInstanceIDCol    = "instance_id"
+	LoginNameUserOwnerRemovedCol  = "owner_removed"
 
 	loginNameDomainSuffix           = "domains"
 	LoginNameDomainNameCol          = "name"
 	LoginNameDomainIsPrimaryCol     = "is_primary"
 	LoginNameDomainResourceOwnerCol = "resource_owner"
 	LoginNameDomainInstanceIDCol    = "instance_id"
+	LoginNameDomainOwnerRemovedCol  = "owner_removed"
 
 	loginNamePolicySuffix             = "policies"
 	LoginNamePoliciesMustBeDomainCol  = "must_be_domain"
 	LoginNamePoliciesIsDefaultCol     = "is_default"
 	LoginNamePoliciesResourceOwnerCol = "resource_owner"
 	LoginNamePoliciesInstanceIDCol    = "instance_id"
+	LoginNamePoliciesOwnerRemovedCol  = "owner_removed"
 )
 
 var (
-	viewStmt = fmt.Sprintf("SELECT"+
-		" user_id"+
-		" , (CASE WHEN %[1]s THEN CONCAT(%[2]s, '@', domain) ELSE %[2]s END) AS login_name"+
-		" , COALESCE(%[3]s, true) AS %[3]s"+
-		" , %[4]s"+
-		" FROM ("+
-		" SELECT"+
-		" policy_users.user_id"+
-		" , policy_users.%[2]s"+
-		" , policy_users.%[5]s"+
-		" , policy_users.%[4]s"+
-		" , policy_users.%[1]s"+
-		" , domains.%[6]s AS domain"+
-		" , domains.%[3]s"+
-		" FROM ("+
-		" SELECT"+
-		" users.id as user_id"+
-		" , users.%[2]s"+
-		" , users.%[4]s"+
-		" , users.%[5]s"+
-		" , COALESCE(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
-		" FROM %[7]s users"+
-		" LEFT JOIN %[8]s policy_custom on policy_custom.%[9]s = users.%[5]s AND policy_custom.%[10]s = users.%[4]s"+
-		" LEFT JOIN %[8]s policy_default on policy_default.%[11]s = true AND policy_default.%[10]s = users.%[4]s) policy_users"+
-		" LEFT JOIN %[12]s domains ON policy_users.%[1]s AND policy_users.%[5]s = domains.%[13]s AND policy_users.%[10]s = domains.%[14]s"+
-		") AS login_names;",
-		LoginNamePoliciesMustBeDomainCol,
-		LoginNameUserUserNameCol,
-		LoginNameDomainIsPrimaryCol,
-		LoginNameUserInstanceIDCol,
-		LoginNameUserResourceOwnerCol,
-		LoginNameDomainNameCol,
-		LoginNameUserProjectionTable,
-		LoginNamePolicyProjectionTable,
-		LoginNamePoliciesResourceOwnerCol,
-		LoginNamePoliciesInstanceIDCol,
-		LoginNamePoliciesIsDefaultCol,
-		LoginNameDomainProjectionTable,
-		LoginNameDomainResourceOwnerCol,
-		LoginNameDomainInstanceIDCol,
-	)
+	policyUsers = sq.Select(
+		alias(
+			col(usersAlias, LoginNameUserIDCol),
+			LoginNameUserCol,
+		),
+		col(usersAlias, LoginNameUserUserNameCol),
+		col(usersAlias, LoginNameUserInstanceIDCol),
+		col(usersAlias, LoginNameUserResourceOwnerCol),
+		alias(
+			coalesce(col(policyCustomAlias, LoginNamePoliciesMustBeDomainCol), col(policyDefaultAlias, LoginNamePoliciesMustBeDomainCol)),
+			LoginNamePoliciesMustBeDomainCol,
+		),
+		alias(col(usersAlias, LoginNameUserOwnerRemovedCol),
+			LoginNameOwnerRemovedUserCol),
+		alias(coalesce(col(policyCustomAlias, LoginNamePoliciesOwnerRemovedCol), "false"),
+			LoginNameOwnerRemovedPolicyCol),
+	).From(alias(LoginNameUserProjectionTable, usersAlias)).
+		LeftJoin(
+			leftJoin(LoginNamePolicyProjectionTable, policyCustomAlias,
+				eq(col(policyCustomAlias, LoginNamePoliciesResourceOwnerCol), col(usersAlias, LoginNameUserResourceOwnerCol)),
+				eq(col(policyCustomAlias, LoginNamePoliciesInstanceIDCol), col(usersAlias, LoginNameUserInstanceIDCol)),
+			),
+		).
+		LeftJoin(
+			leftJoin(LoginNamePolicyProjectionTable, policyDefaultAlias,
+				eq(col(policyDefaultAlias, LoginNamePoliciesIsDefaultCol), "true"),
+				eq(col(policyDefaultAlias, LoginNamePoliciesInstanceIDCol), col(usersAlias, LoginNameUserInstanceIDCol)),
+			),
+		)
+
+	loginNamesTable = sq.Select(
+		col(policyUsersAlias, LoginNameUserCol),
+		col(policyUsersAlias, LoginNameUserUserNameCol),
+		col(policyUsersAlias, LoginNameUserResourceOwnerCol),
+		alias(col(policyUsersAlias, LoginNameUserInstanceIDCol),
+			LoginNameInstanceIDCol),
+		col(policyUsersAlias, LoginNamePoliciesMustBeDomainCol),
+		alias(col(domainsAlias, LoginNameDomainNameCol),
+			domainAlias),
+		col(domainsAlias, LoginNameDomainIsPrimaryCol),
+		col(policyUsersAlias, LoginNameOwnerRemovedUserCol),
+		col(policyUsersAlias, LoginNameOwnerRemovedPolicyCol),
+		alias(coalesce(col(domainsAlias, LoginNameDomainOwnerRemovedCol), "false"),
+			LoginNameOwnerRemovedDomainCol),
+	).FromSelect(policyUsers, policyUsersAlias).
+		LeftJoin(
+			leftJoin(LoginNameDomainProjectionTable, domainsAlias,
+				col(policyUsersAlias, LoginNamePoliciesMustBeDomainCol),
+				eq(col(policyUsersAlias, LoginNameUserResourceOwnerCol), col(domainsAlias, LoginNameDomainResourceOwnerCol)),
+				eq(col(policyUsersAlias, LoginNamePoliciesInstanceIDCol), col(domainsAlias, LoginNameDomainInstanceIDCol)),
+			),
+		)
+
+	viewStmt, _ = sq.Select(
+		LoginNameUserCol,
+		alias(
+			whenThenElse(
+				LoginNamePoliciesMustBeDomainCol,
+				concat(LoginNameUserUserNameCol, "'@'", domainAlias),
+				LoginNameUserUserNameCol),
+			LoginNameCol),
+		alias(coalesce(LoginNameDomainIsPrimaryCol, "true"),
+			LoginNameIsPrimaryCol),
+		LoginNameInstanceIDCol,
+		LoginNameOwnerRemovedUserCol,
+		LoginNameOwnerRemovedPolicyCol,
+		LoginNameOwnerRemovedDomainCol,
+	).FromSelect(loginNamesTable, LoginNameTableAlias).MustSql()
 )
+
+func col(table, name string) string {
+	return table + "." + name
+}
+
+func alias(col, alias string) string {
+	return col + " AS " + alias
+}
+
+func coalesce(values ...string) string {
+	str := "COALESCE("
+	for i, value := range values {
+		if i > 0 {
+			str += ", "
+		}
+		str += value
+	}
+	str += ")"
+	return str
+}
+
+func eq(first, second string) string {
+	return first + " = " + second
+}
+
+func leftJoin(table, alias, on string, and ...string) string {
+	st := table + " " + alias + " ON " + on
+	for _, a := range and {
+		st += " AND " + a
+	}
+	return st
+}
+
+func concat(strs ...string) string {
+	return "CONCAT(" + strings.Join(strs, ", ") + ")"
+}
+
+func whenThenElse(when, then, el string) string {
+	return "(CASE WHEN " + when + " THEN " + then + " ELSE " + el + " END)"
+}
 
 type loginNameProjection struct {
 	crdb.StatementHandler
@@ -100,29 +186,35 @@ func newLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(LoginNameUserUserNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNameUserResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNameUserInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNameUserOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
-			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{LoginNameUserResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{LoginNameUserResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNameUserOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNameDomainIsPrimaryCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LoginNameDomainResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNameDomainInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNameDomainOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNameDomainOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LoginNamePoliciesMustBeDomainCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(LoginNamePoliciesIsDefaultCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(LoginNamePoliciesResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNamePoliciesInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNamePoliciesOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LoginNamePoliciesInstanceIDCol, LoginNamePoliciesResourceOwnerCol),
 			loginNamePolicySuffix,
-			crdb.WithIndex(crdb.NewIndex("is_default_idx", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
+			crdb.WithIndex(crdb.NewIndex("is_default", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNamePoliciesOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -198,6 +290,10 @@ func (p *loginNameProjection) reducers() []handler.AggregateReducer {
 					Event:  org.OrgDomainVerifiedEventType,
 					Reduce: p.reduceDomainVerified,
 				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
+				},
 			},
 		},
 		{
@@ -256,6 +352,7 @@ func (p *loginNameProjection) reduceUserRemoved(event eventstore.Event) (*handle
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -274,6 +371,7 @@ func (p *loginNameProjection) reduceUserNameChanged(event eventstore.Event) (*ha
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -292,6 +390,7 @@ func (p *loginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -349,6 +448,7 @@ func (p *loginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) 
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNamePoliciesResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNamePoliciesInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNamePolicySuffix),
 	), nil
@@ -364,6 +464,7 @@ func (p *loginNameProjection) reduceDomainPolicyRemoved(event eventstore.Event) 
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNamePoliciesResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNamePolicySuffix),
 	), nil
@@ -401,6 +502,7 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCond(LoginNameDomainIsPrimaryCol, true),
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(loginNameDomainSuffix),
 		),
@@ -411,6 +513,7 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainNameCol, e.Domain),
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
 			crdb.WithTableSuffix(loginNameDomainSuffix),
 		),
@@ -428,6 +531,7 @@ func (p *loginNameProjection) reduceDomainRemoved(event eventstore.Event) (*hand
 		[]handler.Condition{
 			handler.NewCond(LoginNameDomainNameCol, e.Domain),
 			handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameDomainSuffix),
 	), nil
@@ -456,6 +560,47 @@ func (p *loginNameProjection) reduceInstanceRemoved(event eventstore.Event) (*ha
 		crdb.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNameUserSuffix),
+		),
+	), nil
+}
+
+func (p *loginNameProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-px02mo", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewMultiStatement(
+		event,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(LoginNameDomainOwnerRemovedCol, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNameDomainSuffix),
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(LoginNamePoliciesOwnerRemovedCol, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(LoginNamePoliciesResourceOwnerCol, e.Aggregate().ID),
+			},
+			crdb.WithTableSuffix(loginNamePolicySuffix),
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(LoginNameUserOwnerRemovedCol, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(LoginNameUserResourceOwnerCol, e.Aggregate().ID),
 			},
 			crdb.WithTableSuffix(loginNameUserSuffix),
 		),

@@ -804,6 +804,19 @@ Sets the state of my organisation to active
     POST: /orgs/me/_reactivate
 
 
+### RemoveOrg
+
+> **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
+[RemoveOrgResponse](#removeorgresponse)
+
+Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+Users of this organisation will not be able login
+
+
+
+    DELETE: /orgs/me
+
+
 ### SetOrgMetadata
 
 > **rpc** SetOrgMetadata([SetOrgMetadataRequest](#setorgmetadatarequest))
@@ -5408,6 +5421,7 @@ This is an empty response
 | password_change_required |  bool | - |  |
 | request_passwordless_registration |  bool | - |  |
 | otp_code |  string | - |  |
+| idps | repeated ImportHumanUserRequest.IDP | - |  |
 
 
 
@@ -5432,6 +5446,19 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | value |  string | - |  |
 | algorithm |  string | - |  |
+
+
+
+
+### ImportHumanUserRequest.IDP
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config_id |  string | internal id of the IDP in ZITADEL | string.min_len: 1<br /> string.max_len: 200<br />  |
+| external_user_id |  string | id of the user on the IDP | string.min_len: 1<br /> string.max_len: 200<br />  |
+| display_name |  string | (display) name of the user on the IDP | string.max_len: 200<br />  |
 
 
 
@@ -7027,6 +7054,23 @@ This is an empty response
 
 
 ### RemoveOrgMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveOrgRequest
+
+
+
+
+
+### RemoveOrgResponse
 
 
 

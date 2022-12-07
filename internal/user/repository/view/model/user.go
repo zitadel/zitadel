@@ -32,6 +32,7 @@ const (
 	UserKeyPreferredLoginName = "preferred_login_name"
 	UserKeyType               = "user_type"
 	UserKeyInstanceID         = "instance_id"
+	UserKeyOwnerRemoved       = "owner_removed"
 )
 
 type userType string

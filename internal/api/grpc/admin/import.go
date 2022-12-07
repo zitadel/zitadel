@@ -377,7 +377,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 
 		domainPolicy := org.GetDomainPolicy()
 		if org.DomainPolicy != nil {
-			_, err := s.command.AddOrgDomainPolicy(ctx, org.GetOrgId(), DomainPolicyToDomain(domainPolicy.UserLoginMustBeDomain, domainPolicy.ValidateOrgDomains, domainPolicy.SmtpSenderAddressMatchesInstanceDomain))
+			_, err := s.command.AddOrgDomainPolicy(ctx, org.GetOrgId(), domainPolicy.UserLoginMustBeDomain, domainPolicy.ValidateOrgDomains, domainPolicy.SmtpSenderAddressMatchesInstanceDomain)
 			if err != nil {
 				errors = append(errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: err.Error()})
 			}
@@ -535,9 +535,9 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		if org.HumanUsers != nil {
 			for _, user := range org.GetHumanUsers() {
 				logging.Debugf("import user: %s", user.GetUserId())
-				human, passwordless := management.ImportHumanUserRequestToDomain(user.User)
+				human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 				human.AggregateID = user.UserId
-				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 					if isCtxTimeout(ctx) {
