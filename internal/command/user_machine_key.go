@@ -12,6 +12,11 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
+type AddMachineKey struct {
+	Type           domain.AuthNKeyType
+	ExpirationDate time.Time
+}
+
 type MachineKey struct {
 	models.ObjectRoot
 
@@ -76,8 +81,12 @@ func (key *MachineKey) valid() (err error) {
 	key.ExpirationDate, err = domain.ValidateExpirationDate(key.ExpirationDate)
 	return err
 }
+
 func (key *MachineKey) checkAggregate(ctx context.Context, filter preparation.FilterToQueryReducer) error {
-	return checkUserExists(ctx, filter, key.AggregateID, key.ResourceOwner)
+	if exists, err := ExistsUser(ctx, filter, key.AggregateID, key.ResourceOwner); err != nil || !exists {
+		return errors.ThrowPreconditionFailed(err, "COMMAND-bnipwm1", "Errors.User.NotFound")
+	}
+	return nil
 }
 
 func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey) (*domain.ObjectDetails, error) {

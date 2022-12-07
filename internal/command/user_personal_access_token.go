@@ -14,6 +14,11 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
+type AddPat struct {
+	ExpirationDate time.Time
+	Scopes         []string
+}
+
 type PersonalAccessToken struct {
 	models.ObjectRoot
 

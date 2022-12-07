@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -13,13 +12,9 @@ import (
 )
 
 type AddMachine struct {
-	Machine                  *Machine
-	Pat                      bool
-	PatExpirationDate        time.Time
-	PatScopes                []string
-	MachineKey               bool
-	MachineKeyType           domain.AuthNKeyType
-	MachineKeyExpirationDate time.Time
+	Machine    *Machine
+	Pat        *AddPat
+	MachineKey *AddMachineKey
 }
 
 type Machine struct {

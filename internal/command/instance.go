@@ -286,6 +286,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
 	)
+
+	var pat *PersonalAccessToken
+	var machineKey *MachineKey
 	// only a human or a machine user should be created as owner
 	if setup.Org.Human != nil {
 		validations = append(validations,
@@ -295,6 +298,22 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		validations = append(validations,
 			AddMachineCommand(userAgg, setup.Org.Machine.Machine),
 		)
+		if setup.Org.Machine.Pat != nil {
+			pat = NewPersonalAccessToken(orgID, userID, setup.Org.Machine.Pat.ExpirationDate, setup.Org.Machine.Pat.Scopes, domain.UserTypeMachine)
+			pat.TokenID, err = c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareAddPersonalAccessToken(pat, c.keyAlgorithm))
+		}
+		if setup.Org.Machine.MachineKey != nil {
+			machineKey = NewMachineKey(orgID, userID, setup.Org.Machine.MachineKey.ExpirationDate, setup.Org.Machine.MachineKey.Type)
+			machineKey.KeyID, err = c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
+		}
 	}
 
 	validations = append(validations,
@@ -381,27 +400,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
-	var pat *PersonalAccessToken
-	var machineKey *MachineKey
-	if setup.Org.Machine != nil {
-		if setup.Org.Machine.Pat {
-			pat = NewPersonalAccessToken(orgID, userID, setup.Org.Machine.PatExpirationDate, setup.Org.Machine.PatScopes, domain.UserTypeMachine)
-			pat.TokenID, err = c.idGenerator.Next()
-			if err != nil {
-				return "", "", nil, nil, err
-			}
-			validations = append(validations, prepareAddPersonalAccessToken(pat, c.keyAlgorithm))
-		}
-		if setup.Org.Machine.MachineKey {
-			machineKey = NewMachineKey(orgID, userID, setup.Org.Machine.MachineKeyExpirationDate, setup.Org.Machine.MachineKeyType)
-			machineKey.KeyID, err = c.idGenerator.Next()
-			if err != nil {
-				return "", "", nil, nil, err
-			}
-			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
-		}
-	}
-
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return "", "", nil, nil, err
@@ -414,13 +412,11 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	var token string
 	var key []byte
-	if setup.Org.Machine != nil {
-		if setup.Org.Machine.Pat {
-			token = pat.Token
-		}
-		if setup.Org.Machine.MachineKey {
-			key = machineKey.PrivateKey
-		}
+	if pat != nil {
+		token = pat.Token
+	}
+	if machineKey != nil {
+		key = machineKey.PrivateKey
 	}
 
 	return instanceID, token, key, &domain.ObjectDetails{

@@ -396,17 +396,6 @@ func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner st
 	return nil
 }
 
-func checkUserExists(ctx context.Context, filter preparation.FilterToQueryReducer, userID, resourceOwner string) error {
-	existingUser, err := userWriteModelByID(ctx, filter, userID, resourceOwner)
-	if err != nil {
-		return err
-	}
-	if !isUserStateExists(existingUser.UserState) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.User.NotFound")
-	}
-	return nil
-}
-
 func (c *Commands) userWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *UserWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

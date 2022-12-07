@@ -54,8 +54,8 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 		validations = append(validations, AddHumanCommand(userAgg, o.Human, c.userPasswordAlg, c.userEncryption))
 	} else if o.Machine != nil {
 		validations = append(validations, AddMachineCommand(userAgg, o.Machine.Machine))
-		if o.Machine.Pat {
-			pat = NewPersonalAccessToken(orgID, userID, o.Machine.PatExpirationDate, o.Machine.PatScopes, domain.UserTypeMachine)
+		if o.Machine.Pat != nil {
+			pat = NewPersonalAccessToken(orgID, userID, o.Machine.Pat.ExpirationDate, o.Machine.Pat.Scopes, domain.UserTypeMachine)
 			tokenID, err := c.idGenerator.Next()
 			if err != nil {
 				return "", "", nil, nil, err
@@ -63,8 +63,8 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 			pat.TokenID = tokenID
 			validations = append(validations, prepareAddPersonalAccessToken(pat, c.keyAlgorithm))
 		}
-		if o.Machine.MachineKey {
-			machineKey = NewMachineKey(orgID, userID, o.Machine.MachineKeyExpirationDate, o.Machine.MachineKeyType)
+		if o.Machine.MachineKey != nil {
+			machineKey = NewMachineKey(orgID, userID, o.Machine.MachineKey.ExpirationDate, o.Machine.MachineKey.Type)
 			keyID, err := c.idGenerator.Next()
 			if err != nil {
 				return "", "", nil, nil, err
@@ -91,13 +91,11 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 
 	var token string
 	var key []byte
-	if o.Machine != nil {
-		if o.Machine.Pat {
-			token = pat.Token
-		}
-		if o.Machine.MachineKey {
-			key = machineKey.PrivateKey
-		}
+	if pat != nil {
+		token = pat.Token
+	}
+	if machineKey != nil {
+		key = machineKey.PrivateKey
 	}
 
 	return userID, token, key, &domain.ObjectDetails{
