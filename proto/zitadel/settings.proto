@@ -86,15 +86,8 @@ message OIDCSettings {
 
 message SecurityPolicy {
   zitadel.v1.ObjectDetails details = 1;
-
-  oneof setting {
-    option (validate.required) = true;
-
-    bool disabled = 2;
-    Origins enabled = 3;
-  }
-}
-
-message Origins {
-  repeated string origins = 1;
+  // states if iframe embedding is enabled or disabled
+  bool enable_iframe_embedding = 2;
+  // origins allowed to load ZITADEL in an iframe if enable_iframe_embedding is true
+  repeated string allowed_origins = 3;
 }

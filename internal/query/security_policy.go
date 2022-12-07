@@ -71,8 +71,10 @@ func (q *Queries) SecurityPolicy(ctx context.Context) (*SecurityPolicy, error) {
 
 func prepareSecurityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*SecurityPolicy, error)) {
 	return sq.Select(
+			SecurityPolicyColumnInstanceID.identifier(),
 			SecurityPolicyColumnCreationDate.identifier(),
 			SecurityPolicyColumnChangeDate.identifier(),
+			SecurityPolicyColumnInstanceID.identifier(),
 			SecurityPolicyColumnSequence.identifier(),
 			SecurityPolicyColumnEnabled.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier()).

@@ -151,16 +151,9 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 }
 
 func SecurityPolicyToPb(policy *query.SecurityPolicy) *settings_pb.SecurityPolicy {
-	if !policy.Enabled {
-		return &settings_pb.SecurityPolicy{
-			Setting: &settings_pb.SecurityPolicy_Disabled{},
-		}
-	}
 	return &settings_pb.SecurityPolicy{
-		Setting: &settings_pb.SecurityPolicy_Enabled{
-			Enabled: &settings_pb.Origins{
-				Origins: policy.AllowedOrigins,
-			},
-		},
+		Details:               obj_grpc.ToViewDetailsPb(policy.Sequence, policy.CreationDate, policy.ChangeDate, policy.AggregateID),
+		EnableIframeEmbedding: policy.Enabled,
+		AllowedOrigins:        policy.AllowedOrigins,
 	}
 }

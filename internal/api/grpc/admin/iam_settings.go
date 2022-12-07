@@ -118,14 +118,7 @@ func (s *Server) GetSecurityPolicy(ctx context.Context, req *admin_pb.GetSecurit
 }
 
 func (s *Server) SetSecurityPolicy(ctx context.Context, req *admin_pb.SetSecurityPolicyRequest) (*admin_pb.SetSecurityPolicyResponse, error) {
-	var enabled bool
-	var origins []string
-	if e, ok := req.Setting.(*admin_pb.SetSecurityPolicyRequest_Enabled); ok {
-		enabled = true
-		origins = e.Enabled.Origins
-	}
-
-	details, err := s.command.SetSecurityPolicy(ctx, enabled, origins)
+	details, err := s.command.SetSecurityPolicy(ctx, req.EnableIframeEmbedding, req.AllowedOrigins)
 	if err != nil {
 		return nil, err
 	}

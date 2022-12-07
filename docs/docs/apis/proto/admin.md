@@ -4072,14 +4072,8 @@ this is en empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) setting.disabled |  SetSecurityPolicyRequest.Disabled | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) setting.enabled |  zitadel.settings.v1.Origins | - |  |
-
-
-
-
-### SetSecurityPolicyRequest.Disabled
-
+| enable_iframe_embedding |  bool | states if iframe embedding is enabled or disabled |  |
+| allowed_origins | repeated string | origins allowed to load ZITADEL in an iframe if enable_iframe_embedding is true |  |
 
 
 
