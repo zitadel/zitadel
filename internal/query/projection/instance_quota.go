@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"math"
 	"time"
 
@@ -32,33 +33,68 @@ const (
 	QuotaAmountCol        = "amount"
 	QuotaLimitCol         = "do_limit"
 
-	QuotaNotificationIdCol         = "id"
-	QuotaNotificationInstanceIDCol = "instance_id"
-	QuotaNotificationUnitCol       = "quota_unit"
-	QuotaNotificationCallURLCol    = "call_url"
-	QuotaNotificationPercentCol    = "percent"
-	QuotaNotificationRepeatCol     = "repeat"
+	QuotaNotificationIdCol              = "id"
+	QuotaNotificationInstanceIDCol      = "instance_id"
+	QuotaNotificationUnitCol            = "quota_unit"
+	QuotaNotificationCallURLCol         = "call_url"
+	QuotaNotificationPercentCol         = "percent"
+	QuotaNotificationRepeatCol          = "repeat"
+	QuotaNotificationLastCallDateCol    = "last_call_date"
+	QuotaNotificationLastCallPercentCol = "last_call_percent"
 )
 
 type Quota struct {
 	Amount      int64
 	Limit       bool
+	client      *sql.DB
+	instanceId  string
+	unit        quota.Unit
 	from        time.Time
 	interval    time.Duration
 	PeriodStart time.Time
 	PeriodEnd   time.Time
 }
 
-func (q *Quota) refreshPeriod() *Quota {
-	periodStart := pushFrom(q.from, q.interval, time.Now())
-	return &Quota{
-		Amount:      q.Amount,
-		Limit:       q.Limit,
-		from:        q.from,
-		interval:    q.interval,
-		PeriodStart: periodStart,
-		PeriodEnd:   periodStart.Add(q.interval),
+// Report calls notification hooks if necessary and returns if usage should be limited
+func (q *Quota) Report(ctx context.Context, used uint64) bool {
+
+	var errs []error
+	dueNotifications, getNotificationsErr := getDueInstanceQuotaNotifications(ctx, client, q, int64(used))
+	if getNotificationsErr != nil {
+		errs = append(errs, getNotificationsErr)
 	}
+	for _, notification := range dueNotifications {
+		alreadyNotified, alreadyNotifiedErr := isNotified(ctx, client, q, notification)
+		if alreadyNotifiedErr != nil {
+			errs = append(errs, alreadyNotifiedErr)
+			continue
+		}
+		if alreadyNotified {
+			continue
+		}
+
+		if notifyErr := notify(ctx, q, notification); notifyErr != nil {
+			errs = append(errs, notifyErr)
+			continue
+		}
+
+		if emitMotifiedErr := emitNotifiedEvent(ctx, client, q, notification); emitMotifiedErr != nil {
+			errs = append(errs, emitMotifiedErr)
+			continue
+		}
+	}
+
+	if severeErr := emitFailedEvents(ctx, client, errs); severeErr != nil {
+		panic(severeErr)
+	}
+
+	doLimit := q.Limit && int64(used) > q.Amount
+	return doLimit
+}
+
+func (q *Quota) refreshPeriod() {
+	q.PeriodStart = pushFrom(q.from, q.interval, time.Now())
+	q.PeriodEnd = q.PeriodStart.Add(q.interval)
 }
 
 func pushFrom(from time.Time, interval time.Duration, now time.Time) time.Time {
@@ -67,6 +103,77 @@ func pushFrom(from time.Time, interval time.Duration, now time.Time) time.Time {
 		return from
 	}
 	return pushFrom(next, interval, now)
+}
+
+type quotaNotification struct {
+}
+
+func getDueInstanceQuotaNotifications(ctx context.Context, client *sql.DB, q *Quota, used int64) ([]*quotaNotification, error) {
+
+	usagePercent := int64(math.Floor(float64(used*100) / float64(q.Amount)))
+
+	stmt, args, err := squirrel.Select(QuotaAmountCol, QuotaLimitCol, QuotaFromCol, QuotaIntervalCol).
+		From(fmt.Sprintf("%s_%s  AS OF SYSTEM TIME '-10s'", QuotaTable, QuotaNotificationsTableSuffix)).
+		Where(squirrel.And{
+			squirrel.Eq{
+				QuotaNotificationInstanceIDCol: q.instanceId,
+				QuotaNotificationUnitCol:       q.unit,
+			},
+			squirrel.Or{
+				squirrel.And{
+					squirrel.Eq{
+						QuotaNotificationRepeatCol: false,
+					},
+					squirrel.Lt{
+						QuotaNotificationPercentCol:      usagePercent,
+						QuotaNotificationLastCallDateCol: q.PeriodStart,
+					},
+				},
+				squirrel.And{
+					squirrel.Eq{
+						QuotaNotificationRepeatCol: true,
+					},
+					squirrel.Expr(),
+					squirrel.Lt{
+						QuotaNotificationPercentCol:       usagePercent,
+						QuotaNotificationLastCallUsageCol: q.PeriodStart,
+					},
+				},
+			},
+		}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, caos_errors.ThrowInternal(err, "QUOTA-V9Sde", "Errors.Internal")
+	}
+
+	notififcation := quotaNotification{}
+	rows, err := client.QueryContext(ctx, stmt, args...)
+	for rows.Next() {
+		if rows.Scan(&notififcation.Amount, &notififcation.Limit, &notififcation.from, &notififcation.interval); err != nil {
+
+		}
+	}
+	return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
+
+	return quota.refreshPeriod(), nil
+}
+
+func isNotified(ctx context.Context, client *sql.DB, quota *Quota, notification *quotaNotification) (bool, error) {
+	return false, errors.ThrowError(nil, "", "not implemented")
+}
+
+func notify(ctx context.Context, quota *Quota, notification *quotaNotification) error {
+	return errors.ThrowError(nil, "", "not implemented")
+}
+
+func emitNotifiedEvent(ctx context.Context, client *sql.DB, quota *Quota, notification *quotaNotification) error {
+	return errors.ThrowError(nil, "", "not implemented")
+}
+
+func emitFailedEvents(ctx context.Context, client *sql.DB, errs []error) error {
+	return errors.ThrowError(nil, "", "not implemented")
 }
 
 func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit) (*Quota, error) {
@@ -84,14 +191,18 @@ func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, un
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-V9Sde", "Errors.Internal")
 	}
 
-	quota := Quota{}
+	quota := Quota{
+		client:     client,
+		instanceId: instanceID,
+		unit:       unit,
+	}
 	if err = client.
 		QueryRowContext(ctx, stmt, args...).
 		Scan(&quota.Amount, &quota.Limit, &quota.from, &quota.interval); err != nil {
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
 	}
-
-	return quota.refreshPeriod(), nil
+	quota.refreshPeriod()
+	return &quota, nil
 }
 
 // TODO: Why not return *StatementHandler?

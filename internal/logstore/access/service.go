@@ -49,7 +49,10 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (bool, error) {
 	}
 
 	usage, err := authenticatedInstanceRequests(ctx, s.dbClient, instanceID, quota.PeriodStart, quota.PeriodEnd)
-	return int64(usage) > quota.Amount, err
+	if err != nil {
+		return false, err
+	}
+	return quota.Report(usage), nil
 }
 
 func (s *Service) Handle(ctx context.Context, record *logstore.AccessLogRecord) (err error) {
