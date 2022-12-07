@@ -74,3 +74,37 @@ Go to the "Advanced" section, per default login with email address should be all
 
 ![Login Policy Advanced Setting: Disable email for login](/img/guides/scenarios/login_policy_advanced.png)
 
+## Embedding ZITADEL in an iFrame
+
+To maximise the security during login and in the Console UI, ZITADEL follows security best practices by setting a
+Content-Security-Policy (CSP) and X-Frame-Options:
+
+```
+Content-Security-Policy: frame-ancestors 'none'
+X-Frame-Options: deny
+```
+
+These settings block the use of serving it in an iframe to prevents clickjacking attacks.
+
+### Enable iFrame embedding
+
+:::caution
+This change can make you vulnerable to clickjacking attacks.
+:::
+
+If your applications need to load ZITADEL inside an iframe, e.g. for a silent login or silent refresh, you can enable the use on an instance level.
+
+1. Navigate to the Instance Settings.
+2. Click on the Security Policy tab.
+3. Enable the "IFrame use" and add the host(s) you load the iframe from.
+
+You can add further hosts later on.
+[//]: # (TODO: add image)
+
+This will change the CSP to the following:
+
+```
+Content-Security-Policy: frame-ancestors https://custom-domain.com
+```
+
+and remove the X-Frame-Options header.
