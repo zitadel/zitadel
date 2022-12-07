@@ -2,7 +2,7 @@
 title: Service Users
 ---
 
-This is a guide on how to create service users in ZITADEL. You can read more about users [here](/docs/concepts/structure/users.md).
+This is a guide on how to create service users in ZITADEL. You can read more about users [here](/concepts/structure/users.md).
 ## Create a Service User
 
 1. Navigate to Service Users
