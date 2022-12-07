@@ -402,7 +402,7 @@ func checkUserExists(ctx context.Context, filter preparation.FilterToQueryReduce
 		return err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.User.NotFound")
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-4M0fs", "Errors.User.NotFound")
 	}
 	return nil
 }
