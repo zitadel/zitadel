@@ -8,7 +8,7 @@ describe('humans', () => {
 
   [
     { mustBeDomain: true, addName: 'e2ehumanusernameadd', removeName: 'e2ehumanusernameremove' },
-    { mustBeDomain: false, addName: 'e2ehumanusernameadd', removeName: 'e2ehumanusernameremove' },
+    { mustBeDomain: false, addName: 'e2ehumanusernameaddGlobal', removeName: 'e2ehumanusernameremoveGlobal' },
     { mustBeDomain: false, addName: 'e2ehumanusernameadd@test.com', removeName: 'e2ehumanusernameremove@test.com' },
   ].forEach((user) => {
     beforeEach(() => {
