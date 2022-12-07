@@ -12,7 +12,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/projection"
+	projection_old "github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -22,47 +23,47 @@ const (
 
 var (
 	instanceTable = table{
-		name:          projection.InstanceProjectionTable,
-		instanceIDCol: projection.InstanceColumnID,
+		name:          projection_old.InstanceProjectionTable,
+		instanceIDCol: projection_old.InstanceColumnID,
 	}
 	InstanceColumnID = Column{
-		name:  projection.InstanceColumnID,
+		name:  projection_old.InstanceColumnID,
 		table: instanceTable,
 	}
 	InstanceColumnName = Column{
-		name:  projection.InstanceColumnName,
+		name:  projection_old.InstanceColumnName,
 		table: instanceTable,
 	}
 	InstanceColumnCreationDate = Column{
-		name:  projection.InstanceColumnCreationDate,
+		name:  projection_old.InstanceColumnCreationDate,
 		table: instanceTable,
 	}
 	InstanceColumnChangeDate = Column{
-		name:  projection.InstanceColumnChangeDate,
+		name:  projection_old.InstanceColumnChangeDate,
 		table: instanceTable,
 	}
 	InstanceColumnSequence = Column{
-		name:  projection.InstanceColumnSequence,
+		name:  projection_old.InstanceColumnSequence,
 		table: instanceTable,
 	}
 	InstanceColumnDefaultOrgID = Column{
-		name:  projection.InstanceColumnDefaultOrgID,
+		name:  projection_old.InstanceColumnDefaultOrgID,
 		table: instanceTable,
 	}
 	InstanceColumnProjectID = Column{
-		name:  projection.InstanceColumnProjectID,
+		name:  projection_old.InstanceColumnProjectID,
 		table: instanceTable,
 	}
 	InstanceColumnConsoleID = Column{
-		name:  projection.InstanceColumnConsoleID,
+		name:  projection_old.InstanceColumnConsoleID,
 		table: instanceTable,
 	}
 	InstanceColumnConsoleAppID = Column{
-		name:  projection.InstanceColumnConsoleAppID,
+		name:  projection_old.InstanceColumnConsoleAppID,
 		table: instanceTable,
 	}
 	InstanceColumnDefaultLanguage = Column{
-		name:  projection.InstanceColumnDefaultLanguage,
+		name:  projection_old.InstanceColumnDefaultLanguage,
 		table: instanceTable,
 	}
 )
@@ -166,43 +167,75 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Inst
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if shouldTriggerBulk {
-		projection.InstanceProjection.Trigger(ctx)
-	}
-
-	stmt, scan := prepareInstanceDomainQuery(authz.GetInstance(ctx).RequestedDomain())
-	query, args, err := stmt.Where(sq.Eq{
-		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")
-	}
-
-	row, err := q.client.QueryContext(ctx, query, args...)
+	instance := projection.NewInstance(authz.GetInstance(ctx).InstanceID())
+	events, err := q.eventstore.Filter(ctx, instance.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
 	}
-	return scan(row)
+	instance.Reduce(events)
+
+	return mapInstance(instance), nil
 }
 
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareInstanceDomainQuery(host)
 	host = strings.Split(host, ":")[0] //remove possible port
-	query, args, err := stmt.Where(sq.Eq{
-		InstanceDomainDomainCol.identifier(): host,
-	}).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
-	}
 
-	row, err := q.client.QueryContext(ctx, query, args...)
+	domainSearch := projection.NewSearchInstanceDomain(host)
+	events, err := q.eventstore.Filter(ctx, domainSearch.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
 	}
-	return scan(row)
+	domainSearch.Reduce(events)
+	if domainSearch.InstanceID == "" {
+		return nil, errors.ThrowNotFound(nil, "QUERY-VZHH2", "Errors.NotFound")
+	}
+
+	instance := projection.NewInstance(domainSearch.InstanceID)
+	events, err = q.eventstore.Filter(ctx, instance.SearchQuery(ctx))
+	if err != nil {
+		return nil, err
+	}
+	instance.Reduce(events)
+
+	return mapInstance(instance), nil
+}
+
+func mapInstance(instance *projection.Instance) *Instance {
+	return &Instance{
+		ID:           instance.ID,
+		ChangeDate:   instance.ChangeDate,
+		CreationDate: instance.CreationDate,
+		Sequence:     instance.Sequence,
+		Name:         instance.Name,
+
+		DefaultOrgID: instance.DefaultOrgID,
+		IAMProjectID: instance.IAMProjectID,
+		ConsoleID:    instance.ConsoleID,
+		ConsoleAppID: instance.ConsoleAppID,
+		DefaultLang:  instance.DefaultLang,
+		Domains:      mapInstanceDomains(instance.Domains),
+	}
+}
+
+func mapInstanceDomains(domains []*projection.InstanceDomain) []*InstanceDomain {
+	instanceDomains := make([]*InstanceDomain, len(domains))
+
+	for i, domain := range domains {
+		instanceDomains[i] = &InstanceDomain{
+			CreationDate: domain.CreationDate,
+			ChangeDate:   domain.ChangeDate,
+			Sequence:     domain.Sequence,
+			Domain:       domain.Domain,
+			InstanceID:   domain.InstanceID,
+			IsGenerated:  domain.IsGenerated,
+			IsPrimary:    domain.IsPrimary,
+		}
+	}
+
+	return instanceDomains
 }
 
 func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
