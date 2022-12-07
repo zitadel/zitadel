@@ -486,6 +486,7 @@ title: zitadel/text.proto
 | description |  string | - | string.max_len: 500<br />  |
 | user_name_button_text |  string | - | string.max_len: 200<br />  |
 | external_login_description |  string | - | string.max_len: 500<br />  |
+| back_button_text |  string | - | string.max_len: 200<br />  |
 
 
 

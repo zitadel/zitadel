@@ -36,6 +36,12 @@
     </div>
 
     {{template "error-message" .}}
+
+    <div class="lgn-actions">
+        <a class="lgn-stroked-button" href="{{ loginNameChangeUrl .AuthReqID }}">
+            {{t "RegisterOption.BackButtonText"}}
+        </a>
+    </div>
 </form>
 
 

@@ -229,6 +229,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r21.setExternalLoginDescription(map.registrationOptionText?.externalLoginDescription ?? '');
   r21.setTitle(map.registrationOptionText?.title ?? '');
   r21.setUserNameButtonText(map.registrationOptionText?.userNameButtonText ?? '');
+  r21.setBackButtonText(map.registrationOptionText?.backButtonText ?? '');
   req.setRegistrationOptionText(r21);
 
   const r22 = new RegistrationOrgScreenText();
