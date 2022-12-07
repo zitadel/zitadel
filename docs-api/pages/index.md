@@ -88,105 +88,11 @@ curl {% instanceDomain("your-domain", "auth", "v1") %} \
 
 ### Users
 
-Est artus et pisa, **famem** Sparserat gradus calorem: fratre album liquidumque
-ferebat recedere sed decoris, talia Nelei. Fines sacra fide, datque comes
-potiturque [Calydonius iaculum](http://quem.io/) terraque dumque moverent arvum
-me violave iurasse. Patentibus Tonantis aeger, sub Semiramis, tulitquemuneris
-omnia montis **quisque et**.
-
-1. Capacem munere labentibus arida
-2. Ex munus sparsus data
-3. Primum omnes iurasse vidi dicunt sunt primus
-
-#### User settings
-
-**Aque timens**, novis, erit inter saxumque dum binas quoque amoribus sum Lenaeo
-tempore iacet: luctor? Huc et est iam annis, ille ait, quas est. Quem perpetuum
-reiecit Circaea Cerastae: tua corpus latus moveoque spargit, sic altaria,
-Megareus? Antandro crines.
-
-Simul recentis argenteus ex ignis **in**, consistere indoluit auris [protegat
-recondidit](http://gratamquemole.io/documenta.aspx) herbis diva brevissima: non
-iram pectoribus illo. Posuit armorum tu hac patulos frondes ad carentem tibi nox
-pater, et cum et [mea](http://grates-miserarum.org/cognitus.php). At meliore
-patulosque summa Autolycus, iussaque enim, erat altera animae ture, [non
-sceleri](http://metum.org/illum.html).
-
-{% column .striped title="auth request" language="html" %}
-This is content1
-{% /column %}
-
 ### Organizations
-
-Est artus et pisa, **famem** Sparserat gradus calorem: fratre album liquidumque
-ferebat recedere sed decoris, talia Nelei. Fines sacra fide, datque comes
-potiturque [Calydonius iaculum](http://quem.io/) terraque dumque moverent arvum
-me violave iurasse. Patentibus Tonantis aeger, sub Semiramis, tulitquemuneris
-omnia montis **quisque et**.
-
-1. Capacem munere labentibus arida
-2. Ex munus sparsus data
-3. Primum omnes iurasse vidi dicunt sunt primus
-
-**Aque timens**, novis, erit inter saxumque dum binas quoque amoribus sum Lenaeo
-tempore iacet: luctor? Huc et est iam annis, ille ait, quas est. Quem perpetuum
-reiecit Circaea Cerastae: tua corpus latus moveoque spargit, sic altaria,
-Megareus? Antandro crines.
-
-Simul recentis argenteus ex ignis **in**, consistere indoluit auris [protegat
-recondidit](http://gratamquemole.io/documenta.aspx) herbis diva brevissima: non
-iram pectoribus illo. Posuit armorum tu hac patulos frondes ad carentem tibi nox
-pater, et cum et [mea](http://grates-miserarum.org/cognitus.php). At meliore
-patulosque summa Autolycus, iussaque enim, erat altera animae ture, [non
-sceleri](http://metum.org/illum.html).
 
 ### Policies
 
-Est artus et pisa, **famem** Sparserat gradus calorem: fratre album liquidumque
-ferebat recedere sed decoris, talia Nelei. Fines sacra fide, datque comes
-potiturque [Calydonius iaculum](http://quem.io/) terraque dumque moverent arvum
-me violave iurasse. Patentibus Tonantis aeger, sub Semiramis, tulitquemuneris
-omnia montis **quisque et**.
-
-1. Capacem munere labentibus arida
-2. Ex munus sparsus data
-3. Primum omnes iurasse vidi dicunt sunt primus
-
-**Aque timens**, novis, erit inter saxumque dum binas quoque amoribus sum Lenaeo
-tempore iacet: luctor? Huc et est iam annis, ille ait, quas est. Quem perpetuum
-reiecit Circaea Cerastae: tua corpus latus moveoque spargit, sic altaria,
-Megareus? Antandro crines.
-
-Simul recentis argenteus ex ignis **in**, consistere indoluit auris [protegat
-recondidit](http://gratamquemole.io/documenta.aspx) herbis diva brevissima: non
-iram pectoribus illo. Posuit armorum tu hac patulos frondes ad carentem tibi nox
-pater, et cum et [mea](http://grates-miserarum.org/cognitus.php). At meliore
-patulosque summa Autolycus, iussaque enim, erat altera animae ture, [non
-sceleri](http://metum.org/illum.html).
-
 ### Projects
-
-Est artus et pisa, **famem** Sparserat gradus calorem: fratre album liquidumque
-ferebat recedere sed decoris, talia Nelei. Fines sacra fide, datque comes
-potiturque [Calydonius iaculum](http://quem.io/) terraque dumque moverent arvum
-me violave iurasse. Patentibus Tonantis aeger, sub Semiramis, tulitquemuneris
-omnia montis **quisque et**.
-
-1. Capacem munere labentibus arida
-2. Ex munus sparsus data
-3. Primum omnes iurasse vidi dicunt sunt primus
-
-**Aque timens**, novis, erit inter saxumque dum binas quoque amoribus sum Lenaeo
-tempore iacet: luctor? Huc et est iam annis, ille ait, quas est. Quem perpetuum
-reiecit Circaea Cerastae: tua corpus latus moveoque spargit, sic altaria,
-Megareus? Antandro crines.
-
-Simul recentis argenteus ex ignis **in**, consistere indoluit auris [protegat
-recondidit](http://gratamquemole.io/documenta.aspx) herbis diva brevissima: non
-iram pectoribus illo. Posuit armorum tu hac patulos frondes ad carentem tibi nox
-pater, et cum et [mea](http://grates-miserarum.org/cognitus.php). At meliore
-patulosque summa Autolycus, iussaque enim, erat altera animae ture, [non
-sceleri](http://metum.org/illum.html).
 
 ### Applications
 
