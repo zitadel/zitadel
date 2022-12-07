@@ -11,49 +11,50 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/projection"
+	projection_old "github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
 	orgsTable = table{
-		name:          projection.OrgProjectionTable,
-		instanceIDCol: projection.OrgColumnInstanceID,
+		name:          projection_old.OrgProjectionTable,
+		instanceIDCol: projection_old.OrgColumnInstanceID,
 	}
 	OrgColumnID = Column{
-		name:  projection.OrgColumnID,
+		name:  projection_old.OrgColumnID,
 		table: orgsTable,
 	}
 	OrgColumnCreationDate = Column{
-		name:  projection.OrgColumnCreationDate,
+		name:  projection_old.OrgColumnCreationDate,
 		table: orgsTable,
 	}
 	OrgColumnChangeDate = Column{
-		name:  projection.OrgColumnChangeDate,
+		name:  projection_old.OrgColumnChangeDate,
 		table: orgsTable,
 	}
 	OrgColumnResourceOwner = Column{
-		name:  projection.OrgColumnResourceOwner,
+		name:  projection_old.OrgColumnResourceOwner,
 		table: orgsTable,
 	}
 	OrgColumnInstanceID = Column{
-		name:  projection.OrgColumnInstanceID,
+		name:  projection_old.OrgColumnInstanceID,
 		table: orgsTable,
 	}
 	OrgColumnState = Column{
-		name:  projection.OrgColumnState,
+		name:  projection_old.OrgColumnState,
 		table: orgsTable,
 	}
 	OrgColumnSequence = Column{
-		name:  projection.OrgColumnSequence,
+		name:  projection_old.OrgColumnSequence,
 		table: orgsTable,
 	}
 	OrgColumnName = Column{
-		name:  projection.OrgColumnName,
+		name:  projection_old.OrgColumnName,
 		table: orgsTable,
 	}
 	OrgColumnDomain = Column{
-		name:  projection.OrgColumnDomain,
+		name:  projection_old.OrgColumnDomain,
 		table: orgsTable,
 	}
 )
@@ -92,21 +93,30 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if shouldTriggerBulk {
-		projection.OrgProjection.Trigger(ctx)
-	}
-
-	stmt, scan := prepareOrgQuery()
-	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.identifier():         id,
-		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	org := projection.NewOrg(id, authz.GetInstance(ctx).InstanceID())
+	events, err := q.eventstore.Filter(ctx, org.SearchQuery(ctx))
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
+		return nil, err
 	}
+	if len(events) == 0 {
+		return nil, errors.ThrowNotFound(err, "QUERY-iTTGJ", "Errors.Org.NotFound")
+	}
+	org.Reduce(events)
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	return mapOrg(org), nil
+}
+
+func mapOrg(org *projection.Org) *Org {
+	return &Org{
+		ID:            org.ID,
+		CreationDate:  org.CreationDate,
+		ChangeDate:    org.ChangeDate,
+		ResourceOwner: org.ResourceOwner,
+		State:         org.State,
+		Sequence:      org.Sequence,
+		Name:          org.Name,
+		Domain:        org.Domain,
+	}
 }
 
 func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (_ *Org, err error) {
