@@ -61,8 +61,6 @@ export default function MyApp({ Component, pageProps }: AppProps<MyAppProps>) {
     ? collectHeadings(pageProps.markdoc.content)
     : [];
 
-  console.log(toc);
-
   return (
     <>
       <Head>
@@ -80,13 +78,15 @@ export default function MyApp({ Component, pageProps }: AppProps<MyAppProps>) {
         defaultTheme="system"
         storageKey="cp-theme"
       >
-        <div className="h-screen flex w-screen flex-grow bg-white dark:bg-background-dark-500 text-gray-800 dark:text-gray-100">
-          <TableOfContents toc={toc} />
-          <div className="overflow-auto flex-grow pt-0 pl-4 pr-8 pb-8">
-            <TopNav></TopNav>
-            <main className="">
-              <Component {...pageProps} />
-            </main>
+        <div className="bg-white dark:bg-background-dark-500 text-gray-800 dark:text-gray-100">
+          <div className="flex flex-grow max-w-8xl mx-auto relative">
+            <TableOfContents toc={toc} />
+            <div className="overflow-auto flex-grow pt-0 pl-4 lg:pl-10 pr-8 lg:pr-10 pb-8">
+              <TopNav></TopNav>
+              <main className="">
+                <Component {...pageProps} />
+              </main>
+            </div>
           </div>
         </div>
       </ThemeProvider>

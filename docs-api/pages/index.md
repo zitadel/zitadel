@@ -6,18 +6,73 @@ description: How to get started with Markdoc
 # ZITADEL API reference
 
 {% callout %}
-This is be our full-featured API reference for ZITADEL
+This will be our full-featured API reference for ZITADEL. Notice it's still work in progress but feel free to report issues and helpful feedback 👷 You can find the main issue [here](https://github.com/zitadel/zitadel/issues/4839).
 {% /callout %}
+
+{% section %}
+{% column columns=2 %}
 
 ### Introduction
 
-This page will be deployed on [https://www.zitadel.com/docs/api](https://www.zitadel.com/docs/api) and house all API relevant documentation including code snippets and examples.
+ZITADEL provides five APIs for different use cases. Four of these APIs are built with GRPC and generate a REST service. Each service's proto definition is located in the source control on GitHub. {% .text-base %}
 
-You can start editing the page by modifying `/pages/index.md`. The page auto-updates as you edit the file.
+As we generate the REST services and Swagger file out of the proto definition we recommend that you rely on the proto file. We annotate the corresponding REST methods on each possible call as well as the AuthN and AuthZ requirements. The last API (assets) is only a REST API because ZITADEL uses multipart form data for certain elements.
+
+{% /column %}
+
+{% column %}
+
+Don't know how to get started? {% .ztdl-subheader .pb-0 %}
+
+Read our Quickstart Guide [here](https://zitadel.com/docs/guides/start/quickstart)
+
+You're not a developer? {% .ztdl-subheader .pb-0 %}
+
+Consider reading our Guide [here](https://zitadel.com/docs/guides/introduction) or contact us at [support@zitadel.com](mailto:support@zitadel.com).
+
+{% card title="Base URLs" %}
+**Auth**: {% instanceDomain("your-domain", "auth", "v1") %}{% .pt-4 .pb-2 %}
+
+**Management** {% instanceDomain("your-domain", "management", "v1") %}{% .py-2 %}
+
+**Admin** {% instanceDomain("your-domain", "admin", "v1") %}{% .py-4 .pt-2 %}
+
+{% /card %}
+{% /column %}
+{% /section %}
+
+{% section %}
+{% column %}
 
 ### Authentication
 
-blabla
+You can authorize your requests for ZITADEL API's by multiple methods.
+These methods rely highly on the environment of your application.
+You can either use an OIDC/OAuth2 Token or generate and use a Personal Access Token.
+
+To successfully authenticate your request, send a valid `Authorization` header, using the `Bearer` scheme.
+
+You can use the token directly after a user has authenticated in your app, or generate Peronsal Access Tokens in the ZITADEL Console.
+
+Your Tokens carry many privileges, so be sure to keep them secure! Do not share your Tokens in publicly accessible areas such as GitHub, client-side code, and so forth.
+
+All API requests must be made over HTTPS. Calls made over plain HTTP will fail. Most API requests without authentication will also fail.
+{% /column %}
+
+{% column %}
+{% card title="User Info Endpoint" %}
+This request gets the basic user information from the user
+
+```bash
+curl {% instanceDomain("your-domain", "auth", "v1") %} \
+  -u 51IK2AACdCycJe9V8zmsnX1ByJhyRegEyFAwcgEA
+# The colon prevents curl from asking for a password.
+```
+
+{% /card %}
+{% /column %}
+
+{% /section %}
 
 ### Organization Context
 
@@ -31,14 +86,6 @@ blabla
 
 ## Core resources
 
-this is an example bash script:
-
-```bash
-npm install
-# or
-yarn install
-```
-
 ### Users
 
 Est artus et pisa, **famem** Sparserat gradus calorem: fratre album liquidumque
@@ -50,6 +97,8 @@ omnia montis **quisque et**.
 1. Capacem munere labentibus arida
 2. Ex munus sparsus data
 3. Primum omnes iurasse vidi dicunt sunt primus
+
+#### User settings
 
 **Aque timens**, novis, erit inter saxumque dum binas quoque amoribus sum Lenaeo
 tempore iacet: luctor? Huc et est iam annis, ille ait, quas est. Quem perpetuum
@@ -64,7 +113,7 @@ patulosque summa Autolycus, iussaque enim, erat altera animae ture, [non
 sceleri](http://metum.org/illum.html).
 
 {% column .striped title="auth request" language="html" %}
-This is content
+This is content1
 {% /column %}
 
 ### Organizations
@@ -143,11 +192,19 @@ sceleri](http://metum.org/illum.html).
 
 ### Members
 
-## Auth
+## Authentication Service
 
-## Management
+The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.
 
-## Admin
+### Introduction
+
+## Management Service
+
+### Introduction1
+
+## Admin Service
+
+### Introduction2
 
 ## Open Id Connect
 

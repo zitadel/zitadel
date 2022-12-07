@@ -11,6 +11,16 @@ export const includes = {
 export const upper = {
   transform(parameters) {
     const string = parameters[0];
-    return typeof string === 'string' ? string.toUpperCase() : string;
+    return typeof string === "string" ? string.toUpperCase() : string;
+  },
+};
+
+export const instanceDomain = {
+  transform(parameters) {
+    const instance = parameters[0];
+    const servicePath = parameters[1];
+    const serviceVersion = parameters[2];
+
+    return `https://${instance}/${servicePath}/${serviceVersion}`;
   },
 };

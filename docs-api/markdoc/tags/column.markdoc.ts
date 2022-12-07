@@ -4,10 +4,7 @@ export const column = {
   render: Column,
   children: ["paragraph", "tag", "list", "code"],
   attributes: {
-    title: {
-      type: String,
-    },
-    language: {
+    position: {
       type: String,
     },
   },

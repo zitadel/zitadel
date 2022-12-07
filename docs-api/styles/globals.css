@@ -28,6 +28,10 @@ h3,
   @apply text-sm;
 }
 
+.ztdl-subheader {
+  @apply uppercase text-black dark:text-white;
+}
+
 a,
 .ztdl-a {
   @apply text-primary-light-500 dark:text-primary-dark-400;
@@ -35,4 +39,8 @@ a,
 
 p {
   @apply text-gray-400 text-sm py-4;
+}
+
+pre {
+  font-size: 14px !important;
 }
