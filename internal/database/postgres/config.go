@@ -20,6 +20,7 @@ type Config struct {
 	Port            int32
 	Database        string
 	MaxOpenConns    uint32
+	MaxIdleConns    uint32
 	MaxConnLifetime time.Duration
 	MaxConnIdleTime time.Duration
 	User            User
@@ -65,6 +66,7 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
 	}
 
 	db.SetMaxOpenConns(int(c.MaxOpenConns))
+	db.SetMaxIdleConns(int(c.MaxIdleConns))
 	db.SetConnMaxLifetime(c.MaxConnLifetime)
 	db.SetConnMaxIdleTime(c.MaxConnIdleTime)
 
