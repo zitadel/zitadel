@@ -38,7 +38,31 @@ a,
 }
 
 p {
-  @apply text-gray-400 text-sm py-4;
+  @apply text-gray-400 text-sm my-4;
+
+  code {
+    @apply text-black/90 dark:text-white/90 bg-gray-100 border border-gray-200 dark:bg-white/10 dark:border-gray-700 rounded-md px-1;
+  }
+}
+
+table {
+  @apply table-auto border-separate mt-2 border-spacing-y-2;
+
+  thead {
+    @apply text-xs uppercase dark:text-white/50;
+
+    tr th {
+      @apply px-2;
+    }
+  }
+
+  tbody {
+    @apply text-sm dark:text-white/50;
+
+    tr td {
+      @apply px-2;
+    }
+  }
 }
 
 pre {

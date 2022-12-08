@@ -3,10 +3,12 @@ import Link from "next/link";
 import { ZitadelLogo } from "./ZitadelLogo";
 import { Disclosure } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import Theme from "./Theme";
 
 export function TableOfContents({ toc }) {
   const items = toc.filter(
-    (item) => item.id && (item.level === 2 || item.level === 3)
+    (item) =>
+      item.id && (item.level === 2 || item.level === 3 || item.level === 4)
   );
 
   if (items.length <= 1) {
@@ -14,14 +16,20 @@ export function TableOfContents({ toc }) {
   }
 
   return (
-    <nav className="sticky top-0 h-screen border-box overflow-y-auto bottom-0 flex-shrink-0 w-60 px-4 border-r border-border-light dark:border-border-dark flex flex-col">
+    <nav className="sticky bg-gray-50 dark:bg-background-dark-600 top-0 h-screen border-box overflow-y-auto bottom-0 flex-shrink-0 w-64 xl:w-72 px-4 xl:px-6 border-r border-border-light dark:border-border-dark flex flex-col">
       <div className="flex flex-col relative">
-        <div className="z-10 sticky h-16 top-0 left-0 right-0 px-4 pt-4 pb-2 bg-white dark:bg-background-dark-500">
-          <Link className="mb-4" href="/">
-            <ZitadelLogo />
-          </Link>
+        <div className="z-10 sticky h-16  top-0 left-0 right-0 ">
+          <div className="pt-4 pb-2 bg-white bg-gray-50 dark:bg-background-dark-600 flex items-center justify-between">
+            <Link className="" href="/">
+              <ZitadelLogo />
+            </Link>
+
+            <div className="relative">
+              <Theme />
+            </div>
+          </div>
         </div>
-        <div className="sticky top-16 left-0 h-8 bg-gradient-to-b from-white dark:from-background-dark-500 to-transparent dark:to-transparent"></div>
+        <div className="sticky top-16 left-0 h-8 bg-gradient-to-b from-gray-50 dark:from-background-dark-600 to-transparent dark:to-transparent"></div>
         <ul className="flex-1 flex flex-col pb-8">
           {items.map((item, i) => {
             const href = `#${item.id}`;
@@ -37,7 +45,6 @@ export function TableOfContents({ toc }) {
                 (remaining.findIndex((i) => i.level === 2) ?? remaining.length);
               const subItems = items.slice(i + 1, nextSection + 1);
               items.splice(i + 1, subItems.length);
-              console.log(subItems);
 
               return (
                 <Disclosure key={`menu_${i}`}>
@@ -53,6 +60,8 @@ export function TableOfContents({ toc }) {
                       </Disclosure.Button>
                       <Disclosure.Panel className="pt-1 text-sm text-gray-500">
                         {subItems.map((subitem, j) => {
+                          const sub_href = `#${subitem.id}`;
+
                           return (
                             <li
                               key={`sub_${i}_${j}_${subitem.title}`}
@@ -66,7 +75,7 @@ export function TableOfContents({ toc }) {
                             >
                               <Link
                                 className="text-sm  dark:text-gray-400 text-gray-500 dark:bg-background-dark-500 hover:text-black hover:dark:text-white"
-                                href={href}
+                                href={sub_href}
                               >
                                 {subitem.title}
                               </Link>

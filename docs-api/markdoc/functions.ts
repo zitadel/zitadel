@@ -24,3 +24,13 @@ export const instanceDomain = {
     return `https://${instance}/${servicePath}/${serviceVersion}`;
   },
 };
+
+export const endpoint = {
+  transform(parameters) {
+    const method = parameters[0];
+    const path = parameters[1];
+    const link = parameters[2];
+
+    return `${method} ${path}`;
+  },
+};

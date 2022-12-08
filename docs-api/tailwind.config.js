@@ -6,6 +6,7 @@ module.exports = {
     "./pages/**/*.{js,ts,jsx,tsx,md}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       fontSize: {
@@ -45,8 +46,8 @@ module.exports = {
             300: "#243252",
             400: "#1a253c",
             500: "#111827",
-            600: "#080b12",
-            700: "#000000",
+            600: "rgb(14 20 34)",
+            700: "#080b12",
             800: "#000000",
             900: "#000000",
           },
@@ -86,7 +87,7 @@ module.exports = {
         8: "32px",
       },
       maxWidth: {
-        "8xl": "88rem",
+        "8xl": "90rem",
       },
     },
   },

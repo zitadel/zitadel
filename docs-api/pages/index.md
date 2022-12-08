@@ -31,11 +31,15 @@ You're not a developer? {% .ztdl-subheader .pb-0 %}
 Consider reading our Guide [here](https://zitadel.com/docs/guides/introduction) or contact us at [support@zitadel.com](mailto:support@zitadel.com).
 
 {% card title="Base URLs" %}
-**Auth**: {% instanceDomain("your-domain", "auth", "v1") %}{% .pt-4 .pb-2 %}
+**Auth**: {% instanceDomain("your-domain", "auth", "v1") %}{% .pt-4 .pb-2 m-0 %}
 
-**Management** {% instanceDomain("your-domain", "management", "v1") %}{% .py-2 %}
+**Management** {% instanceDomain("your-domain", "management", "v1") %}{% .py-2 m-0 %}
 
-**Admin** {% instanceDomain("your-domain", "admin", "v1") %}{% .py-4 .pt-2 %}
+**Admin** {% instanceDomain("your-domain", "admin", "v1") %}{% .py-2 m-0 %}
+
+**System** {% instanceDomain("your-domain", "system", "v1") %}{% .py-2 m-0 %}
+
+**Assets** {% instanceDomain("your-domain", "assets", "v1") %}{% .py-4 .pt-2 m-0 %}
 
 {% /card %}
 {% /column %}
@@ -78,9 +82,83 @@ curl {% instanceDomain("your-domain", "auth", "v1") %} \
 
 ...blabla use `x-zitadel-orgid` header.
 
+{% section %}
+{% column %}
+
 ### Errors
 
+Depending if your using our GRPC Service or REST, you may encounter different types of errors.
+
+If your using GRPC you'll get a code attribute as a response depending on the outcome.
+In general you will get a 0 for an OK rensponse. For all other types take a look at the table or the [official documentation](https://grpc.github.io/grpc/core/md_doc_statuscodes.html).
+
+If your using REST, ZITADEL will return conventional HTTP response codes.
+If your familiar with HTTP you know that 2xx codes stand for successful responses while 4xx indicate an issue on missing information provided.
+5xx errors state that there was an issue with the server.
+
+If your getting a 401 error code you may consider reading the [Authentication Chapter](#authentication) as you may doing something wrong with your headers.
+
+{% /column %}
+{% column %}
+{% card title="GRPC Status Codes" %}
+
+| Code              | Number | Description                                                                                                                              |
+| :---------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| OK                | 0      | Not an error, return on success {% .text-xs %}                                                                                           |
+| CANCELLED         | 1      | The operation was cancelled {% .text-xs %}                                                                                               |
+| UNKNOWN           | 2      | Unknown error {% .text-xs %}                                                                                                             |
+| INVALID_ARGUMENT  | 3      | The client specified an invalid argument {% .text-xs %}                                                                                  |
+| DEADLINE_EXCEEDED | 4      | The deadline expired before the operation could complete {% .text-xs %}                                                                  |
+| NOT_FOUND         | 5      | Some requested object was not found {% .text-xs %}                                                                                       |
+| ALREADY_EXISTS    | 6      | Object already exists {% .text-xs %}                                                                                                     |
+| PERMISSION_DENIED | 7      | Your unauthorized because you are missing an [auth header](#authentication) or your user does not have enough permission. {% .text-xs %} |
+
+{% /card %}
+
+{% card title="REST Status Codes" %}
+
+| Code              | Number | Description                                                    |
+| :---------------- | :----- | :------------------------------------------------------------- |
+| OK                | 200    | The request succeeded {% .text-xs %}                           |
+| Bad Request       | 400    | Not an error, return on success {% .text-xs %}                 |
+| Unauthorized      | 401    | You must send an [auth header](#authentication) {% .text-xs %} |
+| Request Failed    | 402    | Not an error, return on success {% .text-xs %}                 |
+| Forbidden         | 403    | Not an error, return on success {% .text-xs %}                 |
+| Not found         | 404    | Not an error, return on success {% .text-xs %}                 |
+| Conflict          | 409    | Not an error, return on success {% .text-xs %}                 |
+| PERMISSION_DENIED | 429    | Not an error, return on success {% .text-xs %}                 |
+
+{% /card %}
+{% /column %}
+{% /section %}
+
+{% section %}
+
+{% column %}
+
 ### Metadata
+
+With our APIs you get the possibility to store your application related data into ZITADEL Objects.
+Metadata is currently supported for [Users](#Users) and [Organizations](#Organizations).
+
+You can specify infinite key-value entries on these ZITADEL objects.
+
+Make sure you don't save sensitive information as the values are not encrypted, or make sure you encode the value beforehand.
+
+{% /column %}
+
+{% column %}
+{% card title="Endpoints" %}
+
+{% endpoint method="POST" link="#org-metadata" %}/org/metadata/\_search{% /endpoint %}
+{% endpoint method="GET" link="#org-metadata" %}/org/metadata/key{% /endpoint %}
+
+{% endpoint method="POST" link="#user-metadata" %}/users/userId/metadata/\_search{% /endpoint %}
+{% endpoint method="GET" link="#user-metadata" %}/users/userId/metadata/key{% /endpoint %}
+
+{% /card %}
+{% /column %}
+{% /section %}
 
 ### Pagination
 
@@ -88,7 +166,11 @@ curl {% instanceDomain("your-domain", "auth", "v1") %} \
 
 ### Users
 
+#### User Metadata
+
 ### Organizations
+
+#### Org Metadata
 
 ### Policies
 
