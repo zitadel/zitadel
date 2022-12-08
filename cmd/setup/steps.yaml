@@ -22,3 +22,9 @@ FirstInstance:
         Verified:
       Password: Password1!
       PasswordChangeRequired: true
+    Machine:
+      Machine:
+        Username:
+        Name:
+      MachineKey:
+        Type:

@@ -341,6 +341,12 @@ DefaultInstance:
         Number:
         Verified:
       Password:
+    Machine:
+      Machine:
+        Username:
+        Name:
+      MachineKey:
+        Type:
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecret:

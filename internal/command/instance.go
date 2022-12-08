@@ -290,11 +290,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	var pat *PersonalAccessToken
 	var machineKey *MachineKey
 	// only a human or a machine user should be created as owner
-	if setup.Org.Human != nil {
-		validations = append(validations,
-			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
-		)
-	} else if setup.Org.Machine != nil {
+	if setup.Org.Machine != nil && setup.Org.Machine.Machine != nil && !setup.Org.Machine.Machine.IsZero() {
 		validations = append(validations,
 			AddMachineCommand(userAgg, setup.Org.Machine.Machine),
 		)
@@ -314,6 +310,10 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			}
 			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
 		}
+	} else if setup.Org.Human != nil {
+		validations = append(validations,
+			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+		)
 	}
 
 	validations = append(validations,

@@ -25,6 +25,10 @@ type Machine struct {
 	Description string
 }
 
+func (m *Machine) IsZero() bool {
+	return m.Username == "" && m.Name == ""
+}
+
 func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if a.ResourceOwner == "" {

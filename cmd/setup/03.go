@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"strings"
 
 	"golang.org/x/text/language"
@@ -21,6 +22,7 @@ type FirstInstance struct {
 	InstanceName    string
 	DefaultLanguage language.Tag
 	Org             command.OrgSetup
+	MachineKeyPath  string
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
@@ -97,7 +99,25 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		}
 	}
 
-	_, _, _, _, err = cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	_, _, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
+	if key == nil {
+		return err
+	}
+
+	f := os.Stdout
+	if mig.MachineKeyPath != "" {
+		f, err = os.OpenFile(mig.MachineKeyPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
+	}
+	defer f.Close()
+
+	keyDetails, err := key.Detail()
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintln(f, string(keyDetails))
 	return err
 }
 
