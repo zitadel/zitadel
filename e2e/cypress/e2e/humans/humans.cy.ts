@@ -1,8 +1,11 @@
-import { ensureOrganizationMetadataDoesntExist } from 'support/api/organization';
 import { apiAuth } from '../../support/api/apiauth';
-import { ensureHumanUserExists, ensureUserDoesntExist, ensureUserMetadataDoesntExist } from '../../support/api/users';
-import { credentials, loginname } from '../../support/login/users';
-import { User } from '../../support/login/users';
+import {
+  ensureHumanUserExists,
+  ensureUserDoesntExist,
+  ensureUserMetadataDoesntExist,
+  ensureUserMetadataExists,
+} from '../../support/api/users';
+import { loginname } from '../../support/login/users';
 
 describe('humans', () => {
   const humansPath = `/users?type=human`;
@@ -60,6 +63,8 @@ describe('humans', () => {
   const testMetadataValueAdd = 'testvalue';
   const sidenavId = 'metadata';
 
+  const testMetadataKeyRemove = 'testkey';
+
   describe('add user metadata', () => {
     beforeEach(`ensure it doesn't exist already`, () => {
       apiAuth().then((api) => {
@@ -72,7 +77,7 @@ describe('humans', () => {
     });
 
     it('should add a user metadata entry', () => {
-      cy.get(`[data-e2e="sidenav-${sidenavId}"]`).click({ force: true });
+      cy.get(`[data-e2e="sidenav-element-${sidenavId}"]`).click({ force: true });
       cy.get('[data-e2e="edit-metadata-button"]').click({ force: true });
       cy.get('[data-e2e="add-key-value"]').click({ force: true });
       cy.get('[data-e2e="key-input-0"]').type(testMetadataKeyAdd);
@@ -81,6 +86,25 @@ describe('humans', () => {
       cy.get('.data-e2e-success');
       cy.wait(200);
       cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+    });
+  });
+
+  describe('remove metadata', () => {
+    beforeEach('ensure it exists', function () {
+      cy.visit(`/users/me?id=${sidenavId}`);
+      const userIdText = cy.get('[data-e2e="user-id"]').invoke('text');
+      userIdText.then((userId) => {
+        ensureUserMetadataExists(this.api, userId, testMetadataKeyRemove);
+      });
+    });
+
+    it('should delete a metadata key', () => {
+      cy.get(`[data-e2e="sidenav-element-${sidenavId}"]`).click({ force: true });
+      cy.get('[data-e2e="edit-metadata-button"]').click({ force: true });
+      cy.get(`[data-e2e="metadata-remove-button-${testMetadataKeyRemove}"]`).click({ force: true });
+      cy.get('.ok-button').click();
+      cy.get('.data-e2e-success');
+      cy.shouldNotExist({ selector: '.data-e2e-failure' });
     });
   });
 });

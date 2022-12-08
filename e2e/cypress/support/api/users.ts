@@ -1,3 +1,4 @@
+import { values } from 'cypress/types/lodash';
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
 
@@ -50,18 +51,25 @@ export function ensureUserDoesntExist(api: API, username: string): Cypress.Chain
   );
 }
 
-// export function ensureUserMetadataExists(api: API, userId: string, key: string): Cypress.Chainable<number> {
-//   return getSomething(api, `users/${userId}/metadata/${key}`, (metadata: any) => metadata.key === key).then((sRes) => {
-//     if (sRes.entity) {
-//       return;
-//     }
-//   });
-// }
+export function ensureUserMetadataExists(api: API, userId: string, key: string): Cypress.Chainable<number> {
+  return ensureItemExists(
+    api,
+    `${api.mgmtBaseURL}/users/${userId}/metadata/_search`,
+    (metadata: any) => metadata.key === key,
+    `${api.mgmtBaseURL}/users/${userId}/metadata/${key}`,
+    {
+      key: key,
+      value: 'testvalue',
+    },
+    undefined,
+  );
+}
 
-// export function ensureUserMetadataDoesntExist(api: API, userId: string, key: string): Cypress.Chainable<null> {
-//   return getSomething(api, `users/${userId}/metadata/${key}`, (metadata: any) => metadata.key === key).then((sRes) => {
-//     if (sRes.entity) {
-//       return;
-//     }
-//   });
-// }
+export function ensureUserMetadataDoesntExist(api: API, userId: string, key: string): Cypress.Chainable<null> {
+  return ensureItemDoesntExist(
+    api,
+    `${api.mgmtBaseURL}/users/${userId}/metadata/_search`,
+    (metadata: any) => metadata.key === key,
+    (user) => `${api.mgmtBaseURL}/users/${userId}/metadata/${key}`,
+  );
+}
