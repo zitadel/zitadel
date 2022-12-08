@@ -151,7 +151,7 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return nil
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, []byte, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", "", nil, nil, err
@@ -411,15 +411,11 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	}
 
 	var token string
-	var key []byte
 	if pat != nil {
 		token = pat.Token
 	}
-	if machineKey != nil {
-		key = machineKey.PrivateKey
-	}
 
-	return instanceID, token, key, &domain.ObjectDetails{
+	return instanceID, token, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,

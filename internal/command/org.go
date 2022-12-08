@@ -35,7 +35,7 @@ func (c *Commands) SetUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 	return userID, details, err
 }
 
-func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, string, []byte, *domain.ObjectDetails, error) {
+func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
@@ -90,15 +90,11 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 	}
 
 	var token string
-	var key []byte
 	if pat != nil {
 		token = pat.Token
 	}
-	if machineKey != nil {
-		key = machineKey.PrivateKey
-	}
 
-	return userID, token, key, &domain.ObjectDetails{
+	return userID, token, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,

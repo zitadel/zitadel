@@ -67,9 +67,13 @@ func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstan
 	if err != nil {
 		return nil, err
 	}
+	machineKey, err := key.Detail()
+	if err != nil {
+		return nil, err
+	}
 	return &system_pb.CreateInstanceResponse{
 		Pat:        pat,
-		MachineKey: key,
+		MachineKey: machineKey,
 		InstanceId: id,
 		Details:    object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
 	}, nil
