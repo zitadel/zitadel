@@ -67,10 +67,15 @@ func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstan
 	if err != nil {
 		return nil, err
 	}
-	machineKey, err := key.Detail()
-	if err != nil {
-		return nil, err
+
+	var machineKey []byte
+	if key != nil {
+		machineKey, err = key.Detail()
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	return &system_pb.CreateInstanceResponse{
 		Pat:        pat,
 		MachineKey: machineKey,

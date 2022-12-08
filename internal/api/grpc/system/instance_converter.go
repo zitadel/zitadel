@@ -61,11 +61,17 @@ func createInstancePbToAddHuman(user *system_pb.CreateInstanceRequest_Human, def
 		defaultHuman.Email.Verified = user.Email.IsEmailVerified
 	}
 	if user.Profile != nil {
-		defaultHuman.FirstName = user.Profile.FirstName
-		defaultHuman.LastName = user.Profile.LastName
-		lang, err := language.Parse(user.Profile.PreferredLanguage)
-		if err == nil {
-			defaultHuman.PreferredLanguage = lang
+		if user.Profile.FirstName != "" {
+			defaultHuman.FirstName = user.Profile.FirstName
+		}
+		if user.Profile.LastName != "" {
+			defaultHuman.LastName = user.Profile.LastName
+		}
+		if user.Profile.PreferredLanguage != "" {
+			lang, err := language.Parse(user.Profile.PreferredLanguage)
+			if err == nil {
+				defaultHuman.PreferredLanguage = lang
+			}
 		}
 	}
 	// check if default username is email style or else append @<orgname>.<custom-domain>
@@ -73,7 +79,9 @@ func createInstancePbToAddHuman(user *system_pb.CreateInstanceRequest_Human, def
 	if !userLoginMustBeDomain && !strings.Contains(defaultHuman.Username, "@") {
 		defaultHuman.Username = defaultHuman.Username + "@" + domain.NewIAMDomainName(org, externalDomain)
 	}
-	defaultHuman.Username = user.UserName
+	if user.UserName != "" {
+		defaultHuman.Username = user.UserName
+	}
 
 	if user.Password != nil {
 		defaultHuman.Password = user.Password.Password
@@ -83,10 +91,16 @@ func createInstancePbToAddHuman(user *system_pb.CreateInstanceRequest_Human, def
 }
 
 func createInstancePbToAddMachine(user *system_pb.CreateInstanceRequest_Machine, defaultMachine command.AddMachine) *command.AddMachine {
-	defaultMachine.Machine = &command.Machine{
-		Username: user.UserName,
-		Name:     user.Name,
+	if defaultMachine.Machine == nil {
+		defaultMachine.Machine = &command.Machine{}
 	}
+	if user.UserName != "" {
+		defaultMachine.Machine.Username = user.UserName
+	}
+	if user.Name != "" {
+		defaultMachine.Machine.Name = user.Name
+	}
+
 	if user.PersonalAccessToken != nil {
 		defaultMachine.Pat = &command.AddPat{
 			Scopes: []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
