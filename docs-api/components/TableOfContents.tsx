@@ -22,7 +22,7 @@ export function TableOfContents({ toc }) {
           </Link>
         </div>
         <div className="sticky top-16 left-0 h-8 bg-gradient-to-b from-white dark:from-background-dark-500 to-transparent dark:to-transparent"></div>
-        <ul className="flex-1 flex flex-col">
+        <ul className="flex-1 flex flex-col pb-8">
           {items.map((item, i) => {
             const href = `#${item.id}`;
             const active = false;
