@@ -181,7 +181,8 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	domain := strings.Split(host, ":")[0] //remove possible port
+	//remove possible port
+	domain := strings.Split(host, ":")[0]
 
 	domainSearch := projection.NewSearchInstanceDomain(domain)
 	events, err := q.eventstore.Filter(ctx, domainSearch.SearchQuery(ctx))
