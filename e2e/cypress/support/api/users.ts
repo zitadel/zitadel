@@ -1,4 +1,4 @@
-import { ensureItemDoesntExist, ensureItemExists, getSomething } from './ensure';
+import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
 
 export function ensureHumanUserExists(api: API, username: string): Cypress.Chainable<number> {
@@ -50,18 +50,18 @@ export function ensureUserDoesntExist(api: API, username: string): Cypress.Chain
   );
 }
 
-export function ensureUserMetadataExists(api: API, userId: string, key: string): Cypress.Chainable<number> {
-  return getSomething(api, `users/${userId}/metadata/${key}`, (metadata: any) => metadata.key === key).then((sRes) => {
-    if (sRes.entity) {
-      return;
-    }
-  });
-}
+// export function ensureUserMetadataExists(api: API, userId: string, key: string): Cypress.Chainable<number> {
+//   return getSomething(api, `users/${userId}/metadata/${key}`, (metadata: any) => metadata.key === key).then((sRes) => {
+//     if (sRes.entity) {
+//       return;
+//     }
+//   });
+// }
 
-export function ensureUserMetadataDoesntExist(api: API, userId: string, key: string): Cypress.Chainable<null> {
-  return getSomething(api, `users/${userId}/metadata/${key}`, (metadata: any) => metadata.key === key).then((sRes) => {
-    if (sRes.entity) {
-      return;
-    }
-  });
-}
+// export function ensureUserMetadataDoesntExist(api: API, userId: string, key: string): Cypress.Chainable<null> {
+//   return getSomething(api, `users/${userId}/metadata/${key}`, (metadata: any) => metadata.key === key).then((sRes) => {
+//     if (sRes.entity) {
+//       return;
+//     }
+//   });
+// }
