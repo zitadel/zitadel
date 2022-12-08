@@ -167,7 +167,7 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Inst
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	instance := projection.NewInstance(authz.GetInstance(ctx).InstanceID())
+	instance := projection.NewInstance(authz.GetInstance(ctx).InstanceID(), authz.GetInstance(ctx).RequestedDomain())
 	events, err := q.eventstore.Filter(ctx, instance.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
@@ -181,9 +181,9 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	host = strings.Split(host, ":")[0] //remove possible port
+	domain := strings.Split(host, ":")[0] //remove possible port
 
-	domainSearch := projection.NewSearchInstanceDomain(host)
+	domainSearch := projection.NewSearchInstanceDomain(domain)
 	events, err := q.eventstore.Filter(ctx, domainSearch.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
@@ -193,7 +193,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 		return nil, errors.ThrowNotFound(nil, "QUERY-VZHH2", "Errors.NotFound")
 	}
 
-	instance := projection.NewInstance(domainSearch.InstanceID)
+	instance := projection.NewInstance(domainSearch.InstanceID, host)
 	events, err = q.eventstore.Filter(ctx, instance.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
@@ -210,6 +210,7 @@ func mapInstance(instance *projection.Instance) *Instance {
 		CreationDate: instance.CreationDate,
 		Sequence:     instance.Sequence,
 		Name:         instance.Name,
+		host:         instance.Host,
 
 		DefaultOrgID: instance.DefaultOrgID,
 		IAMProjectID: instance.IAMProjectID,

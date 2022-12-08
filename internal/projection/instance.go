@@ -27,11 +27,14 @@ type Instance struct {
 	ConsoleAppID string
 	DefaultLang  language.Tag
 	Domains      []*InstanceDomain
+
+	Host string
 }
 
-func NewInstance(id string) *Instance {
+func NewInstance(id, host string) *Instance {
 	return &Instance{
-		ID: id,
+		ID:   id,
+		Host: host,
 	}
 }
 
