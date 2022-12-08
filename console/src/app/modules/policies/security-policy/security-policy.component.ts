@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 import { SetDefaultLanguageResponse, SetSecurityPolicyRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -17,7 +18,7 @@ export class SecurityPolicyComponent implements OnInit {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
 
-  @Input() public originsControl: UntypedFormControl = new UntypedFormControl({ value: [], disabled: false });
+  @Input() public originsControl: UntypedFormControl = new UntypedFormControl({ value: [], disabled: true });
 
   constructor(private service: AdminService, private toast: ToastService) {}
 
@@ -30,6 +31,11 @@ export class SecurityPolicyComponent implements OnInit {
       if (securityPolicy.policy) {
         this.enabled = securityPolicy.policy?.enableIframeEmbedding;
         this.originsList = securityPolicy.policy?.allowedOriginsList;
+        if (securityPolicy.policy.enableIframeEmbedding) {
+          this.originsControl.enable();
+        } else {
+          this.originsControl.disable();
+        }
       }
     });
   }
@@ -76,6 +82,14 @@ export class SecurityPolicyComponent implements OnInit {
 
     if (index >= 0) {
       this.originsList.splice(index, 1);
+    }
+  }
+
+  public enabledChanged(event: MatCheckboxChange) {
+    if (event.checked) {
+      this.originsControl.enable();
+    } else {
+      this.originsControl.disable();
     }
   }
 }

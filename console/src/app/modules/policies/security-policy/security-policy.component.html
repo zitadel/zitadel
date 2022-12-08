@@ -12,6 +12,7 @@
     class="security-policy-toggle"
     color="primary"
     ngDefaultControl
+    (change)="enabledChanged($event)"
     [(ngModel)]="enabled"
     [disabled]="(['iam.policy.write'] | hasRole | async) === false"
   >
@@ -28,14 +29,14 @@
       matTooltip="{{ 'ACTIONS.ADD' | translate }}"
       type="submit"
       mat-icon-button
-      [disabled]="originsControl.invalid || (['iam.policy.write'] | hasRole | async) === false"
+      [disabled]="!enabled || originsControl.invalid || (['iam.policy.write'] | hasRole | async) === false"
     >
       <mat-icon>add</mat-icon>
     </button>
   </form>
 
   <div class="security-allowed-uris-list">
-    <div *ngFor="let uri of originsList" class="uri-line">
+    <div *ngFor="let uri of originsList" class="uri-line" [ngClass]="{ disabled: !enabled }">
       <span class="uri">{{ uri }}</span>
       <span class="fill-space"></span>
 

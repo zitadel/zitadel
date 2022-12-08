@@ -28,6 +28,8 @@
         padding: 0 0 0 0.75rem;
         border-radius: 4px;
         background: map-get($background, infosection);
+        height: 30px;
+        box-sizing: border-box;
 
         .uri {
           font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -50,6 +52,14 @@
 
           &:not(:hover) {
             color: $secondary-text;
+          }
+        }
+
+        &.disabled {
+          opacity: 0.5;
+
+          .icon-button {
+            display: none;
           }
         }
       }
