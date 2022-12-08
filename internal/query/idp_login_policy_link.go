@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type IDPLoginPolicyLink struct {
@@ -38,7 +39,8 @@ func (q *IDPLoginPolicyLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.Sele
 
 var (
 	idpLoginPolicyLinkTable = table{
-		name: projection.IDPLoginPolicyLinkTable,
+		name:          projection.IDPLoginPolicyLinkTable,
+		instanceIDCol: projection.IDPLoginPolicyLinkInstanceIDCol,
 	}
 	IDPLoginPolicyLinkIDPIDCol = Column{
 		name:  projection.IDPLoginPolicyLinkIDPIDCol,
@@ -72,16 +74,25 @@ var (
 		name:  projection.IDPLoginPolicyLinkProviderTypeCol,
 		table: idpLoginPolicyLinkTable,
 	}
+	IDPLoginPolicyLinkOwnerRemovedCol = Column{
+		name:  projection.IDPLoginPolicyLinkOwnerRemovedCol,
+		table: idpLoginPolicyLinkTable,
+	}
 )
 
-func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string, queries *IDPLoginPolicyLinksSearchQuery) (idps *IDPLoginPolicyLinks, err error) {
+func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string, queries *IDPLoginPolicyLinksSearchQuery, withOwnerRemoved bool) (idps *IDPLoginPolicyLinks, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareIDPLoginPolicyLinksQuery()
-	stmt, args, err := queries.toQuery(query).Where(
-		sq.Eq{
-			IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
-			IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
-		},
-	).ToSql()
+	eq := sq.Eq{
+		IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
+		IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[IDPLoginPolicyLinkOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
 	}

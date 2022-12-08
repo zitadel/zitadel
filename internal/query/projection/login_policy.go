@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "projections.login_policies"
+	LoginPolicyTable = "projections.login_policies4"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyInstanceIDCol            = "instance_id"
@@ -30,12 +30,16 @@ const (
 	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
 	LoginPolicyHidePWResetCol           = "hide_password_reset"
 	IgnoreUnknownUsernames              = "ignore_unknown_usernames"
+	AllowDomainDiscovery                = "allow_domain_discovery"
+	DisableLoginWithEmail               = "disable_login_with_email"
+	DisableLoginWithPhone               = "disable_login_with_phone"
 	DefaultRedirectURI                  = "default_redirect_uri"
 	PasswordCheckLifetimeCol            = "password_check_lifetime"
 	ExternalLoginCheckLifetimeCol       = "external_login_check_lifetime"
 	MFAInitSkipLifetimeCol              = "mfa_init_skip_lifetime"
 	SecondFactorCheckLifetimeCol        = "second_factor_check_lifetime"
 	MultiFactorCheckLifetimeCol         = "multi_factor_check_lifetime"
+	LoginPolicyOwnerRemovedCol          = "owner_removed"
 )
 
 type loginPolicyProjection struct {
@@ -63,14 +67,19 @@ func newLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LoginPolicyPasswordlessTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(LoginPolicyHidePWResetCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(IgnoreUnknownUsernames, crdb.ColumnTypeBool),
+			crdb.NewColumn(AllowDomainDiscovery, crdb.ColumnTypeBool),
+			crdb.NewColumn(DisableLoginWithEmail, crdb.ColumnTypeBool),
+			crdb.NewColumn(DisableLoginWithPhone, crdb.ColumnTypeBool),
 			crdb.NewColumn(DefaultRedirectURI, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(PasswordCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(MFAInitSkipLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SecondFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(MultiFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LoginPolicyOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginPolicyOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -110,6 +119,10 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 					Event:  org.LoginPolicySecondFactorRemovedEventType,
 					Reduce: p.reduce2FARemoved,
 				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
+				},
 			},
 		},
 		{
@@ -138,6 +151,10 @@ func (p *loginPolicyProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.LoginPolicySecondFactorRemovedEventType,
 					Reduce: p.reduce2FARemoved,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(LoginPolicyInstanceIDCol),
 				},
 			},
 		},
@@ -172,6 +189,9 @@ func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyIsDefaultCol, isDefault),
 		handler.NewCol(LoginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
 		handler.NewCol(IgnoreUnknownUsernames, policyEvent.IgnoreUnknownUsernames),
+		handler.NewCol(AllowDomainDiscovery, policyEvent.AllowDomainDiscovery),
+		handler.NewCol(DisableLoginWithEmail, policyEvent.DisableLoginWithEmail),
+		handler.NewCol(DisableLoginWithPhone, policyEvent.DisableLoginWithPhone),
 		handler.NewCol(DefaultRedirectURI, policyEvent.DefaultRedirectURI),
 		handler.NewCol(PasswordCheckLifetimeCol, policyEvent.PasswordCheckLifetime),
 		handler.NewCol(ExternalLoginCheckLifetimeCol, policyEvent.ExternalLoginCheckLifetime),
@@ -217,6 +237,15 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	if policyEvent.IgnoreUnknownUsernames != nil {
 		cols = append(cols, handler.NewCol(IgnoreUnknownUsernames, *policyEvent.IgnoreUnknownUsernames))
 	}
+	if policyEvent.AllowDomainDiscovery != nil {
+		cols = append(cols, handler.NewCol(AllowDomainDiscovery, *policyEvent.AllowDomainDiscovery))
+	}
+	if policyEvent.DisableLoginWithEmail != nil {
+		cols = append(cols, handler.NewCol(DisableLoginWithEmail, *policyEvent.DisableLoginWithEmail))
+	}
+	if policyEvent.DisableLoginWithPhone != nil {
+		cols = append(cols, handler.NewCol(DisableLoginWithPhone, *policyEvent.DisableLoginWithPhone))
+	}
 	if policyEvent.DefaultRedirectURI != nil {
 		cols = append(cols, handler.NewCol(DefaultRedirectURI, *policyEvent.DefaultRedirectURI))
 	}
@@ -241,6 +270,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 		cols,
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -265,6 +295,7 @@ func (p *loginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -289,6 +320,7 @@ func (p *loginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -302,6 +334,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event)
 		e,
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, e.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -326,6 +359,7 @@ func (p *loginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -350,6 +384,27 @@ func (p *loginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handl
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *loginPolicyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-B8NZW", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(LoginPolicyChangeDateCol, e.CreationDate()),
+			handler.NewCol(LoginPolicySequenceCol, e.Sequence()),
+			handler.NewCol(LoginPolicyOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(LoginPolicyInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(LoginPolicyIDCol, e.Aggregate().ID),
 		},
 	), nil
 }

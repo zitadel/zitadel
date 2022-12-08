@@ -11,11 +11,13 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
 	userAuthMethodTable = table{
-		name: projection.UserAuthMethodTable,
+		name:          projection.UserAuthMethodTable,
+		instanceIDCol: projection.UserAuthMethodInstanceIDCol,
 	}
 	UserAuthMethodColumnTokenID = Column{
 		name:  projection.UserAuthMethodTokenIDCol,
@@ -57,6 +59,10 @@ var (
 		name:  projection.UserAuthMethodTypeCol,
 		table: userAuthMethodTable,
 	}
+	UserAuthMethodColumnOwnerRemoved = Column{
+		name:  projection.UserAuthMethodOwnerRemovedCol,
+		table: userAuthMethodTable,
+	}
 )
 
 type AuthMethods struct {
@@ -81,12 +87,16 @@ type UserAuthMethodSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries) (userAuthMethods *AuthMethods, err error) {
+func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, withOwnerRemoved bool) (userAuthMethods *AuthMethods, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareUserAuthMethodsQuery()
-	stmt, args, err := queries.toQuery(query).
-		Where(sq.Eq{
-			UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+	eq := sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	if !withOwnerRemoved {
+		eq[UserAuthMethodColumnOwnerRemoved.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
 	}

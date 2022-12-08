@@ -3,14 +3,20 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"strings"
 
+	"github.com/dop251/goja"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"github.com/zitadel/oidc/v2/pkg/op"
 	"gopkg.in/square/go-jose.v2"
 
+	"github.com/zitadel/zitadel/internal/actions"
+	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/http"
+	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -25,6 +31,7 @@ const (
 	ClaimUserMetaData      = ScopeUserMetaData
 	ScopeResourceOwner     = "urn:zitadel:iam:user:resourceowner"
 	ClaimResourceOwner     = ScopeResourceOwner + ":"
+	ClaimActionLogFormat   = "urn:zitadel:iam:action:%s:log"
 
 	oidcCtx = "oidc"
 )
@@ -32,7 +39,7 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	client, err := o.query.AppByOIDCClientID(ctx, id)
+	client, err := o.query.AppByOIDCClientID(ctx, id, false)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +50,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
 	}
-	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +74,7 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer)
+	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer, false)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +90,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
-	user, err := o.query.GetUserByID(ctx, true, subject)
+	user, err := o.query.GetUserByID(ctx, true, subject, false)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +98,7 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 		scope := scopes[i]
 		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
 			var orgID string
-			org, err := o.query.OrgByDomainGlobal(ctx, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
+			org, err := o.query.OrgByPrimaryDomain(ctx, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
 			if err == nil {
 				orgID = org.ID
 			}
@@ -119,7 +126,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})
-	app, err := o.query.AppByClientID(ctx, id)
+	app, err := o.query.AppByClientID(ctx, id, false)
 	if err != nil {
 		return err
 	}
@@ -137,11 +144,11 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
-		app, err := o.query.AppByOIDCClientID(ctx, token.ApplicationID)
+		app, err := o.query.AppByOIDCClientID(ctx, token.ApplicationID, false)
 		if err != nil {
 			return err
 		}
-		if origin != "" && !http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
+		if origin != "" && !api_http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
 			return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 		}
 	}
@@ -152,7 +159,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if applicationID != "" {
-		app, err := o.query.AppByOIDCClientID(ctx, applicationID)
+		app, err := o.query.AppByOIDCClientID(ctx, applicationID, false)
 		if err != nil {
 			return err
 		}
@@ -171,7 +178,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
-	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
@@ -205,7 +212,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := o.query.GetUserByID(ctx, true, userID)
+	user, err := o.query.GetUserByID(ctx, true, userID, false)
 	if err != nil {
 		return err
 	}
@@ -276,8 +283,9 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 			}
 		}
 	}
+
 	if len(roles) == 0 || applicationID == "" {
-		return nil
+		return o.userinfoFlows(ctx, user.ResourceOwner, userInfo)
 	}
 	projectRoles, err := o.assertRoles(ctx, userID, applicationID, roles)
 	if err != nil {
@@ -286,6 +294,107 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 	if len(projectRoles) > 0 {
 		userInfo.AppendClaims(ClaimProjectRoles, projectRoles)
 	}
+
+	return o.userinfoFlows(ctx, user.ResourceOwner, userInfo)
+}
+
+func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, userInfo oidc.UserInfoSetter) error {
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, resourceOwner, false)
+	if err != nil {
+		return err
+	}
+
+	ctxFields := actions.SetContextFields(
+		actions.SetFields("v1",
+			actions.SetFields("user",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						resourceOwnerQuery, err := query.NewUserMetadataResourceOwnerSearchQuery(resourceOwner)
+						if err != nil {
+							logging.WithError(err).Debug("unable to create search query")
+							panic(err)
+						}
+						metadata, err := o.query.SearchUserMetadata(
+							ctx,
+							true,
+							userInfo.GetSubject(),
+							&query.UserMetadataSearchQueries{Queries: []query.SearchQuery{resourceOwnerQuery}},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get md in action")
+							panic(err)
+						}
+						return object.UserMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
+		),
+	)
+
+	for _, action := range queriedActions {
+		actionCtx, cancel := context.WithTimeout(ctx, action.Timeout())
+		claimLogs := []string{}
+
+		apiFields := actions.WithAPIFields(
+			actions.SetFields("v1",
+				actions.SetFields("userinfo",
+					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if userInfo.GetClaim(key) == nil {
+							userInfo.AppendClaims(key, value)
+							return
+						}
+						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
+					}),
+					actions.SetFields("appendLogIntoClaims", func(entry string) {
+						claimLogs = append(claimLogs, entry)
+					}),
+				),
+				actions.SetFields("user",
+					actions.SetFields("setMetadata", func(call goja.FunctionCall) goja.Value {
+						if len(call.Arguments) != 2 {
+							panic("exactly 2 (key, value) arguments expected")
+						}
+						key := call.Arguments[0].Export().(string)
+						val := call.Arguments[1].Export()
+
+						value, err := json.Marshal(val)
+						if err != nil {
+							logging.WithError(err).Debug("unable to marshal")
+							panic(err)
+						}
+
+						metadata := &domain.Metadata{
+							Key:   key,
+							Value: value,
+						}
+						if _, err = o.command.SetUserMetadata(ctx, metadata, userInfo.GetSubject(), resourceOwner); err != nil {
+							logging.WithError(err).Info("unable to set md in action")
+							panic(err)
+						}
+						return nil
+					}),
+				),
+			),
+		)
+
+		err = actions.Run(
+			actionCtx,
+			ctxFields,
+			apiFields,
+			action.Script,
+			action.Name,
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
+		)
+		cancel()
+		if err != nil {
+			return err
+		}
+		if len(claimLogs) > 0 {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
+		}
+	}
+
 	return nil
 }
 
@@ -327,8 +436,9 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 			}
 		}
 	}
+
 	if len(roles) == 0 || clientID == "" {
-		return claims, nil
+		return o.privateClaimsFlows(ctx, userID, claims)
 	}
 	projectRoles, err := o.assertRoles(ctx, userID, clientID, roles)
 	if err != nil {
@@ -337,11 +447,116 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 	if len(projectRoles) > 0 {
 		claims = appendClaim(claims, ClaimProjectRoles, projectRoles)
 	}
-	return claims, err
+
+	return o.privateClaimsFlows(ctx, userID, claims)
+}
+
+func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claims map[string]interface{}) (map[string]interface{}, error) {
+	user, err := o.query.GetUserByID(ctx, true, userID, false)
+	if err != nil {
+		return nil, err
+	}
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner, false)
+	if err != nil {
+		return nil, err
+	}
+
+	ctxFields := actions.SetContextFields(
+		actions.SetFields("v1",
+			actions.SetFields("user",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						resourceOwnerQuery, err := query.NewUserMetadataResourceOwnerSearchQuery(user.ResourceOwner)
+						if err != nil {
+							logging.WithError(err).Debug("unable to create search query")
+							panic(err)
+						}
+						metadata, err := o.query.SearchUserMetadata(
+							ctx,
+							true,
+							userID,
+							&query.UserMetadataSearchQueries{Queries: []query.SearchQuery{resourceOwnerQuery}},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get md in action")
+							panic(err)
+						}
+						return object.UserMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
+		),
+	)
+
+	for _, action := range queriedActions {
+		claimLogs := []string{}
+		actionCtx, cancel := context.WithTimeout(ctx, action.Timeout())
+
+		apiFields := actions.WithAPIFields(
+			actions.SetFields("v1",
+				actions.SetFields("claims",
+					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if _, ok := claims[key]; !ok {
+							claims[key] = value
+							return
+						}
+						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
+					}),
+					actions.SetFields("appendLogIntoClaims", func(entry string) {
+						claimLogs = append(claimLogs, entry)
+					}),
+				),
+				actions.SetFields("user",
+					actions.SetFields("setMetadata", func(call goja.FunctionCall) {
+						if len(call.Arguments) != 2 {
+							panic("exactly 2 (key, value) arguments expected")
+						}
+						key := call.Arguments[0].Export().(string)
+						val := call.Arguments[1].Export()
+
+						value, err := json.Marshal(val)
+						if err != nil {
+							logging.WithError(err).Debug("unable to marshal")
+							panic(err)
+						}
+
+						metadata := &domain.Metadata{
+							Key:   key,
+							Value: value,
+						}
+						if _, err = o.command.SetUserMetadata(ctx, metadata, userID, user.ResourceOwner); err != nil {
+							logging.WithError(err).Info("unable to set md in action")
+							panic(err)
+						}
+					}),
+				),
+			),
+		)
+
+		err = actions.Run(
+			actionCtx,
+			ctxFields,
+			apiFields,
+			action.Script,
+			action.Name,
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
+		)
+		cancel()
+		if err != nil {
+			return nil, err
+		}
+		if len(claimLogs) > 0 {
+			claims = appendClaim(claims, fmt.Sprintf(ClaimActionLogFormat, action.Name), claimLogs)
+			claimLogs = nil
+		}
+	}
+
+	return claims, nil
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
-	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -355,7 +570,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	}
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{projectQuery, userIDQuery},
-	})
+	}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +584,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
-	metaData, err := o.query.SearchUserMetadata(ctx, true, userID, &query.UserMetadataSearchQueries{})
+	metaData, err := o.query.SearchUserMetadata(ctx, true, userID, &query.UserMetadataSearchQueries{}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -382,7 +597,7 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	user, err := o.query.GetUserByID(ctx, true, userID)
+	user, err := o.query.GetUserByID(ctx, true, userID, false)
 	if err != nil {
 		return nil, err
 	}

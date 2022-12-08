@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	SMSConfigProjectionTable = "projections.sms_configs"
+	SMSConfigProjectionTable = "projections.sms_configs2"
 	SMSTwilioTable           = SMSConfigProjectionTable + "_" + smsTwilioTableSuffix
 
 	SMSColumnID            = "id"
@@ -51,7 +51,7 @@ func newSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(SMSColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSColumnInstanceID, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(SMSColumnID, SMSColumnInstanceID),
+			crdb.NewPrimaryKey(SMSColumnInstanceID, SMSColumnID),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(SMSTwilioConfigColumnSMSID, crdb.ColumnTypeText),
@@ -60,9 +60,9 @@ func newSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(SMSTwilioConfigColumnSenderNumber, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSTwilioConfigColumnToken, crdb.ColumnTypeJSONB),
 		},
-			crdb.NewPrimaryKey(SMSTwilioConfigColumnSMSID, SMSTwilioColumnInstanceID),
+			crdb.NewPrimaryKey(SMSTwilioColumnInstanceID, SMSTwilioConfigColumnSMSID),
 			smsTwilioTableSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_twilio_ref_sms")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -97,6 +97,10 @@ func (p *smsConfigProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.SMSConfigRemovedEventType,
 					Reduce: p.reduceSMSConfigRemoved,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(SMSColumnInstanceID),
 				},
 			},
 		},

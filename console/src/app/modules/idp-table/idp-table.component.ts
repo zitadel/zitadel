@@ -271,6 +271,7 @@ export class IdpTableComponent implements OnInit {
       .setNanos(this.loginPolicy.multiFactorCheckLifetime?.nanos ?? 0);
     mgmtreq.setMultiFactorCheckLifetime(mficl);
 
+    mgmtreq.setAllowDomainDiscovery(this.loginPolicy.allowDomainDiscovery);
     mgmtreq.setIgnoreUnknownUsernames(this.loginPolicy.ignoreUnknownUsernames);
     mgmtreq.setDefaultRedirectUri(this.loginPolicy.defaultRedirectUri);
 
@@ -283,6 +284,7 @@ export class IdpTableComponent implements OnInit {
         if (this.isDefault) {
           return this.addLoginPolicy()
             .then(() => {
+              this.loginPolicy.isDefault = false;
               return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, idp.owner).then(() => {
                 this.toast.showInfo('IDP.TOAST.ADDED', true);
 
@@ -338,6 +340,7 @@ export class IdpTableComponent implements OnInit {
         if (this.isDefault) {
           return this.addLoginPolicy()
             .then(() => {
+              this.loginPolicy.isDefault = false;
               return (this.service as ManagementService)
                 .removeIDPFromLoginPolicy(idp.id)
                 .then(() => {

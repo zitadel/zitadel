@@ -23,7 +23,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceAdded",
+			name: "org reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.LockoutPolicyAddedEventType),
@@ -39,11 +39,10 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.lockout_policies (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.lockout_policies2 (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -62,7 +61,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceChanged",
+			name:   "org reduceChanged",
 			reduce: (&lockoutPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -78,17 +77,17 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.lockout_policies SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.lockout_policies2 SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								uint64(10),
 								true,
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -96,7 +95,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "org.reduceRemoved",
+			name:   "org reduceRemoved",
 			reduce: (&lockoutPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -109,11 +108,37 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.lockout_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.lockout_policies2 WHERE (id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(LockoutPolicyInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.lockout_policies2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -123,7 +148,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceAdded",
+			name:   "instance reduceAdded",
 			reduce: (&lockoutPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -139,11 +164,10 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.lockout_policies (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.lockout_policies2 (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -162,7 +186,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "instance.reduceChanged",
+			name:   "instance reduceChanged",
 			reduce: (&lockoutPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -178,16 +202,46 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       LockoutPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.lockout_policies SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.lockout_policies2 SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								uint64(10),
 								true,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&lockoutPolicyProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.lockout_policies2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
 								"agg-id",
 							},
 						},
@@ -206,7 +260,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, LockoutPolicyTable, tt.want)
 		})
 	}
 }

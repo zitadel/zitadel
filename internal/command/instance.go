@@ -71,6 +71,9 @@ type InstanceSetup struct {
 		ForceMFA                   bool
 		HidePasswordReset          bool
 		IgnoreUnknownUsername      bool
+		AllowDomainDiscovery       bool
+		DisableLoginWithEmail      bool
+		DisableLoginWithPhone      bool
 		PasswordlessType           domain.PasswordlessType
 		DefaultRedirectURI         string
 		PasswordCheckLifetime      time.Duration
@@ -217,6 +220,9 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LoginPolicy.ForceMFA,
 			setup.LoginPolicy.HidePasswordReset,
 			setup.LoginPolicy.IgnoreUnknownUsername,
+			setup.LoginPolicy.AllowDomainDiscovery,
+			setup.LoginPolicy.DisableLoginWithEmail,
+			setup.LoginPolicy.DisableLoginWithPhone,
 			setup.LoginPolicy.PasswordlessType,
 			setup.LoginPolicy.DefaultRedirectURI,
 			setup.LoginPolicy.PasswordCheckLifetime,
@@ -391,11 +397,7 @@ func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
@@ -409,11 +411,7 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
@@ -427,11 +425,7 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string, externalPort uint16, externalSecure bool) error {
@@ -544,7 +538,7 @@ func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) pre
 			if err != nil {
 				return nil, err
 			}
-			if writeModel.State == domain.InstanceStateUnspecified {
+			if !writeModel.State.Exists() {
 				return nil, errors.ThrowNotFound(nil, "INST-nuso2m", "Errors.Instance.NotFound")
 			}
 			if writeModel.Name == name {
@@ -599,4 +593,51 @@ func getSystemConfigWriteModel(ctx context.Context, filter preparation.FilterToQ
 	writeModel.AppendEvents(events...)
 	err = writeModel.Reduce()
 	return writeModel, err
+}
+
+func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(id)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareRemoveInstance(instanceAgg))
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
+	}, nil
+}
+
+func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel, err := c.getInstanceWriteModelByID(ctx, a.ID)
+			if err != nil {
+				return nil, errors.ThrowNotFound(err, "COMMA-pax9m3", "Errors.Instance.NotFound")
+			}
+			if !writeModel.State.Exists() {
+				return nil, errors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
+			}
+			return []eventstore.Command{instance.NewInstanceRemovedEvent(ctx,
+					&a.Aggregate,
+					writeModel.Name,
+					writeModel.Domains)},
+				nil
+		}, nil
+	}
+}
+
+func (c *Commands) getInstanceWriteModelByID(ctx context.Context, orgID string) (*InstanceWriteModel, error) {
+	instanceWriteModel := NewInstanceWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, instanceWriteModel)
+	if err != nil {
+		return nil, err
+	}
+	return instanceWriteModel, nil
 }

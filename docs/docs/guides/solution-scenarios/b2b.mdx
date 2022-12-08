@@ -2,7 +2,7 @@
 title: B2B
 ---
 
-import { B2B } from '../../../src/components/b2b';
+import { B2B } from "../../../src/components/b2b";
 
 ## Business to Business
 
@@ -13,6 +13,7 @@ In ZITADEL a B2B organization represents a business partner or partner who typic
 B2B can be a simple scenario where an organization only shares one of its projects with another organization or have a more complex case where an organization is offering a portal application to all its partners with included (self)administration.
 
 <!-- This guide describes an application  -->
+
 ## Sample scenario
 
 Octagon is a fictitious company which is used throughout this guide to explain the details and key concepts of such a B2B scenario.
@@ -21,9 +22,10 @@ Octagon tries to solve multiple tasks in the banking field. Its portfolio includ
 ### Portal Application
 
 Octagon has a **Portal application** where its employees can access their account and list all applications they are allowed to use.
-Employees work for a department within Octagon or for Octagon itself. 
+Employees work for a department within Octagon or for Octagon itself.
 Some of the users have enhanced features because they supervise certain teams. Those can onboard new employees and manage their roles and features.
 Target groups of the application can be split into:
+
 - **Employees:** users who are using the application as a starting point for their work.
 - **Supervisors:** users who are mainly using the application to manage users and their access of their department.
 - **Administrators:** this users are able to grant additional organizations or departments and elect supervisors.
@@ -39,7 +41,7 @@ In order to define the need of the **Portal Application** some planning consider
 ### Login
 
 You can decide whether a organization is preselected for the login or if the user is redirected to the default login screen. You can send the user to a specific organization by defining the organization in a custom scope. (primary domain)
-Settings to the branding or the login options of the organization can be made from the organization section in [Console](https://{your_domain}.zitadel.cloud/ui/console/org). 
+Settings to the branding or the login options of the organization can be made from the organization section in [Console](https://{your_domain}.zitadel.cloud/ui/console/org).
 The behaviour of the login branding can be set in your projects detail page. You can choose the branding of the selected organization, the user resource owner, or the projects resource owner.
 
 ### Organizations
@@ -56,7 +58,7 @@ In our sample scenario, we assume to have the following users:
 - **Bill:** is employed at Octagon as Administrator of the Portal Application. Bill also uses a Microsoft Account in combination with a Security Key to secure his account.
 
 After having determined the constellation of the organizations and its users, all the necessary data (Portal project with roles and app, users, login requirements, identity providers, branding) should be set up in [Console](https://{your_domain}.zitadel.cloud/ui/console/org).
-A B2B sample application for NextJS can be found in our [Example Repo](https://github.com/zitadel/zitadel-examples).
+A B2B [sample application](https://github.com/zitadel/zitadel-nextjs-b2b). for NextJS can be found [here](../../examples/login/nextjs-b2b).
 
 To allow another organization to use a project, a project grant has to be created. Upon creation, roles for a grant can be limited to a subset of the total project roles.
 
@@ -70,7 +72,7 @@ In this scenario, Dimitri and Michael share the same organization Pentagon, wher
 
 > Note: Roles are meant for internal business logic and therefore need to be validated separately, none of the users described are allowed to create user grants, at least if they do not own a ZITADEL manager role.
 
-If you made a dashboard where some users are able to create user grants, the Management API to do such operations should be triggered with the personal access token of the users, not with a token of a machine user, to create a meaningful audit log. 
+If you made a dashboard where some users are able to create user grants, the Management API to do such operations should be triggered with the personal access token of the users, not with a token of a machine user, to create a meaningful audit log.
 If you had such a use case, ZITADEL manager roles must be assigned to those users.
 
 ### Noteworthy

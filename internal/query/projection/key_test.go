@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
 
@@ -37,14 +38,13 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
 			want: wantReduce{
-				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.keys3 (id, creation_date, change_date, resource_owner, instance_id, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.keys4 (id, creation_date, change_date, resource_owner, instance_id, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -57,7 +57,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys3_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys4_private (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -71,7 +71,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.keys3_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys4_public (id, instance_id, expiry, key) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -94,11 +94,36 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&keyProjection{}).reduceKeyPairAdded,
 			want: wantReduce{
-				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),
 				sequence:         15,
 				previousSequence: 10,
 				executer:         &testExecuter{},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(KeyColumnInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.keys4 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
 			},
 		},
 		{
@@ -112,14 +137,13 @@ func TestKeyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&keyProjection{certEncryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceCertificateAdded,
 			want: wantReduce{
-				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.keys3_certificate (id, instance_id, expiry, certificate) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.keys4_certificate (id, instance_id, expiry, certificate) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -142,7 +166,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, KeyProjectionTable, tt.want)
 		})
 	}
 }

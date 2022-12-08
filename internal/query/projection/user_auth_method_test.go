@@ -8,6 +8,8 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -37,11 +39,10 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserAuthMethodTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_auth_methods3 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name)",
+							expectedStmt: "INSERT INTO projections.user_auth_methods4 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name)",
 							expectedArgs: []interface{}{
 								"token-id",
 								anyArg{},
@@ -75,11 +76,10 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserAuthMethodTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_auth_methods3 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name)",
+							expectedStmt: "INSERT INTO projections.user_auth_methods4 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name)",
 							expectedArgs: []interface{}{
 								"token-id",
 								anyArg{},
@@ -112,11 +112,10 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserAuthMethodTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_auth_methods3 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name)",
+							expectedStmt: "INSERT INTO projections.user_auth_methods4 (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (instance_id, user_id, method_type, token_id) DO UPDATE SET (creation_date, change_date, resource_owner, sequence, state, name) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.resource_owner, EXCLUDED.sequence, EXCLUDED.state, EXCLUDED.name)",
 							expectedArgs: []interface{}{
 								"",
 								anyArg{},
@@ -151,11 +150,10 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserAuthMethodTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_auth_methods3 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -165,6 +163,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								domain.UserAuthMethodTypePasswordless,
 								"ro-id",
 								"token-id",
+								"instance-id",
 							},
 						},
 					},
@@ -188,11 +187,10 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserAuthMethodTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_auth_methods3 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -202,6 +200,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								domain.UserAuthMethodTypeU2F,
 								"ro-id",
 								"token-id",
+								"instance-id",
 							},
 						},
 					},
@@ -223,11 +222,10 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       UserAuthMethodTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_auth_methods3 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -237,6 +235,63 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 								domain.UserAuthMethodTypeOTP,
 								"ro-id",
 								"",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org reduceOwnerRemoved",
+			reduce: (&userAuthMethodProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.user_auth_methods4 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(UserAuthMethodInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.user_auth_methods4 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
 							},
 						},
 					},
@@ -254,7 +309,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, UserAuthMethodTable, tt.want)
 		})
 	}
 }

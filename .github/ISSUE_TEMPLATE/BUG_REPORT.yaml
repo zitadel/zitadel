@@ -1,0 +1,84 @@
+name: Bug Report
+description: "Create a bug report to help us improve ZITADEL. Click [here](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management) to see how we process your issue."
+title: "[Bug]: "
+labels: ["type: bug", "state: triage"]
+body:
+- type: markdown
+  attributes:
+    value: |
+      Thanks for taking the time to fill out this bug report!
+- type: checkboxes
+  id: preflight
+  attributes:
+    label: Preflight Checklist
+    options:
+    - label:
+        I could not find a solution in the documentation, the existing issues or discussions
+      required: true
+    - label:
+        I have joined the [ZITADEL chat](https://zitadel.com/chat)
+- type: dropdown
+  id: environment
+  attributes:
+    label: Environment
+    description: How do you use ZITADEL?
+    options:
+    - ZITADEL Cloud
+    - Self-hosted
+  validations:
+    required: true
+- type: textarea
+  id: description
+  attributes:
+    label: Describe the bug
+    description: A clear and concise description of what the bug is.
+  validations:
+    required: true
+- type: textarea
+  id: reproduce
+  attributes:
+    label: To reproduce
+    description: Steps to reproduce the behaviour
+    placeholder: |
+      Steps to reproduce the behavior:
+      1. Go to '...'
+      2. Click on '....'
+      3. Scroll down to '....'
+      4. See error
+  validations:
+    required: true
+- type: textarea
+  id: screenshots
+  attributes:
+    label: Screenshots
+    description: If applicable, add screenshots to help explain your problem.
+- type: textarea
+  id: expected
+  attributes:
+    label: Expected behavior
+    description: A clear and concise description of what you expected to happen.
+- type: input
+  id: version
+  attributes:
+    label: Version
+    description: Which version of ZITADEL are you using.
+- type: textarea
+  id: os
+  attributes:
+    label: Operating System
+    description: Please complete information about your operating-system, device, browser, etc.
+    placeholder: |
+      Device: [e.g. Windows, Mac, iPhone6]
+      OS: [e.g. iOS8.1, Windows]
+      Browser [e.g. chrome, stock browser, safari]
+      Version [e.g. 22]
+- type: textarea
+  id: config
+  attributes:
+    label: Relevant Configuration
+    description: Add any relevant configurations that could help as. Make sure to redact any sensitive information. 
+- type: textarea
+  id: additional
+  attributes:
+    label: Additional Context
+    description: Please add any other infos that could be useful.

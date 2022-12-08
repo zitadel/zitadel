@@ -28,15 +28,15 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					`SELECT projections.oidc_settings.aggregate_id,`+
-						` projections.oidc_settings.creation_date,`+
-						` projections.oidc_settings.change_date,`+
-						` projections.oidc_settings.resource_owner,`+
-						` projections.oidc_settings.sequence,`+
-						` projections.oidc_settings.access_token_lifetime,`+
-						` projections.oidc_settings.id_token_lifetime,`+
-						` projections.oidc_settings.refresh_token_idle_expiration,`+
-						` projections.oidc_settings.refresh_token_expiration`+
+					`SELECT projections.oidc_settings2.aggregate_id,`+
+						` projections.oidc_settings2.creation_date,`+
+						` projections.oidc_settings2.change_date,`+
+						` projections.oidc_settings2.resource_owner,`+
+						` projections.oidc_settings2.sequence,`+
+						` projections.oidc_settings2.access_token_lifetime,`+
+						` projections.oidc_settings2.id_token_lifetime,`+
+						` projections.oidc_settings2.refresh_token_idle_expiration,`+
+						` projections.oidc_settings2.refresh_token_expiration`+
 						` FROM projections.oidc_settings`,
 					nil,
 					nil,
@@ -55,15 +55,15 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.oidc_settings.aggregate_id,`+
-						` projections.oidc_settings.creation_date,`+
-						` projections.oidc_settings.change_date,`+
-						` projections.oidc_settings.resource_owner,`+
-						` projections.oidc_settings.sequence,`+
-						` projections.oidc_settings.access_token_lifetime,`+
-						` projections.oidc_settings.id_token_lifetime,`+
-						` projections.oidc_settings.refresh_token_idle_expiration,`+
-						` projections.oidc_settings.refresh_token_expiration`+
+					regexp.QuoteMeta(`SELECT projections.oidc_settings2.aggregate_id,`+
+						` projections.oidc_settings2.creation_date,`+
+						` projections.oidc_settings2.change_date,`+
+						` projections.oidc_settings2.resource_owner,`+
+						` projections.oidc_settings2.sequence,`+
+						` projections.oidc_settings2.access_token_lifetime,`+
+						` projections.oidc_settings2.id_token_lifetime,`+
+						` projections.oidc_settings2.refresh_token_idle_expiration,`+
+						` projections.oidc_settings2.refresh_token_expiration`+
 						` FROM projections.oidc_settings`),
 					[]string{
 						"aggregate_id",
@@ -106,15 +106,15 @@ func Test_OIDCConfigsPrepares(t *testing.T) {
 			prepare: prepareOIDCSettingsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.oidc_settings.aggregate_id,`+
-						` projections.oidc_settings.creation_date,`+
-						` projections.oidc_settings.change_date,`+
-						` projections.oidc_settings.resource_owner,`+
-						` projections.oidc_settings.sequence,`+
-						` projections.oidc_settings.access_token_lifetime,`+
-						` projections.oidc_settings.id_token_lifetime,`+
-						` projections.oidc_settings.refresh_token_idle_expiration,`+
-						` projections.oidc_settings.refresh_token_expiration`+
+					regexp.QuoteMeta(`SELECT projections.oidc_settings2.aggregate_id,`+
+						` projections.oidc_settings2.creation_date,`+
+						` projections.oidc_settings2.change_date,`+
+						` projections.oidc_settings2.resource_owner,`+
+						` projections.oidc_settings2.sequence,`+
+						` projections.oidc_settings2.access_token_lifetime,`+
+						` projections.oidc_settings2.id_token_lifetime,`+
+						` projections.oidc_settings2.refresh_token_idle_expiration,`+
+						` projections.oidc_settings2.refresh_token_expiration`+
 						` FROM projections.oidc_settings`),
 					sql.ErrConnDone,
 				),

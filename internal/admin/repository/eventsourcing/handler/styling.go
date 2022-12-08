@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	stylingTable = "adminapi.styling"
+	stylingTable = "adminapi.styling2"
 )
 
 type Styling struct {
@@ -34,21 +34,21 @@ type Styling struct {
 	subscription *v1.Subscription
 }
 
-func newStyling(handler handler, static static.Storage) *Styling {
+func newStyling(ctx context.Context, handler handler, static static.Storage) *Styling {
 	h := &Styling{
 		handler: handler,
 		static:  static,
 	}
-	h.subscribe()
+	h.subscribe(ctx)
 
 	return h
 }
 
-func (m *Styling) subscribe() {
+func (m *Styling) subscribe(ctx context.Context) {
 	m.subscription = m.es.Subscribe(m.AggregateTypes()...)
 	go func() {
 		for event := range m.subscription.Events {
-			query.ReduceEvent(m, event)
+			query.ReduceEvent(ctx, m, event)
 		}
 	}()
 }
@@ -73,15 +73,15 @@ func (m *Styling) CurrentSequence(instanceID string) (uint64, error) {
 	return sequence.CurrentSequence, nil
 }
 
-func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error) {
-	sequences, err := m.view.GetLatestStylingSequences(instanceIDs...)
+func (m *Styling) EventQuery(instanceIDs []string) (*models.SearchQuery, error) {
+	sequences, err := m.view.GetLatestStylingSequences(instanceIDs)
 	if err != nil {
 		return nil, err
 	}
 	searchQuery := models.NewSearchQuery()
-	for _, sequence := range sequences {
+	for _, instanceID := range instanceIDs {
 		var seq uint64
-		for _, instanceID := range instanceIDs {
+		for _, sequence := range sequences {
 			if sequence.InstanceID == instanceID {
 				seq = sequence.CurrentSequence
 				break
@@ -90,7 +90,7 @@ func (m *Styling) EventQuery(instanceIDs ...string) (*models.SearchQuery, error)
 		searchQuery.AddQuery().
 			AggregateTypeFilter(m.AggregateTypes()...).
 			LatestSequenceFilter(seq).
-			InstanceIDFilter(sequence.InstanceID)
+			InstanceIDFilter(instanceID)
 	}
 	return searchQuery, nil
 }
@@ -150,6 +150,14 @@ func (m *Styling) processLabelPolicy(event *models.Event) (err error) {
 			return err
 		}
 		err = m.generateStylingFile(policy)
+	case instance.InstanceRemovedEventType:
+		err = m.deleteInstanceFilesFromStorage(event.InstanceID)
+		if err != nil {
+			return err
+		}
+		return m.view.DeleteInstanceStyling(event)
+	case org.OrgRemovedEventType:
+		return m.view.UpdateOrgOwnerRemovedStyling(event)
 	default:
 		return m.view.ProcessedStylingSequence(event)
 	}
@@ -160,12 +168,12 @@ func (m *Styling) processLabelPolicy(event *models.Event) (err error) {
 }
 
 func (m *Styling) OnError(event *models.Event, err error) error {
-	logging.LogWithFields("SPOOL-2m9fs", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
+	logging.WithFields("id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
 	return spooler.HandleError(event, err, m.view.GetLatestStylingFailedEvent, m.view.ProcessedStylingFailedEvent, m.view.ProcessedStylingSequence, m.errorCountUntilSkip)
 }
 
-func (m *Styling) OnSuccess() error {
-	return spooler.HandleSuccess(m.view.UpdateStylingSpoolerRunTimestamp)
+func (m *Styling) OnSuccess(instanceIDs []string) error {
+	return spooler.HandleSuccess(m.view.UpdateStylingSpoolerRunTimestamp, instanceIDs)
 }
 
 func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
@@ -260,6 +268,10 @@ func (m *Styling) uploadFilesToStorage(instanceID, aggregateID, contentType stri
 	//TODO: handle location as soon as possible
 	_, err := m.static.PutObject(context.Background(), instanceID, "", aggregateID, fileName, contentType, static.ObjectTypeStyling, reader, size)
 	return err
+}
+
+func (m *Styling) deleteInstanceFilesFromStorage(instanceID string) error {
+	return m.static.RemoveInstanceObjects(context.Background(), instanceID)
 }
 
 func (m *Styling) generateColorPaletteRGBA255(hex string) map[string]string {

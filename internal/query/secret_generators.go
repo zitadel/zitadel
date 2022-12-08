@@ -9,17 +9,17 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/query/projection"
-
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
 	secretGeneratorsTable = table{
-		name: projection.SecretGeneratorProjectionTable,
+		name:          projection.SecretGeneratorProjectionTable,
+		instanceIDCol: projection.SecretGeneratorColumnInstanceID,
 	}
 	SecretGeneratorColumnAggregateID = Column{
 		name:  projection.SecretGeneratorColumnAggregateID,
@@ -133,7 +133,10 @@ func (q *Queries) InitHashGenerator(ctx context.Context, generatorType domain.Se
 	return crypto.NewHashGenerator(cryptoConfig, algorithm), nil
 }
 
-func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domain.SecretGeneratorType) (*SecretGenerator, error) {
+func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domain.SecretGeneratorType) (_ *SecretGenerator, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareSecretGeneratorQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SecretGeneratorColumnGeneratorType.identifier(): generatorType,
@@ -148,6 +151,9 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 }
 
 func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGeneratorSearchQueries) (secretGenerators *SecretGenerators, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareSecretGeneratorsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{

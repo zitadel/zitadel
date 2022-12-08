@@ -120,8 +120,24 @@ func PutUserSessions(db *gorm.DB, table string, sessions ...*model.UserSessionVi
 
 func DeleteUserSessions(db *gorm.DB, table, userID, instanceID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), userID},
-		repository.Key{model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID), instanceID},
+		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), Value: userID},
+		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID), Value: instanceID},
+	)
+	return delete(db)
+}
+
+func DeleteInstanceUserSessions(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table,
+		model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID),
+		instanceID,
+	)
+	return delete(db)
+}
+
+func DeleteOrgUserSessions(db *gorm.DB, table, instanceID, orgID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyResourceOwner), Value: orgID},
+		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
 }

@@ -65,20 +65,36 @@ func (v *View) DeleteApplicationRefreshTokens(event *models.Event, ids ...string
 	return v.ProcessedRefreshTokenSequence(event)
 }
 
+func (v *View) DeleteInstanceRefreshTokens(event *models.Event) error {
+	err := usr_view.DeleteInstanceRefreshTokens(v.Db, refreshTokenTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedRefreshTokenSequence(event)
+}
+
+func (v *View) DeleteOrgRefreshTokens(event *models.Event) error {
+	err := usr_view.DeleteOrgRefreshTokens(v.Db, refreshTokenTable, event.InstanceID, event.ResourceOwner)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedRefreshTokenSequence(event)
+}
+
 func (v *View) GetLatestRefreshTokenSequence(instanceID string) (*repository.CurrentSequence, error) {
 	return v.latestSequence(refreshTokenTable, instanceID)
 }
 
-func (v *View) GetLatestRefreshTokenSequences(instanceIDs ...string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(refreshTokenTable, instanceIDs...)
+func (v *View) GetLatestRefreshTokenSequences(instanceIDs []string) ([]*repository.CurrentSequence, error) {
+	return v.latestSequences(refreshTokenTable, instanceIDs)
 }
 
 func (v *View) ProcessedRefreshTokenSequence(event *models.Event) error {
 	return v.saveCurrentSequence(refreshTokenTable, event)
 }
 
-func (v *View) UpdateRefreshTokenSpoolerRunTimestamp() error {
-	return v.updateSpoolerRunSequence(refreshTokenTable)
+func (v *View) UpdateRefreshTokenSpoolerRunTimestamp(instanceIDs []string) error {
+	return v.updateSpoolerRunSequence(refreshTokenTable, instanceIDs)
 }
 
 func (v *View) GetLatestRefreshTokenFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {

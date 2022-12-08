@@ -4,13 +4,13 @@ import (
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func AddLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.LoginPolicy {
-	return &domain.LoginPolicy{
+func AddLoginPolicyToCommand(p *mgmt_pb.AddCustomLoginPolicyRequest) *command.AddLoginPolicy {
+	return &command.AddLoginPolicy{
 		AllowUsernamePassword:      p.AllowUsernamePassword,
 		AllowRegister:              p.AllowRegister,
 		AllowExternalIDP:           p.AllowExternalIdp,
@@ -18,6 +18,7 @@ func AddLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.Logi
 		PasswordlessType:           policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
 		HidePasswordReset:          p.HidePasswordReset,
 		IgnoreUnknownUsernames:     p.IgnoreUnknownUsernames,
+		AllowDomainDiscovery:       p.AllowDomainDiscovery,
 		DefaultRedirectURI:         p.DefaultRedirectUri,
 		PasswordCheckLifetime:      p.PasswordCheckLifetime.AsDuration(),
 		ExternalLoginCheckLifetime: p.ExternalLoginCheckLifetime.AsDuration(),
@@ -26,22 +27,24 @@ func AddLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.Logi
 		MultiFactorCheckLifetime:   p.MultiFactorCheckLifetime.AsDuration(),
 		SecondFactors:              policy_grpc.SecondFactorsTypesToDomain(p.SecondFactors),
 		MultiFactors:               policy_grpc.MultiFactorsTypesToDomain(p.MultiFactors),
-		IDPProviders:               addLoginPolicyIDPsToDomain(p.Idps),
+		IDPProviders:               addLoginPolicyIDPsToCommand(p.Idps),
+		DisableLoginWithEmail:      p.DisableLoginWithEmail,
+		DisableLoginWithPhone:      p.DisableLoginWithPhone,
 	}
 }
-func addLoginPolicyIDPsToDomain(idps []*mgmt_pb.AddCustomLoginPolicyRequest_IDP) []*domain.IDPProvider {
-	providers := make([]*domain.IDPProvider, len(idps))
+func addLoginPolicyIDPsToCommand(idps []*mgmt_pb.AddCustomLoginPolicyRequest_IDP) []*command.AddLoginPolicyIDP {
+	providers := make([]*command.AddLoginPolicyIDP, len(idps))
 	for i, idp := range idps {
-		providers[i] = &domain.IDPProvider{
-			Type:        idp_grpc.IDPProviderTypeFromPb(idp.OwnerType),
-			IDPConfigID: idp.IdpId,
+		providers[i] = &command.AddLoginPolicyIDP{
+			Type:     idp_grpc.IDPProviderTypeFromPb(idp.OwnerType),
+			ConfigID: idp.IdpId,
 		}
 	}
 	return providers
 }
 
-func updateLoginPolicyToDomain(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *domain.LoginPolicy {
-	return &domain.LoginPolicy{
+func updateLoginPolicyToCommand(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *command.ChangeLoginPolicy {
+	return &command.ChangeLoginPolicy{
 		AllowUsernamePassword:      p.AllowUsernamePassword,
 		AllowRegister:              p.AllowRegister,
 		AllowExternalIDP:           p.AllowExternalIdp,
@@ -49,6 +52,9 @@ func updateLoginPolicyToDomain(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *domai
 		PasswordlessType:           policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
 		HidePasswordReset:          p.HidePasswordReset,
 		IgnoreUnknownUsernames:     p.IgnoreUnknownUsernames,
+		AllowDomainDiscovery:       p.AllowDomainDiscovery,
+		DisableLoginWithEmail:      p.DisableLoginWithEmail,
+		DisableLoginWithPhone:      p.DisableLoginWithPhone,
 		DefaultRedirectURI:         p.DefaultRedirectUri,
 		PasswordCheckLifetime:      p.PasswordCheckLifetime.AsDuration(),
 		ExternalLoginCheckLifetime: p.ExternalLoginCheckLifetime.AsDuration(),

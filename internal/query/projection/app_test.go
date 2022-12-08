@@ -10,6 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -24,7 +26,7 @@ func TestAppProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "project.reduceAppAdded",
+			name: "project reduceAppAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationAddedType),
@@ -40,11 +42,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps3 (id, name, project_id, creation_date, change_date, resource_owner, instance_id, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.apps4 (id, name, project_id, creation_date, change_date, resource_owner, instance_id, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"app-id",
 								"my-app",
@@ -62,7 +63,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAppChanged",
+			name: "project reduceAppChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationChangedType),
@@ -78,11 +79,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.apps4 SET (name, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"my-app",
 								anyArg{},
@@ -96,7 +96,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAppDeactivated",
+			name: "project reduceAppDeactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationDeactivatedType),
@@ -111,11 +111,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.apps4 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.AppStateInactive,
 								anyArg{},
@@ -129,7 +128,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAppReactivated",
+			name: "project reduceAppReactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationReactivatedType),
@@ -144,11 +143,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.apps4 SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								domain.AppStateActive,
 								anyArg{},
@@ -162,7 +160,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAppRemoved",
+			name: "project reduceAppRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationRemovedType),
@@ -177,11 +175,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.apps3 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.apps4 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"app-id",
 								"instance-id",
@@ -192,7 +189,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceProjectRemoved",
+			name: "project reduceProjectRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.ProjectRemovedType),
@@ -205,11 +202,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.apps3 WHERE (project_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.apps4 WHERE (project_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -220,7 +216,33 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAPIConfigAdded",
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(AppColumnInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.apps4 WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project reduceAPIConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.APIConfigAddedType),
@@ -238,11 +260,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps3_api_configs (app_id, instance_id, client_id, client_secret, auth_method) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.apps4_api_configs (app_id, instance_id, client_id, client_secret, auth_method) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"app-id",
 								"instance-id",
@@ -252,7 +273,7 @@ func TestAppProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.apps4 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -265,7 +286,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAPIConfigChanged",
+			name: "project reduceAPIConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.APIConfigChangedType),
@@ -283,11 +304,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps3_api_configs SET (client_secret, auth_method) = ($1, $2) WHERE (app_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.apps4_api_configs SET (client_secret, auth_method) = ($1, $2) WHERE (app_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.APIAuthMethodTypePrivateKeyJWT,
@@ -296,7 +316,7 @@ func TestAppProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.apps4 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -309,7 +329,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceAPIConfigChanged noop",
+			name: "project reduceAPIConfigChanged noop",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.APIConfigChangedType),
@@ -324,14 +344,13 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
 			},
 		},
 		{
-			name: "project.reduceAPIConfigSecretChanged",
+			name: "project reduceAPIConfigSecretChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.APIConfigSecretChangedType),
@@ -347,11 +366,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps3_api_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.apps4_api_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"app-id",
@@ -359,7 +377,7 @@ func TestAppProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.apps4 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -372,7 +390,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceOIDCConfigAdded",
+			name: "project reduceOIDCConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.OIDCConfigAddedType),
@@ -403,11 +421,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps3_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+							expectedStmt: "INSERT INTO projections.apps4_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
 							expectedArgs: []interface{}{
 								"app-id",
 								"instance-id",
@@ -430,7 +447,7 @@ func TestAppProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.apps4 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -443,7 +460,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceOIDCConfigChanged",
+			name: "project reduceOIDCConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.OIDCConfigChangedType),
@@ -472,11 +489,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps3_oidc_configs SET (version, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (app_id = $15) AND (instance_id = $16)",
+							expectedStmt: "UPDATE projections.apps4_oidc_configs SET (version, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE (app_id = $15) AND (instance_id = $16)",
 							expectedArgs: []interface{}{
 								domain.OIDCVersionV1,
 								database.StringArray{"redirect.one.ch", "redirect.two.ch"},
@@ -497,7 +513,7 @@ func TestAppProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.apps4 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -510,7 +526,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project.reduceOIDCConfigChanged noop",
+			name: "project reduceOIDCConfigChanged noop",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.OIDCConfigChangedType),
@@ -525,14 +541,13 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
 			},
 		},
 		{
-			name: "project.reduceOIDCConfigSecretChanged",
+			name: "project reduceOIDCConfigSecretChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(project.OIDCConfigSecretChangedType),
@@ -548,11 +563,10 @@ func TestAppProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       AppProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps3_oidc_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.apps4_oidc_configs SET client_secret = $1 WHERE (app_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"app-id",
@@ -560,12 +574,42 @@ func TestAppProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.apps3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.apps4 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"app-id",
 								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project.reduceOwnerRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&appProjection{}).reduceOwnerRemoved,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.apps4 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
 							},
 						},
 					},
@@ -583,7 +627,7 @@ func TestAppProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, AppProjectionTable, tt.want)
 		})
 	}
 }

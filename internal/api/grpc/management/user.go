@@ -30,7 +30,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDReques
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUserByID(ctx, true, req.Id, owner)
+	user, err := s.query.GetUserByID(ctx, true, req.Id, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetU
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUser(ctx, true, loginName)
+	user, err := s.query.GetUser(ctx, true, false, loginName)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries)
+	res, err := s.query.SearchUsers(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -86,14 +86,14 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 
 func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequest) (*mgmt_pb.IsUserUniqueResponse, error) {
 	orgID := authz.GetCtxData(ctx).OrgID
-	policy, err := s.query.DomainPolicyByOrg(ctx, true, orgID)
+	policy, err := s.query.DomainPolicyByOrg(ctx, true, orgID, false)
 	if err != nil {
 		return nil, err
 	}
 	if !policy.UserLoginMustBeDomain {
 		orgID = ""
 	}
-	unique, err := s.query.IsUserUnique(ctx, req.UserName, req.Email, orgID)
+	unique, err := s.query.IsUserUnique(ctx, req.UserName, req.Email, orgID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries)
+	res, err := s.query.SearchUserMetadata(ctx, true, req.Id, metadataQueries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetada
 	if err != nil {
 		return nil, err
 	}
-	data, err := s.query.GetUserMetadataByKey(ctx, true, req.Id, req.Key, owner)
+	data, err := s.query.GetUserMetadataByKey(ctx, true, req.Id, req.Key, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -230,8 +230,12 @@ func AddHumanUserRequestToAddHuman(req *mgmt_pb.AddHumanUserRequest) *command.Ad
 }
 
 func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUserRequest) (*mgmt_pb.ImportHumanUserResponse, error) {
-	human, passwordless := ImportHumanUserRequestToDomain(req)
+	human, passwordless, links := ImportHumanUserRequestToDomain(req)
 	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, s.userCodeAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +247,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -267,17 +271,14 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 }
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
-	machine, err := s.command.AddMachine(ctx, authz.GetCtxData(ctx).OrgID, AddMachineUserRequestToDomain(req))
+	machine := AddMachineUserRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.AddMachine(ctx, machine)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddMachineUserResponse{
-		UserId: machine.AggregateID,
-		Details: obj_grpc.AddToDetailsPb(
-			machine.Sequence,
-			machine.ChangeDate,
-			machine.ResourceOwner,
-		),
+		UserId:  machine.AggregateID,
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -322,33 +323,41 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 }
 
 func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest) (*mgmt_pb.RemoveUserResponse, error) {
-	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(req.Id)
+	memberships, grants, err := s.removeUserDependencies(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
-	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: []query.SearchQuery{userGrantUserQuery},
-	})
-	if err != nil {
-		return nil, err
-	}
-	membershipsUserQuery, err := query.NewMembershipUserIDQuery(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
-		Queries: []query.SearchQuery{membershipsUserQuery},
-	})
-	if err != nil {
-		return nil, err
-	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants)...)
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships, grants...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveUserResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
+}
+
+func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
+	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, nil, err
+	}
+	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{userGrantUserQuery},
+	}, true)
+	if err != nil {
+		return nil, nil, err
+	}
+	membershipsUserQuery, err := query.NewMembershipUserIDQuery(userID)
+	if err != nil {
+		return nil, nil, err
+	}
+	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{membershipsUserQuery},
+	}, true)
+	if err != nil {
+		return nil, nil, err
+	}
+	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), nil
 }
 
 func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserNameRequest) (*mgmt_pb.UpdateUserNameResponse, error) {
@@ -366,7 +375,7 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 	if err != nil {
 		return nil, err
 	}
-	profile, err := s.query.GetHumanProfile(ctx, req.UserId, owner)
+	profile, err := s.query.GetHumanProfile(ctx, req.UserId, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -400,7 +409,7 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 	if err != nil {
 		return nil, err
 	}
-	email, err := s.query.GetHumanEmail(ctx, req.UserId, owner)
+	email, err := s.query.GetHumanEmail(ctx, req.UserId, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -466,7 +475,7 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 	if err != nil {
 		return nil, err
 	}
-	phone, err := s.query.GetHumanPhone(ctx, req.UserId, owner)
+	phone, err := s.query.GetHumanPhone(ctx, req.UserId, false, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -582,7 +591,7 @@ func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHuma
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}
@@ -625,7 +634,7 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}
@@ -678,16 +687,13 @@ func (s *Server) RemoveHumanPasswordless(ctx context.Context, req *mgmt_pb.Remov
 }
 
 func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRequest) (*mgmt_pb.UpdateMachineResponse, error) {
-	machine, err := s.command.ChangeMachine(ctx, UpdateMachineRequestToDomain(ctx, req))
+	machine := UpdateMachineRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.ChangeMachine(ctx, machine)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateMachineResponse{
-		Details: obj_grpc.ChangeToDetailsPb(
-			machine.Sequence,
-			machine.ChangeDate,
-			machine.ResourceOwner,
-		),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -700,7 +706,7 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 	if err != nil {
 		return nil, err
 	}
-	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, resourceOwner, aggregateID)
+	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, false, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -714,7 +720,7 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchAuthNKeys(ctx, query)
+	result, err := s.query.SearchAuthNKeys(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}
@@ -763,7 +769,7 @@ func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.G
 	if err != nil {
 		return nil, err
 	}
-	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, resourceOwner, aggregateID)
+	token, err := s.query.PersonalAccessTokenByID(ctx, true, req.TokenId, false, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -777,7 +783,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchPersonalAccessTokens(ctx, queries)
+	result, err := s.query.SearchPersonalAccessTokens(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -823,7 +829,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.IDPUserLinks(ctx, queries)
+	res, err := s.query.IDPUserLinks(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -847,7 +853,7 @@ func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserM
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.query.Memberships(ctx, request)
+	response, err := s.query.Memberships(ctx, request, false)
 	if err != nil {
 		return nil, err
 	}

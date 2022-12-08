@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type InstanceDomain struct {
@@ -57,6 +58,9 @@ func NewInstanceDomainPrimarySearchQuery(primary bool) (SearchQuery, error) {
 }
 
 func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDomainSearchQueries) (domains *InstanceDomains, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareInstanceDomainsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
@@ -70,6 +74,9 @@ func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDo
 }
 
 func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *InstanceDomainSearchQueries) (domains *InstanceDomains, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareInstanceDomainsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
@@ -139,7 +146,8 @@ func prepareInstanceDomainsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Instance
 
 var (
 	instanceDomainsTable = table{
-		name: projection.InstanceDomainTable,
+		name:          projection.InstanceDomainTable,
+		instanceIDCol: projection.InstanceDomainInstanceIDCol,
 	}
 
 	InstanceDomainCreationDateCol = Column{

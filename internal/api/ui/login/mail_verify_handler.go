@@ -92,14 +92,15 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 	if userID == "" {
 		userID = authReq.UserID
 	}
+
+	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, "Mail Verification", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, "EmailVerification.Title", "EmailVerification.Description", errID, errMessage),
 		UserID:      userID,
 		profileData: l.getProfileData(authReq),
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
-		user, err := l.query.GetUserByID(r.Context(), false, userID)
+		user, err := l.query.GetUserByID(r.Context(), false, userID, false)
 		if err == nil {
 			l.customTexts(r.Context(), translator, user.ResourceOwner)
 		}
@@ -108,11 +109,11 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 }
 
 func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
+	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, "Mail Verified", "", ""),
+		baseData:    l.getBaseData(r, authReq, "EmailVerificationDone.Title", "EmailVerificationDone.Description", "", ""),
 		profileData: l.getProfileData(authReq),
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 	if authReq == nil {
 		l.customTexts(r.Context(), translator, orgID)
 	}

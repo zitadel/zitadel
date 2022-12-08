@@ -22,21 +22,21 @@ func (s *Server) GetLoginPolicy(ctx context.Context, _ *admin_pb.GetLoginPolicyR
 }
 
 func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginPolicyRequest) (*admin_pb.UpdateLoginPolicyResponse, error) {
-	policy, err := s.command.ChangeDefaultLoginPolicy(ctx, updateLoginPolicyToDomain(p))
+	policy, err := s.command.ChangeDefaultLoginPolicy(ctx, updateLoginPolicyToCommand(p))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateLoginPolicyResponse{
 		Details: object.ChangeToDetailsPb(
 			policy.Sequence,
-			policy.ChangeDate,
+			policy.EventDate,
 			policy.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLoginPolicyIDPsRequest) (*admin_pb.ListLoginPolicyIDPsResponse, error) {
-	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetInstance(ctx).InstanceID(), ListLoginPolicyIDPsRequestToQuery(req))
+	res, err := s.query.IDPLoginPolicyLinks(ctx, authz.GetInstance(ctx).InstanceID(), ListLoginPolicyIDPsRequestToQuery(req), false)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *admin_pb.Rem
 	}
 	idps, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{idpQuery},
-	})
+	}, true)
 
 	if err != nil {
 		return nil, err

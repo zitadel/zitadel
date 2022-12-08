@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	OIDCSettingsProjectionTable = "projections.oidc_settings"
+	OIDCSettingsProjectionTable = "projections.oidc_settings2"
 
 	OIDCSettingsColumnAggregateID                = "aggregate_id"
 	OIDCSettingsColumnCreationDate               = "creation_date"
@@ -65,6 +65,10 @@ func (p *oidcSettingsProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.OIDCSettingsChangedEventType,
 					Reduce: p.reduceOIDCSettingsChanged,
+				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(OIDCSettingsColumnInstanceID),
 				},
 			},
 		},
@@ -121,6 +125,7 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Even
 		columns,
 		[]handler.Condition{
 			handler.NewCond(OIDCSettingsColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(OIDCSettingsColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }

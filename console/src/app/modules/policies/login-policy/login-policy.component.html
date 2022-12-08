@@ -290,6 +290,28 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      [(ngModel)]="loginData.allowDomainDiscovery"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
+      {{ 'POLICY.DATA.ALLOWDOMAINDISCOVERY' | translate }}
+    </mat-checkbox>
+  </div>
+
+  <div class="login-policy-row">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
       [(ngModel)]="loginData.ignoreUnknownUsernames"
       [disabled]="
         ([
@@ -304,6 +326,50 @@
       "
     >
       {{ 'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate }}
+    </mat-checkbox>
+  </div>
+
+  <div class="login-policy-row">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="loginData.disableLoginWithEmail"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
+      {{ 'POLICY.DATA.DISABLELOGINWITHEMAIL' | translate }}
+    </mat-checkbox>
+  </div>
+
+  <div class="login-policy-row">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="loginData.disableLoginWithPhone"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+            ? 'policy.write'
+            : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
+      {{ 'POLICY.DATA.DISABLELOGINWITHPHONE' | translate }}
     </mat-checkbox>
   </div>
 

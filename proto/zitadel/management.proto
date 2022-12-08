@@ -841,6 +841,18 @@ service ManagementService {
         };
     }
 
+    // Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+    // Users of this organisation will not be able login
+    rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.delete"
+        };
+    }
+
     // Sets a org metadata by key
     rpc SetOrgMetadata(SetOrgMetadataRequest) returns (SetOrgMetadataResponse) {
         option (google.api.http) = {
@@ -2938,6 +2950,26 @@ service ManagementService {
         };
     }
 
+    rpc ListFlowTypes(ListFlowTypesRequest) returns (ListFlowTypesResponse) {
+        option (google.api.http) = {
+            post: "/flows/types/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.read"
+        };
+    }
+
+    rpc ListFlowTriggerTypes(ListFlowTriggerTypesRequest) returns (ListFlowTriggerTypesResponse) {
+        option (google.api.http) = {
+            post: "/flows/{type}/triggers/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.flow.read"
+        };
+    }
+
     rpc GetFlow(GetFlowRequest) returns (GetFlowResponse) {
         option (google.api.http) = {
             get: "/flows/{type}"
@@ -3108,6 +3140,14 @@ message ImportHumanUserRequest {
         string value = 1;
         string algorithm = 2;
     }
+    message IDP {
+        // internal id of the IDP in ZITADEL
+        string config_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        // id of the user on the IDP
+        string external_user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        // (display) name of the user on the IDP
+        string display_name = 3 [(validate.rules).string = {max_len: 200}];
+    }
 
     string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
@@ -3118,8 +3158,8 @@ message ImportHumanUserRequest {
     HashedPassword hashed_password = 6;
     bool password_change_required = 7;
     bool request_passwordless_registration = 8;
-
     string otp_code = 9;
+    repeated IDP idps = 10;
 }
 
 message ImportHumanUserResponse {
@@ -3647,6 +3687,12 @@ message DeactivateOrgResponse {
 message ReactivateOrgRequest {}
 
 message ReactivateOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveOrgRequest {}
+
+message RemoveOrgResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -4585,6 +4631,22 @@ message AddCustomLoginPolicyRequest {
     repeated zitadel.policy.v1.SecondFactorType second_factors = 14;
     repeated zitadel.policy.v1.MultiFactorType multi_factors = 15;
     repeated IDP idps = 16;
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    bool allow_domain_discovery = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+        }
+    ];
+    bool disable_login_with_email = 18 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+        }
+    ];
+    bool disable_login_with_phone = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+        }
+    ];
 }
 
 message AddCustomLoginPolicyResponse {
@@ -4613,6 +4675,22 @@ message UpdateCustomLoginPolicyRequest {
     google.protobuf.Duration mfa_init_skip_lifetime = 11;
     google.protobuf.Duration second_factor_check_lifetime = 12;
     google.protobuf.Duration multi_factor_check_lifetime = 13;
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    bool allow_domain_discovery = 14 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+        }
+    ];
+    bool disable_login_with_email = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+        }
+    ];
+    bool disable_login_with_phone = 16 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+        }
+    ];
 }
 
 message UpdateCustomLoginPolicyResponse {
@@ -4890,10 +4968,10 @@ message GetDefaultLabelPolicyResponse {
 
 message AddCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {max_len: 50}];
-    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes
+    // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];
@@ -4914,7 +4992,7 @@ message UpdateCustomLabelPolicyRequest {
     string primary_color = 1 [(validate.rules).string = {max_len: 50}];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];
@@ -5713,6 +5791,20 @@ message DeleteActionRequest {
 
 message DeleteActionResponse {}
 
+message ListFlowTypesRequest {}
+
+message ListFlowTypesResponse {
+    repeated zitadel.action.v1.FlowType result = 1;
+}
+
+message ListFlowTriggerTypesRequest {
+    string type = 1;
+}
+
+message ListFlowTriggerTypesResponse {
+    repeated zitadel.action.v1.TriggerType result = 1;
+}
+
 message DeactivateActionRequest {
     string id = 1;
 }
@@ -5730,7 +5822,8 @@ message ReactivateActionResponse {
 }
 
 message GetFlowRequest {
-    zitadel.action.v1.FlowType type = 1;
+    // id of the flow
+    string type = 1;
 }
 
 message GetFlowResponse {
@@ -5738,7 +5831,8 @@ message GetFlowResponse {
 }
 
 message ClearFlowRequest {
-    zitadel.action.v1.FlowType type = 1;
+    // id of the flow
+    string type = 1;
 }
 
 message ClearFlowResponse {
@@ -5746,8 +5840,10 @@ message ClearFlowResponse {
 }
 
 message SetTriggerActionsRequest {
-    zitadel.action.v1.FlowType flow_type = 1;
-    zitadel.action.v1.TriggerType trigger_type = 2;
+    // id of the flow type
+    string flow_type = 1;
+    // id of the trigger type
+    string trigger_type = 2;
     repeated string action_ids = 3;
 }
 

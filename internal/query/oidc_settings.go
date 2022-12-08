@@ -11,11 +11,13 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
 	oidcSettingsTable = table{
-		name: projection.OIDCSettingsProjectionTable,
+		name:          projection.OIDCSettingsProjectionTable,
+		instanceIDCol: projection.OIDCSettingsColumnInstanceID,
 	}
 	OIDCSettingsColumnAggregateID = Column{
 		name:  projection.OIDCSettingsColumnAggregateID,
@@ -72,7 +74,10 @@ type OIDCSettings struct {
 	RefreshTokenExpiration     time.Duration
 }
 
-func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (*OIDCSettings, error) {
+func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (_ *OIDCSettings, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareOIDCSettingsQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OIDCSettingsColumnAggregateID.identifier(): aggregateID,

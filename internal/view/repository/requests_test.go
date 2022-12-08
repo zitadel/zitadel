@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/jinzhu/gorm"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )

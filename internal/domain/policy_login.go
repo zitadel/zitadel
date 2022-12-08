@@ -21,12 +21,15 @@ type LoginPolicy struct {
 	PasswordlessType           PasswordlessType
 	HidePasswordReset          bool
 	IgnoreUnknownUsernames     bool
+	AllowDomainDiscovery       bool
 	DefaultRedirectURI         string
 	PasswordCheckLifetime      time.Duration
 	ExternalLoginCheckLifetime time.Duration
 	MFAInitSkipLifetime        time.Duration
 	SecondFactorCheckLifetime  time.Duration
 	MultiFactorCheckLifetime   time.Duration
+	DisableLoginWithEmail      bool
+	DisableLoginWithPhone      bool
 }
 
 func ValidateDefaultRedirectURI(rawURL string) bool {

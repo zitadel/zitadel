@@ -180,3 +180,20 @@ func (c *crdbStorage) RemoveObjects(ctx context.Context, instanceID, resourceOwn
 	}
 	return nil
 }
+
+func (c *crdbStorage) RemoveInstanceObjects(ctx context.Context, instanceID string) error {
+	stmt, args, err := squirrel.Delete(assetsTable).
+		Where(squirrel.Eq{
+			AssetColInstanceID: instanceID,
+		}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return caos_errors.ThrowInternal(err, "DATAB-Sfgeq", "Errors.Internal")
+	}
+	_, err = c.client.ExecContext(ctx, stmt, args...)
+	if err != nil {
+		return caos_errors.ThrowInternal(err, "DATAB-Efgt2", "Errors.Assets.Object.RemoveFailed")
+	}
+	return nil
+}

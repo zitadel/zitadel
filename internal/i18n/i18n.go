@@ -139,6 +139,10 @@ func (t *Translator) Localize(id string, args map[string]interface{}, langs ...s
 	return localize(t.localizer(langs...), id, args)
 }
 
+func (t *Translator) LocalizeWithoutArgs(id string, langs ...string) string {
+	return localize(t.localizer(langs...), id, map[string]interface{}{})
+}
+
 func (t *Translator) Lang(r *http.Request) language.Tag {
 	matcher := language.NewMatcher(t.bundle.LanguageTags())
 	tag, _ := language.MatchStrings(matcher, t.langsFromRequest(r)...)

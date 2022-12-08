@@ -14,6 +14,68 @@ import (
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
+var (
+	instanceQuery = `SELECT projections.instances.id,` +
+		` projections.instances.creation_date,` +
+		` projections.instances.change_date,` +
+		` projections.instances.sequence,` +
+		` projections.instances.default_org_id,` +
+		` projections.instances.iam_project_id,` +
+		` projections.instances.console_client_id,` +
+		` projections.instances.console_app_id,` +
+		` projections.instances.default_language` +
+		` FROM projections.instances`
+	instanceCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"sequence",
+		"default_org_id",
+		"iam_project_id",
+		"console_client_id",
+		"console_app_id",
+		"default_language",
+	}
+	instancesQuery = `SELECT f.count, f.id,` +
+		` projections.instances.creation_date,` +
+		` projections.instances.change_date,` +
+		` projections.instances.sequence,` +
+		` projections.instances.name,` +
+		` projections.instances.default_org_id,` +
+		` projections.instances.iam_project_id,` +
+		` projections.instances.console_client_id,` +
+		` projections.instances.console_app_id,` +
+		` projections.instances.default_language,` +
+		` projections.instance_domains.domain,` +
+		` projections.instance_domains.is_primary,` +
+		` projections.instance_domains.is_generated,` +
+		` projections.instance_domains.creation_date,` +
+		` projections.instance_domains.change_date, ` +
+		` projections.instance_domains.sequence` +
+		` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f` +
+		` LEFT JOIN projections.instances ON f.id = projections.instances.id` +
+		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`
+	instancesCols = []string{
+		"count",
+		"id",
+		"creation_date",
+		"change_date",
+		"sequence",
+		"name",
+		"default_org_id",
+		"iam_project_id",
+		"console_client_id",
+		"console_app_id",
+		"default_language",
+		"domain",
+		"is_primary",
+		"is_generated",
+		"creation_date",
+		"change_date",
+		"sequence",
+	}
+)
+
 func Test_InstancePrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
@@ -32,16 +94,7 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.instances.id,`+
-						` projections.instances.creation_date,`+
-						` projections.instances.change_date,`+
-						` projections.instances.sequence,`+
-						` projections.instances.default_org_id,`+
-						` projections.instances.iam_project_id,`+
-						` projections.instances.console_client_id,`+
-						` projections.instances.console_app_id,`+
-						` projections.instances.default_language`+
-						` FROM projections.instances`),
+					regexp.QuoteMeta(instanceQuery),
 					nil,
 					nil,
 				),
@@ -61,27 +114,8 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.instances.id,`+
-						` projections.instances.creation_date,`+
-						` projections.instances.change_date,`+
-						` projections.instances.sequence,`+
-						` projections.instances.default_org_id,`+
-						` projections.instances.iam_project_id,`+
-						` projections.instances.console_client_id,`+
-						` projections.instances.console_app_id,`+
-						` projections.instances.default_language`+
-						` FROM projections.instances`),
-					[]string{
-						"id",
-						"creation_date",
-						"change_date",
-						"sequence",
-						"default_org_id",
-						"iam_project_id",
-						"console_client_id",
-						"console_app_id",
-						"default_language",
-					},
+					regexp.QuoteMeta(instanceQuery),
+					instanceCols,
 					[]driver.Value{
 						"id",
 						testNow,
@@ -114,16 +148,7 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.instances.id,`+
-						` projections.instances.creation_date,`+
-						` projections.instances.change_date,`+
-						` projections.instances.sequence,`+
-						` projections.instances.default_org_id,`+
-						` projections.instances.iam_project_id,`+
-						` projections.instances.console_client_id,`+
-						` projections.instances.console_app_id,`+
-						` projections.instances.default_language`+
-						` FROM projections.instances`),
+					regexp.QuoteMeta(instanceQuery),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -143,25 +168,7 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT f.count, f.id,`+
-						` projections.instances.creation_date,`+
-						` projections.instances.change_date,`+
-						` projections.instances.sequence,`+
-						` projections.instances.name,`+
-						` projections.instances.default_org_id,`+
-						` projections.instances.iam_project_id,`+
-						` projections.instances.console_client_id,`+
-						` projections.instances.console_app_id,`+
-						` projections.instances.default_language,`+
-						` projections.instance_domains.domain,`+
-						` projections.instance_domains.is_primary,`+
-						` projections.instance_domains.is_generated,`+
-						` projections.instance_domains.creation_date,`+
-						` projections.instance_domains.change_date, `+
-						` projections.instance_domains.sequence`+
-						` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f`+
-						` LEFT JOIN projections.instances ON f.id = projections.instances.id`+
-						` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`),
+					regexp.QuoteMeta(instancesQuery),
 					nil,
 					nil,
 				),
@@ -176,44 +183,8 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT f.count, f.id,`+
-						` projections.instances.creation_date,`+
-						` projections.instances.change_date,`+
-						` projections.instances.sequence,`+
-						` projections.instances.name,`+
-						` projections.instances.default_org_id,`+
-						` projections.instances.iam_project_id,`+
-						` projections.instances.console_client_id,`+
-						` projections.instances.console_app_id,`+
-						` projections.instances.default_language,`+
-						` projections.instance_domains.domain,`+
-						` projections.instance_domains.is_primary,`+
-						` projections.instance_domains.is_generated,`+
-						` projections.instance_domains.creation_date,`+
-						` projections.instance_domains.change_date, `+
-						` projections.instance_domains.sequence`+
-						` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f`+
-						` LEFT JOIN projections.instances ON f.id = projections.instances.id`+
-						` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`),
-					[]string{
-						"count",
-						"id",
-						"creation_date",
-						"change_date",
-						"sequence",
-						"name",
-						"default_org_id",
-						"iam_project_id",
-						"console_client_id",
-						"console_app_id",
-						"default_language",
-						"domain",
-						"is_primary",
-						"is_generated",
-						"creation_date",
-						"change_date",
-						"sequence",
-					},
+					regexp.QuoteMeta(instancesQuery),
+					instancesCols,
 					[][]driver.Value{
 						{
 							"1",
@@ -276,44 +247,8 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT f.count, f.id,`+
-						` projections.instances.creation_date,`+
-						` projections.instances.change_date,`+
-						` projections.instances.sequence,`+
-						` projections.instances.name,`+
-						` projections.instances.default_org_id,`+
-						` projections.instances.iam_project_id,`+
-						` projections.instances.console_client_id,`+
-						` projections.instances.console_app_id,`+
-						` projections.instances.default_language,`+
-						` projections.instance_domains.domain,`+
-						` projections.instance_domains.is_primary,`+
-						` projections.instance_domains.is_generated,`+
-						` projections.instance_domains.creation_date,`+
-						` projections.instance_domains.change_date, `+
-						` projections.instance_domains.sequence`+
-						` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f`+
-						` LEFT JOIN projections.instances ON f.id = projections.instances.id`+
-						` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`),
-					[]string{
-						"count",
-						"id",
-						"creation_date",
-						"change_date",
-						"sequence",
-						"name",
-						"default_org_id",
-						"iam_project_id",
-						"console_client_id",
-						"console_app_id",
-						"default_language",
-						"domain",
-						"is_primary",
-						"is_generated",
-						"creation_date",
-						"change_date",
-						"sequence",
-					},
+					regexp.QuoteMeta(instancesQuery),
+					instancesCols,
 					[][]driver.Value{
 						{
 							2,
@@ -445,25 +380,7 @@ func Test_InstancePrepares(t *testing.T) {
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT f.count, f.id,`+
-						` projections.instances.creation_date,`+
-						` projections.instances.change_date,`+
-						` projections.instances.sequence,`+
-						` projections.instances.name,`+
-						` projections.instances.default_org_id,`+
-						` projections.instances.iam_project_id,`+
-						` projections.instances.console_client_id,`+
-						` projections.instances.console_app_id,`+
-						` projections.instances.default_language,`+
-						` projections.instance_domains.domain,`+
-						` projections.instance_domains.is_primary,`+
-						` projections.instance_domains.is_generated,`+
-						` projections.instance_domains.creation_date,`+
-						` projections.instance_domains.change_date, `+
-						` projections.instance_domains.sequence`+
-						` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f`+
-						` LEFT JOIN projections.instances ON f.id = projections.instances.id`+
-						` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id`),
+					regexp.QuoteMeta(instancesQuery),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

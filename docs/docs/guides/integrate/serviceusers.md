@@ -2,10 +2,7 @@
 title: Service Users
 ---
 
-import UserDescription from '../../concepts/structure/_user_description.mdx';
-
-<UserDescription name="UserDescription" />
-
+This is a guide on how to create service users in ZITADEL. You can read more about users [here](/concepts/structure/users.md).
 ## Create a Service User
 
 1. Navigate to Service Users

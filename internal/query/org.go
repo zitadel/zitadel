@@ -12,11 +12,13 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
 	orgsTable = table{
-		name: projection.OrgProjectionTable,
+		name:          projection.OrgProjectionTable,
+		instanceIDCol: projection.OrgColumnInstanceID,
 	}
 	OrgColumnID = Column{
 		name:  projection.OrgColumnID,
@@ -86,7 +88,10 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (*Org, error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.OrgProjection.Trigger(ctx)
 	}
@@ -104,7 +109,10 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	return scan(row)
 }
 
-func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
+func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnDomain.identifier():     domain,
@@ -118,7 +126,28 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 	return scan(row)
 }
 
+func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareOrgWithDomainsQuery()
+	query, args, err := stmt.Where(sq.Eq{
+		OrgDomainDomainCol.identifier():     domain,
+		OrgDomainIsVerifiedCol.identifier(): true,
+		OrgColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if name == "" && domain == "" {
 		return false, errors.ThrowInvalidArgument(nil, "QUERY-DGqfd", "Errors.Query.InvalidRequest")
 	}
@@ -146,10 +175,17 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 }
 
 func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	_, err = q.OrgByID(ctx, true, id)
 	return err
 }
+
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareOrgsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
@@ -246,6 +282,42 @@ func prepareOrgQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
 			OrgColumnDomain.identifier(),
 		).
 			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Org, error) {
+			o := new(Org)
+			err := row.Scan(
+				&o.ID,
+				&o.CreationDate,
+				&o.ChangeDate,
+				&o.ResourceOwner,
+				&o.State,
+				&o.Sequence,
+				&o.Name,
+				&o.Domain,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-iTTGJ", "Errors.Org.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-pWS5H", "Errors.Internal")
+			}
+			return o, nil
+		}
+}
+
+func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error)) {
+	return sq.Select(
+			OrgColumnID.identifier(),
+			OrgColumnCreationDate.identifier(),
+			OrgColumnChangeDate.identifier(),
+			OrgColumnResourceOwner.identifier(),
+			OrgColumnState.identifier(),
+			OrgColumnSequence.identifier(),
+			OrgColumnName.identifier(),
+			OrgColumnDomain.identifier(),
+		).
+			From(orgsTable.identifier()).
+			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID)).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Org, error) {
 			o := new(Org)
 			err := row.Scan(

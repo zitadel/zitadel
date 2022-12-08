@@ -4,11 +4,11 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { ColorChromeModule } from 'ngx-color/chrome';
@@ -40,10 +40,10 @@ import { PrivateLabelingPolicyComponent } from './private-labeling-policy.compon
     CardModule,
     MatIconModule,
     HasRoleModule,
-    MatSlideToggleModule,
     MatTooltipModule,
     TranslateModule,
     DetailLayoutModule,
+    MatCheckboxModule,
     DropzoneModule,
     MatDialogModule,
     WarnDialogModule,

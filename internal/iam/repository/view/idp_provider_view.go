@@ -15,7 +15,8 @@ func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idp
 	aggIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	idpConfigIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyIdpConfigID, Value: idpConfigID, Method: domain.SearchMethodEquals}
 	instanceIDQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyInstanceID, Value: instanceID, Method: domain.SearchMethodEquals}
-	query := repository.PrepareGetByQuery(table, aggIDQuery, idpConfigIDQuery, instanceIDQuery)
+	ownerRemovedQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyOwnerRemoved, Value: false, Method: domain.SearchMethodEquals}
+	query := repository.PrepareGetByQuery(table, aggIDQuery, idpConfigIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, policy)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Skvi8", "Errors.IAM.LoginPolicy.IDP.NotExisting")
@@ -34,6 +35,11 @@ func IDPProvidersByIdpConfigID(db *gorm.DB, table, idpConfigID, instanceID strin
 		{
 			Key:    iam_model.IDPProviderSearchKeyInstanceID,
 			Value:  instanceID,
+			Method: domain.SearchMethodEquals,
+		},
+		{
+			Key:    iam_model.IDPProviderSearchKeyOwnerRemoved,
+			Value:  false,
 			Method: domain.SearchMethodEquals,
 		},
 	}
@@ -61,6 +67,11 @@ func IDPProvidersByAggregateIDAndState(db *gorm.DB, table string, aggregateID, i
 		{
 			Key:    iam_model.IDPProviderSearchKeyInstanceID,
 			Value:  instanceID,
+			Method: domain.SearchMethodEquals,
+		},
+		{
+			Key:    iam_model.IDPProviderSearchKeyOwnerRemoved,
+			Value:  false,
 			Method: domain.SearchMethodEquals,
 		},
 	}
@@ -111,4 +122,22 @@ func DeleteIDPProvidersByAggregateID(db *gorm.DB, table, aggregateID, instanceID
 		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID), Value: instanceID},
 	)
 	return delete(db)
+}
+
+func DeleteInstanceIDPProviders(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table,
+		model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID),
+		instanceID,
+	)
+	return delete(db)
+}
+
+func UpdateOrgOwnerRemovedIDPProviders(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
+		model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyOwnerRemoved),
+		true,
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.IDPProviderSearchKey(iam_model.IDPProviderSearchKeyAggregateID), Value: aggID},
+	)
+	return update(db)
 }

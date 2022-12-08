@@ -8,11 +8,13 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	UserAuthMethodTable = "projections.user_auth_methods3"
+	UserAuthMethodTable = "projections.user_auth_methods4"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
@@ -24,6 +26,7 @@ const (
 	UserAuthMethodInstanceIDCol    = "instance_id"
 	UserAuthMethodStateCol         = "state"
 	UserAuthMethodNameCol          = "name"
+	UserAuthMethodOwnerRemovedCol  = "owner_removed"
 )
 
 type userAuthMethodProjection struct {
@@ -46,9 +49,11 @@ func newUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 			crdb.NewColumn(UserAuthMethodResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserAuthMethodInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
-			crdb.WithIndex(crdb.NewIndex("auth_meth_ro_idx", []string{UserAuthMethodResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{UserAuthMethodResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{UserAuthMethodOwnerRemovedCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -95,6 +100,24 @@ func (p *userAuthMethodProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanMFAOTPRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(UserAuthMethodInstanceIDCol),
 				},
 			},
 		},
@@ -174,6 +197,7 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 			handler.NewCond(UserAuthMethodTypeCol, methodType),
 			handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
 			handler.NewCond(UserAuthMethodTokenIDCol, tokenID),
+			handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 		},
 	), nil
 }
@@ -198,6 +222,7 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),
 		handler.NewCond(UserAuthMethodTypeCol, methodType),
 		handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+		handler.NewCond(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
 	}
 	if tokenID != "" {
 		conditions = append(conditions, handler.NewCond(UserAuthMethodTokenIDCol, tokenID))
@@ -205,5 +230,25 @@ func (p *userAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 	return crdb.NewDeleteStatement(
 		event,
 		conditions,
+	), nil
+}
+
+func (p *userAuthMethodProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-FwDZ8", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserAuthMethodChangeDateCol, e.CreationDate()),
+			handler.NewCol(UserAuthMethodSequenceCol, e.Sequence()),
+			handler.NewCol(UserAuthMethodOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserAuthMethodInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserAuthMethodResourceOwnerCol, e.Aggregate().ID),
+		},
 	), nil
 }

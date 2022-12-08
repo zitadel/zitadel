@@ -136,6 +136,11 @@ func (m *Minio) RemoveObjects(ctx context.Context, instanceID, resourceOwner str
 	return g.Wait()
 }
 
+func (m *Minio) RemoveInstanceObjects(ctx context.Context, instanceID string) error {
+	bucketName := m.prefixBucketName(instanceID)
+	return m.Client.RemoveBucket(ctx, bucketName)
+}
+
 func (m *Minio) createBucket(ctx context.Context, name, location string) error {
 	if location == "" {
 		location = m.Location

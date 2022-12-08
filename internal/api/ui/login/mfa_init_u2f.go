@@ -31,7 +31,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 	}
 	data := &u2fInitData{
 		webAuthNData: webAuthNData{
-			userData:               l.getUserData(r, authReq, "Register WebAuthNToken", errID, errMessage),
+			userData:               l.getUserData(r, authReq, "InitMFAU2F.Title", "InitMFAU2F.Description", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		MFAType: domain.MFATypeU2F,

@@ -208,8 +208,8 @@ export class UserGrantCreateComponent implements OnDestroy {
     }
   }
 
-  public selectRoles(roles: Role.AsObject[]): void {
-    this.rolesList = roles.map((role) => role.key);
+  public selectRoles(roleKeys: string[]): void {
+    this.rolesList = roleKeys;
   }
 
   public next(): void {

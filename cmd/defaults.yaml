@@ -8,6 +8,12 @@ Metrics:
   # Select type otel (OpenTelemetry) or none (disables collection and endpoint)
   Type: otel
 
+Tracing:
+  # Choose one in "otel", "google", "log" and "none"
+  Type: none
+  Fraction: 1
+  MetricPrefix: zitadel
+
 # Port ZITADEL will listen on
 Port: 8080
 # Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
@@ -154,7 +160,7 @@ Auth:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
-    ConcurrentInstances: 10
+    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -162,7 +168,7 @@ Admin:
   SearchLimit: 1000
   Spooler:
     ConcurrentWorkers: 1
-    ConcurrentInstances: 10
+    ConcurrentInstances: 1
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
@@ -219,8 +225,6 @@ SAML:
     #  ContactType: "technical"
     #  Company: ZITADEL
     #  EmailAddress: hi@zitadel.com
-
-
 
 Login:
   LanguageCookieName: zitadel.login.lang
@@ -306,6 +310,13 @@ SystemDefaults:
     PrivateKeyLifetime: 6h
     PublicKeyLifetime: 30h
     CertificateLifetime: 8766h
+
+Actions:
+  HTTP:
+    # wildcard sub domains are currently unsupported
+    DenyList:
+      - localhost
+      - "127.0.0.1"
 
 DefaultInstance:
   InstanceName:
@@ -399,6 +410,7 @@ DefaultInstance:
     ForceMFA: false
     HidePasswordReset: false
     IgnoreUnknownUsernames: false
+    AllowDomainDiscovery: false
     PasswordlessType: 1 #1: allowed 0: not allowed
     DefaultRedirectURI: #empty because we use the Console UI
     PasswordCheckLifetime: 240h #10d
@@ -407,15 +419,15 @@ DefaultInstance:
     SecondFactorCheckLifetime: 18h
     MultiFactorCheckLifetime: 12h
   PrivacyPolicy:
-    TOSLink: https://docs.zitadel.com/docs/legal/terms-of-service
-    PrivacyLink: https://docs.zitadel.com/docs/legal/privacy-policy
+    TOSLink: https://zitadel.com/docs/legal/terms-of-service
+    PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
   LabelPolicy:
     PrimaryColor: "#5469d4"
     BackgroundColor: "#fafafa"
     WarnColor: "#cd3d56"
     FontColor: "#000000"
-    PrimaryColorDark: "#bbbafa"
+    PrimaryColorDark: "#2073c4"
     BackgroundColorDark: "#111827"
     WarnColorDark: "#ff3b5b"
     FontColorDark: "#ffffff"
@@ -554,6 +566,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -627,6 +640,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -698,6 +712,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"

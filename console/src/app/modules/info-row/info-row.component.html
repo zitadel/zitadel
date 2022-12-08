@@ -41,6 +41,7 @@
         cnslCopyToClipboard
         [valueToCopy]="login"
         (copiedValue)="copied = $event"
+        data-e2e="copy-loginname"
       >
         {{ login }}
       </button>

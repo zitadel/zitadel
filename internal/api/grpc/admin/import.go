@@ -3,20 +3,24 @@ package admin
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"strconv"
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"google.golang.org/api/option"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
+	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
+	"github.com/zitadel/zitadel/internal/api/grpc/authn"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -61,6 +65,8 @@ type count struct {
 	orgMemberLen            int
 	projectGrantMemberCount int
 	projectGrantMemberLen   int
+	appKeysCount            int
+	machineKeysCount        int
 }
 
 func (c *count) getProgress() string {
@@ -224,9 +230,14 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 		data = localData
 	}
 
+	jsonpb := &runtime.JSONPb{
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	}
 	if v1Transformation {
 		dataImportV1 := new(v1_pb.ImportDataOrg)
-		if err := json.Unmarshal(data, dataImportV1); err != nil {
+		if err := jsonpb.Unmarshal(data, dataImportV1); err != nil {
 			return nil, err
 		}
 
@@ -237,7 +248,7 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 		dataOrgs = dataImport.Orgs
 	} else {
 		dataImport := new(admin_pb.ImportDataOrg)
-		if err := json.Unmarshal(data, dataImport); err != nil {
+		if err := jsonpb.Unmarshal(data, dataImport); err != nil {
 			return nil, err
 		}
 		dataOrgs = dataImport.Orgs
@@ -305,6 +316,10 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 	if err != nil {
 		return nil, nil, err
 	}
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, s.userCodeAlg)
+	if err != nil {
+		return nil, nil, err
+	}
 	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.userCodeAlg)
 	if err != nil {
 		return nil, nil, err
@@ -330,6 +345,8 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		count.projectMembersLen += len(org.GetProjectMembers())
 		count.orgMemberLen += len(org.GetOrgMembers())
 		count.projectGrantMemberLen += len(org.GetProjectGrantMembers())
+		count.machineKeysCount += len(org.GetMachineKeys())
+		count.appKeysCount += len(org.GetAppKeys())
 	}
 
 	for _, org := range orgs {
@@ -360,7 +377,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 
 		domainPolicy := org.GetDomainPolicy()
 		if org.DomainPolicy != nil {
-			_, err := s.command.AddOrgDomainPolicy(ctx, org.GetOrgId(), DomainPolicyToDomain(domainPolicy.UserLoginMustBeDomain, domainPolicy.ValidateOrgDomains, domainPolicy.SmtpSenderAddressMatchesInstanceDomain))
+			_, err := s.command.AddOrgDomainPolicy(ctx, org.GetOrgId(), domainPolicy.UserLoginMustBeDomain, domainPolicy.ValidateOrgDomains, domainPolicy.SmtpSenderAddressMatchesInstanceDomain)
 			if err != nil {
 				errors = append(errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: err.Error()})
 			}
@@ -441,7 +458,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 			}
 		}
 		if org.LoginPolicy != nil {
-			_, err = s.command.AddLoginPolicy(ctx, org.GetOrgId(), management.AddLoginPolicyToDomain(org.GetLoginPolicy()))
+			_, err = s.command.AddLoginPolicy(ctx, org.GetOrgId(), management.AddLoginPolicyToCommand(org.GetLoginPolicy()))
 			if err != nil {
 				errors = append(errors, &admin_pb.ImportDataError{Type: "login_policy", Id: org.GetOrgId(), Message: err.Error()})
 			}
@@ -518,9 +535,9 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		if org.HumanUsers != nil {
 			for _, user := range org.GetHumanUsers() {
 				logging.Debugf("import user: %s", user.GetUserId())
-				human, passwordless := management.ImportHumanUserRequestToDomain(user.User)
+				human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 				human.AggregateID = user.UserId
-				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 					if isCtxTimeout(ctx) {
@@ -548,7 +565,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		if org.MachineUsers != nil {
 			for _, user := range org.GetMachineUsers() {
 				logging.Debugf("import user: %s", user.GetUserId())
-				_, err := s.command.AddMachineWithID(ctx, org.GetOrgId(), user.GetUserId(), management.AddMachineUserRequestToDomain(user.GetUser()))
+				_, err := s.command.AddMachine(ctx, management.AddMachineUserRequestToCommand(user.GetUser(), org.GetOrgId()))
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user", Id: user.GetUserId(), Message: err.Error()})
 					if isCtxTimeout(ctx) {
@@ -575,6 +592,31 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				count.userMetadataCount += 1
 				logging.Debugf("successful usermetadata %d: %s", count.userMetadataCount, userMetadata.GetId()+"_"+userMetadata.GetKey())
 				successOrg.UserMetadata = append(successOrg.UserMetadata, &admin_pb.ImportDataSuccessUserMetadata{UserId: userMetadata.GetId(), Key: userMetadata.GetKey()})
+			}
+		}
+		if org.MachineKeys != nil {
+			for _, key := range org.GetMachineKeys() {
+				logging.Debugf("import machine_user_key: %s", key.KeyId)
+				_, err := s.command.AddUserMachineKeyWithID(ctx, &domain.MachineKey{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   key.UserId,
+						ResourceOwner: org.GetOrgId(),
+					},
+					KeyID:          key.KeyId,
+					Type:           authn.KeyTypeToDomain(key.Type),
+					ExpirationDate: key.ExpirationDate.AsTime(),
+					PublicKey:      key.PublicKey,
+				}, org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user_key", Id: key.KeyId, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
+					continue
+				}
+				count.machineKeysCount += 1
+				logging.Debugf("successful machine_user_key %d: %s", count.machineKeysCount, key.KeyId)
+				successOrg.MachineKeys = append(successOrg.MachineKeys, key.KeyId)
 			}
 		}
 		if org.UserLinks != nil {
@@ -646,6 +688,33 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				successOrg.ApiAppIds = append(successOrg.ApiAppIds, app.GetAppId())
 			}
 		}
+		if org.AppKeys != nil {
+			for _, key := range org.GetAppKeys() {
+				logging.Debugf("import app_key: %s", key.Id)
+				_, err := s.command.AddApplicationKeyWithID(ctx, &domain.ApplicationKey{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   key.ProjectId,
+						ResourceOwner: org.GetOrgId(),
+					},
+					ApplicationID:  key.AppId,
+					ClientID:       key.ClientId,
+					KeyID:          key.Id,
+					Type:           authn.KeyTypeToDomain(key.Type),
+					ExpirationDate: key.ExpirationDate.AsTime(),
+					PublicKey:      key.PublicKey,
+				}, org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "app_key", Id: key.Id, Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
+					continue
+				}
+				count.appKeysCount += 1
+				logging.Debugf("successful app_key %d: %s", count.appKeysCount, key.Id)
+				successOrg.AppKeys = append(successOrg.AppKeys, key.Id)
+			}
+		}
 		if org.Actions != nil {
 			for _, action := range org.GetActions() {
 				logging.Debugf("import action: %s", action.GetActionId())
@@ -693,9 +762,9 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 
 		if org.TriggerActions != nil {
 			for _, triggerAction := range org.GetTriggerActions() {
-				_, err := s.command.SetTriggerActions(ctx, domain.FlowType(triggerAction.FlowType), domain.TriggerType(triggerAction.TriggerType), triggerAction.ActionIds, org.GetOrgId())
+				_, err := s.command.SetTriggerActions(ctx, action_grpc.FlowTypeToDomain(triggerAction.FlowType), action_grpc.TriggerTypeToDomain(triggerAction.TriggerType), triggerAction.ActionIds, org.GetOrgId())
 				if err != nil {
-					errors = append(errors, &admin_pb.ImportDataError{Type: "trigger_action", Id: triggerAction.FlowType.String() + "_" + triggerAction.TriggerType.String(), Message: err.Error()})
+					errors = append(errors, &admin_pb.ImportDataError{Type: "trigger_action", Id: triggerAction.FlowType + "_" + triggerAction.TriggerType, Message: err.Error()})
 					continue
 				}
 				successOrg.TriggerActions = append(successOrg.TriggerActions, &management_pb.SetTriggerActionsRequest{FlowType: triggerAction.FlowType, TriggerType: triggerAction.TriggerType, ActionIds: triggerAction.GetActionIds()})
@@ -808,6 +877,15 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 
 	orgs := make([]*admin_pb.DataOrg, 0)
 	for _, orgV1 := range dataOrgs.Orgs {
+		triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
+		for _, action := range orgV1.GetTriggerActions() {
+			triggerActions = append(triggerActions, &management_pb.SetTriggerActionsRequest{
+				FlowType:    strconv.Itoa(int(action.GetFlowType().Number())),
+				TriggerType: strconv.Itoa(int(action.GetTriggerType().Number())),
+				ActionIds:   action.ActionIds,
+			})
+		}
+
 		org := &admin_pb.DataOrg{
 			OrgId:                            orgV1.GetOrgId(),
 			Org:                              orgV1.GetOrg(),
@@ -823,7 +901,7 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			OidcApps:                         orgV1.GetOidcApps(),
 			HumanUsers:                       orgV1.GetHumanUsers(),
 			MachineUsers:                     orgV1.GetMachineUsers(),
-			TriggerActions:                   orgV1.GetTriggerActions(),
+			TriggerActions:                   triggerActions,
 			Actions:                          orgV1.GetActions(),
 			ProjectGrants:                    orgV1.GetProjectGrants(),
 			UserGrants:                       orgV1.GetUserGrants(),
@@ -842,6 +920,8 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			JwtIdps:                          orgV1.GetJwtIdps(),
 			UserLinks:                        orgV1.GetUserLinks(),
 			Domains:                          orgV1.GetDomains(),
+			AppKeys:                          orgV1.GetAppKeys(),
+			MachineKeys:                      orgV1.GetMachineKeys(),
 		}
 		if orgV1.IamPolicy != nil {
 			defaultDomainPolicy, err := s.query.DefaultDomainPolicy(ctx)

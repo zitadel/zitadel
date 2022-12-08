@@ -3798,7 +3798,7 @@ message UpdateLabelPolicyRequest {
     ];
     bool hide_login_name_suffix = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set. Details about this scope in https://docs.zitadel.com/concepts#Reserved_Scopes";
+            description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
         }
     ];
     string warn_color = 4 [(validate.rules).string = {max_len: 50}];
@@ -3910,6 +3910,22 @@ message UpdateLoginPolicyRequest {
     google.protobuf.Duration mfa_init_skip_lifetime = 11;
     google.protobuf.Duration second_factor_check_lifetime = 12;
     google.protobuf.Duration multi_factor_check_lifetime = 13;
+    // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success.
+    bool allow_domain_discovery = 14 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organisation on success."
+        }
+    ];
+    bool disable_login_with_email = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified email address"
+        }
+    ];
+    bool disable_login_with_phone = 16 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if user can additionally (to the loginname) be identified by their verified phone number"
+        }
+    ];
 }
 
 message UpdateLoginPolicyResponse {
@@ -4632,12 +4648,12 @@ message View {
     google.protobuf.Timestamp event_timestamp = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2019-04-01T08:45:00.000000Z\"";
-            description: "The timestamp the event occured";
+            description: "The timestamp the event occurred";
         }
-    ]; // The timestamp the event occured
+    ]; // The timestamp the event occurred
     google.protobuf.Timestamp last_successful_spooler_run = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "The timestamp the event occured";
+            description: "The timestamp the event occurred";
         }
     ];
 }
@@ -4666,6 +4682,11 @@ message FailedEvent {
     string error_message = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ID=EXAMP-ID3ER Message=Example message\"";
+        }
+    ];
+    google.protobuf.Timestamp last_failed = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The timestamp the failure last occurred";
         }
     ];
 }
@@ -4747,6 +4768,9 @@ message DataOrg {
 
     repeated zitadel.idp.v1.IDPUserLink user_links = 33;
     repeated zitadel.org.v1.Domain domains = 34;
+
+    repeated zitadel.v1.v1.DataAppKey app_keys = 35;
+    repeated zitadel.v1.v1.DataMachineKey machine_keys = 36;
 }
 
 message ImportDataResponse{
@@ -4785,6 +4809,8 @@ message ImportDataSuccessOrg{
     repeated ImportDataSuccessUserLinks user_links = 18;
     repeated ImportDataSuccessUserMetadata user_metadata = 19;
     repeated string domains = 20;
+    repeated string app_keys = 21;
+    repeated string machine_keys = 22;
 }
 
 message ImportDataSuccessProjectGrant{

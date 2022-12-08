@@ -98,7 +98,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r6.setOtpOption(map.initMfaPromptText?.otpOption ?? '');
   r6.setSkipButtonText(map.initMfaPromptText?.skipButtonText ?? '');
   r6.setTitle(map.initMfaPromptText?.title ?? '');
-  r6.setU2fOption(map.initMfaPromptText?.otpOption ?? '');
+  r6.setU2fOption(map.initMfaPromptText?.u2fOption ?? '');
   req.setInitMfaPromptText(r6);
 
   const r7 = new InitMFAU2FScreenText();
@@ -118,7 +118,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   req.setInitPasswordDoneText(r8);
 
   const r9 = new InitPasswordScreenText();
-  r9.setCodeLabel(map.initPasswordText?.description ?? '');
+  r9.setCodeLabel(map.initPasswordText?.codeLabel ?? '');
   r9.setDescription(map.initPasswordText?.description ?? '');
   r9.setNewPasswordConfirmLabel(map.initPasswordText?.newPasswordConfirmLabel ?? '');
   r9.setNewPasswordLabel(map.initPasswordText?.newPasswordLabel ?? '');
@@ -333,7 +333,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r31.setDescriptionClose(map.passwordlessRegistrationDoneText?.descriptionClose ?? '');
   r31.setNextButtonText(map.passwordlessRegistrationDoneText?.nextButtonText ?? '');
   r31.setTitle(map.passwordlessRegistrationDoneText?.title ?? '');
-  r31.setNextButtonText(map.passwordlessRegistrationDoneText?.cancelButtonText ?? '');
+  r31.setCancelButtonText(map.passwordlessRegistrationDoneText?.cancelButtonText ?? '');
   req.setPasswordlessRegistrationDoneText(r31);
 
   const r32 = new PasswordlessRegistrationScreenText();

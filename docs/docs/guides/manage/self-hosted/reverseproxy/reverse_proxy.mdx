@@ -1,0 +1,59 @@
+---
+title: Reverse Proxy Configuration
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Zcloud from "./_zitadel_cloud.mdx";
+import Nginx from "./_nginx.mdx";
+import Traefik from "./_traefik.mdx";
+import Caddy from "./_caddy.mdx";
+import Httpd from "./_httpd.mdx";
+import Cftunnel from "./_cloudflare_tunnel.mdx";
+import Cloudflare from "./_cloudflare.mdx";
+import More from "./_more.mdx";
+
+# Proxy Configuration
+
+<Tabs
+  groupId="proxy-vendor"
+  default="zcloud"
+  values={[
+    { label: "ZITADEL Cloud", value: "zcloud" },
+    { label: "NGINX", value: "nginx" },
+    { label: "Traefik", value: "traefik" },
+    { label: "Caddy", value: "caddy" },
+    { label: "Apache httpd", value: "httpd" },
+    { label: "Cloudflare Tunnel", value: "cftunnel" },
+    { label: "Cloudflare", value: "cf" },
+  ]}
+>
+  <TabItem value="zcloud">
+    <Zcloud />
+    <More />
+  </TabItem>
+  <TabItem value="nginx">
+    <Nginx />
+    <More />
+  </TabItem>
+  <TabItem value="traefik">
+    <Traefik />
+    <More />
+  </TabItem>
+  <TabItem value="caddy">
+    <Caddy />
+    <More />
+  </TabItem>
+  <TabItem value="httpd">
+    <Httpd />
+    <More />
+  </TabItem>
+  <TabItem value="cftunnel">
+    <Cftunnel />
+    <More />
+  </TabItem>
+  <TabItem value="cf">
+    <Cloudflare />
+    <More />
+  </TabItem>
+</Tabs>

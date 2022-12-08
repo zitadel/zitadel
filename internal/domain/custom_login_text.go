@@ -334,7 +334,7 @@ type CustomLoginText struct {
 	ExternalRegistrationUserOverview ExternalRegistrationUserOverviewScreenText
 	RegistrationOrg                  RegistrationOrgScreenText
 	LinkingUsersDone                 LinkingUserDoneScreenText
-	ExternalNotFoundOption           ExternalUserNotFoundScreenText
+	ExternalNotFound                 ExternalUserNotFoundScreenText
 	LoginSuccess                     SuccessLoginScreenText
 	LogoutDone                       LogoutDoneScreenText
 	Footer                           FooterText

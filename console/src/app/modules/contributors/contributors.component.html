@@ -10,6 +10,7 @@
             class="contributor-avatar-circle"
             matTooltip="{{ member.displayName }} | {{ member.rolesList | roletransform }}"
             [ngStyle]="{ 'z-index': 20 - i }"
+            data-e2e="member-avatar"
           >
             <cnsl-avatar
               *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
@@ -40,6 +41,7 @@
         [disabled]="disabled"
         mat-icon-button
         aria-label="Add member"
+        data-e2e="add-member-button"
       >
         <mat-icon>add</mat-icon>
       </button>

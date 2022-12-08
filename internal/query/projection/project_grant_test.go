@@ -9,6 +9,8 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -33,14 +35,40 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grants2 WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_grants3 WHERE (project_id = $1) AND (instance_id = $2)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(ProjectGrantColumnInstanceID),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.project_grants3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -60,17 +88,17 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_grants2 WHERE (grant_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_grants3 WHERE (grant_id = $1) AND (project_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -88,20 +116,20 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantReactivated,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.ProjectGrantStateActive,
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -119,20 +147,20 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantDeactivated,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								domain.ProjectGrantStateInactive,
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -150,20 +178,20 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantChanged,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants2 SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								database.StringArray{"admin", "user"},
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -181,20 +209,20 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantCascadeChanged,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_grants2 SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								database.StringArray{"admin", "user"},
 								"grant-id",
 								"agg-id",
+								"instance-id",
 							},
 						},
 					},
@@ -212,14 +240,13 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 			},
 			reduce: (&projectGrantProjection{}).reduceProjectGrantAdded,
 			want: wantReduce{
-				projection:       ProjectGrantProjectionTable,
 				aggregateType:    eventstore.AggregateType("project"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.project_grants2 (grant_id, project_id, creation_date, change_date, resource_owner, instance_id, state, sequence, granted_org_id, granted_role_keys) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.project_grants3 (grant_id, project_id, creation_date, change_date, resource_owner, instance_id, state, sequence, granted_org_id, granted_role_keys) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"grant-id",
 								"agg-id",
@@ -237,6 +264,46 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:   "org.reduceOwnerRemoved",
+			reduce: (&projectGrantProjection{}).reduceOwnerRemoved,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.project_grants3 SET (change_date, sequence, granted_org_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (granted_org_id = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -248,7 +315,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, tt.want)
+			assertReduce(t, got, err, ProjectGrantProjectionTable, tt.want)
 		})
 	}
 }
