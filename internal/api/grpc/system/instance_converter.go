@@ -30,11 +30,21 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 	}
 
 	if user := req.GetMachine(); user != nil {
-		defaultInstance.Org.Machine = createInstancePbToAddMachine(user, defaultInstance.Org.Machine)
+		defaultMachine := command.AddMachine{}
+		if defaultInstance.Org.Machine != nil {
+			defaultMachine = *defaultInstance.Org.Machine
+		}
+
+		defaultInstance.Org.Machine = createInstancePbToAddMachine(user, defaultMachine)
 		defaultInstance.Org.Human = nil
 	}
 	if user := req.GetHuman(); user != nil {
-		defaultInstance.Org.Human = createInstancePbToAddHuman(user, defaultInstance.Org.Human, defaultInstance.DomainPolicy.UserLoginMustBeDomain, defaultInstance.Org.Name, externalDomain)
+		defaultHuman := command.AddHuman{}
+		if defaultInstance.Org.Human != nil {
+			defaultHuman = *defaultInstance.Org.Human
+		}
+
+		defaultInstance.Org.Human = createInstancePbToAddHuman(user, defaultHuman, defaultInstance.DomainPolicy.UserLoginMustBeDomain, defaultInstance.Org.Name, externalDomain)
 		defaultInstance.Org.Machine = nil
 	}
 
@@ -45,11 +55,7 @@ func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defau
 	return &defaultInstance
 }
 
-func createInstancePbToAddHuman(user *system_pb.CreateInstanceRequest_Human, defaultHuman *command.AddHuman, userLoginMustBeDomain bool, org, externalDomain string) *command.AddHuman {
-	if defaultHuman == nil {
-		defaultHuman = &command.AddHuman{}
-	}
-
+func createInstancePbToAddHuman(user *system_pb.CreateInstanceRequest_Human, defaultHuman command.AddHuman, userLoginMustBeDomain bool, org, externalDomain string) *command.AddHuman {
 	if user.Email != nil {
 		defaultHuman.Email.Address = user.Email.Email
 		defaultHuman.Email.Verified = user.Email.IsEmailVerified
@@ -73,14 +79,10 @@ func createInstancePbToAddHuman(user *system_pb.CreateInstanceRequest_Human, def
 		defaultHuman.Password = user.Password.Password
 		defaultHuman.PasswordChangeRequired = user.Password.PasswordChangeRequired
 	}
-	return defaultHuman
+	return &defaultHuman
 }
 
-func createInstancePbToAddMachine(user *system_pb.CreateInstanceRequest_Machine, defaultMachine *command.AddMachine) *command.AddMachine {
-	if defaultMachine == nil {
-		defaultMachine = &command.AddMachine{}
-	}
-
+func createInstancePbToAddMachine(user *system_pb.CreateInstanceRequest_Machine, defaultMachine command.AddMachine) *command.AddMachine {
 	defaultMachine.Machine = &command.Machine{
 		Username: user.UserName,
 		Name:     user.Name,
@@ -101,7 +103,7 @@ func createInstancePbToAddMachine(user *system_pb.CreateInstanceRequest_Machine,
 			defaultMachine.MachineKey.ExpirationDate = user.MachineKey.ExpirationDate.AsTime()
 		}
 	}
-	return defaultMachine
+	return &defaultMachine
 }
 
 func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {
