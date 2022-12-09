@@ -57,8 +57,9 @@ Database:
     Port: 26257
     Database: zitadel
     MaxOpenConns: 20
+    MaxIdleConns: 10
     MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
+    MaxConnIdleTime: 5m
     Options: ""
     User:
       Username: zitadel
@@ -83,6 +84,7 @@ Database:
     Port:
     Database:
     MaxOpenConns:
+    MaxIdleConns:
     MaxConnLifetime:
     MaxConnIdleTime:
     Options:

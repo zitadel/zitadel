@@ -109,23 +109,23 @@ func (wm *DomainPolicyUsernamesWriteModel) Reduce() error {
 
 func (wm *DomainPolicyUsernamesWriteModel) removeDomain(domain string) {
 	for i, verifiedDomain := range wm.VerifiedDomains {
-		if verifiedDomain != domain {
-			continue
+		if verifiedDomain == domain {
+			wm.VerifiedDomains[i] = wm.VerifiedDomains[len(wm.VerifiedDomains)-1]
+			wm.VerifiedDomains[len(wm.VerifiedDomains)-1] = ""
+			wm.VerifiedDomains = wm.VerifiedDomains[:len(wm.VerifiedDomains)-1]
+			return
 		}
-		wm.VerifiedDomains[i] = wm.VerifiedDomains[len(wm.VerifiedDomains)-1]
-		wm.VerifiedDomains[len(wm.VerifiedDomains)-1] = ""
-		wm.VerifiedDomains = wm.VerifiedDomains[:len(wm.VerifiedDomains)-1]
 	}
 }
 
 func (wm *DomainPolicyUsernamesWriteModel) removeUser(userID string) {
 	for i, user := range wm.Users {
-		if user.id != userID {
-			continue
+		if user.id == userID {
+			wm.Users[i] = wm.Users[len(wm.Users)-1]
+			wm.Users[len(wm.Users)-1] = nil
+			wm.Users = wm.Users[:len(wm.Users)-1]
+			return
 		}
-		wm.Users[i] = wm.Users[len(wm.Users)-1]
-		wm.Users[len(wm.Users)-1] = nil
-		wm.Users = wm.Users[len(wm.Users)-1:]
 	}
 }
 
