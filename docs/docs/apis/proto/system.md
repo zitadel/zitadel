@@ -365,8 +365,8 @@ This is an empty response
 | instance_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | first_org_name |  string | - | string.max_len: 200<br />  |
 | custom_domain |  string | - | string.max_len: 200<br />  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) user.human |  CreateInstanceRequest.Human | oneof field for the user managing the instance |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) user.machine |  CreateInstanceRequest.Machine | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) owner.human |  CreateInstanceRequest.Human | oneof field for the user managing the instance |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) owner.machine |  CreateInstanceRequest.Machine | - |  |
 | default_language |  string | - | string.max_len: 10<br />  |
 
 

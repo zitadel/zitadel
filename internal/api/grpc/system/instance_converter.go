@@ -91,31 +91,45 @@ func createInstancePbToAddHuman(user *system_pb.CreateInstanceRequest_Human, def
 }
 
 func createInstancePbToAddMachine(user *system_pb.CreateInstanceRequest_Machine, defaultMachine command.AddMachine) *command.AddMachine {
-	if defaultMachine.Machine == nil {
-		defaultMachine.Machine = &command.Machine{}
+	machine := command.Machine{}
+	if defaultMachine.Machine != nil {
+		machine = *defaultMachine.Machine
 	}
 	if user.UserName != "" {
-		defaultMachine.Machine.Username = user.UserName
+		machine.Username = user.UserName
 	}
 	if user.Name != "" {
-		defaultMachine.Machine.Name = user.Name
+		machine.Name = user.Name
+	}
+	defaultMachine.Machine = &machine
+
+	if defaultMachine.Pat != nil || user.PersonalAccessToken != nil {
+		pat := command.AddPat{}
+		if defaultMachine.Pat != nil {
+			pat = *defaultMachine.Pat
+		}
+		// scopes are currently static and can not be overwritten
+		pat.Scopes = []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
+		if user.PersonalAccessToken.ExpirationDate != nil {
+			pat.ExpirationDate = user.PersonalAccessToken.ExpirationDate.AsTime()
+		}
+		defaultMachine.Pat = &pat
 	}
 
-	if user.PersonalAccessToken != nil {
-		defaultMachine.Pat = &command.AddPat{
-			Scopes: []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
+	if defaultMachine.MachineKey != nil || user.MachineKey != nil {
+		machineKey := command.AddMachineKey{}
+		if defaultMachine.MachineKey != nil {
+			machineKey = *defaultMachine.MachineKey
 		}
-		if user.PersonalAccessToken.ExpirationDate != nil {
-			defaultMachine.Pat.ExpirationDate = user.PersonalAccessToken.ExpirationDate.AsTime()
+		if user.MachineKey != nil {
+			if user.MachineKey.Type != 0 {
+				machineKey.Type = authn.KeyTypeToDomain(user.MachineKey.Type)
+			}
+			if user.MachineKey.ExpirationDate != nil {
+				machineKey.ExpirationDate = user.MachineKey.ExpirationDate.AsTime()
+			}
 		}
-	}
-	if user.MachineKey != nil {
-		defaultMachine.MachineKey = &command.AddMachineKey{
-			Type: authn.KeyTypeToDomain(user.MachineKey.Type),
-		}
-		if user.MachineKey.ExpirationDate != nil {
-			defaultMachine.MachineKey.ExpirationDate = user.MachineKey.ExpirationDate.AsTime()
-		}
+		defaultMachine.MachineKey = &machineKey
 	}
 	return &defaultMachine
 }
