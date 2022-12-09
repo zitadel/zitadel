@@ -1173,6 +1173,7 @@
       "EXPIREWARNDAYS": "Avviso scadenza dopo il giorno",
       "MAXAGEDAYS": "Lunghezza massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se abiliti questa impostazione, a tutti i nomi di accesso verrà aggiunto il suffisso del dominio dell'organizzazione. Se questa impostazione è disabilitata, devi assicurarti che i nomi utente siano univoci per tutte le organizzazioni.",
       "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
