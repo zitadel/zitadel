@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
@@ -43,7 +45,7 @@ type initUserData struct {
 	HasSymbol    string
 }
 
-func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet bool) string {
+func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet bool, preferredLanguage language.Tag) string {
 	return fmt.Sprintf("%s%s?userID=%s&loginname=%s&code=%s&orgID=%s&passwordset=%t", externalLink(origin), EndpointInitUser, userID, loginName, code, orgID, passwordSet)
 }
 
