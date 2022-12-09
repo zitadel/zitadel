@@ -343,6 +343,15 @@ DefaultInstance:
         Number:
         Verified:
       Password:
+    Machine:
+      Machine:
+        Username:
+        Name:
+      MachineKey:
+        ExpirationDate:
+        Type:
+      Pat:
+        ExpirationDate:
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecret:

@@ -449,9 +449,6 @@ func userWriteModelByID(ctx context.Context, filter preparation.FilterToQueryRed
 	if err != nil {
 		return nil, err
 	}
-	if len(events) == 0 {
-		return nil, nil
-	}
 	user.AppendEvents(events...)
 	err = user.Reduce()
 	return user, err

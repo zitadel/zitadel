@@ -1,4 +1,5 @@
 FirstInstance:
+  MachineKeyPath:
   InstanceName: ZITADEL
   DefaultLanguage: en
   Org:
@@ -22,3 +23,10 @@ FirstInstance:
         Verified:
       Password: Password1!
       PasswordChangeRequired: true
+    Machine:
+      Machine:
+        Username:
+        Name:
+      MachineKey:
+        ExpirationDate:
+        Type:
