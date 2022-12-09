@@ -34,7 +34,7 @@ helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
-  --set replicaCount=1 \
+  --set replicaCount=1
 ```
 
 ### Forward the ZITADEL service port to your local machine
