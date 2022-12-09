@@ -29,7 +29,7 @@ export function ensureDomainPolicy(
     (body: any) => {
       const result = {
         sequence: body.policy?.details?.sequence,
-        id: 1,
+        id: body.policy?.details?.resourceOwner,
         entity: null,
       };
       if (

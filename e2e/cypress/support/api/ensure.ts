@@ -66,14 +66,18 @@ function awaitDesired(
   search: () => Cypress.Chainable<SearchResult>,
   initialSequence?: number,
 ) {
-  search().then((resp) => {
+  return search().then((resp) => {
     const foundExpectedEntity = expectEntity(resp.entity);
     const foundExpectedSequence = !initialSequence || resp.sequence >= initialSequence;
 
-    if (!foundExpectedEntity || !foundExpectedSequence) {
-      expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
+    cy.log(`resp.sequence >= initialSequence: ${resp.sequence >= initialSequence}`);
+    const check = (!foundExpectedEntity || !foundExpectedSequence) && trials > 0;
+    if (check) {
+      cy.log(`trying ${trials} more times`);
       cy.wait(1000);
-      awaitDesired(trials - 1, expectEntity, search, initialSequence);
+      return awaitDesired(trials - 1, expectEntity, search, initialSequence);
+    } else {
+      return;
     }
   });
 }
@@ -117,7 +121,8 @@ export function ensureSomething(
         });
     })
     .then((data) => {
-      awaitDesired(90, expectEntity, search, data.sequence);
-      return cy.wrap<number>(data.id);
+      return awaitDesired(90, expectEntity, search, data.sequence).then(() => {
+        return cy.wrap<number>(data.id);
+      });
     });
 }
