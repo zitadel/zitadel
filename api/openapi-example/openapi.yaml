@@ -1,15 +1,43 @@
-openapi: "3.0.2"
+openapi: "3.1.0"
 info:
-  version: "1.0.0"
-  title: "ZITADELs all mighty API v2"
+  version: "2.0.0"
+  title: "ZITADELs API"
   description: The ZITADEL api
-
+  termsOfService: 'https://zitadel.com/docs/legal/introduction'
+  contact:
+    email: hi@zitadel.com
+    url: 'https://zitadel.com/contact'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  $ref: "server.yaml"
-
+  - "url": "https://{instance}.zitadel.cloud:{port}/{basePath}"
+    "description": "The production API server"
+    variables:
+      instance:
+        default: "test-qcon0h"
+        description: The generated name of your ZITADEL Cloud Instance
+      port: 
+        default: "443"
+      basePath: 
+        default: "v2"
+  - "url": "https://{instance}:{port}/{basePath}"
+    "description": "A self hosted test system"
+    variables:
+      instance:
+        default: "localhost"
+        description: The generated name of your ZITADEL Cloud Instance
+      port: 
+        default: "80"
+      basePath: 
+        default: "v2"
 paths:
-  $ref: "paths.yaml"
-
+  /authorize:
+    $ref: "paths/authorize.yaml"
+  /Users:
+    $ref: "paths/users.yaml"
+  /Users/{id}:
+    $ref: "paths/users_{id}.yaml"
 components:
   securitySchemes:
     ## TODO Ref hardcoded url
@@ -22,10 +50,12 @@ components:
         authorizationCode:
           authorizationUrl: https://example.com/oauth/authorize
           tokenUrl: https://example.com/oauth/token
+          scopes:
+            read_users: read users
+            search_users: search users
     openId:
       type: openIdConnect
       openIdConnectUrl: https://example.com/.well-known/openid-configuration
-
 security:
   - personalAccessToken:
     - user.read

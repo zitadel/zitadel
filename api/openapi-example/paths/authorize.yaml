@@ -1,0 +1,70 @@
+parameters:
+  - name: response_type
+    description: ""
+    in: query
+    example: code
+    required: true
+    schema:
+      type: string
+      format: token
+      enum:
+        - code
+  - name: client_id
+    description: ""
+    in: query
+    example: "1231241245124"
+    required: true
+    schema:
+      type: string
+  - name: redirect_uri
+    description: ""
+    in: query
+    example: ""
+    required: false
+    schema:
+      type: string
+      format: url
+  - name: state
+    description: ""
+    in: query
+    example: my_state
+    required: false
+    schema:
+      type: string
+  - name: scope
+    description: ""
+    in: query
+    example: admin_readwrite
+    required: false
+    schema:
+      type: string
+      
+get:
+  tags:
+    - Authorization
+    - Authentication
+  summary: Request Authorization
+  description: "Start a new authorization from your client."
+  operationId: authorizationRequest
+  x-zitadel-permissions:
+    - user.search
+  responses:
+    default:
+      description: ""
+      content:
+        text/html:
+          schema:
+            type: string
+            format: html
+    404:
+      description: No Authorization was found
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"

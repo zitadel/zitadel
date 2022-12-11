@@ -1,0 +1,39 @@
+type: object
+additionalProperties: true
+minProperties: 1
+description: >-
+  The Problem Details JSON Object [[RFC7807](https://tools.ietf.org/html/rfc7807)].
+properties:
+  type:
+    type: string
+    description: >-
+      A URI reference [[RFC3986](https://tools.ietf.org/html/rfc3986)] that identifies the problem type.
+      It should provide human-readable documentation for the problem type.
+      When this member is not present, its value is assumed to be "about:blank".
+    format: uri
+  title:
+    type: string
+    description: >-
+      A short, human-readable summary of the problem type.
+      It SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization.
+  status:
+    type: integer
+    description: The HTTP status code.
+    minimum: 400
+    maximum: 599
+  detail:
+    type: string
+    description: >-
+      A human-readable explanation specific to this
+      occurrence of the problem.
+  instance:
+    type: string
+    description: >-
+      A URI reference that identifies the specific
+      occurrence of the problem.  It may or may not yield further
+      information if dereferenced.
+
+#    Consumers SHOULD NOT parse the "detail" member for information;
+#    extensions are more suitable and less error-prone ways to obtain such
+#    information.
+#    See: https://datatracker.ietf.org/doc/html/rfc7807#section-3.2

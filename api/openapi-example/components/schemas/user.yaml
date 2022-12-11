@@ -1,0 +1,19 @@
+type: object
+required:
+  - id
+  - name
+  - type
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  type:
+    type: string
+    enum:
+      - human
+      - machine
+    required: 
+      -  id
+  description:
+    type: string

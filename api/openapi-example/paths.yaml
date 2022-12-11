@@ -1,7 +1,0 @@
-/authorize:
-    get:
-        $ref: "auth/authorize.yaml"
-/Users:
-    $ref: "core/users/users.yaml"
-/Users/{userId}:
-    $ref: "core/users/usersById.yaml"
