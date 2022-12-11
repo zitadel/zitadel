@@ -1,6 +1,5 @@
 import React from "react";
 import Head from "next/head";
-import Link from "next/link";
 
 import "prismjs";
 // Import other Prism themes here
@@ -15,8 +14,8 @@ import { TopNav } from "../components/TopNav";
 import { TableOfContents } from "../components/TableOfContents";
 import { ThemeProvider } from "next-themes";
 
-const TITLE = "Markdoc";
-const DESCRIPTION = "A powerful, flexible, Markdown-based authoring framework";
+const TITLE = "ZITADEL API reference";
+const DESCRIPTION = "";
 
 function collectHeadings(node, sections = []) {
   if (node) {
@@ -93,3 +92,18 @@ export default function MyApp({ Component, pageProps }: AppProps<MyAppProps>) {
     </>
   );
 }
+
+// MyApp.getInitialProps = async (ctx) => {
+//   //   const protoPath = "admin.proto";
+//   //   const text = readFileSync(
+//   //     join(__dirname, `../../proto/zitadel/${protoPath}`),
+//   //     "utf8"
+//   //   );
+
+//   //   console.log(text);
+//   console.log(ctx);
+//   return {
+//     ...ctx,
+//     props: {},
+//   };
+// };

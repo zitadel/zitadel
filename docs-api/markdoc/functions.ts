@@ -34,3 +34,22 @@ export const endpoint = {
     return `${method} ${path}`;
   },
 };
+
+// export const proto = {
+//   transform(parameters) {
+//     const protoPath = parameters[0];
+//     const text = readFileSync(
+//       join(__dirname, `../../proto/zitadel/${protoPath}`),
+//       "utf8"
+//     );
+
+//     console.log(text);
+
+//     const content: string = "";
+
+//     const protoDocument = t.parse(content) as t.ProtoDocument;
+//     console.log(JSON.stringify(protoDocument, null, 2));
+
+//     return `${protoPath}`;
+//   },
+// };

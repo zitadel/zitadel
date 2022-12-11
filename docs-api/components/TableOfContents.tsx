@@ -101,7 +101,7 @@ export function TableOfContents({ toc }) {
                     .join(" ")}
                 >
                   <Link
-                    className="text-sm text-gray-500 dark:text-gray-400"
+                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-black hover:dark:text-white"
                     href={href}
                   >
                     {item.title}

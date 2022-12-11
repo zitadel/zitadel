@@ -100,8 +100,8 @@ If your getting a 401 error code you may consider reading the [Authentication Ch
 
 {% /column %}
 {% column %}
-{% card title="GRPC Status Codes" %}
-
+{% card title="Status Codes" hasProtocolToggle="true" %}
+{% if equals($protocol, "grpc") %}
 | Code              | Number | Description                                                                                                                              |
 | :---------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------- |
 | OK                | 0      | Not an error, return on success {% .text-xs %}                                                                                           |
@@ -112,11 +112,8 @@ If your getting a 401 error code you may consider reading the [Authentication Ch
 | NOT_FOUND         | 5      | Some requested object was not found {% .text-xs %}                                                                                       |
 | ALREADY_EXISTS    | 6      | Object already exists {% .text-xs %}                                                                                                     |
 | PERMISSION_DENIED | 7      | Your unauthorized because you are missing an [auth header](#authentication) or your user does not have enough permission. {% .text-xs %} |
-
-{% /card %}
-
-{% card title="REST Status Codes" %}
-
+{% /if %}
+{% if equals($protocol, "rest") %}
 | Code              | Number | Description                                                    |
 | :---------------- | :----- | :------------------------------------------------------------- |
 | OK                | 200    | The request succeeded {% .text-xs %}                           |
@@ -127,7 +124,7 @@ If your getting a 401 error code you may consider reading the [Authentication Ch
 | Not found         | 404    | Not an error, return on success {% .text-xs %}                 |
 | Conflict          | 409    | Not an error, return on success {% .text-xs %}                 |
 | PERMISSION_DENIED | 429    | Not an error, return on success {% .text-xs %}                 |
-
+{% /if %}
 {% /card %}
 {% /column %}
 {% /section %}

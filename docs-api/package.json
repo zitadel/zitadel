@@ -13,6 +13,7 @@
     "next": "latest",
     "next-themes": "^0.2.1",
     "prismjs": "latest",
+    "proto-parser": "^0.0.9",
     "react": "latest",
     "react-dom": "latest"
   },

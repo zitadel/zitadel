@@ -7,5 +7,11 @@ export const card = {
     title: {
       type: String,
     },
+    hasLanguageToggle: {
+      type: Boolean,
+    },
+    hasProtocolToggle: {
+      type: Boolean,
+    },
   },
 };
