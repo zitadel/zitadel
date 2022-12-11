@@ -1,0 +1,20 @@
+- "url": "https://{instance}.zitadel.cloud:{port}/{basePath}"
+  "description": "The production API server"
+  variables:
+    instance:
+      default: "test-qcon0h"
+      description: The generated name of your ZITADEL Cloud Instance
+    port: 
+      default: "443"
+    basePath: 
+      default: "v2"
+- "url": "https://{domain}:{port}/{basePath}"
+  "description": "A self hosted test system"
+  variables:
+    instance:
+      default: "localhost"
+      description: The generated name of your ZITADEL Cloud Instance
+    port: 
+      default: "80"
+    basePath: 
+      default: "v2"

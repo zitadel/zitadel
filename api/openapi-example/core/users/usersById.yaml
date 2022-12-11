@@ -1,0 +1,30 @@
+parameters:
+  - name: userId
+    description: The unique identifier of a user
+    in: path
+    required: true
+    schema:
+      $ref: "schemas.yaml#/UserId"
+get:
+  summary: Read a user
+  x-zitadel-permissions:
+    - user.read
+  responses:
+    "200":
+      description: The user, what else
+      content:
+        application/json:
+          schema:
+            $ref: "schemas.yaml#/User"
+    404:
+      description: No user was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

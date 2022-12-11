@@ -1,0 +1,33 @@
+UserId:
+  description: The unique identifier of a user
+  type: string
+User:
+  type: object
+  required:
+    - id
+    - name
+    - type
+  properties:
+    id:
+      $ref: "#userId"
+    name:
+      type: string
+    type:
+      type: string
+      enum:
+        - human
+        - machine
+    description:
+      type: string
+Users:
+  type: array
+  items:
+    $ref: "#user"
+Error:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      description: A human readable error message
+      type: string

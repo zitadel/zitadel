@@ -1,0 +1,35 @@
+openapi: "3.0.2"
+info:
+  version: "1.0.0"
+  title: "ZITADELs all mighty API v2"
+  description: The ZITADEL api
+
+servers:
+  $ref: "server.yaml"
+
+paths:
+  $ref: "paths.yaml"
+
+components:
+  securitySchemes:
+    ## TODO Ref hardcoded url
+    personalAccessToken:
+      type: http
+      scheme: bearer
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration
+
+security:
+  - personalAccessToken:
+    - user.read
+  - oauth2:
+    - user.read
+  - openId:
+    - user.read
