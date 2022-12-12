@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	idpConfigTable = "auth.idp_configs"
+	idpConfigTable = "auth.idp_configs2"
 )
 
 func (v *View) IDPConfigByID(idpID, instanceID string) (*iam_es_model.IDPConfigView, error) {
@@ -43,6 +43,14 @@ func (v *View) DeleteIDPConfig(idpID string, event *models.Event) error {
 
 func (v *View) DeleteInstanceIDPs(event *models.Event) error {
 	err := view.DeleteInstanceIDPs(v.Db, idpConfigTable, event.InstanceID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedIDPConfigSequence(event)
+}
+
+func (v *View) UpdateOrgOwnerRemovedIDPs(event *models.Event) error {
+	err := view.UpdateOrgOwnerRemovedIDPs(v.Db, idpConfigTable, event.InstanceID, event.AggregateID)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	}

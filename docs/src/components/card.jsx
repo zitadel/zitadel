@@ -10,7 +10,7 @@ export function Card({ link, githubLink, imageSource, title, description, label}
         {description && <p className={styles.card.description}>{description}</p>}
         <span className={styles.fillspace}></span>
         <div className={styles.bottom}>
-          <img className={styles.bottomicon} src="/img/tech/github.svg" alt="github"/>
+          <img className={styles.bottomicon} src="/docs/img/tech/github.svg" alt="github"/>
           <span className={styles.bottomspan}>{label}</span>
         </div>
       </a>

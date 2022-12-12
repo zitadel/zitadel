@@ -22,6 +22,7 @@ import (
 	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
 	"github.com/zitadel/zitadel/internal/api/grpc/authn"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -377,7 +378,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 
 		domainPolicy := org.GetDomainPolicy()
 		if org.DomainPolicy != nil {
-			_, err := s.command.AddOrgDomainPolicy(ctx, org.GetOrgId(), DomainPolicyToDomain(domainPolicy.UserLoginMustBeDomain, domainPolicy.ValidateOrgDomains, domainPolicy.SmtpSenderAddressMatchesInstanceDomain))
+			_, err := s.command.AddOrgDomainPolicy(ctx, org.GetOrgId(), domainPolicy.UserLoginMustBeDomain, domainPolicy.ValidateOrgDomains, domainPolicy.SmtpSenderAddressMatchesInstanceDomain)
 			if err != nil {
 				errors = append(errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: err.Error()})
 			}
@@ -597,7 +598,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		if org.MachineKeys != nil {
 			for _, key := range org.GetMachineKeys() {
 				logging.Debugf("import machine_user_key: %s", key.KeyId)
-				_, err := s.command.AddUserMachineKeyWithID(ctx, &domain.MachineKey{
+				_, err := s.command.AddUserMachineKey(ctx, &command.MachineKey{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   key.UserId,
 						ResourceOwner: org.GetOrgId(),
@@ -606,7 +607,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 					Type:           authn.KeyTypeToDomain(key.Type),
 					ExpirationDate: key.ExpirationDate.AsTime(),
 					PublicKey:      key.PublicKey,
-				}, org.GetOrgId())
+				})
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "machine_user_key", Id: key.KeyId, Message: err.Error()})
 					if isCtxTimeout(ctx) {

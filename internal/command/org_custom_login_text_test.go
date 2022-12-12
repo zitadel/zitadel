@@ -1429,7 +1429,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						CancelButtonText: "CancelButtonText",
 						NextButtonText:   "NextButtonText",
 					},
-					ExternalNotFoundOption: domain.ExternalUserNotFoundScreenText{
+					ExternalNotFound: domain.ExternalUserNotFoundScreenText{
 						Title:                  "Title",
 						Description:            "Description",
 						LinkButtonText:         "LinkButtonText",
@@ -3692,7 +3692,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					RegistrationUser:                 domain.RegistrationUserScreenText{},
 					RegistrationOrg:                  domain.RegistrationOrgScreenText{},
 					LinkingUsersDone:                 domain.LinkingUserDoneScreenText{},
-					ExternalNotFoundOption:           domain.ExternalUserNotFoundScreenText{},
+					ExternalNotFound:                 domain.ExternalUserNotFoundScreenText{},
 					LoginSuccess:                     domain.SuccessLoginScreenText{},
 					LogoutDone:                       domain.LogoutDoneScreenText{},
 					Footer:                           domain.FooterText{},
@@ -7251,7 +7251,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						CancelButtonText: "CancelButtonText",
 						NextButtonText:   "NextButtonText",
 					},
-					ExternalNotFoundOption: domain.ExternalUserNotFoundScreenText{
+					ExternalNotFound: domain.ExternalUserNotFoundScreenText{
 						Title:                  "Title",
 						Description:            "Description",
 						LinkButtonText:         "LinkButtonText",

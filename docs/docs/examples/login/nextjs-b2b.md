@@ -34,7 +34,8 @@ Open the Console (`https://{YourDomain}.zitadel.cloud/ui/console/projects`) and 
 
 Then on the project detail page click on new application and enter a name for this app.
 Let's call this one `portal-web`.
-Select `Web`, continue, `PKCE`, then enter `http://localhost:3000/api/auth/callback/zitadel` for the redirect, and `http://localhost:3000` for the post redirect. Then press on `create`.
+Select `Web`, continue, `CODE`, then enter `http://localhost:3000/api/auth/callback/zitadel` for the redirect, and `http://localhost:3000` for the post redirect. Then press on `create`.
+Because the requests from your NextJS application to ZITADEL are made on the server side, you can safely select `CODE`. With this you still get a secret which is then usable alongside PKCE. Your secret never gets exposed on the browser since it is kept in your NextJS server.
 
 Copy the "Resource Id" of the project `Portal` as you will need this in your environment configuration file later.
 
@@ -133,13 +134,13 @@ Let's call this new organization `Demo-Customer`.
 
 ### Users
 
-Now switch back to the organization `Demo-Customer` and [create a new user](https://docs.zitadel.com/docs/manuals/user-register) in this organization.
+Now switch back to the organization `Demo-Customer` and [create a new user](/manuals/user-register) in this organization.
 Let's call the first user `Alice Admin`. Create a second user called `Eric Employee`.
 
 ### Manager Role
 
 We want to enable Alice to assign roles to users in her organization in a self-service manner.
-To make this happen, we need give Alice an [Manager Role](https://docs.zitadel.com/docs/concepts/structure/managers) within the Organization `Demo-Customer`.
+To make this happen, we need give Alice an [Manager Role](/concepts/structure/managers) within the Organization `Demo-Customer`.
 
 Still in the organization `Demo-Customer`, navigate to Organization. Click on the plus on the top right and give `Alice Admin` the Manager Role `Org Owner`.
 
@@ -150,7 +151,7 @@ Login with your user on the customer organization to validate the setup.
 ### Organization Grant
 
 Switch to the `Demo-Vendor` organization, select Projects in the navigation, and click on `Portal` and then `Grants`.
-[Grant all roles of the Project](https://docs.zitadel.com/docs/guides/basics/projects#exercise---grant-a-project) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
+[Grant all roles of the Project](/guides/manage/console/projects#grant-a-project) to the organization `demo-customer.{YourDomain}.zitadel.cloud`.
 
 ### Authorization
 

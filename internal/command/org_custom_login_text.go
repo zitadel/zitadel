@@ -60,6 +60,9 @@ func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, domain.LoginCustomText, lang))
+	if err != nil {
+		return nil, err
+	}
 	err = AppendAndReduce(customText, pushedEvents...)
 	if err != nil {
 		return nil, err

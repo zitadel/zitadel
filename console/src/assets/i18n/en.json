@@ -829,7 +829,8 @@
     "STATE": {
       "0": "Not defined",
       "1": "Active",
-      "2": "Deactivated"
+      "2": "Deactivated",
+      "3": "Removed"
     },
     "MEMBER": {
       "TITLE": "Organization Managers",
@@ -1165,7 +1166,8 @@
       "MAXATTEMPTS": "Password maximum Attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
-      "USERLOGINMUSTBEDOMAIN": "User Loginname must contain orgdomain",
+      "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
       "VALIDATEORGDOMAINS": "Validate Org domains",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
@@ -1681,6 +1683,7 @@
     "TITLEFIRST": "Name of the application",
     "TYPETITLE": "Type of application",
     "OIDC": {
+      "WELLKNOWN": "Further links can be retrieved from the <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"
