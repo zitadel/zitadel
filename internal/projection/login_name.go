@@ -11,24 +11,17 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func NewUserLoginNames(userID, instance string) *UserLoginNames {
-	return &UserLoginNames{
-		UserID:     userID,
-		InstanceID: instance,
-	}
-}
-
-func NewUserLoginNamesWithOwner(userID, instance, owner string) *UserLoginNames {
-	return &UserLoginNames{
+func NewLoginNamesWithOwner(userID, instance, owner string) *LoginNames {
+	return &LoginNames{
 		UserID:     userID,
 		InstanceID: instance,
 		OwnerID:    owner,
 	}
 }
 
-var _ Projection = (*UserLoginNames)(nil)
+var _ Projection = (*LoginNames)(nil)
 
-type UserLoginNames struct {
+type LoginNames struct {
 	UserID     string
 	InstanceID string
 	OwnerID    string
@@ -57,7 +50,7 @@ type loginNamePolicy struct {
 	active       bool
 }
 
-func (ln *UserLoginNames) Reduce(events []eventstore.Event) {
+func (ln *LoginNames) Reduce(events []eventstore.Event) {
 	// user events are reduced before the others
 	// to ensure all the ids are set
 	ln.reduceUserEvents(events)
@@ -96,7 +89,7 @@ func (ln *UserLoginNames) Reduce(events []eventstore.Event) {
 	ln.generate()
 }
 
-func (ln *UserLoginNames) reduceUserEvents(events []eventstore.Event) {
+func (ln *LoginNames) reduceUserEvents(events []eventstore.Event) {
 	for _, event := range events {
 		if event.Aggregate().Type != user.AggregateType {
 			continue
@@ -120,11 +113,12 @@ func (ln *UserLoginNames) reduceUserEvents(events []eventstore.Event) {
 	}
 }
 
-func (ln *UserLoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQueryBuilder {
+func (ln *LoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		InstanceID(ln.InstanceID).
 		OrderAsc().
-		// ResourceOwner(ln.ownerID).
+		// ResourceOwner(ln.OwnerID). TODO: Filter for resource owner is not possible
+		// because of the instance query
 		AddQuery().
 		AggregateTypes(
 			user.AggregateType,
@@ -162,7 +156,7 @@ func (ln *UserLoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQue
 		Builder()
 }
 
-func (ln *UserLoginNames) generate() {
+func (ln *LoginNames) generate() {
 	if ln.removed {
 		return
 	}
@@ -186,56 +180,56 @@ func (ln *UserLoginNames) generate() {
 	}
 }
 
-func (ln *UserLoginNames) reduceHumanAdded(event *user.HumanAddedEvent) {
+func (ln *LoginNames) reduceHumanAdded(event *user.HumanAddedEvent) {
 	ln.username = event.UserName
 	ln.OwnerID = event.Aggregate().ResourceOwner
 }
 
-func (ln *UserLoginNames) reduceHumanRegistered(event *user.HumanRegisteredEvent) {
+func (ln *LoginNames) reduceHumanRegistered(event *user.HumanRegisteredEvent) {
 	ln.username = event.UserName
 	ln.OwnerID = event.Aggregate().ResourceOwner
 }
 
-func (ln *UserLoginNames) reduceMachineAddedEvent(event *user.MachineAddedEvent) {
+func (ln *LoginNames) reduceMachineAddedEvent(event *user.MachineAddedEvent) {
 	ln.username = event.UserName
 	ln.OwnerID = event.Aggregate().ResourceOwner
 }
 
-func (ln *UserLoginNames) reduceUserRemoved(event *user.UserRemovedEvent) {
+func (ln *LoginNames) reduceUserRemoved(event *user.UserRemovedEvent) {
 	ln.removed = true
 }
 
-func (ln *UserLoginNames) reduceUsernameChanged(event *user.UsernameChangedEvent) {
+func (ln *LoginNames) reduceUsernameChanged(event *user.UsernameChangedEvent) {
 	ln.username = event.UserName
 }
 
-func (ln *UserLoginNames) reduceUserDomainClaimed(event *user.DomainClaimedEvent) {
+func (ln *LoginNames) reduceUserDomainClaimed(event *user.DomainClaimedEvent) {
 	ln.username = event.UserName
 }
 
-func (ln *UserLoginNames) reduceOrgDomainPolicyAddedEvent(event *org.DomainPolicyAddedEvent) {
+func (ln *LoginNames) reduceOrgDomainPolicyAddedEvent(event *org.DomainPolicyAddedEvent) {
 	ln.ownerPolicy.mustBeDomain = event.UserLoginMustBeDomain
 	ln.ownerPolicy.active = true
 }
 
-func (ln *UserLoginNames) reduceOrgDomainPolicyChangedEvent(event *org.DomainPolicyChangedEvent) {
+func (ln *LoginNames) reduceOrgDomainPolicyChangedEvent(event *org.DomainPolicyChangedEvent) {
 	if event.UserLoginMustBeDomain == nil {
 		return
 	}
 	ln.ownerPolicy.mustBeDomain = *event.UserLoginMustBeDomain
 }
 
-func (ln *UserLoginNames) reduceDomainPolicyRemovedEvent(event *org.DomainPolicyRemovedEvent) {
+func (ln *LoginNames) reduceDomainPolicyRemovedEvent(event *org.DomainPolicyRemovedEvent) {
 	ln.ownerPolicy.active = false
 }
 
-func (ln *UserLoginNames) reduceOrgDomainPrimarySetEvent(event *org.DomainPrimarySetEvent) {
+func (ln *LoginNames) reduceOrgDomainPrimarySetEvent(event *org.DomainPrimarySetEvent) {
 	for _, domain := range ln.domains {
 		domain.isPrimary = domain.name == event.Domain
 	}
 }
 
-func (ln *UserLoginNames) reduceOrgDomainRemovedEvent(event *org.DomainRemovedEvent) {
+func (ln *LoginNames) reduceOrgDomainRemovedEvent(event *org.DomainRemovedEvent) {
 	for i, domain := range ln.domains {
 		if domain.name != event.Domain {
 			continue
@@ -247,21 +241,21 @@ func (ln *UserLoginNames) reduceOrgDomainRemovedEvent(event *org.DomainRemovedEv
 	}
 }
 
-func (ln *UserLoginNames) reduceOrgDomainVerifiedEvent(event *org.DomainVerifiedEvent) {
+func (ln *LoginNames) reduceOrgDomainVerifiedEvent(event *org.DomainVerifiedEvent) {
 	ln.domains = append(ln.domains, &loginNameDomain{name: event.Domain})
 }
 
-func (ln *UserLoginNames) reduceInstanceDomainPolicyAddedEvent(event *instance.DomainPolicyAddedEvent) {
+func (ln *LoginNames) reduceInstanceDomainPolicyAddedEvent(event *instance.DomainPolicyAddedEvent) {
 	ln.instancePolicy.mustBeDomain = event.UserLoginMustBeDomain
 }
 
-func (ln *UserLoginNames) reduceInstanceDomainPolicyChangedEvent(event *instance.DomainPolicyChangedEvent) {
+func (ln *LoginNames) reduceInstanceDomainPolicyChangedEvent(event *instance.DomainPolicyChangedEvent) {
 	if event.UserLoginMustBeDomain == nil {
 		return
 	}
 	ln.instancePolicy.mustBeDomain = *event.UserLoginMustBeDomain
 }
 
-func (ln *UserLoginNames) reduceInstanceRemovedEvent(event *instance.InstanceRemovedEvent) {
+func (ln *LoginNames) reduceInstanceRemovedEvent(event *instance.InstanceRemovedEvent) {
 	ln.removed = true
 }
