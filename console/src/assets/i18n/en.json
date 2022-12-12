@@ -1683,6 +1683,7 @@
     "TITLEFIRST": "Name of the application",
     "TYPETITLE": "Type of application",
     "OIDC": {
+      "WELLKNOWN": "Further links can be retrieved from the <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"
