@@ -1,0 +1,37 @@
+parameters:
+  - name: username
+    description: ""
+    in: query
+    example: "username"
+    required: true
+    schema:
+      type: string
+      
+get:
+  tags:
+    - Login
+  summary: Request Authorization
+  description: "Start a new authorization from your client."
+  operationId: startLogin
+  x-zitadel-permissions: []
+  responses:
+    default:
+      description: ""
+      content:
+        application/json:
+          schema:
+            availableAuthenticationMethods:
+              description: "The list of the users available authenticationMethods respecting the clients and policies requirements."
+              $ref: "../components/schemas/authentication.yaml"
+    404:
+      description: No Authorization was found
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"

@@ -17,3 +17,5 @@ properties:
       -  id
   description:
     type: string
+  authenticationMethods:
+    $ref: "authentication.yaml"

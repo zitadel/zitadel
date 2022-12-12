@@ -1,0 +1,18 @@
+type: object
+description: ""
+properties:
+  password:
+    type: string
+    description: ""
+  u2f:
+    type: string
+    description: ""
+  otp:
+    type: string
+    description: ""
+  webauthn:
+    type: string
+    description: ""
+  idp:
+    type: string
+    description: ""

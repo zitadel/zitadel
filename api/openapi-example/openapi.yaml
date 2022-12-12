@@ -34,6 +34,8 @@ servers:
 paths:
   /authorize:
     $ref: "paths/authorize.yaml"
+  /login:
+    $ref: "paths/authorize.yaml"
   /Users:
     $ref: "paths/users.yaml"
   /Users/{id}:
