@@ -255,18 +255,56 @@ func ListMachineKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListMachine
 
 }
 
-func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.MachineKey {
+func AddMachineKeyRequestToCommand(req *mgmt_pb.AddMachineKeyRequest, resourceOwner string) *command.MachineKey {
 	expDate := time.Time{}
 	if req.ExpirationDate != nil {
 		expDate = req.ExpirationDate.AsTime()
 	}
 
-	return &domain.MachineKey{
+	return &command.MachineKey{
 		ObjectRoot: models.ObjectRoot{
-			AggregateID: req.UserId,
+			AggregateID:   req.UserId,
+			ResourceOwner: resourceOwner,
 		},
 		ExpirationDate: expDate,
 		Type:           authn.KeyTypeToDomain(req.Type),
+	}
+}
+
+func RemoveMachineKeyRequestToCommand(req *mgmt_pb.RemoveMachineKeyRequest, resourceOwner string) *command.MachineKey {
+	return &command.MachineKey{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: resourceOwner,
+		},
+		KeyID: req.KeyId,
+	}
+}
+
+func AddPersonalAccessTokenRequestToCommand(req *mgmt_pb.AddPersonalAccessTokenRequest, resourceOwner string, scopes []string, allowedUserType domain.UserType) *command.PersonalAccessToken {
+	expDate := time.Time{}
+	if req.ExpirationDate != nil {
+		expDate = req.ExpirationDate.AsTime()
+	}
+
+	return &command.PersonalAccessToken{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: resourceOwner,
+		},
+		ExpirationDate:  expDate,
+		Scopes:          scopes,
+		AllowedUserType: allowedUserType,
+	}
+}
+
+func RemovePersonalAccessTokenRequestToCommand(req *mgmt_pb.RemovePersonalAccessTokenRequest, resourceOwner string) *command.PersonalAccessToken {
+	return &command.PersonalAccessToken{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   req.UserId,
+			ResourceOwner: resourceOwner,
+		},
+		TokenID: req.TokenId,
 	}
 }
 
