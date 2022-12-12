@@ -193,6 +193,9 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			cmds := make([]eventstore.Command, 0, 3)
 			cmds = append(cmds, createCmd)
 
+			if human.Email.Verified {
+				cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
+			}
 			//add init code if
 			// email not verified or
 			// user not registered and password set
@@ -203,9 +206,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				}
 				cmds = append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, value, expiry))
 			} else {
-				if human.Email.Verified {
-					cmds = append(cmds, user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate))
-				} else {
+				if !human.Email.Verified {
 					value, expiry, err := newEmailCode(ctx, filter, codeAlg)
 					if err != nil {
 						return nil, err

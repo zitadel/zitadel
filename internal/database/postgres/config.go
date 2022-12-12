@@ -67,6 +67,7 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, error) {
 
 	db.SetMaxIdleConns(int(c.MaxIdleConns))
 	db.SetMaxOpenConns(int(c.MaxOpenConns))
+	db.SetMaxIdleConns(int(c.MaxIdleConns))
 	db.SetConnMaxLifetime(c.MaxConnLifetime)
 	db.SetConnMaxIdleTime(c.MaxConnIdleTime)
 

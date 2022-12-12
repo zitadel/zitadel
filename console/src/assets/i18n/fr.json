@@ -1167,6 +1167,7 @@
       "EXPIREWARNDAYS": "Expiration Avertissement après le jour",
       "MAXAGEDAYS": "Âge maximum en jours",
       "USERLOGINMUSTBEDOMAIN": "Le nom de connexion de l'utilisateur doit contenir le nom de domaine de l'organisation",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si vous activez ce paramètre, tous les noms de connexion seront suffixés avec le domaine de l'organisation. Si ce paramètre est désactivé, vous devez vous assurer que les noms d'utilisateur sont uniques pour toutes les organisations.",
       "VALIDATEORGDOMAINS": "Valider les domaines d'Org",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'adresse de l'expéditeur SMTP correspond au domaine de l'instance",
       "ALLOWUSERNAMEPASSWORD": "Nom d'utilisateur Mot de passe autorisé",
@@ -1678,6 +1679,7 @@
     "ORIGINS": "Origines",
     "NOTANORIGIN": "La valeur saisie n'est pas une origine",
     "OIDC": {
+      "WELLKNOWN": "Pour plus d'informations, consultez le <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
       "INFO": {
         "ISSUER": "Émetteur",
         "CLIENTID": "Id client"
