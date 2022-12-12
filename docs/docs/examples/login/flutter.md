@@ -166,12 +166,12 @@ Our Android and iOS Application opens ZITADEL's login within a custom tab, on We
 
 If everything works out correctly, your applications should look like this:
 
-<div style={{display: 'grid', 'grid-column-gap': '1rem', 'grid-template-columns': '1fr 1fr', 'max-width': '500px', 'margin': '0 auto'}}>
-    <img src="/img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
-    <img src="/img/flutter/authed.png" alt="Flutter Authenticated" height="500px" />
+<div style={{display: 'grid', 'gridColumnGap': '1rem', 'gridTemplateColumns': '1fr 1fr', 'maxWidth': '500px', 'margin': '0 auto'}}>
+    <img src="/docs/img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
+    <img src="/docs/img/flutter/authed.png" alt="Flutter Authenticated" height="500px" />
 </div>
 
-<div style={{display: 'grid', 'grid-column-gap': '1rem', 'grid-template-columns': '1fr 1fr', 'max-width': '800px', 'margin': '0 auto'}}>
-    <img src="/img/flutter/web-not-authed.png" alt="Unauthenticated" height="500px" />
-    <img src="/img/flutter/web-authed.png" alt="Flutter Authenticated" height="500px" />
+<div style={{display: 'grid', 'gridColumnGap': '1rem', 'gridTemplateColumns': '1fr 1fr', 'maxWidth': '800px', 'margin': '0 auto'}}>
+    <img src="/docs/img/flutter/web-not-authed.png" alt="Unauthenticated" height="500px" />
+    <img src="/docs/img/flutter/web-authed.png" alt="Flutter Authenticated" height="500px" />
 </div>
