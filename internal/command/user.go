@@ -349,7 +349,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	if !userWriteModel.UserState.Exists() {
 		return nil, errors.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
 	}
-	domainPolicy, err := domainPolicyWriteModel(ctx, filter)
+	domainPolicy, err := domainPolicyWriteModel(ctx, filter, userWriteModel.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
