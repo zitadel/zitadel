@@ -9,17 +9,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 var _ Projection = (*User)(nil)
-
-func NewUser(id, instance string) *User {
-	return &User{
-		ID:         id,
-		instanceID: instance,
-	}
-}
 
 func NewUserWithOwner(id, instance, owner string) *User {
 	return &User{
@@ -36,6 +30,7 @@ type User struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
+	OwnerRemoved  bool
 	Sequence      uint64
 	State         domain.UserState
 	Type          domain.UserType
@@ -120,6 +115,8 @@ func (u *User) Reduce(events []eventstore.Event) {
 			u.reduceMachineAdded(e)
 		case *user.MachineChangedEvent:
 			u.reduceMachineChanged(e)
+		case *org.OrgRemovedEvent:
+			u.reduceOwnerRemoved(e)
 		default:
 			logging.WithFields("type", e.Type()).Debug("event not handeled")
 		}
@@ -171,6 +168,10 @@ func (u *User) SearchQuery(context.Context) *eventstore.SearchQueryBuilder {
 			user.MachineAddedEventType,
 			user.MachineChangedEventType,
 		).
+		Or().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(u.ResourceOwner).
+		EventTypes(org.OrgRemovedEventType).
 		Builder()
 }
 
@@ -306,6 +307,6 @@ func (u *User) reduceMachineChanged(event *user.MachineChangedEvent) {
 	}
 }
 
-// func (u *User) reduceHumanPasswordChanged(event *user.HumanPasswordChangedEvent) {
-
-// }
+func (u *User) reduceOwnerRemoved(event *org.OrgRemovedEvent) {
+	u.OwnerRemoved = true
+}

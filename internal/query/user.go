@@ -323,12 +323,15 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	user := projection.NewUser(userID, authz.GetInstance(ctx).InstanceID())
+	user := projection.NewUserWithOwner(userID, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).ResourceOwner)
 	events, err := q.eventstore.Filter(ctx, user.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
 	}
 	user.Reduce(events)
+	if len(events) == 0 || (!withOwnerRemoved && user.OwnerRemoved) {
+		return nil, errors.ThrowNotFound(nil, "QUERY-A6ZyK", "Errors.User.NotFound")
+	}
 
 	loginNames := projection.NewLoginNamesWithOwner(user.ID, authz.GetInstance(ctx).InstanceID(), user.ResourceOwner)
 	events, err = q.eventstore.Filter(ctx, loginNames.SearchQuery(ctx))

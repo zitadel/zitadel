@@ -10,8 +10,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
-
-	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 var (
@@ -87,79 +85,6 @@ func Test_InstancePrepares(t *testing.T) {
 		want    want
 		object  interface{}
 	}{
-		{
-			name: "prepareInstanceQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
-			},
-			want: want{
-				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(instanceQuery),
-					nil,
-					nil,
-				),
-				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
-						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: (*Instance)(nil),
-		},
-		{
-			name: "prepareInstanceQuery found",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
-			},
-			want: want{
-				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(instanceQuery),
-					instanceCols,
-					[]driver.Value{
-						"id",
-						testNow,
-						testNow,
-						uint64(20211108),
-						"global-org-id",
-						"project-id",
-						"client-id",
-						"app-id",
-						"en",
-					},
-				),
-			},
-			object: &Instance{
-				ID:           "id",
-				CreationDate: testNow,
-				ChangeDate:   testNow,
-				Sequence:     20211108,
-				DefaultOrgID: "global-org-id",
-				IAMProjectID: "project-id",
-				ConsoleID:    "client-id",
-				ConsoleAppID: "app-id",
-				DefaultLang:  language.English,
-			},
-		},
-		{
-			name: "prepareInstanceQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
-			},
-			want: want{
-				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(instanceQuery),
-					sql.ErrConnDone,
-				),
-				err: func(err error) (error, bool) {
-					if !errors.Is(err, sql.ErrConnDone) {
-						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
-					}
-					return nil, true
-				},
-			},
-			object: nil,
-		},
 		{
 			name: "prepareInstancesQuery no result",
 			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {

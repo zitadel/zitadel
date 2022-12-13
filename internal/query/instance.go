@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
 	"strings"
 	"time"
 
@@ -248,44 +247,6 @@ func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	return instance.DefaultLanguage()
 }
 
-func prepareInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-	return sq.Select(
-			InstanceColumnID.identifier(),
-			InstanceColumnCreationDate.identifier(),
-			InstanceColumnChangeDate.identifier(),
-			InstanceColumnSequence.identifier(),
-			InstanceColumnDefaultOrgID.identifier(),
-			InstanceColumnProjectID.identifier(),
-			InstanceColumnConsoleID.identifier(),
-			InstanceColumnConsoleAppID.identifier(),
-			InstanceColumnDefaultLanguage.identifier(),
-		).
-			From(instanceTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{host: host}
-			lang := ""
-			err := row.Scan(
-				&instance.ID,
-				&instance.CreationDate,
-				&instance.ChangeDate,
-				&instance.Sequence,
-				&instance.DefaultOrgID,
-				&instance.IAMProjectID,
-				&instance.ConsoleID,
-				&instance.ConsoleAppID,
-				&lang,
-			)
-			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-5m09s", "Errors.IAM.NotFound")
-				}
-				return nil, errors.ThrowInternal(err, "QUERY-3j9sf", "Errors.Internal")
-			}
-			instance.DefaultLang = language.Make(lang)
-			return instance, nil
-		}
-}
-
 func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
 	instanceFilterTable := instanceTable.setAlias(InstancesFilterTableAlias)
 	instanceFilterIDColumn := InstanceColumnID.setTable(instanceFilterTable)
@@ -387,87 +348,5 @@ func prepareInstancesQuery() (sq.SelectBuilder, func(sq.SelectBuilder) sq.Select
 					Count: count,
 				},
 			}, nil
-		}
-}
-
-func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
-	return sq.Select(
-			InstanceColumnID.identifier(),
-			InstanceColumnCreationDate.identifier(),
-			InstanceColumnChangeDate.identifier(),
-			InstanceColumnSequence.identifier(),
-			InstanceColumnName.identifier(),
-			InstanceColumnDefaultOrgID.identifier(),
-			InstanceColumnProjectID.identifier(),
-			InstanceColumnConsoleID.identifier(),
-			InstanceColumnConsoleAppID.identifier(),
-			InstanceColumnDefaultLanguage.identifier(),
-			InstanceDomainDomainCol.identifier(),
-			InstanceDomainIsPrimaryCol.identifier(),
-			InstanceDomainIsGeneratedCol.identifier(),
-			InstanceDomainCreationDateCol.identifier(),
-			InstanceDomainChangeDateCol.identifier(),
-			InstanceDomainSequenceCol.identifier(),
-		).
-			From(instanceTable.identifier()).
-			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
-			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Instance, error) {
-			instance := &Instance{
-				host:    host,
-				Domains: make([]*InstanceDomain, 0),
-			}
-			lang := ""
-			for rows.Next() {
-				var (
-					domain       sql.NullString
-					isPrimary    sql.NullBool
-					isGenerated  sql.NullBool
-					changeDate   sql.NullTime
-					creationDate sql.NullTime
-					sequence     sql.NullInt64
-				)
-				err := rows.Scan(
-					&instance.ID,
-					&instance.CreationDate,
-					&instance.ChangeDate,
-					&instance.Sequence,
-					&instance.Name,
-					&instance.DefaultOrgID,
-					&instance.IAMProjectID,
-					&instance.ConsoleID,
-					&instance.ConsoleAppID,
-					&lang,
-					&domain,
-					&isPrimary,
-					&isGenerated,
-					&changeDate,
-					&creationDate,
-					&sequence,
-				)
-				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
-				}
-				if !domain.Valid {
-					continue
-				}
-				instance.Domains = append(instance.Domains, &InstanceDomain{
-					CreationDate: creationDate.Time,
-					ChangeDate:   changeDate.Time,
-					Sequence:     uint64(sequence.Int64),
-					Domain:       domain.String,
-					IsPrimary:    isPrimary.Bool,
-					IsGenerated:  isGenerated.Bool,
-					InstanceID:   instance.ID,
-				})
-			}
-			if instance.ID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
-			}
-			instance.DefaultLang = language.Make(lang)
-			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
-			}
-			return instance, nil
 		}
 }
