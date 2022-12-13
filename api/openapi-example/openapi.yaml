@@ -32,13 +32,40 @@ servers:
       basePath: 
         default: "v2"
 paths:
-  /authorize:
-    $ref: "paths/authorize.yaml"
-  /login:
-    $ref: "paths/authorize.yaml"
-  /Users:
+  /me:
+    $ref: "paths/me.yaml"
+  /oauth/authorize:
+    $ref: "paths/authorize.yaml"  
+  /organizations:
+    $ref: "paths/organizations.yaml"
+  /organizations/{id}:
+    $ref: "paths/organizations_{id}.yaml"
+  /passwords:
+    $ref: "paths/passwords.yaml"
+  /passwords/{userId}/change:
+    $ref: "paths/passwords_{userId}_change.yaml"
+  /passwords/{userId}/reset:
+    $ref: "paths/passwords_{userId}_reset.yaml"
+  /passwords/{userId}/verify:
+    $ref: "paths/passwords_{userId}_verify.yaml"
+  /providers:
+    $ref: "paths/providers.yaml"
+  /providers/{id}:
+    $ref: "paths/providers_{id}.yaml"
+  /providers/{id}/start:
+    $ref: "paths/providers_{id}_start.yaml"
+  /providers/{id}/callback:
+    $ref: "paths/providers_{id}_callback.yaml"
+  #/sessions:
+  #/sessions/{id}/:
+  #/sessions/{id}/revoke:
+  #/totps:
+  #/u2fs:
+  /passkeys:
+    $ref: "paths/passkeys.yaml"
+  /users:
     $ref: "paths/users.yaml"
-  /Users/{id}:
+  /users/{id}:
     $ref: "paths/users_{id}.yaml"
 components:
   securitySchemes:

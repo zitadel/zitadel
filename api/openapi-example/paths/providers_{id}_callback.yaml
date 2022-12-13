@@ -1,0 +1,42 @@
+parameters:
+  - name: id
+    description: The unique identifier of the provider
+    in: path
+    required: true
+    schema:
+      type: string
+  - name: code
+    description: The unique identifier of the provider
+    in: query
+    required: true
+    schema:
+      type: string
+## Todo more? Code_Challenge, State, Nonce?
+  
+get:
+  tags:
+    - Providers
+  summary: Callback from provider
+  description: "Request redirect to a provider by id and more parameters."
+  operationId: finishProviderCallback
+  x-zitadel-permissions:
+    - provider.start
+  responses:
+    200:
+      description: The provider, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/provider.yaml"
+    404:
+      description: No user was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"

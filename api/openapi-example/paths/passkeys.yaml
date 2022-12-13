@@ -1,0 +1,30 @@
+parameters:
+  - name: userId
+    description: The unique identifier of a user
+    in: query
+    required: true
+    schema:
+      type: string
+
+get:
+  tags:
+    - Passkeys
+    - Authentication
+  summary: Get passkeys for a user
+  description: "Get all passkeys from a specific user by his id." # I know that we currently only allow search inside orgs.
+  operationId: getPasskeysByUserId
+  x-zitadel-permissions:
+    - passkeys.read
+  responses:
+    200:
+      description: The passkeys, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/users.yaml" #TODO define schema
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"

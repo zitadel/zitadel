@@ -1,26 +1,22 @@
 parameters:
-  - name: id
-    description: The unique identifier of a user
-    in: path
-    required: true
-    schema:
-      type: string
-      
+  - $ref: "../components/parameters/limit.yaml"
+  - $ref: "../components/parameters/position.yaml"
+
 get:
   tags:
-    - User
-  summary: Read a user
-  description: "Get a single user by his unique id."
-  operationId: getUserById
+    - Organization
+  summary: Search organizations
+  description: "Search organizations inside your zitadel instance."
+  operationId: searchOrganizations
   x-zitadel-permissions:
-    - user.read
+    - organization.search
   responses:
     200:
-      description: The user, what else
+      description: The users, what else
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/user.yaml"
+            $ref: "../components/schemas/organizations.yaml"
     404:
       description: No user was found you muppet
       content:
@@ -34,24 +30,23 @@ get:
           schema:
             $ref: "../components/schemas/problem.yaml"
 
-put:
+post:
   tags:
-    - User
-  summary: Update a user
-  description: "Update a user with the help of the unique id."
-  operationId: updateUserById
+    - Organization
+  summary: Create organization
+  description: "Create a new organization inside your zitadel instance."
+  operationId: createOrganization
   x-zitadel-permissions:
-    - user.update
-  #requestBody: TODO
+    - organization.create
   responses:
     200:
-      description: The user, what else
+      description: The organization, what else
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/user.yaml"
+            $ref: "../components/schemas/organization.yaml"
     404:
-      description: No user was found you muppet
+      description: No organization was found you muppet
       content:
         application/json:
           schema:
@@ -62,4 +57,3 @@ put:
         application/json:
           schema:
             $ref: "../components/schemas/problem.yaml"
-            

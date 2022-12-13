@@ -4,6 +4,9 @@ required:
   - name
   - type
 properties:
+  organizationId:
+    type: string
+    default: #Organization of the current user
   id:
     type: string
   name:
@@ -17,5 +20,5 @@ properties:
       -  id
   description:
     type: string
-  authenticationMethods:
-    $ref: "authentication.yaml"
+  #authenticationMethods:
+    ## TODO link

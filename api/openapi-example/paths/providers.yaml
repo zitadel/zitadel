@@ -1,0 +1,51 @@
+get:
+  parameters:
+    - $ref: "../components/parameters/limit.yaml"
+    - $ref: "../components/parameters/position.yaml"
+    - $ref: "../components/parameters/organizationId.yaml"
+
+  tags:
+    - Providers
+  summary: Search providers
+  description: "Search providers inside your ZITADEL instance."
+  operationId: searchProviders
+  x-zitadel-permissions:
+    - providers.search
+  responses:
+    200:
+      description: The providers, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/users.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+
+post:
+  parameters:
+    - $ref: "../components/parameters/organizationId.yaml"
+  tags:
+    - Providers
+  summary: Create provider
+  description: "Create a new provider in an organization."
+  operationId: createProvider
+  x-zitadel-permissions:
+    - provider.create
+  #requestBody: TODO
+  responses:
+    200:
+      description: The provider, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/provider.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
