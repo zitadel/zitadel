@@ -1685,6 +1685,7 @@
     "ORIGINS": "Origines",
     "NOTANORIGIN": "La valeur saisie n'est pas une origine",
     "OIDC": {
+      "WELLKNOWN": "Pour plus d'informations, consultez le <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
       "INFO": {
         "ISSUER": "Émetteur",
         "CLIENTID": "Id client"

@@ -1689,6 +1689,7 @@
     "TITLEFIRST": "Name der Applikation.",
     "TYPETITLE": "Art der Anwendung",
     "OIDC": {
+      "WELLKNOWN": "Weitere Links können vom <a href='{{url}}' title='Discovery endpoint' target='_blank'>Discovery endpoint</a> abgerufen werden.",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"
