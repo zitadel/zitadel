@@ -155,6 +155,8 @@ Errors:
     Empty: 组织为空
     NotFound: 未找到组织
     NotChanged: 组织信息未改变
+    DefaultOrgNotDeletable: 默认组织不应删除
+    ZitadelOrgNotDeletable: 不得删除与ZITADEL项目有关的组织
     InvalidDomain: 无效的域名
     DomainMissing: 域名缺失
     DomainNotOnOrg: 组织中不存在域
