@@ -1,0 +1,20 @@
+parameters:
+  - name: orgId
+  - name: applicationId
+      
+get:
+  responses:
+    200:
+      description: The users, what else
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              # Branding
+              labelPolicy:
+              privacyPolicy:
+              # Includes the list of available IdPs
+              loginPolicy:
+              lockOutPolicy:
+              complexityPolicy:

@@ -42,19 +42,21 @@ paths:
     $ref: "paths/organizations_{id}.yaml"
   /passwords:
     $ref: "paths/passwords.yaml"
-  /passwords/{userId}/change:
+  /passwords/{userId}/_change:
     $ref: "paths/passwords_{userId}_change.yaml"
-  /passwords/{userId}/reset:
+  /passwords/{userId}/_reset:
     $ref: "paths/passwords_{userId}_reset.yaml"
-  /passwords/{userId}/verify:
+  /passwords/{userId}/_verify:
     $ref: "paths/passwords_{userId}_verify.yaml"
   /providers:
     $ref: "paths/providers.yaml"
+  /providers/_search:
+    $ref: "paths/providers_search.yaml"
   /providers/{id}:
     $ref: "paths/providers_{id}.yaml"
-  /providers/{id}/start:
+  /providers/{id}/_start:
     $ref: "paths/providers_{id}_start.yaml"
-  /providers/{id}/callback:
+  /providers/{id}/_callback:
     $ref: "paths/providers_{id}_callback.yaml"
   #/sessions:
   #/sessions/{id}/:
