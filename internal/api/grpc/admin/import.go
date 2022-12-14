@@ -420,6 +420,17 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 			_, err = s.command.AddLabelPolicy(ctx, org.GetOrgId(), management.AddLabelPolicyToDomain(org.GetLabelPolicy()))
 			if err != nil {
 				errors = append(errors, &admin_pb.ImportDataError{Type: "label_policy", Id: org.GetOrgId(), Message: err.Error()})
+				if isCtxTimeout(ctx) {
+					return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+				}
+			} else {
+				_, err = s.command.ActivateLabelPolicy(ctx, org.GetOrgId())
+				if err != nil {
+					errors = append(errors, &admin_pb.ImportDataError{Type: "label_policy", Id: org.GetOrgId(), Message: err.Error()})
+					if isCtxTimeout(ctx) {
+						return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
+					}
+				}
 			}
 		}
 		if org.LockoutPolicy != nil {
