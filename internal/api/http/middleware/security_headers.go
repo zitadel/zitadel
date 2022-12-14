@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"net/http"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 )
 
@@ -62,11 +63,14 @@ func (h *headers) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		r = saveContext(r, nonceKey, nonce)
 	}
+	allowedHosts := authz.GetInstance(r.Context()).SecurityPolicyAllowedOrigins()
 	headers := w.Header()
-	headers.Set(http_utils.ContentSecurityPolicy, h.csp.Value(nonce, r.Host))
+	headers.Set(http_utils.ContentSecurityPolicy, h.csp.Value(nonce, r.Host, allowedHosts))
 	headers.Set(http_utils.XXSSProtection, "1; mode=block")
 	headers.Set(http_utils.StrictTransportSecurity, "max-age=31536000; includeSubDomains")
-	headers.Set(http_utils.XFrameOptions, "DENY")
+	if len(allowedHosts) == 0 {
+		headers.Set(http_utils.XFrameOptions, "DENY")
+	}
 	headers.Set(http_utils.XContentTypeOptions, "nosniff")
 	headers.Set(http_utils.ReferrerPolicy, "same-origin")
 	headers.Set(http_utils.FeaturePolicy, "payment 'none'")
