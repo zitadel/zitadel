@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	QuotaAddedEventType   = instanceEventTypePrefix + quota.AddedEventType
-	QuotaRemovedEventType = instanceEventTypePrefix + quota.RemovedEventType
+	QuotaAddedEventType    = instanceEventTypePrefix + quota.AddedEventType
+	QuotaNotifiedEventType = instanceEventTypePrefix + quota.NotifiedEventType
+	QuotaRemovedEventType  = instanceEventTypePrefix + quota.RemovedEventType
 )
 
 type QuotaAddedEvent struct {
@@ -29,7 +30,6 @@ func NewQuotaAddedEvent(
 	limit bool,
 	notifications []*quota.AddedEventNotification,
 ) *QuotaAddedEvent {
-
 	return &QuotaAddedEvent{
 		AddedEvent: *quota.NewAddedEvent(
 			eventstore.NewBaseEventForPush(
@@ -56,8 +56,44 @@ func QuotaAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &QuotaAddedEvent{AddedEvent: *e.(*quota.AddedEvent)}, nil
 }
 
+type QuotaNotifiedEvent struct {
+	quota.NotifiedEvent `json:",inline"`
+}
+
+func NewQuotaNotifiedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	unit quota.Unit,
+	id string,
+	threshold uint64,
+	usage uint64,
+) *QuotaNotifiedEvent {
+	return &QuotaNotifiedEvent{
+		NotifiedEvent: *quota.NewNotifiedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				QuotaNotifiedEventType,
+			),
+			unit,
+			id,
+			threshold,
+			usage,
+		),
+	}
+}
+
+func QuotaNotifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := quota.NotifiedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &QuotaNotifiedEvent{NotifiedEvent: *e.(*quota.NotifiedEvent)}, nil
+}
+
 type QuotaRemovedEvent struct {
-	quota.RemovedEvent
+	quota.RemovedEvent `json:",inline"`
 }
 
 func NewQuotaRemovedEvent(

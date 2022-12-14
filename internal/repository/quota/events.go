@@ -16,6 +16,7 @@ const (
 	UniqueQuotaNotificationIDType = "quota_notification"
 	eventTypePrefix               = eventstore.EventType("quota.")
 	AddedEventType                = eventTypePrefix + "added"
+	NotifiedEventType             = eventTypePrefix + "notified"
 	RemovedEventType              = eventTypePrefix + "removed"
 )
 
@@ -52,9 +53,9 @@ type AddedEvent struct {
 
 type AddedEventNotification struct {
 	ID      string `json:"id"`
-	Percent uint32 `json:"percent"`
+	Percent uint64 `json:"percent"`
 	Repeat  bool   `json:"repeat,omitempty"`
-	CallURL string `json:"callUrl,omitempty"`
+	CallURL string `json:"callUrl"`
 }
 
 func (e *AddedEvent) Data() interface{} {
@@ -93,6 +94,51 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal quota added")
+	}
+
+	return e, nil
+}
+
+type NotifiedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	ID                   string `json:"id"`
+	Unit                 Unit   `json:"unit"`
+	Threshold            uint64 `json:"threshold"`
+	Usage                uint64 `json:"usage"`
+}
+
+func (e *NotifiedEvent) Data() interface{} {
+	return e
+}
+
+func (e *NotifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewNotifiedEvent(
+	base *eventstore.BaseEvent,
+	unit Unit,
+	id string,
+	threshold uint64,
+	usage uint64,
+) *NotifiedEvent {
+	return &NotifiedEvent{
+		BaseEvent: *base,
+		Unit:      unit,
+		ID:        id,
+		Threshold: threshold,
+		Usage:     usage,
+	}
+}
+
+func NotifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &NotifiedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal quota notified")
 	}
 
 	return e, nil

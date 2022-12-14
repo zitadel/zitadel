@@ -172,7 +172,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	tlsConfig, err := config.TLS.Config()
 
-	accessSvc := access.NewService(ctx, config.LogStore.Access, dbClient)
+	accessSvc := access.NewService(ctx, eventstore, config.LogStore.Access, dbClient)
 
 	if err != nil {
 		return err

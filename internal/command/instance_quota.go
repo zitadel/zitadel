@@ -2,10 +2,11 @@ package command
 
 import (
 	"context"
+	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/repository/quota"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -64,7 +65,7 @@ func (c *Commands) RemoveInstanceQuota(ctx context.Context, unit quota.Unit) (*d
 }
 
 type QuotaNotification struct {
-	Percent uint32
+	Percent uint64
 	Repeat  bool
 	CallURL string
 }
@@ -115,7 +116,12 @@ func (c *Commands) AddInstanceQuotaCommand(
 			return nil, errors.ThrowInvalidArgument(err, "INSTA-H2Poe", "Errors.Invalid.Argument") // TODO: Better error message?
 		}
 
-		// TODO: More validations without side effects
+		for _, notification := range q.Notifications {
+
+			if err = isUrl(notification.CallURL); err != nil || notification.Percent < 1 {
+				return nil, errors.ThrowInvalidArgument(err, "INSTA-pBfjq", "Errors.Invalid.Argument") // TODO: Better error message?
+			}
+		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
 				// TODO: Validations with side effects
@@ -140,4 +146,17 @@ func (c *Commands) AddInstanceQuotaCommand(
 			},
 			nil
 	}
+}
+
+func isUrl(str string) error {
+	u, err := url.Parse(str)
+	if err != nil {
+		return err
+	}
+
+	if u.Scheme == "" || u.Host == "" {
+		return fmt.Errorf("url %s is invalid", str)
+	}
+
+	return nil
 }
