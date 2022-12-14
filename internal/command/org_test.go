@@ -1027,10 +1027,52 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 		res    res
 	}{
 		{
+			name: "default org, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:   authz.WithInstance(context.Background(), &mockInstance{}),
+				orgID: "defaultOrgID",
+			},
+			res: res{
+				err: errors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "zitadel org, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("projectID", "org1").Aggregate,
+								"ZITADEL",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						)),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+			},
+			res: res{
+				err: errors.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "org not found, error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(), // zitadel project check
 					expectFilter(),
 				),
 			},
@@ -1047,6 +1089,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(), // zitadel project check
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -1074,6 +1117,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(), // zitadel project check
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -1121,6 +1165,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(), // zitadel project check
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
@@ -1165,6 +1210,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(), // zitadel project check
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),

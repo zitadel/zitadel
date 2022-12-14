@@ -314,6 +314,19 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDeta
 func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			instance := authz.GetInstance(ctx)
+			if a.ID == instance.DefaultOrganisationID() {
+				return nil, errors.ThrowPreconditionFailed(nil, "COMMA-wG9p1", "Errors.Org.DefaultOrgNotDeletable")
+			}
+			err := c.checkProjectExists(ctx, instance.ProjectID(), a.ID)
+			// if there is no error, the ZITADEL project was found on the org to be deleted
+			if err == nil {
+				return nil, errors.ThrowPreconditionFailed(err, "COMMA-AF3JW", "Errors.Org.ZitadelOrgNotDeletable")
+			}
+			// "precondition failed" error means the project does not exist, return other errors
+			if !errors.IsPreconditionFailed(err) {
+				return nil, err
+			}
 			writeModel, err := c.getOrgWriteModelByID(ctx, a.ID)
 			if err != nil {
 				return nil, errors.ThrowPreconditionFailed(err, "COMMA-wG9p1", "Errors.Org.NotFound")
