@@ -15,6 +15,10 @@ type Config struct {
 	repo repository.Repository
 }
 
+func TestConfig(repo repository.Repository) *Config {
+	return &Config{repo: repo}
+}
+
 func Start(config *Config) (*Eventstore, error) {
 	config.repo = z_sql.NewCRDB(config.Client)
 	return NewEventstore(config), nil
