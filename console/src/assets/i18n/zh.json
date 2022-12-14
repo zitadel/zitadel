@@ -881,7 +881,8 @@
       "BRANDING": "品牌标识",
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
-      "SECRETS": "验证码外观"
+      "SECRETS": "验证码外观",
+      "SECURITY": "安全设置"
     },
     "GROUPS": {
       "NOTIFICATIONS": "通知",
@@ -969,6 +970,11 @@
       "INCLUDEUPPERLETTERS": "包含大写字母",
       "LENGTH": "长度",
       "UPDATED": "设置已更新。"
+    },
+    "SECURITY": {
+      "DESCRIPTION": "此设置将CSP设置为允许来自一组允许的域的框架。请注意，通过启用iFrames的使用，你会有允许点击劫持的风险。",
+      "IFRAMEENABLED": "允许 iFrame",
+      "ALLOWEDORIGINS": "允许的来源 URL"
     },
     "DIALOG": {
       "RESET": {
@@ -1678,6 +1684,7 @@
     "ORIGINS": "其他来源",
     "NOTANORIGIN": "输入的值不是有效来源",
     "OIDC": {
+      "WELLKNOWN": "欲了解更多信息，请看<a href='{url}}' title='发现端点' target='_blank'>发现端点</a>。",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"

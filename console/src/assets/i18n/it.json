@@ -881,7 +881,8 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
       "OIDC": "OIDC Token lifetime e scadenza",
-      "SECRETS": "Aspetto dei segreti"
+      "SECRETS": "Aspetto dei segreti",
+      "SECURITY": "Impostazioni di sicurezza"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
@@ -969,6 +970,11 @@
       "INCLUDEUPPERLETTERS": "Contiene lettere maiuscole",
       "LENGTH": "Lunghezza",
       "UPDATED": "Impostazioni aggiornati"
+    },
+    "SECURITY": {
+      "DESCRIPTION": "Questa impostazione consente al CSP di consentire il framing da un insieme di domini consentiti. Si noti che abilitando l'uso di iFrames, si corre il rischio di consentire il clickjacking.",
+      "IFRAMEENABLED": "I Frame enabled",
+      "ALLOWEDORIGINS": "URL consentiti"
     },
     "DIALOG": {
       "RESET": {
@@ -1683,6 +1689,7 @@
     "TITLEFIRST": "Nome dell' applicazione",
     "TYPETITLE": "Che tipo di applicazione vuoi creare?",
     "OIDC": {
+      "WELLKNOWN": "Per ulteriori informazioni, consultare il sito <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client ID"

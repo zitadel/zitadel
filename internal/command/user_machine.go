@@ -51,7 +51,7 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 			if isUserStateExists(writeModel.UserState) {
 				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-k2una", "Errors.User.AlreadyExisting")
 			}
-			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ResourceOwner)
 			if err != nil {
 				return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotFound")
 			}
