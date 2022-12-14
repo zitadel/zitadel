@@ -99,3 +99,7 @@ func (m *mockInstance) RequestedDomain() string {
 func (m *mockInstance) RequestedHost() string {
 	return "zitadel.cloud:443"
 }
+
+func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
+	return nil
+}

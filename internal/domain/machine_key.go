@@ -42,17 +42,7 @@ func (key *MachineKey) Detail() ([]byte, error) {
 }
 
 func (key *MachineKey) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Type   string `json:"type"`
-		KeyID  string `json:"keyId"`
-		Key    string `json:"key"`
-		UserID string `json:"userId"`
-	}{
-		Type:   "serviceaccount",
-		KeyID:  key.KeyID,
-		Key:    string(key.PrivateKey),
-		UserID: key.AggregateID,
-	})
+	return MachineKeyMarshalJSON(key.KeyID, key.PrivateKey, key.AggregateID)
 }
 
 type MachineKeyState int32
@@ -67,4 +57,18 @@ const (
 
 func (f MachineKeyState) Valid() bool {
 	return f >= 0 && f < machineKeyStateCount
+}
+
+func MachineKeyMarshalJSON(keyID string, privateKey []byte, userID string) ([]byte, error) {
+	return json.Marshal(struct {
+		Type   string `json:"type"`
+		KeyID  string `json:"keyId"`
+		Key    string `json:"key"`
+		UserID string `json:"userId"`
+	}{
+		Type:   "serviceaccount",
+		KeyID:  keyID,
+		Key:    string(privateKey),
+		UserID: userID,
+	})
 }

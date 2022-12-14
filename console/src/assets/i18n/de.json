@@ -881,7 +881,8 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
       "OIDC": "OIDC Token Lifetime und Expiration",
-      "SECRETS": "Secret Erscheinungsbild"
+      "SECRETS": "Secret Erscheinungsbild",
+      "SECURITY": "Sicherheitseinstellungen"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Benachrichtigungen",
@@ -969,6 +970,11 @@
       "INCLUDEUPPERLETTERS": "Enthält Grossbuchstaben",
       "LENGTH": "Länge",
       "UPDATED": "Einstellungen geändert"
+    },
+    "SECURITY": {
+      "DESCRIPTION": "Mit dieser Einstellung wird die CSP so eingestellt, dass Framing von einer Reihe zulässiger Domänen zugelassen wird. Beachten Sie, dass Sie durch die Aktivierung der Verwendung von iFrames das Risiko eingehen, Clickjacking zu ermöglichen.",
+      "IFRAMEENABLED": "iFrame zulassen",
+      "ALLOWEDORIGINS": "Zulässige URLs"
     },
     "DIALOG": {
       "RESET": {
@@ -1166,7 +1172,8 @@
       "MAXATTEMPTS": "Maximale Anzahl an Versuchen",
       "EXPIREWARNDAYS": "Ablauf Warnung nach Tagen",
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
-      "USERLOGINMUSTBEDOMAIN": "Benutzer Loginname muss die Domain der Organisation beinhalten",
+      "USERLOGINMUSTBEDOMAIN": "Organisationsdomain dem Loginname hinzufügen",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
       "VALIDATEORGDOMAINS": "Org Domains validieren",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
@@ -1682,6 +1689,7 @@
     "TITLEFIRST": "Name der Applikation.",
     "TYPETITLE": "Art der Anwendung",
     "OIDC": {
+      "WELLKNOWN": "Weitere Links können vom <a href='{{url}}' title='Discovery endpoint' target='_blank'>Discovery endpoint</a> abgerufen werden.",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"

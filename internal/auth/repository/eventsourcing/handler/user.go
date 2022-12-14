@@ -317,12 +317,12 @@ func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceI
 	if err != nil {
 		return false, "", nil, err
 	}
-	if org.DomainPolicy == nil {
-		policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
-		if err != nil {
-			return false, "", nil, err
-		}
-		userLoginMustBeDomain = policy.UserLoginMustBeDomain
+	if org.DomainPolicy != nil {
+		return org.DomainPolicy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 	}
-	return userLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
+	policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
+	if err != nil {
+		return false, "", nil, err
+	}
+	return policy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 }
