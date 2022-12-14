@@ -132,7 +132,7 @@ type mockLoginPolicy struct {
 	policy *query.LoginPolicy
 }
 
-func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, _ bool, id string) (*query.LoginPolicy, error) {
+func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, _ bool, id string, _ bool) (*query.LoginPolicy, error) {
 	return m.policy, nil
 }
 
@@ -140,7 +140,7 @@ type mockLockoutPolicy struct {
 	policy *query.LockoutPolicy
 }
 
-func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error) {
+func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error) {
 	return m.policy, nil
 }
 
@@ -195,7 +195,7 @@ type mockUserGrants struct {
 	userGrants int
 }
 
-func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
+func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
@@ -212,7 +212,7 @@ type mockProject struct {
 	projectCheck bool
 }
 
-func (m *mockProject) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
+func (m *mockProject) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
 	return &query.Project{HasProjectCheck: m.projectCheck}, nil
 }
 
@@ -227,7 +227,7 @@ type mockApp struct {
 	app *query.App
 }
 
-func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string) (*query.App, error) {
+func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string, _ bool) (*query.App, error) {
 	if m.app != nil {
 		return m.app, nil
 	}
@@ -238,7 +238,7 @@ type mockIDPUserLinks struct {
 	idps []*query.IDPUserLink
 }
 
-func (m *mockIDPUserLinks) IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery) (*query.IDPUserLinks, error) {
+func (m *mockIDPUserLinks) IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery, withOwnerRemoved bool) (*query.IDPUserLinks, error) {
 	return &query.IDPUserLinks{Links: m.idps}, nil
 }
 

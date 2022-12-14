@@ -57,8 +57,9 @@ Database:
     Port: 26257
     Database: zitadel
     MaxOpenConns: 20
+    MaxIdleConns: 10
     MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
+    MaxConnIdleTime: 5m
     Options: ""
     User:
       Username: zitadel
@@ -83,6 +84,7 @@ Database:
     Port:
     Database:
     MaxOpenConns:
+    MaxIdleConns:
     MaxConnLifetime:
     MaxConnIdleTime:
     Options:
@@ -341,6 +343,15 @@ DefaultInstance:
         Number:
         Verified:
       Password:
+    Machine:
+      Machine:
+        Username:
+        Name:
+      MachineKey:
+        ExpirationDate:
+        Type:
+      Pat:
+        ExpirationDate:
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecret:
@@ -419,8 +430,8 @@ DefaultInstance:
     SecondFactorCheckLifetime: 18h
     MultiFactorCheckLifetime: 12h
   PrivacyPolicy:
-    TOSLink: https://docs.zitadel.com/docs/legal/terms-of-service
-    PrivacyLink: https://docs.zitadel.com/docs/legal/privacy-policy
+    TOSLink: https://zitadel.com/docs/legal/terms-of-service
+    PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
   LabelPolicy:
     PrimaryColor: "#5469d4"
@@ -566,6 +577,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -639,6 +651,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"
@@ -710,6 +723,7 @@ InternalAuthZ:
         - "org.global.read"
         - "org.create"
         - "org.write"
+        - "org.delete"
         - "org.member.read"
         - "org.member.write"
         - "org.member.delete"

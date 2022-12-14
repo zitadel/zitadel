@@ -9,11 +9,11 @@ import (
 	admin_grpc "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func setUpOrgHumanToCommand(human *admin_grpc.SetUpOrgRequest_Human) command.AddHuman {
+func setUpOrgHumanToCommand(human *admin_grpc.SetUpOrgRequest_Human) *command.AddHuman {
 	var lang language.Tag
 	lang, err := language.Parse(human.Profile.PreferredLanguage)
 	logging.OnError(err).Debug("unable to parse language")
-	return command.AddHuman{
+	return &command.AddHuman{
 		Username:          human.UserName,
 		FirstName:         human.Profile.FirstName,
 		LastName:          human.Profile.LastName,

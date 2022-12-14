@@ -1,11 +1,7 @@
-import React from 'react';
+import React from "react";
 
-import styles from '../css/column.module.css';
-
-export default function Column({children}) {
-    return (
-      <div className={styles.column}>
-        {children}
-      </div>
-    )
+export default function Column({ children }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">{children}</div>
+  );
 }
