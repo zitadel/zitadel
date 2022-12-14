@@ -7,7 +7,6 @@ import (
 
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -176,7 +175,7 @@ func (p *notificationsProjection) reduceInitCodeAdded(event eventstore.Event) (*
 	if err != nil {
 		return nil, err
 	}
-	translator, err := p.getTranslatorWithOrgTextsAndUserLanguage(ctx, notifyUser.ResourceOwner, notifyUser.PreferredLanguage, domain.InitCodeMessageType)
+	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.InitCodeMessageType)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +238,7 @@ func (p *notificationsProjection) reduceEmailCodeAdded(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	translator, err := p.getTranslatorWithOrgTextsAndUserLanguage(ctx, notifyUser.ResourceOwner,notifyUser.PreferredLanguage, domain.VerifyEmailMessageType)
+	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.VerifyEmailMessageType)
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +301,7 @@ func (p *notificationsProjection) reducePasswordCodeAdded(event eventstore.Event
 	if err != nil {
 		return nil, err
 	}
-	translator, err := p.getTranslatorWithOrgTextsAndUserLanguage(ctx, notifyUser.ResourceOwner,notifyUser.PreferredLanguage, domain.PasswordResetMessageType)
+	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.PasswordResetMessageType)
 	if err != nil {
 		return nil, err
 	}
@@ -373,7 +372,7 @@ func (p *notificationsProjection) reduceDomainClaimed(event eventstore.Event) (*
 	if err != nil {
 		return nil, err
 	}
-	translator, err := p.getTranslatorWithOrgTextsAndUserLanguage(ctx, notifyUser.ResourceOwner,notifyUser.PreferredLanguage, domain.DomainClaimedMessageType)
+	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.DomainClaimedMessageType)
 	if err != nil {
 		return nil, err
 	}
@@ -434,7 +433,7 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 	if err != nil {
 		return nil, err
 	}
-	translator, err := p.getTranslatorWithOrgTextsAndUserLanguage(ctx, notifyUser.ResourceOwner, notifyUser.PreferredLanguage,domain.PasswordlessRegistrationMessageType)
+	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.PasswordlessRegistrationMessageType)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +491,7 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	translator, err := p.getTranslatorWithOrgTextsAndUserLanguage(ctx, notifyUser.ResourceOwner,notifyUser.PreferredLanguage, domain.VerifyPhoneMessageType)
+	translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.VerifyPhoneMessageType)
 	if err != nil {
 		return nil, err
 	}
@@ -616,35 +615,6 @@ func (p *notificationsProjection) getLogProvider(ctx context.Context) (*log.LogC
 
 func (p *notificationsProjection) getTranslatorWithOrgTexts(ctx context.Context, orgID, textType string) (*i18n.Translator, error) {
 	translator, err := i18n.NewTranslator(p.statikDir, p.queries.GetDefaultLanguage(ctx), "")
-	if err != nil {
-		return nil, err
-	}
-
-	allCustomTexts, err := p.queries.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), textType, false)
-	if err != nil {
-		return translator, nil
-	}
-	customTexts, err := p.queries.CustomTextListByTemplate(ctx, orgID, textType, false)
-	if err != nil {
-		return translator, nil
-	}
-	allCustomTexts.CustomTexts = append(allCustomTexts.CustomTexts, customTexts.CustomTexts...)
-
-	for _, text := range allCustomTexts.CustomTexts {
-		msg := i18n.Message{
-			ID:   text.Template + "." + text.Key,
-			Text: text.Text,
-		}
-		err = translator.AddMessages(text.Language, msg)
-		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "orgID", orgID, "messageType", textType, "messageID", msg.ID).
-			OnError(err).
-			Warn("could not add translation message")
-	}
-	return translator, nil
-}
-
-func (p *notificationsProjection) getTranslatorWithOrgTextsAndUserLanguage(ctx context.Context, orgID string, preferredLanguage language.Tag, textType string) (*i18n.Translator, error) {
-	translator, err := i18n.NewTranslator(p.statikDir,preferredLanguage, "")
 	if err != nil {
 		return nil, err
 	}
