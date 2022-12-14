@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -18,17 +19,19 @@ type Eventstore struct {
 	repo              repository.Repository
 	interceptorMutex  sync.Mutex
 	eventInterceptors map[EventType]eventTypeInterceptors
+	PushTimeout       time.Duration
 }
 
 type eventTypeInterceptors struct {
 	eventMapper func(*repository.Event) (Event, error)
 }
 
-func NewEventstore(repo repository.Repository) *Eventstore {
+func NewEventstore(config *Config) *Eventstore {
 	return &Eventstore{
-		repo:              repo,
+		repo:              config.repo,
 		eventInterceptors: map[EventType]eventTypeInterceptors{},
 		interceptorMutex:  sync.Mutex{},
+		PushTimeout:       config.PushTimeout,
 	}
 }
 
@@ -45,6 +48,13 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 	if err != nil {
 		return nil, err
 	}
+
+	if es.PushTimeout > 0 {
+		var cancel func()
+		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
+		defer cancel()
+	}
+
 	err = es.repo.Push(ctx, events, constraints...)
 	if err != nil {
 		return nil, err
