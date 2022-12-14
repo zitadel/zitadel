@@ -219,7 +219,13 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 	data.Phone = externalUser.Phone
 	data.ExternalPhone = externalUser.Phone
 	data.ExternalPhoneVerified = externalUser.IsPhoneVerified
-	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, nil)
+
+	funcs := map[string]interface{}{
+		"selectedLanguage": func(l string) bool {
+			return data.Language == l
+		},
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, funcs)
 }
 
 func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Request) {
@@ -262,6 +268,7 @@ func (l *Login) mapTokenToLoginHumanAndExternalIDP(tokens *oidc.Tokens, idpConfi
 		NickName:          tokens.IDTokenClaims.GetNickname(),
 		Email:             tokens.IDTokenClaims.GetEmail(),
 		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
+		PreferredLanguage: tokens.IDTokenClaims.GetLocale(),
 	}
 
 	if tokens.IDTokenClaims.GetPhoneNumber() != "" {

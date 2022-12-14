@@ -234,7 +234,7 @@ func (m *mockInstance) DefaultLanguage() language.Tag {
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {
-	return "orgID"
+	return "defaultOrgID"
 }
 
 func (m *mockInstance) RequestedDomain() string {
