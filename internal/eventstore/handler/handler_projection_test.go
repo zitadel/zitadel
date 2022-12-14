@@ -68,7 +68,7 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
 					return eventstore.NewEventstore(
-						es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+						eventstore.TestConfig(es_repo_mock.NewRepo(t).ExpectFilterEvents()),
 					)
 				},
 				query: testQuery(
@@ -93,7 +93,7 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 			"process error",
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
-					return eventstore.NewEventstore(
+					return eventstore.NewEventstore(eventstore.TestConfig(
 						es_repo_mock.NewRepo(t).ExpectFilterEvents(
 							&repository.Event{
 								ID:                        "id",
@@ -106,6 +106,7 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 								AggregateType:             "testAgg",
 							},
 						),
+					),
 					)
 				},
 				query: testQuery(
@@ -131,7 +132,7 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 			"process ok",
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
-					return eventstore.NewEventstore(
+					return eventstore.NewEventstore(eventstore.TestConfig(
 						es_repo_mock.NewRepo(t).ExpectFilterEvents(
 							&repository.Event{
 								ID:                        "id",
@@ -144,6 +145,7 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 								AggregateType:             "testAgg",
 							},
 						),
+					),
 					)
 				},
 				query: testQuery(
@@ -170,7 +172,7 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 			"process limit exceeded ok",
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
-					return eventstore.NewEventstore(
+					return eventstore.NewEventstore(eventstore.TestConfig(
 						es_repo_mock.NewRepo(t).
 							ExpectFilterEvents(
 								&repository.Event{
@@ -184,6 +186,7 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 									AggregateType:             "testAgg",
 								},
 							).ExpectFilterEvents(),
+					),
 					)
 				},
 				query: testQuery(
@@ -389,8 +392,9 @@ func TestProjectionHandler_FetchEvents(t *testing.T) {
 				ctx: context.Background(),
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEventsError(ErrFilter),
+				),
 				),
 				query: testQuery(
 					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -415,7 +419,7 @@ func TestProjectionHandler_FetchEvents(t *testing.T) {
 			},
 			fields: fields{
 				eventstore: eventstore.NewEventstore(
-					es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+					eventstore.TestConfig(es_repo_mock.NewRepo(t).ExpectFilterEvents()),
 				),
 				query: testQuery(
 					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -439,7 +443,7 @@ func TestProjectionHandler_FetchEvents(t *testing.T) {
 				ctx: context.Background(),
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							ID:                        "id",
@@ -462,6 +466,7 @@ func TestProjectionHandler_FetchEvents(t *testing.T) {
 							AggregateType:             "testAgg",
 						},
 					),
+				),
 				),
 				query: testQuery(
 					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -485,7 +490,7 @@ func TestProjectionHandler_FetchEvents(t *testing.T) {
 				ctx: context.Background(),
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							ID:                        "id",
@@ -508,6 +513,7 @@ func TestProjectionHandler_FetchEvents(t *testing.T) {
 							AggregateType:             "testAgg",
 						},
 					),
+				),
 				),
 				query: testQuery(
 					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
@@ -694,8 +700,9 @@ func TestProjection_schedule(t *testing.T) {
 			},
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
-					return eventstore.NewEventstore(
+					return eventstore.NewEventstore(eventstore.TestConfig(
 						es_repo_mock.NewRepo(t).ExpectFilterEventsError(ErrFilter),
+					),
 					)
 				},
 				triggerProjection: time.NewTimer(0),
@@ -713,7 +720,7 @@ func TestProjection_schedule(t *testing.T) {
 			},
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
-					return eventstore.NewEventstore(
+					return eventstore.NewEventstore(eventstore.TestConfig(
 						es_repo_mock.NewRepo(t).ExpectFilterEvents(
 							&repository.Event{
 								AggregateType:             "system",
@@ -723,6 +730,7 @@ func TestProjection_schedule(t *testing.T) {
 								Type:                      "system.projections.scheduler.succeeded",
 							}).
 							ExpectInstanceIDsError(ErrFilter),
+					),
 					)
 				},
 				triggerProjection: time.NewTimer(0),
@@ -740,7 +748,7 @@ func TestProjection_schedule(t *testing.T) {
 			},
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
-					return eventstore.NewEventstore(
+					return eventstore.NewEventstore(eventstore.TestConfig(
 						es_repo_mock.NewRepo(t).ExpectFilterEvents(
 							&repository.Event{
 								AggregateType:             "system",
@@ -749,6 +757,7 @@ func TestProjection_schedule(t *testing.T) {
 								InstanceID:                "",
 								Type:                      "system.projections.scheduler.succeeded",
 							}).ExpectInstanceIDs("instanceID1"),
+					),
 					)
 				},
 				triggerProjection: time.NewTimer(0),
@@ -771,7 +780,7 @@ func TestProjection_schedule(t *testing.T) {
 			},
 			fields{
 				eventstore: func(t *testing.T) *eventstore.Eventstore {
-					return eventstore.NewEventstore(
+					return eventstore.NewEventstore(eventstore.TestConfig(
 						es_repo_mock.NewRepo(t).ExpectFilterEvents(
 							&repository.Event{
 								AggregateType:             "system",
@@ -780,6 +789,7 @@ func TestProjection_schedule(t *testing.T) {
 								InstanceID:                "",
 								Type:                      "system.projections.scheduler.succeeded",
 							}).ExpectInstanceIDs("instanceID1"),
+					),
 					)
 				},
 				triggerProjection: time.NewTimer(0),

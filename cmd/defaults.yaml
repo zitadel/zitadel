@@ -320,6 +320,9 @@ Actions:
       - localhost
       - "127.0.0.1"
 
+Eventstore:
+  PushTimeout: 15s
+
 DefaultInstance:
   InstanceName:
   DefaultLanguage: en
