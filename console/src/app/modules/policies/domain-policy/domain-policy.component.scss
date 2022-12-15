@@ -34,37 +34,6 @@
       align-items: center;
     }
   }
-
-  .loginname-preview {
-    margin: 1rem 0;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    .left-right {
-      display: flex;
-      flex-direction: row;
-
-      @media only screen and (max-width: 600px) {
-        flex-direction: column;
-      }
-
-      div {
-        display: flex;
-        flex-direction: column;
-        margin: 0.5rem;
-
-        small {
-          opacity: 0.9;
-        }
-      }
-    }
-
-    i {
-      margin: 0 1rem;
-    }
-  }
 }
 
 .btn-container {
