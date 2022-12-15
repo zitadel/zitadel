@@ -51,6 +51,12 @@ The user will logout from all clients even in the case the user agent was closed
 This is not yet implemented in ZITADEL
 :::
 
+## Use Cases
+
+1. Logout all users from this browser (current implementation of ZITADEL end_session_endpoint)
+2. Logout my user from this browser
+3. Logout my user from all devices
+
 ## Logout in ZITADEL
 
 ZITADEL generates a user-agent cookie as soon as a user authenticates the first time. 
