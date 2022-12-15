@@ -53,8 +53,8 @@ This is not yet implemented in ZITADEL
 
 ## Use Cases
 
-1. Logout all users from this browser (current implementation of ZITADEL end_session_endpoint)
-2. Logout my user from this browser
+1. Logout all users from current user-agent/browser (current implementation of ZITADEL end_session_endpoint)
+2. Logout my user from current user-agent/browser
 3. Logout my user from all devices
 
 ## Logout in ZITADEL
