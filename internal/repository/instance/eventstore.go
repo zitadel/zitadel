@@ -30,6 +30,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(DebugNotificationProviderLogRemovedEventType, DebugNotificationProviderLogRemovedEventMapper).
 		RegisterFilterEventMapper(OIDCSettingsAddedEventType, OIDCSettingsAddedEventMapper).
 		RegisterFilterEventMapper(OIDCSettingsChangedEventType, OIDCSettingsChangedEventMapper).
+		RegisterFilterEventMapper(SecurityPolicySetEventType, SecurityPolicySetEventMapper).
 		RegisterFilterEventMapper(LabelPolicyAddedEventType, LabelPolicyAddedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyChangedEventType, LabelPolicyChangedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyActivatedEventType, LabelPolicyActivatedEventMapper).
