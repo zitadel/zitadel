@@ -69,7 +69,7 @@ So ZITADEL is able to read the configured redirect uris.
 A logout request will look similar to the following:
 ```
 GET https://{your-domain}/oidc/v1/end_session_endpoint
-    ?id_token_hint=id_token_issued_to_client
+    ?id_token_hint={id_token_issued_to_client}
 ```
 
 
