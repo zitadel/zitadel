@@ -52,7 +52,6 @@ func AccessStorageInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 		resMd, _ := metadata.FromOutgoingContext(ctx)
 		instance := authz.GetInstance(ctx)
 
-		// TODO: Why is the instance missing at some paths like /oauth, /.well-known and /ui? Should we fix that for the access logs?
 		record := &logstore.AccessLogRecord{
 			Timestamp:       time.Now(),
 			Protocol:        logstore.GRPC,

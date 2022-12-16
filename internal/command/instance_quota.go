@@ -1,10 +1,17 @@
 package command
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/query"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -156,6 +163,98 @@ func isUrl(str string) error {
 
 	if u.Scheme == "" || u.Host == "" {
 		return fmt.Errorf("url %s is invalid", str)
+	}
+
+	return nil
+}
+
+// ReportUsage calls notification hooks if necessary and returns if usage should be limited
+func (c *Commands) ReportUsage(ctx context.Context, q *query.Quota, used uint64) (doLimit bool, err error) {
+
+	doLimit = q.Limit && int64(used) > q.Amount
+
+	dueNotifications, err := query.GetDueInstanceQuotaNotifications(ctx, q, used)
+	if err != nil {
+		return doLimit, err
+	}
+
+	for _, notification := range dueNotifications {
+
+		alreadyNotified, err := isAlreadNotified(ctx, c.eventstore, notification, q.PeriodStart)
+		if err != nil {
+			return doLimit, err
+		}
+
+		if alreadyNotified {
+			// TODO: Debugf
+			logging.Infof(
+				"quota notification with ID %s and threshold %d was already notified in this period",
+				notification.NotifiedEvent.ID,
+				notification.NotifiedEvent.Threshold,
+			)
+			continue
+		}
+
+		if err = notify(ctx, notification); err != nil {
+			if err != nil {
+				return doLimit, err
+			}
+		}
+
+		if _, err := c.eventstore.Push(ctx, notification.NotifiedEvent); err != nil {
+			return doLimit, err
+		}
+	}
+
+	return doLimit, nil
+}
+
+func isAlreadNotified(ctx context.Context, es *eventstore.Eventstore, notification *query.QuotaNotification, periodStart time.Time) (bool, error) {
+
+	events, err := es.Filter(
+		ctx,
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			InstanceID(notification.NotifiedEvent.Aggregate().InstanceID).
+			AddQuery().
+			AggregateTypes(instance.AggregateType).
+			AggregateIDs(notification.NotifiedEvent.Aggregate().ID).
+			SequenceGreater(notification.NotifiedEvent.Sequence()).
+			EventTypes(quota.NotifiedEventType).
+			CreationDateAfter(periodStart).
+			EventData(map[string]interface{}{
+				"id":        notification.NotifiedEvent.ID,
+				"threshold": notification.NotifiedEvent.Threshold,
+			}).
+			Builder(),
+	)
+	return len(events) > 0, err
+}
+
+func notify(ctx context.Context, notification *query.QuotaNotification) error {
+
+	payload, err := json.Marshal(notification.NotifiedEvent)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, notification.CallUrl, bytes.NewReader(payload))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if err = resp.Body.Close(); err != nil {
+		return err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return fmt.Errorf("calling url %s returned %s", notification.CallUrl, resp.Status)
 	}
 
 	return nil
