@@ -247,10 +247,6 @@ service SystemService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "views";
-      external_docs: {
-        url: "https://docs.zitadel.com/concepts#Software_Architecture";
-        description: "details of ZITADEL's event driven software concepts";
-      };
       responses: {
         key: "200";
         value: {
