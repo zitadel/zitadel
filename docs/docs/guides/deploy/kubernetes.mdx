@@ -19,7 +19,9 @@ helm repo add cockroachdb https://charts.cockroachdb.com/
 helm repo add zitadel https://charts.zitadel.com
 ```
 
-### Install an insecure cockroachdb and zitadel release that works with localhost
+### Install zitadel
+
+#### Install an insecure cockroachdb and zitadel release that works with localhost
 
 ```bash
 # CockroachDB
@@ -34,8 +36,38 @@ helm install my-zitadel zitadel/zitadel \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
   --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
-  --set replicaCount=1
+  --set replicaCount=1 \
+  --set cockroachdb.single-node=true \
+  --set cockroachdb.statefulset.replicas=1
 ```
+
+<DefaultUser components={props.components} />
+
+#### Install an insecure zitadel release that works with localhost with a service account
+
+!!!Caution!!! With this setup you only get a service account with a key and no admin account where you can login directly into ZITADEL.
+
+```bash
+helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
+  --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
+  --set zitadel.configmapConfig.ExternalSecure=false \
+  --set zitadel.configmapConfig.TLS.Enabled=false \
+  --set zitadel.secretConfig.Database.cockroach.User.Password="a-zitadel-db-user-password" \
+  --set replicaCount=1 \
+  --set cockroachdb.single-node=true \
+  --set cockroachdb.statefulset.replicas=1 \
+  --set zitadel.configmapConfig.FirstInstance.MachineKeyPath="/machinekey/zitadel-admin-sa.json" \
+  --set zitadel.configmapConfig.FirstInstance.Org.Machine.Machine.Username="zitadel-admin-sa" \
+  --set zitadel.configmapConfig.FirstInstance.Org.Machine.Machine.Name="Admin" \
+  --set zitadel.configmapConfig.FirstInstance.Org.Machine.MachineKey.Type=1
+```
+
+When helm is done, you get a command to retrieve your machine key, which is saved as a kubernetes secret, for example:
+```bash
+kubectl -n zitadel get secret zitadel-admin-sa -o jsonpath='{ .data.zitadel-admin-sa\.json }' | base64 -D
+```
+
+This key can be used to provision resources with for example [Terraform](../manage/terraform/basics.md).
 
 ### Forward the ZITADEL service port to your local machine
 
@@ -43,6 +75,5 @@ helm install my-zitadel zitadel/zitadel \
 kubectl port-forward svc/my-zitadel 8080:8080
 ```
 
-<DefaultUser components={props.components} />
 <Next components={props.components} />
 <Disclaimer components={props.components} />
