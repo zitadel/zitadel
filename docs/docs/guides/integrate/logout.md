@@ -16,8 +16,8 @@ Single Logout (SLO) is the counterpart to SSO. With SLO a user can logout and te
 The purpose of a logout is to terminate a user session. 
 Depending on how the session handling is implemented, there are different mechanisms that can be used.
 There are two possibilities where sessions are stored:
-- User Agent stores session information (e.g. in a cookie)
-- Server Side stores session information (e.g. in a database)
+- The User Agent (e.g the Browser or Mobile App) stores the session information (e.g. in a cookie)
+- A Server stores the session information (e.g. in a database or api)
 
 OpenID Connect defines three logout mechanisms to address the different architectures:
 - [OpenID Connect Session Management 1.0](https://openid.net/specs/openid-connect-session-1_0.html)
