@@ -65,10 +65,13 @@ More in the [documentation](/apis/openidoauth/authn-methods) about authenticatio
 
 <p>
   <span className="text-cyan-500">Prompt</span> defines if and how the user
-  should be prompted on login. For example you can pre-select a login name (
-  <code>select_account</code>) or present the register form (<code>create</code>
-  ) to users directly. The value <code>login</code> requires the user to
-  re-authenticate.
+  should be prompted on login. For example: 
+  <ul>
+    <li><code>select_account</code>: user is prompted to select one of the existing sessions or create a new one</li>
+    <li><code>create</code>: present the register form</li>
+    <li><code>login</code>: requires the user to re-authenticate</li>
+    <li><code>none</code>: user must be authenticated without interaction, an error is returned otherwise; use for silent-refresh</li>
+  </ul>
 </p>
 
 <p>
