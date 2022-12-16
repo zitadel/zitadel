@@ -2,7 +2,7 @@
 title: Logout
 ---
 
-This guide shows you different concepts and use cases for logout and how to use it in ZITADEL.
+This guide shows you the different concepts and use cases of the logout process and how to use it in ZITADEL.
 
 ## OpenID Connect Single Logout 
 
