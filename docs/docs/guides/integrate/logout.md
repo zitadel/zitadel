@@ -51,7 +51,7 @@ The user will logout from all clients even in the case the user agent was closed
 This is not yet implemented in ZITADEL
 :::
 
-## Use Cases
+## Scenarios
 
 1. Logout all users from current user-agent/browser (current implementation of ZITADEL end_session_endpoint)
 2. Logout my user from current user-agent/browser
