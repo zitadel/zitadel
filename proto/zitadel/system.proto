@@ -299,7 +299,6 @@ service SystemService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "failed events";
-
       responses: {
         key: "200";
         value: {
