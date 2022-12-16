@@ -12,18 +12,26 @@ For running an easily testable, insecure, non-HA ZITADEL instance, run the follo
 
 ## Helm
 
-### Add the helm repository
+### Add the helm repositories for CockroachDB and ZITADEL
 
 ```bash
+helm repo add cockroachdb https://charts.cockroachdb.com/
 helm repo add zitadel https://charts.zitadel.com
 ```
 
 ### Install zitadel
 
-#### Install an insecure zitadel release that works with localhost with an admin account
+#### Install an insecure cockroachdb and zitadel release that works with localhost
 
 ```bash
-helm install --namespace zitadel --create-namespace my-zitadel zitadel/zitadel \
+# CockroachDB
+helm install crdb cockroachdb/cockroachdb \
+  --set fullnameOverride=crdb \
+  --set single-node=true \
+  --set statefulset.replicas=1
+
+# ZITADEL
+helm install my-zitadel zitadel/zitadel \
   --set zitadel.masterkey="MasterkeyNeedsToHave32Characters" \
   --set zitadel.configmapConfig.ExternalSecure=false \
   --set zitadel.configmapConfig.TLS.Enabled=false \
@@ -64,7 +72,7 @@ This key can be used to provision resources with for example [Terraform](../mana
 ### Forward the ZITADEL service port to your local machine
 
 ```bash
-kubectl -n zitadel port-forward svc/my-zitadel 8080:8080
+kubectl port-forward svc/my-zitadel 8080:8080
 ```
 
 <Next components={props.components} />
