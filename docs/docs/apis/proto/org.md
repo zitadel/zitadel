@@ -135,6 +135,7 @@ title: zitadel/org.proto
 | ORG_STATE_UNSPECIFIED | 0 | - |
 | ORG_STATE_ACTIVE | 1 | - |
 | ORG_STATE_INACTIVE | 2 | - |
+| ORG_STATE_REMOVED | 3 | - |
 
 
 

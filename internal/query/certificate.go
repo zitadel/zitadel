@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Certificate interface {
@@ -64,7 +65,10 @@ var (
 	}
 )
 
-func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (*Certificates, error) {
+func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (_ *Certificates, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareCertificateQuery()
 	if t.IsZero() {
 		t = time.Now()
@@ -75,13 +79,10 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 				KeyColUse.identifier():        usage,
 			},
-			sq.Gt{
-				CertificateColExpiry.identifier(): t,
-			},
-			sq.Gt{
-				KeyPrivateColExpiry.identifier(): t,
-			},
-		}).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
+			sq.Gt{CertificateColExpiry.identifier(): t},
+			sq.Gt{KeyPrivateColExpiry.identifier(): t},
+		},
+	).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
 	}

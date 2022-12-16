@@ -21,9 +21,7 @@ func (wm *CustomLoginTextsReadModel) Reduce() error {
 		case *policy.CustomTextSetEvent:
 			wm.CustomLoginTexts[e.Template+e.Language.String()] = &CustomText{Language: e.Language, Template: e.Template}
 		case *policy.CustomTextTemplateRemovedEvent:
-			if _, ok := wm.CustomLoginTexts[e.Template+e.Language.String()]; ok {
-				delete(wm.CustomLoginTexts, e.Template+e.Language.String())
-			}
+			delete(wm.CustomLoginTexts, e.Template+e.Language.String())
 		}
 	}
 	return wm.WriteModel.Reduce()

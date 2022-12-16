@@ -8,11 +8,12 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
-	InstanceMemberProjectionTable = "projections.instance_members2"
+	InstanceMemberProjectionTable = "projections.instance_members3"
 
 	InstanceMemberIAMIDCol = "id"
 )
@@ -29,7 +30,8 @@ func newInstanceMemberProjection(ctx context.Context, config crdb.StatementHandl
 		crdb.NewTable(
 			append(memberColumns, crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText)),
 			crdb.NewPrimaryKey(MemberInstanceID, InstanceColumnID, MemberUserIDCol),
-			crdb.WithIndex(crdb.NewIndex("inst_memb_user_idx", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("user_id", []string{MemberUserIDCol})),
+			crdb.WithIndex(crdb.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
 		),
 	)
 
@@ -65,6 +67,15 @@ func (p *instanceMemberProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceUserOwnerRemoved,
+				},
+			},
+		},
+		{
 			Aggregate: user.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
@@ -81,7 +92,12 @@ func (p *instanceMemberProjection) reduceAdded(event eventstore.Event) (*handler
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pGNCu", "reduce.wrong.event.type %s", instance.MemberAddedEventType)
 	}
-	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(InstanceMemberIAMIDCol, e.Aggregate().ID))
+	ctx := setMemberContext(e.Aggregate())
+	userOwner, err := getResourceOwnerOfUser(ctx, p.Eventstore, e.Aggregate().InstanceID, e.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return reduceMemberAdded(e.MemberAddedEvent, userOwner, withMemberCol(InstanceMemberIAMIDCol, e.Aggregate().ID))
 }
 
 func (p *instanceMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
@@ -114,4 +130,12 @@ func (p *instanceMemberProjection) reduceUserRemoved(event eventstore.Event) (*h
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-mkDHF", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
+}
+
+func (p *instanceMemberProjection) reduceUserOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-mkDHa", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+	return reduceMemberUserOwnerRemoved(e)
 }

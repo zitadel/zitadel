@@ -88,7 +88,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	}
 	translator := l.getTranslator(r.Context(), authRequest)
 	data := registerOrgData{
-		baseData:            l.getBaseData(r, authRequest, "RegistrationOrg.Title","RegistrationOrg.Description", errID, errMessage),
+		baseData:            l.getBaseData(r, authRequest, "RegistrationOrg.Title", "RegistrationOrg.Description", errID, errMessage),
 		registerOrgFormData: *formData,
 	}
 	pwPolicy := l.getPasswordComplexityPolicy(r, "0")
@@ -144,7 +144,7 @@ func (d registerOrgFormData) toCommandOrg() *command.OrgSetup {
 	}
 	return &command.OrgSetup{
 		Name: d.RegisterOrgName,
-		Human: command.AddHuman{
+		Human: &command.AddHuman{
 			Username:  d.Username,
 			FirstName: d.Firstname,
 			LastName:  d.Lastname,

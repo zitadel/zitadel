@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	idpProviderTable = "auth.idp_providers"
+	idpProviderTable = "auth.idp_providers2"
 )
 
 type IDPProvider struct {
@@ -140,7 +140,9 @@ func (i *IDPProvider) processIdpProvider(event *models.Event) (err error) {
 	case org.LoginPolicyRemovedEventType:
 		return i.view.DeleteIDPProvidersByAggregateID(event.AggregateID, event.InstanceID, event)
 	case instance.InstanceRemovedEventType:
-		return i.view.DeleteInstanceIDPs(event)
+		return i.view.DeleteInstanceIDPProviders(event)
+	case org.OrgRemovedEventType:
+		return i.view.UpdateOrgOwnerRemovedIDPProviders(event)
 	default:
 		return i.view.ProcessedIDPProviderSequence(event)
 	}
@@ -194,9 +196,9 @@ func (i *IDPProvider) OnSuccess(instanceIDs []string) error {
 }
 
 func (i *IDPProvider) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID, false)
 }
 
 func (i *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID, false)
 }

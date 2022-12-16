@@ -23,7 +23,7 @@ You should consider to implement [exponential backoff](https://en.wikipedia.org/
 
 ## What rate limits do apply
 
-For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register and reset features) and for API paths each. Learn more about [the exact rules](/docs/apis/ratelimits).
+For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register and reset features) and for API paths each. Learn more about [the exact rules](/apis/ratelimits).
 
 ## Load Testing
 

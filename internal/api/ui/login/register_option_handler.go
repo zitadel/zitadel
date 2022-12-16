@@ -54,7 +54,7 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := registerOptionData{
-		baseData: l.getBaseData(r, authReq, "RegisterOption.Title","RegisterOption.Description", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, "RegisterOption.Title", "RegisterOption.Description", errID, errMessage),
 	}
 	funcs := map[string]interface{}{
 		"hasRegistration": func() bool {
@@ -109,7 +109,7 @@ func (l *Login) passLoginHintToRegistration(r *http.Request, authReq *domain.Aut
 		logging.WithFields("authRequest", authReq.ID, "org", authReq.RequestedOrgID).Error("unable to search query for registration loginHint")
 		return data
 	}
-	domains, err := l.query.SearchOrgDomains(r.Context(), &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{searchQuery}})
+	domains, err := l.query.SearchOrgDomains(r.Context(), &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{searchQuery}}, false)
 	if err != nil {
 		logging.WithFields("authRequest", authReq.ID, "org", authReq.RequestedOrgID).Error("unable to load domains for registration loginHint")
 		return data

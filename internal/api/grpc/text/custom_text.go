@@ -65,7 +65,7 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 		ExternalRegistrationUserOverviewText: ExternalRegistrationUserOverviewScreenTextToPb(text.ExternalRegistrationUserOverview),
 		RegistrationOrgText:                  RegistrationOrgScreenTextToPb(text.RegistrationOrg),
 		LinkingUserDoneText:                  LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
-		ExternalUserNotFoundText:             ExternalUserNotFoundScreenTextToPb(text.ExternalNotFoundOption),
+		ExternalUserNotFoundText:             ExternalUserNotFoundScreenTextToPb(text.ExternalNotFound),
 		SuccessLoginText:                     SuccessLoginScreenTextToPb(text.LoginSuccess),
 		LogoutText:                           LogoutDoneScreenTextToPb(text.LogoutDone),
 		FooterText:                           FooterTextToPb(text.Footer),
@@ -761,6 +761,7 @@ func PasswordlessRegistrationDoneScreenTextPbToDomain(text *text_pb.Passwordless
 		Description:      text.Description,
 		DescriptionClose: text.DescriptionClose,
 		NextButtonText:   text.NextButtonText,
+		CancelButtonText: text.CancelButtonText,
 	}
 }
 

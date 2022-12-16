@@ -209,11 +209,11 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 			return scopes, nil
 		}
 	}
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
+	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID, false)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
 	}
-	project, err := o.query.ProjectByID(ctx, false, projectID)
+	project, err := o.query.ProjectByID(ctx, false, projectID, false)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
 	}
@@ -224,7 +224,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +236,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 
 func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
 	token.Audience = append(token.Audience, clientID)
-	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
 	if err != nil {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
 	}
@@ -244,7 +244,7 @@ func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.T
 	if err != nil {
 		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
 	if err != nil {
 		return err
 	}

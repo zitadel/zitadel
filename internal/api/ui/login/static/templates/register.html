@@ -15,7 +15,8 @@
 
     {{ .CSRF }}
 
-    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}"/>
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="language" value="{{.Language}}" />
 
     <div class="lgn-register">
 
@@ -23,29 +24,27 @@
             <div class="lgn-field">
                 <label class="lgn-label" for="firstname">{{t "RegistrationUser.FirstnameLabel"}}</label>
                 <input class="lgn-input" type="text" id="firstname" name="firstname" autocomplete="given-name"
-                       value="{{ .Firstname }}" autofocus required>
+                    value="{{ .Firstname }}" autofocus required>
             </div>
             <div class="lgn-field">
                 <label class="lgn-label" for="lastname">{{t "RegistrationUser.LastnameLabel"}}</label>
                 <input class="lgn-input" type="text" id="lastname" name="lastname" autocomplete="family-name"
-                       value="{{ .Lastname }}" required>
+                    value="{{ .Lastname }}" required>
             </div>
         </div>
 
         <div class="lgn-field double">
             <label class="lgn-label" for="email">{{t "RegistrationUser.EmailLabel"}}</label>
-            <input class="lgn-input" type="email" id="email" name="email" autocomplete="email" value="{{ .Email }}"
-                   required>
+            <input class="lgn-input" type="email" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
         </div>
 
         {{if .ShowUsername}}
         <div class="lgn-field double">
             <label class="lgn-label" for="username">{{t "RegistrationUser.UsernameLabel"}}</label>
             <div class="lgn-suffix-wrapper">
-                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email"
-                       value="{{ .Username }}" required>
+                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Username }}" required>
                 {{if .ShowUsernameSuffix}}
-                <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
+                    <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
                 {{end}}
             </div>
         </div>
@@ -55,15 +54,14 @@
             <div class="lgn-field">
                 <label class="lgn-label" for="register-password">{{t "RegistrationUser.PasswordLabel"}}</label>
                 <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
-                       data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
-                       data-has-symbol="{{ .HasSymbol }}" class="lgn-input" type="password" id="register-password"
-                       name="register-password" autocomplete="new-password" required>
+                    data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
+                    data-has-symbol="{{ .HasSymbol }}" class="lgn-input" type="password" id="register-password"
+                    name="register-password" autocomplete="new-password" required>
             </div>
             <div class="lgn-field">
-                <label class="lgn-label" for="register-password-confirmation">{{t
-                    "RegistrationUser.PasswordConfirmLabel"}}</label>
+                <label class="lgn-label" for="register-password-confirmation">{{t "RegistrationUser.PasswordConfirmLabel"}}</label>
                 <input class="lgn-input" type="password" id="register-password-confirmation"
-                       name="register-password-confirmation" autocomplete="new-password" required>
+                    name="register-password-confirmation" autocomplete="new-password" required>
             </div>
         </div>
 
@@ -112,15 +110,13 @@
             {{t "RegistrationUser.BackButtonText"}}
         </a>
         <span class="fill-space"></span>
-        <button class="lgn-raised-button lgn-primary" id="register-button" type="submit">{{t
-            "RegistrationUser.NextButtonText"}}
-        </button>
+        <button class="lgn-raised-button lgn-primary" id="register-button" type="submit">{{t "RegistrationUser.NextButtonText"}}</button>
     </div>
 </form>
 
-<script src="{{ resourceUrl " scripts/input_suffix_offset.js" }}"></script>
-<script src="{{ resourceUrl " scripts/form_submit.js" }}"></script>
-<script src="{{ resourceUrl " scripts/password_policy_check.js" }}"></script>
-<script src="{{ resourceUrl " scripts/register_check.js" }}"></script>
+<script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
+<script src="{{ resourceUrl "scripts/register_check.js" }}"></script>
 
 {{template "main-bottom" .}}

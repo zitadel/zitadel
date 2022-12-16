@@ -114,7 +114,7 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 		disabled,
 	}
 	if authReq == nil {
-		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID)
+		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID, false)
 		logging.Log("HANDL-XjWKE").OnError(err).Error("unable to get active label policy")
 		data.LabelPolicy = labelPolicyToDomain(policy)
 
@@ -195,7 +195,7 @@ func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *htt
 	translator := l.getTranslator(r.Context(), authReq)
 
 	data := passwordlessRegistrationDoneDate{
-		userData:       l.getUserData(r, authReq, "PasswordlessRegistrationDone.Title","PasswordlessRegistrationDone.Description", errID, errMessage),
+		userData:       l.getUserData(r, authReq, "PasswordlessRegistrationDone.Title", "PasswordlessRegistrationDone.Description", errID, errMessage),
 		HideNextButton: authReq == nil,
 	}
 	if authReq == nil {

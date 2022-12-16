@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -18,7 +19,7 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users5"
+	UserTable        = "projections.users6"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -32,6 +33,7 @@ const (
 	UserInstanceIDCol    = "instance_id"
 	UserUsernameCol      = "username"
 	UserTypeCol          = "type"
+	UserOwnerRemovedCol  = "owner_removed"
 
 	UserHumanSuffix        = "humans"
 	HumanUserIDCol         = "user_id"
@@ -87,10 +89,12 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserUsernameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(UserOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			crdb.NewPrimaryKey(UserIDCol, UserInstanceIDCol),
-			crdb.WithIndex(crdb.NewIndex("username_idx5", []string{UserUsernameCol})),
-			crdb.WithIndex(crdb.NewIndex("user_ro_idx5", []string{UserResourceOwnerCol})),
+			crdb.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
+			crdb.WithIndex(crdb.NewIndex("username", []string{UserUsernameCol})),
+			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{UserResourceOwnerCol})),
+			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{UserOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText),
@@ -107,9 +111,9 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(HumanPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(HumanIsPhoneVerifiedCol, crdb.ColumnTypeBool, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(HumanUserIDCol, HumanUserInstanceIDCol),
+			crdb.NewPrimaryKey(HumanUserInstanceIDCol, HumanUserIDCol),
 			UserHumanSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_human_ref_user5")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText),
@@ -117,9 +121,9 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(MachineNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineDescriptionCol, crdb.ColumnTypeText, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(MachineUserIDCol, MachineUserInstanceIDCol),
+			crdb.NewPrimaryKey(MachineUserInstanceIDCol, MachineUserIDCol),
 			UserMachineSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_machine_ref_user5")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(NotifyUserIDCol, crdb.ColumnTypeText),
@@ -130,9 +134,9 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(NotifyVerifiedPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(NotifyPasswordSetCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			crdb.NewPrimaryKey(NotifyUserIDCol, NotifyInstanceIDCol),
+			crdb.NewPrimaryKey(NotifyInstanceIDCol, NotifyUserIDCol),
 			UserNotifySuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys("fk_notify_ref_user5")),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -271,6 +275,15 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reduceHumanPasswordChanged,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOwnerRemoved,
 				},
 			},
 		},
@@ -964,5 +977,26 @@ func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 			},
 			crdb.WithTableSuffix(UserMachineSuffix),
 		),
+	), nil
+
+}
+
+func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-NCsdV", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserChangeDateCol, e.CreationDate()),
+			handler.NewCol(UserSequenceCol, e.Sequence()),
+			handler.NewCol(UserOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserResourceOwnerCol, e.Aggregate().ID),
+		},
 	), nil
 }
