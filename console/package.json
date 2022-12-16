@@ -63,7 +63,7 @@
     "@types/jasmine": "~4.3.0",
     "@types/jasminewd2": "~2.0.10",
     "@types/jsonwebtoken": "^8.5.5",
-    "@types/node": "^18.8.1",
+    "@types/node": "^18.11.15",
     "@typescript-eslint/parser": "5.42.0",
     "@typescript-eslint/eslint-plugin": "5.42.0",
     "codelyzer": "^6.0.0",
