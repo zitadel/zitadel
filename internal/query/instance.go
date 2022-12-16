@@ -10,6 +10,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/projection"
 	projection_old "github.com/zitadel/zitadel/internal/query/projection"
@@ -81,6 +82,12 @@ type Instance struct {
 	DefaultLang  language.Tag
 	Domains      []*InstanceDomain
 	host         string
+	csp          csp
+}
+
+type csp struct {
+	enabled        bool
+	allowedOrigins database.StringArray
 }
 
 type Instances struct {
@@ -118,6 +125,13 @@ func (i *Instance) DefaultLanguage() language.Tag {
 
 func (i *Instance) DefaultOrganisationID() string {
 	return i.DefaultOrgID
+}
+
+func (i *Instance) SecurityPolicyAllowedOrigins() []string {
+	if !i.csp.enabled {
+		return nil
+	}
+	return i.csp.allowedOrigins
 }
 
 type InstanceSearchQueries struct {
@@ -218,6 +232,11 @@ func mapInstance(instance *projection.Instance) *Instance {
 		ConsoleAppID: instance.ConsoleAppID,
 		DefaultLang:  instance.DefaultLang,
 		Domains:      mapInstanceDomains(instance.Domains),
+
+		csp: csp{
+			enabled:        instance.CSP.Enabled,
+			allowedOrigins: instance.CSP.AllowedOrigins,
+		},
 	}
 }
 

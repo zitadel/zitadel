@@ -20,6 +20,7 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 	Removed      bool
+	CSP          InstanceCSP
 
 	DefaultOrgID string
 	IAMProjectID string
@@ -29,6 +30,11 @@ type Instance struct {
 	Domains      []*InstanceDomain
 
 	Host string
+}
+
+type InstanceCSP struct {
+	Enabled        bool
+	AllowedOrigins []string
 }
 
 func NewInstance(id, host string) *Instance {
@@ -55,25 +61,27 @@ func (i *Instance) Reduce(events []eventstore.Event) {
 
 		switch e := event.(type) {
 		case *instance.InstanceAddedEvent:
-			i.reduceInstanceAddedEvent(e)
+			i.reduceInstanceAdded(e)
 		case *instance.InstanceChangedEvent:
-			i.reduceInstanceChangedEvent(e)
+			i.reduceInstanceChanged(e)
 		case *instance.InstanceRemovedEvent:
-			i.reduceInstanceRemovedEvent(e)
+			i.reduceInstanceRemoved(e)
 		case *instance.DefaultOrgSetEvent:
-			i.reduceDefaultOrgSetEvent(e)
+			i.reduceDefaultOrgSet(e)
 		case *instance.ProjectSetEvent:
-			i.reduceProjectSetEvent(e)
+			i.reduceProjectSet(e)
 		case *instance.ConsoleSetEvent:
-			i.reduceConsoleSetEvent(e)
+			i.reduceConsoleSet(e)
 		case *instance.DefaultLanguageSetEvent:
-			i.reduceDefaultLanguageSetEvent(e)
+			i.reduceDefaultLanguageSet(e)
 		case *instance.DomainAddedEvent:
-			i.reduceDomainAddedEvent(e)
+			i.reduceDomainAdded(e)
 		case *instance.DomainPrimarySetEvent:
-			i.reduceDomainPrimarySetEvent(e)
+			i.reduceDomainPrimarySet(e)
 		case *instance.DomainRemovedEvent:
-			i.reduceDomainRemovedEvent(e)
+			i.reduceDomainRemoved(e)
+		case *instance.SecurityPolicySetEvent:
+			i.reduceSecurityPolicySet(e)
 		}
 	}
 }
@@ -98,42 +106,44 @@ func (i *Instance) SearchQuery(context.Context) *eventstore.SearchQueryBuilder {
 			instance.InstanceDomainAddedEventType,
 			instance.InstanceDomainPrimarySetEventType,
 			instance.InstanceDomainRemovedEventType,
+
+			instance.SecurityPolicySetEventType,
 		).
 		Builder()
 }
 
-func (i *Instance) reduceInstanceAddedEvent(event *instance.InstanceAddedEvent) {
+func (i *Instance) reduceInstanceAdded(event *instance.InstanceAddedEvent) {
 	i.ID = event.Aggregate().ID
 	i.CreationDate = event.CreationDate()
 	i.Name = event.Name
 }
 
-func (i *Instance) reduceInstanceChangedEvent(event *instance.InstanceChangedEvent) {
+func (i *Instance) reduceInstanceChanged(event *instance.InstanceChangedEvent) {
 	i.Name = event.Name
 }
 
-func (i *Instance) reduceInstanceRemovedEvent(event *instance.InstanceRemovedEvent) {
+func (i *Instance) reduceInstanceRemoved(event *instance.InstanceRemovedEvent) {
 	i.Removed = true
 }
 
-func (i *Instance) reduceDefaultOrgSetEvent(event *instance.DefaultOrgSetEvent) {
+func (i *Instance) reduceDefaultOrgSet(event *instance.DefaultOrgSetEvent) {
 	i.DefaultOrgID = event.OrgID
 }
 
-func (i *Instance) reduceProjectSetEvent(event *instance.ProjectSetEvent) {
+func (i *Instance) reduceProjectSet(event *instance.ProjectSetEvent) {
 	i.IAMProjectID = event.ProjectID
 }
 
-func (i *Instance) reduceConsoleSetEvent(event *instance.ConsoleSetEvent) {
+func (i *Instance) reduceConsoleSet(event *instance.ConsoleSetEvent) {
 	i.ConsoleAppID = event.AppID
 	i.ConsoleID = event.ClientID
 }
 
-func (i *Instance) reduceDefaultLanguageSetEvent(event *instance.DefaultLanguageSetEvent) {
+func (i *Instance) reduceDefaultLanguageSet(event *instance.DefaultLanguageSetEvent) {
 	i.DefaultLang = event.Language
 }
 
-func (i *Instance) reduceDomainAddedEvent(event *instance.DomainAddedEvent) {
+func (i *Instance) reduceDomainAdded(event *instance.DomainAddedEvent) {
 	i.Domains = append(i.Domains, &InstanceDomain{
 		CreationDate: event.CreationDate(),
 		ChangeDate:   event.CreationDate(),
@@ -144,13 +154,13 @@ func (i *Instance) reduceDomainAddedEvent(event *instance.DomainAddedEvent) {
 	})
 }
 
-func (i *Instance) reduceDomainPrimarySetEvent(event *instance.DomainPrimarySetEvent) {
+func (i *Instance) reduceDomainPrimarySet(event *instance.DomainPrimarySetEvent) {
 	for _, domain := range i.Domains {
 		domain.IsPrimary = domain.Domain == event.Domain
 	}
 }
 
-func (i *Instance) reduceDomainRemovedEvent(event *instance.DomainRemovedEvent) {
+func (i *Instance) reduceDomainRemoved(event *instance.DomainRemovedEvent) {
 	for idx, domain := range i.Domains {
 		if domain.Domain != event.Domain {
 			continue
@@ -159,5 +169,14 @@ func (i *Instance) reduceDomainRemovedEvent(event *instance.DomainRemovedEvent) 
 		i.Domains[len(i.Domains)-1] = nil
 		i.Domains = i.Domains[:len(i.Domains)-1]
 		return
+	}
+}
+
+func (i *Instance) reduceSecurityPolicySet(event *instance.SecurityPolicySetEvent) {
+	if event.Enabled != nil {
+		i.CSP.Enabled = *event.Enabled
+	}
+	if event.AllowedOrigins != nil {
+		i.CSP.AllowedOrigins = *event.AllowedOrigins
 	}
 }
