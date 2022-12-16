@@ -26,8 +26,8 @@ OpenID Connect defines three logout mechanisms to address the different architec
 
 #### Session Management
 
-Session Management in OpenID Connect defines a mechanism for a client (Relying Party, RP) to monitor the login status of the user in the provider (OP, e.g ZITADEL).
-When a user logs out of the provider, the user's session is terminated.
+Session Management in OpenID Connect defines a mechanism for a client (Relying Party, RP) to monitor the state of the user session from a identity provider (OP, e.g ZITADEL).
+When a user logs out of the provider, the user's session is terminated and the client can in turn reflect that in its behavior.
 
 #### RP initiated Logout
 
