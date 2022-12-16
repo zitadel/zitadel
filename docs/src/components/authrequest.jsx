@@ -36,7 +36,7 @@ export function SetAuthRequest() {
 
   const allResponseTypes = ["code", "id_token", "id_token token"];
 
-  const allPrompts = ["", "login", "select_account", "create"];
+  const allPrompts = ["", "login", "select_account", "create", "none"];
 
   const allAuthMethods = ["(none) PKCE", "Client Secret Basic"];
 
