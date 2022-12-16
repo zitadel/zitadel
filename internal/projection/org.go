@@ -29,7 +29,7 @@ func NewOrg(id, instance string) *Org {
 	return &Org{
 		ID:       id,
 		instance: instance,
-		State:    domain.OrgStateRemoved,
+		State:    domain.OrgStateUnspecified,
 	}
 }
 

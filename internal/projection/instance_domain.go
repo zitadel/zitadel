@@ -31,6 +31,8 @@ func (domains *SearchInstanceDomain) Reduce(events []eventstore.Event) {
 			}
 		case *instance.DomainRemovedEvent:
 			domains.reduceRemoved(e)
+		case *instance.InstanceRemovedEvent:
+			domains.reduceInstanceRemoved(e)
 		}
 	}
 }
@@ -61,5 +63,9 @@ func (domains *SearchInstanceDomain) reduceAdded(event *instance.DomainAddedEven
 }
 
 func (domains *SearchInstanceDomain) reduceRemoved(event *instance.DomainRemovedEvent) {
+	domains.removedInstances = append(domains.removedInstances, event.Aggregate().ID)
+}
+
+func (domains *SearchInstanceDomain) reduceInstanceRemoved(event *instance.InstanceRemovedEvent) {
 	domains.removedInstances = append(domains.removedInstances, event.Aggregate().ID)
 }

@@ -77,6 +77,8 @@ func (ln *LoginNames) Reduce(events []eventstore.Event) {
 			ln.reduceOrgDomainRemovedEvent(e)
 		case *org.DomainVerifiedEvent:
 			ln.reduceOrgDomainVerifiedEvent(e)
+		case *org.OrgRemovedEvent:
+			ln.reduceOrgRemoved(e)
 		case *instance.DomainPolicyAddedEvent:
 			ln.reduceInstanceDomainPolicyAddedEvent(e)
 		case *instance.DomainPolicyChangedEvent:
@@ -144,6 +146,7 @@ func (ln *LoginNames) SearchQuery(ctx context.Context) *eventstore.SearchQueryBu
 			org.OrgDomainPrimarySetEventType,
 			org.OrgDomainRemovedEventType,
 			org.OrgDomainVerifiedEventType,
+			org.OrgRemovedEventType,
 		).
 		Or().
 		AggregateTypes(instance.AggregateType).
@@ -243,6 +246,10 @@ func (ln *LoginNames) reduceOrgDomainRemovedEvent(event *org.DomainRemovedEvent)
 
 func (ln *LoginNames) reduceOrgDomainVerifiedEvent(event *org.DomainVerifiedEvent) {
 	ln.domains = append(ln.domains, &loginNameDomain{name: event.Domain})
+}
+
+func (ln *LoginNames) reduceOrgRemoved(event *org.OrgRemovedEvent) {
+	ln.removed = true
 }
 
 func (ln *LoginNames) reduceInstanceDomainPolicyAddedEvent(event *instance.DomainPolicyAddedEvent) {
