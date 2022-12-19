@@ -29,7 +29,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	for _, e := range expects {
 		e(m)
 	}
-	es := eventstore.NewEventstore(m)
+	es := eventstore.NewEventstore(eventstore.TestConfig(m))
 	iam_repo.RegisterEventMappers(es)
 	org.RegisterEventMappers(es)
 	usr_repo.RegisterEventMappers(es)
@@ -234,7 +234,7 @@ func (m *mockInstance) DefaultLanguage() language.Tag {
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {
-	return "orgID"
+	return "defaultOrgID"
 }
 
 func (m *mockInstance) RequestedDomain() string {
@@ -243,4 +243,8 @@ func (m *mockInstance) RequestedDomain() string {
 
 func (m *mockInstance) RequestedHost() string {
 	return "zitadel.cloud:443"
+}
+
+func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
+	return nil
 }

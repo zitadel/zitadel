@@ -24,7 +24,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	for _, e := range expects {
 		e(m)
 	}
-	es := eventstore.NewEventstore(m)
+	es := eventstore.NewEventstore(eventstore.TestConfig(m))
 	iam_repo.RegisterEventMappers(es)
 	org.RegisterEventMappers(es)
 	usr_repo.RegisterEventMappers(es)

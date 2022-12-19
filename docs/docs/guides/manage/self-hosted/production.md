@@ -2,12 +2,12 @@
 title: Production Checklist
 ---
 
-As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/guides/deploy/overview),
+As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/guides/deploy/overview),
 you are ready to configure ZITADEL for production usage.
 
 ## High Availability
 
-We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers, like [Kubernetes](/docs/guides/deploy/kubernetes). For keeping startup times fast when scaling ZITADEL, you should also consider using separate jobs with `zitadel init` and `zitadel setup`, so your workload containers just have to execute `zitadel start`.
+We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers, like [Kubernetes](/guides/deploy/kubernetes). For keeping startup times fast when scaling ZITADEL, you should also consider using separate jobs with `zitadel init` and `zitadel setup`, so your workload containers just have to execute `zitadel start`.
 
 ## Configuration
 
@@ -48,7 +48,7 @@ Also, if you are concerned about multi-regional data locality,
 
 ### Configure ZITADEL
 
-Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/guides/manage/self-hosted/database).
+Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/guides/manage/self-hosted/database).
 
 ```yaml
 Database:
@@ -64,7 +64,7 @@ Database:
     Options: ""
 ```
 
-You also might want to configure how [projections](/docs/concepts/eventstore/implementation#projections) are computed. These are the default values:
+You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
 ```yaml
 Projections:
@@ -100,7 +100,7 @@ or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
 ## Data Initialization
 
 - You can configure instance defaults in the DefaultInstance section.
-  If you plan to eventually create [multiple virtual instances](/docs/concepts/structure/instance#multiple-virtual-instances), these defaults take effect.
+  If you plan to eventually create [multiple virtual instances](/concepts/structure/instance#multiple-virtual-instances), these defaults take effect.
   Also, these configurations apply to the first instance, that ZITADEL automatically creates for you.
   Especially the following properties are of special interest for your production setup.
 
@@ -125,7 +125,7 @@ DefaultInstance:
     FromName:
 ```
 
-- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/docs/guides/manage/self-hosted/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
-- Learn how to configure ZITADEL via the [Console user interface](/docs/guides/manage/console/overview).
-- Probably, you also want to [apply your custom branding](/docs/guides/manage/customize/branding), [hook into certain events](/docs/guides/manage/customize/behavior), [customize texts](/docs/guides/manage/customize/texts) or [add metadata to your users](/docs/guides/manage/customize/user-metadata).
-- If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/docs/guides/manage/terraform/basics).
+- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/guides/manage/self-hosted/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
+- Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
+- Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
+- If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).

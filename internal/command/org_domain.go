@@ -30,7 +30,7 @@ func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userI
 			if existing != nil && existing.State == domain.OrgDomainStateActive {
 				return nil, errors.ThrowAlreadyExists(nil, "V2-e1wse", "Errors.Already.Exists")
 			}
-			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
