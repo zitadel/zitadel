@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  margin: 0;
+}
+
+h1,
+.ztdl-h1 {
+  @apply text-3xl my-4;
+}
+
+h2,
+.ztdl-h2 {
+  @apply text-2xl my-4;
+}
+
+h3,
+.ztdl-h3 {
+  @apply text-xl mb-2 mt-4;
+}
+
+.ztdl-p {
+  @apply text-sm;
+}
+
+.ztdl-subheader {
+  @apply uppercase text-black dark:text-white;
+}
+
+a,
+.ztdl-a {
+  @apply text-primary-light-500 dark:text-primary-dark-400;
+}
+
+p {
+  @apply text-gray-400 text-sm my-4;
+
+  code {
+    @apply text-black/90 dark:text-white/90 bg-gray-100 border border-gray-200 dark:bg-white/10 dark:border-gray-700 rounded-md px-1;
+  }
+}
+
+table {
+  @apply table-auto border-separate mt-2 border-spacing-y-2;
+
+  thead {
+    @apply text-xs uppercase dark:text-white/50;
+
+    tr th {
+      @apply px-2;
+    }
+  }
+
+  tbody {
+    @apply text-sm dark:text-white/50;
+
+    tr td {
+      @apply px-2;
+    }
+  }
+}
+
+pre {
+  font-size: 14px !important;
+}

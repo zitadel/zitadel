@@ -1,6 +1,7 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: "ZITADEL Docs",
+  staticDirectories: ["static"],
   trailingSlash: false,
   url: "https://zitadel.com",
   baseUrl: "/docs/",
@@ -43,8 +44,8 @@ module.exports = {
       // title: 'ZITADEL',
       logo: {
         alt: "ZITADEL logo",
-        src: "img/zitadel-logo-dark.svg",
-        srcDark: "img/zitadel-logo-light.svg",
+        src: "/img/zitadel-logo-dark.svg",
+        srcDark: "/img/zitadel-logo-light.svg",
       },
       items: [
         {

@@ -97,7 +97,6 @@ please refer to the corresponding docs
 [for CockroachDB](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html)
 or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
 
-
 ## Data Initialization
 
 - You can configure instance defaults in the DefaultInstance section.
