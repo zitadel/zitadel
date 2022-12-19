@@ -11,9 +11,9 @@ describe('machines', () => {
   });
 
   [
-    { mustBeDomain: true, addName: 'e2emachineusernameadd', removeName: 'e2emachineusernameremove' },
     { mustBeDomain: false, addName: 'e2emachineusernameaddGlobal', removeName: 'e2emachineusernameremoveGlobal' },
     { mustBeDomain: false, addName: 'e2emachineusernameadd@test.com', removeName: 'e2emachineusernameremove@test.com' },
+    { mustBeDomain: true, addName: 'e2emachineusernameadd', removeName: 'e2emachineusernameremove' },
   ].forEach((machine) => {
     describe(`add "${machine.addName}" with domain setting "${machine.mustBeDomain}"`, () => {
       beforeEach(`ensure it doesn't exist already`, function () {

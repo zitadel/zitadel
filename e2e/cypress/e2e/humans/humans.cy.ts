@@ -7,9 +7,9 @@ describe('humans', () => {
   const humansPath = `/users?type=human`;
 
   [
-    { mustBeDomain: true, addName: 'e2ehumanusernameadd', removeName: 'e2ehumanusernameremove' },
     { mustBeDomain: false, addName: 'e2ehumanusernameaddGlobal', removeName: 'e2ehumanusernameremoveGlobal' },
     { mustBeDomain: false, addName: 'e2ehumanusernameadd@test.com', removeName: 'e2ehumanusernameremove@test.com' },
+    { mustBeDomain: true, addName: 'e2ehumanusernameadd', removeName: 'e2ehumanusernameremove' },
   ].forEach((user) => {
     beforeEach(() => {
       apiAuth().as('api');
@@ -17,7 +17,7 @@ describe('humans', () => {
 
     describe(`add "${user.addName}" with domain setting "${user.mustBeDomain}"`, () => {
       beforeEach(`ensure it doesn't exist already`, function () {
-        ensureDomainPolicy(this.api, user.mustBeDomain, false, false);
+        ensureDomainPolicy(this.api, user.mustBeDomain, true, false);
         ensureUserDoesntExist(this.api, user.addName);
         cy.visit(humansPath);
       });
