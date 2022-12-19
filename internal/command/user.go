@@ -349,7 +349,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	if !userWriteModel.UserState.Exists() {
 		return nil, errors.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
 	}
-	domainPolicy, err := domainPolicyWriteModel(ctx, filter)
+	domainPolicy, err := domainPolicyWriteModel(ctx, filter, userWriteModel.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -448,9 +448,6 @@ func userWriteModelByID(ctx context.Context, filter preparation.FilterToQueryRed
 	events, err := filter(ctx, user.Query())
 	if err != nil {
 		return nil, err
-	}
-	if len(events) == 0 {
-		return nil, nil
 	}
 	user.AppendEvents(events...)
 	err = user.Reduce()

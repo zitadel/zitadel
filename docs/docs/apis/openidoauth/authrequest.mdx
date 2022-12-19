@@ -20,7 +20,7 @@ This playground should help you to initially craft an authentication request and
 
 ## Request parameters explained
 
-Not all request parameters are available in the playground. Please refer to the full documentation of the [authorization endpoint](/docs/apis/openidoauth/endpoints#authorization_endpoint).
+Not all request parameters are available in the playground. Please refer to the full documentation of the [authorization endpoint](/apis/openidoauth/endpoints#authorization_endpoint).
 
 ### Your Domain
 
@@ -47,7 +47,7 @@ The <span className="text-yellow-500">Instance Domain</span> to your ZITADEL ins
   need code.
 </p>
 
-More in the <a href="/docs/apis/openidoauth/endpoints#required-request-parameters">documentation</a> about required Parameters.
+More in the <a href="/apis/openidoauth/endpoints#required-request-parameters">documentation</a> about required Parameters.
 
 ### Authentication methods
 
@@ -57,18 +57,21 @@ Depending on the authentication and authorization flow of your application you m
 for most application types. The playground appends automatically a code challenge
 for PKCE flows.
 
-You need to append a "Code Challenge" by providing a random <span className="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/docs/guides/integrate/login-users#token-request) for more details.
+You need to append a "Code Challenge" by providing a random <span className="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/guides/integrate/login-users#token-request) for more details.
 
-More in the [documentation](/docs/apis/openidoauth/authn-methods) about authentication methods.
+More in the [documentation](/apis/openidoauth/authn-methods) about authentication methods.
 
 ### Additional Parameters
 
 <p>
   <span className="text-cyan-500">Prompt</span> defines if and how the user
-  should be prompted on login. For example you can pre-select a login name (
-  <code>select_account</code>) or present the register form (<code>create</code>
-  ) to users directly. The value <code>login</code> requires the user to
-  re-authenticate.
+  should be prompted on login. For example: 
+  <ul>
+    <li><code>select_account</code>: user is prompted to select one of the existing sessions or create a new one</li>
+    <li><code>create</code>: present the register form</li>
+    <li><code>login</code>: requires the user to re-authenticate</li>
+    <li><code>none</code>: user must be authenticated without interaction, an error is returned otherwise; use for silent-refresh</li>
+  </ul>
 </p>
 
 <p>
@@ -76,7 +79,7 @@ More in the [documentation](/docs/apis/openidoauth/authn-methods) about authenti
   of a user. You can skip the account picker by providing the Login hint.
 </p>
 
-There are many more additional parameters. Please refer to the [documentation](/docs/apis/openidoauth/endpoints#additional-parameters) about additional parameters.
+There are many more additional parameters. Please refer to the [documentation](/apis/openidoauth/endpoints#additional-parameters) about additional parameters.
 
 ## Standard Scopes
 
@@ -84,32 +87,32 @@ Used to request additional information from ZITADEL.
 These scopes are defined in the OpenID Connect specification.
 The `openid` scope is mandatory.
 
-Not all scopes are available in the playground. Please refer to the full [documentation](/docs/apis/openidoauth/scopes) for the exhaustive list of available standard and reserved scopes.
+Not all scopes are available in the playground. Please refer to the full [documentation](/apis/openidoauth/scopes) for the exhaustive list of available standard and reserved scopes.
 
 ## Reserved Scopes
 
 You can request additional information that is specific to ZITADEL or customize the behavior of ZITADEL by including reserved scopes.
-Please refer to the [documentation](/docs/apis/openidoauth/scopes#reserved-scopes) for a full list of available reserved scopes.
+Please refer to the [documentation](/apis/openidoauth/scopes#reserved-scopes) for a full list of available reserved scopes.
 
 ### Organization policies and branding
 
 Enforce an organization's policies and branding as well as membership of the user by passing the scope `urn:zitadel:iam:org:id:{id}` with the required <span className="text-purple-500">Organization ID</span>.
 
-Please refer to the full [guide on branding](/docs/guides/manage/customize/branding).
+Please refer to the full [guide on branding](/guides/manage/customize/branding).
 
 ### Get user metadata
 
 Pass the scope `urn:zitadel:iam:user:metadata` to request a user's metadata.
-Please refer to the full [guide on user-metadata](/docs/guides/manage/customize/user-metadata) for further details.
+Please refer to the full [guide on user-metadata](/guides/manage/customize/user-metadata) for further details.
 
 ### Access core apis
 
-Calling the [core API](/docs/apis/introduction) with the authenticated user, requires that the projectID of ZITADEL is included in the audience claim.
+Calling the [core API](/apis/introduction) with the authenticated user, requires that the projectID of ZITADEL is included in the audience claim.
 
 This can be achieved by adding the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your applications authorization request.
 
 ## How to use ZITADEL in your project
 
-Please refer to our [guide](/docs/guides/integrate/login-users) on how to login users.
+Please refer to our [guide](/guides/integrate/login-users) on how to login users.
 
-OpenID Connect certified libraries should allow you to customize the parameters and define scopes for the authorization request. You can also continue by using one of our [example applications](/docs/examples/introduction).
+OpenID Connect certified libraries should allow you to customize the parameters and define scopes for the authorization request. You can also continue by using one of our [example applications](/examples/introduction).

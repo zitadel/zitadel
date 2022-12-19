@@ -17,6 +17,7 @@ import (
 func Test_customDomainPolicy(t *testing.T) {
 	type args struct {
 		filter preparation.FilterToQueryReducer
+		orgID  string
 	}
 	tests := []struct {
 		name    string
@@ -30,6 +31,7 @@ func Test_customDomainPolicy(t *testing.T) {
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
+				orgID: "id",
 			},
 			want:    nil,
 			wantErr: true,
@@ -40,11 +42,15 @@ func Test_customDomainPolicy(t *testing.T) {
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{}, nil
 				},
+				orgID: "id",
 			},
 			want: &OrgDomainPolicyWriteModel{
 				PolicyDomainWriteModel: PolicyDomainWriteModel{
-					WriteModel: eventstore.WriteModel{},
-					State:      domain.PolicyStateUnspecified,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:   "id",
+						ResourceOwner: "id",
+					},
+					State: domain.PolicyStateUnspecified,
 				},
 			},
 			wantErr: false,
@@ -63,6 +69,7 @@ func Test_customDomainPolicy(t *testing.T) {
 						),
 					}, nil
 				},
+				orgID: "id",
 			},
 			want: &OrgDomainPolicyWriteModel{
 				PolicyDomainWriteModel: PolicyDomainWriteModel{
@@ -82,7 +89,7 @@ func Test_customDomainPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := orgDomainPolicy(context.Background(), tt.args.filter)
+			got, err := orgDomainPolicy(context.Background(), tt.args.filter, tt.args.orgID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("customDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -181,6 +188,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 func Test_DomainPolicy(t *testing.T) {
 	type args struct {
 		filter preparation.FilterToQueryReducer
+		orgID  string
 	}
 	tests := []struct {
 		name    string
@@ -194,6 +202,7 @@ func Test_DomainPolicy(t *testing.T) {
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
+				orgID: "id",
 			},
 			want:    nil,
 			wantErr: true,
@@ -212,6 +221,7 @@ func Test_DomainPolicy(t *testing.T) {
 						),
 					}, nil
 				},
+				orgID: "id",
 			},
 			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
@@ -237,6 +247,7 @@ func Test_DomainPolicy(t *testing.T) {
 						return nil, errors.ThrowInternal(nil, "USER-6HnsD", "Errors.Internal")
 					}).
 					Filter(),
+				orgID: "id",
 			},
 			want:    nil,
 			wantErr: true,
@@ -260,6 +271,7 @@ func Test_DomainPolicy(t *testing.T) {
 						}, nil
 					}).
 					Filter(),
+				orgID: "id",
 			},
 			want: &PolicyDomainWriteModel{
 				WriteModel: eventstore.WriteModel{
@@ -288,7 +300,7 @@ func Test_DomainPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := domainPolicyWriteModel(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter)
+			got, err := domainPolicyWriteModel(authz.WithInstanceID(context.Background(), "INSTANCE"), tt.args.filter, tt.args.orgID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("defaultDomainPolicy() error = %v, wantErr %v", err, tt.wantErr)
 				return

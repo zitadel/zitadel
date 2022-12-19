@@ -107,7 +107,7 @@ Export the result to the environment variable `BASIC_AUTH`.
 
 ### Create Auth Request
 
-You need to create a valid auth request, including the reserved scope `urn:zitadel:iam:user:metadata`. Please refer to our API documentation for more information about [reserved scopes](../../../apis/openidoauth/scopes#reserved-scopes) or try it out in our [OIDC Authrequest Playground](/docs/apis/openidoauth/authrequest?scope=openid%20email%20profile%20urn%3Azitadel%3Aiam%3Auser%3Ametadata).
+You need to create a valid auth request, including the reserved scope `urn:zitadel:iam:user:metadata`. Please refer to our API documentation for more information about [reserved scopes](../../../apis/openidoauth/scopes#reserved-scopes) or try it out in our [OIDC Authrequest Playground](/apis/openidoauth/authrequest?scope=openid%20email%20profile%20urn%3Azitadel%3Aiam%3Auser%3Ametadata).
 
 Login with the user to which you have added the metadata. After the login you will be redirected.
 
