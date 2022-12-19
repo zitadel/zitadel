@@ -195,7 +195,7 @@ RegisterOption:
   Description: 选择您的注册方式
   RegisterUsernamePasswordButtonText: 使用用户名密码
   ExternalLoginDescription: 或使用外部身份提供者
-  BackButtonText: 登录
+  LoginButtonText: 登录
 
 RegistrationUser:
   Title: 注册

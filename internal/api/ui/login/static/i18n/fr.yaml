@@ -195,7 +195,7 @@ RegisterOption:
   Description: Choisissez comment vous souhaitez vous enregistrer
   RegisterUsernamePasswordButtonText: Avec nom d'utilisateur et mot de passe
   ExternalLoginDescription: ou s'enregistrer avec un utilisateur externe
-  BackButtonText: connexion
+  LoginButtonText: connexion
 
 RegistrationUser:
   Title: Inscription

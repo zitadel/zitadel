@@ -345,6 +345,7 @@ func RegistrationOptionScreenTextToPb(text domain.RegistrationOptionScreenText) 
 		Description:              text.Description,
 		UserNameButtonText:       text.RegisterUsernamePasswordButtonText,
 		ExternalLoginDescription: text.ExternalLoginDescription,
+		LoginButtonText:          text.LoginButtonText,
 	}
 }
 
@@ -811,6 +812,7 @@ func RegistrationOptionScreenTextPbToDomain(text *text_pb.RegistrationOptionScre
 		Description:                        text.Description,
 		RegisterUsernamePasswordButtonText: text.UserNameButtonText,
 		ExternalLoginDescription:           text.ExternalLoginDescription,
+		LoginButtonText:                    text.LoginButtonText,
 	}
 }
 

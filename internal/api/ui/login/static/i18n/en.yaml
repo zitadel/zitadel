@@ -195,7 +195,7 @@ RegisterOption:
   Description: Choose how you'd like to register
   RegisterUsernamePasswordButtonText: With username password
   ExternalLoginDescription: or register with an external user
-  BackButtonText: login
+  LoginButtonText: login
 
 RegistrationUser:
   Title: Registration
