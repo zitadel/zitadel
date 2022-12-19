@@ -54,13 +54,12 @@ func New(
 	accessSvc *access.Service,
 ) *API {
 	api := &API{
-		port:              port,
-		verifier:          verifier,
-		health:            queries,
-		router:            router,
-		externalSecure:    externalSecure,
-		http1HostName:     http1HostName,
-		accessInterceptor: middleware.NewAccessInterceptor(accessSvc),
+		port:           port,
+		verifier:       verifier,
+		health:         queries,
+		router:         router,
+		externalSecure: externalSecure,
+		http1HostName:  http1HostName,
 	}
 
 	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessSvc)
@@ -84,7 +83,6 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) erro
 }
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
-	handler = a.accessInterceptor.Handle(handler)
 	prefix = strings.TrimSuffix(prefix, "/")
 	subRouter := a.router.PathPrefix(prefix).Name(prefix).Subrouter()
 	subRouter.PathPrefix("").Handler(http.StripPrefix(prefix, handler))

@@ -3,7 +3,10 @@ package middleware
 import (
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
+
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 
@@ -13,12 +16,25 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 )
 
+const (
+	// TODO: Make configurable?
+	limitExceededCookiename   = "zitadel.quota.exceeded"
+	limitExceededCookieMaxAge = 60 * 5 // 5 minutes
+)
+
 type AccessInterceptor struct {
-	svc *access.Service
+	svc           *access.Service
+	cookieHandler *http_utils.CookieHandler
 }
 
 func NewAccessInterceptor(svc *access.Service) *AccessInterceptor {
-	return &AccessInterceptor{svc: svc}
+	return &AccessInterceptor{
+		svc: svc,
+		cookieHandler: http_utils.NewCookieHandler(
+			http_utils.WithUnsecure(),
+			http_utils.WithMaxAge(limitExceededCookieMaxAge),
+		),
+	}
 }
 
 func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
@@ -27,11 +43,8 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
-		next.ServeHTTP(wrappedWriter, request)
 
 		ctx := request.Context()
-
-		// TODO: Why is the instance always empty?
 		instance := authz.GetInstance(ctx)
 		limit, err := a.svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
@@ -39,9 +52,14 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			err = nil
 		}
 
+		a.cookieHandler.SetCookie(wrappedWriter, limitExceededCookiename, request.Host, strconv.FormatBool(limit))
+
 		if limit {
 			wrappedWriter.WriteHeader(http.StatusTooManyRequests)
+			wrappedWriter.ignoreWrites = true
 		}
+
+		next.ServeHTTP(wrappedWriter, request)
 
 		requestURL := request.RequestURI
 		unescapedURL, err := url.QueryUnescape(requestURL)
@@ -70,10 +88,14 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 
 type statusRecorder struct {
 	http.ResponseWriter
-	status int
+	status       int
+	ignoreWrites bool
 }
 
 func (r *statusRecorder) WriteHeader(status int) {
+	if r.ignoreWrites {
+		return
+	}
 	r.status = status
 	r.ResponseWriter.WriteHeader(status)
 }

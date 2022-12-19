@@ -58,6 +58,7 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
 	return s.report(ctx, quota, usage)
 }
 
