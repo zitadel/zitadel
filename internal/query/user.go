@@ -323,7 +323,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	user := projection.NewUserWithOwner(userID, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).ResourceOwner)
+	user := projection.NewUserWithOwner(userID, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
 	events, err := q.eventstore.Filter(ctx, user.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
