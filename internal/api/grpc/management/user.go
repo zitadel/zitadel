@@ -2,7 +2,6 @@ package management
 
 import (
 	"context"
-	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -731,27 +730,24 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 }
 
 func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRequest) (*mgmt_pb.AddMachineKeyResponse, error) {
-	key, err := s.command.AddUserMachineKey(ctx, AddMachineKeyRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	machineKey := AddMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
+	details, err := s.command.AddUserMachineKey(ctx, machineKey)
 	if err != nil {
 		return nil, err
 	}
-	keyDetails, err := key.Detail()
+	keyDetails, err := machineKey.Detail()
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddMachineKeyResponse{
-		KeyId:      key.KeyID,
+		KeyId:      machineKey.KeyID,
 		KeyDetails: keyDetails,
-		Details: obj_grpc.AddToDetailsPb(
-			key.Sequence,
-			key.ChangeDate,
-			key.ResourceOwner,
-		),
+		Details:    obj_grpc.DomainToAddDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachineKeyRequest) (*mgmt_pb.RemoveMachineKeyResponse, error) {
-	objectDetails, err := s.command.RemoveUserMachineKey(ctx, req.UserId, req.KeyId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveUserMachineKey(ctx, RemoveMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}
@@ -794,28 +790,21 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 }
 
 func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPersonalAccessTokenRequest) (*mgmt_pb.AddPersonalAccessTokenResponse, error) {
-	expDate := time.Time{}
-	if req.ExpirationDate != nil {
-		expDate = req.ExpirationDate.AsTime()
-	}
 	scopes := []string{oidc.ScopeOpenID, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
-	pat, token, err := s.command.AddPersonalAccessToken(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, expDate, scopes, domain.UserTypeMachine)
+	pat := AddPersonalAccessTokenRequestToCommand(req, authz.GetCtxData(ctx).OrgID, scopes, domain.UserTypeMachine)
+	details, err := s.command.AddPersonalAccessToken(ctx, pat)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddPersonalAccessTokenResponse{
 		TokenId: pat.TokenID,
-		Token:   token,
-		Details: obj_grpc.AddToDetailsPb(
-			pat.Sequence,
-			pat.ChangeDate,
-			pat.ResourceOwner,
-		),
+		Token:   pat.Token,
+		Details: obj_grpc.DomainToAddDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *mgmt_pb.RemovePersonalAccessTokenRequest) (*mgmt_pb.RemovePersonalAccessTokenResponse, error) {
-	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, RemovePersonalAccessTokenRequestToCommand(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}

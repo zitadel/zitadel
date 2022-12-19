@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -58,9 +59,10 @@ func (wm *OrgDomainPolicyWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	userLoginMustBeDomain,
 	validateOrgDomains,
-	smtpSenderAddressMatchesInstanceDomain bool) (*org.DomainPolicyChangedEvent, bool) {
+	smtpSenderAddressMatchesInstanceDomain bool) (changedEvent *org.DomainPolicyChangedEvent, usernameChange bool, err error) {
 	changes := make([]policy.DomainPolicyChanges, 0)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
+		usernameChange = true
 		changes = append(changes, policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain))
 	}
 	if wm.ValidateOrgDomains != validateOrgDomains {
@@ -70,11 +72,8 @@ func (wm *OrgDomainPolicyWriteModel) NewChangedEvent(
 		changes = append(changes, policy.ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddressMatchesInstanceDomain))
 	}
 	if len(changes) == 0 {
-		return nil, false
+		return nil, false, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
 	}
-	changedEvent, err := org.NewDomainPolicyChangedEvent(ctx, aggregate, changes)
-	if err != nil {
-		return nil, false
-	}
-	return changedEvent, true
+	changedEvent, err = org.NewDomainPolicyChangedEvent(ctx, aggregate, changes)
+	return changedEvent, usernameChange, err
 }

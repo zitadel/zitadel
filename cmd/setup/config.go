@@ -3,6 +3,7 @@ package setup
 import (
 	"bytes"
 	"strings"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
@@ -39,6 +40,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 		)),
@@ -87,6 +89,7 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 		)),
 	)

@@ -12,16 +12,16 @@ var (
 )
 
 type expiration interface {
-	expirationDate() time.Time
-	setExpirationDate(time.Time)
+	GetExpirationDate() time.Time
+	SetExpirationDate(time.Time)
 }
 
 func EnsureValidExpirationDate(key expiration) error {
-	date, err := ValidateExpirationDate(key.expirationDate())
+	date, err := ValidateExpirationDate(key.GetExpirationDate())
 	if err != nil {
 		return err
 	}
-	key.setExpirationDate(date)
+	key.SetExpirationDate(date)
 	return nil
 }
 

@@ -62,7 +62,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	eventstoreClient, err := eventstore.Start(dbClient)
+	eventstoreClient, err := eventstore.Start(&eventstore.Config{Client: dbClient})
 	logging.OnError(err).Fatal("unable to start eventstore")
 	migration.RegisterMappers(eventstoreClient)
 
