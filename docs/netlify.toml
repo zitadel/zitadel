@@ -1,9 +1,13 @@
-# This is a workaround to address the problem around the baseUrl from docusaurus
-# Be aware that this prevents the usage of the path /docs/docs
 [[redirects]]
-  from = "/docs/*"
-  to = "/:splat"
-  status = 200
+  from = "/guides/deploy/*"
+  to = "/docs/self-hosting/deploy/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/manage/self-hosted/*"
+  to = "/docs/self-hosting/manage/:splat"
+  status = 301
   force = true
  
 [[headers]]
