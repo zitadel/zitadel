@@ -2,23 +2,23 @@
 title: Production Checklist
 ---
 
-As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/guides/deploy/overview),
+As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/self-hosting/deploy/overview),
 you are ready to configure ZITADEL for production usage.
 
 ## High Availability
 
-We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers, like [Kubernetes](/guides/deploy/kubernetes). For keeping startup times fast when scaling ZITADEL, you should also consider using separate jobs with `zitadel init` and `zitadel setup`, so your workload containers just have to execute `zitadel start`.
+We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers, like [Kubernetes]/docs/self-hosting/deploy/kubernetes). For keeping startup times fast when scaling ZITADEL, you should also consider using separate jobs with `zitadel init` and `zitadel setup`, so your workload containers just have to execute `zitadel start`.
 
 ## Configuration
 
-Read [on the configure page](/guides/manage/self-hosted/configure) about the available options you have to configure ZITADEL.
+Read [on the configure page](/docs/self-hosting/manage/configure) about the available options you have to configure ZITADEL.
 
 ## Networking
 
-- To make ZITADEL available at the domain of your choice, [you need to configure the ExternalDomain property](/guides/manage/self-hosted/custom-domain).
-- To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/guides/manage/self-hosted/tls_modes).
-- If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/guides/manage/self-hosted/http2)**.
-- You can also refer to some **[example reverse proxy configurations](/guides/manage/self-hosted/reverseproxy/reverse_proxy)**.
+- To make ZITADEL available at the domain of your choice, [you need to configure the ExternalDomain property](/docs/self-hosting/manage/custom-domain).
+- To enable and restrict access to **HTTPS**, head over to [the description of your TLS options](/docs/self-hosting/manage/tls_modes).
+- If you want to front ZITADEL with a reverse proxy, web application firewall or content delivery network, make sure to support **[HTTP/2](/docs/self-hosting/manage/http2)**.
+- You can also refer to some **[example reverse proxy configurations](/docs/self-hosting/manage/reverseproxy/reverse_proxy)**.
 - The ZITADEL Console web GUI uses many gRPC-Web stubs. This results in a fairly big JavaScript bundle. You might want to compress it using [Gzip](https://www.gnu.org/software/gzip/) or [Brotli](https://github.com/google/brotli).
 - Serving and caching the assets using a content delivery network could improve network latencies and shield your ZITADEL runtime.
 
@@ -48,7 +48,7 @@ Also, if you are concerned about multi-regional data locality,
 
 ### Configure ZITADEL
 
-Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/guides/manage/self-hosted/database).
+Depending on your environment, you maybe would want to tweak some settings about how ZITADEL interacts with the database in the database section of your ZITADEL configuration. Read more about your [database configuration options](/docs/self-hosting/manage/database).
 
 ```yaml
 Database:
@@ -126,7 +126,7 @@ DefaultInstance:
     FromName:
 ```
 
-- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/guides/manage/self-hosted/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
+- If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/docs/self-hosting/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
 - Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).

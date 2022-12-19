@@ -45,20 +45,6 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Deploy",
-      collapsed: false,
-      items: [
-        "guides/deploy/overview",
-        "guides/deploy/linux",
-        "guides/deploy/macos",
-        "guides/deploy/compose",
-        "guides/deploy/knative",
-        "guides/deploy/kubernetes",
-        "guides/deploy/loadbalancing-example/loadbalancing-example",
-      ],
-    },
-    {
-      type: "category",
       label: "Manage",
       collapsed: false,
       items: [
@@ -72,19 +58,6 @@ module.exports = {
             "guides/manage/cloud/billing",
             "guides/manage/cloud/users",
             "guides/manage/cloud/support",
-          ],
-        },
-        {
-          type: "category",
-          label: "Self-Hosted",
-          items: [
-            "guides/manage/self-hosted/production",
-            "guides/manage/self-hosted/configure/configure",
-            "guides/manage/self-hosted/reverseproxy/reverse_proxy",
-            "guides/manage/self-hosted/custom-domain",
-            "guides/manage/self-hosted/http2",
-            "guides/manage/self-hosted/tls_modes",
-            "guides/manage/self-hosted/database/database",
           ],
         },
         {
@@ -272,6 +245,36 @@ module.exports = {
       label: "Rate Limits",
       collapsed: false,
       items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
+    },
+  ],
+  selfHosting: [
+    {
+      type: "category",
+      label: "Deploy",
+      collapsed: false,
+      items: [
+        "self-hosting/deploy/overview",
+        "self-hosting/deploy/linux",
+        "self-hosting/deploy/macos",
+        "self-hosting/deploy/compose",
+        "self-hosting/deploy/knative",
+        "self-hosting/deploy/kubernetes",
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+      ],
+    },
+    {
+      type: "category",
+      label: "Manage",
+      collapsed: false,
+      items: [
+        "self-hosting/manage/production",
+        "self-hosting/manage/configure/configure",
+        "self-hosting/manage/reverseproxy/reverse_proxy",
+        "self-hosting/manage/custom-domain",
+        "self-hosting/manage/http2",
+        "self-hosting/manage/tls_modes",
+        "self-hosting/manage/database/database",
+      ],
     },
   ],
   concepts: [
