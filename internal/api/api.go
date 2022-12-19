@@ -89,6 +89,7 @@ func (a *API) RegisterHandler(prefix string, handler http.Handler) {
 }
 
 func (a *API) routeGRPC() {
+	// TODO: How to set quota exceeded cookie?
 	http2Route := a.router.
 		MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
 			return r.ProtoMajor == 2

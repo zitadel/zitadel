@@ -554,31 +554,31 @@ DefaultInstance:
       - Unit: "requests.all.authenticated"
         # Start Time for the quota periods
         From: "2022-10-24 00:00:00"
-        Interval: 720h
-        Amount: 20
-        Limit: true
+        Interval: 720h # 1 week
+        Amount: 25000
+        Limit: false
         Notifications:
           - Percent: 100
-            Repeat: false
-            CallURL: ""
+            Repeat: true
+            CallURL: "https://example.com"
           - Percent: 95
-            CallURL: ""
+            CallURL: "https://example.com"
           - Percent: 50
-            CallURL: ""
+            CallURL: "https://example.com"
 
       - Unit: "actions.all.runs.seconds"
         # Start Time for the quota periods
         From: "2022-10-24 00:00:00"
         Interval: 720h # 1 week
-        Amount: 3600
-        Limit: true
+        Amount: 3600 # 1 hour
+        Limit: false
         Notifications:
           - Percent: 100
-            CallURL: ""
+            CallURL: "https://example.com"
           - Percent: 95
-            CallURL: ""
+            CallURL: "https://example.com"
           - Percent: 50
-            CallURL: ""
+            CallURL: "https://example.com"
 
 InternalAuthZ:
   RolePermissionMappings:
