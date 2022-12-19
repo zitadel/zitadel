@@ -376,14 +376,17 @@ func (s *Server) exportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		for _, processedGrant := range org.ProjectGrants {
 			processedGrants = append(processedGrants, processedGrant.GrantId)
 		}
+	}
 
+	for _, org := range orgs {
+		/******************************************************************************************************************
+		  Authorizations
+		  ******************************************************************************************************************/
 		org.UserGrants, err = s.getNecessaryUserGrantsForOrg(ctx, org.OrgId, processedProjects, processedGrants, processedUsers)
 		if err != nil {
 			return nil, err
 		}
-	}
 
-	for _, org := range orgs {
 		/******************************************************************************************************************
 		  Members
 		  ******************************************************************************************************************/
