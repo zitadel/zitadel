@@ -117,6 +117,8 @@ func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instan
 				},
 				squirrel.And{
 					squirrel.Eq{accessProtocolCol: logstore.GRPC},
+					squirrel.NotEq{accessResponseStatusCol: codes.PermissionDenied},
+					squirrel.NotEq{accessResponseStatusCol: codes.Internal},
 					squirrel.NotEq{accessResponseStatusCol: codes.ResourceExhausted},
 				},
 			},
