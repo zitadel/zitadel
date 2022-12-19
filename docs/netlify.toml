@@ -1,11 +1,11 @@
 [[redirects]]
-  from = "/guides/deploy/*"
+  from = "/docs/guides/deploy/*"
   to = "/docs/self-hosting/deploy/:splat"
   status = 301
   force = true
 
 [[redirects]]
-  from = "/guides/manage/self-hosted/*"
+  from = "/docs/guides/manage/self-hosted/*"
   to = "/docs/self-hosting/manage/:splat"
   status = 301
   force = true
