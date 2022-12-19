@@ -9,6 +9,14 @@
   to = "/docs/self-hosting/manage/:splat"
   status = 301
   force = true
+
+# This is a workaround to address the problem around the baseUrl from docusaurus
+# Be aware that this prevents the usage of the path /docs/docs
+[[redirects]]
+  from = "/docs/*"
+  to = "/:splat"
+  status = 200
+  force = true
  
 [[headers]]
   for = "/*"
