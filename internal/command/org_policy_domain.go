@@ -90,7 +90,7 @@ func prepareAddOrgDomainPolicy(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := orgDomainPolicy(ctx, filter)
+			writeModel, err := orgDomainPolicy(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -133,7 +133,7 @@ func prepareChangeOrgDomainPolicy(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := orgDomainPolicy(ctx, filter)
+			writeModel, err := orgDomainPolicy(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}
@@ -169,7 +169,7 @@ func prepareRemoveOrgDomainPolicy(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := orgDomainPolicy(ctx, filter)
+			writeModel, err := orgDomainPolicy(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err
 			}

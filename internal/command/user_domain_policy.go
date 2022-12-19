@@ -3,13 +3,12 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
-func domainPolicyWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer) (*PolicyDomainWriteModel, error) {
-	wm, err := orgDomainPolicy(ctx, filter)
+func domainPolicyWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (*PolicyDomainWriteModel, error) {
+	wm, err := orgDomainPolicy(ctx, filter, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +25,8 @@ func domainPolicyWriteModel(ctx context.Context, filter preparation.FilterToQuer
 	return nil, errors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
 }
 
-func orgDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*OrgDomainPolicyWriteModel, error) {
-	policy := NewOrgDomainPolicyWriteModel(authz.GetCtxData(ctx).OrgID)
+func orgDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (*OrgDomainPolicyWriteModel, error) {
+	policy := NewOrgDomainPolicyWriteModel(orgID)
 	events, err := filter(ctx, policy.Query())
 	if err != nil {
 		return nil, err

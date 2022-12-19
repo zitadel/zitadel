@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -314,7 +315,12 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
+	funcs := map[string]interface{}{
+		"selectedLanguage": func(l string) bool {
+			return data.Language == l
+		},
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, funcs)
 }
 
 func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
@@ -420,6 +426,7 @@ func (l *Login) mapExternalNotFoundOptionFormDataToLoginUser(formData *externalN
 		IsEmailVerified:   isEmailVerified,
 		Phone:             formData.Phone,
 		IsPhoneVerified:   isPhoneVerified,
+		PreferredLanguage: language.Make(formData.Language),
 	}
 }
 
@@ -445,6 +452,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 		NickName:          tokens.IDTokenClaims.GetNickname(),
 		Email:             tokens.IDTokenClaims.GetEmail(),
 		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
+		PreferredLanguage: tokens.IDTokenClaims.GetLocale(),
 	}
 
 	if tokens.IDTokenClaims.GetPhoneNumber() != "" {

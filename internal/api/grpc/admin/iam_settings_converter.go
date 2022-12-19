@@ -149,3 +149,11 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 	}
 	return mapped
 }
+
+func SecurityPolicyToPb(policy *query.SecurityPolicy) *settings_pb.SecurityPolicy {
+	return &settings_pb.SecurityPolicy{
+		Details:               obj_grpc.ToViewDetailsPb(policy.Sequence, policy.CreationDate, policy.ChangeDate, policy.AggregateID),
+		EnableIframeEmbedding: policy.Enabled,
+		AllowedOrigins:        policy.AllowedOrigins,
+	}
+}

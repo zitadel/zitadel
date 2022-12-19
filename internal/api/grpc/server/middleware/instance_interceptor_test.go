@@ -193,3 +193,7 @@ func (m *mockInstance) RequestedDomain() string {
 func (m *mockInstance) RequestedHost() string {
 	return "localhost:8080"
 }
+
+func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
+	return nil
+}
