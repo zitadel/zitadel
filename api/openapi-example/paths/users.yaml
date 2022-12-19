@@ -1,0 +1,49 @@
+parameters:
+  - $ref: "../components/parameters/limit.yaml"
+  - $ref: "../components/parameters/position.yaml"
+  - $ref: "../components/parameters/organizationId.yaml"
+
+get:
+  tags:
+    - User
+  summary: Search users
+  description: "Search users inside your ZITADEL instance." # I know that we currently only allow search inside orgs.
+  operationId: searchUsers
+  x-zitadel-permissions:
+    - user.search
+  responses:
+    200:
+      description: The users, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/users.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+
+post:
+  tags:
+    - User
+  summary: Create user
+  description: "Create a new user in an organization."
+  operationId: createUser
+  x-zitadel-permissions:
+    - user.create
+  #requestBody: TODO
+  responses:
+    200:
+      description: The users, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/users.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"

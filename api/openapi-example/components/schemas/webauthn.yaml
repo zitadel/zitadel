@@ -1,0 +1,19 @@
+type: object
+required:
+  - id
+  - name
+  - state
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  state:
+    type: string
+    enum:
+    - AUTH_FACTOR_STATE_UNSPECIFIED
+    - AUTH_FACTOR_STATE_NOT_READY
+    - AUTH_FACTOR_STATE_READY
+    - AUTH_FACTOR_STATE_REMOVED
+  description:
+    type: string

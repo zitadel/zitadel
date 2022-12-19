@@ -1,0 +1,65 @@
+parameters:
+  - name: id
+    description: The unique identifier of a user
+    in: path
+    required: true
+    schema:
+      type: string
+      
+get:
+  tags:
+    - User
+  summary: Read a user
+  description: "Get a single user by his unique id."
+  operationId: getUserById
+  x-zitadel-permissions:
+    - user.read
+  responses:
+    200:
+      description: The user, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/user.yaml"
+    404:
+      description: No user was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+
+put:
+  tags:
+    - User
+  summary: Update a user
+  description: "Update a user with the help of the unique id."
+  operationId: updateUserById
+  x-zitadel-permissions:
+    - user.update
+  #requestBody: TODO
+  responses:
+    200:
+      description: The user, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/user.yaml"
+    404:
+      description: No user was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+            

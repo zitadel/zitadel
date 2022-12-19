@@ -1,0 +1,64 @@
+parameters:
+  - name: id
+    description: The unique identifier of the provider
+    in: path
+    required: true
+    schema:
+      type: string
+
+get:
+  tags:
+    - Providers
+  summary: Read an provider
+  description: "Get a single provider by unique id."
+  operationId: getProviderById
+  x-zitadel-permissions:
+    - provider.read
+  responses:
+    200:
+      description: The provider, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/provider.yaml"
+    404:
+      description: No user was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+
+put:
+  tags:
+    - Providers
+  summary: Update an provider
+  description: "Update an provider with the help of the unique id."
+  operationId: updateProviderById
+  x-zitadel-permissions:
+    - provider.update$
+  #requestBody: TODO
+  responses:
+    200:
+      description: The organization, what else
+      content:
+        application/json:
+          schema:
+            $ref:  "../components/schemas/provider.yaml"
+    404:
+      description: No provider was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"

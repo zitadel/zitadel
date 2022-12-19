@@ -1,0 +1,64 @@
+parameters:
+  - name: id
+    description: The unique identifier of the organization
+    in: path
+    required: true
+    schema:
+      type: string
+      
+get:
+  tags:
+    - Organization
+  summary: Read an organization
+  description: "Get a single organization by unique id."
+  operationId: getOrganizationById
+  x-zitadel-permissions:
+    - organization.read
+  responses:
+    200:
+      description: The org, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/organization.yaml"
+    404:
+      description: No user was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+
+put:
+  tags:
+    - Organization
+  summary: Update an organization
+  description: "Update an organization with the help of the unique id."
+  operationId: updateOrganizationById
+  x-zitadel-permissions:
+    - organization.update
+  responses:
+    200:
+      description: The organization, what else
+      content:
+        application/json:
+          schema:
+            $ref:  "../components/schemas/organization.yaml"
+    404:
+      description: No organization was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+            

@@ -1,0 +1,59 @@
+parameters:
+  - $ref: "../components/parameters/limit.yaml"
+  - $ref: "../components/parameters/position.yaml"
+
+get:
+  tags:
+    - Organization
+  summary: Search organizations
+  description: "Search organizations inside your zitadel instance."
+  operationId: searchOrganizations
+  x-zitadel-permissions:
+    - organization.search
+  responses:
+    200:
+      description: The users, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/organizations.yaml"
+    404:
+      description: No user was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+
+post:
+  tags:
+    - Organization
+  summary: Create organization
+  description: "Create a new organization inside your zitadel instance."
+  operationId: createOrganization
+  x-zitadel-permissions:
+    - organization.create
+  responses:
+    200:
+      description: The organization, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/organization.yaml"
+    404:
+      description: No organization was found you muppet
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"

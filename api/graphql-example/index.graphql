@@ -1,0 +1,44 @@
+input CreateUserInput {
+  username: String!
+  email: String
+  phone: String
+  firstName: String
+  lastName: String
+  role: ZitadelRoleEnum
+}
+input SearchUserInput {
+  username: String
+  email: String
+  phone: String
+  firstName: String
+  lastName: String
+  role: ZitadelRoleEnum
+}
+type CreateUserPayload {
+  user: User!
+}
+type CreateUsersPayload {
+  users: [User]
+}
+type Mutation {
+  createUser(input: CreateUserInput!): CreateUserPayload
+  createUsers(input: [CreateUserInput!]!): CreateUsersPayload
+}
+type Query {
+  users(input: SearchUserInput!): [User!]!
+}
+type User {
+  id: ID!
+  username: String!
+  email: String
+  phone: String
+  firstName: String
+  lastName: String
+  role: ZitadelRoleEnum!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+enum ZitadelRoleEnum {
+  IAM_OWNER
+}
+scalar DateTime

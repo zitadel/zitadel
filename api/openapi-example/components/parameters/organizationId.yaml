@@ -1,0 +1,6 @@
+name: organizationId
+description: The unique identifier of an organization
+in: query
+required: false
+schema:
+  type: string

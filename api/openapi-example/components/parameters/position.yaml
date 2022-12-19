@@ -1,0 +1,7 @@
+name: position
+description: The position on the result pages
+in: query
+required: false
+schema:
+  type: integer
+  default: 0

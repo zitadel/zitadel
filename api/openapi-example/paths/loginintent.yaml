@@ -1,0 +1,36 @@
+parameters:
+  - name: userId
+    description: The unique identifier of a user
+    in: query
+    required: false
+    schema:
+      type: string
+  - name: loginName
+    description: The unique identifier of a user
+    in: query
+    required: false
+    schema:
+      type: string
+  - name: orgId
+  - name: applicationId
+      
+get:
+  responses:
+    200:
+      description: The users, what else
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              # Includes Authenticator and linked IdPs
+              user:
+                $ref: "../components/schemas/users.yaml"
+              # Branding
+              labelPolicy:
+              privacyPolicy:
+              # Includes the list of available IdPs
+              loginPolicy:
+              lockOutPolicy:
+              passwordComplexityPolicy:
+              

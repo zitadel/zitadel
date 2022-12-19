@@ -1,0 +1,17 @@
+type: object
+required:
+  - id
+  - name
+  - type
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  type: 
+    type: string
+    enum: 
+    - openIdGeneric
+    - oAuth2Generic
+    - github
+    - google

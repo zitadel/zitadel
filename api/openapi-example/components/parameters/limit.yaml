@@ -1,0 +1,8 @@
+name: limit
+description: The limit of results per page
+in: query
+required: false
+schema:
+  type: integer
+  default: 10
+  maximum: 100

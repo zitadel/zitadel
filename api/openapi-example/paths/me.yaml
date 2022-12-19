@@ -1,0 +1,21 @@
+get:
+  tags:
+    - User
+  summary: Get the current user
+  description: "This returns the currently authenticated user throught its authentication." # I know that we currently only allow search inside orgs.
+  operationId: getCurrentUser
+  x-zitadel-permissions:
+    - user.read
+  responses:
+    200:
+      description: The users, what else
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/user.yaml"
+    500:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/problem.yaml"
