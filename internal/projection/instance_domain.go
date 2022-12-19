@@ -10,15 +10,23 @@ import (
 var _ Projection = (*SearchInstanceDomain)(nil)
 
 type SearchInstanceDomain struct {
-	host             string
-	removedInstances []string
+	domain string
+	// removed key is instance id
+	removed map[string]*removedInstance
 
 	InstanceID string
 }
 
-func NewSearchInstanceDomain(host string) *SearchInstanceDomain {
+type removedInstance struct {
+	isRemoved bool
+	// domains are the list of removed domains
+	domains []string
+}
+
+func NewSearchInstanceDomain(domain string) *SearchInstanceDomain {
 	return &SearchInstanceDomain{
-		host: host,
+		domain:  domain,
+		removed: map[string]*removedInstance{},
 	}
 }
 
@@ -30,7 +38,7 @@ func (domains *SearchInstanceDomain) Reduce(events []eventstore.Event) {
 				return
 			}
 		case *instance.DomainRemovedEvent:
-			domains.reduceRemoved(e)
+			domains.reduceDomainRemoved(e)
 		case *instance.InstanceRemovedEvent:
 			domains.reduceInstanceRemoved(e)
 		}
@@ -47,25 +55,51 @@ func (domains *SearchInstanceDomain) SearchQuery(context.Context) *eventstore.Se
 			instance.InstanceDomainRemovedEventType,
 		).
 		EventData(map[string]interface{}{
-			"domain": domains.host,
+			"domain": domains.domain,
 		}).
+		Or().
+		AggregateTypes(instance.AggregateType).
+		EventTypes(instance.InstanceRemovedEventType).
 		Builder()
 }
 
 func (domains *SearchInstanceDomain) reduceAdded(event *instance.DomainAddedEvent) (ok bool) {
-	for _, removed := range domains.removedInstances {
-		if removed == event.Domain {
-			return false
-		}
+	if domains.isRemoved(event.Aggregate().ID, event.Domain) {
+		return false
 	}
 	domains.InstanceID = event.Aggregate().ID
 	return true
 }
 
-func (domains *SearchInstanceDomain) reduceRemoved(event *instance.DomainRemovedEvent) {
-	domains.removedInstances = append(domains.removedInstances, event.Aggregate().ID)
+func (domains *SearchInstanceDomain) reduceDomainRemoved(event *instance.DomainRemovedEvent) {
+	if _, ok := domains.removed[event.Aggregate().ID]; !ok {
+		domains.removed[event.Aggregate().ID] = new(removedInstance)
+	}
+	domains.removed[event.Aggregate().ID].domains =
+		append(domains.removed[event.Aggregate().ID].domains, event.Domain)
 }
 
 func (domains *SearchInstanceDomain) reduceInstanceRemoved(event *instance.InstanceRemovedEvent) {
-	domains.removedInstances = append(domains.removedInstances, event.Aggregate().ID)
+	if _, ok := domains.removed[event.Aggregate().ID]; !ok {
+		domains.removed[event.Aggregate().ID] = new(removedInstance)
+	}
+	domains.removed[event.Aggregate().ID].isRemoved = true
+}
+
+func (domains *SearchInstanceDomain) isRemoved(instanceID, domain string) bool {
+	removed, ok := domains.removed[instanceID]
+	if !ok {
+		return false
+	}
+
+	if removed.isRemoved {
+		return true
+	}
+
+	for _, removedDomain := range removed.domains {
+		if removedDomain == domain {
+			return true
+		}
+	}
+	return false
 }
