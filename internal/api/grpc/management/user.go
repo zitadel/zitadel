@@ -25,11 +25,7 @@ import (
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
-	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
-	if err != nil {
-		return nil, err
-	}
-	user, err := s.query.GetUserByID(ctx, true, req.Id, false, owner)
+	user, err := s.query.GetUserByID(ctx, true, req.Id, false, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

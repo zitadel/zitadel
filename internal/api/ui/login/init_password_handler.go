@@ -149,7 +149,7 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 		}
 	}
 	if authReq == nil {
-		user, err := l.query.GetUserByID(r.Context(), false, userID, false)
+		user, err := l.query.GetUserByID(r.Context(), false, userID, false, "")
 		if err == nil {
 			l.customTexts(r.Context(), translator, user.ResourceOwner)
 		}

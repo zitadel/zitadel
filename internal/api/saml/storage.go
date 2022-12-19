@@ -121,7 +121,7 @@ func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.Auth
 func (p *Storage) SetUserinfoWithUserID(ctx context.Context, userinfo models.AttributeSetter, userID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := p.query.GetUserByID(ctx, true, userID, false)
+	user, err := p.query.GetUserByID(ctx, true, userID, false, "")
 	if err != nil {
 		return err
 	}

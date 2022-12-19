@@ -319,11 +319,11 @@ func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
 }
 
-func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (_ *User, err error) {
+func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, resourceOwner string) (_ *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	user := projection.NewUserWithOwner(userID, authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
+	user := projection.NewUserWithOwner(userID, authz.GetInstance(ctx).InstanceID(), resourceOwner)
 	events, err := q.eventstore.Filter(ctx, user.SearchQuery(ctx))
 	if err != nil {
 		return nil, err
