@@ -136,6 +136,7 @@ module.exports = {
             "guides/integrate/gitlab-saml",
           ],
         },
+        "guides/integrate/logout",
       ],
     },
     {
