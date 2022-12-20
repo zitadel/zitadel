@@ -881,7 +881,8 @@
       "BRANDING": "品牌标识",
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
-      "SECRETS": "验证码外观"
+      "SECRETS": "验证码外观",
+      "SECURITY": "安全设置"
     },
     "GROUPS": {
       "NOTIFICATIONS": "通知",
@@ -969,6 +970,11 @@
       "INCLUDEUPPERLETTERS": "包含大写字母",
       "LENGTH": "长度",
       "UPDATED": "设置已更新。"
+    },
+    "SECURITY": {
+      "DESCRIPTION": "此设置将CSP设置为允许来自一组允许的域的框架。请注意，通过启用iFrames的使用，你会有允许点击劫持的风险。",
+      "IFRAMEENABLED": "允许 iFrame",
+      "ALLOWEDORIGINS": "允许的来源 URL"
     },
     "DIALOG": {
       "RESET": {
@@ -1166,6 +1172,7 @@
       "EXPIREWARNDAYS": "密码过期警告",
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "用户名必须包含组织域名",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "如果启用此设置，所有登录名都将以组织域为后缀。如果禁用此设置，您必须确保用户名在所有组织中都是唯一的。",
       "VALIDATEORGDOMAINS": "验证组织域名",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP 发件人地址与实例域名匹配",
       "ALLOWUSERNAMEPASSWORD": "允许用户名密码",
@@ -1677,6 +1684,7 @@
     "ORIGINS": "其他来源",
     "NOTANORIGIN": "输入的值不是有效来源",
     "OIDC": {
+      "WELLKNOWN": "欲了解更多信息，请看<a href='{url}}' title='发现端点' target='_blank'>发现端点</a>。",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client Id"

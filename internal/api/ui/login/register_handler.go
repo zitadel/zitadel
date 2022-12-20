@@ -21,7 +21,6 @@ type registerFormData struct {
 	Firstname    string `schema:"firstname"`
 	Lastname     string `schema:"lastname"`
 	Language     string `schema:"language"`
-	Gender       int32  `schema:"gender"`
 	Password     string `schema:"register-password"`
 	Password2    string `schema:"register-password-confirmation"`
 	TermsConfirm bool   `schema:"terms-confirm"`
@@ -167,12 +166,6 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 			}
 			return formData.Language == l
 		},
-		"selectedGender": func(g int32) bool {
-			if formData == nil {
-				return false
-			}
-			return formData.Gender == g
-		},
 	}
 	if authRequest == nil {
 		l.customTexts(r.Context(), translator, resourceOwner)
@@ -187,7 +180,6 @@ func (d registerFormData) toHumanDomain() *domain.Human {
 			FirstName:         d.Firstname,
 			LastName:          d.Lastname,
 			PreferredLanguage: language.Make(d.Language),
-			Gender:            domain.Gender(d.Gender),
 		},
 		Password: &domain.Password{
 			SecretString: d.Password,

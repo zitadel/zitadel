@@ -49,7 +49,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     external_docs: {
         description: "Detailed information about ZITADEL",
-        url: "https://docs.zitadel.com"
+        url: "https://zitadel.com/docs"
     }
 };
 

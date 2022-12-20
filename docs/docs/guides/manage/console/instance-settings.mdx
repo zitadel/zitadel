@@ -97,14 +97,14 @@ The Login Policy defines how the login process should look like and which authen
 Passwordless authentication means that the user doesn't need to enter a password to login. In our case the user has to enter his loginname and as the next step proof the identity through a registered device or token.
 There are two different types one is depending on the device (e.g. Fingerprint, Face recognition, WindowsHello) and the other is independent (eg. Yubikey, Solokey).
 
-### Multifactor
+### Multifactor (MFA)
 
 In the multifactors section you can configure what kind of multifactors should be allowed. For passwordless to work, it's required to enable U2F (Universial Second Factor) with PIN. There is no other option at the moment.
 Multifactors:
 
 - U2F (Universal Second Factor) with PIN, e.g FaceID, WindowsHello, Fingerprint, Hardwaretokens like Yubikey
 
-Secondfactors:
+Secondfactors (2FA):
 
 - OTP (One Time Password), Authenticator Apps like Google/Microsoft Authenticator, Authy, etc.
 - U2F (Universal Second Factor), e.g FaceID, WindowsHello, Fingerprint, Hardwaretokens like Yubikey
