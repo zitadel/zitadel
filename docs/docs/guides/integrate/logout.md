@@ -61,6 +61,7 @@ This is not yet implemented in ZITADEL
 
 ZITADEL generates a user-agent cookie as soon as a user authenticates the first time. 
 All open sessions on that user-agent (browser) will be stored to the same cookie.
+If you delete the cookie in your browser we will not be able to find out which sessions belong to your user-agent.
 
 Initiating a request to the [end_session_endpoint](../../apis/openidoauth/endpoints#end_session_endpoint) will terminate all open sessions on the given user agent.
 If you have specified some post_logout_redirect_uris on your client you have to send either the id_token_hint or the client_id as param in your request.
