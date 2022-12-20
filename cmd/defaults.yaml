@@ -320,10 +320,12 @@ Actions:
 
 LogStore:
   Access:
-    Enabled: true
+    Enabled: false
+    Keep: 2160h # 90 days
+    CleanupInterval: 4h
     Debounce:
       MinFrequency: 2m
-      MaxBulkSize: 0
+      MaxBulkSize: 100
 
 DefaultInstance:
   InstanceName:

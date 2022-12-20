@@ -3,6 +3,9 @@ package access
 import (
 	"context"
 	"database/sql"
+	"time"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/query"
 
@@ -12,8 +15,10 @@ import (
 )
 
 type Config struct {
-	Enabled  bool
-	Debounce *logstore.DebouncerConfig
+	Enabled         bool
+	Keep            time.Duration
+	CleanupInterval time.Duration
+	Debounce        *logstore.DebouncerConfig
 }
 
 type Service struct {
@@ -34,18 +39,28 @@ func NewService(ctx context.Context, cfg *Config, dbClient *sql.DB, report repor
 		report:   report,
 	}
 
-	if svc.enabled {
-		if cfg.Debounce != nil && cfg.Debounce.MinFrequency > 0 && cfg.Debounce.MaxBulkSize > 0 {
-			svc.debouncer = logstore.NewDebouncer(ctx, cfg.Debounce, newStorageBulkSink(dbClient))
-		}
+	if cfg.Debounce != nil && (cfg.Debounce.MinFrequency > 0 || cfg.Debounce.MaxBulkSize > 0) {
+		svc.debouncer = logstore.NewDebouncer(ctx, cfg.Debounce, newStorageBulkSink(dbClient))
+	}
+	if cfg.Keep != 0 {
+		go svc.startCleanupping(cfg.CleanupInterval, cfg.Keep)
 	}
 	return svc
 }
 
-// TODO: Cache things in-memory here?
+func (s *Service) startCleanupping(cleanupInterval, keep time.Duration) {
+	// TODO: synchronize with other ZITADEL binaries?
+	for range time.Tick(cleanupInterval) {
+		if err := cleanup(s.ctx, s.dbClient, keep); err != nil {
+			logging.WithError(err).Error("cleaning up access logs failed")
+		}
+	}
+}
+
+// Limit TODO: Cache things in-memory here?
 func (s *Service) Limit(ctx context.Context, instanceID string) (bool, error) {
 
-	if instanceID == "" {
+	if !s.enabled || instanceID == "" {
 		return false, nil
 	}
 

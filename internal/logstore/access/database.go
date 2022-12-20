@@ -80,17 +80,17 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 
 	stmt, args, err := builder.ToSql()
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "LOGCH-KOS7I", "Errors.Internal")
+		return caos_errors.ThrowInternal(err, "ACCESS-KOS7I", "Errors.Internal")
 	}
 
 	result, err := dbClient.ExecContext(ctx, stmt, args...)
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "LOGCH-alnT9", "Errors.Access.StorageFailed")
+		return caos_errors.ThrowInternal(err, "ACCESS-alnT9", "Errors.Access.StorageFailed")
 	}
 
 	rows, err := result.RowsAffected()
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "LOGCH-7KIpL", "Errors.Internal")
+		return caos_errors.ThrowInternal(err, "ACCESS-7KIpL", "Errors.Internal")
 	}
 
 	logging.Debugf("successfully stored %d acccess logs", rows)
@@ -127,14 +127,14 @@ func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instan
 		ToSql()
 
 	if err != nil {
-		return 0, caos_errors.ThrowInternal(err, "QUOTA-V9Sde", "Errors.Internal")
+		return 0, caos_errors.ThrowInternal(err, "ACCESS-V9Sde", "Errors.Internal")
 	}
 
 	var count uint64
 	if err = dbClient.
 		QueryRowContext(ctx, stmt, args...).
 		Scan(&count); err != nil {
-		return 0, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Access.ScanFailed")
+		return 0, caos_errors.ThrowInternal(err, "ACCESS-pBPrM", "Errors.Access.ScanFailed")
 	}
 
 	return count, nil
@@ -148,4 +148,21 @@ func pruneRequestHeaders(header http.Header) http.Header {
 		}
 	}
 	return clonedHeader
+}
+
+func cleanup(ctx context.Context, dbClient *sql.DB, keep time.Duration) error {
+
+	stmt, args, err := squirrel.Delete(accessLogsTable).
+		Where(squirrel.LtOrEq{accessTimestampCol: time.Now().Add(-keep)}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return caos_errors.ThrowInternal(err, "ACCESS-2oTh6", "Errors.Internal")
+	}
+
+	execCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	_, err = dbClient.ExecContext(execCtx, stmt, args...)
+	return err
 }

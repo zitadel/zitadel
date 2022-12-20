@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/logging"
 )
 
+// BulkSink TODO: How to make that generic, so any can be specified?
 type BulkSink interface {
 	SendBulk(ctx context.Context, bulk []any) error
 }
