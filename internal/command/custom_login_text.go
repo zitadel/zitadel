@@ -761,6 +761,10 @@ func (c *Commands) createRegistrationOptionEvents(ctx context.Context, agg *even
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationOptionLoginButtonText, existingText.RegistrationOptionLoginButtonText, text.RegisterOption.LoginButtonText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	return events
 }
 
