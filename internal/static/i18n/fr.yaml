@@ -155,6 +155,8 @@ Errors:
     Empty: L'organisation est vide
     NotFound: Organisation non trouvée
     NotChanged: L'organisation n'a pas changé
+    DefaultOrgNotDeletable: L'organisation par défault ne doit pas être supprimée
+    ZitadelOrgNotDeletable: L'organisation avec ZITADEL project ne doit pas être supprimée
     InvalidDomain: Domaine non valide
     DomainMissing: Domaine manquant
     DomainNotOnOrg: Le domaine n'existe pas dans l'organisation
