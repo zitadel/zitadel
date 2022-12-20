@@ -8,8 +8,14 @@ const languages = [
   { name: "Go", code: "go" },
 ];
 
-export default function LanguageSwitcher() {
-  const [selected, setSelected] = useState(languages[0]);
+type Props = {
+  initial: string;
+};
+
+export default function LanguageSwitcher({ initial }: Props) {
+  const [selected, setSelected] = useState(
+    languages.find((l) => l.code === initial) ?? languages[0]
+  );
 
   return (
     <div className="w-28">

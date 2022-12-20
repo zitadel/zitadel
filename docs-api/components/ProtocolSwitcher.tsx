@@ -7,8 +7,14 @@ const protocols = [
   { name: "REST", code: "rest" },
 ];
 
-export default function ProtocolSwitcher() {
-  const [selected, setSelected] = useState(protocols[0]);
+type Props = {
+  initial: string;
+};
+
+export default function ProtocolSwitcher({ initial }: Props) {
+  const [selected, setSelected] = useState(
+    protocols.find((p) => p.code === initial) ?? protocols[0]
+  );
 
   return (
     <div className="w-28">

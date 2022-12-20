@@ -13,5 +13,11 @@ export const card = {
     hasProtocolToggle: {
       type: Boolean,
     },
+    language: {
+      type: String,
+    },
+    protocol: {
+      type: String,
+    },
   },
 };

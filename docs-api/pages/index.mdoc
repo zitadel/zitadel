@@ -100,8 +100,12 @@ If your getting a 401 error code you may consider reading the [Authentication Ch
 
 {% /column %}
 {% column %}
-{% card title="Status Codes" hasProtocolToggle="true" %}
+{% card title="Status Codes" hasProtocolToggle="true" protocol=$protocol %}
+hello {% $protocol %} 
+
 {% if equals($protocol, "grpc") %}
+
+
 | Code              | Number | Description                                                                                                                              |
 | :---------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------- |
 | OK                | 0      | Not an error, return on success {% .text-xs %}                                                                                           |
