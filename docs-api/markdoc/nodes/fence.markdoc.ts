@@ -1,7 +1,7 @@
 import { nodes } from "@markdoc/markdoc";
-import { CodeBlock } from "../../components/CodeBlock";
+import { Code } from "../../components/Code";
 
 export const fence = {
-  render: CodeBlock,
+  render: Code,
   attributes: nodes.fence.attributes,
 };

@@ -67,3 +67,6 @@ migrations/cockroach/migrate_cloud.go
 
 go.work
 go.work.sum
+
+# npm
+node_modules/

@@ -10,6 +10,7 @@
     "@heroicons/react": "^2.0.13",
     "@markdoc/markdoc": "latest",
     "@markdoc/next.js": "latest",
+    "copy-to-clipboard": "^3.3.3",
     "next": "latest",
     "next-themes": "^0.2.1",
     "prismjs": "latest",

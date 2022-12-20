@@ -2,6 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --white: #ffffff;
+  --black: #18181b;
+  --black-light: #58585f;
+  --black-medium: #2c2c30;
+  --gray-light: #f6f9fc;
+  --gray-medium: #dce6e9;
+
+  --dark: var(--black);
+  --text: var(--dark);
+  --translucent: rgba(0, 0, 0, 0.4);
+
+  --yellow: #ffd848;
+  --purple: #6e00f5;
+  --green: #0a993e;
+  --blue: #0073e6;
+  --magenta: #dc34dc;
+
+  --theme: var(--magenta);
+}
+
+.dark {
+  --translucent: rgba(255, 255, 255, 0.4);
+}
+
+body ::selection,
+body.dark ::selection {
+  color: var(--black) !important;
+  background: var(--theme) !important;
+}
+
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
@@ -32,7 +63,7 @@ h3,
   @apply uppercase text-black dark:text-white;
 }
 
-a,
+main a,
 .ztdl-a {
   @apply text-primary-light-500 dark:text-primary-dark-400;
 }
@@ -67,4 +98,59 @@ table {
 
 pre {
   font-size: 14px !important;
+  @apply border rounded-md border-black/10 dark:border-white/10;
+
+  &[class*="language-"] {
+    text-shadow: none !important;
+    @apply bg-gray-100 dark:bg-white/5;
+  }
+}
+
+pre[class*="language-"] {
+  color: var(--text) !important;
+
+  .md-link {
+    color: inherit !important;
+  }
+}
+
+.dark pre[class*="language-"] {
+  --light: var(--black);
+  --dark: var(--white);
+  --text: var(--dark);
+
+  --purple: var(--yellow); /* Change purple to yellow in dark mode */
+  --green: #00d924;
+  --blue: #80e9ff;
+  --magenta: #ff80ff;
+}
+
+.token {
+  color: var(--text) !important;
+  background: transparent !important;
+}
+
+.token.comment {
+  color: var(--translucent) !important;
+}
+
+pre .token.string,
+pre .token.boolean,
+pre .token.number {
+  color: var(--magenta) !important;
+}
+
+pre .token.function,
+pre .token.tagType,
+pre .token.tag {
+  color: var(--blue) !important;
+}
+
+pre .token.keyword,
+.cm-attribute {
+  color: var(--purple) !important;
+}
+
+pre .token.variable {
+  color: var(--green) !important;
 }

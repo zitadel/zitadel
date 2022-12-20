@@ -177,6 +177,27 @@ Make sure you don't save sensitive information as the values are not encrypted, 
 
 ### Projects
 
+```js
+import { Tag } from '@markdoc/markdoc';
+
+export const group = {
+  render: 'Group',
+  attributes: {
+    items: { type: Array }
+  },
+  transform(node, config) {
+    const attributes = node.transformAttributes(config);
+    const children = node.transformChildren(config);
+
+    for (const item of attributes.items) {
+      /* Do something with each item */
+    }
+
+    return new Tag('Group', attributes, children);
+  }
+};
+```
+
 ### Applications
 
 ### Members

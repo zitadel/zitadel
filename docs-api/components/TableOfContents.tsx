@@ -4,8 +4,11 @@ import { ZitadelLogo } from "./ZitadelLogo";
 import { Disclosure } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import Theme from "./Theme";
+import { useRouter } from "next/router";
 
 export function TableOfContents({ toc }) {
+  const router = useRouter();
+
   const items = toc.filter(
     (item) =>
       item.id && (item.level === 2 || item.level === 3 || item.level === 4)
@@ -16,10 +19,10 @@ export function TableOfContents({ toc }) {
   }
 
   return (
-    <nav className="sticky bg-gray-50 dark:bg-background-dark-600 top-0 h-screen border-box overflow-y-auto bottom-0 flex-shrink-0 w-64 xl:w-72 px-4 xl:px-6 border-r border-border-light dark:border-border-dark flex flex-col">
+    <nav className="sticky bg-gray-50 dark:bg-background-dark-600 top-0 h-screen border-box overflow-y-auto bottom-0 flex-shrink-0 w-64 xl:w-72 pr-4 xl:px-6 border-r border-border-light dark:border-border-dark flex flex-col">
       <div className="flex flex-col relative">
-        <div className="z-10 sticky h-16  top-0 left-0 right-0 ">
-          <div className="pt-4 pb-2 bg-white bg-gray-50 dark:bg-background-dark-600 flex items-center justify-between">
+        <div className="z-10 sticky h-16 top-0 left-0 right-0">
+          <div className="pl-4 pt-4 pb-2 bg-gray-50 dark:bg-background-dark-600 flex items-center justify-between">
             <Link className="" href="/">
               <ZitadelLogo />
             </Link>
@@ -33,9 +36,8 @@ export function TableOfContents({ toc }) {
         <ul className="flex-1 flex flex-col pb-8">
           {items.map((item, i) => {
             const href = `#${item.id}`;
-            const active = false;
-            // const active =
-            //   typeof window !== "undefined" && window.location.hash === href;
+
+            const active = `#${router.asPath.split("#")[1]}` === href;
 
             if (item.level === 2 && i < items.length) {
               const remaining = items.slice(i + 1);
@@ -50,7 +52,7 @@ export function TableOfContents({ toc }) {
                 <Disclosure key={`menu_${i}`}>
                   {({ open }) => (
                     <>
-                      <Disclosure.Button className="flex w-full justify-between rounded-lg py-2 pt-6 text-left text-sm font-medium text-gray-500 dark:text-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                      <Disclosure.Button className="pl-4 flex w-full justify-between rounded-lg py-2 pt-6 text-left text-sm font-medium text-gray-500 dark:text-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                         <span className="uppercase text-xs">{item.title}</span>
                         <ChevronDownIcon
                           className={`${
@@ -62,19 +64,32 @@ export function TableOfContents({ toc }) {
                         {subItems.map((subitem, j) => {
                           const sub_href = `#${subitem.id}`;
 
+                          const sub_active =
+                            `#${router.asPath.split("#")[1]}` === sub_href;
+
                           return (
                             <li
                               key={`sub_${i}_${j}_${subitem.title}`}
                               className={[
-                                subitem.level === 3 ? "" : undefined,
-                                subitem.level === 4 ? "pl-4" : undefined,
-                                "py-1 text-sm min-h-8",
+                                subitem.level === 3 ? "pl-4" : undefined,
+                                subitem.level === 4 ? "pl-8" : undefined,
+                                sub_active
+                                  ? "bg-primary-light-500/5 dark:bg-white/5"
+                                  : "",
+                                "py-1 text-sm min-h-8 flex items-center rounded-r-md xl:rounded-l-md",
                               ]
                                 .filter(Boolean)
                                 .join(" ")}
                             >
                               <Link
-                                className="text-sm  dark:text-gray-400 text-gray-500 dark:bg-background-dark-500 hover:text-black hover:dark:text-white"
+                                className={[
+                                  "text-sm",
+                                  sub_active
+                                    ? "text-primary-light-500 dark:text-primary-dark-400"
+                                    : "text-gray-500 dark:text-gray-400 hover:text-black hover:dark:text-white",
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
                                 href={sub_href}
                               >
                                 {subitem.title}
@@ -92,16 +107,22 @@ export function TableOfContents({ toc }) {
                 <li
                   key={`sub_${i}_${item.title}`}
                   className={[
-                    active
-                      ? "text-black dark:bg-background-dark-500 dark:text-primary-dark-500"
-                      : "",
+                    "pl-4 rounded-r-md xl:rounded-l-md",
+                    active ? "bg-primary-light-500/5 dark:bg-white/5" : "",
                     item.level === 3 ? "py-1" : undefined,
                   ]
                     .filter(Boolean)
                     .join(" ")}
                 >
                   <Link
-                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-black hover:dark:text-white"
+                    className={[
+                      "text-sm ",
+                      active
+                        ? "text-primary-light-500 dark:text-primary-dark-400"
+                        : "text-gray-500 dark:text-gray-400 hover:text-black hover:dark:text-white",
+                    ]
+                      .filter(Boolean)
+                      .join("")}
                     href={href}
                   >
                     {item.title}
