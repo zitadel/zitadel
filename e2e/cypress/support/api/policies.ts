@@ -28,7 +28,7 @@ export function ensureDomainPolicy(
     `${api.adminBaseURL}/policies/domain`,
     (body: any) => {
       const result = {
-        sequence: body.policy?.details?.sequence,
+        sequence: parseInt(<string>body.policy?.details?.sequence),
         id: body.policy?.details?.resourceOwner,
         entity: null,
       };
