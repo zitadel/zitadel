@@ -290,7 +290,7 @@ You may edit the texts in these files or create a new file for additional langua
 ## Want to start ZITADEL?
 
 You can find an installation guide for all the different environments here:
-[https://zitadel.com/docs/guides/deploy/overview](https://zitadel.com/docs/guides/deploy/overview)
+[https://zitadel.com/docs/self-hosting/deploy/overview](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 ## **Did you find a security flaw?**
 
