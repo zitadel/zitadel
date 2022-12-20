@@ -2,20 +2,20 @@
 title: Logout
 ---
 
-This guide shows you different concepts and use cases for logout and how to use it in ZITADEL.
+This guide shows you the different concepts and use cases of the logout process and how to use it in ZITADEL.
 
 ## OpenID Connect Single Logout 
 
 ### Single Sign On (SSO) vs Single Logout (SLO)
 
-Single Sing On (SSO) allows a user to login once and be authenticated to several related applications.
-Single Logout (SLO) is the counterpart to this. With SLO a user can logout and terminate all related sessions, without actively logout from all systems.
+Single Sing On (SSO) allows a user to login once without the need for authentication across multiple applications.
+Single Logout (SLO) is the counterpart to SSO. With SLO a user can logout and terminate sessions across many applications, without actively logging out from them.
 
 The purpose of a logout is to terminate a user session.
 Depending on how the session handling is implemented, there are different mechanisms that can be used.
-There are two different possibilities:
-- User Agent stores session information (e.g. in a cookie)
-- Server Side stores session information (e.g. in a database)
+There are two possibilities where sessions are stored:
+- The User Agent (e.g the Browser or Mobile App) stores the session information (e.g. in a cookie)
+- A Server stores the session information (e.g. in a database or api)
 
 ### OpenID Connect Logout
 
@@ -26,8 +26,8 @@ OpenID Connect defines three logout mechanisms to address the different architec
 
 #### Session Management
 
-Session Management in OpenID Connect defines a mechanism for a client (Relying Party, RP) to monitor the login status of the user in the provider (OP, e.g ZITADEL).
-When a user logs out of the provider, the user's session is terminated.
+Session Management in OpenID Connect defines a mechanism for a client (Relying Party, RP) to monitor the state of the user session from a identity provider (OP, e.g ZITADEL).
+When a user logs out of the provider, the user's session is terminated and the client can in turn reflect that in its behavior.
 
 #### RP initiated Logout
 
@@ -60,11 +60,11 @@ The user will logout from all clients even in the case the user agent was closed
 This is not yet implemented in ZITADEL
 :::
 
-## Use Cases
+## Scenarios
 
-1. Logout all users from current user-agent/browser (current implementation of ZITADEL end_session_endpoint)
-2. Logout my user from current user-agent/browser
-3. Logout my user from all devices
+1. Logout all users from the current user-agent/browser (current implementation of ZITADEL end_session_endpoint)
+2. Logout my user from the current user-agent/browser
+3. Logout my user from the all devices
 
 ## Session Handling in ZITADEL
 
