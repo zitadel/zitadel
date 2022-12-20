@@ -1,6 +1,6 @@
 import { Endpoint } from "../../components/Endpoint";
 
-export const endpoint = {
+export default {
   render: Endpoint,
   children: ["paragraph"],
   attributes: {

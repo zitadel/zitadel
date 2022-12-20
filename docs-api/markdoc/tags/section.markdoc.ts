@@ -1,6 +1,6 @@
 import { Section } from "../../components/Section";
 
-export const section = {
+export default {
   render: Section,
   children: ["paragraph", "tag", "list", "code"],
   attributes: {

@@ -3,8 +3,8 @@ import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
 const protocols = [
-  { name: "GRPC", code: "grpc" },
   { name: "REST", code: "rest" },
+  { name: "GRPC", code: "grpc" },
 ];
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 
 export default function ProtocolSwitcher({ initial }: Props) {
   const [selected, setSelected] = useState(
-    protocols.find((p) => p.code === initial) ?? protocols[0]
+    (initial && protocols.find((p) => p.code === initial)) ?? protocols[0]
   );
 
   return (

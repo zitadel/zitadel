@@ -31,15 +31,15 @@ You're not a developer? {% .ztdl-subheader .pb-0 %}
 Consider reading our Guide [here](https://zitadel.com/docs/guides/introduction) or contact us at [support@zitadel.com](mailto:support@zitadel.com).
 
 {% card title="Base URLs" %}
-**Auth**: {% instanceDomain("your-domain", "auth", "v1") %}{% .pt-4 .pb-2 m-0 %}
+**Auth**: {% instanceDomain($instance, "auth", "v1") %}{% .pt-4 .pb-2 m-0 %}
 
-**Management** {% instanceDomain("your-domain", "management", "v1") %}{% .py-2 m-0 %}
+**Management** {% instanceDomain($instance, "management", "v1") %}{% .py-2 m-0 %}
 
-**Admin** {% instanceDomain("your-domain", "admin", "v1") %}{% .py-2 m-0 %}
+**Admin** {% instanceDomain($instance, "admin", "v1") %}{% .py-2 m-0 %}
 
-**System** {% instanceDomain("your-domain", "system", "v1") %}{% .py-2 m-0 %}
+**System** {% instanceDomain($instance, "system", "v1") %}{% .py-2 m-0 %}
 
-**Assets** {% instanceDomain("your-domain", "assets", "v1") %}{% .py-4 .pt-2 m-0 %}
+**Assets** {% instanceDomain($instance, "assets", "v1") %}{% .py-4 .pt-2 m-0 %}
 
 {% /card %}
 {% /column %}
@@ -68,7 +68,7 @@ All API requests must be made over HTTPS. Calls made over plain HTTP will fail. 
 This request gets the basic user information from the user
 
 ```bash
-curl {% instanceDomain("your-domain", "auth", "v1") %} \
+curl {% instanceDomain($instance, "auth", "v1") %} \
   -u 51IK2AACdCycJe9V8zmsnX1ByJhyRegEyFAwcgEA
 # The colon prevents curl from asking for a password.
 ```
@@ -100,36 +100,8 @@ If your getting a 401 error code you may consider reading the [Authentication Ch
 
 {% /column %}
 {% column %}
-{% card title="Status Codes" hasProtocolToggle="true" protocol=$protocol %}
-hello {% $protocol %} 
+{% partial file="error_codes.mdoc" /%}
 
-{% if equals($protocol, "grpc") %}
-
-
-| Code              | Number | Description                                                                                                                              |
-| :---------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------- |
-| OK                | 0      | Not an error, return on success {% .text-xs %}                                                                                           |
-| CANCELLED         | 1      | The operation was cancelled {% .text-xs %}                                                                                               |
-| UNKNOWN           | 2      | Unknown error {% .text-xs %}                                                                                                             |
-| INVALID_ARGUMENT  | 3      | The client specified an invalid argument {% .text-xs %}                                                                                  |
-| DEADLINE_EXCEEDED | 4      | The deadline expired before the operation could complete {% .text-xs %}                                                                  |
-| NOT_FOUND         | 5      | Some requested object was not found {% .text-xs %}                                                                                       |
-| ALREADY_EXISTS    | 6      | Object already exists {% .text-xs %}                                                                                                     |
-| PERMISSION_DENIED | 7      | Your unauthorized because you are missing an [auth header](#authentication) or your user does not have enough permission. {% .text-xs %} |
-{% /if %}
-{% if equals($protocol, "rest") %}
-| Code              | Number | Description                                                    |
-| :---------------- | :----- | :------------------------------------------------------------- |
-| OK                | 200    | The request succeeded {% .text-xs %}                           |
-| Bad Request       | 400    | Not an error, return on success {% .text-xs %}                 |
-| Unauthorized      | 401    | You must send an [auth header](#authentication) {% .text-xs %} |
-| Request Failed    | 402    | Not an error, return on success {% .text-xs %}                 |
-| Forbidden         | 403    | Not an error, return on success {% .text-xs %}                 |
-| Not found         | 404    | Not an error, return on success {% .text-xs %}                 |
-| Conflict          | 409    | Not an error, return on success {% .text-xs %}                 |
-| PERMISSION_DENIED | 429    | Not an error, return on success {% .text-xs %}                 |
-{% /if %}
-{% /card %}
 {% /column %}
 {% /section %}
 
@@ -197,6 +169,14 @@ export const group = {
   }
 };
 ```
+
+{% codeblock %}
+{% $protocol %}
+```
+console.log('hello')
+```
+{% /codeblock %}
+
 
 ### Applications
 

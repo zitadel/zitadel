@@ -1,8 +1,8 @@
-import Prism from 'prismjs';
+import Prism from "prismjs";
 
-import * as React from 'react';
+import * as React from "react";
 
-export function CodeBlock({children, 'data-language': language}) {
+export function CodeBlock({ children, "data-language": language }) {
   const ref = React.useRef(null);
 
   React.useEffect(() => {
@@ -11,10 +11,8 @@ export function CodeBlock({children, 'data-language': language}) {
 
   return (
     <div className="code" aria-live="polite">
-      <pre
-        ref={ref}
-        className={`language-${language}`}
-      >
+      hello
+      <pre ref={ref} className={`language-${language}`}>
         {children}
       </pre>
       <style jsx>
@@ -24,7 +22,7 @@ export function CodeBlock({children, 'data-language': language}) {
           }
 
           /* Override Prism styles */
-          .code :global(pre[class*='language-']) {
+          .code :global(pre[class*="language-"]) {
             text-shadow: none;
             border-radius: 4px;
           }

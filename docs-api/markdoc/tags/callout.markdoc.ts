@@ -1,6 +1,6 @@
 import { Callout } from "../../components/Callout";
 
-export const callout = {
+export default {
   render: Callout,
   children: ["paragraph", "tag", "list"],
   attributes: {

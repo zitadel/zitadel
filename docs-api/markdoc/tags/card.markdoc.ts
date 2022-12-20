@@ -1,6 +1,6 @@
 import { Card } from "../../components/Card";
 
-export const card = {
+export default {
   render: Card,
   children: [""],
   attributes: {

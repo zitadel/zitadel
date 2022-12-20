@@ -1,5 +1,6 @@
 import React from "react";
 import Head from "next/head";
+import { Lato } from "@next/font/google";
 
 import "prismjs";
 import "prismjs/components/prism-bash.min";
@@ -50,11 +51,14 @@ function collectHeadings(node, sections = []) {
 
 export type MyAppProps = MarkdocNextJsPageProps;
 
+// const lato = Lato({ subsets: ["latin"], weight: ["400"] });
+
 export default function MyApp({ Component, pageProps }: AppProps<MyAppProps>) {
   const { markdoc } = pageProps;
 
   let title = TITLE;
   let description = DESCRIPTION;
+
   if (markdoc) {
     if (markdoc.frontmatter.title) {
       title = markdoc.frontmatter.title;
@@ -85,7 +89,9 @@ export default function MyApp({ Component, pageProps }: AppProps<MyAppProps>) {
         defaultTheme="system"
         storageKey="cp-theme"
       >
-        <div className="bg-white dark:bg-background-dark-500 text-gray-800 dark:text-gray-100">
+        <div
+          className={`bg-white dark:bg-background-dark-500 text-gray-800 dark:text-gray-100 `}
+        >
           <div className="flex flex-grow max-w-8xl mx-auto relative">
             <TableOfContents toc={toc} />
             <div className="overflow-auto flex-grow pt-0 pl-4 lg:pl-10 pr-8 lg:pr-10 pb-8">

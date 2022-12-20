@@ -13,7 +13,7 @@ function generateID(children, attributes) {
     .toLowerCase();
 }
 
-export const heading = {
+export default {
   render: Heading,
   children: ["inline"],
   attributes: {

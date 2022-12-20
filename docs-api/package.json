@@ -11,11 +11,11 @@
     "@markdoc/markdoc": "latest",
     "@markdoc/next.js": "latest",
     "copy-to-clipboard": "^3.3.3",
-    "next": "latest",
+    "next": "^13.0.7",
     "next-themes": "^0.2.1",
     "prismjs": "latest",
     "proto-parser": "^0.0.9",
-    "react": "latest",
+    "react": "^18.2.0",
     "react-dom": "latest"
   },
   "devDependencies": {

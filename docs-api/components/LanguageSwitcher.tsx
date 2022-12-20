@@ -14,7 +14,7 @@ type Props = {
 
 export default function LanguageSwitcher({ initial }: Props) {
   const [selected, setSelected] = useState(
-    languages.find((l) => l.code === initial) ?? languages[0]
+    (initial && languages.find((l) => l.code === initial)) ?? languages[0]
   );
 
   return (
