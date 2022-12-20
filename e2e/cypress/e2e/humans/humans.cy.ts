@@ -17,7 +17,7 @@ describe('humans', () => {
 
     describe(`add "${user.addName}" with domain setting "${user.mustBeDomain}"`, () => {
       beforeEach(`ensure it doesn't exist already`, function () {
-        ensureDomainPolicy(this.api, user.mustBeDomain, false, false);
+        ensureDomainPolicy(this.api, user.mustBeDomain, true, false);
         ensureUserDoesntExist(this.api, user.addName);
         cy.visit(humansPath);
       });
