@@ -195,6 +195,7 @@ RegisterOption:
   Description: Choisissez comment vous souhaitez vous enregistrer
   RegisterUsernamePasswordButtonText: Avec nom d'utilisateur et mot de passe
   ExternalLoginDescription: ou s'enregistrer avec un utilisateur externe
+  LoginButtonText: connexion
 
 RegistrationUser:
   Title: Inscription
@@ -222,7 +223,7 @@ RegistrationUser:
   PrivacyConfirm: J'accepte les
   PrivacyLinkText: politique de confidentialité
   ExternalLogin: ou m'inscrire avec un utilisateur externe
-  BackButtonText: retour
+  BackButtonText: connexion
   NextButtonText: suivant
 
 ExternalRegistrationUserOverview:

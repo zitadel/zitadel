@@ -195,6 +195,7 @@ RegisterOption:
   Description: 选择您的注册方式
   RegisterUsernamePasswordButtonText: 使用用户名密码
   ExternalLoginDescription: 或使用外部身份提供者
+  LoginButtonText: 登录
 
 RegistrationUser:
   Title: 注册
@@ -222,7 +223,7 @@ RegistrationUser:
   PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
   ExternalLogin: 使用外部身份提供者注册
-  BackButtonText: 返回
+  BackButtonText: 登录
   NextButtonText: 继续
 
 ExternalRegistrationUserOverview:

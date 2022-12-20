@@ -206,6 +206,7 @@ const (
 	LoginKeyRegistrationOptionDescription              = LoginKeyRegistrationOption + "Description"
 	LoginKeyRegistrationOptionUserNameButtonText       = LoginKeyRegistrationOption + "RegisterUsernamePasswordButtonText"
 	LoginKeyRegistrationOptionExternalLoginDescription = LoginKeyRegistrationOption + "ExternalLoginDescription"
+	LoginKeyRegistrationOptionLoginButtonText          = LoginKeyRegistrationOption + "LoginButtonText"
 
 	LoginKeyRegistrationUser                       = "RegistrationUser."
 	LoginKeyRegistrationUserTitle                  = LoginKeyRegistrationUser + "Title"
@@ -261,6 +262,7 @@ const (
 	LoginKeyRegisterOrgPrivacyConfirm       = LoginKeyRegistrationOrg + "PrivacyConfirm"
 	LoginKeyRegisterOrgPrivacyLinkText      = LoginKeyRegistrationOrg + "PrivacyLinkText"
 	LoginKeyRegisterOrgSaveButtonText       = LoginKeyRegistrationOrg + "SaveButtonText"
+	LoginKeyRegisterOrgBackButtonText       = LoginKeyRegistrationOrg + "BackButtonText"
 
 	LoginKeyLinkingUserDone                 = "LinkingUsersDone."
 	LoginKeyLinkingUserDoneTitle            = LoginKeyLinkingUserDone + "Title"
@@ -540,6 +542,7 @@ type RegistrationOptionScreenText struct {
 	Description                        string
 	RegisterUsernamePasswordButtonText string
 	ExternalLoginDescription           string
+	LoginButtonText                    string
 }
 
 type RegistrationUserScreenText struct {

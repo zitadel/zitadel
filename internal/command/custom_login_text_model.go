@@ -204,6 +204,7 @@ type CustomLoginTextReadModel struct {
 	RegistrationOptionDescription              string
 	RegistrationOptionUserNameButtonText       string
 	RegistrationOptionExternalLoginDescription string
+	RegistrationOptionLoginButtonText          string
 
 	RegistrationUserTitle                  string
 	RegistrationUserDescription            string
@@ -1878,6 +1879,10 @@ func (wm *CustomLoginTextReadModel) handleRegistrationOptionScreenSetEvent(e *po
 		wm.RegistrationOptionExternalLoginDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyRegistrationOptionLoginButtonText {
+		wm.RegistrationOptionLoginButtonText = e.Text
+		return
+	}
 }
 
 func (wm *CustomLoginTextReadModel) handleRegistrationOptionScreenRemoveEvent(e *policy.CustomTextRemovedEvent) {
@@ -1895,6 +1900,10 @@ func (wm *CustomLoginTextReadModel) handleRegistrationOptionScreenRemoveEvent(e 
 	}
 	if e.Key == domain.LoginKeyRegistrationOptionExternalLoginDescription {
 		wm.RegistrationOptionExternalLoginDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyRegistrationOptionLoginButtonText {
+		wm.RegistrationOptionLoginButtonText = ""
 		return
 	}
 }

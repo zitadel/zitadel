@@ -935,6 +935,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionLoginButtonText, "LoginButtonText", language.English,
+								),
+							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, "Title", language.English,
 								),
 							),
@@ -1569,6 +1575,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						Description:                        "Description",
 						RegisterUsernamePasswordButtonText: "RegisterUsernamePasswordButtonText",
 						ExternalLoginDescription:           "ExternalLoginDescription",
+						LoginButtonText:                    "LoginButtonText",
 					},
 					RegistrationUser: domain.RegistrationUserScreenText{
 						Title:                  "Title",
@@ -2546,6 +2553,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, "ExternalLoginDescription", language.English,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewCustomTextSetEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionLoginButtonText, "LoginButtonText", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -3857,6 +3870,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, language.English,
+								),
+							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewCustomTextRemovedEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionLoginButtonText, language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -5226,6 +5245,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionLoginButtonText, "LoginButtonText", language.English,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, "Title", language.English,
 							),
 						),
@@ -6530,6 +6555,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionExternalLoginDescription, language.English,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewCustomTextRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionLoginButtonText, language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -7847,6 +7878,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationOptionLoginButtonText, "LoginButtonText", language.English,
+								),
+							),
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewCustomTextSetEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTitle, "Title", language.English,
 								),
 							),
@@ -8481,6 +8518,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						Description:                        "Description",
 						RegisterUsernamePasswordButtonText: "RegisterUsernamePasswordButtonText",
 						ExternalLoginDescription:           "ExternalLoginDescription",
+						LoginButtonText:                    "LoginButtonText",
 					},
 					RegistrationUser: domain.RegistrationUserScreenText{
 						Title:                  "Title",
