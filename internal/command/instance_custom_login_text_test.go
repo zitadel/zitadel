@@ -1025,7 +1025,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -1121,7 +1121,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -1217,7 +1217,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -1301,7 +1301,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -1592,7 +1592,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
 						TOSConfirm:             "TOSConfirm",
 						TOSLinkText:            "TOSLinkText",
-						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyConfirm:         "PrivacyConfirm",
 						PrivacyLinkText:        "PrivacyLinkText",
 						NextButtonText:         "NextButtonText",
 						BackButtonText:         "BackButtonText",
@@ -1610,7 +1610,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOSAndPrivacyLabel: "TOSAndPrivacyLabel",
 						TOSConfirm:         "TOSConfirm",
 						TOSLinkText:        "TOSLinkText",
-						TOSConfirmAnd:      "TOSConfirmAnd",
+						PrivacyConfirm:     "PrivacyConfirm",
 						PrivacyLinkText:    "PrivacyLinkText",
 						BackButtonText:     "BackButtonText",
 						NextButtonText:     "NextButtonText",
@@ -1628,7 +1628,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:   "TOSAndPrivacyLabel",
 						TOSConfirm:           "TOSConfirm",
 						TOSLinkText:          "TOSLinkText",
-						TOSConfirmAnd:        "TOSConfirmAnd",
+						PrivacyConfirm:       "PrivacyConfirm",
 						PrivacyLinkText:      "PrivacyLinkText",
 						SaveButtonText:       "SaveButtonText",
 					},
@@ -1646,7 +1646,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
 						TOSConfirm:             "TOSConfirm",
 						TOSLinkText:            "TOSLinkText",
-						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyConfirm:         "PrivacyConfirm",
 						PrivacyLinkText:        "PrivacyLinkText",
 					},
 					LoginSuccess: domain.SuccessLoginScreenText{
@@ -2648,7 +2648,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -2744,7 +2744,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -2840,7 +2840,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -2924,7 +2924,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -3965,7 +3965,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -4061,7 +4061,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -4157,7 +4157,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -4241,7 +4241,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextRemovedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -5335,7 +5335,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -5432,7 +5432,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -5528,7 +5528,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -5612,7 +5612,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, "PrivacyConfirm", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -6651,7 +6651,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -6747,7 +6747,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -6843,7 +6843,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -6927,7 +6927,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, language.English,
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -7968,7 +7968,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -8064,7 +8064,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -8160,7 +8160,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTosConfirmAnd, "TOSConfirmAnd", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -8244,7 +8244,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusherWithInstanceID(
 								"INSTANCE",
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+									&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyConfirm, "PrivacyConfirm", language.English,
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -8535,7 +8535,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
 						TOSConfirm:             "TOSConfirm",
 						TOSLinkText:            "TOSLinkText",
-						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyConfirm:         "PrivacyConfirm",
 						PrivacyLinkText:        "PrivacyLinkText",
 						NextButtonText:         "NextButtonText",
 						BackButtonText:         "BackButtonText",
@@ -8553,7 +8553,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOSAndPrivacyLabel: "TOSAndPrivacyLabel",
 						TOSConfirm:         "TOSConfirm",
 						TOSLinkText:        "TOSLinkText",
-						TOSConfirmAnd:      "TOSConfirmAnd",
+						PrivacyConfirm:     "PrivacyConfirm",
 						PrivacyLinkText:    "PrivacyLinkText",
 						BackButtonText:     "BackButtonText",
 						NextButtonText:     "NextButtonText",
@@ -8571,7 +8571,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:   "TOSAndPrivacyLabel",
 						TOSConfirm:           "TOSConfirm",
 						TOSLinkText:          "TOSLinkText",
-						TOSConfirmAnd:        "TOSConfirmAnd",
+						PrivacyConfirm:       "PrivacyConfirm",
 						PrivacyLinkText:      "PrivacyLinkText",
 						SaveButtonText:       "SaveButtonText",
 					},
@@ -8589,7 +8589,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
 						TOSConfirm:             "TOSConfirm",
 						TOSLinkText:            "TOSLinkText",
-						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyConfirm:         "PrivacyConfirm",
 						PrivacyLinkText:        "PrivacyLinkText",
 					},
 					LoginSuccess: domain.SuccessLoginScreenText{
