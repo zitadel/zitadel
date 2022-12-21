@@ -430,6 +430,19 @@ and adds the user to the orgs members as ORG_OWNER
     POST: /orgs/_setup
 
 
+### RemoveOrg
+
+> **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
+[RemoveOrgResponse](#removeorgresponse)
+
+Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+Users of this organisation will not be able login
+
+
+
+    DELETE: /orgs/{org_id}
+
+
 ### GetIDPByID
 
 > **rpc** GetIDPByID([GetIDPByIDRequest](#getidpbyidrequest))
@@ -3523,6 +3536,28 @@ This is an empty request
 
 
 ### RemoveMultiFactorFromLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveOrgRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveOrgResponse
 
 
 

@@ -613,6 +613,41 @@ service AdminService {
         };
     }
 
+
+    // Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+    // Users of this organisation will not be able login
+    rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{org_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "orgs";
+            tags: "global";
+            responses: {
+                key: "200";
+                value: {
+                    description: "org removed successfully";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid org";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+
     // Returns a identity provider configuration of the IAM instance
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
@@ -3017,6 +3052,28 @@ message SetUpOrgResponse {
     string org_id = 2;
     string user_id = 3;
 }
+
+message RemoveOrgRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message RemoveOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 
 message GetIDPByIDRequest {
     string id = 1 [
