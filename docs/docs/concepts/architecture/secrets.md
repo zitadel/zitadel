@@ -91,16 +91,16 @@ By default ZITADEL uses `RSA256` for signing purposes and `AES256` for encryptio
 ### Masterkey
 
 Since the Masterkey is used as means of protecting the Secrets Storage it cannot be stored in the storage.
-You find [here the many ways how ZITADEL can consume the Masterkey](../../guides/manage/self-hosted/configure).
+You find [here the many ways how ZITADEL can consume the Masterkey](/docs/self-hosting/manage/configure).
 
 ### TLS Material
 
 ZITADEL does support end to end TLS as such it can consume TLS Key Material.
-Please check our [TLS Modes documentation](../../guides/manage/self-hosted/tls_modes) for more details.
+Please check our [TLS Modes documentation](/docs/self-hosting/manage/tls_modes) for more details.
 
 ### Admin User
 
-The initial Admin User of ZITADEL can be configured through [ZITADELs config options](../../guides/manage/self-hosted/configure).
+The initial Admin User of ZITADEL can be configured through [ZITADELs config options](/docs/self-hosting/manage/configure).
 
 :::info
 To prevent elevated breaches ZITADEL forces the Admin Users password to be changed during the first login.
