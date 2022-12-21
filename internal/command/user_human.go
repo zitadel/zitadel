@@ -130,7 +130,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter, a.ResourceOwner)
 			if err != nil {
 				return nil, err
 			}

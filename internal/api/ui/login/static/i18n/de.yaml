@@ -195,6 +195,7 @@ RegisterOption:
   Description: Wähle aus wie du dich registrieren möchtest.
   RegisterUsernamePasswordButtonText: Mit Benutzername Passwort
   ExternalLoginDescription: oder registriere dich mit einem externen Benutzer
+  LoginButtonText: login
 
 RegistrationUser:
   Title: Registration
@@ -219,10 +220,10 @@ RegistrationUser:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   ExternalLogin: oder registriere dich mit einem externen Benutzer
-  BackButtonText: zurück
+  BackButtonText: login
   NextButtonText: weiter
 
 ExternalRegistrationUserOverview:
@@ -243,7 +244,7 @@ ExternalRegistrationUserOverview:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   ExternalLogin: oder registriere dich mit einem externen Benutzer
   BackButtonText: zurück
@@ -262,7 +263,7 @@ RegistrationOrg:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   SaveButtonText: Organisation speichern
 
@@ -291,7 +292,7 @@ ExternalNotFound:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   German: Deutsch
   English: English

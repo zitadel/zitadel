@@ -17,7 +17,8 @@ import (
 type OrgSetup struct {
 	Name         string
 	CustomDomain string
-	Human        AddHuman
+	Human        *AddHuman
+	Machine      *AddMachine
 	Roles        []string
 }
 
@@ -30,10 +31,11 @@ func (c *Commands) SetUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 		return "", nil, errors.ThrowPreconditionFailed(nil, "COMMAND-poaj2", "Errors.Org.AlreadyExisting")
 	}
 
-	return c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+	userID, _, _, details, err := c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+	return userID, details, err
 }
 
-func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, *domain.ObjectDetails, error) {
+func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, userID string, userIDs ...string) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
@@ -44,23 +46,55 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID, user
 
 	validations := []preparation.Validation{
 		AddOrgCommand(ctx, orgAgg, o.Name, userIDs...),
-		AddHumanCommand(userAgg, &o.Human, c.userPasswordAlg, c.userEncryption),
-		c.AddOrgMemberCommand(orgAgg, userID, roles...),
 	}
+
+	var pat *PersonalAccessToken
+	var machineKey *MachineKey
+	if o.Human != nil {
+		validations = append(validations, AddHumanCommand(userAgg, o.Human, c.userPasswordAlg, c.userEncryption))
+	} else if o.Machine != nil {
+		validations = append(validations, AddMachineCommand(userAgg, o.Machine.Machine))
+		if o.Machine.Pat != nil {
+			pat = NewPersonalAccessToken(orgID, userID, o.Machine.Pat.ExpirationDate, o.Machine.Pat.Scopes, domain.UserTypeMachine)
+			tokenID, err := c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			pat.TokenID = tokenID
+			validations = append(validations, prepareAddPersonalAccessToken(pat, c.keyAlgorithm))
+		}
+		if o.Machine.MachineKey != nil {
+			machineKey = NewMachineKey(orgID, userID, o.Machine.MachineKey.ExpirationDate, o.Machine.MachineKey.Type)
+			keyID, err := c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			machineKey.KeyID = keyID
+			validations = append(validations, prepareAddUserMachineKey(machineKey, c.keySize))
+		}
+	}
+	validations = append(validations, c.AddOrgMemberCommand(orgAgg, userID, roles...))
+
 	if o.CustomDomain != "" {
 		validations = append(validations, c.prepareAddOrgDomain(orgAgg, o.CustomDomain, userIDs))
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
-	return userID, &domain.ObjectDetails{
+
+	var token string
+	if pat != nil {
+		token = pat.Token
+	}
+
+	return userID, token, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
@@ -78,7 +112,8 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, userIDs ...string)
 		return "", nil, err
 	}
 
-	return c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+	userID, _, _, details, err := c.setUpOrgWithIDs(ctx, o, orgID, userID, userIDs...)
+	return userID, details, err
 }
 
 // AddOrgCommand defines the commands to create a new org,
@@ -279,6 +314,19 @@ func (c *Commands) RemoveOrg(ctx context.Context, id string) (*domain.ObjectDeta
 func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			instance := authz.GetInstance(ctx)
+			if a.ID == instance.DefaultOrganisationID() {
+				return nil, errors.ThrowPreconditionFailed(nil, "COMMA-wG9p1", "Errors.Org.DefaultOrgNotDeletable")
+			}
+			err := c.checkProjectExists(ctx, instance.ProjectID(), a.ID)
+			// if there is no error, the ZITADEL project was found on the org to be deleted
+			if err == nil {
+				return nil, errors.ThrowPreconditionFailed(err, "COMMA-AF3JW", "Errors.Org.ZitadelOrgNotDeletable")
+			}
+			// "precondition failed" error means the project does not exist, return other errors
+			if !errors.IsPreconditionFailed(err) {
+				return nil, err
+			}
 			writeModel, err := c.getOrgWriteModelByID(ctx, a.ID)
 			if err != nil {
 				return nil, errors.ThrowPreconditionFailed(err, "COMMA-wG9p1", "Errors.Org.NotFound")

@@ -72,7 +72,7 @@ const features = [
               description=""
             />
             <ListElement
-              link="/docs/guides/deploy/overview"
+              link="/docs/self-hosting/deploy/overview"
               type={ICONTYPE.SYSTEM}
               title="Deploy"
               description=""

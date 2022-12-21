@@ -345,6 +345,7 @@ func RegistrationOptionScreenTextToPb(text domain.RegistrationOptionScreenText) 
 		Description:              text.Description,
 		UserNameButtonText:       text.RegisterUsernamePasswordButtonText,
 		ExternalLoginDescription: text.ExternalLoginDescription,
+		LoginButtonText:          text.LoginButtonText,
 	}
 }
 
@@ -364,7 +365,7 @@ func RegistrationUserScreenTextToPb(text domain.RegistrationUserScreenText) *tex
 		TosAndPrivacyLabel:     text.TOSAndPrivacyLabel,
 		TosConfirm:             text.TOSConfirm,
 		TosLinkText:            text.TOSLinkText,
-		TosConfirmAnd:          text.TOSConfirmAnd,
+		PrivacyConfirm:         text.PrivacyConfirm,
 		PrivacyLinkText:        text.PrivacyLinkText,
 		NextButtonText:         text.NextButtonText,
 		BackButtonText:         text.BackButtonText,
@@ -385,7 +386,7 @@ func ExternalRegistrationUserOverviewScreenTextToPb(text domain.ExternalRegistra
 		TosAndPrivacyLabel: text.TOSAndPrivacyLabel,
 		TosConfirm:         text.TOSConfirm,
 		TosLinkText:        text.TOSLinkText,
-		TosConfirmAnd:      text.TOSConfirmAnd,
+		PrivacyConfirm:     text.PrivacyConfirm,
 		PrivacyLinkText:    text.PrivacyLinkText,
 		NextButtonText:     text.NextButtonText,
 		BackButtonText:     text.BackButtonText,
@@ -406,7 +407,7 @@ func RegistrationOrgScreenTextToPb(text domain.RegistrationOrgScreenText) *text_
 		TosAndPrivacyLabel:   text.TOSAndPrivacyLabel,
 		TosConfirm:           text.TOSConfirm,
 		TosLinkText:          text.TOSLinkText,
-		TosConfirmAnd:        text.TOSConfirmAnd,
+		PrivacyConfirm:       text.PrivacyConfirm,
 		PrivacyLinkText:      text.PrivacyLinkText,
 		SaveButtonText:       text.SaveButtonText,
 	}
@@ -430,7 +431,7 @@ func ExternalUserNotFoundScreenTextToPb(text domain.ExternalUserNotFoundScreenTe
 		TosAndPrivacyLabel:     text.TOSAndPrivacyLabel,
 		TosConfirm:             text.TOSConfirm,
 		TosLinkText:            text.PrivacyLinkText,
-		TosConfirmAnd:          text.TOSConfirmAnd,
+		PrivacyConfirm:         text.PrivacyConfirm,
 		PrivacyLinkText:        text.PrivacyLinkText,
 	}
 }
@@ -811,6 +812,7 @@ func RegistrationOptionScreenTextPbToDomain(text *text_pb.RegistrationOptionScre
 		Description:                        text.Description,
 		RegisterUsernamePasswordButtonText: text.UserNameButtonText,
 		ExternalLoginDescription:           text.ExternalLoginDescription,
+		LoginButtonText:                    text.LoginButtonText,
 	}
 }
 
@@ -833,7 +835,7 @@ func RegistrationUserScreenTextPbToDomain(text *text_pb.RegistrationUserScreenTe
 		TOSAndPrivacyLabel:     text.TosAndPrivacyLabel,
 		TOSConfirm:             text.TosConfirm,
 		TOSLinkText:            text.TosLinkText,
-		TOSConfirmAnd:          text.TosConfirmAnd,
+		PrivacyConfirm:         text.PrivacyConfirm,
 		PrivacyLinkText:        text.PrivacyLinkText,
 		NextButtonText:         text.NextButtonText,
 		BackButtonText:         text.BackButtonText,
@@ -857,7 +859,7 @@ func ExternalRegistrationUserOverviewScreenTextPbToDomain(text *text_pb.External
 		TOSAndPrivacyLabel: text.TosAndPrivacyLabel,
 		TOSConfirm:         text.TosConfirm,
 		TOSLinkText:        text.TosLinkText,
-		TOSConfirmAnd:      text.TosConfirmAnd,
+		PrivacyConfirm:     text.PrivacyConfirm,
 		PrivacyLinkText:    text.PrivacyLinkText,
 		NextButtonText:     text.NextButtonText,
 		BackButtonText:     text.BackButtonText,
@@ -881,7 +883,7 @@ func RegistrationOrgScreenTextPbToDomain(text *text_pb.RegistrationOrgScreenText
 		TOSAndPrivacyLabel:   text.TosAndPrivacyLabel,
 		TOSConfirm:           text.TosConfirm,
 		TOSLinkText:          text.TosLinkText,
-		TOSConfirmAnd:        text.TosConfirmAnd,
+		PrivacyConfirm:       text.PrivacyConfirm,
 		PrivacyLinkText:      text.PrivacyLinkText,
 		SaveButtonText:       text.SaveButtonText,
 	}
@@ -911,7 +913,7 @@ func ExternalUserNotFoundScreenTextPbToDomain(text *text_pb.ExternalUserNotFound
 		TOSAndPrivacyLabel:     text.TosAndPrivacyLabel,
 		TOSConfirm:             text.TosConfirm,
 		TOSLinkText:            text.PrivacyLinkText,
-		TOSConfirmAnd:          text.TosConfirmAnd,
+		PrivacyConfirm:         text.PrivacyConfirm,
 		PrivacyLinkText:        text.PrivacyLinkText,
 	}
 }
