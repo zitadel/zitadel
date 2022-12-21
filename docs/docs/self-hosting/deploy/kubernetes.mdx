@@ -70,7 +70,7 @@ When helm is done, you get a command to retrieve your machine key, which is save
 kubectl -n zitadel get secret zitadel-admin-sa -o jsonpath='{ .data.zitadel-admin-sa\.json }' | base64 -D
 ```
 
-This key can be used to provision resources with for example [Terraform](../manage/terraform/basics.md).
+This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform/basics.md).
 
 ### Forward the ZITADEL service port to your local machine
 

@@ -21,7 +21,7 @@ By executing the commands below, you will download the following file:
 
 ```bash
 # Download the docker compose example configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/guides/deploy/docker-compose.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
 
 # Run the database and application containers.
 docker compose up --detach
@@ -42,7 +42,7 @@ By executing the commands below, you will download the following file:
 
 ```bash
 # Download the docker compose example configuration.
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/guides/deploy/docker-compose-sa.yaml -O docker-compose.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose-sa.yaml -O docker-compose.yaml
 
 # Run the database and application containers.
 docker compose up --detach
@@ -51,7 +51,7 @@ docker compose up --detach
 mv ./machinekey/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
 ```
 
-This key can be used to provision resources with for example [Terraform](../manage/terraform/basics.md).
+This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform/basics.md).
 
 <Next components={props.components} />
 <Disclaimer components={props.components} />
