@@ -220,7 +220,7 @@ RegistrationUser:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   ExternalLogin: oder registriere dich mit einem externen Benutzer
   BackButtonText: login
@@ -244,7 +244,7 @@ ExternalRegistrationUserOverview:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   ExternalLogin: oder registriere dich mit einem externen Benutzer
   BackButtonText: zurück
@@ -263,7 +263,7 @@ RegistrationOrg:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   SaveButtonText: Organisation speichern
 
@@ -292,7 +292,7 @@ ExternalNotFound:
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
-  TosConfirmAnd: und die
+  PrivacyConfirm: Ich akzeptiere die
   PrivacyLinkText: Datenschutzerklärung
   German: Deutsch
   English: English
