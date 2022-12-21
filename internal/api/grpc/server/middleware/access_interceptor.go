@@ -5,24 +5,22 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zitadel/logging"
-
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
-
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
-
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/access"
+	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 )
 
-func AccessLimitInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
+func AccessLimitInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-
+		if !svc.Enabled() {
+			return handler(ctx, req)
+		}
 		instance := authz.GetInstance(ctx)
 		limit, err := svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
@@ -37,8 +35,11 @@ func AccessLimitInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 		return resp, err
 	}
 }
-func AccessStorageInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
+func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		if !svc.Enabled() {
+			return handler(ctx, req)
+		}
 
 		reqMd, _ := metadata.FromIncomingContext(ctx)
 
@@ -52,9 +53,9 @@ func AccessStorageInterceptor(svc *access.Service) grpc.UnaryServerInterceptor {
 		resMd, _ := metadata.FromOutgoingContext(ctx)
 		instance := authz.GetInstance(ctx)
 
-		record := &logstore.AccessLogRecord{
+		record := &access.AccessLogRecord{
 			Timestamp:       time.Now(),
-			Protocol:        logstore.GRPC,
+			Protocol:        access.GRPC,
 			RequestURL:      info.FullMethod,
 			ResponseStatus:  respStatus,
 			RequestHeaders:  http.Header(reqMd),

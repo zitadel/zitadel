@@ -3,7 +3,7 @@ package start
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore/access"
+	"github.com/zitadel/zitadel/internal/logstore"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
@@ -62,7 +62,14 @@ type Config struct {
 	Machine           *id.Config
 	Actions           *actions.Config
 	LogStore          *struct {
-		Access *access.Config
+		Access *struct {
+			Database *logstore.EmitterConfig
+			Stdout   *logstore.EmitterConfig
+		}
+		Execution *struct {
+			Database *logstore.EmitterConfig
+			Stdout   *logstore.EmitterConfig
+		}
 	}
 }
 

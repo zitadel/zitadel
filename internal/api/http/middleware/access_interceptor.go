@@ -1,19 +1,17 @@
 package middleware
 
 import (
+	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
-
-	"github.com/zitadel/zitadel/internal/logstore/access"
+	"github.com/zitadel/zitadel/internal/logstore"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 )
 
 const (
@@ -23,11 +21,11 @@ const (
 )
 
 type AccessInterceptor struct {
-	svc           *access.Service
+	svc           *logstore.Service
 	cookieHandler *http_utils.CookieHandler
 }
 
-func NewAccessInterceptor(svc *access.Service) *AccessInterceptor {
+func NewAccessInterceptor(svc *logstore.Service) *AccessInterceptor {
 	return &AccessInterceptor{
 		svc: svc,
 		cookieHandler: http_utils.NewCookieHandler(
@@ -66,9 +64,9 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		if err != nil {
 			logging.Warningf("failed to unescape request url %s", requestURL)
 		}
-		err = a.svc.Handle(ctx, &logstore.AccessLogRecord{
+		err = a.svc.Handle(ctx, &access.AccessLogRecord{
 			Timestamp:       time.Now(),
-			Protocol:        logstore.HTTP,
+			Protocol:        access.HTTP,
 			RequestURL:      unescapedURL,
 			ResponseStatus:  uint32(wrappedWriter.status),
 			RequestHeaders:  request.Header,

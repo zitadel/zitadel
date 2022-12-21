@@ -8,25 +8,24 @@ import (
 	"github.com/zitadel/logging"
 )
 
-// BulkSink TODO: How to make that generic, so any can be specified?
-type BulkSink interface {
-	SendBulk(ctx context.Context, bulk []any) error
+type bulkSink interface {
+	sendBulk(ctx context.Context, bulk []LogRecord) error
 }
 
-var _ BulkSink = BulkSinkFunc(nil)
+var _ bulkSink = bulkSinkFunc(nil)
 
-type BulkSinkFunc func(ctx context.Context, items []any) error
+type bulkSinkFunc func(ctx context.Context, items []LogRecord) error
 
-func (s BulkSinkFunc) SendBulk(ctx context.Context, items []any) error {
+func (s bulkSinkFunc) sendBulk(ctx context.Context, items []LogRecord) error {
 	return s(ctx, items)
 }
 
-type Debouncer struct {
+type debouncer struct {
 	ctx               context.Context
 	mux               sync.Mutex
 	cfg               *DebouncerConfig
-	storage           BulkSink
-	cache             []any
+	storage           bulkSink
+	cache             []LogRecord
 	cacheLen          uint
 	shipSynchronously bool
 	ticker            *time.Ticker
@@ -37,8 +36,8 @@ type DebouncerConfig struct {
 	MaxBulkSize  uint
 }
 
-func NewDebouncer(ctx context.Context, cfg *DebouncerConfig, ship BulkSink) *Debouncer {
-	a := &Debouncer{
+func newDebouncer(ctx context.Context, cfg *DebouncerConfig, ship bulkSink) *debouncer {
+	a := &debouncer{
 		ctx:     ctx,
 		cfg:     cfg,
 		storage: ship,
@@ -51,7 +50,7 @@ func NewDebouncer(ctx context.Context, cfg *DebouncerConfig, ship BulkSink) *Deb
 	return a
 }
 
-func (d *Debouncer) Add(item any) {
+func (d *debouncer) add(item LogRecord) {
 	d.mux.Lock()
 	defer d.mux.Unlock()
 	d.cache = append(d.cache, item)
@@ -62,13 +61,13 @@ func (d *Debouncer) Add(item any) {
 	}
 }
 
-func (d *Debouncer) ship() {
+func (d *debouncer) ship() {
 	if d.cacheLen == 0 {
 		return
 	}
 	d.mux.Lock()
 	defer d.mux.Unlock()
-	if err := d.storage.SendBulk(d.ctx, d.cache); err != nil {
+	if err := d.storage.sendBulk(d.ctx, d.cache); err != nil {
 		logging.WithError(err).Warnf("storing bulk of size %d failed", len(d.cache))
 	}
 	d.cache = nil
@@ -78,7 +77,7 @@ func (d *Debouncer) ship() {
 	}
 }
 
-func (d *Debouncer) shipWhenTimerFires() {
+func (d *debouncer) shipWhenTimerFires() {
 	for range d.ticker.C {
 		d.ship()
 	}

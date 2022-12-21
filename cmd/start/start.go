@@ -13,7 +13,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore/access"
+	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
+	"github.com/zitadel/zitadel/internal/logstore/emitters/stdout"
 
 	"github.com/zitadel/saml/pkg/provider"
 
@@ -171,13 +173,21 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	verifier := internal_authz.Start(repo, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	tlsConfig, err := config.TLS.Config()
-
-	accessSvc := access.NewService(ctx, config.LogStore.Access, dbClient, commands.ReportUsage)
-	accessInterceptor := middleware.NewAccessInterceptor(accessSvc)
-
 	if err != nil {
 		return err
 	}
+
+	accessStdoutEmitter, err := logstore.NewEmitter(ctx, config.LogStore.Access.Stdout, stdout.NewStdoutEmitter())
+	if err != nil {
+		return err
+	}
+	accessDBEmitter, err := logstore.NewEmitter(ctx, config.LogStore.Access.Database, access.NewDatabaseLogStorage(dbClient))
+	if err != nil {
+		return err
+	}
+
+	accessSvc := logstore.New(accessDBEmitter, dbClient, commands.ReportUsage, accessStdoutEmitter)
+	accessInterceptor := middleware.NewAccessInterceptor(accessSvc)
 	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {

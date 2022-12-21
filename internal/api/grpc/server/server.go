@@ -3,7 +3,7 @@ package server
 import (
 	"crypto/tls"
 
-	"github.com/zitadel/zitadel/internal/logstore/access"
+	"github.com/zitadel/zitadel/internal/logstore"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
@@ -31,7 +31,7 @@ func CreateServer(
 	queries *query.Queries,
 	hostHeaderName string,
 	tlsConfig *tls.Config,
-	accessSvc *access.Service,
+	accessSvc *logstore.Service,
 ) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{

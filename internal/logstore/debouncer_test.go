@@ -1,13 +1,12 @@
-package logstore_test
+package logstore
 
 // TODO: Move to access package
 
 import (
+	"context"
 	"reflect"
 	"testing"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/logstorage/debouncer"
 )
 
 type shipper struct {
@@ -19,7 +18,7 @@ func (s *shipper) StoreBulk(items []any) {
 }
 
 type given struct {
-	cfg   *debouncer.Config
+	cfg   *DebouncerConfig
 	ticks uint
 	delay time.Duration
 }
@@ -40,7 +39,7 @@ func TestNew(t *testing.T) {
 		name: "When MinFrequency is 0 seconds and MaxBulkSize is 5, calls should be made immediately",
 		given: given{
 			ticks: 3,
-			cfg: &debouncer.Config{
+			cfg: &DebouncerConfig{
 				MinFrequency: 0,
 				MaxBulkSize:  5,
 			},
@@ -50,7 +49,7 @@ func TestNew(t *testing.T) {
 		name: "When MinFrequency is 2 seconds and MaxBulkSize is 0, calls should be made immediately",
 		given: given{
 			ticks: 3,
-			cfg: &debouncer.Config{
+			cfg: &DebouncerConfig{
 				MinFrequency: 2 * time.Second,
 				MaxBulkSize:  0,
 			},
@@ -61,7 +60,7 @@ func TestNew(t *testing.T) {
 		name: "When MinFrequency is 2 second and MaxBulkSize is 4, one call should be made",
 		given: given{
 			ticks: 3,
-			cfg: &debouncer.Config{
+			cfg: &DebouncerConfig{
 				MinFrequency: 2 * time.Second,
 				MaxBulkSize:  4,
 			},
@@ -72,7 +71,7 @@ func TestNew(t *testing.T) {
 		name: "When MinFrequency is 1 second and MaxBulkSize is 4, first two calls, then one call should be made",
 		given: given{
 			ticks: 3,
-			cfg: &debouncer.Config{
+			cfg: &DebouncerConfig{
 				MinFrequency: 1 * time.Second,
 				MaxBulkSize:  4,
 			},
@@ -82,7 +81,7 @@ func TestNew(t *testing.T) {
 		name: "When MinFrequency is 2 second and MaxBulkSize is 2, first two calls, then one call should be made",
 		given: given{
 			ticks: 3,
-			cfg: &debouncer.Config{
+			cfg: &DebouncerConfig{
 				MinFrequency: 2 * time.Second,
 				MaxBulkSize:  2,
 			},
@@ -98,7 +97,7 @@ func TestNew(t *testing.T) {
 
 func run(t *testing.T, in given, expect []uint) {
 	mock := &shipper{}
-	svc := debouncer.New(in.cfg, mock)
+	svc := newDebouncer(context.Background(), in.cfg, mock)
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
 	var ticked uint
@@ -107,7 +106,7 @@ func run(t *testing.T, in given, expect []uint) {
 			break
 		}
 		ticked++
-		svc.Add(1)
+		svc.add(1)
 	}
 	if ticked != in.ticks {
 		t.Fatalf("Test setup is wrong. Wanted %d ticks, but broke with %d ticks", in.ticks, ticked)

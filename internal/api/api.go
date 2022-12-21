@@ -6,9 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/api/http/middleware"
-
-	"github.com/zitadel/zitadel/internal/logstore/access"
+	"github.com/zitadel/zitadel/internal/logstore"
 
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
@@ -18,6 +16,7 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -51,7 +50,7 @@ func New(
 	tlsConfig *tls.Config,
 	http2HostName,
 	http1HostName string,
-	accessSvc *access.Service,
+	accessSvc *logstore.Service,
 ) *API {
 	api := &API{
 		port:           port,

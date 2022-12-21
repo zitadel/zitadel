@@ -5,17 +5,18 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
-	"google.golang.org/grpc/codes"
+	"github.com/zitadel/zitadel/internal/logstore"
 
-	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 
 	"github.com/Masterminds/squirrel"
+	"google.golang.org/grpc/codes"
+
 	"github.com/zitadel/logging"
+	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/logstore"
 )
 
 const (
@@ -30,22 +31,24 @@ const (
 	accessProjectIdCol       = "project_id"
 	accessRequestedDomainCol = "requested_domain"
 	accessRequestedHostCol   = "requested_host"
-	redacted                 = "[REDACTED]"
 )
 
-func newStorageBulkSink(dbClient *sql.DB) logstore.BulkSinkFunc {
-	return func(ctx context.Context, bulk []any) error {
-		return storeAccessLogs(ctx, dbClient, bulk)
-	}
+var _ logstore.UsageQuerier = (*databaseLogStorage)(nil)
+var _ logstore.LogCleanupper = (*databaseLogStorage)(nil)
+
+type databaseLogStorage struct {
+	dbClient *sql.DB
 }
 
-// Emit notification request events
-// Notify centrally
-func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
+func NewDatabaseLogStorage(dbClient *sql.DB) *databaseLogStorage {
+	return &databaseLogStorage{dbClient: dbClient}
+}
 
-	if len(bulk) == 0 {
-		return nil
-	}
+func (l *databaseLogStorage) QuotaUnit() quota.Unit {
+	return quota.RequestsAllAuthenticated
+}
+
+func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord) error {
 
 	builder := squirrel.Insert(accessLogsTable).
 		Columns(
@@ -63,13 +66,13 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 		PlaceholderFormat(squirrel.Dollar)
 
 	for idx := range bulk {
-		item := bulk[idx].(*logstore.AccessLogRecord)
+		item := bulk[idx].(*AccessLogRecord)
 		builder = builder.Values(
 			item.Timestamp,
 			item.Protocol,
 			item.RequestURL,
 			item.ResponseStatus,
-			pruneRequestHeaders(item.RequestHeaders), // TODO: Do we have to redact more secrets
+			item.RequestHeaders,
 			item.ResponseHeaders,
 			item.InstanceID,
 			item.ProjectID,
@@ -83,7 +86,7 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 		return caos_errors.ThrowInternal(err, "ACCESS-KOS7I", "Errors.Internal")
 	}
 
-	result, err := dbClient.ExecContext(ctx, stmt, args...)
+	result, err := l.dbClient.ExecContext(ctx, stmt, args...)
 	if err != nil {
 		return caos_errors.ThrowInternal(err, "ACCESS-alnT9", "Errors.Access.StorageFailed")
 	}
@@ -97,8 +100,7 @@ func storeAccessLogs(ctx context.Context, dbClient *sql.DB, bulk []any) error {
 	return nil
 }
 
-func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instanceId string, start, end time.Time) (uint64, error) {
-
+func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start, end time.Time) (uint64, error) {
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("count(%s)", accessInstanceIdCol),
 	).
@@ -110,13 +112,13 @@ func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instan
 			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, zitadel_http.Authorization)),
 			squirrel.Or{
 				squirrel.And{
-					squirrel.Eq{accessProtocolCol: logstore.HTTP},
+					squirrel.Eq{accessProtocolCol: HTTP},
 					squirrel.NotEq{accessResponseStatusCol: http.StatusForbidden},
 					squirrel.NotEq{accessResponseStatusCol: http.StatusInternalServerError},
 					squirrel.NotEq{accessResponseStatusCol: http.StatusTooManyRequests},
 				},
 				squirrel.And{
-					squirrel.Eq{accessProtocolCol: logstore.GRPC},
+					squirrel.Eq{accessProtocolCol: GRPC},
 					squirrel.NotEq{accessResponseStatusCol: codes.PermissionDenied},
 					squirrel.NotEq{accessResponseStatusCol: codes.Internal},
 					squirrel.NotEq{accessResponseStatusCol: codes.ResourceExhausted},
@@ -131,7 +133,7 @@ func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instan
 	}
 
 	var count uint64
-	if err = dbClient.
+	if err = l.dbClient.
 		QueryRowContext(ctx, stmt, args...).
 		Scan(&count); err != nil {
 		return 0, caos_errors.ThrowInternal(err, "ACCESS-pBPrM", "Errors.Access.ScanFailed")
@@ -140,18 +142,7 @@ func authenticatedInstanceRequests(ctx context.Context, dbClient *sql.DB, instan
 	return count, nil
 }
 
-func pruneRequestHeaders(header http.Header) http.Header {
-	clonedHeader := header.Clone()
-	for key := range clonedHeader {
-		if strings.ToLower(key) == strings.ToLower(zitadel_http.Authorization) {
-			clonedHeader[key] = []string{redacted}
-		}
-	}
-	return clonedHeader
-}
-
-func cleanup(ctx context.Context, dbClient *sql.DB, keep time.Duration) error {
-
+func (l *databaseLogStorage) Cleanup(ctx context.Context, keep time.Duration) error {
 	stmt, args, err := squirrel.Delete(accessLogsTable).
 		Where(squirrel.LtOrEq{accessTimestampCol: time.Now().Add(-keep)}).
 		PlaceholderFormat(squirrel.Dollar).
@@ -163,6 +154,6 @@ func cleanup(ctx context.Context, dbClient *sql.DB, keep time.Duration) error {
 
 	execCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	_, err = dbClient.ExecContext(execCtx, stmt, args...)
+	_, err = l.dbClient.ExecContext(execCtx, stmt, args...)
 	return err
 }
