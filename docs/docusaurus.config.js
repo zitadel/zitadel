@@ -67,6 +67,12 @@ module.exports = {
         },
         {
           type: "doc",
+          label: "Self-Hosting",
+          docId: "self-hosting/deploy/overview",
+          position: "left",
+        },
+        {
+          type: "doc",
           docId: "concepts/introduction",
           label: "Concepts",
           position: "left",
