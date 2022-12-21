@@ -1,13 +1,20 @@
 package actions
 
 import (
-	"github.com/zitadel/logging"
-
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/console"
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/logstore"
 )
 
-var ServerLog *logrus
+var (
+	ServerLog   *logrus
+	logstoreSvc *logstore.Service
+)
+
+func SetLogstoreService(svc *logstore.Service) {
+	logstoreSvc = svc
+}
 
 type logrus struct{}
 

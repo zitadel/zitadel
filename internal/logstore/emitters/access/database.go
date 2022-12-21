@@ -66,7 +66,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 		PlaceholderFormat(squirrel.Dollar)
 
 	for idx := range bulk {
-		item := bulk[idx].(*AccessLogRecord)
+		item := bulk[idx].(*Record)
 		builder = builder.Values(
 			item.Timestamp,
 			item.Protocol,

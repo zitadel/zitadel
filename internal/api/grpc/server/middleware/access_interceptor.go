@@ -53,7 +53,7 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 		resMd, _ := metadata.FromOutgoingContext(ctx)
 		instance := authz.GetInstance(ctx)
 
-		record := &access.AccessLogRecord{
+		record := &access.Record{
 			Timestamp:       time.Now(),
 			Protocol:        access.GRPC,
 			RequestURL:      info.FullMethod,

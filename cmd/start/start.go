@@ -149,6 +149,19 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
+	/*
+		actionsExecutionStdoutEmitter, err := logstore.NewEmitter(ctx, config.LogStore.Execution.Stdout, stdout.NewStdoutEmitter())
+		if err != nil {
+			return err
+		}
+		actionsExecutionDBEmitter, err := logstore.NewEmitter(ctx, config.LogStore.Execution.Database, execution.NewDatabaseLogStorage(dbClient))
+		if err != nil {
+			return err
+		}
+
+		actions.SetLogstoreService(logstore.New(actionsExecutionDBEmitter, dbClient, commands.ReportUsage, actionsExecutionStdoutEmitter))
+	*/
+
 	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()

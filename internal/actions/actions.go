@@ -14,11 +14,14 @@ type Config struct {
 	HTTP HTTPConfig
 }
 
-var (
-	ErrHalt = errors.New("interrupt")
-)
+var ErrHalt = errors.New("interrupt")
 
 type jsAction func(fields, fields) error
+
+const (
+	actionStartedMessage  = "action started"
+	actionFinishedMessage = "action finished"
+)
 
 func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) error {
 	config, err := prepareRun(ctx, ctxParam, apiParam, script, opts)

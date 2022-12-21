@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 
 	"github.com/zitadel/zitadel/internal/logstore"
 
@@ -64,7 +65,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		if err != nil {
 			logging.Warningf("failed to unescape request url %s", requestURL)
 		}
-		err = a.svc.Handle(ctx, &access.AccessLogRecord{
+		err = a.svc.Handle(ctx, &access.Record{
 			Timestamp:       time.Now(),
 			Protocol:        access.HTTP,
 			RequestURL:      unescapedURL,

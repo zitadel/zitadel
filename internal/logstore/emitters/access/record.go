@@ -10,9 +10,9 @@ import (
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 )
 
-var _ logstore.LogRecord = (*AccessLogRecord)(nil)
+var _ logstore.LogRecord = (*Record)(nil)
 
-type AccessLogRecord struct {
+type Record struct {
 	Timestamp       time.Time   `json:"ts"`
 	Protocol        Protocol    `json:"protocol"`
 	RequestURL      string      `json:"requestURL"`
@@ -36,7 +36,7 @@ const (
 	redacted = "[REDACTED]"
 )
 
-func (a *AccessLogRecord) RedactSecrets() logstore.LogRecord {
+func (a *Record) RedactSecrets() logstore.LogRecord {
 	clone := &(*a)
 	redactHeaders(clone.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "cookie")
 	redactHeaders(clone.ResponseHeaders, "set-cookie")

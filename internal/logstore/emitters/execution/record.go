@@ -6,15 +6,16 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore"
 )
 
-var _ logstore.LogRecord = (*ExecutionLogRecord)(nil)
+var _ logstore.LogRecord = (*Record)(nil)
 
-type ExecutionLogRecord struct {
+type Record struct {
 	Timestamp      time.Time
 	InstanceID     string
 	OrganizationID string
 	ActionID       string
 	RunID          string
 	Message        string
+	Level          string
 	FileDescriptor FileDescriptor
 }
 
@@ -25,7 +26,7 @@ const (
 	StdErr FileDescriptor = "stderr"
 )
 
-func (e *ExecutionLogRecord) RedactSecrets() logstore.LogRecord {
+func (e *Record) RedactSecrets() logstore.LogRecord {
 	// TODO implement
 	return e
 }
