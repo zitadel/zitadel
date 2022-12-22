@@ -220,7 +220,7 @@ RegistrationUser:
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
-  TosConfirmAnd: 和
+  PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
   ExternalLogin: 使用外部身份提供者注册
   BackButtonText: 登录
@@ -244,7 +244,7 @@ ExternalRegistrationUserOverview:
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
-  TosConfirmAnd: 和
+  PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
   ExternalLogin: 使用外部身份提供者注册
   BackButtonText: 返回
@@ -263,7 +263,7 @@ RegistrationOrg:
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
-  TosConfirmAnd: 和
+  PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
   SaveButtonText: 创建组织
 
@@ -292,7 +292,7 @@ ExternalNotFound:
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
-  TosConfirmAnd: 和
+  PrivacyConfirm: 我接受
   PrivacyLinkText: 隐私政策
   German: Deutsch
   English: English
