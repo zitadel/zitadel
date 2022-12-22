@@ -215,6 +215,10 @@ func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 	return NewTextQuery(OrgColumnName, value, method)
 }
 
+func NewOrgStateSearchQuery(value int32) (SearchQuery, error) {
+	return NewNumberQuery(OrgColumnState, value, NumberEquals)
+}
+
 func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
 	list := make([]interface{}, len(ids))
 	for i, value := range ids {

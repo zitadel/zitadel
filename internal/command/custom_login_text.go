@@ -761,6 +761,10 @@ func (c *Commands) createRegistrationOptionEvents(ctx context.Context, agg *even
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationOptionLoginButtonText, existingText.RegistrationOptionLoginButtonText, text.RegisterOption.LoginButtonText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	return events
 }
 
@@ -822,7 +826,7 @@ func (c *Commands) createRegistrationUserEvents(ctx context.Context, agg *events
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserTOSConfirmAnd, existingText.RegistrationUserTOSConfirmAnd, text.RegistrationUser.TOSConfirmAnd, text.Language, defaultText)
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserPrivacyConfirm, existingText.RegistrationUserPrivacyConfirm, text.RegistrationUser.PrivacyConfirm, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -891,7 +895,7 @@ func (c *Commands) createExternalRegistrationUserOverviewEvents(ctx context.Cont
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, existingText.ExternalRegistrationUserOverviewTOSConfirmAnd, text.ExternalRegistrationUserOverview.TOSConfirmAnd, text.Language, defaultText)
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalRegistrationUserOverviewPrivacyConfirm, existingText.ExternalRegistrationUserOverviewPrivacyConfirm, text.ExternalRegistrationUserOverview.PrivacyConfirm, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -960,7 +964,7 @@ func (c *Commands) createRegistrationOrgEvents(ctx context.Context, agg *eventst
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegisterOrgTosConfirmAnd, existingText.RegisterOrgTOSConfirmAnd, text.RegistrationOrg.TOSConfirmAnd, text.Language, defaultText)
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegisterOrgPrivacyConfirm, existingText.RegisterOrgPrivacyConfirm, text.RegistrationOrg.PrivacyConfirm, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}
@@ -1026,7 +1030,7 @@ func (c *Commands) createExternalUserNotFoundEvents(ctx context.Context, agg *ev
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundTOSConfirmAnd, existingText.ExternalUserNotFoundTOSConfirmAnd, text.ExternalNotFound.TOSConfirmAnd, text.Language, defaultText)
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundPrivacyConfirm, existingText.ExternalUserNotFoundPrivacyConfirm, text.ExternalNotFound.PrivacyConfirm, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
 	}

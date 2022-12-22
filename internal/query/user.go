@@ -387,7 +387,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerR
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
+		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -411,7 +411,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRem
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
+		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -435,7 +435,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRem
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
+		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -562,7 +562,7 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	}
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
+		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {

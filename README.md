@@ -49,13 +49,13 @@ With ZITADEL you can rely on a hardened and extensible turnkey solution to solve
 
 Deploying ZITADEL locally takes less than 3 minutes. So go ahead and give it a try!
 
-* [Linux](https://zitadel.com/docs/guides/deploy/linux)
-* [MacOS](https://zitadel.com/docs/guides/deploy/macos)
-* [Docker compose](https://zitadel.com/docs/guides/deploy/compose)
-* [Knative](https://zitadel.com/docs/guides/deploy/knative)
-* [Kubernetes](https://zitadel.com/docs/guides/deploy/kubernetes)
+* [Linux](https://zitadel.com/docs/self-hosting/deploy/linux)
+* [MacOS](https://zitadel.com/docs/self-hosting/deploy/macos)
+* [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose)
+* [Knative](https://zitadel.com/docs/self-hosting/deploy/knative)
+* [Kubernetes](https://zitadel.com/docs/self-hosting/deploy/kubernetes)
 
-See all guides [here](https://zitadel.com/docs/guides/deploy/overview)
+See all guides [here](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 > If you are interested to get professional support for your self-hosted ZITADEL [please reach out to us](https://zitadel.com/contact)!
 
@@ -93,7 +93,7 @@ Yet it offers everything you need for a customer identity (CIAM) use case.
 - [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints),  [OIDC Integration Guides](https://zitadel.com/docs/guides/integrate/auth0-oidc)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints), [SAML Integration Guides](https://zitadel.com/docs/guides/integrate/auth0-saml)
-- [Postgres](https://zitadel.com/docs/guides/manage/self-hosted/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/guides/manage/self-hosted/database#cockroach) (version >= 22.0)
+- [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/self-hosting/manage/database#cockroach) (version >= 22.0)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
