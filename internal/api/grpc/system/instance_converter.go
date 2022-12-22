@@ -135,52 +135,61 @@ func createInstancePbToAddMachine(user *system_pb.CreateInstanceRequest_Machine,
 }
 
 func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {
+	instance := defaultInstance
+	instance.Org.Human = new(command.AddHuman)
+	if defaultInstance.Org.Human != nil {
+		tHuman := *defaultInstance.Org.Human
+		instance.Org.Human = &tHuman
+	}
+
 	if req.InstanceName != "" {
-		defaultInstance.InstanceName = req.InstanceName
-		defaultInstance.Org.Name = req.InstanceName
+		instance.InstanceName = req.InstanceName
+		instance.Org.Name = req.InstanceName
 	}
 	if req.CustomDomain != "" {
-		defaultInstance.CustomDomain = req.CustomDomain
+		instance.CustomDomain = req.CustomDomain
 	}
 	if req.FirstOrgName != "" {
-		defaultInstance.Org.Name = req.FirstOrgName
+		instance.Org.Name = req.FirstOrgName
 	}
+
 	if req.OwnerEmail.Email != "" {
-		defaultInstance.Org.Human.Email.Address = req.OwnerEmail.Email
-		defaultInstance.Org.Human.Email.Verified = req.OwnerEmail.IsEmailVerified
+		instance.Org.Human.Email.Address = req.OwnerEmail.Email
+		instance.Org.Human.Email.Verified = req.OwnerEmail.IsEmailVerified
 	}
 	if req.OwnerProfile != nil {
 		if req.OwnerProfile.FirstName != "" {
-			defaultInstance.Org.Human.FirstName = req.OwnerProfile.FirstName
+			instance.Org.Human.FirstName = req.OwnerProfile.FirstName
 		}
 		if req.OwnerProfile.LastName != "" {
-			defaultInstance.Org.Human.LastName = req.OwnerProfile.LastName
+			instance.Org.Human.LastName = req.OwnerProfile.LastName
 		}
 		if req.OwnerProfile.PreferredLanguage != "" {
 			lang, err := language.Parse(req.OwnerProfile.PreferredLanguage)
 			if err == nil {
-				defaultInstance.Org.Human.PreferredLanguage = lang
+				instance.Org.Human.PreferredLanguage = lang
 			}
 		}
 	}
 	// check if default username is email style or else append @<orgname>.<custom-domain>
 	// this way we have the same value as before changing `UserLoginMustBeDomain` to false
-	if !defaultInstance.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(defaultInstance.Org.Human.Username, "@") {
-		defaultInstance.Org.Human.Username = defaultInstance.Org.Human.Username + "@" + domain.NewIAMDomainName(defaultInstance.Org.Name, externalDomain)
+	if !instance.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(instance.Org.Human.Username, "@") {
+		instance.Org.Human.Username = instance.Org.Human.Username + "@" + domain.NewIAMDomainName(instance.Org.Name, externalDomain)
 	}
 	if req.OwnerUserName != "" {
-		defaultInstance.Org.Human.Username = req.OwnerUserName
+		instance.Org.Human.Username = req.OwnerUserName
 	}
 	if req.OwnerPassword != nil {
-		defaultInstance.Org.Human.Password = req.OwnerPassword.Password
-		defaultInstance.Org.Human.PasswordChangeRequired = req.OwnerPassword.PasswordChangeRequired
+		instance.Org.Human.Password = req.OwnerPassword.Password
+		instance.Org.Human.PasswordChangeRequired = req.OwnerPassword.PasswordChangeRequired
 	}
 	if lang := language.Make(req.DefaultLanguage); lang != language.Und {
-		defaultInstance.DefaultLanguage = lang
+		instance.DefaultLanguage = lang
 	}
 
-	return &defaultInstance
+	return &instance
 }
+
 func ListInstancesRequestToModel(req *system_pb.ListInstancesRequest) (*query.InstanceSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := instance_grpc.InstanceQueriesToModel(req.Queries)
