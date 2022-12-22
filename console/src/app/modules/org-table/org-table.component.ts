@@ -3,6 +3,7 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { Org, OrgFieldName, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
@@ -56,6 +57,7 @@ export class OrgTableComponent {
     private router: Router,
     private toast: ToastService,
     private _liveAnnouncer: LiveAnnouncer,
+    private translate: TranslateService,
   ) {
     this.requestOrgs$.next({ limit: this.initialLimit, offset: 0, queries: this.searchQueries });
     this.authService.getActiveOrg().then((org) => (this.activeOrg = org));
@@ -134,8 +136,14 @@ export class OrgTableComponent {
   }
 
   public setAndNavigateToOrg(org: Org.AsObject): void {
-    this.authService.setActiveOrg(org);
-    this.router.navigate(['/org']);
+    if (org.state !== OrgState.ORG_STATE_REMOVED) {
+      this.authService.setActiveOrg(org);
+      this.router.navigate(['/org']);
+    } else {
+      this.translate.get('ORG.TOAST.ORG_WAS_DELETED').subscribe((data) => {
+        this.toast.showInfo(data);
+      });
+    }
   }
 
   public changePage(): void {
