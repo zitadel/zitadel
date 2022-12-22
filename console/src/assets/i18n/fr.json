@@ -779,6 +779,7 @@
       "ORGDETAIL_TITLE": "Saisissez le nom et le domaine de votre nouvelle organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Saisissez le nom de votre nouvelle organisation.",
       "ORGDETAILUSER_TITLE": "Configurer le propriétaire de l'organisation",
+      "DELETE": "Supprimer l'organisation",
       "RENAME": {
         "ACTION": "Renommer",
         "TITLE": "Renommer l'organisation",
@@ -845,7 +846,9 @@
       "MEMBERADDED": "Gestionnaire ajouté.",
       "MEMBERREMOVED": "Gestionnaire supprimé.",
       "MEMBERCHANGED": "Gestionnaire modifié.",
-      "SETPRIMARY": "Domaine primaire défini."
+      "SETPRIMARY": "Domaine primaire défini.",
+      "DELETED": "Organisation supprimée avec succès",
+      "ORG_WAS_DELETED": "L'organisation a été supprimée"
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -855,6 +858,13 @@
       "REACTIVATE": {
         "TITLE": "Réactiver l'organisation",
         "DESCRIPTION": "Vous êtes sur le point de réactiver votre organisation. Les utilisateurs peuvent ensuite se reconnecter ? Voulez-vous continuer ?"
+      },
+      "DELETE": {
+        "TITLE": "Supprimer l'organisation",
+        "DESCRIPTION": "Vous êtes sur le point de supprimer votre organisation. Cela déclenche un processus au cours duquel toutes les données relatives à l'organisation seront supprimées. Vous ne pouvez pas revenir sur cette action pour le moment.",
+        "TYPENAME": "Tapez '{{value}}', pour supprimer votre organisation.",
+        "ORGNAME": "Nom",
+        "BTN": "Supprimer"
       }
     }
   },
