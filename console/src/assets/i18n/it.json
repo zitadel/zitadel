@@ -757,7 +757,8 @@
       "ROLEREMOVED": "Ruolo rimosso.",
       "ROLECHANGED": "Ruolo cambiato.",
       "REACTIVATED": "Riattivato",
-      "DEACTIVATED": "Disattivato"
+      "DEACTIVATED": "Disattivato",
+      "DELETED": "Organizzazione cancellata con successo"
     }
   },
   "ORG": {
@@ -779,6 +780,7 @@
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
+      "DELETE": "Elimina organizzazione",
       "RENAME": {
         "ACTION": "Rinomina",
         "TITLE": "Rinomina organizzazione",
@@ -845,7 +847,9 @@
       "MEMBERADDED": "Manager aggiunto con successo",
       "MEMBERREMOVED": "Manager rimosso con successo",
       "MEMBERCHANGED": "Manager cambiato con successo",
-      "SETPRIMARY": "Dominio primario cambiato con successo"
+      "SETPRIMARY": "Dominio primario cambiato con successo",
+      "DELETED": "Organizzazione eliminata con successo",
+      "ORG_WAS_DELETED": "Organizzazione è stata eliminata"
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -855,6 +859,13 @@
       "REACTIVATE": {
         "TITLE": "Riattivare l'organizzazione",
         "DESCRIPTION": "Stai per riattivare la tua organizzazione. Utenti dell' organizzazione possono accedere nuovamente dopo l'attivazione. Vuoi procedere?"
+      },
+      "DELETE": {
+        "TITLE": "Elimina organizzazione",
+        "DESCRIPTION": "Si sta per eliminare l'organizzazione. In questo modo si avvia un processo di eliminazione di tutti i dati relativi all'organizzazione. Per il momento non è possibile annullare questa azione.",
+        "TYPENAME": "Inserisci '{{value}}' nel campo, per cancellare l'organizzazione.",
+        "ORGNAME": "Nome",
+        "BTN": "Elimina"
       }
     }
   },

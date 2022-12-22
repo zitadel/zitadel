@@ -126,6 +126,44 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  public deleteOrg(): void {
+    const mgmtUserData = {
+      confirmKey: 'ACTIONS.DELETE',
+      cancelKey: 'ACTIONS.CANCEL',
+      titleKey: 'ORG.DIALOG.DELETE.TITLE',
+      warnSectionKey: 'ORG.DIALOG.DELETE.DESCRIPTION',
+      hintKey: 'ORG.DIALOG.DELETE.TYPENAME',
+      hintParam: 'ORG.DIALOG.DELETE.DESCRIPTION',
+      confirmationKey: 'ORG.DIALOG.DELETE.ORGNAME',
+      confirmation: this.org?.name,
+    };
+
+    if (this.org) {
+      let dialogRef;
+
+      dialogRef = this.dialog.open(WarnDialogComponent, {
+        data: mgmtUserData,
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          this.mgmtService
+            .removeOrg()
+            .then(() => {
+              setTimeout(() => {
+                this.router.navigate(['/orgs']);
+              }, 1000);
+              this.toast.showInfo('ORG.TOAST.DELETED', true);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
+    }
+  }
+
   private async getData(): Promise<void> {
     this.mgmtService
       .getMyOrg()

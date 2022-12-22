@@ -373,7 +373,7 @@ func ListUserMembershipsRequestToModel(ctx context.Context, req *mgmt_pb.ListUse
 	if err != nil {
 		return nil, err
 	}
-	ownerQuery, err := query.NewMembershipResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	ownerQuery, err := query.NewMembershipResourceOwnersSearchQuery(authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

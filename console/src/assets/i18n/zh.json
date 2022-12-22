@@ -779,6 +779,7 @@
       "ORGDETAIL_TITLE": "输入新组织的名称和域名。",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
+      "DELETE": "删除组织",
       "RENAME": {
         "ACTION": "改名",
         "TITLE": "重命名组织",
@@ -845,7 +846,9 @@
       "MEMBERADDED": "管理者已添加。",
       "MEMBERREMOVED": "管理者已删除。",
       "MEMBERCHANGED": "管理者以改变。",
-      "SETPRIMARY": "已设为主域名。"
+      "SETPRIMARY": "已设为主域名。",
+      "DELETED": "成功删除的组织",
+      "ORG_WAS_DELETED": "组织被删除"
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -855,6 +858,13 @@
       "REACTIVATE": {
         "TITLE": "重新启用组织",
         "DESCRIPTION": "您即将重新启用您的组织。用户将能够再次登录。你确定要继续吗？"
+      },
+      "DELETE": {
+        "TITLE": "删除组织",
+        "DESCRIPTION": "你即将删除你的组织。这将启动一个过程，所有与组织有关的数据将被删除。你现在还不能恢复这一行动。",
+        "TYPENAME": "键入'{价值}'，以删除您的组织。",
+        "ORGNAME": "组织名称",
+        "BTN": "删除"
       }
     }
   },
