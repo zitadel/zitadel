@@ -69,13 +69,11 @@ function awaitDesired(
     const foundExpectedEntity = expectEntity(resp.entity);
     const foundExpectedSequence = !initialSequence || resp.sequence >= initialSequence;
 
-    const check = (!foundExpectedEntity || !foundExpectedSequence) && trials > 0;
+    const check = !foundExpectedEntity || !foundExpectedSequence;
     if (check) {
-      cy.log(`trying ${trials} more times`);
+      expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
       cy.wait(1000);
       return awaitDesired(trials - 1, expectEntity, search, initialSequence);
-    } else {
-      return;
     }
   });
 }
