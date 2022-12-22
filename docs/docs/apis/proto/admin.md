@@ -435,7 +435,7 @@ and adds the user to the orgs members as ORG_OWNER
 > **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
 [RemoveOrgResponse](#removeorgresponse)
 
-Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+Sets the state of the organisation and all its resource (Users, Projects, Grants to and from the org) to removed
 Users of this organisation will not be able login
 
 
