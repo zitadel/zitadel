@@ -20,7 +20,9 @@ jobs:
           node-version: '18'
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
+        working-directory: ${{ env.working-directory }}
       - run: yarn build
+        working-directory: ${{ env.working-directory }}
 
   # docker-build:
   #   runs-on: ubuntu-latest
