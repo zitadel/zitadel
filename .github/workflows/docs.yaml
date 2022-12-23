@@ -5,6 +5,10 @@ on:
     paths:
       - 'docs/**'
 
+defaults:
+  run:
+    working-directory: docs
+
 jobs:
   npm-build:
     runs-on: ubuntu-latest
