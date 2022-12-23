@@ -27,7 +27,7 @@ describe('organizations', () => {
 
       cy.get('[data-e2e="name"]').focus().clear().type(testOrgNameChange);
       cy.get('[data-e2e="dialog-submit"]').click();
-      cy.shouldConfirmSuccess()
+      cy.shouldConfirmSuccess();
       cy.visit(orgPath);
       cy.get('[data-e2e="top-view-title"').should('contain', testOrgNameChange);
     });

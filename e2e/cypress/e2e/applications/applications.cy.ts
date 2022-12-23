@@ -31,7 +31,7 @@ describe('applications', () => {
       cy.get('[data-e2e="continue-button-redirecturis"]').click();
       cy.get('[data-e2e="create-button"]').click();
       cy.get('[id*=overlay]').should('exist');
-      cy.shouldConfirmSuccess()
+      cy.shouldConfirmSuccess();
       const expectClientId = new RegExp(`^.*[0-9]+\\@${testProjectName}.*$`);
       cy.get('[data-e2e="client-id-copy"]').click();
       cy.contains('[data-e2e="client-id"]', expectClientId);

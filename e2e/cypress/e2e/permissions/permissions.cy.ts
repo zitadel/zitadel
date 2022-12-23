@@ -39,7 +39,7 @@ describe('permissions', () => {
           cy.get('[data-e2e="user-option"]').click();
           cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
           cy.get('[data-e2e="confirm-add-member-button"]').click();
-          cy.shouldConfirmSuccess()
+          cy.shouldConfirmSuccess();
           cy.contains('[data-e2e="member-avatar"]', 'ee');
         });
       });
@@ -58,7 +58,7 @@ describe('permissions', () => {
         it('should remove a manager', () => {
           cy.get('@managerRow').find('[data-e2e="remove-member-button"]').click({ force: true });
           cy.get('[data-e2e="confirm-dialog-button"]').click();
-          cy.shouldConfirmSuccess()
+          cy.shouldConfirmSuccess();
           cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
         });
 
@@ -69,7 +69,7 @@ describe('permissions', () => {
             .find('[data-e2e="remove-role-button"]')
             .click({ force: true }); // TODO: Is this a bug?
           cy.get('[data-e2e="confirm-dialog-button"]').click();
-          cy.shouldConfirmSuccess()
+          cy.shouldConfirmSuccess();
           cy.get('@managerRow')
             .find('[data-e2e="remove-role-button"]')
             .should('have.length', roles.length - 1);
@@ -153,7 +153,7 @@ describe('permissions', () => {
             cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
             cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
             cy.get('[data-e2e="save-button"]').click();
-            cy.shouldConfirmSuccess()
+            cy.shouldConfirmSuccess();
             cy.contains('tr', testRoleName);
           });
           it('should remove a role');

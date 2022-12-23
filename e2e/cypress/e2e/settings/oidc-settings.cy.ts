@@ -33,6 +33,6 @@ describe('oidc settings', () => {
       .clear()
       .type('7');
     cy.get('[data-e2e="save-button"]').click();
-    cy.shouldConfirmSuccess()
+    cy.shouldConfirmSuccess();
   });
 });

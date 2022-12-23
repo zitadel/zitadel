@@ -30,7 +30,7 @@ describe('machines', () => {
         cy.get('[formcontrolname="name"]').type('e2emachinename');
         cy.get('[formcontrolname="description"]').type('e2emachinedescription');
         cy.get('[data-e2e="create-button"]').click();
-        cy.shouldConfirmSuccess()
+        cy.shouldConfirmSuccess();
         let loginName = machine.addName;
         if (machine.mustBeDomain) {
           loginName = loginname(machine.addName, Cypress.env('ORGANIZATION'));
@@ -55,7 +55,7 @@ describe('machines', () => {
         cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(loginName);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
-        cy.shouldConfirmSuccess()
+        cy.shouldConfirmSuccess();
         cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
       });
 
