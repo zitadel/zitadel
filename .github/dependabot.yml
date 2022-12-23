@@ -34,7 +34,7 @@ updates:
     prefix: chore
     include: scope
 - package-ecosystem: "docker"
-  directory: "/build/operator"
+  directory: "/docs"
   schedule:
     interval: "weekly"
     time: "02:00"
