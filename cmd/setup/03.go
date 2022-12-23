@@ -110,8 +110,8 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+		defer f.Close()
 	}
-	defer f.Close()
 
 	keyDetails, err := key.Detail()
 	if err != nil {
