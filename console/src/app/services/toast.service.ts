@@ -62,7 +62,7 @@ export class ToastService {
         message,
       },
       duration: success ? 4000 : 5000,
-      panelClass: success ? 'data-e2e-success' : 'data-e2e-failure',
+      panelClass: [ 'data-e2e-message' , success ? 'data-e2e-success' : 'data-e2e-failure' ],
       horizontalPosition: this.horizontalPosition,
       verticalPosition: this.verticalPosition,
     });

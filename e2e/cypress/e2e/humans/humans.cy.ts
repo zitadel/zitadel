@@ -32,14 +32,13 @@ describe('humans', () => {
         cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
         cy.get('[formcontrolname="phone"]').type('+41 123456789');
         cy.get('[data-e2e="create-button"]').click();
-        cy.get('.data-e2e-success');
+        cy.shouldConfirmSuccess()
         let loginName = user.addName;
         if (user.mustBeDomain) {
           loginName = loginname(user.addName, Cypress.env('ORGANIZATION'));
         }
         cy.contains('[data-e2e="copy-loginname"]', loginName).click();
         cy.clipboardMatches(loginName);
-        cy.shouldNotExist({ selector: '.data-e2e-failure' });
       });
     });
 
@@ -58,9 +57,8 @@ describe('humans', () => {
         cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(loginName);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
-        cy.get('.data-e2e-success');
+        cy.shouldConfirmSuccess()
         cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
-        cy.shouldNotExist({ selector: '.data-e2e-failure' });
       });
     });
   });

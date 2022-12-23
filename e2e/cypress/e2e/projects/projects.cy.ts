@@ -19,8 +19,7 @@ describe('projects', () => {
       cy.get('.add-project-button').click({ force: true });
       cy.get('input').type(testProjectNameCreate);
       cy.get('[data-e2e="continue-button"]').click();
-      cy.get('.data-e2e-success');
-      cy.shouldNotExist({ selector: '.data-e2e-failure' });
+      cy.shouldConfirmSuccess()
     });
 
     it('should configure a project to assert roles on authentication');
@@ -40,9 +39,8 @@ describe('projects', () => {
         cy.get(rowSelector).find('[data-e2e="delete-project-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
-        cy.get('.data-e2e-success');
+        cy.shouldConfirmSuccess()
         cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
-        cy.shouldNotExist({ selector: '.data-e2e-failure' });
       });
 
       it('removes the project from grid view', () => {
@@ -50,9 +48,8 @@ describe('projects', () => {
         cy.get(cardSelector).find('[data-e2e="delete-project-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
-        cy.get('.data-e2e-success');
+        cy.shouldConfirmSuccess()
         cy.shouldNotExist({ selector: cardSelector, timeout: 2000 });
-        cy.shouldNotExist({ selector: '.data-e2e-failure' });
       });
     });
 

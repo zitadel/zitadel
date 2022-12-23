@@ -26,7 +26,7 @@ import 'cypress-wait-until';
 //
 
 interface ShouldNotExistOptions {
-  selector?: string;
+  selector: string;
   timeout?: number;
 }
 
@@ -43,7 +43,11 @@ declare global {
       /**
        * Custom command that waits until the selector finds zero elements.
        */
-      shouldNotExist(options?: ShouldNotExistOptions): Cypress.Chainable<null>;
+      shouldNotExist(options: ShouldNotExistOptions): Cypress.Chainable<null>;
+      /**
+       * Custom command that asserts success is printed after a change.
+       */
+      shouldConfirmSuccess(): Cypress.Chainable<null>;
     }
   }
 }
@@ -70,11 +74,30 @@ Cypress.Commands.add('clipboardMatches', { prevSubject: false }, (pattern: RegEx
     */
 });
 
-Cypress.Commands.add('shouldNotExist', { prevSubject: false }, (options?: ShouldNotExistOptions) => {
+Cypress.Commands.add('shouldNotExist', { prevSubject: false }, (options: ShouldNotExistOptions) => {
+
+  if (!options.timeout){
+    const elements = Cypress.$(options.selector)
+    expect(elements.text()).to.be.empty
+    expect(elements.length).to.be.empty
+    return null
+  }
   return cy.waitUntil(
     () => {
-      return Cypress.$(options?.selector).length === 0;
+      const elements = Cypress.$(options.selector)
+      if (!elements.length){
+        return cy.wrap(true)
+      }
+      return cy.log(`elements with selector ${options.selector} and text ${elements.text()} exist`).wrap(false)
     },
-    { timeout: typeof options?.timeout === 'number' ? options.timeout : 500 },
-  );
+    {
+      timeout: options.timeout,
+     },
+  ).then(() => null);
 });
+
+Cypress.Commands.add('shouldConfirmSuccess', { prevSubject: false }, () => {
+  cy.get('.data-e2e-message');
+  cy.shouldNotExist({ selector: '.data-e2e-failure' });
+  cy.get('.data-e2e-success');
+})
