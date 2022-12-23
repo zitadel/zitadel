@@ -22,6 +22,7 @@ jobs:
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
       - run: yarn build
+
   # docker-build:
   #   runs-on: ubuntu-latest
   #   steps:
