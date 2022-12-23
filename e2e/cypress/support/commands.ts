@@ -81,7 +81,7 @@ Cypress.Commands.add('shouldNotExist', { prevSubject: false }, (options: ShouldN
   if (!options.timeout) {
     const elements = Cypress.$(options.selector);
     expect(elements.text()).to.be.empty;
-    expect(elements.length).to.be.empty;
+    expect(elements.length).to.equal(0);
     return null;
   }
   return cy
@@ -94,7 +94,7 @@ Cypress.Commands.add('shouldNotExist', { prevSubject: false }, (options: ShouldN
         return cy.log(`elements with selector ${options.selector} and text ${elements.text()} exist`).wrap(false);
       },
       {
-        timeout: options.timeout.timeout,
+        timeout: options.timeout.ms,
         errorMsg: options.timeout.errMessage,
       },
     )
