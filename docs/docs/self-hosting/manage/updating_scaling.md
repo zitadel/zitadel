@@ -1,0 +1,69 @@
+---
+title: Updating and Scaling
+---
+
+This page shows, how you can improve your day-two operations
+by separating the init and setup phases from the ZITADEL start runtime process.
+
+## Scaling ZITADEL
+
+For production setups, we recommend that you run  ZITADEL in a highly available mode.
+As all shared state is managed in the database,
+the ZITADEL binary itself is stateless.
+You can easily run as many ZITADEL binaries in parallel as you want.
+If you use [Knative](/docs/self-hosting/deploy/knative)
+or [Google Cloud Run](https://cloud.google.com/run) (which uses Knative, too),
+you can even scale to zero.
+Especially if you use an autoscaler that scales to zero,
+it is crucial that you minimise startup times.
+
+## Updating ZITADEL
+
+When updating ZITADEL, the setup job takes care of database migrations.
+You generally want to run the job in a controlled manner,
+so multiple executions don’t interfere with each other.
+Also, after the setup is done,
+rolling out a new ZITADEL version is much faster
+when the runtime processes are just executed with zitadel start.
+
+## Separating Init and Setup from the Runtime
+
+If you use the [official ZITADEL Helm chart](/docs/self-hosting/deploy/kubernetes),
+then you can stop reading now,
+as the init and setup phases are already separated and executed in dedicated Kubernetes Jobs.
+If you use another orchestrator and want to separate the phases yourself,
+you should know what happens during these phases.
+
+### The Init Phase
+
+The command `zitadel init` ensures the database connection is ready to use for the subsequent phases.
+It just needs to be executed once over ZITADELs full life cycle,
+when you install ZITADEL from scratch.
+Using the configured database admin user, `zitadel init` ensures the following:
+- If it doesn’t exist already, it creates a database with the configured database name.
+- If it doesn’t exist already, it creates a non-privileged user.
+  Subsequent phases connect to the database with this user's credentials only.
+- If they don’t exist already, it creates all schemas and some basic tables.
+- If not already done, it grants permissions to the non privileged user.
+
+### The Setup Phase
+
+During `zitadel setup`, ZITADEL creates projection tables and migrates existing data.
+Depending on the ZITADEL version and the runtime resources,
+this step can take several minutes.
+When deploying a new ZITADEL version,
+make sure the setup phase runs before you roll out the new `zitadel start` processes.
+The setup phase is executed in subsequent steps
+whereas a new version's execution takes over where the last execution stopped.
+Therefore, configuration changes relevant for the setup phase won’t take effect in regard to the setup execution.
+
+### The Start Phase
+
+The `zitadel start` command assumes the database is already initialised and set up.
+It starts serving requests within fractions of a second.
+Beware, in the background, out-of-date projections
+[recompute their state by replaying all missed events](/docs/concepts/eventstore/implementation#projections).
+If a new ZITADEL version is deployed, this can take quite a long time,
+depending on the amount of events to catch up.
+You probably should consider manually migrating these projections first.
+Refer to the [release notes for v2.14.0](https://github.com/zitadel/zitadel/releases/tag/v2.14.0) as an example.
