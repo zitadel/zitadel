@@ -40,7 +40,10 @@ describe('projects', () => {
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.shouldConfirmSuccess();
-        cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
+        cy.shouldNotExist({
+          selector: rowSelector,
+          timeout: { ms: 2000, errMessage: 'timed out before project disappeared from the table' },
+        });
       });
 
       it('removes the project from grid view', () => {
@@ -49,7 +52,10 @@ describe('projects', () => {
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(testProjectNameDelete);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.shouldConfirmSuccess();
-        cy.shouldNotExist({ selector: cardSelector, timeout: 2000 });
+        cy.shouldNotExist({
+          selector: cardSelector,
+          timeout: { ms: 2000, errMessage: 'timed out before project disappeared from the grid' },
+        });
       });
     });
 

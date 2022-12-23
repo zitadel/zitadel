@@ -56,7 +56,10 @@ describe('machines', () => {
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(loginName);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.shouldConfirmSuccess();
-        cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
+        cy.shouldNotExist({
+          selector: rowSelector,
+          timeout: { ms: 2000, errMessage: 'timed out before machine disappeared from the table' },
+        });
       });
 
       it('should create a personal access token');

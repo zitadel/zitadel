@@ -27,7 +27,10 @@ import 'cypress-wait-until';
 
 interface ShouldNotExistOptions {
   selector: string;
-  timeout?: number;
+  timeout?: {
+    errMessage: string;
+    ms: number;
+  };
 }
 
 declare global {
@@ -91,7 +94,8 @@ Cypress.Commands.add('shouldNotExist', { prevSubject: false }, (options: ShouldN
         return cy.log(`elements with selector ${options.selector} and text ${elements.text()} exist`).wrap(false);
       },
       {
-        timeout: options.timeout,
+        timeout: options.timeout.timeout,
+        errorMsg: options.timeout.errMessage,
       },
     )
     .then(() => null);

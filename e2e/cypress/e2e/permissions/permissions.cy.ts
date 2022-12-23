@@ -59,7 +59,10 @@ describe('permissions', () => {
           cy.get('@managerRow').find('[data-e2e="remove-member-button"]').click({ force: true });
           cy.get('[data-e2e="confirm-dialog-button"]').click();
           cy.shouldConfirmSuccess();
-          cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
+          cy.shouldNotExist({
+            selector: rowSelector,
+            timeout: { ms: 2000, errMessage: 'timed out before manager disappeared from the table' },
+          });
         });
 
         it('should remove a managers authorization', () => {
