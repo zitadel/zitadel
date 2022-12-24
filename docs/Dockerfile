@@ -1,8 +1,12 @@
+# Build the ZITADEL Documentation
+FROM node:18 AS build
+WORKDIR /src
+COPY package.json ./
+COPY yarn.lock ./
+RUN yarn install --frozen-lockfile 
+COPY . .
+RUN yarn build
+
 # Host the ZITADEL Documentation 
-FROM node:18-alpine AS deploy
-USER node
-WORKDIR /app
-COPY --from=build /src/package.json ./
-COPY --from=build /src/build/ ./
-EXPOSE 3000
-CMD ["yarn", "serve"]
+FROM nginx:alpine
+COPY --from=build /src/build/ /usr/share/nginx/html/docs
