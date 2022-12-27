@@ -13,4 +13,16 @@ CREATE TABLE IF NOT EXISTS logstore.access (
     project_id       TEXT,
     requested_domain TEXT,
     requested_host   TEXT
-)
+);
+
+CREATE TABLE IF NOT EXISTS logstore.execution (
+    ts TIMESTAMPTZ,
+    started TIMESTAMPTZ,
+    message TEXT,
+    loglevel INT,
+    instance_id      TEXT,
+    project_id TEXT,
+    action_id TEXT,
+    metadata JSONB
+);
+

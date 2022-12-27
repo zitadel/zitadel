@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/dop251/goja_nodejs/console"
+
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
 	"github.com/zitadel/logging"
@@ -25,8 +27,8 @@ type runConfig struct {
 	allowedToFail bool
 	timeout,
 	prepareTimeout time.Duration
-	modules map[string]require.ModuleLoader
-
+	modules  map[string]require.ModuleLoader
+	logger   console.Printer
 	vm       *goja.Runtime
 	ctxParam *ctxConfig
 	apiParam *apiConfig

@@ -341,7 +341,7 @@ LogStore:
         MinFrequency: 0s
         MaxBulkSize: 0
     Stdout:
-      Enabled: false
+      Enabled: true
       Debounce:
         MinFrequency: 0s
         MaxBulkSize: 0

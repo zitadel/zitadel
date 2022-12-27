@@ -20,6 +20,7 @@ type QuotaAddedEvent struct {
 	quota.AddedEvent `json:",inline"`
 }
 
+// TODO: Make own aggregate for Quotas
 func NewQuotaAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

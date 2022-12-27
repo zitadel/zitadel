@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dop251/goja_nodejs/require"
 	z_errs "github.com/zitadel/zitadel/internal/errors"
@@ -19,8 +20,9 @@ var ErrHalt = errors.New("interrupt")
 type jsAction func(fields, fields) error
 
 const (
-	actionStartedMessage  = "action started"
-	actionFinishedMessage = "action finished"
+	actionStartedMessage   = "action run started"
+	actionFailedMessage    = "action run failed"
+	actionSucceededMessage = "action run succeeded"
 )
 
 func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) error {
@@ -48,8 +50,12 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 }
 
 func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields, script string, opts []Option) (config *runConfig, err error) {
+
 	config = newRunConfig(ctx, opts...)
-	if config.timeout == 0 {
+	if config.timeout == 0 ||
+		strings.Contains(script, actionStartedMessage) ||
+		strings.Contains(script, actionFailedMessage) ||
+		strings.Contains(script, actionSucceededMessage) {
 		return nil, z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
 	}
 	t := config.Prepare()
@@ -70,7 +76,6 @@ func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields,
 	for name, loader := range config.modules {
 		registry.RegisterNativeModule(name, loader)
 	}
-
 	// overload error if function panics
 	defer func() {
 		r := recover()
@@ -79,6 +84,8 @@ func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields,
 			return
 		}
 	}()
+
+	config.logger.Log(actionStartedMessage)
 	_, err = config.vm.RunString(script)
 	return config, err
 }
@@ -86,24 +93,43 @@ func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields,
 func executeFn(config *runConfig, fn jsAction) (err error) {
 	defer func() {
 		r := recover()
-		if r != nil && !config.allowedToFail {
-			var ok bool
-			if err, ok = r.(error); ok {
-				return
+		if r == nil {
+			return
+		}
+		var ok bool
+		if err, ok = r.(error); ok {
+			config.logger.Error(fmt.Sprintf("%s: %s", actionFailedMessage, err.Error()))
+			if config.allowedToFail {
+				err = nil
 			}
+			return
+		}
 
-			e, ok := r.(string)
-			if ok {
-				err = errors.New(e)
-				return
+		e, ok := r.(string)
+		if ok {
+			err = errors.New(e)
+			config.logger.Error(fmt.Sprintf("%s: %s", actionFailedMessage, err.Error()))
+			if config.allowedToFail {
+				err = nil
 			}
-			err = fmt.Errorf("unknown error occured: %v", r)
+			return
+		}
+		err = fmt.Errorf("unknown error occured: %v", r)
+		config.logger.Error(fmt.Sprintf("%s: %s", actionFailedMessage, err.Error()))
+		if config.allowedToFail {
+			err = nil
 		}
 	}()
+
 	err = fn(config.ctxParam.fields, config.apiParam.fields)
-	if err != nil && !config.allowedToFail {
+	if err != nil {
+		config.logger.Error(fmt.Sprintf("%s: %s", actionFailedMessage, err.Error()))
+		if config.allowedToFail {
+			return nil
+		}
 		return err
 	}
+	config.logger.Log(actionSucceededMessage)
 	return nil
 }
 

@@ -3,8 +3,11 @@ package execution
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"time"
+
+	"github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
+	caos_errors "github.com/zitadel/zitadel/internal/errors"
 
 	"github.com/zitadel/zitadel/internal/logstore"
 
@@ -12,17 +15,15 @@ import (
 )
 
 const (
-	accessLogsTable          = "logstore.execution"
-	accessTimestampCol       = "ts"
-	accessProtocolCol        = "protocol"
-	accessRequestURLCol      = "request_url"
-	accessResponseStatusCol  = "response_status"
-	accessRequestHeadersCol  = "request_headers"
-	accessResponseHeadersCol = "response_headers"
-	accessInstanceIdCol      = "instance_id"
-	accessProjectIdCol       = "project_id"
-	accessRequestedDomainCol = "requested_domain"
-	accessRequestedHostCol   = "requested_host"
+	executionLogsTable     = "logstore.execution"
+	executionTimestampCol  = "ts"
+	executionStartedCol    = "started"
+	executionMessageCol    = "message"
+	executionLogLevelCol   = "loglevel"
+	executionInstanceIdCol = "instance_id"
+	executionProjectIdCol  = "project_id"
+	executionActionIdCol   = "action_id"
+	executionMetadataCol   = "metadata"
 )
 
 var _ logstore.UsageQuerier = (*databaseLogStorage)(nil)
@@ -41,16 +42,111 @@ func (l *databaseLogStorage) QuotaUnit() quota.Unit {
 }
 
 func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord) error {
-	// TODO: Implement
-	return errors.New("not yet implemented")
+	builder := squirrel.Insert(executionLogsTable).
+		Columns(
+			executionTimestampCol,
+			executionStartedCol,
+			executionMessageCol,
+			executionLogLevelCol,
+			executionInstanceIdCol,
+			executionProjectIdCol,
+			executionActionIdCol,
+			executionMetadataCol,
+		).
+		PlaceholderFormat(squirrel.Dollar)
+
+	for idx := range bulk {
+		item := bulk[idx].(*Record)
+		builder = builder.Values(
+			item.Timestamp,
+			item.Started,
+			item.Message,
+			item.LogLevel,
+			item.InstanceID,
+			item.ProjectID,
+			item.ActionID,
+			item.Metadata,
+		)
+	}
+
+	stmt, args, err := builder.ToSql()
+	if err != nil {
+		return caos_errors.ThrowInternal(err, "EXEC-KOS7I", "Errors.Internal")
+	}
+
+	result, err := l.dbClient.ExecContext(ctx, stmt, args...)
+	if err != nil {
+		return caos_errors.ThrowInternal(err, "EXEC-0j6i5", "Errors.Access.StorageFailed")
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return caos_errors.ThrowInternal(err, "EXEC-MGchJ", "Errors.Internal")
+	}
+
+	logging.Debugf("successfully stored %d execution logs", rows)
+	return nil
 }
 
 func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start, end time.Time) (uint64, error) {
-	// TODO: Implement
-	return 0, errors.New("not yet implemented")
+	/* TODO: Implement
+	stmt, args, err := squirrel.Select(
+		fmt.Sprintf("count(%s)", accessInstanceIdCol),
+	).
+		From(executionLogsTable + " AS OF SYSTEM TIME '-20s'").
+		Where(squirrel.And{
+			squirrel.Eq{accessInstanceIdCol: instanceId},
+			squirrel.GtOrEq{accessTimestampCol: start},
+			squirrel.LtOrEq{accessTimestampCol: end},
+			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, zitadel_http.Authorization)),
+			squirrel.Or{
+				squirrel.And{
+					squirrel.Eq{accessProtocolCol: HTTP},
+					squirrel.NotEq{accessResponseStatusCol: http.StatusForbidden},
+					squirrel.NotEq{accessResponseStatusCol: http.StatusInternalServerError},
+					squirrel.NotEq{accessResponseStatusCol: http.StatusTooManyRequests},
+				},
+				squirrel.And{
+					squirrel.Eq{accessProtocolCol: GRPC},
+					squirrel.NotEq{accessResponseStatusCol: codes.PermissionDenied},
+					squirrel.NotEq{accessResponseStatusCol: codes.Internal},
+					squirrel.NotEq{accessResponseStatusCol: codes.ResourceExhausted},
+				},
+			},
+		}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return 0, caos_errors.ThrowInternal(err, "ACCESS-V9Sde", "Errors.Internal")
+	}
+
+	var count uint64
+	if err = l.dbClient.
+		QueryRowContext(ctx, stmt, args...).
+		Scan(&count); err != nil {
+		return 0, caos_errors.ThrowInternal(err, "ACCESS-pBPrM", "Errors.Access.ScanFailed")
+	}
+
+	return count, nil
+
+	*/
+	return 0, nil
 }
 
 func (l *databaseLogStorage) Cleanup(ctx context.Context, keep time.Duration) error {
-	// TODO: Implement
-	return errors.New("not yet implemented")
+	stmt, args, err := squirrel.Delete(executionLogsTable).
+		Where(squirrel.LtOrEq{executionTimestampCol: time.Now().Add(-keep)}).
+		// TODO: Window by Action ID
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return caos_errors.ThrowInternal(err, "ACCESS-2oTh6", "Errors.Internal")
+	}
+
+	execCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	_, err = l.dbClient.ExecContext(execCtx, stmt, args...)
+	return err
 }

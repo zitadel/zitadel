@@ -3,7 +3,8 @@ package stdout
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/logstore"
 )
@@ -15,7 +16,7 @@ func NewStdoutEmitter() logstore.LogEmitter {
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(bytes))
+			logging.WithFields("record", string(bytes)).Info("log record emitted")
 		}
 		return nil
 	})

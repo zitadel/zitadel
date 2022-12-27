@@ -3,30 +3,25 @@ package execution
 import (
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/zitadel/zitadel/internal/logstore"
 )
 
 var _ logstore.LogRecord = (*Record)(nil)
 
 type Record struct {
-	Timestamp      time.Time
-	InstanceID     string
-	OrganizationID string
-	ActionID       string
-	RunID          string
-	Message        string
-	Level          string
-	FileDescriptor FileDescriptor
+	Timestamp  time.Time
+	Started    time.Time
+	Message    string
+	LogLevel   logrus.Level
+	InstanceID string
+	ProjectID  string
+	ActionID   string
+	Metadata   map[string]interface{}
 }
 
-type FileDescriptor string
-
-const (
-	StdOut FileDescriptor = "stdout"
-	StdErr FileDescriptor = "stderr"
-)
-
 func (e *Record) RedactSecrets() logstore.LogRecord {
-	// TODO implement
+	// TODO implement?
 	return e
 }

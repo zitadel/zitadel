@@ -173,13 +173,13 @@ func (c *Commands) ReportUsage(ctx context.Context, q *query.Quota, used uint64)
 
 	doLimit = q.Limit && int64(used) > q.Amount
 
+	// TODO: Remove from command side
 	dueNotifications, err := query.GetDueInstanceQuotaNotifications(ctx, q, used)
 	if err != nil {
 		return doLimit, err
 	}
 
 	for _, notification := range dueNotifications {
-
 		alreadyNotified, err := isAlreadNotified(ctx, c.eventstore, notification, q.PeriodStart)
 		if err != nil {
 			return doLimit, err
