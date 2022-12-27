@@ -108,7 +108,7 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 		Where(squirrel.And{
 			squirrel.Eq{accessInstanceIdCol: instanceId},
 			squirrel.GtOrEq{accessTimestampCol: start},
-			squirrel.LtOrEq{accessTimestampCol: end},
+			squirrel.Lt{accessTimestampCol: end},
 			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, zitadel_http.Authorization)),
 			squirrel.Or{
 				squirrel.And{

@@ -334,7 +334,7 @@ LogStore:
         MaxBulkSize: 0
   Execution:
     Database:
-      Enabled: true
+      Enabled: false
       Keep: 2160h # 90 days
       CleanupInterval: 4h
       Debounce:
@@ -575,7 +575,7 @@ DefaultInstance:
       - Unit: "requests.all.authenticated"
         # Start Time for the quota periods
         From: "2022-10-24 00:00:00"
-        Interval: 720h # 1 week
+        Interval: 720h # 30 days
         Amount: 25000
         Limit: false
         Notifications:
@@ -589,7 +589,7 @@ DefaultInstance:
       - Unit: "actions.all.runs.seconds"
         # Start Time for the quota periods
         From: "2022-10-24 00:00:00"
-        Interval: 720h # 1 week
+        Interval: 720h # 30 days
         Amount: 3600 # 1 hour
         Limit: false
         Notifications:

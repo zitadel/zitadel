@@ -34,32 +34,30 @@ type logger struct {
 
 // newLogger returns a *logger instance that should only be used for a single action run.
 // The first log call sets the started field for subsequent log calls
-func newLogger(ctx context.Context, actionID string, metadata map[string]interface{}) *logger {
-	instance := authz.GetInstance(ctx)
-
+func newLogger(ctx context.Context, actionID, instanceID, projectID string, metadata map[string]interface{}) *logger {
 	return &logger{
 		ctx:        ctx,
 		started:    time.Time{},
-		instanceID: instance.InstanceID(),
-		projectID:  instance.ProjectID(),
+		instanceID: instanceID,
+		projectID:  projectID,
 		actionID:   actionID,
 		metadata:   metadata,
 	}
 }
 
 func (l *logger) Log(msg string) {
-	l.log(msg, logrus.InfoLevel)
+	l.log(msg, logrus.InfoLevel, false)
 }
 
 func (l *logger) Warn(msg string) {
-	l.log(msg, logrus.WarnLevel)
+	l.log(msg, logrus.WarnLevel, false)
 }
 
 func (l *logger) Error(msg string) {
-	l.log(msg, logrus.ErrorLevel)
+	l.log(msg, logrus.ErrorLevel, false)
 }
 
-func (l *logger) log(msg string, level logrus.Level) {
+func (l *logger) log(msg string, level logrus.Level, last bool) {
 
 	ts := time.Now()
 	if l.started.IsZero() {
@@ -68,7 +66,6 @@ func (l *logger) log(msg string, level logrus.Level) {
 
 	record := &execution.Record{
 		Timestamp:  ts,
-		Started:    l.started,
 		InstanceID: l.instanceID,
 		ProjectID:  l.projectID,
 		ActionID:   l.actionID,
@@ -76,14 +73,22 @@ func (l *logger) log(msg string, level logrus.Level) {
 		LogLevel:   level,
 		Metadata:   l.metadata,
 	}
+
+	if last {
+		record.TookMS = ts.Sub(l.started).Milliseconds()
+	}
+
 	if err := logstoreService.Handle(context.TODO() /* TODO: context */, record); err != nil {
 		logging.WithError(err).WithField("record", record).Errorf("handling execution log failed")
 	}
 }
 
 func WithLogger(ctx context.Context, actionID string, metadata map[string]interface{}) Option {
+	instance := authz.GetInstance(ctx)
+	instanceID := instance.InstanceID()
 	return func(c *runConfig) {
-		c.logger = newLogger(ctx, actionID, metadata)
+		c.logger = newLogger(ctx, actionID, instanceID, instance.ProjectID(), metadata)
+		c.instanceID = instanceID
 		c.modules["zitadel/log"] = func(runtime *goja.Runtime, module *goja.Object) {
 			console.RequireWithPrinter(c.logger)(runtime, module)
 		}

@@ -45,7 +45,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 
 		ctx := request.Context()
 		instance := authz.GetInstance(ctx)
-		limit, err := a.svc.Limit(ctx, instance.InstanceID())
+		limit, _, err := a.svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
 			logging.Warnf("failed to check whether requests should be limited: %s", err.Error())
 			err = nil

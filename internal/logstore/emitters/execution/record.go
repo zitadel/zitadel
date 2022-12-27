@@ -12,7 +12,7 @@ var _ logstore.LogRecord = (*Record)(nil)
 
 type Record struct {
 	Timestamp  time.Time
-	Started    time.Time
+	TookMS     int64
 	Message    string
 	LogLevel   logrus.Level
 	InstanceID string

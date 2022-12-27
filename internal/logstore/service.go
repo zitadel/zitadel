@@ -3,6 +3,7 @@ package logstore
 import (
 	"context"
 	"database/sql"
+	"math"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/query"
@@ -60,20 +61,23 @@ func (s *Service) Handle(ctx context.Context, record LogRecord) error {
 }
 
 // Limit TODO: Cache things in-memory here?
-func (s *Service) Limit(ctx context.Context, instanceID string) (bool, error) {
+func (s *Service) Limit(ctx context.Context, instanceID string) (bool, *uint64, error) {
 	if !s.reportingEnabled || instanceID == "" {
-		return false, nil
+		return false, nil, nil
 	}
 
 	quota, err := query.GetInstanceQuota(ctx, s.dbClient, instanceID, s.usageQuerier.QuotaUnit())
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
 	usage, err := s.usageQuerier.QueryUsage(ctx, instanceID, quota.PeriodStart, quota.PeriodEnd)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
-	return s.report(ctx, quota, usage)
+	remaining := uint64(math.Max(0, float64(quota.Amount)-float64(usage)))
+
+	doLimit, err := s.report(ctx, quota, usage)
+	return doLimit, &remaining, err
 }
