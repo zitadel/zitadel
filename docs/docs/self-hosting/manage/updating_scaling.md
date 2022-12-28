@@ -2,12 +2,23 @@
 title: Updating and Scaling
 ---
 
-This page shows, how you can improve your day-two operations
-by separating the init and setup phases from the ZITADEL start runtime process.
+## TL;DR
+
+For getting started easily, you can just combine the init, setup and runtime phases
+by executing the `zitadel` binary with the argument `start-from-init`.
+However, to improve day-two-operations,
+we recommend you run the init phase and the setup phase
+separately using `zitadel init` and  `zitadel setup` respectively.
+Both the init and the setup phases are idempotent,
+meaning you can run them as many times as you want whithout unexpectedly changing any state.
+Nevertheless, they just __need__ to be run at certain points in time, whereas further runs are obsolete.
+The init phase has to run once over the full ZITADEL lifecycle, before the setup and runtime phases run first.
+The setup phase has to run each time a new ZITADEL version is deployed.
+After init and setup is done, you can start the runtime phase, that immediately accepts traffic, using `zitadel start`.
 
 ## Scaling ZITADEL
 
-For production setups, we recommend that you run  ZITADEL in a highly available mode.
+For production setups, we recommend that you [run ZITADEL in a highly available mode](/docs/self-hosting/manage/production).
 As all shared state is managed in the database,
 the ZITADEL binary itself is stateless.
 You can easily run as many ZITADEL binaries in parallel as you want.
@@ -19,18 +30,19 @@ it is crucial that you minimise startup times.
 
 ## Updating ZITADEL
 
-When updating ZITADEL, the setup job takes care of database migrations.
+When want to deploy a new ZITADEL version,
+the new versions setup phase takes care of database migrations.
 You generally want to run the job in a controlled manner,
 so multiple executions don’t interfere with each other.
 Also, after the setup is done,
 rolling out a new ZITADEL version is much faster
-when the runtime processes are just executed with zitadel start.
+when the runtime processes are just executed with `zitadel start`.
 
 ## Separating Init and Setup from the Runtime
 
 If you use the [official ZITADEL Helm chart](/docs/self-hosting/deploy/kubernetes),
-then you can stop reading now,
-as the init and setup phases are already separated and executed in dedicated Kubernetes Jobs.
+then you can stop reading now.
+The init and setup phases are already separated and executed in dedicated Kubernetes Jobs.
 If you use another orchestrator and want to separate the phases yourself,
 you should know what happens during these phases.
 
@@ -39,12 +51,14 @@ you should know what happens during these phases.
 The command `zitadel init` ensures the database connection is ready to use for the subsequent phases.
 It just needs to be executed once over ZITADELs full life cycle,
 when you install ZITADEL from scratch.
-Using the configured database admin user, `zitadel init` ensures the following:
+During `zitadel init`, for connecting to your database,
+ZITADEL uses the privileged and preexisting database user configured in `Database.<cockroach|postgres>.Admin.Username`.
+, `zitadel init` ensures the following:
 - If it doesn’t exist already, it creates a database with the configured database name.
-- If it doesn’t exist already, it creates a non-privileged user.
+- If it doesn’t exist already, it creates the unprivileged user use configured in `Database.<cockroach|postgres>.User.Username`.
   Subsequent phases connect to the database with this user's credentials only.
+- If not already done, it grants the necessary permissions ZITADEL needs to the non privileged user.
 - If they don’t exist already, it creates all schemas and some basic tables.
-- If not already done, it grants permissions to the non privileged user.
 
 ### The Setup Phase
 
@@ -57,7 +71,7 @@ The setup phase is executed in subsequent steps
 whereas a new version's execution takes over where the last execution stopped.
 Therefore, configuration changes relevant for the setup phase won’t take effect in regard to the setup execution.
 
-### The Start Phase
+### The Runtime Phase
 
 The `zitadel start` command assumes the database is already initialised and set up.
 It starts serving requests within fractions of a second.
