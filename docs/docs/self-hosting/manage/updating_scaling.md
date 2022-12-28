@@ -59,7 +59,7 @@ Therefore, configuration changes relevant for the setup phase won’t take effec
 
 ### The Start Phase
 
-The `zitadel start` command assumes the database is already initialised and set up.
+The `zitadel start` command assumes the database is already initialized and set up.
 It starts serving requests within fractions of a second.
 Beware, in the background, out-of-date projections
 [recompute their state by replaying all missed events](/docs/concepts/eventstore/implementation#projections).
