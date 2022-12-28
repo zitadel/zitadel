@@ -26,7 +26,7 @@ If you use [Knative](/docs/self-hosting/deploy/knative)
 or [Google Cloud Run](https://cloud.google.com/run) (which uses Knative, too),
 you can even scale to zero.
 Especially if you use an autoscaler that scales to zero,
-it is crucial that you minimise startup times.
+it is crucial that you minimize startup times.
 
 ## Updating ZITADEL
 
@@ -73,7 +73,7 @@ Therefore, configuration changes relevant for the setup phase won’t take effec
 
 ### The Runtime Phase
 
-The `zitadel start` command assumes the database is already initialised and set up.
+The `zitadel start` command assumes the database is already initialized and set up.
 It starts serving requests within fractions of a second.
 Beware, in the background, out-of-date projections
 [recompute their state by replaying all missed events](/docs/concepts/eventstore/implementation#projections).
