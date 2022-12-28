@@ -15,7 +15,7 @@ If you use [Knative](/docs/self-hosting/deploy/knative)
 or [Google Cloud Run](https://cloud.google.com/run) (which uses Knative, too),
 you can even scale to zero.
 Especially if you use an autoscaler that scales to zero,
-it is crucial that you minimise startup times.
+it is crucial that you minimize startup times.
 
 ## Updating ZITADEL
 
