@@ -74,6 +74,33 @@ Go to the "Advanced" section, per default login with email address should be all
 
 ![Login Policy Advanced Setting: Disable email for login](/img/guides/scenarios/login_policy_advanced.png)
 
+## Use phone number to login
+
+There are two different possibilities to achieve login with a phone number.
+
+1. Use a phone number as username
+2. Use the phone number field of the user as additional login to the username
+
+![Domain Policy: Organization domain as suffix](/img/guides/scenarios/domain_policy_org_domain_disabled.png)
+
+### Use a phone number as username
+
+To be able to use the phone number as username you have to disable the attribute "User Loginname must contain orgdomain" on your domain settings.
+This means that your users will not be suffixed with the domain of an organization and you can enter the phone number as username.
+All usernames will then be globally unique within your instance.
+
+You can either set this attribute on your whole ZITADEL instance or just on some specific organizations.
+
+### Use the phone number field of the user as additional login to the username
+
+No matter how the username of your user looks like, 
+you can additionally allow login with the phone number attribute of the user.
+
+You can enable this feature in the "Login Behavior and Security" Setting of your instance or organizations.
+Go to the "Advanced" section, per default login with phone number should be allowed. It is possible to disable it.
+
+![Login Policy Advanced Setting: Disable phone for login](/img/guides/scenarios/login_policy_advanced_phone.png)
+
 ## Embedding ZITADEL in an iFrame
 
 To maximise the security during login and in the Console UI, ZITADEL follows security best practices by setting a
