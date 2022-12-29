@@ -13,6 +13,6 @@ Rate limits are implemented according to our [rate limit policy](/legal/rate-lim
 <details>
     <summary>Open to see the reqular expression</summary>
     <pre>
-/system/v[0-9]+/.*|/auth/v[0-9]+/.|/admin/v[0-9]+/.|/management/v[0-9]+/.*|zitadel\.system\.v[0-9]+\.SystemService/.*|zitadel\.admin\.v[0-9]+\.AdminService/.*|zitadel\.auth\.v[0-9]+\.AuthService/.*|zitadel\.management\.v[0-9]+\.ManagementService/.*
+/openapi/.*|/oauth/v[0-9]+/.*|/saml/v[0-9]+/.*|/oidc/v[0-9]+/.*|/assets/v[0-9]+/.*|/system/v[0-9]+/.*|/auth/v[0-9]+/.|/admin/v[0-9]+/.|/management/v[0-9]+/.*|zitadel\.system\.v[0-9]+\.SystemService/.*|zitadel\.admin\.v[0-9]+\.AdminService/.*|zitadel\.auth\.v[0-9]+\.AuthService/.*|zitadel\.management\.v[0-9]+\.ManagementService/.*
     </pre>
 </details>
