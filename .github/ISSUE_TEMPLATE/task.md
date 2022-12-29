@@ -1,7 +1,6 @@
 ---
 name: User Story
-about: A user story describes what a specific persona need and why and which acceptance criteria must
-  be met.
+about: A user story is a brief	description of a feature that has to be implemented from the perspective of the end user.
 title: ''
 assignees: ''
 
