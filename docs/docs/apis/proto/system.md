@@ -88,7 +88,7 @@ This might take some time
 > **rpc** RemoveInstance([RemoveInstanceRequest](#removeinstancerequest))
 [RemoveInstanceResponse](#removeinstanceresponse)
 
-Removes an instances
+Removes an instance
 This might take some time
 
 

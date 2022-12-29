@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress';
-import { credentials } from '@zitadel/node'
 import { readFileSync } from'fs';
+import { Client } from "pg";
+
 const jwt = require('jsonwebtoken');
 
 let tokensCache = new Map<string,string>()
@@ -21,7 +22,7 @@ export default defineConfig({
 
   env: {
     ORGANIZATION: process.env.CYPRESS_ORGANIZATION || 'zitadel',
-    BACKEND_URL: backendUrl()
+    BACKEND_URL: backendUrl(),
   },
 
   e2e: {
@@ -42,17 +43,31 @@ export default defineConfig({
       })
       on('task', {
         systemToken(): Promise<string> {
-          const privateKey = readFileSync(process.env.CYPRESS_SYSTEM_USER_KEY_PATH || `${__dirname}/systemuser/cypress.pem`, 'utf-8')
-          console.log("pk",  privateKey)
+          const privateKey = readFileSync(process.env.CYPRESS_SYSTEM_USER_KEY_PATH || `${__dirname}/systemuser/cypress.pem.base64`, 'utf-8')
           let iat = Math.floor(Date.now() / 1000);
           let exp = iat + (24*60*60)
           return jwt.sign({
             "iss": "cypress",
             "sub": "cypress",
-            "aud": "http://localhost:8080",
+            "aud": backendUrl(),
             "iat": iat,
             "exp": exp
-          }, privateKey, { algorithm: 'RS256' })
+          }, Buffer.from(privateKey, 'base64').toString('ascii'), { algorithm: 'RS256' })
+        }
+      })
+      on('task', {
+        runSQL(statement: string){
+          const client = new Client({
+            connectionString: process.env.CYPRESS_DATABASE_CONNECTION_URL || 'postgresql://root@localhost:26257/zitadel'
+          });
+
+          return client.connect().then(() => {
+            return client.query(statement).then((result) => {
+              return client.end().then(() => {
+                return result
+              })
+            })
+          })
         }
       })
     },

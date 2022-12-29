@@ -7,6 +7,19 @@ FirstInstance:
     Human:
       PasswordChangeRequired: false
 
+LogStore:
+  Access:
+    Database:
+      Enabled: true
+      Debounce:
+        MinFrequency: 0s
+        MaxBulkSize: 0
+  Execution:
+    Database:
+      Enabled: true
+    Stdout:
+      Enabled: false
+
 DefaultInstance:
   LoginPolicy:
     MfaInitSkipLifetime: 0

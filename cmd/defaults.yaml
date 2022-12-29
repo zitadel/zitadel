@@ -583,36 +583,34 @@ DefaultInstance:
       Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
       ButtonText: Login
   Quotas:
-    # TODO: Remove DetailsPath?
-    DetailsPath: "/ui/quotas"
     Items:
-      - Unit: "requests.all.authenticated"
-        # Start Time for the quota periods
-        From: "2022-10-24 00:00:00"
-        Interval: 720h # 30 days
-        Amount: 25000
-        Limit: false
-        Notifications:
-          - Percent: 100
-            Repeat: true
-            CallURL: "https://example.com"
-          - Percent: 95
-            CallURL: "https://example.com"
-          - Percent: 50
-            CallURL: "https://example.com"
-      - Unit: "actions.all.runs.seconds"
-        # Start Time for the quota periods
-        From: "2022-10-24 00:00:00"
-        Interval: 720h # 30 days
-        Amount: 3600 # 1 hour
-        Limit: false
-        Notifications:
-          - Percent: 100
-            CallURL: "https://example.com"
-          - Percent: 95
-            CallURL: "https://example.com"
-          - Percent: 50
-            CallURL: "https://example.com"
+#      - Unit: "requests.all.authenticated"
+#        # Start Time for the quota periods
+#        From: "2022-10-24 00:00:00"
+#        Interval: 720h # 30 days
+#        Amount: 25000
+#        Limit: false
+#        Notifications:
+#          - Percent: 100
+#            Repeat: true
+#            CallURL: "https://example.com"
+#          - Percent: 95
+#            CallURL: "https://example.com"
+#          - Percent: 50
+#            CallURL: "https://example.com"
+#      - Unit: "actions.all.runs.seconds"
+#        # Start Time for the quota periods
+#        From: "2022-10-24 00:00:00"
+#        Interval: 720h # 30 days
+#        Amount: 3600 # 1 hour
+#        Limit: false
+#        Notifications:
+#          - Percent: 100
+#            CallURL: "https://example.com"
+#          - Percent: 95
+#            CallURL: "https://example.com"
+#          - Percent: 50
+#            CallURL: "https://example.com"
 
 InternalAuthZ:
   RolePermissionMappings:
