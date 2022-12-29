@@ -25,7 +25,7 @@ Help shaping the future of ZITADEL:
 [Contribute](#how-to-contribute)
 
 - [Contribute code](#contribute)
-- If you found a mistake on our [docs page](https://docs.zitadel.com) or something is missing please read [the docs section](#contribute-docs)
+- If you found a mistake on our [docs page](https://zitadel.com/docs) or something is missing please read [the docs section](#contribute-docs)
 - [Translate](#contribute-internationalization) and improve texts
 
 Follow [@zitadel](https://twitter.com/zitadel) on twitter
@@ -290,7 +290,7 @@ You may edit the texts in these files or create a new file for additional langua
 ## Want to start ZITADEL?
 
 You can find an installation guide for all the different environments here:
-[https://docs.zitadel.com/docs/guides/deploy/overview](https://docs.zitadel.com/docs/guides/deploy/overview)
+[https://zitadel.com/docs/self-hosting/deploy/overview](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 ## **Did you find a security flaw?**
 

@@ -18,6 +18,7 @@ const (
 	ExternalIDPKeyIDPConfigID    = "idp_config_id"
 	ExternalIDPKeyResourceOwner  = "resource_owner"
 	ExternalIDPKeyInstanceID     = "instance_id"
+	ExternalIDPKeyOwnerRemoved   = "owner_removed"
 )
 
 type ExternalIDPView struct {

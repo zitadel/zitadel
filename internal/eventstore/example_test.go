@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 )
 
 // ------------------------------------------------------------
@@ -287,7 +286,12 @@ func (rm *UserReadModel) Reduce() error {
 // ------------------------------------------------------------
 
 func TestUserReadModel(t *testing.T) {
-	es := eventstore.NewEventstore(sql.NewCRDB(testCRDBClient))
+	es, err := eventstore.Start(&eventstore.Config{Client: testCRDBClient})
+	if err != nil {
+		t.Errorf("unable to start eventstore: %v", err)
+		t.FailNow()
+	}
+	// es := eventstore.NewEventstore(&eventstore.Config{re})
 	es.RegisterFilterEventMapper(UserAddedEventMapper()).
 		RegisterFilterEventMapper(UserFirstNameChangedMapper()).
 		RegisterFilterEventMapper(UserPasswordCheckedMapper()).

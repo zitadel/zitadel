@@ -77,26 +77,33 @@
         {{ if or .TOSLink .PrivacyLink }}
         <div class="lgn-field">
             <label class="lgn-label">{{t "ExternalNotFound.TosAndPrivacyLabel"}}</label>
+            {{ if .TOSLink }}
             <div class="lgn-checkbox">
                 <input type="checkbox" id="terms-confirm"
                        name="terms-confirm" required>
                 <label for="terms-confirm">
                     {{t "ExternalNotFound.TosConfirm"}}
-                    {{ if .TOSLink }}
                     <a class="tos-link" target="_blank" href="{{ .TOSLink }}" rel="noopener noreferrer">
                         {{t "ExternalNotFound.TosLinkText"}}
                     </a>
-                    {{end}}
-                    {{ if and .TOSLink .PrivacyLink }}
-                    {{t "ExternalNotFound.TosConfirmAnd"}}
-                    {{ end }}
-                    {{ if .PrivacyLink }}
+                </label>
+            </div>
+            {{end}}
+            {{ if and .TOSLink .PrivacyLink }}
+            <br />
+            {{end}}
+            {{ if .PrivacyLink }}
+            <div class="lgn-checkbox">
+                <input type="checkbox" id="terms-confirm-privacy"
+                       name="terms-confirm-privacy" required>
+                <label for="terms-confirm-privacy">
+                    {{t "ExternalNotFound.PrivacyConfirm"}}
                     <a class="tos-link" target="_blank" href="{{ .PrivacyLink}}" rel="noopener noreferrer">
                         {{t "ExternalNotFound.PrivacyLinkText"}}
                     </a>
-                    {{end}}
                 </label>
             </div>
+            {{end}}
         </div>
         {{ end }}
     </div>

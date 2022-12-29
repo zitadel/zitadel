@@ -99,7 +99,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 
 	handler := mux.NewRouter()
 
-	handler.Use(security, instanceHandler, accessInterceptor)
+	handler.Use(instanceHandler, security, accessInterceptor)
 	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
 		environmentJSON, err := createEnvironmentJSON(url, issuer(r), authz.GetInstance(r.Context()).ConsoleClientID(), customerPortal)

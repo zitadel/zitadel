@@ -72,7 +72,7 @@ The common update involves the following steps and do not need manual interventi
 - As soon as the new version is ready to accept traffic it will signal this on the readiness endpoint `/debug/ready` 
 - At this point your network infrastructure can send traffic to the new version
 
-Users who use [Kubernetes/Helm](../../guides/deploy/kubernetes) or serverless container services like Google Cloud Run can benefit from the fact the above process is automated.
+Users who use [Kubernetes/Helm](/docs/self-hosting/deploy/kubernetes) or serverless container services like Google Cloud Run can benefit from the fact the above process is automated.
 
 :::info
 As a good practice we recommend creating Database Backups prior to an update.

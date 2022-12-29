@@ -105,7 +105,8 @@ func startZitadel(config *Config, masterKey string) error {
 		return err
 	}
 
-	eventstoreClient, err := eventstore.Start(dbClient)
+	config.Eventstore.Client = dbClient
+	eventstoreClient, err := eventstore.Start(config.Eventstore)
 	if err != nil {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}

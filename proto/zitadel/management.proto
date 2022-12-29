@@ -59,7 +59,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     external_docs: {
         description: "Detailed information about ZITADEL",
-        url: "https://docs.zitadel.com"
+        url: "https://zitadel.com/docs"
     }
 
     extensions: {
@@ -838,6 +838,18 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.write"
+        };
+    }
+
+    // Sets the state of my organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+    // Users of this organisation will not be able login
+    rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.delete"
         };
     }
 
@@ -3675,6 +3687,12 @@ message DeactivateOrgResponse {
 message ReactivateOrgRequest {}
 
 message ReactivateOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveOrgRequest {}
+
+message RemoveOrgResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

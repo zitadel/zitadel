@@ -106,6 +106,19 @@ title: zitadel/settings.proto
 
 
 
+### SecurityPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| enable_iframe_embedding |  bool | states if iframe embedding is enabled or disabled |  |
+| allowed_origins | repeated string | origins allowed to load ZITADEL in an iframe if enable_iframe_embedding is true |  |
+
+
+
+
 ### TwilioConfig
 
 

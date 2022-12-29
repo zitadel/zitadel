@@ -37,15 +37,15 @@ The http server is responsible for the following functions:
 
 The API layer consist of the multiple APIs provided by ZITADEL. Each serves a dedicated purpose.
 All APIs of ZITADEL are always available as gRCP, gRPC-web and REST service. 
-The only exception is the [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoints) and [Asset API](/docs/apis/introduction#assets) due their unique nature.
+The only exception is the [OpenID Connect & OAuth](/apis/openidoauth/endpoints) and [Asset API](/apis/introduction#assets) due their unique nature.
 
-- [OpenID Connect & OAuth](/docs/apis/openidoauth/endpoints) - allows to request authentication and authorization of ZITADEL
-- [SAML](/docs/apis/saml/endpoints) - allows to request authentication and authorization of ZITADEL through the SAML standard
-- [Authentication API](/docs/apis/introduction#authentication) - allow a user to do operation in its own context
-- [Management API](/docs/apis/introduction#management) - allows an admin or machine to manage the ZITADEL resources on an organization level
-- [Administration API](/docs/apis/introduction#administration) - allows an admin or machine to manage the ZITADEL resources on an instance level
-- [System API](/docs/apis/introduction#system) - allows to create and change new ZITADEL instances
-- [Asset API](/docs/apis/introduction#assets) - is used to upload and download static assets
+- [OpenID Connect & OAuth](/apis/openidoauth/endpoints) - allows to request authentication and authorization of ZITADEL
+- [SAML](/apis/saml/endpoints) - allows to request authentication and authorization of ZITADEL through the SAML standard
+- [Authentication API](/apis/introduction#authentication) - allow a user to do operation in its own context
+- [Management API](/apis/introduction#management) - allows an admin or machine to manage the ZITADEL resources on an organization level
+- [Administration API](/apis/introduction#administration) - allows an admin or machine to manage the ZITADEL resources on an instance level
+- [System API](/apis/introduction#system) - allows to create and change new ZITADEL instances
+- [Asset API](/apis/introduction#assets) - is used to upload and download static assets
 
 ### Core Layer
 

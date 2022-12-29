@@ -19,6 +19,7 @@ import {
   OIDC,
   PRIVACYPOLICY,
   SECRETS,
+  SECURITY,
 } from '../../modules/settings-list/settings';
 
 @Component({
@@ -49,6 +50,7 @@ export class InstanceSettingsComponent {
     PRIVACYPOLICY,
     OIDC,
     SECRETS,
+    SECURITY,
   ];
   constructor(breadcrumbService: BreadcrumbService, activatedRoute: ActivatedRoute) {
     const breadcrumbs = [

@@ -15,7 +15,6 @@ import {
   OIDCAuthMethodType,
   OIDCGrantType,
   OIDCResponseType,
-  SAMLConfig,
 } from 'src/app/proto/generated/zitadel/app_pb';
 import {
   AddAPIAppRequest,
@@ -111,8 +110,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
   }[] = [
     { type: OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, checked: true, disabled: false },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT, checked: false, disabled: true },
-    // { type: OIDCGrantType.OIDCGRANTTYPE_REFRESH_TOKEN, checked: false, disabled: true },
-    // TODO show when implemented
+    { type: OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, checked: false, disabled: true },
   ];
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];

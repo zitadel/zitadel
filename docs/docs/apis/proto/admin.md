@@ -332,6 +332,30 @@ Get log notification provider
     GET: /notification/provider/log
 
 
+### GetSecurityPolicy
+
+> **rpc** GetSecurityPolicy([GetSecurityPolicyRequest](#getsecuritypolicyrequest))
+[GetSecurityPolicyResponse](#getsecuritypolicyresponse)
+
+Get the security policy
+
+
+
+    GET: /policies/security
+
+
+### SetSecurityPolicy
+
+> **rpc** SetSecurityPolicy([SetSecurityPolicyRequest](#setsecuritypolicyrequest))
+[SetSecurityPolicyResponse](#setsecuritypolicyresponse)
+
+set the security policy
+
+
+
+    PUT: /policies/security
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -404,6 +428,19 @@ and adds the user to the orgs members as ORG_OWNER
 
 
     POST: /orgs/_setup
+
+
+### RemoveOrg
+
+> **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
+[RemoveOrgResponse](#removeorgresponse)
+
+Sets the state of the organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+Users of this organisation will not be able login
+
+
+
+    DELETE: /orgs/{org_id}
 
 
 ### GetIDPByID
@@ -2739,6 +2776,23 @@ This is an empty request
 
 
 
+### GetSecurityPolicyRequest
+This is an empty request
+
+
+
+
+### GetSecurityPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.settings.v1.SecurityPolicy | - |  |
+
+
+
+
 ### GetSupportedLanguagesRequest
 This is an empty request
 
@@ -3492,6 +3546,28 @@ This is an empty request
 
 
 
+### RemoveOrgRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveOrgResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveSMSProviderRequest
 
 
@@ -4015,6 +4091,29 @@ this is en empty request
 
 
 ### SetDefaultVerifyPhoneMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetSecurityPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| enable_iframe_embedding |  bool | states if iframe embedding is enabled or disabled |  |
+| allowed_origins | repeated string | origins allowed to load ZITADEL in an iframe if enable_iframe_embedding is true |  |
+
+
+
+
+### SetSecurityPolicyResponse
 
 
 

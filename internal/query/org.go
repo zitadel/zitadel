@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -87,7 +88,10 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (*Org, error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.OrgProjection.Trigger(ctx)
 	}
@@ -105,7 +109,10 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	return scan(row)
 }
 
-func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (*Org, error) {
+func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnDomain.identifier():     domain,
@@ -119,7 +126,10 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (*Org, 
 	return scan(row)
 }
 
-func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (*Org, error) {
+func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	stmt, scan := prepareOrgWithDomainsQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgDomainDomainCol.identifier():     domain,
@@ -135,6 +145,9 @@ func (q *Queries) OrgByVerifiedDomain(ctx context.Context, domain string) (*Org,
 }
 
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if name == "" && domain == "" {
 		return false, errors.ThrowInvalidArgument(nil, "QUERY-DGqfd", "Errors.Query.InvalidRequest")
 	}
@@ -162,10 +175,17 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 }
 
 func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	_, err = q.OrgByID(ctx, true, id)
 	return err
 }
+
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	query, scan := prepareOrgsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
@@ -193,6 +213,10 @@ func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, 
 
 func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(OrgColumnName, value, method)
+}
+
+func NewOrgStateSearchQuery(value int32) (SearchQuery, error) {
+	return NewNumberQuery(OrgColumnState, value, NumberEquals)
 }
 
 func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {

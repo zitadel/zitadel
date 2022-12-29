@@ -19,25 +19,25 @@ var (
 		", members.resource_owner" +
 		", members.user_id" +
 		", members.roles" +
-		", projections.login_names.login_name" +
-		", projections.users5_humans.email" +
-		", projections.users5_humans.first_name" +
-		", projections.users5_humans.last_name" +
-		", projections.users5_humans.display_name" +
-		", projections.users5_machines.name" +
-		", projections.users5_humans.avatar_key" +
+		", projections.login_names2.login_name" +
+		", projections.users6_humans.email" +
+		", projections.users6_humans.first_name" +
+		", projections.users6_humans.last_name" +
+		", projections.users6_humans.display_name" +
+		", projections.users6_machines.name" +
+		", projections.users6_humans.avatar_key" +
 		", COUNT(*) OVER () " +
-		"FROM projections.project_members2 AS members " +
-		"LEFT JOIN projections.users5_humans " +
-		"ON members.user_id = projections.users5_humans.user_id " +
-		"AND members.instance_id = projections.users5_humans.instance_id " +
-		"LEFT JOIN projections.users5_machines " +
-		"ON members.user_id = projections.users5_machines.user_id " +
-		"AND members.instance_id = projections.users5_machines.instance_id " +
-		"LEFT JOIN projections.login_names " +
-		"ON members.user_id = projections.login_names.user_id " +
-		"AND members.instance_id = projections.login_names.instance_id " +
-		"WHERE projections.login_names.is_primary = $1")
+		"FROM projections.project_members3 AS members " +
+		"LEFT JOIN projections.users6_humans " +
+		"ON members.user_id = projections.users6_humans.user_id " +
+		"AND members.instance_id = projections.users6_humans.instance_id " +
+		"LEFT JOIN projections.users6_machines " +
+		"ON members.user_id = projections.users6_machines.user_id " +
+		"AND members.instance_id = projections.users6_machines.instance_id " +
+		"LEFT JOIN projections.login_names2 " +
+		"ON members.user_id = projections.login_names2.user_id " +
+		"AND members.instance_id = projections.login_names2.instance_id " +
+		"WHERE projections.login_names2.is_primary = $1")
 	projectMembersColumns = []string{
 		"creation_date",
 		"change_date",

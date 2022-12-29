@@ -29,20 +29,20 @@ func Test_CertificatePrepares(t *testing.T) {
 			prepare: prepareCertificateQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.keys3.id,`+
-						` projections.keys3.creation_date,`+
-						` projections.keys3.change_date,`+
-						` projections.keys3.sequence,`+
-						` projections.keys3.resource_owner,`+
-						` projections.keys3.algorithm,`+
-						` projections.keys3.use,`+
-						` projections.keys3_certificate.expiry,`+
-						` projections.keys3_certificate.certificate,`+
-						` projections.keys3_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys4.id,`+
+						` projections.keys4.creation_date,`+
+						` projections.keys4.change_date,`+
+						` projections.keys4.sequence,`+
+						` projections.keys4.resource_owner,`+
+						` projections.keys4.algorithm,`+
+						` projections.keys4.use,`+
+						` projections.keys4_certificate.expiry,`+
+						` projections.keys4_certificate.certificate,`+
+						` projections.keys4_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys3`+
-						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id AND projections.keys3.instance_id = projections.keys3_certificate.instance_id`+
-						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id AND projections.keys3.instance_id = projections.keys3_private.instance_id`),
+						` FROM projections.keys4`+
+						` LEFT JOIN projections.keys4_certificate ON projections.keys4.id = projections.keys4_certificate.id AND projections.keys4.instance_id = projections.keys4_certificate.instance_id`+
+						` LEFT JOIN projections.keys4_private ON projections.keys4.id = projections.keys4_private.id AND projections.keys4.instance_id = projections.keys4_private.instance_id`),
 					nil,
 					nil,
 				),
@@ -60,20 +60,20 @@ func Test_CertificatePrepares(t *testing.T) {
 			prepare: prepareCertificateQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.keys3.id,`+
-						` projections.keys3.creation_date,`+
-						` projections.keys3.change_date,`+
-						` projections.keys3.sequence,`+
-						` projections.keys3.resource_owner,`+
-						` projections.keys3.algorithm,`+
-						` projections.keys3.use,`+
-						` projections.keys3_certificate.expiry,`+
-						` projections.keys3_certificate.certificate,`+
-						` projections.keys3_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys4.id,`+
+						` projections.keys4.creation_date,`+
+						` projections.keys4.change_date,`+
+						` projections.keys4.sequence,`+
+						` projections.keys4.resource_owner,`+
+						` projections.keys4.algorithm,`+
+						` projections.keys4.use,`+
+						` projections.keys4_certificate.expiry,`+
+						` projections.keys4_certificate.certificate,`+
+						` projections.keys4_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys3`+
-						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id AND projections.keys3.instance_id = projections.keys3_certificate.instance_id`+
-						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id AND projections.keys3.instance_id = projections.keys3_private.instance_id`),
+						` FROM projections.keys4`+
+						` LEFT JOIN projections.keys4_certificate ON projections.keys4.id = projections.keys4_certificate.id AND projections.keys4.instance_id = projections.keys4_certificate.instance_id`+
+						` LEFT JOIN projections.keys4_private ON projections.keys4.id = projections.keys4_private.id AND projections.keys4.instance_id = projections.keys4_private.instance_id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -135,20 +135,20 @@ func Test_CertificatePrepares(t *testing.T) {
 			prepare: prepareCertificateQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.keys3.id,`+
-						` projections.keys3.creation_date,`+
-						` projections.keys3.change_date,`+
-						` projections.keys3.sequence,`+
-						` projections.keys3.resource_owner,`+
-						` projections.keys3.algorithm,`+
-						` projections.keys3.use,`+
-						` projections.keys3_certificate.expiry,`+
-						` projections.keys3_certificate.certificate,`+
-						` projections.keys3_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys4.id,`+
+						` projections.keys4.creation_date,`+
+						` projections.keys4.change_date,`+
+						` projections.keys4.sequence,`+
+						` projections.keys4.resource_owner,`+
+						` projections.keys4.algorithm,`+
+						` projections.keys4.use,`+
+						` projections.keys4_certificate.expiry,`+
+						` projections.keys4_certificate.certificate,`+
+						` projections.keys4_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.keys3`+
-						` LEFT JOIN projections.keys3_certificate ON projections.keys3.id = projections.keys3_certificate.id AND projections.keys3.instance_id = projections.keys3_certificate.instance_id`+
-						` LEFT JOIN projections.keys3_private ON projections.keys3.id = projections.keys3_private.id AND projections.keys3.instance_id = projections.keys3_private.instance_id`),
+						` FROM projections.keys4`+
+						` LEFT JOIN projections.keys4_certificate ON projections.keys4.id = projections.keys4_certificate.id AND projections.keys4.instance_id = projections.keys4_certificate.instance_id`+
+						` LEFT JOIN projections.keys4_private ON projections.keys4.id = projections.keys4_private.id AND projections.keys4.instance_id = projections.keys4_private.instance_id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
