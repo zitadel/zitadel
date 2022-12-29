@@ -200,6 +200,10 @@ import {
   UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
+  GetSecurityPolicyRequest,
+  GetSecurityPolicyResponse,
+  SetSecurityPolicyRequest,
+  SetSecurityPolicyResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -478,6 +482,17 @@ export class AdminService {
     req.setLanguage(language);
 
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  /* security policy */
+
+  public getSecurityPolicy(): Promise<GetSecurityPolicyResponse.AsObject> {
+    const req = new GetSecurityPolicyRequest();
+    return this.grpcService.admin.getSecurityPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public setSecurityPolicy(req: SetSecurityPolicyRequest): Promise<SetSecurityPolicyResponse.AsObject> {
+    return this.grpcService.admin.setSecurityPolicy(req, null).then((resp) => resp.toObject());
   }
 
   /* notification settings */

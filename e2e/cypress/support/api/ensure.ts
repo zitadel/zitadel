@@ -56,7 +56,6 @@ export function ensureSetting(
     'PUT',
     body,
     (entity) => !!entity,
-    (body) => body?.settings?.id,
   );
 }
 
@@ -66,14 +65,15 @@ function awaitDesired(
   search: () => Cypress.Chainable<SearchResult>,
   initialSequence?: number,
 ) {
-  search().then((resp) => {
+  return search().then((resp) => {
     const foundExpectedEntity = expectEntity(resp.entity);
     const foundExpectedSequence = !initialSequence || resp.sequence >= initialSequence;
 
-    if (!foundExpectedEntity || !foundExpectedSequence) {
+    const check = !foundExpectedEntity || !foundExpectedSequence;
+    if (check) {
       expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
       cy.wait(1000);
-      awaitDesired(trials - 1, expectEntity, search, initialSequence);
+      return awaitDesired(trials - 1, expectEntity, search, initialSequence);
     }
   });
 }
@@ -117,7 +117,8 @@ export function ensureSomething(
         });
     })
     .then((data) => {
-      awaitDesired(90, expectEntity, search, data.sequence);
-      return cy.wrap<number>(data.id);
+      return awaitDesired(90, expectEntity, search, data.sequence).then(() => {
+        return cy.wrap<number>(data.id);
+      });
     });
 }

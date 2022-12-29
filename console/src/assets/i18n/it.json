@@ -757,7 +757,8 @@
       "ROLEREMOVED": "Ruolo rimosso.",
       "ROLECHANGED": "Ruolo cambiato.",
       "REACTIVATED": "Riattivato",
-      "DEACTIVATED": "Disattivato"
+      "DEACTIVATED": "Disattivato",
+      "DELETED": "Organizzazione cancellata con successo"
     }
   },
   "ORG": {
@@ -779,6 +780,7 @@
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
+      "DELETE": "Elimina organizzazione",
       "RENAME": {
         "ACTION": "Rinomina",
         "TITLE": "Rinomina organizzazione",
@@ -829,7 +831,8 @@
     "STATE": {
       "0": "Non definito",
       "1": "Attivo",
-      "2": "Disattivato"
+      "2": "Disattivato",
+      "3": "Rimosso"
     },
     "MEMBER": {
       "TITLE": "Manager dell'organizzazione",
@@ -844,7 +847,9 @@
       "MEMBERADDED": "Manager aggiunto con successo",
       "MEMBERREMOVED": "Manager rimosso con successo",
       "MEMBERCHANGED": "Manager cambiato con successo",
-      "SETPRIMARY": "Dominio primario cambiato con successo"
+      "SETPRIMARY": "Dominio primario cambiato con successo",
+      "DELETED": "Organizzazione eliminata con successo",
+      "ORG_WAS_DELETED": "Organizzazione è stata eliminata"
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -854,6 +859,13 @@
       "REACTIVATE": {
         "TITLE": "Riattivare l'organizzazione",
         "DESCRIPTION": "Stai per riattivare la tua organizzazione. Utenti dell' organizzazione possono accedere nuovamente dopo l'attivazione. Vuoi procedere?"
+      },
+      "DELETE": {
+        "TITLE": "Elimina organizzazione",
+        "DESCRIPTION": "Si sta per eliminare l'organizzazione. In questo modo si avvia un processo di eliminazione di tutti i dati relativi all'organizzazione. Per il momento non è possibile annullare questa azione.",
+        "TYPENAME": "Inserisci '{{value}}' nel campo, per cancellare l'organizzazione.",
+        "ORGNAME": "Nome",
+        "BTN": "Elimina"
       }
     }
   },
@@ -880,7 +892,8 @@
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
       "OIDC": "OIDC Token lifetime e scadenza",
-      "SECRETS": "Aspetto dei segreti"
+      "SECRETS": "Aspetto dei segreti",
+      "SECURITY": "Impostazioni di sicurezza"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
@@ -968,6 +981,11 @@
       "INCLUDEUPPERLETTERS": "Contiene lettere maiuscole",
       "LENGTH": "Lunghezza",
       "UPDATED": "Impostazioni aggiornati"
+    },
+    "SECURITY": {
+      "DESCRIPTION": "Questa impostazione consente al CSP di consentire il framing da un insieme di domini consentiti. Si noti che abilitando l'uso di iFrames, si corre il rischio di consentire il clickjacking.",
+      "IFRAMEENABLED": "I Frame enabled",
+      "ALLOWEDORIGINS": "URL consentiti"
     },
     "DIALOG": {
       "RESET": {
@@ -1166,6 +1184,7 @@
       "EXPIREWARNDAYS": "Avviso scadenza dopo il giorno",
       "MAXAGEDAYS": "Lunghezza massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se abiliti questa impostazione, a tutti i nomi di accesso verrà aggiunto il suffisso del dominio dell'organizzazione. Se questa impostazione è disabilitata, devi assicurarti che i nomi utente siano univoci per tutte le organizzazioni.",
       "VALIDATEORGDOMAINS": "Verifica domini dell' organizzazione",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
@@ -1681,6 +1700,7 @@
     "TITLEFIRST": "Nome dell' applicazione",
     "TYPETITLE": "Che tipo di applicazione vuoi creare?",
     "OIDC": {
+      "WELLKNOWN": "Per ulteriori informazioni, consultare il sito <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
       "INFO": {
         "ISSUER": "Issuer",
         "CLIENTID": "Client ID"

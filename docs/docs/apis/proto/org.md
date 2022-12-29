@@ -95,6 +95,18 @@ title: zitadel/org.proto
 | ----- | ---- | ----------- | ----------- |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.name_query |  OrgNameQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.domain_query |  OrgDomainQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.state_query |  OrgStateQuery | - |  |
+
+
+
+
+### OrgStateQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| state |  OrgState | - | enum.defined_only: true<br />  |
 
 
 
@@ -135,6 +147,7 @@ title: zitadel/org.proto
 | ORG_STATE_UNSPECIFIED | 0 | - |
 | ORG_STATE_ACTIVE | 1 | - |
 | ORG_STATE_INACTIVE | 2 | - |
+| ORG_STATE_REMOVED | 3 | - |
 
 
 

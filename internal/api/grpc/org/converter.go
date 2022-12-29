@@ -25,6 +25,8 @@ func OrgQueryToModel(apiQuery *org_pb.OrgQuery) (query.SearchQuery, error) {
 		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
 	case *org_pb.OrgQuery_NameQuery:
 		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
+	case *org_pb.OrgQuery_StateQuery:
+		return query.NewOrgStateSearchQuery(int32(q.StateQuery.State))
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
@@ -99,6 +101,8 @@ func OrgStateToPb(state domain.OrgState) org_pb.OrgState {
 		return org_pb.OrgState_ORG_STATE_ACTIVE
 	case domain.OrgStateInactive:
 		return org_pb.OrgState_ORG_STATE_INACTIVE
+	case domain.OrgStateRemoved:
+		return org_pb.OrgState_ORG_STATE_REMOVED
 	default:
 		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
 	}

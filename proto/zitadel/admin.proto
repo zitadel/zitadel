@@ -58,7 +58,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     external_docs: {
         description: "Detailed information about ZITADEL",
-        url: "https://docs.zitadel.com"
+        url: "https://zitadel.com/docs"
     }
 
     security_definitions: {
@@ -448,6 +448,29 @@ service AdminService {
         };
     }
 
+    // Get the security policy
+    rpc GetSecurityPolicy(GetSecurityPolicyRequest) returns (GetSecurityPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/security";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    // set the security policy
+    rpc SetSecurityPolicy(SetSecurityPolicyRequest) returns (SetSecurityPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/security";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
@@ -461,10 +484,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "orgs";
             tags: "global";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Organizations";
-                description: "detailed information about organizations";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -487,10 +506,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "orgs";
             tags: "global";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Organizations";
-                description: "detailed information about organizations";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -543,10 +558,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "orgs";
             tags: "global";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Organizations";
-                description: "detailed information about organizations";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -582,10 +593,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "orgs";
             tags: "global";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Organizations";
-                description: "detailed information about organizations";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -606,6 +613,41 @@ service AdminService {
         };
     }
 
+
+    // Sets the state of the organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+    // Users of this organisation will not be able login
+    rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{org_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "orgs";
+            tags: "global";
+            responses: {
+                key: "200";
+                value: {
+                    description: "org removed successfully";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid org";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+
     // Returns a identity provider configuration of the IAM instance
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
@@ -618,10 +660,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -655,10 +693,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -694,10 +728,6 @@ service AdminService {
             tags: "identity provider";
             tags: "oidc";
 
-            external_docs: {
-                url: "https://docs.zitadel.com/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
-                description: "detailed descriptions about oidc configuration";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -767,10 +797,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -804,10 +830,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -841,10 +863,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -877,10 +895,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#What_are_Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -916,10 +930,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
             tags: "oidc";
-            external_docs: {
-                url: "https://docs.zitadel.com/concepts#OpenID_Connect_1_0_and_OAuth_2_0";
-                description: "detailed descriptions about oidc configuration";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1011,10 +1021,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1040,10 +1046,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1067,10 +1069,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1095,10 +1093,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1123,10 +1117,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1151,10 +1141,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "orgiam";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the orgiam";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1177,10 +1163,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1205,10 +1187,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1231,10 +1209,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1258,10 +1232,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1285,10 +1255,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domain policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domain policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1312,10 +1278,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "domainpolicy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#IAM_Access_Preference";
-                description: "detailed information about the domainpolicy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1473,10 +1435,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "login policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Login_Options";
-                description: "detailed information about the login policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1501,10 +1459,6 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "login policy";
             tags: "policy";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Login_Options";
-                description: "detailed information about the login policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1530,10 +1484,6 @@ service AdminService {
             tags: "login policy";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1559,10 +1509,6 @@ service AdminService {
             tags: "login policy";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1587,10 +1533,6 @@ service AdminService {
             tags: "login policy";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1614,10 +1556,6 @@ service AdminService {
             tags: "second factor";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1643,10 +1581,6 @@ service AdminService {
             tags: "second factor";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1682,10 +1616,6 @@ service AdminService {
             tags: "second factor";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1720,10 +1650,6 @@ service AdminService {
             tags: "multi factor";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1749,10 +1675,6 @@ service AdminService {
             tags: "multi factor";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1788,10 +1710,6 @@ service AdminService {
             tags: "multi factor";
             tags: "policy";
             tags: "identity provider";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Identity_Providers";
-                description: "detailed information about identity providers";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1826,10 +1744,6 @@ service AdminService {
             tags: "policy";
             tags: "password policy";
             tags: "password complexity";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Password_complexity";
-                description: "detailed information about the password complexity policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -1855,10 +1769,6 @@ service AdminService {
             tags: "policy";
             tags: "password policy";
             tags: "password complexity";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#Password_complexity";
-                description: "detailed information about the password complexity policy";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2390,10 +2300,6 @@ service AdminService {
             tags: "iam";
             tags: "member";
             tags: "roles";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
-                description: "detailed information about the IAM member roles";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2419,10 +2325,6 @@ service AdminService {
             tags: "iam";
             tags: "member";
             tags: "iam member";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
-                description: "detailed information about the IAM member roles";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2448,10 +2350,6 @@ service AdminService {
             tags: "iam";
             tags: "member";
             tags: "iam member";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
-                description: "detailed information about the IAM member roles";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2488,10 +2386,6 @@ service AdminService {
             tags: "iam";
             tags: "member";
             tags: "iam member";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
-                description: "detailed information about the IAM member roles";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2526,10 +2420,6 @@ service AdminService {
             tags: "iam";
             tags: "member";
             tags: "iam member";
-            external_docs: {
-                url: "https://docs.zitadel.com/administrate#ZITADEL_s_management_roles";
-                description: "detailed information about the IAM member roles";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2564,10 +2454,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "views";
-            external_docs: {
-                url: "https://docs.zitadel.com/concepts#Software_Architecture";
-                description: "details of ZITADEL's event driven software concepts";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2591,10 +2477,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
-            external_docs: {
-                url: "https://docs.zitadel.com/concepts#Software_Architecture";
-                description: "details of ZITADEL's event driven software concepts";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2620,10 +2502,6 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "failed events";
-            external_docs: {
-                url: "https://docs.zitadel.com/concepts#Software_Architecture";
-                description: "details of ZITADEL's event driven software concepts";
-            };
             responses: {
                 key: "200";
                 value: {
@@ -2929,6 +2807,24 @@ message UpdateOIDCSettingsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+// This is an empty request
+message GetSecurityPolicyRequest{}
+
+message GetSecurityPolicyResponse{
+    zitadel.settings.v1.SecurityPolicy policy = 1;
+}
+
+message SetSecurityPolicyRequest{
+    // states if iframe embedding is enabled or disabled
+   bool enable_iframe_embedding = 1;
+   // origins allowed to load ZITADEL in an iframe if enable_iframe_embedding is true
+   repeated string allowed_origins = 2;
+}
+
+message SetSecurityPolicyResponse{
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 // if name or domain is already in use, org is not unique
 // at least one argument has to be provided
 message IsOrgUniqueRequest {
@@ -3156,6 +3052,28 @@ message SetUpOrgResponse {
     string org_id = 2;
     string user_id = 3;
 }
+
+message RemoveOrgRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message RemoveOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 
 message GetIDPByIDRequest {
     string id = 1 [

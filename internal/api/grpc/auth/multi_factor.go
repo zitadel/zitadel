@@ -26,7 +26,7 @@ func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFac
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
 	if err != nil {
 		return nil, err
 	}

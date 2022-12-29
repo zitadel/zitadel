@@ -195,6 +195,7 @@ RegisterOption:
   Description: Choisissez comment vous souhaitez vous enregistrer
   RegisterUsernamePasswordButtonText: Avec nom d'utilisateur et mot de passe
   ExternalLoginDescription: ou s'enregistrer avec un utilisateur externe
+  LoginButtonText: connexion
 
 RegistrationUser:
   Title: Inscription
@@ -219,10 +220,10 @@ RegistrationUser:
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
-  TosConfirmAnd: et la
+  PrivacyConfirm: J'accepte les
   PrivacyLinkText: politique de confidentialité
   ExternalLogin: ou m'inscrire avec un utilisateur externe
-  BackButtonText: retour
+  BackButtonText: connexion
   NextButtonText: suivant
 
 ExternalRegistrationUserOverview:
@@ -243,7 +244,7 @@ ExternalRegistrationUserOverview:
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
-  TosConfirmAnd: et la
+  PrivacyConfirm: J'accepte les
   PrivacyLinkText: politique de confidentialité
   ExternalLogin: ou m'inscrire avec un utilisateur externe
   BackButtonText: retour
@@ -262,7 +263,7 @@ RegistrationOrg:
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
-  TosConfirmAnd: et la
+  PrivacyConfirm: J'accepte les
   PrivacyLinkText: politique de confidentialité
   SaveButtonText: Créer une organisation
 
@@ -291,7 +292,7 @@ ExternalNotFound:
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
-  TosConfirmAnd: et la
+  PrivacyConfirm: J'accepte les
   PrivacyLinkText: politique de confidentialité
   German: Deutsch
   English: English

@@ -28,17 +28,17 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 			prepare: prepareDomainPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.domain_policies.id,`+
-						` projections.domain_policies.sequence,`+
-						` projections.domain_policies.creation_date,`+
-						` projections.domain_policies.change_date,`+
-						` projections.domain_policies.resource_owner,`+
-						` projections.domain_policies.user_login_must_be_domain,`+
-						` projections.domain_policies.validate_org_domains,`+
-						` projections.domain_policies.smtp_sender_address_matches_instance_domain,`+
-						` projections.domain_policies.is_default,`+
-						` projections.domain_policies.state`+
-						` FROM projections.domain_policies`),
+					regexp.QuoteMeta(`SELECT projections.domain_policies2.id,`+
+						` projections.domain_policies2.sequence,`+
+						` projections.domain_policies2.creation_date,`+
+						` projections.domain_policies2.change_date,`+
+						` projections.domain_policies2.resource_owner,`+
+						` projections.domain_policies2.user_login_must_be_domain,`+
+						` projections.domain_policies2.validate_org_domains,`+
+						` projections.domain_policies2.smtp_sender_address_matches_instance_domain,`+
+						` projections.domain_policies2.is_default,`+
+						` projections.domain_policies2.state`+
+						` FROM projections.domain_policies2`),
 					nil,
 					nil,
 				),
@@ -56,17 +56,17 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 			prepare: prepareDomainPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.domain_policies.id,`+
-						` projections.domain_policies.sequence,`+
-						` projections.domain_policies.creation_date,`+
-						` projections.domain_policies.change_date,`+
-						` projections.domain_policies.resource_owner,`+
-						` projections.domain_policies.user_login_must_be_domain,`+
-						` projections.domain_policies.validate_org_domains,`+
-						` projections.domain_policies.smtp_sender_address_matches_instance_domain,`+
-						` projections.domain_policies.is_default,`+
-						` projections.domain_policies.state`+
-						` FROM projections.domain_policies`),
+					regexp.QuoteMeta(`SELECT projections.domain_policies2.id,`+
+						` projections.domain_policies2.sequence,`+
+						` projections.domain_policies2.creation_date,`+
+						` projections.domain_policies2.change_date,`+
+						` projections.domain_policies2.resource_owner,`+
+						` projections.domain_policies2.user_login_must_be_domain,`+
+						` projections.domain_policies2.validate_org_domains,`+
+						` projections.domain_policies2.smtp_sender_address_matches_instance_domain,`+
+						` projections.domain_policies2.is_default,`+
+						` projections.domain_policies2.state`+
+						` FROM projections.domain_policies2`),
 					[]string{
 						"id",
 						"sequence",
@@ -111,17 +111,17 @@ func Test_DomainPolicyPrepares(t *testing.T) {
 			prepare: prepareDomainPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.domain_policies.id,`+
-						` projections.domain_policies.sequence,`+
-						` projections.domain_policies.creation_date,`+
-						` projections.domain_policies.change_date,`+
-						` projections.domain_policies.resource_owner,`+
-						` projections.domain_policies.user_login_must_be_domain,`+
-						` projections.domain_policies.validate_org_domains,`+
-						` projections.domain_policies.smtp_sender_address_matches_instance_domain,`+
-						` projections.domain_policies.is_default,`+
-						` projections.domain_policies.state`+
-						` FROM projections.domain_policies`),
+					regexp.QuoteMeta(`SELECT projections.domain_policies2.id,`+
+						` projections.domain_policies2.sequence,`+
+						` projections.domain_policies2.creation_date,`+
+						` projections.domain_policies2.change_date,`+
+						` projections.domain_policies2.resource_owner,`+
+						` projections.domain_policies2.user_login_must_be_domain,`+
+						` projections.domain_policies2.validate_org_domains,`+
+						` projections.domain_policies2.smtp_sender_address_matches_instance_domain,`+
+						` projections.domain_policies2.is_default,`+
+						` projections.domain_policies2.state`+
+						` FROM projections.domain_policies2`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

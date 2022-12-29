@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) GetIDPByID(ctx context.Context, req *admin_pb.GetIDPByIDRequest) (*admin_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.IDPByIDAndResourceOwner(ctx, true, req.Id, authz.GetInstance(ctx).InstanceID())
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, true, req.Id, authz.GetInstance(ctx).InstanceID(), false)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.IDPs(ctx, queries)
+	resp, err := s.query.IDPs(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 	}
 	idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{
 		Queries: []query.SearchQuery{providerQuery},
-	})
+	}, true)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 	}
 	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{idpQuery},
-	})
+	}, true)
 	if err != nil {
 		return nil, err
 	}

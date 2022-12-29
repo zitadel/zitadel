@@ -28,6 +28,10 @@
     <button data-e2e="rename" mat-menu-item (click)="renameOrg()">
       {{ 'ORG.PAGES.RENAME.ACTION' | translate }}
     </button>
+
+    <button data-e2e="delete" mat-menu-item (click)="deleteOrg()">
+      {{ 'ORG.PAGES.DELETE' | translate }}
+    </button>
   </ng-container>
   <cnsl-contributors
     topContributors

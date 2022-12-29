@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	stylingTable = "adminapi.styling"
+	stylingTable = "adminapi.styling2"
 )
 
 type Styling struct {
@@ -156,6 +156,8 @@ func (m *Styling) processLabelPolicy(event *models.Event) (err error) {
 			return err
 		}
 		return m.view.DeleteInstanceStyling(event)
+	case org.OrgRemovedEventType:
+		return m.view.UpdateOrgOwnerRemovedStyling(event)
 	default:
 		return m.view.ProcessedStylingSequence(event)
 	}

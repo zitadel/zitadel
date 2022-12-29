@@ -1,0 +1,57 @@
+---
+title: Docker Compose
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import DockerComposeSource from '!!raw-loader!./docker-compose.yaml'
+import DockerComposeSaSource from '!!raw-loader!./docker-compose-sa.yaml'
+import Disclaimer from './_disclaimer.mdx'
+import DefaultUser from './_defaultuser.mdx'
+import Next from './_next.mdx'
+
+The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
+
+## Docker compose
+
+By executing the commands below, you will download the following file:
+
+<details><summary>docker-compose.yaml</summary>
+    <CodeBlock language="yaml">{DockerComposeSource}</CodeBlock>
+</details>
+
+```bash
+# Download the docker compose example configuration.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose.yaml
+
+# Run the database and application containers.
+docker compose up --detach
+```
+
+<DefaultUser components={props.components} />
+
+## VideoGuide
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/-02FaoN9Fko" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Docker compose with service account
+
+By executing the commands below, you will download the following file:
+
+<details><summary>docker-compose-sa.yaml</summary>
+    <CodeBlock language="yaml">{DockerComposeSaSource}</CodeBlock>
+</details>
+
+```bash
+# Download the docker compose example configuration.
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose-sa.yaml -O docker-compose.yaml
+
+# Run the database and application containers.
+docker compose up --detach
+
+# then you can move your machine key
+mv ./machinekey/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
+```
+
+This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform/basics.md).
+
+<Next components={props.components} />
+<Disclaimer components={props.components} />
