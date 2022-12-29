@@ -2,8 +2,11 @@ package logstore
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
+
+	"github.com/thejerf/abtime"
 
 	"github.com/zitadel/logging"
 )
@@ -21,14 +24,14 @@ func (s bulkSinkFunc) sendBulk(ctx context.Context, items []LogRecord) error {
 }
 
 type debouncer struct {
-	ctx               context.Context
-	mux               sync.Mutex
-	cfg               *DebouncerConfig
-	storage           bulkSink
-	cache             []LogRecord
-	cacheLen          uint
-	shipSynchronously bool
-	ticker            *time.Ticker
+	ctx      context.Context
+	clock    abtime.AbstractTime
+	ticker   abtime.Ticker
+	mux      sync.Mutex
+	cfg      DebouncerConfig
+	storage  bulkSink
+	cache    []LogRecord
+	cacheLen uint
 }
 
 type DebouncerConfig struct {
@@ -36,16 +39,17 @@ type DebouncerConfig struct {
 	MaxBulkSize  uint
 }
 
-func newDebouncer(ctx context.Context, cfg *DebouncerConfig, ship bulkSink) *debouncer {
+func newDebouncer(ctx context.Context, cfg DebouncerConfig, clock abtime.AbstractTime, manualTickerMinFrequencyId int, ship bulkSink) *debouncer {
 	a := &debouncer{
 		ctx:     ctx,
+		clock:   clock,
 		cfg:     cfg,
 		storage: ship,
 	}
 
 	if cfg.MinFrequency > 0 {
-		a.ticker = time.NewTicker(cfg.MinFrequency)
-		go a.shipWhenTimerFires()
+		a.ticker = clock.NewTicker(cfg.MinFrequency, manualTickerMinFrequencyId)
+		go a.shipOnTicks()
 	}
 	return a
 }
@@ -55,7 +59,7 @@ func (d *debouncer) add(item LogRecord) {
 	defer d.mux.Unlock()
 	d.cache = append(d.cache, item)
 	d.cacheLen++
-	if d.cacheLen >= d.cfg.MaxBulkSize {
+	if d.cfg.MaxBulkSize > 0 && d.cacheLen >= d.cfg.MaxBulkSize {
 		// Add should not block and release the lock
 		go d.ship()
 	}
@@ -77,8 +81,9 @@ func (d *debouncer) ship() {
 	}
 }
 
-func (d *debouncer) shipWhenTimerFires() {
-	for range d.ticker.C {
+func (d *debouncer) shipOnTicks() {
+	for t := range d.ticker.Channel() {
+		fmt.Println(t)
 		d.ship()
 	}
 }

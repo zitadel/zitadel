@@ -36,7 +36,7 @@ const (
 	redacted = "[REDACTED]"
 )
 
-func (a *Record) RedactSecrets() logstore.LogRecord {
+func (a *Record) Redact() logstore.LogRecord {
 	clone := &(*a)
 	redactHeaders(clone.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "cookie")
 	redactHeaders(clone.ResponseHeaders, "set-cookie")

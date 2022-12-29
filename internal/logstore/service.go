@@ -53,7 +53,7 @@ func (s *Service) Enabled() bool {
 
 func (s *Service) Handle(ctx context.Context, record LogRecord) error {
 	for _, sink := range s.enabledSinks {
-		if err := sink.Emit(ctx, record.RedactSecrets()); err != nil {
+		if err := sink.Emit(ctx, record.Redact()); err != nil {
 			return err
 		}
 	}

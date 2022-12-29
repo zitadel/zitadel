@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/thejerf/abtime"
+
 	"github.com/zitadel/logging"
 )
 
@@ -13,6 +15,8 @@ type EmitterConfig struct {
 	Keep            time.Duration
 	CleanupInterval time.Duration
 	Debounce        *DebouncerConfig
+	Z_ManualTickerMinFrequencyID,
+	Z_ManualTickerCleanupID int
 }
 
 type emitter struct {
@@ -20,10 +24,17 @@ type emitter struct {
 	ctx       context.Context
 	debouncer *debouncer
 	emitter   LogEmitter
+	clock     abtime.AbstractTime
 }
 
 type LogRecord interface {
-	RedactSecrets() LogRecord
+	Redact() LogRecord
+}
+
+type LogRecordFunc func() LogRecord
+
+func (r LogRecordFunc) Redact() LogRecord {
+	return r()
 }
 
 type LogEmitter interface {
@@ -41,12 +52,13 @@ type LogCleanupper interface {
 	Cleanup(ctx context.Context, keep time.Duration) error
 }
 
-func NewEmitter(ctx context.Context, cfg *EmitterConfig, logger LogEmitter) (*emitter, error) {
+func NewEmitter(ctx context.Context, clock abtime.AbstractTime, cfg *EmitterConfig, logger LogEmitter) (*emitter, error) {
 
 	svc := &emitter{
 		enabled: cfg != nil && cfg.Enabled,
 		ctx:     ctx,
 		emitter: logger,
+		clock:   clock,
 	}
 
 	if !svc.enabled {
@@ -54,7 +66,7 @@ func NewEmitter(ctx context.Context, cfg *EmitterConfig, logger LogEmitter) (*em
 	}
 
 	if cfg.Debounce != nil && (cfg.Debounce.MinFrequency > 0 || cfg.Debounce.MaxBulkSize > 0) {
-		svc.debouncer = newDebouncer(ctx, cfg.Debounce, newStorageBulkSink(svc.emitter))
+		svc.debouncer = newDebouncer(ctx, *cfg.Debounce, clock, cfg.Z_ManualTickerMinFrequencyID, newStorageBulkSink(svc.emitter))
 	}
 
 	cleanupper, ok := logger.(LogCleanupper)
@@ -70,14 +82,13 @@ func NewEmitter(ctx context.Context, cfg *EmitterConfig, logger LogEmitter) (*em
 	}
 
 	if cfg.Keep != 0 && cfg.CleanupInterval != 0 {
-		go svc.startCleanupping(cleanupper, cfg.CleanupInterval, cfg.Keep)
+		go svc.startCleanupping(cleanupper, cfg.CleanupInterval, cfg.Keep, cfg.Z_ManualTickerCleanupID)
 	}
 	return svc, nil
 }
 
-func (s *emitter) startCleanupping(cleanupper LogCleanupper, cleanupInterval, keep time.Duration) {
-	// TODO: synchronize with other ZITADEL binaries?
-	for range time.Tick(cleanupInterval) {
+func (s *emitter) startCleanupping(cleanupper LogCleanupper, cleanupInterval, keep time.Duration, z_manualTickerCleanupID int) {
+	for range s.clock.Tick(cleanupInterval, z_manualTickerCleanupID) {
 		if err := cleanupper.Cleanup(s.ctx, keep); err != nil {
 			logging.WithError(err).Error("cleaning up logs failed")
 		}

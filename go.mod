@@ -12,6 +12,7 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.8.0
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
+	github.com/benbjohnson/clock v1.2.0
 	github.com/boombuler/barcode v1.0.1
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
 	github.com/dop251/goja v0.0.0-20220815083517-0c74f9139fd6
@@ -77,6 +78,8 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0
 	sigs.k8s.io/yaml v1.3.0
 )
+
+require github.com/thejerf/abtime v1.0.6 // indirect
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
@@ -167,7 +170,7 @@ require (
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/russellhaering/goxmldsig v1.2.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/afero v1.8.1 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
