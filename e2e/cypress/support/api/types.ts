@@ -1,7 +1,9 @@
 export interface API {
   token: string;
+  systemToken: string,
   mgmtBaseURL: string;
   adminBaseURL: string;
+  systemBaseURL: string;
 }
 
 export type SearchResult = {

@@ -1,4 +1,7 @@
 import { defineConfig } from 'cypress';
+import { credentials } from '@zitadel/node'
+import { readFileSync } from'fs';
+const jwt = require('jsonwebtoken');
 
 let tokensCache = new Map<string,string>()
 
@@ -18,7 +21,7 @@ export default defineConfig({
 
   env: {
     ORGANIZATION: process.env.CYPRESS_ORGANIZATION || 'zitadel',
-    BACKEND_URL: process.env.CYPRESS_BACKEND_URL || baseUrl().replace("/ui/console", "")
+    BACKEND_URL: backendUrl()
   },
 
   e2e: {
@@ -37,10 +40,29 @@ export default defineConfig({
           return tokensCache.get(key) || null;
         }
       })
+      on('task', {
+        systemToken(): Promise<string> {
+          const privateKey = readFileSync(process.env.CYPRESS_SYSTEM_USER_KEY_PATH || `${__dirname}/systemuser/cypress.pem`, 'utf-8')
+          console.log("pk",  privateKey)
+          let iat = Math.floor(Date.now() / 1000);
+          let exp = iat + (24*60*60)
+          return jwt.sign({
+            "iss": "cypress",
+            "sub": "cypress",
+            "aud": "http://localhost:8080",
+            "iat": iat,
+            "exp": exp
+          }, privateKey, { algorithm: 'RS256' })
+        }
+      })
     },
   },
 });
 
 function baseUrl(){
   return process.env.CYPRESS_BASE_URL || 'http://localhost:8080/ui/console'
+}
+
+function backendUrl(){
+  return process.env.CYPRESS_BACKEND_URL || baseUrl().replace("/ui/console", "")
 }

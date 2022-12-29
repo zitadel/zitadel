@@ -5,13 +5,17 @@ const authHeaderKey = 'Authorization',
   orgIdHeaderKey = 'x-zitadel-orgid';
 
 export function apiAuth(): Cypress.Chainable<API> {
-  return login(User.IAMAdminUser, 'Password1!', false, true).then((token) => {
-    return <API>{
-      token: token,
-      mgmtBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1`,
-      adminBaseURL: `${Cypress.env('BACKEND_URL')}/admin/v1`,
-    };
-  });
+  return cy.task('systemToken').then(systemToken => {
+    return login(User.IAMAdminUser, 'Password1!', false, true).then((token) => {
+      return <API>{
+        token: token,
+        systemToken: systemToken,
+        mgmtBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1`,
+        adminBaseURL: `${Cypress.env('BACKEND_URL')}/admin/v1`,
+        systemBaseURL: `${Cypress.env('BACKEND_URL')}/system/v1`,
+      };
+    })
+  })
 }
 
 export function requestHeaders(api: API, orgId?: number): object {
