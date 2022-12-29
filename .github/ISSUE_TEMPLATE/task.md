@@ -1,14 +1,13 @@
 ---
-name: Task
-about: A task describes what is to be implemented and which acceptance criteria must
+name: User Story
+about: A user story describes what a specific persona need and why and which acceptance criteria must
   be met.
 title: ''
-labels: 'state: triage'
 assignees: ''
 
 ---
 
-Description
+As a [type of user], I want [some goal] so that [some reason].
 
 **Acceptance criteria**
 - [ ] ...
