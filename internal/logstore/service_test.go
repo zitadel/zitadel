@@ -10,7 +10,9 @@ import (
 	"github.com/benbjohnson/clock"
 
 	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/emitters/mock"
+	emittermock "github.com/zitadel/zitadel/internal/logstore/emitters/mock"
+	reportermock "github.com/zitadel/zitadel/internal/logstore/reporters/mock"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
@@ -23,9 +25,11 @@ func TestService(t *testing.T) {
 	// important for deterministic results
 	beforeProcs := runtime.GOMAXPROCS(1)
 	defer runtime.GOMAXPROCS(beforeProcs)
+
 	type args struct {
 		mainSink      *logstore.EmitterConfig
 		secondarySink *logstore.EmitterConfig
+		quota         query.Quota
 	}
 	type wantSink struct {
 		bulks []int
@@ -33,7 +37,6 @@ func TestService(t *testing.T) {
 	}
 	type want struct {
 		enabled       bool
-		doLimit       bool
 		remaining     *uint64
 		mainSink      wantSink
 		secondarySink wantSink
@@ -50,10 +53,10 @@ func TestService(t *testing.T) {
 				MaxBulkSize:  60,
 			})),
 			secondarySink: emitterConfig(),
+			quota:         quotaConfig(),
 		},
 		want: want{
 			enabled:   true,
-			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
 				bulks: repeat(60, 1),
@@ -75,10 +78,10 @@ func TestService(t *testing.T) {
 				MinFrequency: 10 * time.Second,
 				MaxBulkSize:  0,
 			})),
+			quota: quotaConfig(),
 		},
 		want: want{
 			enabled:   true,
-			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
 				bulks: repeat(6, 10),
@@ -94,10 +97,10 @@ func TestService(t *testing.T) {
 		args: args{
 			mainSink:      emitterConfig(withDisabled()),
 			secondarySink: emitterConfig(),
+			quota:         quotaConfig(),
 		},
 		want: want{
 			enabled:   true,
-			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
 				bulks: repeat(99, 0),
@@ -113,10 +116,10 @@ func TestService(t *testing.T) {
 		args: args{
 			mainSink:      emitterConfig(withDisabled()),
 			secondarySink: emitterConfig(withDisabled()),
+			quota:         quotaConfig(),
 		},
 		want: want{
 			enabled:   false,
-			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
 				bulks: repeat(99, 0),
@@ -135,18 +138,75 @@ func TestService(t *testing.T) {
 				MinFrequency: 0,
 				MaxBulkSize:  15,
 			}), withCleanupping(5*time.Second, 47*time.Second)),
+			quota: quotaConfig(),
 		},
 		want: want{
 			enabled:   true,
-			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
 				bulks: repeat(1, 60),
-				len:   20, // last cleanup is at second 1 + 28 + 28 = 57. So we expect keep 17 plus 3 added = 20
+				len:   21,
 			},
 			secondarySink: wantSink{
 				bulks: repeat(15, 4),
-				len:   17, // last cleanup is at second 1 + 47 = 48. So we expect keep 5 plus 12 added = 17,
+				len:   18,
+			},
+		},
+	}, {
+		name: "when quota has a limit of 90, 30 should be remaining",
+		args: args{
+			mainSink:      emitterConfig(),
+			secondarySink: emitterConfig(),
+			quota:         quotaConfig(withLimiting()),
+		},
+		want: want{
+			enabled:   true,
+			remaining: uint64Ptr(30),
+			mainSink: wantSink{
+				bulks: repeat(1, 60),
+				len:   60,
+			},
+			secondarySink: wantSink{
+				bulks: repeat(1, 60),
+				len:   60,
+			},
+		},
+	}, {
+		name: "when quota has a limit of 30, 0 should be remaining",
+		args: args{
+			mainSink:      emitterConfig(),
+			secondarySink: emitterConfig(),
+			quota:         quotaConfig(withLimiting(), withAmountAndInterval(30)),
+		},
+		want: want{
+			enabled:   true,
+			remaining: uint64Ptr(0),
+			mainSink: wantSink{
+				bulks: repeat(1, 60),
+				len:   60,
+			},
+			secondarySink: wantSink{
+				bulks: repeat(1, 60),
+				len:   60,
+			},
+		},
+	}, {
+		name: "when quota has amount of 30 but is not limited, remaining should be nil",
+		args: args{
+			mainSink:      emitterConfig(),
+			secondarySink: emitterConfig(),
+			quota:         quotaConfig(withAmountAndInterval(30)),
+		},
+		want: want{
+			enabled:   true,
+			remaining: nil,
+			mainSink: wantSink{
+				bulks: repeat(1, 60),
+				len:   60,
+			},
+			secondarySink: wantSink{
+				bulks: repeat(1, 60),
+				len:   60,
 			},
 		},
 	}}
@@ -155,13 +215,16 @@ func TestService(t *testing.T) {
 			tt.Run(ttt.name, func(t *testing.T) {
 				ctx := context.Background()
 				clock := clock.NewMock()
-				mainStorage := mock.NewInMemoryStorage(clock)
+
+				updateQuotaPeriod(&ttt.args.quota, clock)
+
+				mainStorage := emittermock.NewInMemoryStorage(clock)
 				mainEmitter, err := logstore.NewEmitter(ctx, clock, ttt.args.mainSink, mainStorage)
 				if err != nil {
 					t.Errorf("expected no error but got %v", err)
 					return
 				}
-				secondaryStorage := mock.NewInMemoryStorage(clock)
+				secondaryStorage := emittermock.NewInMemoryStorage(clock)
 				secondaryEmitter, err := logstore.NewEmitter(ctx, clock, ttt.args.secondarySink, secondaryStorage)
 				if err != nil {
 					t.Fatalf("expected no error but got %v", err)
@@ -169,9 +232,8 @@ func TestService(t *testing.T) {
 				}
 
 				svc := logstore.New(
+					reportermock.NewNoopReporter(&ttt.args.quota),
 					mainEmitter,
-					nil,
-					nil,
 					secondaryEmitter)
 
 				if svc.Enabled() != ttt.want.enabled {
@@ -179,18 +241,21 @@ func TestService(t *testing.T) {
 					return
 				}
 
+				var (
+					remaining *uint64
+				)
 				for i := 0; i < ticks; i++ {
-					err = svc.Handle(ctx, mock.NewRecord(clock))
+					err = svc.Handle(ctx, emittermock.NewRecord(clock))
+					runtime.Gosched()
+					remaining, err = svc.Limit(ctx, "non-empty-instance-id")
+					if err != nil {
+						t.Fatalf("expected no error but got %v", err)
+						return
+					}
 					clock.Add(tick)
 				}
+				time.Sleep(time.Millisecond)
 				runtime.Gosched()
-				time.Sleep(50 * time.Millisecond)
-
-				if err != nil {
-					t.Errorf("expected no error but got %v", err)
-					return
-				}
-				err = nil
 
 				mainBulks := mainStorage.Bulks()
 				if !reflect.DeepEqual(ttt.want.mainSink.bulks, mainBulks) {
@@ -212,15 +277,6 @@ func TestService(t *testing.T) {
 					t.Errorf("wanted secondary storage to have len %d, but got %d", ttt.want.secondarySink.len, secondaryLen)
 				}
 
-				doLimit, remaining, err := svc.Limit(ctx, "")
-				if err != nil {
-					t.Errorf("expected no error but got %v", err)
-					return
-				}
-				if doLimit != ttt.want.doLimit {
-					t.Errorf("wantet limit %t but got %t", ttt.want.doLimit, doLimit)
-				}
-
 				if remaining == nil && ttt.want.remaining == nil {
 					return
 				}
@@ -228,9 +284,11 @@ func TestService(t *testing.T) {
 				if remaining == nil && ttt.want.remaining != nil ||
 					remaining != nil && ttt.want.remaining == nil {
 					t.Errorf("wantet remaining nil %t but got %t", ttt.want.remaining == nil, remaining == nil)
+					return
 				}
 				if *remaining != *ttt.want.remaining {
 					t.Errorf("wantet remaining %d but got %d", *ttt.want.remaining, *remaining)
+					return
 				}
 			})
 		})

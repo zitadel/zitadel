@@ -169,20 +169,18 @@ func isUrl(str string) error {
 }
 
 // ReportUsage calls notification hooks if necessary and returns if usage should be limited
-func (c *Commands) ReportUsage(ctx context.Context, q *query.Quota, used uint64) (doLimit bool, err error) {
-
-	doLimit = q.Limit && int64(used) > q.Amount
+func (c *Commands) ReportUsage(ctx context.Context, q *query.Quota, used uint64) error {
 
 	// TODO: Remove from command side
 	dueNotifications, err := query.GetDueInstanceQuotaNotifications(ctx, q, used)
 	if err != nil {
-		return doLimit, err
+		return err
 	}
 
 	for _, notification := range dueNotifications {
 		alreadyNotified, err := isAlreadNotified(ctx, c.eventstore, notification, q.PeriodStart)
 		if err != nil {
-			return doLimit, err
+			return err
 		}
 
 		if alreadyNotified {
@@ -197,16 +195,16 @@ func (c *Commands) ReportUsage(ctx context.Context, q *query.Quota, used uint64)
 
 		if err = notify(ctx, notification); err != nil {
 			if err != nil {
-				return doLimit, err
+				return err
 			}
 		}
 
-		if _, err := c.eventstore.Push(ctx, notification.NotifiedEvent); err != nil {
-			return doLimit, err
+		if _, err = c.eventstore.Push(ctx, notification.NotifiedEvent); err != nil {
+			return err
 		}
 	}
 
-	return doLimit, nil
+	return nil
 }
 
 func isAlreadNotified(ctx context.Context, es *eventstore.Eventstore, notification *query.QuotaNotification, periodStart time.Time) (bool, error) {

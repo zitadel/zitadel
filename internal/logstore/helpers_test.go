@@ -3,12 +3,16 @@ package logstore_test
 import (
 	"time"
 
+	clockpkg "github.com/benbjohnson/clock"
+
+	"github.com/zitadel/zitadel/internal/query"
+
 	"github.com/zitadel/zitadel/internal/logstore"
 )
 
-type option func(config *logstore.EmitterConfig)
+type emitterOption func(config *logstore.EmitterConfig)
 
-func emitterConfig(options ...option) *logstore.EmitterConfig {
+func emitterConfig(options ...emitterOption) *logstore.EmitterConfig {
 	cfg := &logstore.EmitterConfig{
 		Enabled:         true,
 		Keep:            time.Hour,
@@ -24,22 +28,54 @@ func emitterConfig(options ...option) *logstore.EmitterConfig {
 	return cfg
 }
 
-func withDebouncerConfig(config *logstore.DebouncerConfig) option {
+func withDebouncerConfig(config *logstore.DebouncerConfig) emitterOption {
 	return func(c *logstore.EmitterConfig) {
 		c.Debounce = config
 	}
 }
 
-func withDisabled() option {
+func withDisabled() emitterOption {
 	return func(c *logstore.EmitterConfig) {
 		c.Enabled = false
 	}
 }
 
-func withCleanupping(keep, interval time.Duration) option {
+func withCleanupping(keep, interval time.Duration) emitterOption {
 	return func(c *logstore.EmitterConfig) {
 		c.Keep = keep
 		c.CleanupInterval = interval
+	}
+}
+
+type quotaOption func(config *query.Quota)
+
+func quotaConfig(quotaOptions ...quotaOption) query.Quota {
+	q := &query.Quota{
+		Amount:   90,
+		Limit:    false,
+		Interval: 90 * time.Second,
+	}
+	for _, opt := range quotaOptions {
+		opt(q)
+	}
+	return *q
+}
+
+func updateQuotaPeriod(q *query.Quota, clock clockpkg.Clock) {
+	q.PeriodStart = clock.Now()
+	q.PeriodEnd = q.PeriodStart.Add(q.Interval)
+}
+
+func withAmountAndInterval(n int64) quotaOption {
+	return func(c *query.Quota) {
+		c.Amount = n
+		c.Interval = time.Duration(n) * time.Second
+	}
+}
+
+func withLimiting() quotaOption {
+	return func(c *query.Quota) {
+		c.Limit = true
 	}
 }
 
@@ -50,3 +86,5 @@ func repeat(value, times int) []int {
 	}
 	return ints
 }
+
+func uint64Ptr(n uint64) *uint64 { return &n }

@@ -2,7 +2,6 @@ package logstore
 
 import (
 	"context"
-	"database/sql"
 	"math"
 	"time"
 
@@ -10,30 +9,32 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-type reportFunc func(ctx context.Context, q *query.Quota, used uint64) (doLimit bool, err error)
-
 type UsageQuerier interface {
 	LogEmitter
 	QuotaUnit() quota.Unit
 	QueryUsage(ctx context.Context, instanceId string, start, end time.Time) (uint64, error)
 }
 
+type UsageReporter interface {
+	GetQuota(ctx context.Context, instanceID string, unit quota.Unit) (*query.Quota, error)
+	// TODO: Determining doLimit is the services responsibility
+	Report(ctx context.Context, q *query.Quota, used uint64) (err error)
+}
+
 type Service struct {
 	usageQuerier     UsageQuerier
-	dbClient         *sql.DB
-	report           reportFunc
+	usageReporter    UsageReporter
 	enabledSinks     []*emitter
 	sinkEnabled      bool
 	reportingEnabled bool
 }
 
-func New(usageQuerierSink *emitter, dbClient *sql.DB, reportFunc reportFunc, additionalSink ...*emitter) *Service {
+func New(usageReporter UsageReporter, usageQuerierSink *emitter, additionalSink ...*emitter) *Service {
 
 	svc := &Service{
 		reportingEnabled: usageQuerierSink.enabled,
 		usageQuerier:     usageQuerierSink.emitter.(UsageQuerier),
-		dbClient:         dbClient,
-		report:           reportFunc,
+		usageReporter:    usageReporter,
 	}
 
 	for _, s := range append([]*emitter{usageQuerierSink}, additionalSink...) {
@@ -61,23 +62,25 @@ func (s *Service) Handle(ctx context.Context, record LogRecord) error {
 }
 
 // Limit TODO: Cache things in-memory here?
-func (s *Service) Limit(ctx context.Context, instanceID string) (bool, *uint64, error) {
+func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error) {
 	if !s.reportingEnabled || instanceID == "" {
-		return false, nil, nil
+		return nil, nil
 	}
 
-	quota, err := query.GetInstanceQuota(ctx, s.dbClient, instanceID, s.usageQuerier.QuotaUnit())
+	quota, err := s.usageReporter.GetQuota(ctx, instanceID, s.usageQuerier.QuotaUnit())
 	if err != nil {
-		return false, nil, err
+		return nil, err
 	}
 
 	usage, err := s.usageQuerier.QueryUsage(ctx, instanceID, quota.PeriodStart, quota.PeriodEnd)
 	if err != nil {
-		return false, nil, err
+		return nil, err
 	}
 
-	remaining := uint64(math.Max(0, float64(quota.Amount)-float64(usage)))
-
-	doLimit, err := s.report(ctx, quota, usage)
-	return doLimit, &remaining, err
+	var remaining *uint64
+	if quota.Limit {
+		r := uint64(math.Max(0, float64(quota.Amount)-float64(usage)))
+		remaining = &r
+	}
+	return remaining, s.usageReporter.Report(ctx, quota, usage)
 }

@@ -38,7 +38,7 @@ func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, un
 	}
 	if err = client.
 		QueryRowContext(ctx, stmt, args...).
-		Scan(&quota.Amount, &quota.Limit, &quota.from, &quota.interval); err != nil {
+		Scan(&quota.Amount, &quota.Limit, &quota.from, &quota.Interval); err != nil {
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
 	}
 	quota.refreshPeriod()
@@ -52,14 +52,14 @@ type Quota struct {
 	InstanceId  string
 	Unit        quota.Unit
 	from        time.Time
-	interval    time.Duration
+	Interval    time.Duration
 	PeriodStart time.Time
 	PeriodEnd   time.Time
 }
 
 func (q *Quota) refreshPeriod() {
-	q.PeriodStart = pushFrom(q.from, q.interval, time.Now())
-	q.PeriodEnd = q.PeriodStart.Add(q.interval)
+	q.PeriodStart = pushFrom(q.from, q.Interval, time.Now())
+	q.PeriodEnd = q.PeriodStart.Add(q.Interval)
 }
 
 func pushFrom(from time.Time, interval time.Duration, now time.Time) time.Time {

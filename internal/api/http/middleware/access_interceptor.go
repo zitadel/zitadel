@@ -45,11 +45,12 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 
 		ctx := request.Context()
 		instance := authz.GetInstance(ctx)
-		limit, _, err := a.svc.Limit(ctx, instance.InstanceID())
+		remaining, err := a.svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
 			logging.Warnf("failed to check whether requests should be limited: %s", err.Error())
 			err = nil
 		}
+		limit := remaining != nil && *remaining == 0
 
 		a.cookieHandler.SetCookie(wrappedWriter, limitExceededCookiename, request.Host, strconv.FormatBool(limit))
 

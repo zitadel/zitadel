@@ -39,7 +39,7 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 		return z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
 	}
 
-	doLimit, remaining, err := logstoreService.Limit(ctx, config.instanceID)
+	remaining, err := logstoreService.Limit(ctx, config.instanceID)
 	if err != nil {
 		logging.Warnf("failed to check whether action executions should be limited: %s", err.Error())
 		err = nil
@@ -47,7 +47,7 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 
 	config.cutTimeouts(remaining)
 
-	if doLimit {
+	if remaining != nil && *remaining == 0 {
 		err = errors.New("action execution seconds exhausted")
 		if config.allowedToFail {
 			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)

@@ -22,14 +22,14 @@ func AccessLimitInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
 			return handler(ctx, req)
 		}
 		instance := authz.GetInstance(ctx)
-		limit, _, err := svc.Limit(ctx, instance.InstanceID())
+		remaining, err := svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
 			logging.Warnf("failed to check whether requests should be limited: %s", err.Error())
 			err = nil
 		}
 
 		resp, err := handler(ctx, req)
-		if limit {
+		if remaining != nil && *remaining == 0 {
 			err = status.Error(codes.ResourceExhausted, "quota for authenticated requests exceeded")
 		}
 		return resp, err
