@@ -1,15 +1,16 @@
 package mock
 
 import (
-	"github.com/thejerf/abtime"
 	"time"
+
+	"github.com/benbjohnson/clock"
 
 	"github.com/zitadel/zitadel/internal/logstore"
 )
 
 var _ logstore.LogRecord = (*record)(nil)
 
-func NewRecord(clock *abtime.ManualTime) *record {
+func NewRecord(clock clock.Clock) *record {
 	return &record{ts: clock.Now()}
 }
 

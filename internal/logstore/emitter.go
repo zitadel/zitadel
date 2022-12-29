@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/thejerf/abtime"
+	"github.com/benbjohnson/clock"
 
 	"github.com/zitadel/logging"
 )
@@ -15,8 +15,6 @@ type EmitterConfig struct {
 	Keep            time.Duration
 	CleanupInterval time.Duration
 	Debounce        *DebouncerConfig
-	Z_ManualTickerMinFrequencyID,
-	Z_ManualTickerCleanupID int
 }
 
 type emitter struct {
@@ -24,7 +22,7 @@ type emitter struct {
 	ctx       context.Context
 	debouncer *debouncer
 	emitter   LogEmitter
-	clock     abtime.AbstractTime
+	clock     clock.Clock
 }
 
 type LogRecord interface {
@@ -52,7 +50,7 @@ type LogCleanupper interface {
 	Cleanup(ctx context.Context, keep time.Duration) error
 }
 
-func NewEmitter(ctx context.Context, clock abtime.AbstractTime, cfg *EmitterConfig, logger LogEmitter) (*emitter, error) {
+func NewEmitter(ctx context.Context, clock clock.Clock, cfg *EmitterConfig, logger LogEmitter) (*emitter, error) {
 
 	svc := &emitter{
 		enabled: cfg != nil && cfg.Enabled,
@@ -66,7 +64,7 @@ func NewEmitter(ctx context.Context, clock abtime.AbstractTime, cfg *EmitterConf
 	}
 
 	if cfg.Debounce != nil && (cfg.Debounce.MinFrequency > 0 || cfg.Debounce.MaxBulkSize > 0) {
-		svc.debouncer = newDebouncer(ctx, *cfg.Debounce, clock, cfg.Z_ManualTickerMinFrequencyID, newStorageBulkSink(svc.emitter))
+		svc.debouncer = newDebouncer(ctx, *cfg.Debounce, clock, newStorageBulkSink(svc.emitter))
 	}
 
 	cleanupper, ok := logger.(LogCleanupper)
@@ -82,13 +80,13 @@ func NewEmitter(ctx context.Context, clock abtime.AbstractTime, cfg *EmitterConf
 	}
 
 	if cfg.Keep != 0 && cfg.CleanupInterval != 0 {
-		go svc.startCleanupping(cleanupper, cfg.CleanupInterval, cfg.Keep, cfg.Z_ManualTickerCleanupID)
+		go svc.startCleanupping(cleanupper, cfg.CleanupInterval, cfg.Keep)
 	}
 	return svc, nil
 }
 
-func (s *emitter) startCleanupping(cleanupper LogCleanupper, cleanupInterval, keep time.Duration, z_manualTickerCleanupID int) {
-	for range s.clock.Tick(cleanupInterval, z_manualTickerCleanupID) {
+func (s *emitter) startCleanupping(cleanupper LogCleanupper, cleanupInterval, keep time.Duration) {
+	for range s.clock.Tick(cleanupInterval) {
 		if err := cleanupper.Cleanup(s.ctx, keep); err != nil {
 			logging.WithError(err).Error("cleaning up logs failed")
 		}

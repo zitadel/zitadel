@@ -2,11 +2,10 @@ package logstore
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
-	"github.com/thejerf/abtime"
+	"github.com/benbjohnson/clock"
 
 	"github.com/zitadel/logging"
 )
@@ -25,8 +24,8 @@ func (s bulkSinkFunc) sendBulk(ctx context.Context, items []LogRecord) error {
 
 type debouncer struct {
 	ctx      context.Context
-	clock    abtime.AbstractTime
-	ticker   abtime.Ticker
+	clock    clock.Clock
+	ticker   *clock.Ticker
 	mux      sync.Mutex
 	cfg      DebouncerConfig
 	storage  bulkSink
@@ -39,7 +38,7 @@ type DebouncerConfig struct {
 	MaxBulkSize  uint
 }
 
-func newDebouncer(ctx context.Context, cfg DebouncerConfig, clock abtime.AbstractTime, manualTickerMinFrequencyId int, ship bulkSink) *debouncer {
+func newDebouncer(ctx context.Context, cfg DebouncerConfig, clock clock.Clock, ship bulkSink) *debouncer {
 	a := &debouncer{
 		ctx:     ctx,
 		clock:   clock,
@@ -48,7 +47,7 @@ func newDebouncer(ctx context.Context, cfg DebouncerConfig, clock abtime.Abstrac
 	}
 
 	if cfg.MinFrequency > 0 {
-		a.ticker = clock.NewTicker(cfg.MinFrequency, manualTickerMinFrequencyId)
+		a.ticker = clock.Ticker(cfg.MinFrequency)
 		go a.shipOnTicks()
 	}
 	return a
@@ -82,8 +81,7 @@ func (d *debouncer) ship() {
 }
 
 func (d *debouncer) shipOnTicks() {
-	for t := range d.ticker.Channel() {
-		fmt.Println(t)
+	for range d.ticker.C {
 		d.ship()
 	}
 }

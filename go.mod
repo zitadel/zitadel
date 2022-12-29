@@ -79,8 +79,6 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
-require github.com/thejerf/abtime v1.0.6 // indirect
-
 require (
 	cloud.google.com/go v0.99.0 // indirect
 	cloud.google.com/go/trace v1.0.0 // indirect
