@@ -14,7 +14,7 @@ jobs:
         with:
           # You can target a repository in a different organization
           # to the issue
-          project-url: https://github.com/orgs/zitadel/projects/2/views/1
+          project-url: https://github.com/orgs/zitadel/projects/2
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: OKR
           label-operator: NOT
