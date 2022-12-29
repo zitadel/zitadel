@@ -13,7 +13,7 @@ import (
 	"syscall"
 	"time"
 
-	esreporter "github.com/zitadel/zitadel/internal/logstore/reporters/eventstore"
+	quota_projection "github.com/zitadel/zitadel/internal/logstore/quotaqueriers/projection"
 
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
@@ -161,8 +161,9 @@ func startZitadel(config *Config, masterKey string) error {
 		return err
 	}
 
-	usageReporter := esreporter.NewEventstoreReporter(dbClient, commands)
-	actions.SetLogstoreService(logstore.New(usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter))
+	quotaQuerier := quota_projection.NewQuerier(dbClient)
+	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
+	actions.SetLogstoreService(logstore.New(quotaQuerier, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter))
 
 	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
@@ -171,14 +172,28 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, usageReporter)
+	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, quotaQuerier, usageReporter)
 	if err != nil {
 		return err
 	}
 	return listen(ctx, router, config.Port, tlsConfig)
 }
 
-func startAPIs(ctx context.Context, clock clockpkg.Clock, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, config *Config, store static.Storage, authZRepo authz_repo.Repository, keys *encryptionKeys, usageReporter logstore.UsageReporter) error {
+func startAPIs(
+	ctx context.Context,
+	clock clockpkg.Clock,
+	router *mux.Router,
+	commands *command.Commands,
+	queries *query.Queries,
+	eventstore *eventstore.Eventstore,
+	dbClient *sql.DB,
+	config *Config,
+	store static.Storage,
+	authZRepo authz_repo.Repository,
+	keys *encryptionKeys,
+	quotaQuerier logstore.QuotaQuerier,
+	usageReporter logstore.UsageReporter,
+) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -201,7 +216,7 @@ func startAPIs(ctx context.Context, clock clockpkg.Clock, router *mux.Router, co
 		return err
 	}
 
-	accessSvc := logstore.New(usageReporter, accessDBEmitter, accessStdoutEmitter)
+	accessSvc := logstore.New(quotaQuerier, usageReporter, accessDBEmitter, accessStdoutEmitter)
 	accessInterceptor := middleware.NewAccessInterceptor(accessSvc)
 	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)

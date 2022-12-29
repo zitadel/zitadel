@@ -5,6 +5,8 @@ import (
 	"math"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/repository/instance"
+
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
@@ -15,25 +17,36 @@ type UsageQuerier interface {
 	QueryUsage(ctx context.Context, instanceId string, start, end time.Time) (uint64, error)
 }
 
-type UsageReporter interface {
+type QuotaQuerier interface {
 	GetQuota(ctx context.Context, instanceID string, unit quota.Unit) (*query.Quota, error)
-	// TODO: Determining doLimit is the services responsibility
-	Report(ctx context.Context, q *query.Quota, used uint64) (err error)
+	GetDueQuotaNotifications(ctx context.Context, q *query.Quota, used uint64) ([]*instance.QuotaNotifiedEvent, error)
+}
+
+type UsageReporter interface {
+	Report(ctx context.Context, notifications []*instance.QuotaNotifiedEvent) (err error)
+}
+
+type UsageReporterFunc func(context.Context, []*instance.QuotaNotifiedEvent) (err error)
+
+func (u UsageReporterFunc) Report(ctx context.Context, notifications []*instance.QuotaNotifiedEvent) (err error) {
+	return u(ctx, notifications)
 }
 
 type Service struct {
 	usageQuerier     UsageQuerier
+	quotaQuerier     QuotaQuerier
 	usageReporter    UsageReporter
 	enabledSinks     []*emitter
 	sinkEnabled      bool
 	reportingEnabled bool
 }
 
-func New(usageReporter UsageReporter, usageQuerierSink *emitter, additionalSink ...*emitter) *Service {
+func New(quotaQuerier QuotaQuerier, usageReporter UsageReporter, usageQuerierSink *emitter, additionalSink ...*emitter) *Service {
 
 	svc := &Service{
 		reportingEnabled: usageQuerierSink.enabled,
 		usageQuerier:     usageQuerierSink.emitter.(UsageQuerier),
+		quotaQuerier:     quotaQuerier,
 		usageReporter:    usageReporter,
 	}
 
@@ -67,7 +80,7 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error)
 		return nil, nil
 	}
 
-	quota, err := s.usageReporter.GetQuota(ctx, instanceID, s.usageQuerier.QuotaUnit())
+	quota, err := s.quotaQuerier.GetQuota(ctx, instanceID, s.usageQuerier.QuotaUnit())
 	if err != nil {
 		return nil, err
 	}
@@ -82,5 +95,11 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error)
 		r := uint64(math.Max(0, float64(quota.Amount)-float64(usage)))
 		remaining = &r
 	}
-	return remaining, s.usageReporter.Report(ctx, quota, usage)
+
+	notifications, err := s.quotaQuerier.GetDueQuotaNotifications(ctx, quota, usage)
+	if err != nil {
+		return remaining, err
+	}
+
+	return remaining, s.usageReporter.Report(ctx, notifications)
 }

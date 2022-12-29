@@ -32,7 +32,6 @@ func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, un
 	}
 
 	quota := Quota{
-		client:     client,
 		InstanceId: instanceID,
 		Unit:       unit,
 	}
@@ -48,7 +47,6 @@ func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, un
 type Quota struct {
 	Amount      int64
 	Limit       bool
-	client      *sql.DB
 	InstanceId  string
 	Unit        quota.Unit
 	from        time.Time
@@ -70,12 +68,7 @@ func pushFrom(from time.Time, interval time.Duration, now time.Time) time.Time {
 	return pushFrom(next, interval, now)
 }
 
-type QuotaNotification struct {
-	NotifiedEvent *instance.QuotaNotifiedEvent
-	CallUrl       string
-}
-
-func GetDueInstanceQuotaNotifications(ctx context.Context, quota *Quota, usedAbs uint64) ([]*QuotaNotification, error) {
+func GetDueInstanceQuotaNotifications(ctx context.Context, dbClient *sql.DB, quota *Quota, usedAbs uint64) ([]*instance.QuotaNotifiedEvent, error) {
 
 	usedRel := int64(math.Floor(float64(usedAbs*100) / float64(quota.Amount)))
 
@@ -120,8 +113,11 @@ func GetDueInstanceQuotaNotifications(ctx context.Context, quota *Quota, usedAbs
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-V9Sde", "Errors.Internal")
 	}
 
-	var notifications []*QuotaNotification
-	rows, err := quota.client.QueryContext(ctx, stmt, args...)
+	var notifications []*instance.QuotaNotifiedEvent
+	rows, err := dbClient.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, caos_errors.ThrowInternal(err, "QUOTA-SV9LW", "Errors.Quota.QueryFailed")
+	}
 	for rows.Next() {
 		row := struct {
 			id        string
@@ -131,17 +127,16 @@ func GetDueInstanceQuotaNotifications(ctx context.Context, quota *Quota, usedAbs
 		if rows.Scan(&row.id, &row.callUrl, &row.threshold); err != nil {
 			return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
 		}
-		notifications = append(notifications, &QuotaNotification{
-			NotifiedEvent: instance.NewQuotaNotifiedEvent(
-				ctx,
-				&instance.NewAggregate(quota.InstanceId).Aggregate,
-				quota.Unit,
-				row.id,
-				row.threshold,
-				usedAbs,
-			),
-			CallUrl: row.callUrl,
-		})
+		notifications = append(notifications, instance.NewQuotaNotifiedEvent(
+			ctx,
+			&instance.NewAggregate(quota.InstanceId).Aggregate,
+			quota.Unit,
+			row.id,
+			row.callUrl,
+			quota.PeriodStart,
+			row.threshold,
+			usedAbs,
+		))
 	}
 	return notifications, nil
 }

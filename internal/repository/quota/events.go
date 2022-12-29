@@ -101,10 +101,12 @@ func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 type NotifiedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	ID                   string `json:"id"`
-	Unit                 Unit   `json:"unit"`
-	Threshold            uint64 `json:"threshold"`
-	Usage                uint64 `json:"usage"`
+	Unit                 Unit      `json:"unit"`
+	ID                   string    `json:"id"`
+	CallURL              string    `json:"callURL"`
+	PeriodStart          time.Time `json:"periodStart"`
+	Threshold            uint64    `json:"threshold"`
+	Usage                uint64    `json:"usage"`
 }
 
 func (e *NotifiedEvent) Data() interface{} {
@@ -119,15 +121,19 @@ func NewNotifiedEvent(
 	base *eventstore.BaseEvent,
 	unit Unit,
 	id string,
+	callURL string,
+	periodStart time.Time,
 	threshold uint64,
 	usage uint64,
 ) *NotifiedEvent {
 	return &NotifiedEvent{
-		BaseEvent: *base,
-		Unit:      unit,
-		ID:        id,
-		Threshold: threshold,
-		Usage:     usage,
+		BaseEvent:   *base,
+		Unit:        unit,
+		ID:          id,
+		CallURL:     callURL,
+		PeriodStart: periodStart,
+		Threshold:   threshold,
+		Usage:       usage,
 	}
 }
 

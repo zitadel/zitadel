@@ -7,11 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/repository/instance"
+
 	"github.com/benbjohnson/clock"
 
 	"github.com/zitadel/zitadel/internal/logstore"
 	emittermock "github.com/zitadel/zitadel/internal/logstore/emitters/mock"
-	reportermock "github.com/zitadel/zitadel/internal/logstore/reporters/mock"
+	quotaqueriermock "github.com/zitadel/zitadel/internal/logstore/quotaqueriers/mock"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
@@ -216,7 +218,9 @@ func TestService(t *testing.T) {
 				ctx := context.Background()
 				clock := clock.NewMock()
 
-				updateQuotaPeriod(&ttt.args.quota, clock)
+				ttt.args.quota.PeriodStart = time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+				ttt.args.quota.PeriodEnd = ttt.args.quota.PeriodStart.Add(ttt.args.quota.Interval)
+				clock.Set(ttt.args.quota.PeriodStart)
 
 				mainStorage := emittermock.NewInMemoryStorage(clock)
 				mainEmitter, err := logstore.NewEmitter(ctx, clock, ttt.args.mainSink, mainStorage)
@@ -232,7 +236,8 @@ func TestService(t *testing.T) {
 				}
 
 				svc := logstore.New(
-					reportermock.NewNoopReporter(&ttt.args.quota),
+					quotaqueriermock.NewNoopQuerier(&ttt.args.quota),
+					logstore.UsageReporterFunc(func(context.Context, []*instance.QuotaNotifiedEvent) error { return nil }),
 					mainEmitter,
 					secondaryEmitter)
 

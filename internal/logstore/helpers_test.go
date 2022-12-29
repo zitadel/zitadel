@@ -3,8 +3,6 @@ package logstore_test
 import (
 	"time"
 
-	clockpkg "github.com/benbjohnson/clock"
-
 	"github.com/zitadel/zitadel/internal/query"
 
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -59,11 +57,6 @@ func quotaConfig(quotaOptions ...quotaOption) query.Quota {
 		opt(q)
 	}
 	return *q
-}
-
-func updateQuotaPeriod(q *query.Quota, clock clockpkg.Clock) {
-	q.PeriodStart = clock.Now()
-	q.PeriodEnd = q.PeriodStart.Add(q.Interval)
 }
 
 func withAmountAndInterval(n int64) quotaOption {

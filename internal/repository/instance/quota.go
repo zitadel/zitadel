@@ -66,6 +66,8 @@ func NewQuotaNotifiedEvent(
 	aggregate *eventstore.Aggregate,
 	unit quota.Unit,
 	id string,
+	callURL string,
+	periodStart time.Time,
 	threshold uint64,
 	usage uint64,
 ) *QuotaNotifiedEvent {
@@ -78,6 +80,8 @@ func NewQuotaNotifiedEvent(
 			),
 			unit,
 			id,
+			callURL,
+			periodStart,
 			threshold,
 			usage,
 		),
