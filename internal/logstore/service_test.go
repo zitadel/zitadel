@@ -2,7 +2,6 @@ package logstore_test
 
 import (
 	"context"
-	"errors"
 	"reflect"
 	"runtime"
 	"testing"
@@ -29,14 +28,11 @@ func TestService(t *testing.T) {
 		secondarySink *logstore.EmitterConfig
 	}
 	type wantSink struct {
-		err   error
 		bulks []int
 		len   int
 	}
 	type want struct {
 		enabled       bool
-		handleErr     error
-		limitErr      error
 		doLimit       bool
 		remaining     *uint64
 		mainSink      wantSink
@@ -57,17 +53,13 @@ func TestService(t *testing.T) {
 		},
 		want: want{
 			enabled:   true,
-			handleErr: nil,
-			limitErr:  nil,
 			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
-				err:   nil,
 				bulks: repeat(60, 1),
 				len:   60,
 			},
 			secondarySink: wantSink{
-				err:   nil,
 				bulks: repeat(1, 60),
 				len:   60,
 			},
@@ -86,17 +78,13 @@ func TestService(t *testing.T) {
 		},
 		want: want{
 			enabled:   true,
-			handleErr: nil,
-			limitErr:  nil,
 			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
-				err:   nil,
 				bulks: repeat(6, 10),
 				len:   60,
 			},
 			secondarySink: wantSink{
-				err:   nil,
 				bulks: repeat(10, 6),
 				len:   60,
 			},
@@ -109,19 +97,34 @@ func TestService(t *testing.T) {
 		},
 		want: want{
 			enabled:   true,
-			handleErr: nil,
-			limitErr:  nil,
 			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
-				err:   nil,
 				bulks: repeat(99, 0),
 				len:   0,
 			},
 			secondarySink: wantSink{
-				err:   nil,
 				bulks: repeat(1, 60),
 				len:   60,
+			},
+		},
+	}, {
+		name: "when all sink are disabled, the service should be disabled",
+		args: args{
+			mainSink:      emitterConfig(withDisabled()),
+			secondarySink: emitterConfig(withDisabled()),
+		},
+		want: want{
+			enabled:   false,
+			doLimit:   false,
+			remaining: nil,
+			mainSink: wantSink{
+				bulks: repeat(99, 0),
+				len:   0,
+			},
+			secondarySink: wantSink{
+				bulks: repeat(99, 0),
+				len:   0,
 			},
 		},
 	}, {
@@ -135,17 +138,13 @@ func TestService(t *testing.T) {
 		},
 		want: want{
 			enabled:   true,
-			handleErr: nil,
-			limitErr:  nil,
 			doLimit:   false,
 			remaining: nil,
 			mainSink: wantSink{
-				err:   nil,
 				bulks: repeat(1, 60),
 				len:   20, // last cleanup is at second 1 + 28 + 28 = 57. So we expect keep 17 plus 3 added = 20
 			},
 			secondarySink: wantSink{
-				err:   nil,
 				bulks: repeat(15, 4),
 				len:   17, // last cleanup is at second 1 + 47 = 48. So we expect keep 5 plus 12 added = 17,
 			},
@@ -159,9 +158,7 @@ func TestService(t *testing.T) {
 				mainStorage := mock.NewInMemoryStorage(clock)
 				mainEmitter, err := logstore.NewEmitter(ctx, clock, ttt.args.mainSink, mainStorage)
 				if err != nil {
-					if !errors.Is(err, ttt.want.mainSink.err) {
-						t.Errorf("wantet err %v but got err %v", ttt.want.mainSink.err, err)
-					}
+					t.Errorf("expected no error but got %v", err)
 					return
 				}
 				secondaryStorage := mock.NewInMemoryStorage(clock)
@@ -189,8 +186,8 @@ func TestService(t *testing.T) {
 				runtime.Gosched()
 				time.Sleep(50 * time.Millisecond)
 
-				if !errors.Is(err, ttt.want.handleErr) {
-					t.Errorf("wantet err %v but got err %v", ttt.want.handleErr, err)
+				if err != nil {
+					t.Errorf("expected no error but got %v", err)
 					return
 				}
 				err = nil
@@ -216,8 +213,9 @@ func TestService(t *testing.T) {
 				}
 
 				doLimit, remaining, err := svc.Limit(ctx, "")
-				if !errors.Is(err, ttt.want.limitErr) {
-					t.Errorf("wantet err %v but got err %v", ttt.want.limitErr, err)
+				if err != nil {
+					t.Errorf("expected no error but got %v", err)
+					return
 				}
 				if doLimit != ttt.want.doLimit {
 					t.Errorf("wantet limit %t but got %t", ttt.want.doLimit, doLimit)
