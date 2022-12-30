@@ -146,9 +146,9 @@ To ease your production setup we created a step by step checklist you may wish t
   - [] use serverless architecture such as Knative or a hyperscaler equivalent (e.g. CloudRun from Google)
   - [] separate `zitadel init` and `zitadel setup` for fast startup times when scaling ZITADEL
 - [] High availability for Database 
-  -[] follow the [Production Checklist](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html) for CockroachDB if you selfhost the database or use [CockroachDB cloud](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
-  -[] configure backups on a regular basis for the Database
-  -[] test a restore scenario before going live
+  - [] follow the [Production Checklist](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html) for CockroachDB if you selfhost the database or use [CockroachDB cloud](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
+  - [] configure backups on a regular basis for the Database
+  - [] test a restore scenario before going live
 
 ### configuration
 
