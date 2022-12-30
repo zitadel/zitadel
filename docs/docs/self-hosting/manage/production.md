@@ -135,3 +135,21 @@ DefaultInstance:
 - Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).
+
+
+## Checklist
+To ease your production setup we created a step by step checklist you may wish to follow.
+
+### infrastructure configuration
+- [] High availability for ZITADEL containers
+  - [] use container orchestrator such as Kubernetes or
+  - [] use serverless architecture such as Knative or a hyperscaler equivalent (e.g. CloudRun from Google)
+  - [] separate `zitadel init` and `zitadel setup` for fast startup times when scaling ZITADEL
+- [] High availability for Database 
+  -[] follow the [Production Checklist](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html) for CockroachDB if you selfhost the database or use [CockroachDB cloud](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
+  -[] configure backups on a regular basis for the Database
+  -[] test a restore scenario before going live
+
+### configuration
+
+### security
