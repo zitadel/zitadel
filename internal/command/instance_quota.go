@@ -145,26 +145,28 @@ type Quota struct {
 	Notifications QuotaNotifications
 }
 
+func (q *Quota) isValid() bool {
+	for _, notification := range q.Notifications {
+		if err := isUrl(notification.CallURL); err != nil || notification.Percent < 1 {
+			return false
+		}
+	}
+
+	return q.Unit.Enum() != quota.Unimplemented &&
+		!q.From.IsZero() &&
+		q.Amount > 0 &&
+		q.Interval > time.Minute &&
+		(q.Limit || len(q.Notifications) > 0)
+}
+
 func (c *Commands) AddInstanceQuotaCommand(
 	a *instance.Aggregate,
 	q *Quota,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 
-		unit := q.Unit.Enum()
-		if unit == quota.Unimplemented {
-			return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument") // TODO: Better error message?
-		}
-
-		if q.From.IsZero() {
-			return nil, errors.ThrowInvalidArgument(nil, "INSTA-AbgnG", "Errors.Invalid.Argument") // TODO: Better error message?
-		}
-
-		for _, notification := range q.Notifications {
-
-			if err := isUrl(notification.CallURL); err != nil || notification.Percent < 1 {
-				return nil, errors.ThrowInvalidArgument(err, "INSTA-pBfjq", "Errors.Invalid.Argument") // TODO: Better error message?
-			}
+		if !q.isValid() {
+			return nil, errors.ThrowInvalidArgument(nil, "INSTA-pBfjq", "Errors.Invalid.Argument") // TODO: Better error message?
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
@@ -180,7 +182,7 @@ func (c *Commands) AddInstanceQuotaCommand(
 				return []eventstore.Command{instance.NewQuotaAddedEvent(
 					ctx,
 					&a.Aggregate,
-					unit,
+					q.Unit.Enum(),
 					q.From,
 					q.Interval,
 					q.Amount,
