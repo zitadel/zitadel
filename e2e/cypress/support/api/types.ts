@@ -1,9 +1,14 @@
-export interface API {
+export interface Token {
   token: string;
-  systemToken: string,
+}
+
+export interface API extends Token {
   mgmtBaseURL: string;
   adminBaseURL: string;
-  systemBaseURL: string;
+}
+
+export interface SystemAPI extends Token {
+  baseURL: string;
 }
 
 export type SearchResult = {

@@ -71,7 +71,13 @@ func (c *Commands) RemoveInstanceQuota(ctx context.Context, unit QuotaUnit) (*do
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.IDMissing")
 	}
 
-	quota, err := c.getQuotaWriteModel(ctx, unit.Enum())
+	domainQuotaUnit := unit.Enum()
+
+	if domainQuotaUnit == quota.Unimplemented {
+		return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument") // TODO: Better error message?
+	}
+
+	quota, err := c.getQuotaWriteModel(ctx, domainQuotaUnit)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +138,7 @@ func (q *QuotaNotifications) toAddedEventNotifications(genID func() string) []*q
 
 type Quota struct {
 	Unit          QuotaUnit
-	From          string
+	From          time.Time
 	Interval      time.Duration
 	Amount        uint64
 	Limit         bool
@@ -150,14 +156,13 @@ func (c *Commands) AddInstanceQuotaCommand(
 			return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument") // TODO: Better error message?
 		}
 
-		from, err := time.Parse("2006-01-02 15:04:05", q.From)
-		if err != nil {
-			return nil, errors.ThrowInvalidArgument(err, "INSTA-H2Poe", "Errors.Invalid.Argument") // TODO: Better error message?
+		if q.From.IsZero() {
+			return nil, errors.ThrowInvalidArgument(nil, "INSTA-AbgnG", "Errors.Invalid.Argument") // TODO: Better error message?
 		}
 
 		for _, notification := range q.Notifications {
 
-			if err = isUrl(notification.CallURL); err != nil || notification.Percent < 1 {
+			if err := isUrl(notification.CallURL); err != nil || notification.Percent < 1 {
 				return nil, errors.ThrowInvalidArgument(err, "INSTA-pBfjq", "Errors.Invalid.Argument") // TODO: Better error message?
 			}
 		}
@@ -176,7 +181,7 @@ func (c *Commands) AddInstanceQuotaCommand(
 					ctx,
 					&a.Aggregate,
 					unit,
-					from,
+					q.From,
 					q.Interval,
 					q.Amount,
 					q.Limit,

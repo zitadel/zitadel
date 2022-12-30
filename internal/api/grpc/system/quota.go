@@ -3,8 +3,6 @@ package system
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/command"
-
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -30,7 +28,7 @@ func (s *Server) AddQuota(ctx context.Context, req *system.AddQuotaRequest) (*sy
 
 func (s *Server) RemoveQuota(ctx context.Context, req *system.RemoveQuotaRequest) (*system.RemoveQuotaResponse, error) {
 	ctx = authz.WithInstanceID(ctx, req.InstanceId)
-	details, err := s.command.RemoveInstanceQuota(ctx, command.QuotaUnit(req.Unit))
+	details, err := s.command.RemoveInstanceQuota(ctx, instanceQuotaUnitPbToQuotaUnit(req.Unit))
 	if err != nil {
 		return nil, err
 	}

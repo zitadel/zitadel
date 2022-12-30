@@ -174,7 +174,14 @@ func NewRemovedEvent(
 }
 
 func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	return &RemovedEvent{
+	e := &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "ACTION-4bReE", "unable to unmarshal quota removed")
+	}
+
+	return e, nil
 }

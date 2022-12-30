@@ -224,7 +224,7 @@ Creates a new quota
 
 
 
-    POST: /quotas
+    POST: /instances/{instance_id}/quotas
 
 
 ### RemoveQuota
@@ -236,7 +236,7 @@ Removes a quota
 
 
 
-    DELETE: /quotas/{unit}
+    DELETE: /instances/{instance_id}/quotas/{unit}
 
 
 
@@ -858,8 +858,9 @@ This is an empty response
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| UNIT_REQUESTS_ALL_AUTHENTICATED | 0 | - |
-| UNIT_ACTIONS_ALL_RUNS_SECONDS | 1 | - |
+| UNIT_UNIMPLEMENTED | 0 | - |
+| UNIT_REQUESTS_ALL_AUTHENTICATED | 1 | - |
+| UNIT_ACTIONS_ALL_RUNS_SECONDS | 2 | - |
 
 
 

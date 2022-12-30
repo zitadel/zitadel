@@ -170,6 +170,7 @@ func (es *Eventstore) mapEvents(events []*repository.Event) (mappedEvents []Even
 type reducer interface {
 	//Reduce handles the events of the internal events list
 	// it only appends the newly added events
+	// TODO: Reduce why is reduce allowed to return an error?
 	Reduce() error
 	//AppendEvents appends the passed events to an internal list of events
 	AppendEvents(...Event)

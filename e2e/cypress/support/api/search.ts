@@ -1,8 +1,8 @@
 import { requestHeaders } from './apiauth';
-import { API, Entity, SearchResult } from './types';
+import { API, Entity, SearchResult, Token } from './types';
 
 export function searchSomething(
-  api: API,
+  token: Token,
   searchPath: string,
   method: string,
   mapResult: (body: any) => SearchResult,
@@ -12,7 +12,7 @@ export function searchSomething(
     .request({
       method: method,
       url: searchPath,
-      headers: requestHeaders(api, orgId),
+      headers: requestHeaders(token, orgId),
       failOnStatusCode: method == 'POST',
     })
     .then((res) => {

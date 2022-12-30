@@ -1,20 +1,29 @@
 package system
 
 import (
-	"time"
-
 	"github.com/zitadel/zitadel/internal/command"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 func instanceQuotaPbToQuota(req *system_pb.AddQuotaRequest) *command.Quota {
 	return &command.Quota{
-		Unit:          command.QuotaUnit(req.Unit),
-		From:          req.From.AsTime().Format(time.RFC3339),
+		Unit:          instanceQuotaUnitPbToQuotaUnit(req.Unit),
+		From:          req.From.AsTime(),
 		Interval:      req.Interval.AsDuration(),
 		Amount:        req.Amount,
 		Limit:         req.Limit,
 		Notifications: instanceQuotaNotificationsPbToQuotaNotifications(req.Notifications),
+	}
+}
+
+func instanceQuotaUnitPbToQuotaUnit(unit system_pb.Unit) command.QuotaUnit {
+	switch unit {
+	case system_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED:
+		return command.QuotaRequestsAllAuthenticated
+	case system_pb.Unit_UNIT_ACTIONS_ALL_RUNS_SECONDS:
+		return command.QuotaActionsAllRunsSeconds
+	default:
+		return command.QuotaUnit(unit.String())
 	}
 }
 

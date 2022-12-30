@@ -586,7 +586,7 @@ DefaultInstance:
     Items:
 #      - Unit: "requests.all.authenticated"
 #        # Start Time for the quota periods
-#        From: "2022-10-24 00:00:00"
+#        From: "2023-01-01T00:00:00Z01:00"
 #        Interval: 720h # 30 days
 #        Amount: 25000
 #        Limit: false
@@ -600,7 +600,7 @@ DefaultInstance:
 #            CallURL: "https://example.com"
 #      - Unit: "actions.all.runs.seconds"
 #        # Start Time for the quota periods
-#        From: "2022-10-24 00:00:00"
+#        From: "2023-01-01T00:00:00Z01:00"
 #        Interval: 720h # 30 days
 #        Amount: 3600 # 1 hour
 #        Limit: false

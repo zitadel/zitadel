@@ -344,7 +344,7 @@ service SystemService {
   // Creates a new quota
   rpc AddQuota(AddQuotaRequest) returns (AddQuotaResponse) {
     option (google.api.http) = {
-      post: "/quotas"
+      post: "/instances/{instance_id}/quotas"
       body: "*"
     };
 
@@ -356,7 +356,7 @@ service SystemService {
   // Removes a quota
   rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
     option (google.api.http) = {
-      delete: "/quotas/{unit}"
+      delete: "/instances/{instance_id}/quotas/{unit}"
     };
 
     option (zitadel.v1.auth_option) = {
@@ -517,8 +517,9 @@ message RemoveInstanceResponse {
 
 
 enum Unit {
-  UNIT_REQUESTS_ALL_AUTHENTICATED = 0;
-  UNIT_ACTIONS_ALL_RUNS_SECONDS = 1;
+  UNIT_UNIMPLEMENTED = 0;
+  UNIT_REQUESTS_ALL_AUTHENTICATED = 1;
+  UNIT_ACTIONS_ALL_RUNS_SECONDS = 2;
 }
 
 message AddQuotaRequest {

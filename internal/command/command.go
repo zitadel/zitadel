@@ -129,6 +129,7 @@ func StartCommands(es *eventstore.Eventstore,
 
 func AppendAndReduce(object interface {
 	AppendEvents(...eventstore.Event)
+	// TODO: Why is it allowed to return an error here?
 	Reduce() error
 }, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
