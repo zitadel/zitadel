@@ -236,7 +236,7 @@ Removes a quota
 
 
 
-    DELETE: /quotas/{quota_id}
+    DELETE: /quotas/{unit}
 
 
 
@@ -344,7 +344,7 @@ Removes a quota
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| unit |  AddQuotaRequest.Unit | - |  |
+| unit |  Unit | - |  |
 | from |  google.protobuf.Timestamp | - |  |
 | interval |  google.protobuf.Duration | - |  |
 | amount |  uint64 | - |  |
@@ -373,7 +373,6 @@ Removes a quota
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| quota_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
@@ -600,30 +599,6 @@ This is an empty response
 
 
 
-### GetUsageRequest
-TODO: Delete?
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetUsageResponse
-TODO: Delete?
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| executed_requests |  uint64 | - |  |
-| executed_action_mins |  uint64 | - |  |
-
-
-
-
 ### HealthzRequest
 This is an empty request
 
@@ -795,7 +770,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| quota_id |  string | - |  |
+| unit |  Unit | - |  |
 
 
 
@@ -871,6 +846,20 @@ This is an empty response
 | instance |  string | - |  |
 
 
+
+
+
+
+## Enums
+
+
+### Unit {#unit}
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| UNIT_REQUESTS_ALL_AUTHENTICATED | 0 | - |
+| UNIT_ACTIONS_ALL_RUNS_SECONDS | 1 | - |
 
 
 

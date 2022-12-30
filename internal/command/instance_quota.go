@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -64,9 +65,42 @@ func (c *Commands) AddInstanceQuota(
 	return writeModelToObjectDetails(wm), nil
 }
 
-func (c *Commands) RemoveInstanceQuota(ctx context.Context, unit quota.Unit) (*domain.ObjectDetails, error) {
-	// TODO: Implement
-	return nil, errors.ThrowUnimplemented(nil, "INSTA-h12vl", "*Commands.RemoveInstanceQuota is unimplemented")
+func (c *Commands) RemoveInstanceQuota(ctx context.Context, unit QuotaUnit) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	if instanceAgg.InstanceID == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.IDMissing")
+	}
+
+	quota, err := c.getQuotaWriteModel(ctx, unit.Enum())
+	if err != nil {
+		return nil, err
+	}
+
+	if !quota.exists {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
+	}
+
+	events := []eventstore.Command{
+		instance.NewQuotaRemovedEvent(ctx, &instanceAgg.Aggregate, unit.Enum()),
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(quota, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&quota.WriteModel), nil
+}
+
+func (c *Commands) getQuotaWriteModel(ctx context.Context, unit quota.Unit) (*quotaWriteModel, error) {
+	wm := newQuotaWriteModel(ctx, unit)
+	err := c.eventstore.FilterToQueryReducer(ctx, wm)
+	if err != nil {
+		return nil, err
+	}
+	return wm, nil
 }
 
 type QuotaNotification struct {

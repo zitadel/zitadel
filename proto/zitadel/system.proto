@@ -356,7 +356,7 @@ service SystemService {
   // Removes a quota
   rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
     option (google.api.http) = {
-      delete: "/quotas/{quota_id}"
+      delete: "/quotas/{unit}"
     };
 
     option (zitadel.v1.auth_option) = {
@@ -516,12 +516,12 @@ message RemoveInstanceResponse {
 }
 
 
-message AddQuotaRequest {
-  enum Unit {
-      UNIT_REQUESTS_ALL_AUTHENTICATED = 0;
-      UNIT_ACTIONS_ALL_RUNS_SECONDS = 1;
-  }
+enum Unit {
+  UNIT_REQUESTS_ALL_AUTHENTICATED = 0;
+  UNIT_ACTIONS_ALL_RUNS_SECONDS = 1;
+}
 
+message AddQuotaRequest {
   message Notification {
       uint32 percent = 1;
       bool repeat = 2;
@@ -563,29 +563,16 @@ message AddQuotaRequest {
 }
 
 message AddQuotaResponse {
-  string quota_id = 1;
-  zitadel.v1.ObjectDetails details = 2;
+  zitadel.v1.ObjectDetails details = 1;
 }
 
 message RemoveQuotaRequest {
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  string quota_id = 2;
+  Unit unit = 2;
 }
 
 message RemoveQuotaResponse {
   zitadel.v1.ObjectDetails details = 1;
-}
-
-// TODO: Delete?
-message GetUsageRequest {
-  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-// TODO: Delete?
-message GetUsageResponse {
-  zitadel.v1.ObjectDetails details = 1;
-  uint64 executed_requests = 2;
-  uint64 executed_action_mins = 3;
 }
 
 message ExistsDomainRequest {

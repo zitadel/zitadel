@@ -116,6 +116,15 @@ func esReducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: instance.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  instance.QuotaRemovedEventType,
+					Reduce: reduceQuotaRemoved,
+				},
+			},
+		},
 	}
 }
 
@@ -174,4 +183,23 @@ func reduceQuotaNotified(event eventstore.Event) (*handler.Statement, error) {
 		handler.NewCond(QuotaNotificationUnitCol, e.Unit),
 		handler.NewCond(QuotaNotificationIdCol, e.ID),
 	}, crdb.WithTableSuffix(QuotaNotificationsTableSuffix)), nil
+}
+
+func reduceQuotaRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*instance.QuotaRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DlFsg", "reduce.wrong.event.type% s", quota.NotifiedEventType)
+	}
+
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddDeleteStatement([]handler.Condition{
+			handler.NewCond(QuotaNotificationInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(QuotaNotificationUnitCol, e.Unit),
+		}, crdb.WithTableSuffix(QuotaNotificationsTableSuffix)),
+		crdb.AddDeleteStatement([]handler.Condition{
+			handler.NewCond(QuotaInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(QuotaUnitCol, e.Unit),
+		}),
+	), nil
 }
