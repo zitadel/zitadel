@@ -1,5 +1,7 @@
 import { defineConfig } from 'cypress';
 import { Client } from "pg";
+import { createServer } from 'http'
+
 const jwt = require('jsonwebtoken');
 
 const privateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -60,14 +62,10 @@ export default defineConfig({
         safetoken({key, token}) {
           tokensCache.set(key,token);
           return null
-        }
-      })
-      on('task', {
+        },
         loadtoken({key}): string | null {
           return tokensCache.get(key) || null;
-        }
-      })
-      on('task', {
+        },
         systemToken(): Promise<string> {
           let iat = Math.floor(Date.now() / 1000);
           let exp = iat + (999*12*30*24*60*60) // ~ 999 years
@@ -78,9 +76,7 @@ export default defineConfig({
             "iat": iat,
             "exp": exp
           }, Buffer.from(privateKey, 'ascii').toString('ascii'), { algorithm: 'RS256' })
-        }
-      })
-      on('task', {
+        },
         runSQL(statement: string){
           const client = new Client({
             connectionString: process.env.CYPRESS_DATABASE_CONNECTION_URL || 'postgresql://root@localhost:26257/zitadel'
@@ -93,6 +89,38 @@ export default defineConfig({
               })
             })
           })
+        },
+        receive(){
+          return new Promise<any>((resolve) => {
+            const port = 8900
+            const server = createServer(requestListener);
+              server.listen(port, () => {
+                console.log(`Server is running on http://:${port}`);
+            });
+
+            function requestListener (req, res) {
+
+              const ret = {
+                url: req.url,
+                data: "",
+              }
+
+              const chunks = [];
+              let data: Buffer = null;
+              req.on("data", (chunk) => {
+                chunks.push(chunk);
+              });
+              req.on("end", () => {
+                ret.data = Buffer.concat(chunks).toString();
+              });
+
+              res.writeHead(200);
+              res.end()
+              server.close()
+              console.log(`Server is closed`);
+              resolve(ret);
+            }
+          });
         }
       })
     },

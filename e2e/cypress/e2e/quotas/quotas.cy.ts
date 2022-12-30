@@ -82,5 +82,10 @@ describe('quotas', () => {
     beforeEach(() => {
       cy.task('runSQL', 'TRUNCATE logstore.access;');
     });
+    it.only('receives', () => {
+      cy.task('receive').then((received) => {
+        cy.log('receive returned', received);
+      });
+    });
   });
 });
