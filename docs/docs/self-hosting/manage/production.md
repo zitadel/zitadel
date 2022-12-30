@@ -164,14 +164,27 @@ To ease your production setup we created a step by step checklist you may wish t
 #### Networking
 - [] Use a Layer 7 Web Application Firewall to secure ZITADEL that supports **[HTTP/2](/docs/self-hosting/manage/http2)**
   - [] secure the access by IP if needed
-  - [] secure the access by ratelimits for specific endpoints (e.g. API vs frontend) to secure availability on high load
+  - [] secure the access by [ratelimits](https://zitadel.com/docs/apis/ratelimits) for specific endpoints (e.g. API vs frontend) to secure availability on high load
   - [] doublecheck your Firewall for IPv6 connectivity and change accordingly
 
-### configuration
-- [] configure a valid SMTP Server and test emails
-- [] Custom Branding
+### ZITADEL configuration
+- [] configure a valid [SMTP Server](https://zitadel.com/docs/guides/manage/console/instance-settings#smtp) and test emails
+- [] Add [Custom Branding](https://zitadel.com/docs/guides/manage/customize/branding) if required
 
-### security
-- [] use a FQDN and a trusted valid certificate for external connections
+### Security
+- [] use a FQDN and a trusted valid certificate for external [TLS](https://zitadel.com/docs/self-hosting/manage/tls_modes#http2) connections
 - [] make use of different Serviceaccounts to secure ZITADEL within your Hyperscaler or Kubernetes 
 - [] make use of a CDN Service if needed to ease maintainability and Firewall/DNS/WAF configuration
+- [] make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and cluster
+
+### Monitoring
+use a appropriate Monitoring Solution to have an overview about your ZITADEL instance. In particular you may want to watch out for things like:
+
+- [] CPU and Memory of ZITADEL and the Database
+- [] open Database connections
+- [] running instances of ZITADEL and the Database
+- [] latency of requests
+- [] requests per second
+- [] requests by URL/endpoint
+- [] lifetime of TLS certificates
+- [] logs
