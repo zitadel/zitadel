@@ -14,6 +14,9 @@ export function addQuota(
     },
     body: {
       unit: unit,
+      amount: 25000,
+      interval: `${30*24*60*60}s`,
+      limit: true,
     },
     failOnStatusCode: failOnStatusCode,
   });
