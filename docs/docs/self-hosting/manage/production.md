@@ -137,6 +137,8 @@ DefaultInstance:
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).
 
 
+---
+
 ## Checklist
 To ease your production setup we created a step by step checklist you may wish to follow.
 
@@ -147,18 +149,18 @@ To ease your production setup we created a step by step checklist you may wish t
 - [] use a secrets manager to save your sensible informations
 - [] reduce the manual interaction with your platform to an absolute minimum 
 #### HA Setup
-- [] High availability for ZITADEL containers
+- [] High Availability for ZITADEL containers
   - [] use container orchestrator such as Kubernetes or
   - [] use serverless architecture such as Knative or a hyperscaler equivalent (e.g. CloudRun from Google)
   - [] separate `zitadel init` and `zitadel setup` for fast startup times when scaling ZITADEL
-- [] High availability for Database 
+- [] High Availability for database 
   - [] follow the [Production Checklist](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html) for CockroachDB if you selfhost the database or use [CockroachDB cloud](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
   - [] configure backups on a regular basis for the Database
   - [] test a restore scenario before going live
-  - [] secure database connections from outside your network or use an internal subnet
-- [] High availability for critical infrastructure components (depending on your setup)
+  - [] secure database connections from outside your network and/or use an internal subnet for database connectivity
+- [] High Availability for critical infrastructure components (depending on your setup)
   - [] Loadbalancer
-  - [] Reverse proxies / API gateway
+  - [] [Reverse Proxies](https://zitadel.com/docs/self-hosting/manage/reverseproxy/reverse_proxy)
   - [] Web Application Firewall
 
 #### Networking
@@ -178,13 +180,15 @@ To ease your production setup we created a step by step checklist you may wish t
 - [] make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and cluster
 
 ### Monitoring
-use a appropriate Monitoring Solution to have an overview about your ZITADEL instance. In particular you may want to watch out for things like:
+Use a appropriate Monitoring Solution to have an overview about your ZITADEL instance. In particular you may want to watch out for things like:
 
-- [] CPU and Memory of ZITADEL and the Database
-- [] open Database connections
-- [] running instances of ZITADEL and the Database
+- [] CPU and Memory of ZITADEL and the database
+- [] open database connections
+- [] running instances of ZITADEL and the database
 - [] latency of requests
 - [] requests per second
 - [] requests by URL/endpoint
 - [] lifetime of TLS certificates
-- [] logs
+- [] ZITADEL and database logs
+- [] ZITADEL [Metrics](https://zitadel.com/docs/apis/observability/metrics)
+---
