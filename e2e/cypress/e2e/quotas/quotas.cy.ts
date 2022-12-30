@@ -23,7 +23,7 @@ describe('quotas', () => {
           }
         });
       });
-      it.only('should add a quota only once per unit', function () {
+      it('should add a quota only once per unit', function () {
         addQuota(this.api, this.instanceId, authenticatedRequestsUnit);
         addQuota(this.api, this.instanceId, authenticatedRequestsUnit, false).then((res) => {
           expect(res.status).to.equal(409);
@@ -54,7 +54,7 @@ describe('quotas', () => {
             }
           });
         });
-        it.only('should remove a quota only once per unit', function () {
+        it('should remove a quota only once per unit', function () {
           removeQuota(this.api, this.instanceId, authenticatedRequestsUnit);
           removeQuota(this.api, this.instanceId, authenticatedRequestsUnit, false).then((res) => {
             expect(res.status).to.equal(404);

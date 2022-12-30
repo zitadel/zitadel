@@ -2,6 +2,7 @@ import { requestHeaders } from './apiauth';
 import { findFromList as mapFromList, searchSomething } from './search';
 import { API, Entity, SearchResult, Token } from './types';
 
+// Deprecated (see ensureSomething)
 export function ensureItemExists(
   token: Token,
   searchPath: string,
@@ -24,6 +25,7 @@ export function ensureItemExists(
   );
 }
 
+// Deprecated (see ensureSomething)
 export function ensureItemDoesntExist(
   token: Token,
   searchPath: string,
@@ -41,6 +43,7 @@ export function ensureItemDoesntExist(
   ).then(() => null);
 }
 
+// Deprecated (see ensureSomething)
 export function ensureSetting(
   api: API,
   path: string,
@@ -59,6 +62,7 @@ export function ensureSetting(
   );
 }
 
+// Deprecated (see ensureSomething)
 function awaitDesired(
   trials: number,
   expectEntity: (entity: Entity) => boolean,
@@ -78,11 +82,19 @@ function awaitDesired(
   });
 }
 
+// Deprecated (see ensureSomething)
 interface EnsuredResult {
   id: number;
   sequence: number;
 }
 
+/**
+ * TODO: Deprecated
+ *
+ * We can now query the relevant views processed sequences via
+ * System-API. This can be implemented in a much more generic
+ * way which makes the code tremendously easier maintainable.
+ */
 export function ensureSomething(
   token: Token,
   search: () => Cypress.Chainable<SearchResult>,
