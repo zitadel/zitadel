@@ -110,6 +110,8 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 			squirrel.GtOrEq{accessTimestampCol: start},
 			squirrel.Lt{accessTimestampCol: end},
 			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, zitadel_http.Authorization)),
+			squirrel.NotLike{accessRequestURLCol: "/zitadel.system.v1.SystemService/"},
+			squirrel.NotLike{accessRequestURLCol: "/system/v1/"},
 			squirrel.Or{
 				squirrel.And{
 					squirrel.Eq{accessProtocolCol: HTTP},
