@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -104,14 +105,14 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("count(%s)", accessInstanceIdCol),
 	).
-		From(accessLogsTable + " AS OF SYSTEM TIME '-20s'").
+		From(accessLogsTable /* + " AS OF SYSTEM TIME '-20s'"*/). // TODO: Incomment
 		Where(squirrel.And{
 			squirrel.Eq{accessInstanceIdCol: instanceId},
 			squirrel.GtOrEq{accessTimestampCol: start},
 			squirrel.Lt{accessTimestampCol: end},
-			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, zitadel_http.Authorization)),
-			squirrel.NotLike{accessRequestURLCol: "/zitadel.system.v1.SystemService/"},
-			squirrel.NotLike{accessRequestURLCol: "/system/v1/"},
+			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, strings.ToLower(zitadel_http.Authorization))),
+			squirrel.NotLike{accessRequestURLCol: "%/zitadel.system.v1.SystemService/%"},
+			squirrel.NotLike{accessRequestURLCol: "%/system/v1/%"},
 			squirrel.Or{
 				squirrel.And{
 					squirrel.Eq{accessProtocolCol: HTTP},

@@ -35,7 +35,7 @@ export function ensureHumanIsOrgMember(api: API, username: string, roles: string
 
 export function ensureHumanIsNotProjectMember(
   api: API,
-  projectId: string,
+  projectId: number,
   username: string,
   grantId?: number,
 ): Cypress.Chainable<number> {
@@ -49,7 +49,7 @@ export function ensureHumanIsNotProjectMember(
 
 export function ensureHumanIsProjectMember(
   api: API,
-  projectId: string,
+  projectId: number,
   username: string,
   roles: string[],
   grantId?: number,

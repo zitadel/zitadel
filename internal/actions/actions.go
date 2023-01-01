@@ -33,8 +33,7 @@ func actionFailedMessage(err error) string {
 }
 
 func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) error {
-
-	config := newRunConfig(ctx, opts...)
+	config := newRunConfig(ctx, append(opts, withLogger(ctx))...)
 	if config.functionTimeout == 0 {
 		return z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
 	}

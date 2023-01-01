@@ -2,12 +2,13 @@ import { apiAuth } from '../../support/api/apiauth';
 import { ensureMachineUserExists, ensureUserDoesntExist } from '../../support/api/users';
 import { loginname } from '../../support/login/users';
 import { ensureDomainPolicy } from '../../support/api/policies';
+import { Context } from 'support/commands';
 
 describe('machines', () => {
   const machinesPath = `/users?type=machine`;
 
   beforeEach(() => {
-    apiAuth().as('api');
+    cy.context().as('ctx');
   });
 
   [
@@ -17,9 +18,11 @@ describe('machines', () => {
   ].forEach((machine) => {
     describe(`add "${machine.addName}" with domain setting "${machine.mustBeDomain}"`, () => {
       beforeEach(`ensure it doesn't exist already`, function () {
-        ensureDomainPolicy(this.api, machine.mustBeDomain, false, false);
-        ensureUserDoesntExist(this.api, machine.addName);
-        cy.visit(machinesPath);
+        cy.get<Context>('@ctx').then((ctx) => {
+          ensureDomainPolicy(ctx.api, machine.mustBeDomain, false, false);
+          ensureUserDoesntExist(ctx.api, machine.addName);
+          cy.visit(machinesPath);
+        });
       });
 
       it('should add a machine', () => {
@@ -43,8 +46,10 @@ describe('machines', () => {
 
     describe(`remove "${machine.removeName}" with domain setting "${machine.mustBeDomain}"`, () => {
       beforeEach('ensure it exists', function () {
-        ensureMachineUserExists(this.api, machine.removeName);
-        cy.visit(machinesPath);
+        cy.get<Context>('@ctx').then((ctx) => {
+          ensureMachineUserExists(ctx.api, machine.removeName);
+          cy.visit(machinesPath);
+        });
       });
 
       let loginName = machine.removeName;

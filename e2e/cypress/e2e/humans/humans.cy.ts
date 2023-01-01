@@ -2,24 +2,27 @@ import { apiAuth } from '../../support/api/apiauth';
 import { ensureHumanUserExists, ensureUserDoesntExist } from '../../support/api/users';
 import { loginname } from '../../support/login/users';
 import { ensureDomainPolicy } from '../../support/api/policies';
+import { Context } from 'support/commands';
 
 describe('humans', () => {
   const humansPath = `/users?type=human`;
+
+  beforeEach(() => {
+    cy.context().as('ctx');
+  });
 
   [
     { mustBeDomain: false, addName: 'e2ehumanusernameaddGlobal', removeName: 'e2ehumanusernameremoveGlobal' },
     { mustBeDomain: false, addName: 'e2ehumanusernameadd@test.com', removeName: 'e2ehumanusernameremove@test.com' },
     { mustBeDomain: true, addName: 'e2ehumanusernameadd', removeName: 'e2ehumanusernameremove' },
   ].forEach((user) => {
-    beforeEach(() => {
-      apiAuth().as('api');
-    });
-
     describe(`add "${user.addName}" with domain setting "${user.mustBeDomain}"`, () => {
       beforeEach(`ensure it doesn't exist already`, function () {
-        ensureDomainPolicy(this.api, user.mustBeDomain, true, false);
-        ensureUserDoesntExist(this.api, user.addName);
-        cy.visit(humansPath);
+        cy.get<Context>('@ctx').then((ctx) => {
+          ensureDomainPolicy(ctx.api, user.mustBeDomain, true, false);
+          ensureUserDoesntExist(ctx.api, user.addName);
+          cy.visit(humansPath);
+        });
       });
 
       it('should add a user', () => {
@@ -45,7 +48,9 @@ describe('humans', () => {
 
     describe(`remove "${user.removeName}" with domain setting "${user.mustBeDomain}"`, () => {
       beforeEach('ensure it exists', function () {
-        ensureHumanUserExists(this.api, user.removeName);
+        cy.get<Context>('@ctx').then((ctx) => {
+          ensureHumanUserExists(ctx.api, user.removeName);
+        });
         cy.visit(humansPath);
       });
 

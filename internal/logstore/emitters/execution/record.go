@@ -21,7 +21,7 @@ type Record struct {
 	Metadata   map[string]interface{}
 }
 
-func (e *Record) Redact() logstore.LogRecord {
+func (e *Record) Normalize() logstore.LogRecord {
 	// TODO implement?
 	return e
 }

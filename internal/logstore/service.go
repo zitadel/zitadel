@@ -43,15 +43,20 @@ type Service struct {
 
 func New(quotaQuerier QuotaQuerier, usageReporter UsageReporter, usageQuerierSink *emitter, additionalSink ...*emitter) *Service {
 
+	var usageQuerier UsageQuerier
+	if usageQuerierSink != nil {
+		usageQuerier = usageQuerierSink.emitter.(UsageQuerier)
+	}
+
 	svc := &Service{
-		reportingEnabled: usageQuerierSink.enabled,
-		usageQuerier:     usageQuerierSink.emitter.(UsageQuerier),
+		reportingEnabled: usageQuerierSink != nil && usageQuerierSink.enabled,
+		usageQuerier:     usageQuerier,
 		quotaQuerier:     quotaQuerier,
 		usageReporter:    usageReporter,
 	}
 
 	for _, s := range append([]*emitter{usageQuerierSink}, additionalSink...) {
-		if s.enabled {
+		if s != nil && s.enabled {
 			svc.enabledSinks = append(svc.enabledSinks, s)
 		}
 	}
@@ -67,7 +72,7 @@ func (s *Service) Enabled() bool {
 
 func (s *Service) Handle(ctx context.Context, record LogRecord) error {
 	for _, sink := range s.enabledSinks {
-		if err := sink.Emit(ctx, record.Redact()); err != nil {
+		if err := sink.Emit(ctx, record.Normalize()); err != nil {
 			return err
 		}
 	}

@@ -34,14 +34,14 @@ type logger struct {
 
 // newLogger returns a *logger instance that should only be used for a single action run.
 // The first log call sets the started field for subsequent log calls
-func newLogger(ctx context.Context, actionID, instanceID, projectID string, metadata map[string]interface{}) *logger {
+func newLogger(ctx context.Context, instanceID, projectID string) *logger {
 	return &logger{
 		ctx:        ctx,
 		started:    time.Time{},
 		instanceID: instanceID,
 		projectID:  projectID,
-		actionID:   actionID,
-		metadata:   metadata,
+		actionID:   "",  // TODO: fill
+		metadata:   nil, // TODO: fill
 	}
 }
 
@@ -83,11 +83,11 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 	}
 }
 
-func WithLogger(ctx context.Context, actionID string, metadata map[string]interface{}) Option {
+func withLogger(ctx context.Context) Option {
 	instance := authz.GetInstance(ctx)
 	instanceID := instance.InstanceID()
 	return func(c *runConfig) {
-		c.logger = newLogger(ctx, actionID, instanceID, instance.ProjectID(), metadata)
+		c.logger = newLogger(ctx, instanceID, instance.ProjectID())
 		c.instanceID = instanceID
 		c.modules["zitadel/log"] = func(runtime *goja.Runtime, module *goja.Object) {
 			console.RequireWithPrinter(c.logger)(runtime, module)

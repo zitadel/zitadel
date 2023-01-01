@@ -40,7 +40,7 @@ function customize(theme: string, user: User) {
         cy.get('[data-e2e="image-part-logo"]')
           .find('input')
           .then(function (el) {
-            const blob = Cypress.Blob.base64StringToBlob(this.logo, 'image/png');
+            const blob = Cypress.Blob.base64StringToBlob(ctx.logo, 'image/png');
             const file = new File([blob], 'images/logo.png', { type: 'image/png' });
             const list = new DataTransfer();
 

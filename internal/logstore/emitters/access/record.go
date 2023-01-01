@@ -36,19 +36,22 @@ const (
 	redacted = "[REDACTED]"
 )
 
-func (a *Record) Redact() logstore.LogRecord {
+func (a *Record) Normalize() logstore.LogRecord {
 	clone := &(*a)
-	redactHeaders(clone.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "cookie")
-	redactHeaders(clone.ResponseHeaders, "set-cookie")
+	normalizeHeaders(clone.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "grpcgateway-authorization", "cookie", "grpcgateway-cookie")
+	normalizeHeaders(clone.ResponseHeaders, "set-cookie")
 	return clone
 }
 
-func redactHeaders(header http.Header, redactKeysLower ...string) {
-	for k := range header {
+// normalizeHeaders lowers all header keys and redacts secrets
+func normalizeHeaders(header http.Header, redactKeysLower ...string) {
+	for k, v := range header {
 		lowerKey := strings.ToLower(k)
+		delete(header, k)
+		header[lowerKey] = v
 		for _, r := range redactKeysLower {
 			if lowerKey == r {
-				header[k] = []string{redacted}
+				header[lowerKey] = []string{redacted}
 				break
 			}
 		}

@@ -19,7 +19,7 @@ type record struct {
 	redacted bool
 }
 
-func (r *record) Redact() logstore.LogRecord {
+func (r *record) Normalize() logstore.LogRecord {
 	clone := &(*r)
 	clone.redacted = true
 	return clone

@@ -1,3 +1,7 @@
+// The library github.com/benbjohnson/clock fails when race is enabled
+// https://github.com/benbjohnson/clock/issues/44
+//go:build !race
+
 package logstore_test
 
 import (
@@ -7,11 +11,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/logstore"
+
 	"github.com/zitadel/zitadel/internal/repository/instance"
 
 	"github.com/benbjohnson/clock"
 
-	"github.com/zitadel/zitadel/internal/logstore"
 	emittermock "github.com/zitadel/zitadel/internal/logstore/emitters/mock"
 	quotaqueriermock "github.com/zitadel/zitadel/internal/logstore/quotaqueriers/mock"
 	"github.com/zitadel/zitadel/internal/query"
@@ -114,7 +119,7 @@ func TestService(t *testing.T) {
 			},
 		},
 	}, {
-		name: "when all sink are disabled, the service should be disabled",
+		name: "when all sink are disabled, the service is disabled",
 		args: args{
 			mainSink:      emitterConfig(withDisabled()),
 			secondarySink: emitterConfig(withDisabled()),
@@ -155,7 +160,7 @@ func TestService(t *testing.T) {
 			},
 		},
 	}, {
-		name: "when quota has a limit of 90, 30 should be remaining",
+		name: "when quota has a limit of 90, 30 are remaining",
 		args: args{
 			mainSink:      emitterConfig(),
 			secondarySink: emitterConfig(),
@@ -174,7 +179,7 @@ func TestService(t *testing.T) {
 			},
 		},
 	}, {
-		name: "when quota has a limit of 30, 0 should be remaining",
+		name: "when quota has a limit of 30, 0 are remaining",
 		args: args{
 			mainSink:      emitterConfig(),
 			secondarySink: emitterConfig(),
@@ -193,7 +198,7 @@ func TestService(t *testing.T) {
 			},
 		},
 	}, {
-		name: "when quota has amount of 30 but is not limited, remaining should be nil",
+		name: "when quota has amount of 30 but is not limited, remaining is nil",
 		args: args{
 			mainSink:      emitterConfig(),
 			secondarySink: emitterConfig(),

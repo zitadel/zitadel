@@ -1,4 +1,8 @@
 import 'cypress-wait-until';
+import { apiAuth, systemAuth } from './api/apiauth';
+import { API, SystemAPI } from './api/types';
+import { ensureQuotaIsRemoved, Unit } from './api/quota';
+import { instanceUnderTest } from './api/instances';
 //
 //namespace Cypress {
 //    interface Chainable {
@@ -44,8 +48,24 @@ declare global {
        * Custom command that waits until the selector finds zero elements.
        */
       shouldNotExist(options?: ShouldNotExistOptions): Cypress.Chainable<null>;
+
+      /**
+       * Custom command that ensures a reliable testing context and returns it
+       */
+      context(): Cypress.Chainable<Context>;
+
+      /**
+       * Custom command that has to be called before each test
+       */
+      resetContext(): Cypress.Chainable<null>;
     }
   }
+}
+
+export interface Context {
+  api: API;
+  system: SystemAPI;
+  instanceId: number;
 }
 
 Cypress.Commands.add('clipboardMatches', { prevSubject: false }, (pattern: RegExp | string) => {
@@ -77,4 +97,47 @@ Cypress.Commands.add('shouldNotExist', { prevSubject: false }, (options?: Should
     },
     { timeout: typeof options?.timeout === 'number' ? options.timeout : 500 },
   );
+});
+/*
+Cypress.Commands.add('authenticate', {prevSubject:false}, ()=>{
+  return systemAuth().then((system) => {
+    return apiAuth().then((api) => {
+      return {
+        api: api,
+        system: system,
+      }
+    });
+})
+})*/
+
+Cypress.Commands.add('context', { prevSubject: false }, () => {
+  return systemAuth().then((system) => {
+    return instanceUnderTest(system).then((instanceId) => {
+      return ensureQuotaIsRemoved(
+        {
+          system: system,
+          api: null,
+          instanceId: instanceId,
+        },
+        Unit.AuthenticatedRequests,
+      ).then(() => {
+        return ensureQuotaIsRemoved(
+          {
+            system: system,
+            api: null,
+            instanceId: instanceId,
+          },
+          Unit.ExecutionSeconds,
+        ).then(() => {
+          return apiAuth().then((api) => {
+            return {
+              system: system,
+              api: api,
+              instanceId: instanceId,
+            };
+          });
+        });
+      });
+    });
+  });
 });

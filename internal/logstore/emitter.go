@@ -26,12 +26,12 @@ type emitter struct {
 }
 
 type LogRecord interface {
-	Redact() LogRecord
+	Normalize() LogRecord
 }
 
 type LogRecordFunc func() LogRecord
 
-func (r LogRecordFunc) Redact() LogRecord {
+func (r LogRecordFunc) Normalize() LogRecord {
 	return r()
 }
 

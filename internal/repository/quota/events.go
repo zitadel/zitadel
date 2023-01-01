@@ -2,6 +2,7 @@ package quota
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/errors"
@@ -29,7 +30,7 @@ const (
 func NewAddQuotaUnitUniqueConstraint(unit Unit) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueQuotaNameType,
-		string(unit),
+		strconv.FormatUint(uint64(unit), 10),
 		"Errors.Quota.AlreadyExists",
 	)
 }
@@ -37,7 +38,8 @@ func NewAddQuotaUnitUniqueConstraint(unit Unit) *eventstore.EventUniqueConstrain
 func NewRemoveQuotaNameUniqueConstraint(unit Unit) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
 		UniqueQuotaNameType,
-		string(unit))
+		strconv.FormatUint(uint64(unit), 10),
+	)
 }
 
 type AddedEvent struct {

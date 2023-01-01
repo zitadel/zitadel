@@ -5,6 +5,11 @@ export interface Token {
 export interface API extends Token {
   mgmtBaseURL: string;
   adminBaseURL: string;
+  authBaseURL: string;
+  assetsBaseURL: string;
+  oidcBaseURL: string;
+  oauthBaseURL: string;
+  samlBaseURL: string;
 }
 
 export interface SystemAPI extends Token {

@@ -1,14 +1,7 @@
 import { SystemAPI } from './types';
 
-// We just have to query the instanceId once
-let instanceId: Cypress.Chainable<number>;
-
 export function instanceUnderTest(api: SystemAPI): Cypress.Chainable<number> {
-  if (instanceId) {
-    return instanceId;
-  }
-
-  instanceId = cy
+  return cy
     .request({
       method: 'POST',
       url: `${api.baseURL}/instances/_search`,
@@ -24,5 +17,4 @@ export function instanceUnderTest(api: SystemAPI): Cypress.Chainable<number> {
       );
       return instances[0].id;
     });
-  return instanceId;
 }

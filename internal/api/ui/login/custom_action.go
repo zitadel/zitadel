@@ -115,7 +115,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithLogger(actionCtx, a.ID, nil))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -219,7 +219,7 @@ func (l *Login) customExternalUserToLoginUserMapping(ctx context.Context, user *
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithLogger(actionCtx, a.ID, nil))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -303,7 +303,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.To
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithLogger(actionCtx, a.ID, nil))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
