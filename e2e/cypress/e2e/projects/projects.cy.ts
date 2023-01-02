@@ -14,9 +14,9 @@ describe('projects', () => {
     beforeEach(`ensure it doesn't exist already`, function () {
       cy.get<Context>('@ctx').then((ctx) => {
         ensureProjectDoesntExist(ctx.api, testProjectNameCreate);
-      cy.visit(`/projects`);
+        cy.visit(`/projects`);
+      });
     });
-  });
 
     it('should add a project', () => {
       cy.get('.add-project-button').click({ force: true });
@@ -33,9 +33,9 @@ describe('projects', () => {
     beforeEach('ensure it exists', function () {
       cy.get<Context>('@ctx').then((ctx) => {
         ensureProjectExists(ctx.api, testProjectNameDelete);
-      cy.visit(`/projects`);
+        cy.visit(`/projects`);
+      });
     });
-  });
 
     describe('remove project', () => {
       it('removes the project from list view', () => {
