@@ -43,7 +43,7 @@ export function ensureHumanIsNotProjectMember(
     api,
     `${api.mgmtBaseURL}/projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members/_search`,
     (member: any) => (<string>member.preferredLoginName).startsWith(username),
-    (member) => `${api.mgmtBaseURL}/projects/${projectId}${grantId ? `grants/${grantId}/` : ''}/members/${member.userId}`,
+    (member) => `${api.mgmtBaseURL}/projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members/${member.userId}`,
   );
 }
 

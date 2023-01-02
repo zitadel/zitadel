@@ -9,7 +9,6 @@ import { ensureOrgExists } from 'support/api/orgs';
 import { ensureHumanUserExists, ensureUserDoesntExist } from 'support/api/users';
 import { Context } from 'support/commands';
 import { loginname } from 'support/login/users';
-import { apiAuth } from '../../support/api/apiauth';
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from '../../support/api/projects';
 
 describe('permissions', () => {
@@ -18,7 +17,7 @@ describe('permissions', () => {
   });
 
   describe('management', () => {
-    const testManagerLoginname = loginname('e2ehumanmanager', Cypress.env('ORGANIZATION'));
+    const testManagerUsername = 'e2ehumanmanager';
     function testAuthorizations(
       roles: string[],
       beforeCreate: (ctx: Context) => void,
@@ -27,8 +26,8 @@ describe('permissions', () => {
     ) {
       beforeEach(function () {
         cy.get<Context>('@ctx').then((ctx) => {
-          ensureUserDoesntExist(ctx.api, testManagerLoginname);
-          ensureHumanUserExists(ctx.api, testManagerLoginname);
+          ensureUserDoesntExist(ctx.api, testManagerUsername);
+          ensureHumanUserExists(ctx.api, testManagerUsername);
         });
       });
 
@@ -42,7 +41,7 @@ describe('permissions', () => {
 
         it('should add a manager', () => {
           cy.get('[data-e2e="add-member-button"]').click();
-          cy.get('[data-e2e="add-member-input"]').type(testManagerLoginname);
+          cy.get('[data-e2e="add-member-input"]').type(testManagerUsername);
           cy.get('[data-e2e="user-option"]').click();
           cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
           cy.get('[data-e2e="confirm-add-member-button"]').click();
@@ -53,7 +52,7 @@ describe('permissions', () => {
       });
 
       describe('mutate authorization', () => {
-        const rowSelector = `tr:contains(${testManagerLoginname})`;
+        const rowSelector = `tr:contains(${testManagerUsername})`;
 
         beforeEach(() => {
           cy.get<Context>('@ctx').then((ctx) => {
@@ -97,12 +96,13 @@ describe('permissions', () => {
       testAuthorizations(
         roles.map((role) => role.display),
         function (ctx: Context) {
-          ensureHumanIsNotOrgMember(ctx.api, testManagerLoginname);
+          ensureHumanIsNotOrgMember(ctx.api, testManagerUsername);
         },
         function (ctx: Context) {
+          ensureHumanIsNotOrgMember(ctx.api, testManagerUsername);
           ensureHumanIsOrgMember(
             ctx.api,
-            testManagerLoginname,
+            testManagerUsername,
             roles.map((role) => role.internal),
           );
         },
@@ -137,15 +137,16 @@ describe('permissions', () => {
             roles.map((role) => role.display),
             function (ctx) {
               cy.get<number>('@projectId').then((projectId) => {
-                ensureHumanIsNotProjectMember(ctx.api, projectId, testManagerLoginname);
+                ensureHumanIsNotProjectMember(ctx.api, projectId, testManagerUsername);
               });
             },
             function (ctx) {
               cy.get<number>('@projectId').then((projectId) => {
+                ensureHumanIsNotProjectMember(ctx.api, projectId, testManagerUsername);
                 ensureHumanIsProjectMember(
                   ctx.api,
                   projectId,
-                  testManagerLoginname,
+                  testManagerUsername,
                   roles.map((role) => role.internal),
                 );
               });
@@ -213,17 +214,18 @@ describe('permissions', () => {
             function (ctx: Context) {
               cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
                 cy.get<number>('@grantId').then((grantId) => {
-                  ensureHumanIsNotProjectMember(ctx.api, foreignProjectId, testManagerLoginname, grantId);
+                  ensureHumanIsNotProjectMember(ctx.api, foreignProjectId, testManagerUsername, grantId);
                 });
               });
             },
             function (ctx: Context) {
               cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
                 cy.get<number>('@grantId').then((grantId) => {
+                  ensureHumanIsNotProjectMember(ctx.api, foreignProjectId, testManagerUsername, grantId);
                   ensureHumanIsProjectMember(
                     ctx.api,
                     foreignProjectId,
-                    testManagerLoginname,
+                    testManagerUsername,
                     roles.map((role) => role.internal),
                     grantId,
                   );

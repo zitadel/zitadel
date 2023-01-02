@@ -55,7 +55,7 @@ export default defineConfig({
 
   e2e: {
     baseUrl: baseUrl(),
-    experimentalSessionAndOrigin: true,
+    experimentalRunAllSpecs: true,
     setupNodeEvents(on, config) {
 
       on('task', {
