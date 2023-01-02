@@ -172,6 +172,9 @@ To ease your production setup we created a step by step best practise checklist 
 ### ZITADEL configuration
 - [] configure a valid [SMTP Server](https://zitadel.com/docs/guides/manage/console/instance-settings#smtp) and test emails
 - [] Add [Custom Branding](https://zitadel.com/docs/guides/manage/customize/branding) if required
+- [] configure a valid [SMS Service](https://zitadel.com/docs/guides/manage/console/instance-settings#sms) such as Twilio if needed
+- [] configure your privacy policy, terms of service and a help Link if needed
+- [] secure your [masterkey](https://zitadel.com/docs/self-hosting/manage/configure)
 
 ### Security
 - [] use a FQDN and a trusted valid certificate for external [TLS](https://zitadel.com/docs/self-hosting/manage/tls_modes#http2) connections
