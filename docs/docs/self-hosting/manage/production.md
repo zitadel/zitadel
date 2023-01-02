@@ -140,7 +140,7 @@ DefaultInstance:
 ---
 
 ## Checklist
-To ease your production setup we created a step by step checklist you may wish to follow.
+To ease your production setup we created a step by step best practise checklist you may wish to follow.
 
 ### infrastructure configuration
 
