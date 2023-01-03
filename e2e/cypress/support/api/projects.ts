@@ -1,5 +1,5 @@
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
-import { API } from './types';
+import { API, Entity } from './types';
 
 export function ensureProjectExists(api: API, projectName: string, orgId?: number): Cypress.Chainable<number> {
   return ensureItemExists(
@@ -40,9 +40,8 @@ export function ensureProjectResourceDoesntExist(
   return ensureItemDoesntExist(
     api,
     `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/_search`,
-    (resource: any) => resource[resourceType.compareProperty] === resourceName,
-    (resource) =>
-      `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`,
+    (resource: Entity) => resource[resourceType.compareProperty] === resourceName,
+    (resource: Entity) => `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`,
     orgId,
   );
 }

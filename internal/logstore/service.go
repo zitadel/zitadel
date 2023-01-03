@@ -86,7 +86,7 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error)
 	}
 
 	quota, err := s.quotaQuerier.GetQuota(ctx, instanceID, s.usageQuerier.QuotaUnit())
-	if err != nil {
+	if err != nil || quota == nil {
 		return nil, err
 	}
 

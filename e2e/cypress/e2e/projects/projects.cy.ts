@@ -11,7 +11,7 @@ describe('projects', () => {
   const testProjectNameDelete = 'e2eprojectdelete';
 
   describe('add project', () => {
-    beforeEach(`ensure it doesn't exist already`, function () {
+    beforeEach(`ensure it doesn't exist already`, ()=> {
       cy.get<Context>('@ctx').then((ctx) => {
         ensureProjectDoesntExist(ctx.api, testProjectNameCreate);
         cy.visit(`/projects`);
@@ -30,7 +30,7 @@ describe('projects', () => {
   });
 
   describe('edit project', () => {
-    beforeEach('ensure it exists', function () {
+    beforeEach('ensure it exists', ()=> {
       cy.get<Context>('@ctx').then((ctx) => {
         ensureProjectExists(ctx.api, testProjectNameDelete);
         cy.visit(`/projects`);

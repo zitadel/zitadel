@@ -11,25 +11,22 @@ beforeEach(() => {
 describe('quotas', () => {
   describe('management', () => {
     describe('add one quota', () => {
-      it('should add a quota only once per unit', function () {
+      it('should add a quota only once per unit', ()=> {
         cy.get<Context>('@ctx').then((ctx) => {
-          addQuota(ctx).then(() => {
-            cy.log('1');
-          });
+          addQuota(ctx);
           addQuota(ctx, false).then((res) => {
-            cy.log('2');
             expect(res.status).to.equal(409);
           });
         });
       });
 
       describe('add two quotas', () => {
-        beforeEach(function () {
+        beforeEach(()=> {
           cy.get<Context>('@ctx').then((ctx) => {
             ensureQuotaIsRemoved(ctx, Unit.ExecutionSeconds);
           });
         });
-        it('should add a quota for each unit', function () {
+        it('should add a quota for each unit', ()=> {
           cy.get<Context>('@ctx').then((ctx) => {
             addQuota(ctx);
             addQuota(ctx, true, Unit.ExecutionSeconds);
@@ -40,12 +37,12 @@ describe('quotas', () => {
 
     describe('edit', () => {
       describe('remove one quota', () => {
-        beforeEach(function () {
+        beforeEach(()=> {
           cy.get<Context>('@ctx').then((ctx) => {
             ensureQuotaIsAdded(ctx);
           });
         });
-        it('should remove a quota only once per unit', function () {
+        it('should remove a quota only once per unit', ()=> {
           cy.get<Context>('@ctx').then((ctx) => {
             removeQuota(ctx);
           });
@@ -57,12 +54,12 @@ describe('quotas', () => {
         });
 
         describe('remove two quotas', () => {
-          beforeEach(function () {
+          beforeEach(()=> {
             cy.get<Context>('@ctx').then((ctx) => {
               ensureQuotaIsAdded(ctx, Unit.ExecutionSeconds);
             });
           });
-          it('should remove a quota for each unit', function () {
+          it('should remove a quota for each unit', ()=> {
             cy.get<Context>('@ctx').then((ctx) => {
               removeQuota(ctx);
               removeQuota(ctx, true, Unit.ExecutionSeconds);
@@ -76,7 +73,7 @@ describe('quotas', () => {
   describe('usage', () => {
     describe('authenticated requests', () => {
       describe('notifications', () => {
-        it('authenticated requests are limited', function () {
+        it('authenticated requests are limited', ()=> {
           cy.get<Context>('@ctx').then((ctx) => {
             const urls = [
               `${ctx.api.authBaseURL}/users/me`,

@@ -19,7 +19,7 @@ import (
 func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit) (*Quota, error) {
 
 	stmt, args, err := squirrel.Select(projection.QuotaAmountCol, projection.QuotaLimitCol, projection.QuotaFromCol, projection.QuotaIntervalCol).
-		From(projection.QuotaTable + " AS OF SYSTEM TIME '-20s'").
+		From(projection.QuotaTable /* + " AS OF SYSTEM TIME '-20s'"*/). // TODO: Incomment
 		Where(squirrel.Eq{
 			projection.QuotaInstanceIDCol: instanceID,
 			projection.QuotaUnitCol:       unit,

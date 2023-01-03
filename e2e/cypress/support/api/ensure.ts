@@ -111,6 +111,10 @@ export function ensureSomething(
         return cy.wrap({ id: sRes.id, sequence: sRes.sequence });
       }
 
+      if (apiPath(sRes.entity).indexOf('/admin/v1/policies/domain') > -1) {
+        debugger;
+      }
+
       return cy
         .request({
           method: ensureMethod,
