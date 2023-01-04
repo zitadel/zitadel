@@ -62,7 +62,7 @@
     "@angular/language-service": "^14.2.9",
     "@types/jasmine": "~4.3.0",
     "@types/jasminewd2": "~2.0.10",
-    "@types/jsonwebtoken": "^8.5.5",
+    "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^18.8.1",
     "@typescript-eslint/parser": "5.42.0",
     "@typescript-eslint/eslint-plugin": "5.42.0",
