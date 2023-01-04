@@ -465,7 +465,7 @@ DefaultInstance:
   SMTPConfiguration:
     # configuration of the host
     SMTP:
-      #for example smtp.mailtrap.io:2525
+      # must include the port, like smtp.mailtrap.io:2525
       Host:
       User:
       Password:
