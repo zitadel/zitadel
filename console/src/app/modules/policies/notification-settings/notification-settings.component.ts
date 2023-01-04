@@ -139,7 +139,7 @@ export class NotificationSettingsComponent implements OnInit {
   private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse> {
     if (this.hasSMTPConfig) {
       const req = new UpdateSMTPConfigRequest();
-      req.setHostAndPort(this.hostAndPort?.value ?? '');
+      req.setHost(this.hostAndPort?.value ?? '');
       req.setSenderAddress(this.senderAddress?.value ?? '');
       req.setSenderName(this.senderName?.value ?? '');
       req.setTls(this.tls?.value ?? false);
