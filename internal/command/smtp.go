@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"net"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -103,11 +104,9 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, hostA
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
 		}
-		if hostAndPort = strings.TrimSpace(hostAndPort); hostAndPort == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-SF3g1", "Errors.Invalid.Argument")
-		}
-		if strings.Count(hostAndPort, ":") != 1 {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-VDwvq", "Errors.Invalid.Argument")
+		hostAndPort = strings.TrimSpace(hostAndPort)
+		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			fromSplitted := strings.Split(from, "@")
@@ -151,13 +150,10 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, ho
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
 		}
-		if hostAndPort = strings.TrimSpace(hostAndPort); hostAndPort == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-VDwvq", "Errors.Invalid.Argument")
+		hostAndPort = strings.TrimSpace(hostAndPort)
+		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-Kv875", "Errors.Invalid.Argument")
 		}
-		if strings.Count(hostAndPort, ":") != 1 {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-VDwvq", "Errors.Invalid.Argument")
-		}
-
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			fromSplitted := strings.Split(from, "@")
 			senderDomain := fromSplitted[len(fromSplitted)-1]
