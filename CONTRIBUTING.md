@@ -253,6 +253,9 @@ npm run lint:fix
 # Change to the e2e directory
 cd .. && cd e2e/
 
+# If you made changes in the e2e directory, make sure you reformat the files here too
+npm run lint:fix
+
 # Install npm dependencies
 npm install
 
