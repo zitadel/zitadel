@@ -59,7 +59,7 @@ export class NotificationSettingsComponent implements OnInit {
       senderAddress: [{ disabled: true, value: '' }, [Validators.required]],
       senderName: [{ disabled: true, value: '' }, [Validators.required]],
       tls: [{ disabled: true, value: true }, [Validators.required]],
-      host: [{ disabled: true, value: '' }, [Validators.required]],
+      hostAndPort: [{ disabled: true, value: '' }, [Validators.required]],
       user: [{ disabled: true, value: '' }, [Validators.required]],
     });
   }
@@ -139,7 +139,7 @@ export class NotificationSettingsComponent implements OnInit {
   private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse> {
     if (this.hasSMTPConfig) {
       const req = new UpdateSMTPConfigRequest();
-      req.setHost(this.host?.value ?? '');
+      req.setHostAndPort(this.hostAndPort?.value ?? '');
       req.setSenderAddress(this.senderAddress?.value ?? '');
       req.setSenderName(this.senderName?.value ?? '');
       req.setTls(this.tls?.value ?? false);
@@ -148,7 +148,7 @@ export class NotificationSettingsComponent implements OnInit {
       return this.service.updateSMTPConfig(req);
     } else {
       const req = new AddSMTPConfigRequest();
-      req.setHost(this.host?.value ?? '');
+      req.setHost(this.hostAndPort?.value ?? '');
       req.setSenderAddress(this.senderAddress?.value ?? '');
       req.setSenderName(this.senderName?.value ?? '');
       req.setTls(this.tls?.value ?? false);
@@ -305,7 +305,7 @@ export class NotificationSettingsComponent implements OnInit {
     return this.form.get('user');
   }
 
-  public get host(): AbstractControl | null {
-    return this.form.get('host');
+  public get hostAndPort(): AbstractControl | null {
+    return this.form.get('hostAndPort');
   }
 }
