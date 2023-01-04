@@ -39,9 +39,8 @@ describe('permissions', () => {
           cy.get('[data-e2e="user-option"]').click();
           cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
           cy.get('[data-e2e="confirm-add-member-button"]').click();
-          cy.get('.data-e2e-success');
+          cy.shouldConfirmSuccess();
           cy.contains('[data-e2e="member-avatar"]', 'ee');
-          cy.shouldNotExist({ selector: '.data-e2e-failure' });
         });
       });
 
@@ -59,9 +58,11 @@ describe('permissions', () => {
         it('should remove a manager', () => {
           cy.get('@managerRow').find('[data-e2e="remove-member-button"]').click({ force: true });
           cy.get('[data-e2e="confirm-dialog-button"]').click();
-          cy.get('.data-e2e-success');
-          cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
-          cy.shouldNotExist({ selector: '.data-e2e-failure' });
+          cy.shouldConfirmSuccess();
+          cy.shouldNotExist({
+            selector: rowSelector,
+            timeout: { ms: 2000, errMessage: 'timed out before manager disappeared from the table' },
+          });
         });
 
         it('should remove a managers authorization', () => {
@@ -71,11 +72,10 @@ describe('permissions', () => {
             .find('[data-e2e="remove-role-button"]')
             .click({ force: true }); // TODO: Is this a bug?
           cy.get('[data-e2e="confirm-dialog-button"]').click();
-          cy.get('.data-e2e-success');
+          cy.shouldConfirmSuccess();
           cy.get('@managerRow')
             .find('[data-e2e="remove-role-button"]')
             .should('have.length', roles.length - 1);
-          cy.shouldNotExist({ selector: '.data-e2e-failure' });
         });
       });
     }
@@ -156,9 +156,8 @@ describe('permissions', () => {
             cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
             cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
             cy.get('[data-e2e="save-button"]').click();
-            cy.get('.data-e2e-success');
+            cy.shouldConfirmSuccess();
             cy.contains('tr', testRoleName);
-            cy.shouldNotExist({ selector: '.data-e2e-failure' });
           });
           it('should remove a role');
         });
