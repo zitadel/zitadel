@@ -270,7 +270,7 @@ You can also open the test suite interactively for fast success feedback on spec
 npm run open:dev
 ```
 
-When you are happy with your changes, you can format your cleanup your environment
+When you are happy with your changes, you can format your code and cleanup your environment
 
 ```bash
 # Stop and remove the docker containers for zitadel and the database
