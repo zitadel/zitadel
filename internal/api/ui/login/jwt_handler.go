@@ -129,7 +129,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 	}
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	user, metadata, err = l.customExternalUserToLoginUserMapping(r.Context(), user, tokens, authReq, idpConfig, metadata, resourceOwner)
+	user, metadata, err = l.customUserToLoginUserMapping(r.Context(), user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -144,7 +144,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(r.Context(), authReq.UserID, tokens, authReq, idpConfig, resourceOwner)
+	userGrants, err := l.customGrants(r.Context(), authReq.UserID, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

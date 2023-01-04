@@ -125,8 +125,8 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	return user, err
 }
 
-func (l *Login) customExternalUserToLoginUserMapping(ctx context.Context, user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, metadata []*domain.Metadata, resourceOwner string) (*domain.Human, []*domain.Metadata, error) {
-	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePreCreation, resourceOwner, false)
+func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.Human, metadata []*domain.Metadata, resourceOwner string, flowType domain.FlowType) (*domain.Human, []*domain.Metadata, error) {
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePreCreation, resourceOwner, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -229,8 +229,8 @@ func (l *Login) customExternalUserToLoginUserMapping(ctx context.Context, user *
 	return user, metadata, err
 }
 
-func (l *Login) customGrants(ctx context.Context, userID string, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, resourceOwner string) ([]*domain.UserGrant, error) {
-	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation, resourceOwner, false)
+func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner string, flowType domain.FlowType) ([]*domain.UserGrant, error) {
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePostCreation, resourceOwner, false)
 	if err != nil {
 		return nil, err
 	}

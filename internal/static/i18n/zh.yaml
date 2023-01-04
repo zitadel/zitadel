@@ -924,6 +924,7 @@ Action:
       Unspecified: 未指定的
       ExternalAuthentication: 外部认证
       CustomiseToken: 自定义令牌
+      InternalAuthentication: 内部认证
   TriggerType:
     Unspecified: 未指定的
     PostAuthentication: 后期认证
