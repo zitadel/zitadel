@@ -119,7 +119,7 @@
             >
               <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
               <span>{{ role | roletransform }}</span>
-              <button *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
+              <button (click)="$event.stopPropagation()" *ngIf="canWrite" matChipRemove data-e2e="remove-role-button">
                 <mat-icon>cancel</mat-icon>
               </button>
             </mat-chip>

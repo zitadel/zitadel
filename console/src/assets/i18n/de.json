@@ -1484,6 +1484,12 @@
       "DELETED": "Projekt gelöscht."
     }
   },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Rolle löschen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff eine Rolle zu entfernen. Wollen Sie fortfahren?"
+    }
+  },
   "NEXTSTEPS": {
     "TITLE": "Nächste Schritte"
   },

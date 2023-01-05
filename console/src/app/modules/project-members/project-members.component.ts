@@ -23,6 +23,7 @@ export class ProjectMembersComponent {
   public INITIALPAGESIZE: number = 25;
   public project!: Project.AsObject | GrantedProject.AsObject;
   public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
+  public projectId: string = '';
   public grantId: string = '';
   public projectName: string = '';
   public dataSource!: ProjectMembersDataSource;
@@ -40,7 +41,7 @@ export class ProjectMembersComponent {
     private mgmtService: ManagementService,
     private dialog: MatDialog,
     private toast: ToastService,
-    breadcrumbService: BreadcrumbService,
+    private breadcrumbService: BreadcrumbService,
     private route: ActivatedRoute,
   ) {
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -49,78 +50,85 @@ export class ProjectMembersComponent {
       this.getRoleOptions();
 
       this.route.params.subscribe((params) => {
+        this.projectId = params.projectid;
         this.grantId = params.grantid;
-        if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-          this.mgmtService.getProjectByID(params.projectid).then((resp) => {
-            if (resp.project) {
-              this.project = resp.project;
-              this.projectName = this.project.name;
-              this.dataSource = new ProjectMembersDataSource(this.mgmtService);
-              this.dataSource.loadMembers(this.project.id, this.projectType, 0, this.INITIALPAGESIZE);
+        this.loadMembers();
+      });
+    });
+  }
 
-              this.changePageFactory = (event?: PageEvent) => {
-                return this.dataSource.loadMembers(
-                  (this.project as Project.AsObject).id,
-                  this.projectType,
-                  event?.pageIndex ?? 0,
-                  event?.pageSize ?? this.INITIALPAGESIZE,
-                  this.grantId,
-                );
-              };
+  public loadMembers(): Promise<any> {
+    if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
+      return this.mgmtService.getProjectByID(this.projectId).then((resp) => {
+        if (resp.project) {
+          this.project = resp.project;
+          this.projectName = this.project.name;
+          this.dataSource = new ProjectMembersDataSource(this.mgmtService);
+          this.dataSource.loadMembers(this.project.id, this.projectType, 0, this.INITIALPAGESIZE);
 
-              this.mgmtService.getIAM().then((iam) => {
-                const isZitadel = iam.iamProjectId === (this.project as Project.AsObject).id;
-                const breadcrumbs = [
-                  new Breadcrumb({
-                    type: BreadcrumbType.ORG,
-                    routerLink: ['/org'],
-                  }),
-                  new Breadcrumb({
-                    type: BreadcrumbType.PROJECT,
-                    param: { key: 'projectid', value: (this.project as Project.AsObject).id },
-                    routerLink: ['/projects', (this.project as Project.AsObject).id],
-                    isZitadel: isZitadel,
-                  }),
-                ];
-                breadcrumbService.setBreadcrumb(breadcrumbs);
-              });
-            }
-          });
-        } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
-          this.mgmtService.getGrantedProjectByID(params.projectid, params.grantid).then((resp) => {
-            if (resp.grantedProject) {
-              this.project = resp.grantedProject;
-              this.projectName = this.project.projectName;
-              this.dataSource = new ProjectMembersDataSource(this.mgmtService);
-              this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE, this.grantId);
+          this.changePageFactory = (event?: PageEvent) => {
+            return this.dataSource.loadMembers(
+              (this.project as Project.AsObject).id,
+              this.projectType,
+              event?.pageIndex ?? 0,
+              event?.pageSize ?? this.INITIALPAGESIZE,
+              this.grantId,
+            );
+          };
 
-              this.changePageFactory = (event?: PageEvent) => {
-                return this.dataSource.loadMembers(
-                  (this.project as GrantedProject.AsObject).projectId,
-                  this.projectType,
-                  event?.pageIndex ?? 0,
-                  event?.pageSize ?? this.INITIALPAGESIZE,
-                  this.grantId,
-                );
-              };
-
-              const breadcrumbs = [
-                new Breadcrumb({
-                  type: BreadcrumbType.ORG,
-                  routerLink: ['/org'],
-                }),
-                new Breadcrumb({
-                  type: BreadcrumbType.GRANTEDPROJECT,
-                  param: { key: 'projectid', value: (this.project as GrantedProject.AsObject).projectId },
-                  routerLink: ['/projects', (this.project as GrantedProject.AsObject).projectId],
-                }),
-              ];
-              breadcrumbService.setBreadcrumb(breadcrumbs);
-            }
+          this.mgmtService.getIAM().then((iam) => {
+            const isZitadel = iam.iamProjectId === (this.project as Project.AsObject).id;
+            const breadcrumbs = [
+              new Breadcrumb({
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              }),
+              new Breadcrumb({
+                type: BreadcrumbType.PROJECT,
+                param: { key: 'projectid', value: (this.project as Project.AsObject).id },
+                routerLink: ['/projects', (this.project as Project.AsObject).id],
+                isZitadel: isZitadel,
+              }),
+            ];
+            this.breadcrumbService.setBreadcrumb(breadcrumbs);
           });
         }
       });
-    });
+    } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
+      return this.mgmtService.getGrantedProjectByID(this.projectId, this.grantId).then((resp) => {
+        if (resp.grantedProject) {
+          this.project = resp.grantedProject;
+          this.projectName = this.project.projectName;
+          this.dataSource = new ProjectMembersDataSource(this.mgmtService);
+          this.dataSource.loadMembers(this.project.projectId, this.projectType, 0, this.INITIALPAGESIZE, this.grantId);
+
+          this.changePageFactory = (event?: PageEvent) => {
+            return this.dataSource.loadMembers(
+              (this.project as GrantedProject.AsObject).projectId,
+              this.projectType,
+              event?.pageIndex ?? 0,
+              event?.pageSize ?? this.INITIALPAGESIZE,
+              this.grantId,
+            );
+          };
+
+          const breadcrumbs = [
+            new Breadcrumb({
+              type: BreadcrumbType.ORG,
+              routerLink: ['/org'],
+            }),
+            new Breadcrumb({
+              type: BreadcrumbType.GRANTEDPROJECT,
+              param: { key: 'projectid', value: (this.project as GrantedProject.AsObject).projectId },
+              routerLink: ['/projects', (this.project as GrantedProject.AsObject).projectId],
+            }),
+          ];
+          this.breadcrumbService.setBreadcrumb(breadcrumbs);
+        }
+      });
+    } else {
+      return Promise.reject();
+    }
   }
 
   public getRoleOptions(): void {
@@ -172,7 +180,9 @@ export class ProjectMembersComponent {
       }),
     ).then(() => {
       setTimeout(() => {
-        this.changePage.emit();
+        this.loadMembers().then(() => {
+          this.changePage.emit();
+        });
       }, 1000);
     });
   }
@@ -183,7 +193,9 @@ export class ProjectMembersComponent {
         .removeProjectMember((this.project as Project.AsObject).id, member.userId)
         .then(() => {
           setTimeout(() => {
-            this.changePage.emit();
+            this.loadMembers().then(() => {
+              this.changePage.emit();
+            });
           }, 1000);
           this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
         })
@@ -195,7 +207,9 @@ export class ProjectMembersComponent {
         .removeProjectGrantMember((this.project as GrantedProject.AsObject).projectId, this.grantId, member.userId)
         .then(() => {
           setTimeout(() => {
-            this.changePage.emit();
+            this.loadMembers().then(() => {
+              this.changePage.emit();
+            });
           }, 1000);
           this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
         })
@@ -237,7 +251,9 @@ export class ProjectMembersComponent {
           )
             .then(() => {
               setTimeout(() => {
-                this.changePage.emit();
+                this.loadMembers().then(() => {
+                  this.changePage.emit();
+                });
               }, 1000);
               this.toast.showInfo('PROJECT.TOAST.MEMBERSADDED', true);
             })
@@ -255,6 +271,11 @@ export class ProjectMembersComponent {
       this.mgmtService
         .updateProjectMember((this.project as Project.AsObject).id, member.userId, selectionChange)
         .then(() => {
+          setTimeout(() => {
+            this.loadMembers().then(() => {
+              this.changePage.emit();
+            });
+          }, 1000);
           this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
         })
         .catch((error) => {
@@ -269,6 +290,11 @@ export class ProjectMembersComponent {
           selectionChange,
         )
         .then(() => {
+          setTimeout(() => {
+            this.loadMembers().then(() => {
+              this.changePage.emit();
+            });
+          }, 1000);
           this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
         })
         .catch((error) => {
