@@ -158,6 +158,9 @@ goreleaser build --id prod --snapshot --single-target --rm-dist --output .artifa
 # Pack the binary into a docker image
 DOCKER_BUILDKIT=1 docker build --file build/Dockerfile .artifacts/zitadel -t zitadel:local
 
+# If you made changes in the e2e directory, make sure you reformat the files
+(cd ./e2e && npm run lint:fix)
+
 # Run the tests
 ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/docker-compose.yaml run e2e
 ```
@@ -244,8 +247,14 @@ After making changes to the code, you should run the end-to-end-tests.
 Open another shell.
 
 ```bash
+# Reformat your console code
+npm run lint:fix
+
 # Change to the e2e directory
 cd .. && cd e2e/
+
+# If you made changes in the e2e directory, make sure you reformat the files here too
+npm run lint:fix
 
 # Install npm dependencies
 npm install
@@ -261,7 +270,7 @@ You can also open the test suite interactively for fast success feedback on spec
 npm run open:dev
 ```
 
-When you are happy with your changes, you can cleanup your environment
+When you are happy with your changes, you can format your code and cleanup your environment
 
 ```bash
 # Stop and remove the docker containers for zitadel and the database
