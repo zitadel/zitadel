@@ -20,7 +20,7 @@ type Profile struct {
 }
 
 func (p *Profile) IsValid() bool {
-	return p.FirstName != "" && p.LastName != ""
+	return true
 }
 
 func AvatarURL(prefix, resourceOwner, key string) string {

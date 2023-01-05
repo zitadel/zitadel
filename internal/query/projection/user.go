@@ -570,12 +570,12 @@ func (p *userProjection) reduceHumanProfileChanged(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-769v4", "reduce.wrong.event.type %s", user.HumanProfileChangedType)
 	}
 	cols := make([]handler.Column, 0, 6)
-	if e.FirstName != "" {
-		cols = append(cols, handler.NewCol(HumanFirstNameCol, e.FirstName))
+	if e.FirstName != nil {
+		cols = append(cols, handler.NewCol(HumanFirstNameCol, *e.FirstName))
 	}
 
-	if e.LastName != "" {
-		cols = append(cols, handler.NewCol(HumanLastNameCol, e.LastName))
+	if e.LastName != nil {
+		cols = append(cols, handler.NewCol(HumanLastNameCol, *e.LastName))
 	}
 
 	if e.NickName != nil {

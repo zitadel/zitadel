@@ -3507,37 +3507,6 @@ func TestAddHumanCommand(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid first name",
-			args: args{
-				a: agg,
-				human: &AddHuman{
-					Username:          "username",
-					PreferredLanguage: language.English,
-					Email: Email{
-						Address: "support@zitadel.com",
-					},
-				},
-			},
-			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument"),
-			},
-		},
-		{
-			name: "invalid last name",
-			args: args{
-				a: agg,
-				human: &AddHuman{
-					Username:          "username",
-					PreferredLanguage: language.English,
-					FirstName:         "hurst",
-					Email:             Email{Address: "support@zitadel.com"},
-				},
-			},
-			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.Invalid.Argument"),
-			},
-		},
-		{
 			name: "invalid password",
 			args: args{
 				a: agg,
@@ -3634,6 +3603,74 @@ func TestAddHumanCommand(t *testing.T) {
 							"giraffe",
 							"",
 							"gigi giraffe",
+							language.English,
+							0,
+							"support@zitadel.com",
+							true,
+						)
+						event.AddPasswordData(&crypto.CryptoValue{
+							CryptoType: crypto.TypeHash,
+							Algorithm:  "hash",
+							KeyID:      "",
+							Crypted:    []byte("password"),
+						}, false)
+						return event
+					}(),
+					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
+				},
+			},
+		},
+		{
+			name: "correct, no names",
+			args: args{
+				a: agg,
+				human: &AddHuman{
+					Email:             Email{Address: "support@zitadel.com", Verified: true},
+					PreferredLanguage: language.English,
+					Password:          "password",
+					Username:          "username",
+				},
+				passwordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewDomainPolicyAddedEvent(
+								context.Background(),
+								&org.NewAggregate("id").Aggregate,
+								true,
+								true,
+								true,
+							),
+						}, nil
+					}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewPasswordComplexityPolicyAddedEvent(
+									context.Background(),
+									&org.NewAggregate("id").Aggregate,
+									2,
+									false,
+									false,
+									false,
+									false,
+								),
+							}, nil
+						}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					func() *user.HumanAddedEvent {
+						event := user.NewHumanAddedEvent(
+							context.Background(),
+							&agg.Aggregate,
+							"username",
+							"",
+							"",
+							"",
+							"username",
 							language.English,
 							0,
 							"support@zitadel.com",

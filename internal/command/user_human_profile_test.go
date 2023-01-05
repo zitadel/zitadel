@@ -171,6 +171,142 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "profile changed, remove names, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email",
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newProfileChangedEvent(context.Background(),
+									"user1", "org1",
+									"",
+									"",
+									"nickname2",
+									"displayname2",
+									language.English,
+									domain.GenderMale,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				address: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					FirstName:         "",
+					LastName:          "",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: language.English,
+					Gender:            domain.GenderMale,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					FirstName:         "",
+					LastName:          "",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: language.English,
+					Gender:            domain.GenderMale,
+				},
+			},
+		},
+		{
+			name: "profile changed, add names, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"",
+								"",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email",
+								true,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								newProfileChangedEvent(context.Background(),
+									"user1", "org1",
+									"firstname2",
+									"lastname2",
+									"nickname2",
+									"displayname2",
+									language.English,
+									domain.GenderMale,
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				address: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					FirstName:         "firstname2",
+					LastName:          "lastname2",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: language.English,
+					Gender:            domain.GenderMale,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					FirstName:         "firstname2",
+					LastName:          "lastname2",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: language.English,
+					Gender:            domain.GenderMale,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

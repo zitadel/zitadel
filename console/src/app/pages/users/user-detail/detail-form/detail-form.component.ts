@@ -31,8 +31,8 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   constructor(private fb: UntypedFormBuilder, private dialog: MatDialog) {
     this.profileForm = this.fb.group({
       userName: [{ value: '', disabled: true }, [Validators.required]],
-      firstName: [{ value: '', disabled: this.disabled }, Validators.required],
-      lastName: [{ value: '', disabled: this.disabled }, Validators.required],
+      firstName: [{ value: '', disabled: this.disabled }],
+      lastName: [{ value: '', disabled: this.disabled }],
       nickName: [{ value: '', disabled: this.disabled }],
       displayName: [{ value: '', disabled: this.disabled }, Validators.required],
       gender: [{ value: 0, disabled: this.disabled }],
@@ -43,8 +43,8 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   public ngOnChanges(): void {
     this.profileForm = this.fb.group({
       userName: [{ value: '', disabled: true }, [Validators.required]],
-      firstName: [{ value: '', disabled: this.disabled }, Validators.required],
-      lastName: [{ value: '', disabled: this.disabled }, Validators.required],
+      firstName: [{ value: '', disabled: this.disabled }],
+      lastName: [{ value: '', disabled: this.disabled }],
       nickName: [{ value: '', disabled: this.disabled }],
       displayName: [{ value: '', disabled: this.disabled }, Validators.required],
       gender: [{ value: 0, disabled: this.disabled }],

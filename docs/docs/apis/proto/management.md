@@ -3344,8 +3344,8 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| first_name |  string | - | string.max_len: 200<br />  |
+| last_name |  string | - | string.max_len: 200<br />  |
 | nick_name |  string | - | string.max_len: 200<br />  |
 | display_name |  string | - | string.max_len: 200<br />  |
 | preferred_language |  string | - | string.max_len: 10<br />  |
@@ -5481,8 +5481,8 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| first_name |  string | - | string.max_len: 200<br />  |
+| last_name |  string | - | string.max_len: 200<br />  |
 | nick_name |  string | - | string.max_len: 200<br />  |
 | display_name |  string | - | string.max_len: 200<br />  |
 | preferred_language |  string | - | string.max_len: 10<br />  |
@@ -8362,8 +8362,8 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| first_name |  string | - | string.max_len: 200<br />  |
+| last_name |  string | - | string.max_len: 200<br />  |
 | nick_name |  string | - | string.max_len: 200<br />  |
 | display_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | preferred_language |  string | - | string.max_len: 10<br />  |

@@ -62,12 +62,8 @@ func createInstancePbToAddHuman(req *system_pb.CreateInstanceRequest_Human, defa
 		user.Email.Verified = req.Email.IsEmailVerified
 	}
 	if req.Profile != nil {
-		if req.Profile.FirstName != "" {
-			user.FirstName = req.Profile.FirstName
-		}
-		if req.Profile.LastName != "" {
-			user.LastName = req.Profile.LastName
-		}
+		user.FirstName = req.Profile.FirstName
+		user.LastName = req.Profile.LastName
 		if req.Profile.PreferredLanguage != "" {
 			lang, err := language.Parse(req.Profile.PreferredLanguage)
 			if err == nil {
@@ -167,12 +163,8 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 		instance.Org.Human.Email.Verified = req.OwnerEmail.IsEmailVerified
 	}
 	if req.OwnerProfile != nil {
-		if req.OwnerProfile.FirstName != "" {
-			instance.Org.Human.FirstName = req.OwnerProfile.FirstName
-		}
-		if req.OwnerProfile.LastName != "" {
-			instance.Org.Human.LastName = req.OwnerProfile.LastName
-		}
+		instance.Org.Human.FirstName = req.OwnerProfile.FirstName
+		instance.Org.Human.LastName = req.OwnerProfile.LastName
 		if req.OwnerProfile.PreferredLanguage != "" {
 			lang, err := language.Parse(req.OwnerProfile.PreferredLanguage)
 			if err == nil {

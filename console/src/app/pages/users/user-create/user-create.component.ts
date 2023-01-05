@@ -112,8 +112,8 @@ export class UserCreateComponent implements OnDestroy {
     this.userForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       userName: ['', [Validators.required, Validators.minLength(2)]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: [''],
+      lastName: [''],
       nickName: [''],
       gender: [],
       preferredLanguage: [''],

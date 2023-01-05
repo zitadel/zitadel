@@ -37,6 +37,7 @@ describe('humans', () => {
           }
           cy.get('[formcontrolname="phone"]').type('+41 123456789');
           cy.get('[data-e2e="create-button"]').click();
+          cy.shouldNotExist({ selector: '.data-e2e-failure' });
           cy.get('.data-e2e-success');
           let loginName = user.addName;
           if (user.mustBeDomain) {
@@ -44,7 +45,6 @@ describe('humans', () => {
           }
           cy.contains('[data-e2e="copy-loginname"]', loginName).click();
           cy.clipboardMatches(loginName);
-          cy.shouldNotExist({ selector: '.data-e2e-failure' });
         });
       });
     });

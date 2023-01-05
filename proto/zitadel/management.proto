@@ -3088,8 +3088,8 @@ message IsUserUniqueResponse {
 
 message AddHumanUserRequest {
     message Profile {
-        string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-        string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string first_name = 1 [(validate.rules).string = {max_len: 200}];
+        string last_name = 2 [(validate.rules).string = {max_len: 200}];
         string nick_name = 3 [(validate.rules).string = {max_len: 200}];
         string display_name = 4 [(validate.rules).string = {max_len: 200}];
         string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
@@ -3120,8 +3120,8 @@ message AddHumanUserResponse {
 
 message ImportHumanUserRequest {
     message Profile {
-        string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-        string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+        string first_name = 1 [(validate.rules).string = {max_len: 200}];
+        string last_name = 2 [(validate.rules).string = {max_len: 200}];
         string nick_name = 3 [(validate.rules).string = {max_len: 200}];
         string display_name = 4 [(validate.rules).string = {max_len: 200}];
         string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
@@ -3310,8 +3310,8 @@ message GetHumanProfileResponse {
 message UpdateHumanProfileRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string first_name = 2 [(validate.rules).string = {max_len: 200}];
+    string last_name = 3 [(validate.rules).string = {max_len: 200}];
     string nick_name = 4 [(validate.rules).string = {max_len: 200}];
     string display_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string preferred_language = 6 [(validate.rules).string = {max_len: 10}];

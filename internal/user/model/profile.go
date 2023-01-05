@@ -19,11 +19,3 @@ type Profile struct {
 	LoginNames         []string
 	AvatarKey          string
 }
-
-func (p *Profile) IsValid() bool {
-	return p.FirstName != "" && p.LastName != ""
-}
-
-func (p *Profile) SetNamesAsDisplayname() {
-	p.DisplayName = p.FirstName + " " + p.LastName
-}

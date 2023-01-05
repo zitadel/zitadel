@@ -9,7 +9,9 @@
     [name]="
       user.human && user.human.profile && user.human.profile.displayName
         ? user.human.profile.displayName
-        : user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
+        : user.human?.profile?.firstName && user.human?.profile?.lastName
+        ? user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
+        : user.userName
     "
     [size]="80"
   >

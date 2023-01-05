@@ -53,11 +53,11 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 			wm.Gender = e.Gender
 			wm.UserState = domain.UserStateActive
 		case *user.HumanProfileChangedEvent:
-			if e.FirstName != "" {
-				wm.FirstName = e.FirstName
+			if e.FirstName != nil {
+				wm.FirstName = *e.FirstName
 			}
-			if e.LastName != "" {
-				wm.LastName = e.LastName
+			if e.LastName != nil {
+				wm.LastName = *e.LastName
 			}
 			if e.NickName != nil {
 				wm.NickName = *e.NickName

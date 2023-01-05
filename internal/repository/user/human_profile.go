@@ -20,8 +20,8 @@ const (
 type HumanProfileChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	FirstName         string         `json:"firstName,omitempty"`
-	LastName          string         `json:"lastName,omitempty"`
+	FirstName         *string        `json:"firstName,omitempty"`
+	LastName          *string        `json:"lastName,omitempty"`
 	NickName          *string        `json:"nickName,omitempty"`
 	DisplayName       *string        `json:"displayName,omitempty"`
 	PreferredLanguage *language.Tag  `json:"preferredLanguage,omitempty"`
@@ -61,13 +61,13 @@ type ProfileChanges func(event *HumanProfileChangedEvent)
 
 func ChangeFirstName(firstName string) func(event *HumanProfileChangedEvent) {
 	return func(e *HumanProfileChangedEvent) {
-		e.FirstName = firstName
+		e.FirstName = &firstName
 	}
 }
 
 func ChangeLastName(lastName string) func(event *HumanProfileChangedEvent) {
 	return func(e *HumanProfileChangedEvent) {
-		e.LastName = lastName
+		e.LastName = &lastName
 	}
 }
 

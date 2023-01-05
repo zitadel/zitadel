@@ -71,10 +71,8 @@ Cypress.Commands.add('clipboardMatches', { prevSubject: false }, (pattern: RegEx
 });
 
 Cypress.Commands.add('shouldNotExist', { prevSubject: false }, (options?: ShouldNotExistOptions) => {
-  return cy.waitUntil(
-    () => {
-      return Cypress.$(options?.selector).length === 0;
-    },
-    { timeout: typeof options?.timeout === 'number' ? options.timeout : 500 },
-  );
+  return cy.waitUntil(() => Cypress.$(options?.selector).length === 0, {
+    errorMsg: () => `Timed out while waiting for element to not exist: ${Cypress.$(options?.selector).text()}`,
+    timeout: typeof options?.timeout === 'number' ? options.timeout : 500,
+  });
 });
