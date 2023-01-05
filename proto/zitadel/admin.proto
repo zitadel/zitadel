@@ -2544,6 +2544,17 @@ service AdminService {
             permission: "iam.read";
         };
     }
+
+    rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
+        option (google.api.http) = {
+            post: "/events/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
+        };
+    }
 }
 
 
@@ -4797,3 +4808,7 @@ message ExportDataRequest {
 message ExportDataResponse {
     repeated DataOrg orgs = 1;
 }
+
+message ListEventsRequest {}
+
+message ListEventsResponse {}
