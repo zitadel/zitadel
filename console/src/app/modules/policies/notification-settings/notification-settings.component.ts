@@ -85,6 +85,7 @@ export class NotificationSettingsComponent implements OnInit {
         if (smtpConfig.smtpConfig) {
           this.hasSMTPConfig = true;
           this.form.patchValue(smtpConfig.smtpConfig);
+          this.form.patchValue({ ['hostAndPort']: smtpConfig.smtpConfig.host });
         }
       })
       .catch((error) => {
