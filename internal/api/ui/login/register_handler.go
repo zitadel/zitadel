@@ -83,6 +83,14 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// For consistency with the external authentication flow,
+	// the setMetadata() function is provided on the pre creation hook, for now,
+	// like for the ExternalAuthentication flow.
+	// If there is a need for additional context after registration,
+	// we could provide that method in the PostCreation trigger too,
+	// without breaking existing actions.
+	// Also, if that field is needed, we probably also should provide it
+	// for ExternalAuthentication.
 	user, metadatas, err := l.customUserToLoginUserMapping(r.Context(), data.toHumanDomain(), make([]*domain.Metadata, 0), resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
@@ -104,14 +112,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// read auth request again to get current state including userID
-	authRequest, err = l.authRepo.AuthRequestByID(r.Context(), authRequest.ID, authRequest.AgentID)
-	if err != nil {
-		l.renderError(w, r, authRequest, err)
-		return
-	}
-
-	userGrants, err := l.customGrants(r.Context(), authRequest.UserID, resourceOwner, domain.FlowTypeInternalAuthentication)
+	userGrants, err := l.customGrants(r.Context(), user.AggregateID, resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
 		return
