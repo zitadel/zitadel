@@ -1566,6 +1566,18 @@ Exports data from instance
     POST: /export
 
 
+### ListEvents
+
+> **rpc** ListEvents([ListEventsRequest](#listeventsrequest))
+[ListEventsResponse](#listeventsresponse)
+
+
+
+
+
+    POST: /events/_search
+
+
 
 
 
@@ -1972,6 +1984,47 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### Event
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| editor |  EventEditor | - |  |
+| aggregate |  EventAggregate | - |  |
+| sequence |  uint64 | - |  |
+| creation_date |  google.protobuf.Timestamp | The timestamp the event occurred |  |
+| payload |  google.protobuf.Any | - |  |
+
+
+
+
+### EventAggregate
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| type |  string | - |  |
+| resource_owner |  string | - |  |
+
+
+
+
+### EventEditor
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - |  |
+| display_name |  string | - |  |
+| service |  string | - |  |
 
 
 
@@ -3068,6 +3121,36 @@ at least one argument has to be provided
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | is_unique |  bool | - |  |
+
+
+
+
+### ListEventsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sequence |  uint64 | sequence represents the order of events. It's always upcounting if asc is false sequence is used as less than filter if asc is true sequence is used as greater than filter if sequence is 0 the field is ignored |  |
+| limit |  uint32 | - |  |
+| asc |  bool | - |  |
+| editor_user_id |  string | - |  |
+| event_types | repeated string | the event types are filtered using starts with this means that you can filter for user.machine and all the event types of user.machine.* will be returned |  |
+| aggregate_id |  string | - |  |
+| aggregate_type |  string | - |  |
+| resource_owner |  string | - |  |
+| creation_date |  google.protobuf.Timestamp | if asc is false creation_date is used as less than filter if asc is true creation_date is used as greater than filter if creation_date is not set the field is ignored |  |
+
+
+
+
+### ListEventsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| events | repeated Event | - |  |
 
 
 
