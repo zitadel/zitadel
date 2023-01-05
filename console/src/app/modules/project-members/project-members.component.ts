@@ -157,34 +157,29 @@ export class ProjectMembersComponent {
     Promise.all(
       this.selection.map((member) => {
         if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
-          return this.mgmtService
-            .removeProjectMember((this.project as Project.AsObject).id, member.userId)
-            .then(() => {
-              this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
+          return this.mgmtService.removeProjectMember((this.project as Project.AsObject).id, member.userId).then(() => {
+            this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
+          });
         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
           return this.mgmtService
             .removeProjectGrantMember((this.project as GrantedProject.AsObject).projectId, this.grantId, member.userId)
             .then(() => {
               this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
             });
         } else {
           return Promise.reject();
         }
       }),
-    ).then(() => {
-      setTimeout(() => {
-        this.loadMembers().then(() => {
+    )
+      .then(() => {
+        setTimeout(() => {
           this.changePage.emit();
-        });
-      }, 1000);
-    });
+        }, 1000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.changePage.emit();
+      });
   }
 
   public removeProjectMember(member: Member.AsObject | Member.AsObject): void {
@@ -193,28 +188,26 @@ export class ProjectMembersComponent {
         .removeProjectMember((this.project as Project.AsObject).id, member.userId)
         .then(() => {
           setTimeout(() => {
-            this.loadMembers().then(() => {
-              this.changePage.emit();
-            });
+            this.changePage.emit();
           }, 1000);
           this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
         })
         .catch((error) => {
           this.toast.showError(error);
+          this.changePage.emit();
         });
     } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
       this.mgmtService
         .removeProjectGrantMember((this.project as GrantedProject.AsObject).projectId, this.grantId, member.userId)
         .then(() => {
           setTimeout(() => {
-            this.loadMembers().then(() => {
-              this.changePage.emit();
-            });
+            this.changePage.emit();
           }, 1000);
           this.toast.showInfo('PROJECT.TOAST.MEMBERREMOVED', true);
         })
         .catch((error) => {
           this.toast.showError(error);
+          this.changePage.emit();
         });
     }
   }
@@ -251,9 +244,7 @@ export class ProjectMembersComponent {
           )
             .then(() => {
               setTimeout(() => {
-                this.loadMembers().then(() => {
-                  this.changePage.emit();
-                });
+                this.changePage.emit();
               }, 1000);
               this.toast.showInfo('PROJECT.TOAST.MEMBERSADDED', true);
             })
@@ -272,14 +263,13 @@ export class ProjectMembersComponent {
         .updateProjectMember((this.project as Project.AsObject).id, member.userId, selectionChange)
         .then(() => {
           setTimeout(() => {
-            this.loadMembers().then(() => {
-              this.changePage.emit();
-            });
+            this.changePage.emit();
           }, 1000);
           this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
         })
         .catch((error) => {
           this.toast.showError(error);
+          this.changePage.emit();
         });
     } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {
       this.mgmtService
@@ -291,14 +281,13 @@ export class ProjectMembersComponent {
         )
         .then(() => {
           setTimeout(() => {
-            this.loadMembers().then(() => {
-              this.changePage.emit();
-            });
+            this.changePage.emit();
           }, 1000);
           this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
         })
         .catch((error) => {
           this.toast.showError(error);
+          this.changePage.emit();
         });
     }
   }
