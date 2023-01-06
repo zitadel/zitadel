@@ -10,13 +10,13 @@ import "zitadel/policy.proto";
 import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
+import "zitadel/event.proto";
 import "zitadel/management.proto";
 import "zitadel/v1.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
-import "google/protobuf/struct.proto";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -4891,33 +4891,7 @@ message ListEventsRequest {
 }
 
 message ListEventsResponse {
-    repeated Event events = 1;
-}
-
-message Event {
-    EventEditor editor = 1;
-    EventAggregate aggregate = 2;
-    uint64 sequence = 3;
-    // The timestamp the event occurred
-    google.protobuf.Timestamp creation_date = 4 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"2019-04-01T08:45:00.000000Z\"";
-        }
-    ];
-    google.protobuf.Struct payload = 5;
-    string type = 6;
-}
-
-message EventEditor {
-    string user_id = 1;
-    string display_name = 2;
-    string service = 3;
-}
-
-message EventAggregate {
-    string id = 1;
-    string type = 2;
-    string resource_owner = 3;
+    repeated zitadel.event.v1.Event events = 1;
 }
 
 message ListEventTypesRequest {}

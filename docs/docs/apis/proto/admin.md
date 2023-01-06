@@ -2012,48 +2012,6 @@ This is an empty request
 
 
 
-### Event
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| editor |  EventEditor | - |  |
-| aggregate |  EventAggregate | - |  |
-| sequence |  uint64 | - |  |
-| creation_date |  google.protobuf.Timestamp | The timestamp the event occurred |  |
-| payload |  google.protobuf.Struct | - |  |
-| type |  string | - |  |
-
-
-
-
-### EventAggregate
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - |  |
-| type |  string | - |  |
-| resource_owner |  string | - |  |
-
-
-
-
-### EventEditor
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| user_id |  string | - |  |
-| display_name |  string | - |  |
-| service |  string | - |  |
-
-
-
-
 ### ExportDataRequest
 
 
@@ -3209,7 +3167,7 @@ at least one argument has to be provided
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| events | repeated Event | - |  |
+| events | repeated zitadel.event.v1.Event | - |  |
 
 
 

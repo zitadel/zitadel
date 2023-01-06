@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	event_pb "github.com/zitadel/zitadel/pkg/grpc/event"
 )
 
 func (s *Server) ListEvents(ctx context.Context, in *admin_pb.ListEventsRequest) (*admin_pb.ListEventsResponse, error) {
@@ -28,13 +29,13 @@ func (s *Server) ListEvents(ctx context.Context, in *admin_pb.ListEventsRequest)
 func (s *Server) ListEventTypes(ctx context.Context, in *admin_pb.ListEventTypesRequest) (*admin_pb.ListEventTypesResponse, error) {
 	return &admin_pb.ListEventTypesResponse{
 		EventTypes: s.query.SearchEventTypes(ctx),
-	},nil
+	}, nil
 }
 
 func (s *Server) ListAggregateTypes(ctx context.Context, in *admin_pb.ListAggregateTypesRequest) (*admin_pb.ListAggregateTypesResponse, error) {
 	return &admin_pb.ListAggregateTypesResponse{
 		AggregateTypes: s.query.SearchAggregateTypes(ctx),
-	},nil
+	}, nil
 }
 
 func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) (*eventstore.SearchQueryBuilder, error) {
@@ -66,7 +67,7 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 
 func convertEventsToResponse(events []*query.Event) (response *admin_pb.ListEventsResponse, err error) {
 	response = &admin_pb.ListEventsResponse{
-		Events: make([]*admin_pb.Event, len(events)),
+		Events: make([]*event_pb.Event, len(events)),
 	}
 
 	for i, event := range events {
@@ -79,7 +80,7 @@ func convertEventsToResponse(events []*query.Event) (response *admin_pb.ListEven
 	return response, nil
 }
 
-func convertEvent(event *query.Event) (*admin_pb.Event, error) {
+func convertEvent(event *query.Event) (*event_pb.Event, error) {
 	var payload *structpb.Struct
 	if len(event.Payload) > 0 {
 		payload = new(structpb.Struct)
@@ -87,13 +88,13 @@ func convertEvent(event *query.Event) (*admin_pb.Event, error) {
 			return nil, errors.ThrowInternal(err, "ADMIN-eaimD", "Errors.Internal")
 		}
 	}
-	return &admin_pb.Event{
-		Editor: &admin_pb.EventEditor{
+	return &event_pb.Event{
+		Editor: &event_pb.Editor{
 			UserId:      event.Editor.ID,
 			DisplayName: event.Editor.DisplayName,
 			Service:     event.Editor.Service,
 		},
-		Aggregate: &admin_pb.EventAggregate{
+		Aggregate: &event_pb.Aggregate{
 			Id:            event.Aggregate.ID,
 			Type:          string(event.Aggregate.Type),
 			ResourceOwner: event.Aggregate.ResourceOwner,
