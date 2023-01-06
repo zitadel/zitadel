@@ -49,7 +49,7 @@ jobs:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
           image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
-          tag: ${{ github.event.number }} ## Adds a preview URL with the PR number
+          tag: pr-${{ github.event.number }} ## Adds a preview URL with the PR number
           no_traffic: true
 
       - name: Show Output
