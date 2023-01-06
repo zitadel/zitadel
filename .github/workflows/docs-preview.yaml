@@ -47,6 +47,9 @@ jobs:
       pull-requests: 'write'
     needs: Build
     runs-on: ubuntu-latest
+    environment:
+      name: Docs Preview
+      url: ${{ steps.deploy.outputs.url }}
     steps:
       - name: Google Auth
         id: auth
