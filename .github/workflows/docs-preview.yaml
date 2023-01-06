@@ -48,6 +48,11 @@ jobs:
     needs: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}'
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
