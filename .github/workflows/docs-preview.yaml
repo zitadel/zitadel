@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: zitadel.com
-  GAR_LOCATION: europe-docker.pkg.dev
+  GAR_LOCATION: europe
   REPOSITORY: zitadel-com/docs
   SERVICE: hello
   REGION: europe-west6
