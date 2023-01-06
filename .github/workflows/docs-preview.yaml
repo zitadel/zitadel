@@ -19,6 +19,12 @@ permissions:
 jobs:
   Build:
     uses: ./.github/workflows/docs-build.yaml
+    with:
+      PROJECT_ID: ${{ env.PROJECT_ID }}
+      GAR_LOCATION: ${{ env.GAR_LOCATION }}
+      REPOSITORY: ${{ env.REPOSITORY }}
+      SERVICE: ${{ env.SERVICE }}
+      REGION: ${{ env.REGION }}
     secrets:
       SERVICE_ACCOUNT: ${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}
 
