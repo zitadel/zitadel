@@ -30,14 +30,13 @@ describe('machines', () => {
         cy.get('[formcontrolname="name"]').type('e2emachinename');
         cy.get('[formcontrolname="description"]').type('e2emachinedescription');
         cy.get('[data-e2e="create-button"]').click();
-        cy.get('.data-e2e-success');
+        cy.shouldConfirmSuccess();
         let loginName = machine.addName;
         if (machine.mustBeDomain) {
           loginName = loginname(machine.addName, Cypress.env('ORGANIZATION'));
         }
         cy.contains('[data-e2e="copy-loginname"]', loginName).click();
         cy.clipboardMatches(loginName);
-        cy.shouldNotExist({ selector: '.data-e2e-failure' });
       });
     });
 
@@ -56,9 +55,11 @@ describe('machines', () => {
         cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().type(loginName);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
-        cy.get('.data-e2e-success');
-        cy.shouldNotExist({ selector: rowSelector, timeout: 2000 });
-        cy.shouldNotExist({ selector: '.data-e2e-failure' });
+        cy.shouldConfirmSuccess();
+        cy.shouldNotExist({
+          selector: rowSelector,
+          timeout: { ms: 2000, errMessage: 'timed out before machine disappeared from the table' },
+        });
       });
 
       it('should create a personal access token');
