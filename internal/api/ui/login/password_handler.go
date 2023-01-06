@@ -39,6 +39,7 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, authReq.AgentID, domain.BrowserInfoFromRequest(r))
+	l.triggerPostLocalAuthentication()
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames {
 			l.renderLogin(w, r, authReq, err)

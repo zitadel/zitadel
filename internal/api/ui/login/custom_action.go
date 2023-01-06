@@ -30,25 +30,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		return nil, err
 	}
 
-	ctxFields := actions.SetContextFields(
-		actions.SetFields("accessToken", tokens.AccessToken),
-		actions.SetFields("idToken", tokens.IDToken),
-		actions.SetFields("getClaim", func(claim string) interface{} {
-			return tokens.IDTokenClaims.GetClaim(claim)
-		}),
-		actions.SetFields("claimsJSON", func() (string, error) {
-			c, err := json.Marshal(tokens.IDTokenClaims)
-			if err != nil {
-				return "", err
-			}
-			return string(c), nil
-		}),
-		actions.SetFields("v1",
-			actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
-				return object.UserFromExternalUser(c, user)
-			}),
-		),
-	)
+	mutableMetas := &metas{m: user.Metadatas}
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {
 			user.FirstName = firstName
@@ -83,32 +65,26 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		actions.SetFields("metadata", &user.Metadatas),
 		actions.SetFields("v1",
 			actions.SetFields("user",
-				actions.SetFields("appendMetadata", func(call goja.FunctionCall) goja.Value {
-					if len(call.Arguments) != 2 {
-						panic("exactly 2 (key, value) arguments expected")
-					}
-					key := call.Arguments[0].Export().(string)
-					val := call.Arguments[1].Export()
-
-					value, err := json.Marshal(val)
-					if err != nil {
-						logging.WithError(err).Debug("unable to marshal")
-						panic(err)
-					}
-
-					user.Metadatas = append(user.Metadatas,
-						&domain.Metadata{
-							Key:   key,
-							Value: value,
-						})
-					return nil
-				}),
+				actions.SetFields("appendMetadata", appendMetadataFunc(mutableMetas)),
 			),
+			actions.SetFields("mgmt", object.ManagementAPIField(l.mgmtServer)),
 		),
 	)
 
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
+
+		ctxFieldOptions := append(tokenCtxFields(tokens),
+			actions.SetFields("v1",
+				actions.SetFields("ctx", actionCtx),
+				actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
+					return object.UserFromExternalUser(c, user)
+				}),
+			),
+		)
+
+		ctxFields := actions.SetContextFields(ctxFieldOptions...)
+
 		err = actions.Run(
 			actionCtx,
 			ctxFields,
@@ -122,7 +98,53 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 			return nil, err
 		}
 	}
+	user.Metadatas = mutableMetas.m
 	return user, err
+}
+
+func (l *Login) triggerPostLocalAuthentication(ctx context.Context, tokens *oidc.Tokens, req *domain.AuthRequest, authenticationError error) error {
+	resourceOwner := req.RequestedOrgID
+	if resourceOwner == "" {
+		resourceOwner = req.UserOrgID
+	}
+
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeInternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
+	if err != nil {
+		return err
+	}
+
+	apiFields := actions.WithAPIFields(
+		actions.SetFields("v1",
+			actions.SetFields("mgmt", object.ManagementAPIField(l.mgmtServer)),
+		),
+	)
+
+	for _, a := range triggerActions {
+		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
+
+		ctxFields := actions.SetContextFields(
+			append(tokenCtxFields(tokens),
+				actions.SetFields("v1",
+					actions.SetFields("ctx", actionCtx),
+					actions.SetFields("authenticationError", authenticationError.Error()),
+				),
+			)...,
+		)
+
+		err = actions.Run(
+			actionCtx,
+			ctxFields,
+			apiFields,
+			a.Script,
+			a.Name,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
+		)
+		cancel()
+		if err != nil {
+			return err
+		}
+	}
+	return err
 }
 
 func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.Human, metadata []*domain.Metadata, resourceOwner string, flowType domain.FlowType) (*domain.Human, []*domain.Metadata, error) {
@@ -131,13 +153,8 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.H
 		return nil, nil, err
 	}
 
-	ctxOpts := actions.SetContextFields(
-		actions.SetFields("v1",
-			actions.SetFields("user", func(c *actions.FieldConfig) interface{} {
-				return object.UserFromHuman(c, user)
-			}),
-		),
-	)
+	mutableMetas := &metas{m: metadata}
+
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {
 			user.FirstName = firstName
@@ -187,32 +204,24 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.H
 		actions.SetFields("metadata", metadata),
 		actions.SetFields("v1",
 			actions.SetFields("user",
-				actions.SetFields("appendMetadata", func(call goja.FunctionCall) goja.Value {
-					if len(call.Arguments) != 2 {
-						panic("exactly 2 (key, value) arguments expected")
-					}
-					key := call.Arguments[0].Export().(string)
-					val := call.Arguments[1].Export()
-
-					value, err := json.Marshal(val)
-					if err != nil {
-						logging.WithError(err).Debug("unable to marshal")
-						panic(err)
-					}
-
-					metadata = append(metadata,
-						&domain.Metadata{
-							Key:   key,
-							Value: value,
-						})
-					return nil
-				}),
+				actions.SetFields("appendMetadata", appendMetadataFunc(mutableMetas)),
 			),
+			actions.SetFields("mgmt", object.ManagementAPIField(l.mgmtServer)),
 		),
 	)
 
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
+
+		ctxOpts := actions.SetContextFields(
+			actions.SetFields("v1",
+				actions.SetFields("user", func(c *actions.FieldConfig) interface{} {
+					return object.UserFromHuman(c, user)
+				}),
+				actions.SetFields("ctx", actionCtx),
+			),
+		)
+
 		err = actions.Run(
 			actionCtx,
 			ctxOpts,
@@ -226,7 +235,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.H
 			return nil, nil, err
 		}
 	}
-	return user, metadata, err
+	return user, mutableMetas.m, err
 }
 
 func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner string, flowType domain.FlowType) ([]*domain.UserGrant, error) {
@@ -277,6 +286,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner s
 					return nil
 				}
 			}),
+			actions.SetFields("mgmt", object.ManagementAPIField(l.mgmtServer)),
 		),
 	)
 
@@ -294,6 +304,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner s
 						return object.UserFromQuery(c, user)
 					}
 				}),
+				actions.SetFields("ctx", actionCtx),
 			),
 		)
 
@@ -313,6 +324,23 @@ func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner s
 	return actionUserGrantsToDomain(userID, actionUserGrants), err
 }
 
+func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
+	return []actions.FieldOption{
+		actions.SetFields("accessToken", tokens.AccessToken),
+		actions.SetFields("idToken", tokens.IDToken),
+		actions.SetFields("getClaim", func(claim string) interface{} {
+			return tokens.IDTokenClaims.GetClaim(claim)
+		}),
+		actions.SetFields("claimsJSON", func() (string, error) {
+			c, err := json.Marshal(tokens.IDTokenClaims)
+			if err != nil {
+				return "", err
+			}
+			return string(c), nil
+		}),
+	}
+}
+
 func actionUserGrantsToDomain(userID string, actionUserGrants []actions.UserGrant) []*domain.UserGrant {
 	if actionUserGrants == nil {
 		return nil
@@ -327,4 +355,31 @@ func actionUserGrantsToDomain(userID string, actionUserGrants []actions.UserGran
 		}
 	}
 	return userGrants
+}
+
+type metas struct {
+	m []*domain.Metadata
+}
+
+func appendMetadataFunc(mutableMetas *metas) func(goja.FunctionCall) goja.Value {
+	return func(call goja.FunctionCall) goja.Value {
+		if len(call.Arguments) != 2 {
+			panic("exactly 2 (key, value) arguments expected")
+		}
+		key := call.Arguments[0].Export().(string)
+		val := call.Arguments[1].Export()
+
+		value, err := json.Marshal(val)
+		if err != nil {
+			logging.WithError(err).Debug("unable to marshal")
+			panic(err)
+		}
+
+		mutableMetas.m = append(mutableMetas.m,
+			&domain.Metadata{
+				Key:   key,
+				Value: value,
+			})
+		return nil
+	}
 }

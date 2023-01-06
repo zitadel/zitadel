@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/api/grpc/management"
+
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
@@ -40,6 +42,7 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
+	mgmtServer          *management.Server
 }
 
 type Config struct {
@@ -72,6 +75,7 @@ func CreateLogin(config Config,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
+	mgmtServer *management.Server,
 ) (*Login, error) {
 
 	login := &Login{
@@ -85,6 +89,7 @@ func CreateLogin(config Config,
 		authRepo:            authRepo,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
+		mgmtServer:          mgmtServer,
 	}
 	statikFS, err := fs.NewWithNamespace("login")
 	if err != nil {
