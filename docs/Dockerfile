@@ -1,4 +1,6 @@
-FROM node:18-slim
+FROM node:18-alpine
+
+RUN apk update && apk --no-cache add git
 
 COPY . .
 
