@@ -6,9 +6,9 @@ on:
       - cloud-run-preview
 
 env:
-  PROJECT_ID: zitadel.com
+  PROJECT_ID: zitadel-com
   GAR_LOCATION: europe
-  REPOSITORY: zitadel-com/docs
+  REPOSITORY: docs
   SERVICE: hello
   REGION: europe-west6
 
