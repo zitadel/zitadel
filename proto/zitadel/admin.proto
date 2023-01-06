@@ -16,7 +16,7 @@ import "zitadel/v1.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
-import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -2546,9 +2546,31 @@ service AdminService {
         };
     }
 
+    rpc ListEventTypes(ListEventTypesRequest) returns (ListEventTypesResponse) {
+        option (google.api.http) = {
+            post: "/events/types/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
+        };
+    }
+
     rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
         option (google.api.http) = {
             post: "/events/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
+        };
+    }
+
+    rpc ListAggregateTypes(ListAggregateTypesRequest) returns (ListAggregateTypesResponse) {
+        option (google.api.http) = {
+            post: "/aggregates/types/_search";
             body: "*"
         };
 
@@ -4882,7 +4904,8 @@ message Event {
             example: "\"2019-04-01T08:45:00.000000Z\"";
         }
     ];
-    google.protobuf.Any payload = 5;
+    google.protobuf.Struct payload = 5;
+    string type = 6;
 }
 
 message EventEditor {
@@ -4895,4 +4918,16 @@ message EventAggregate {
     string id = 1;
     string type = 2;
     string resource_owner = 3;
+}
+
+message ListEventTypesRequest {}
+
+message ListEventTypesResponse {
+    repeated string event_types = 1;
+}
+
+message ListAggregateTypesRequest {}
+
+message ListAggregateTypesResponse {
+    repeated string aggregate_types = 1;
 }

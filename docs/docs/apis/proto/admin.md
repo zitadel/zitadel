@@ -1566,6 +1566,18 @@ Exports data from instance
     POST: /export
 
 
+### ListEventTypes
+
+> **rpc** ListEventTypes([ListEventTypesRequest](#listeventtypesrequest))
+[ListEventTypesResponse](#listeventtypesresponse)
+
+
+
+
+
+    POST: /events/types/_search
+
+
 ### ListEvents
 
 > **rpc** ListEvents([ListEventsRequest](#listeventsrequest))
@@ -1576,6 +1588,18 @@ Exports data from instance
 
 
     POST: /events/_search
+
+
+### ListAggregateTypes
+
+> **rpc** ListAggregateTypes([ListAggregateTypesRequest](#listaggregatetypesrequest))
+[ListAggregateTypesResponse](#listaggregatetypesresponse)
+
+
+
+
+
+    POST: /aggregates/types/_search
 
 
 
@@ -1998,7 +2022,8 @@ This is an empty request
 | aggregate |  EventAggregate | - |  |
 | sequence |  uint64 | - |  |
 | creation_date |  google.protobuf.Timestamp | The timestamp the event occurred |  |
-| payload |  google.protobuf.Any | - |  |
+| payload |  google.protobuf.Struct | - |  |
+| type |  string | - |  |
 
 
 
@@ -3121,6 +3146,40 @@ at least one argument has to be provided
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | is_unique |  bool | - |  |
+
+
+
+
+### ListAggregateTypesRequest
+
+
+
+
+
+### ListAggregateTypesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| aggregate_types | repeated string | - |  |
+
+
+
+
+### ListEventTypesRequest
+
+
+
+
+
+### ListEventTypesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| event_types | repeated string | - |  |
 
 
 
