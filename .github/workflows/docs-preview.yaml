@@ -1,4 +1,4 @@
-name: Docs preview
+name: Docs Preview
 
 on:
   pull_request:
@@ -44,6 +44,7 @@ jobs:
   Deploy:
     permissions:
       contents: 'read'
+      pull-requests: 'write'
     needs: Build
     runs-on: ubuntu-latest
     steps:
