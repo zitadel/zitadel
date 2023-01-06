@@ -199,8 +199,8 @@ module.exports = {
         docs: {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
-          showLastUpdateAuthor: true,
-          showLastUpdateTime: true,
+          showLastUpdateAuthor: false,
+          showLastUpdateTime: false,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
         },
