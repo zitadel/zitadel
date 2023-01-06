@@ -1,10 +1,9 @@
-name: Build and Deploy to Cloud Run
+name: Docs preview
 
 on:
   pull_request:
     branches: 
     - 'main'
-    - 'cloud-run-preview'
 
 env:
   PROJECT_ID: zitadel-com
@@ -14,12 +13,9 @@ env:
   REGION: europe-west6
 
 jobs:
-  deploy:
+  Build:
     permissions:
       contents: 'read'
-      id-token: 'write'
-      pull-requests: 'write'
-
     runs-on: ubuntu-latest
     steps:
       - name: Google Auth
@@ -45,6 +41,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  Deploy:
+    permissions:
+      contents: 'read'
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
@@ -54,7 +56,6 @@ jobs:
           image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
           tag: pr-${{ github.event.number }} ## Adds a preview URL with the PR number
           no_traffic: true
-
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
         with:
