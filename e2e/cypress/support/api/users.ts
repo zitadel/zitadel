@@ -1,5 +1,36 @@
+import { last } from 'cypress/types/lodash';
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
+
+export function registerUser(
+  api: API,
+  username: string,
+  firstname: string,
+  lastname: string,
+  email: string,
+  emailIsVerified: boolean,
+  initialPassword: string,
+): Cypress.Chainable<Cypress.Response<any>> {
+  return cy.request({
+    method: 'POST',
+    url: `${api.mgmtBaseURL}/users/human`,
+    body: {
+      userName: username,
+      profile: {
+        firstName: firstname,
+        lastName: lastname,
+      },
+      email: {
+        email: email,
+        isEmailVerified: emailIsVerified,
+      },
+      initialPassword: initialPassword,
+    },
+    auth: {
+      bearer: api.token,
+    },
+  });
+}
 
 export function ensureHumanUserExists(api: API, username: string): Cypress.Chainable<number> {
   return ensureItemExists(

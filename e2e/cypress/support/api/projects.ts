@@ -63,3 +63,25 @@ export function ensureApplicationExists(api: API, projectId: number, appName: st
     },
   );
 }
+
+export function ensureRoleExists(api: API, projectId: number, roleKey: string): Cypress.Chainable<null> {
+  return cy
+    .request({
+      method: 'POST',
+      url: `${api.mgmtBaseURL}/projects/${projectId}/roles`,
+      body: {
+        roleKey: roleKey,
+        displayName: roleKey,
+      },
+      auth: {
+        bearer: api.token,
+      },
+      failOnStatusCode: false,
+    })
+    .then((res) => {
+      if (!res.isOkStatusCode) {
+        expect(res.status).to.equal(409);
+      }
+      return null;
+    });
+}

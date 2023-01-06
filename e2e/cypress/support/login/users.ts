@@ -11,7 +11,6 @@ export function login(
   user: User,
   pw?: string,
   force?: boolean,
-  skipMFAChangePW?: boolean,
   onUsernameScreen?: () => void,
   onPasswordScreen?: () => void,
   onAuthenticated?: () => void,

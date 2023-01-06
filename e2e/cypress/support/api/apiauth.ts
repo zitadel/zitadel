@@ -5,7 +5,7 @@ const authHeaderKey = 'Authorization',
   orgIdHeaderKey = 'x-zitadel-orgid';
 
 export function apiAuth(): Cypress.Chainable<API> {
-  return login(User.IAMAdminUser, 'Password1!', false, true).then((token) => {
+  return login(User.IAMAdminUser, 'Password1!', false).then((token) => {
     return <API>{
       token: token,
       mgmtBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1`,
