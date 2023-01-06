@@ -54,5 +54,11 @@ jobs:
           tag: pr-${{ github.event.number }} ## Adds a preview URL with the PR number
           no_traffic: true
 
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
+      - name: Comment Preview URL in PR
+        uses: mshick/add-pr-comment@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          message: |
+            🍿 Successfully deployed preview revision at ${{ steps.deploy.outputs.url }}
+          allow-repeats: false
