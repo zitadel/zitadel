@@ -32,7 +32,7 @@ on:
 
 jobs:
   Preview:
-    if: ${{ inputs.BRANCH !== 'refs/heads/main' }}
+    if: ${{ inputs.BRANCH != 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
       name: Docs Preview
