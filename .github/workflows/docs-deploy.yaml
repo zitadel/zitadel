@@ -86,6 +86,7 @@ jobs:
           ## Maybe we should set a specific suffic like a short sha later on
           ## https://cloud.google.com/sdk/gcloud/reference/run/deploy#--revision-suffix
           # suffix: 
+          revision_traffic: LATEST=100
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
         with:
