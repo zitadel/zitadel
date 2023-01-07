@@ -1,8 +1,11 @@
-name: Docs Preview
+name: Docs
 
 on:
   pull_request:
     branches: 
+    - 'main'
+  push:
+    branches:
     - 'main'
 
 env:
@@ -43,29 +46,13 @@ jobs:
 
   Deploy:
     needs: Build
-    runs-on: ubuntu-latest
-    environment:
-      name: Docs Preview
-      url: ${{ steps.deploy.outputs.url }}
-    steps:
-      ## TODO Setup env specific account to deploy cloud run
-      - name: Google Auth
-        id: auth
-        uses: 'google-github-actions/auth@v0'
-        with:
-          credentials_json: '${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}'
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v0
-        with:
-          service: ${{ env.SERVICE }}
-          region: ${{ env.REGION }}
-          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
-          tag: pr-${{ github.event.number }}
-          no_traffic: true
-      - name: Comment Preview URL in PR
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            🍿 Successfully deployed preview revision at ${{ steps.deploy.outputs.url }}
-          allow-repeats: false
+    uses: ./.github/workflows/docs-build.yaml
+    with:
+      PROJECT_ID: ${{ needs.vars.outputs.PROJECT_ID }}
+      GAR_LOCATION: ${{ needs.vars.outputs.GAR_LOCATION }}
+      REPOSITORY: ${{ needs.vars.outputs.REPOSITORY }}
+      SERVICE: ${{ needs.vars.outputs.SERVICE }}
+      REGION: ${{ needs.vars.outputs.REGION }}
+      PRODUCTION: ${{ github.ref == 'refs/heads/main'}}
+    secrets:
+      SERVICE_ACCOUNT: ${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}

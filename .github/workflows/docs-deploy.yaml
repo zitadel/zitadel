@@ -1,0 +1,89 @@
+on:
+  workflow_call:
+    secrets:
+      SERVICE_ACCOUNT:
+        description: 'A token passed from the caller workflow'
+        required: true
+    inputs:
+      PRODUCTION:
+        required: true
+        type: boolean
+        default: false
+      PROJECT_ID:
+        description: 'TBD'
+        required: true
+        type: string
+      GAR_LOCATION:
+        description: 'TBD'
+        required: true
+        type: string
+      REPOSITORY:
+        description: 'TBD'
+        required: true
+        type: string
+      SERVICE:
+        description: 'TBD'
+        required: true
+        type: string
+      REGION:
+        description: 'TBD'
+        required: true
+        type: string
+
+jobs:
+  Deploy-Preview:
+    if: ${{ inputs.PRODUCTION }} == false
+    runs-on: ubuntu-latest
+    environment:
+      name: Docs Preview
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      ## TODO Setup env specific account to deploy cloud run
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}'
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ inputs.SERVICE }}
+          region: ${{ inputs.REGION }}
+          image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
+          tag: pr-${{ github.event.number }}
+          no_traffic: true
+      - name: Comment Preview URL in PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            🍿 Successfully deployed preview revision at ${{ steps.deploy.outputs.url }}
+          allow-repeats: false
+  Deploy-Production:
+    if: ${{ inputs.PRODUCTION }} == true
+    runs-on: ubuntu-latest
+    environment:
+      name: Docs Production
+      url: https://zitadel.com/docs
+    steps:
+      ## TODO Setup env specific account to deploy cloud run
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}'
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ inputs.SERVICE }}
+          region: ${{ inputs.REGION }}
+          image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
+          tag: pr-${{ github.event.number }}
+          no_traffic: true
+      - name: Comment Preview URL in PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            🍿 Successfully deployed new version https://zitadel.com/docs
+          allow-repeats: false
