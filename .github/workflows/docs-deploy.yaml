@@ -7,26 +7,27 @@ on:
     inputs:
       PRODUCTION:
         required: true
+        description: 'Evaluates if we should run production or preview deployments'
         type: boolean
         default: false
       PROJECT_ID:
-        description: 'TBD'
+        description: 'The google cloud project id'
         required: true
         type: string
       GAR_LOCATION:
-        description: 'TBD'
+        description: 'The google cloud artifact registry domain'
         required: true
         type: string
       REPOSITORY:
-        description: 'TBD'
+        description: 'The google cloud artifact registry repository'
         required: true
         type: string
       SERVICE:
-        description: 'TBD'
+        description: 'The google cloud run service name'
         required: true
         type: string
       REGION:
-        description: 'TBD'
+        description: 'The google cloud run service location'
         required: true
         type: string
 
@@ -52,6 +53,9 @@ jobs:
           region: ${{ inputs.REGION }}
           image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
           tag: pr-${{ github.event.number }}
+          ## Maybe we should set a specific suffic like a short sha later on
+          ## https://cloud.google.com/sdk/gcloud/reference/run/deploy#--revision-suffix
+          # suffix: 
           no_traffic: true
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
@@ -79,8 +83,9 @@ jobs:
           service: ${{ inputs.SERVICE }}
           region: ${{ inputs.REGION }}
           image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
-          ## TODO Only for debug
-          no_traffic: true
+          ## Maybe we should set a specific suffic like a short sha later on
+          ## https://cloud.google.com/sdk/gcloud/reference/run/deploy#--revision-suffix
+          # suffix: 
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
         with:

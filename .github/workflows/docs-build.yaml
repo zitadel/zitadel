@@ -6,28 +6,28 @@ on:
         required: true
     inputs:
       PROJECT_ID:
-        description: 'TBD'
+        description: 'The google cloud project id'
         required: true
         type: string
       GAR_LOCATION:
-        description: 'TBD'
+        description: 'The google cloud artifact registry domain'
         required: true
         type: string
       REPOSITORY:
-        description: 'TBD'
+        description: 'The google cloud artifact registry repository'
         required: true
         type: string
       SERVICE:
-        description: 'TBD'
+        description: 'The google cloud run service name'
         required: true
         type: string
       REGION:
-        description: 'TBD'
+        description: 'The google cloud run service location'
         required: true
         type: string
 
 jobs:
-  Build:
+  Container:
     runs-on: ubuntu-latest
     steps:
       ## TODO Setup non env specific account to push images
