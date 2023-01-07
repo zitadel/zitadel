@@ -31,7 +31,7 @@ on:
         type: string
 
 jobs:
-  Deploy-Preview:
+  Preview:
     if: ${{ inputs.PRODUCTION }} == false
     runs-on: ubuntu-latest
     environment:
@@ -43,7 +43,7 @@ jobs:
         id: auth
         uses: 'google-github-actions/auth@v0'
         with:
-          credentials_json: '${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}'
+          credentials_json: '${{ secrets.SERVICE_ACCOUNT }}'
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
@@ -59,7 +59,7 @@ jobs:
           message: |
             🍿 Successfully deployed preview revision at ${{ steps.deploy.outputs.url }}
           allow-repeats: false
-  Deploy-Production:
+  Production:
     if: ${{ inputs.PRODUCTION }} == true
     runs-on: ubuntu-latest
     environment:
@@ -71,7 +71,7 @@ jobs:
         id: auth
         uses: 'google-github-actions/auth@v0'
         with:
-          credentials_json: '${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}'
+          credentials_json: '${{ secrets.SERVICE_ACCOUNT }}'
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
@@ -79,7 +79,7 @@ jobs:
           service: ${{ inputs.SERVICE }}
           region: ${{ inputs.REGION }}
           image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
-          tag: pr-${{ github.event.number }}
+          ## TODO Only for debug
           no_traffic: true
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
