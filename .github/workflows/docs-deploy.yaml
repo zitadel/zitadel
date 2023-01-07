@@ -5,10 +5,10 @@ on:
         description: 'A token passed from the caller workflow'
         required: true
     inputs:
-      PRODUCTION:
+      BRANCH:
         required: true
         description: 'Evaluates if we should run production or preview deployments'
-        type: boolean
+        type: string
       PROJECT_ID:
         description: 'The google cloud project id'
         required: true
@@ -32,7 +32,7 @@ on:
 
 jobs:
   Preview:
-    if: ${{ inputs.PRODUCTION == false }}
+    if: ${{ inputs.BRANCH !== 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
       name: Docs Preview
@@ -63,7 +63,8 @@ jobs:
             🍿 Successfully deployed preview revision at ${{ steps.deploy.outputs.url }}
           allow-repeats: false
   Production:
-    if: ${{ inputs.PRODUCTION == true }}
+    #if: ${{ inputs.BRANCH == 'refs/heads/main' }}
+    if: ${{ inputs.BRANCH == 'refs/heads/cloud-run-preview' }}
     runs-on: ubuntu-latest
     environment:
       name: Docs Production
