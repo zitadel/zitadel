@@ -38,7 +38,6 @@ jobs:
       name: Docs Preview
       url: ${{ steps.deploy.outputs.url }}
     steps:
-      ## TODO Setup env specific account to deploy cloud run
       - name: Google Auth
         id: auth
         uses: 'google-github-actions/auth@v0'
@@ -60,15 +59,12 @@ jobs:
             🍿 Successfully deployed preview revision at ${{ steps.deploy.outputs.url }}
           allow-repeats: false
   Production:
-    #if: ${{ inputs.BRANCH == 'refs/heads/main' }}
-    if: ${{ inputs.BRANCH == 'refs/pull/4997/merge' }}
+    if: ${{ inputs.BRANCH == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
       name: Docs Production
-      url: ${{ steps.deploy.outputs.url }}
-      #url: https://zitadel.com/docs
+      url: https://zitadel.com/docs
     steps:
-      ## TODO Setup env specific account to deploy cloud run
       - name: Google Auth
         id: auth
         uses: 'google-github-actions/auth@v0'
@@ -89,9 +85,9 @@ jobs:
           service: ${{ inputs.SERVICE }}
           region: ${{ inputs.REGION }}
           tag_traffic: 'main=100'
-      - name: Comment Preview URL in PR
+      - name: Comment in PR
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            🍿 Successfully deployed new version ${{ steps.traffic.outputs.url }}! This is still a preview URL!
+            🍿 Successfully deployed new version https://zitadel.com/docs
           allow-repeats: false
