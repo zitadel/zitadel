@@ -81,9 +81,17 @@ jobs:
           service: ${{ inputs.SERVICE }}
           region: ${{ inputs.REGION }}
           image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
+          tag: main
+      - name: Switch Traffic to new Revision
+        id: traffic
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ inputs.SERVICE }}
+          region: ${{ inputs.REGION }}
+          tag_traffic: 'main=100'
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            🍿 Successfully deployed new version ${{ steps.deploy.outputs.url }}! This is still a preview URL!
+            🍿 Successfully deployed new version ${{ steps.traffic.outputs.url }}! This is still a preview URL!
           allow-repeats: false
