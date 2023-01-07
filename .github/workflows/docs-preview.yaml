@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   ## This is only a workaround since nested jobs can't simply pass env vars
-  Set-Vars:
+  Vars:
     runs-on: ubuntu-latest
     outputs:
       PROJECT_ID: ${{ env.PROJECT_ID }}
@@ -30,7 +30,7 @@ jobs:
       - run: echo "Exposing env vars"
 
   Build:
-    needs: Set-Vars
+    needs: Vars
     uses: ./.github/workflows/docs-build.yaml
     with:
       PROJECT_ID: ${{ needs.vars.outputs.PROJECT_ID }}
