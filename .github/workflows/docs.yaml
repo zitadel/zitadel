@@ -67,6 +67,6 @@ jobs:
       REPOSITORY: ${{ needs.deploy-vars.outputs.REPOSITORY }}
       SERVICE: ${{ needs.deploy-vars.outputs.SERVICE }}
       REGION: ${{ needs.deploy-vars.outputs.REGION }}
-      PRODUCTION: ${{ github.ref == 'refs/heads/main'}}
+      PRODUCTION: ${{ github.ref == 'refs/heads/cloud-run-preview'}}
     secrets:
       SERVICE_ACCOUNT: ${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}

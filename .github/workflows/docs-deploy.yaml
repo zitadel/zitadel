@@ -90,5 +90,5 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            🍿 Successfully deployed new version https://zitadel.com/docs
+            🍿 Successfully deployed new version ${{ steps.deploy.outputs.url }}! This is still a preview URL!
           allow-repeats: false
