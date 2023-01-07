@@ -32,7 +32,7 @@ on:
 
 jobs:
   Preview:
-    if: ${{ inputs.PRODUCTION }} == false
+    if: ${{ inputs.PRODUCTION == false }}
     runs-on: ubuntu-latest
     environment:
       name: Docs Preview
@@ -60,7 +60,7 @@ jobs:
             🍿 Successfully deployed preview revision at ${{ steps.deploy.outputs.url }}
           allow-repeats: false
   Production:
-    if: ${{ inputs.PRODUCTION }} == true
+    if: ${{ inputs.PRODUCTION == true }}
     runs-on: ubuntu-latest
     environment:
       name: Docs Production

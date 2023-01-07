@@ -21,7 +21,8 @@ permissions:
 
 jobs:
   ## This is only a workaround since nested jobs can't simply pass env vars
-  Vars:
+  ## https://github.com/orgs/community/discussions/26671
+  Build-Vars:
     runs-on: ubuntu-latest
     outputs:
       PROJECT_ID: ${{ env.PROJECT_ID }}
@@ -33,26 +34,39 @@ jobs:
       - run: echo "Exposing env vars"
 
   Build:
-    needs: Vars
+    needs: Build-Vars
     uses: ./.github/workflows/docs-build.yaml
     with:
-      PROJECT_ID: ${{ needs.vars.outputs.PROJECT_ID }}
-      GAR_LOCATION: ${{ needs.vars.outputs.GAR_LOCATION }}
-      REPOSITORY: ${{ needs.vars.outputs.REPOSITORY }}
-      SERVICE: ${{ needs.vars.outputs.SERVICE }}
-      REGION: ${{ needs.vars.outputs.REGION }}
+      PROJECT_ID: ${{ needs.build-vars.outputs.PROJECT_ID }}
+      GAR_LOCATION: ${{ needs.build-vars.outputs.GAR_LOCATION }}
+      REPOSITORY: ${{ needs.build-vars.outputs.REPOSITORY }}
+      SERVICE: ${{ needs.build-vars.outputs.SERVICE }}
+      REGION: ${{ needs.build-vars.outputs.REGION }}
     secrets:
       SERVICE_ACCOUNT: ${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}
 
+  Deploy-Vars:
+    ## This is only a workaround since nested jobs can't simply pass env vars
+    ## https://github.com/orgs/community/discussions/26671
+    runs-on: ubuntu-latest
+    outputs:
+      PROJECT_ID: ${{ env.PROJECT_ID }}
+      GAR_LOCATION: ${{ env.GAR_LOCATION }}
+      REPOSITORY: ${{ env.REPOSITORY }}
+      SERVICE: ${{ env.SERVICE }}
+      REGION: ${{ env.REGION }}
+    steps:
+      - run: echo "Exposing env vars"
+
   Deploy:
-    needs: Build
+    needs: [Build, Deploy-Vars]
     uses: ./.github/workflows/docs-deploy.yaml
     with:
-      PROJECT_ID: ${{ needs.vars.outputs.PROJECT_ID }}
-      GAR_LOCATION: ${{ needs.vars.outputs.GAR_LOCATION }}
-      REPOSITORY: ${{ needs.vars.outputs.REPOSITORY }}
-      SERVICE: ${{ needs.vars.outputs.SERVICE }}
-      REGION: ${{ needs.vars.outputs.REGION }}
+      PROJECT_ID: ${{ needs.deploy-vars.outputs.PROJECT_ID }}
+      GAR_LOCATION: ${{ needs.deploy-vars.outputs.GAR_LOCATION }}
+      REPOSITORY: ${{ needs.deploy-vars.outputs.REPOSITORY }}
+      SERVICE: ${{ needs.deploy-vars.outputs.SERVICE }}
+      REGION: ${{ needs.deploy-vars.outputs.REGION }}
       PRODUCTION: ${{ github.ref == 'refs/heads/main'}}
     secrets:
       SERVICE_ACCOUNT: ${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}
