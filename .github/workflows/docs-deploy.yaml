@@ -64,7 +64,7 @@ jobs:
           allow-repeats: false
   Production:
     #if: ${{ inputs.BRANCH == 'refs/heads/main' }}
-    if: ${{ inputs.BRANCH == 'refs/heads/cloud-run-preview' }}
+    if: ${{ inputs.BRANCH == 'refs/pull/4997/merge' }}
     runs-on: ubuntu-latest
     environment:
       name: Docs Production
