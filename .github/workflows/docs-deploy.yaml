@@ -9,7 +9,6 @@ on:
         required: true
         description: 'Evaluates if we should run production or preview deployments'
         type: boolean
-        default: false
       PROJECT_ID:
         description: 'The google cloud project id'
         required: true
