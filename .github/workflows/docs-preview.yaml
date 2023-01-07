@@ -17,14 +17,27 @@ permissions:
   pull-requests: 'write'
 
 jobs:
-  Build:
-    uses: ./.github/workflows/docs-build.yaml
-    with:
+  ## This is only a workaround since nested jobs can't simply pass env vars
+  Set-Vars:
+    runs-on: ubuntu-latest
+    outputs:
       PROJECT_ID: ${{ env.PROJECT_ID }}
       GAR_LOCATION: ${{ env.GAR_LOCATION }}
       REPOSITORY: ${{ env.REPOSITORY }}
       SERVICE: ${{ env.SERVICE }}
       REGION: ${{ env.REGION }}
+    steps:
+      - run: echo "Exposing env vars"
+
+  Build:
+    needs: Set-Vars
+    uses: ./.github/workflows/docs-build.yaml
+    with:
+      PROJECT_ID: ${{ needs.vars.outputs.PROJECT_ID }}
+      GAR_LOCATION: ${{ needs.vars.outputs.GAR_LOCATION }}
+      REPOSITORY: ${{ needs.vars.outputs.REPOSITORY }}
+      SERVICE: ${{ needs.vars.outputs.SERVICE }}
+      REGION: ${{ needs.vars.outputs.REGION }}
     secrets:
       SERVICE_ACCOUNT: ${{ secrets.TEST_FFO_DOCS_CLOUDRUN_DEPLOY }}
 
