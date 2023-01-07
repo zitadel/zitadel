@@ -52,9 +52,6 @@ jobs:
           region: ${{ inputs.REGION }}
           image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
           tag: pr-${{ github.event.number }}
-          ## Maybe we should set a specific suffic like a short sha later on
-          ## https://cloud.google.com/sdk/gcloud/reference/run/deploy#--revision-suffix
-          # suffix: 
           no_traffic: true
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
@@ -83,11 +80,6 @@ jobs:
           service: ${{ inputs.SERVICE }}
           region: ${{ inputs.REGION }}
           image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
-          tag: production
-          ## Maybe we should set a specific suffic like a short sha later on
-          ## https://cloud.google.com/sdk/gcloud/reference/run/deploy#--revision-suffix
-          # suffix: 
-          tag_traffic: 'production=100'
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
         with:
