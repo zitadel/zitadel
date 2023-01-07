@@ -83,10 +83,11 @@ jobs:
           service: ${{ inputs.SERVICE }}
           region: ${{ inputs.REGION }}
           image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
+          tag: production
           ## Maybe we should set a specific suffic like a short sha later on
           ## https://cloud.google.com/sdk/gcloud/reference/run/deploy#--revision-suffix
           # suffix: 
-          revision_traffic: LATEST=100
+          tag_traffic: 'production=100'
       - name: Comment Preview URL in PR
         uses: mshick/add-pr-comment@v2
         with:
