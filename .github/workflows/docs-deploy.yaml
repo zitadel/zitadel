@@ -65,7 +65,8 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: Docs Production
-      url: https://zitadel.com/docs
+      url: ${{ steps.deploy.outputs.url }}
+      #url: https://zitadel.com/docs
     steps:
       ## TODO Setup env specific account to deploy cloud run
       - name: Google Auth
