@@ -7,22 +7,24 @@ export enum User {
   IAMAdminUser = 'zitadel-admin',
 }
 
+export function loginAsPredefinedUser(user: User) {
+  return login(loginname(<string>user, Cypress.env('ORGANIZATION')), undefined, false);
+}
+
 export function login(
-  user: User,
-  pw?: string,
+  username: string,
+  pw = 'Password1!',
   force?: boolean,
   onUsernameScreen?: () => void,
   onPasswordScreen?: () => void,
   onAuthenticated?: () => void,
 ): Cypress.Chainable<string> {
-  let creds = credentials(user, pw);
-
   const loginUrl: string = '/ui/login';
   const issuerUrl: string = '/oauth/v2';
 
   return cy
     .session(
-      creds.username,
+      username,
       () => {
         const cookies = new Map<string, string>();
 
@@ -60,11 +62,11 @@ export function login(
         cy.visit(loginUrl, { retryOnNetworkFailure: true });
 
         onUsernameScreen ? onUsernameScreen() : null;
-        cy.get('#loginName').type(creds.username);
+        cy.get('#loginName').type(username);
         cy.get('#submit-button').click();
 
         onPasswordScreen ? onPasswordScreen() : null;
-        cy.get('#password').type(creds.password);
+        cy.get('#password').type(pw);
         cy.get('#submit-button').click();
 
         cy.wait('@password').then((interception) => {
@@ -76,14 +78,10 @@ export function login(
         });
 
         cy.wait('@token').then(() => {
-          cy.task('safetoken', { key: creds.username, token: userToken });
+          cy.task('safetoken', { key: username, token: userToken });
         });
 
         onAuthenticated ? onAuthenticated() : null;
-
-        cy.get('[data-e2e=authenticated-welcome]', {
-          timeout: 10_000,
-        });
       },
       {
         validate: () => {
@@ -94,23 +92,12 @@ export function login(
       },
     )
     .then(() => {
-      return cy.task('loadtoken', { key: creds.username });
+      return cy.task('loadtoken', { key: username });
     });
 }
 
 export function loginname(withoutDomain: string, org?: string): string {
   return `${withoutDomain}@${org}.${host(Cypress.config('baseUrl'))}`;
-}
-
-function credentials(user: User, pw?: string) {
-  // TODO: ugly
-  const woDomain = user == User.IAMAdminUser ? User.IAMAdminUser : `${user}_user_name`;
-  const org = Cypress.env('ORGANIZATION') ? Cypress.env('ORGANIZATION') : 'zitadel';
-
-  return {
-    username: loginname(woDomain, org),
-    password: pw ? pw : Cypress.env(`${user}_password`),
-  };
 }
 
 function updateCookies(newCookies: string[] | undefined, currentCookies: Map<string, string>) {

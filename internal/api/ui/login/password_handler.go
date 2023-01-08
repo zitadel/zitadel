@@ -39,7 +39,13 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, authReq.AgentID, domain.BrowserInfoFromRequest(r))
-	l.triggerPostLocalAuthentication()
+
+	// TODO: Only if not more MFA steps?
+	if actionErr := l.triggerPostLocalAuthentication(r.Context(), authReq, err); actionErr != nil {
+		if err == nil {
+			err = actionErr
+		}
+	}
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames {
 			l.renderLogin(w, r, authReq, err)

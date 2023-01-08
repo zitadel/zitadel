@@ -15,9 +15,9 @@ export function ensureActionExists(api: API, name: string, script: string): Cypr
     }
 
     if (action.script != script) {
-      return updateAction(api, action.id, script);
+      updateAction(api, action.id, name, script);
     }
-    return action.id;
+    return cy.wrap(<number>action.id);
   });
 }
 
@@ -67,17 +67,18 @@ function createAction(api: API, name: string, script: string): Cypress.Chainable
     .its('body.id');
 }
 
-function updateAction(api: API, id: string, script: string): Cypress.Chainable<number> {
-  return cy
-    .request({
-      method: 'PUT',
-      url: `${api.mgmtBaseURL}/actions/${id}`,
-      body: {
-        script: script,
-      },
-      ...auth(api),
-    })
-    .its('body.id');
+function updateAction(api: API, id: string, name: string, script: string) {
+  return cy.request({
+    method: 'PUT',
+    url: `${api.mgmtBaseURL}/actions/${id}`,
+    body: {
+      name: name,
+      script: script,
+      allowedToFail: false,
+      timeout: '10s',
+    },
+    ...auth(api),
+  });
 }
 
 function removeAction(api: API, id: string) {

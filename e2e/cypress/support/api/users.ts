@@ -2,42 +2,17 @@ import { last } from 'cypress/types/lodash';
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
 
-export function registerUser(
+export function ensureHumanUserExists(
   api: API,
   username: string,
-  firstname: string,
-  lastname: string,
-  email: string,
-  emailIsVerified: boolean,
-  initialPassword: string,
-): Cypress.Chainable<Cypress.Response<any>> {
-  return cy.request({
-    method: 'POST',
-    url: `${api.mgmtBaseURL}/users/human`,
-    body: {
-      userName: username,
-      profile: {
-        firstName: firstname,
-        lastName: lastname,
-      },
-      email: {
-        email: email,
-        isEmailVerified: emailIsVerified,
-      },
-      initialPassword: initialPassword,
-    },
-    auth: {
-      bearer: api.token,
-    },
-  });
-}
-
-export function ensureHumanUserExists(api: API, username: string): Cypress.Chainable<number> {
+  password: string,
+  emailIsVerified = false,
+): Cypress.Chainable<number> {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/users/_search`,
     (user: any) => user.userName === username,
-    `${api.mgmtBaseURL}/users/human`,
+    `${api.mgmtBaseURL}/users/human/_import`,
     {
       user_name: username,
       profile: {
@@ -46,10 +21,13 @@ export function ensureHumanUserExists(api: API, username: string): Cypress.Chain
       },
       email: {
         email: 'e2e@email.ch',
+        isEmailVerified: emailIsVerified,
       },
       phone: {
         phone: '+41 123456789',
       },
+      password: password,
+      password_change_required: false,
     },
     undefined,
     'userId',
@@ -79,4 +57,13 @@ export function ensureUserDoesntExist(api: API, username: string): Cypress.Chain
     (user: any) => user.userName === username,
     (user) => `${api.mgmtBaseURL}/users/${user.id}`,
   );
+}
+
+export function setMetadata(api: API, userId: number, key: string, value: string) {
+  return cy.request({
+    method: 'POST',
+    url: `${api.mgmtBaseURL}/users/${userId}/metadata/${key}`,
+    body: { value: value },
+    auth: { bearer: api.token },
+  });
 }

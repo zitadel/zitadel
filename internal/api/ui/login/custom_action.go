@@ -67,7 +67,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", appendMetadataFunc(mutableMetas)),
 			),
-			actions.SetFields("mgmt", object.ManagementAPIField(l.mgmtServer)),
+			actions.SetFields("mgmt", object.ManagementField(l.mgmtServer)),
 		),
 	)
 
@@ -80,6 +80,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 				actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
 					return object.UserFromExternalUser(c, user)
 				}),
+				actions.SetFields("authRequest", object.AuthRequestField(*req)),
 			),
 		)
 
@@ -102,7 +103,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	return user, err
 }
 
-func (l *Login) triggerPostLocalAuthentication(ctx context.Context, tokens *oidc.Tokens, req *domain.AuthRequest, authenticationError error) error {
+func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.AuthRequest, authenticationError error) error {
 	resourceOwner := req.RequestedOrgID
 	if resourceOwner == "" {
 		resourceOwner = req.UserOrgID
@@ -115,20 +116,25 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, tokens *oidc
 
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("v1",
-			actions.SetFields("mgmt", object.ManagementAPIField(l.mgmtServer)),
+			actions.SetFields("mgmt", l.mgmtServer),
 		),
 	)
 
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
 
+		authErrStr := ""
+		if authenticationError != nil {
+			authErrStr = authenticationError.Error()
+		}
+
 		ctxFields := actions.SetContextFields(
-			append(tokenCtxFields(tokens),
-				actions.SetFields("v1",
-					actions.SetFields("ctx", actionCtx),
-					actions.SetFields("authenticationError", authenticationError.Error()),
-				),
-			)...,
+			// TODO: add tokenCtxFields(tokens)
+			actions.SetFields("v1",
+				actions.SetFields("ctx", actionCtx),
+				actions.SetFields("authenticationError", authErrStr),
+				actions.SetFields("authRequest", object.AuthRequestField(*req)),
+			),
 		)
 
 		err = actions.Run(
@@ -147,7 +153,7 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, tokens *oidc
 	return err
 }
 
-func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.Human, metadata []*domain.Metadata, resourceOwner string, flowType domain.FlowType) (*domain.Human, []*domain.Metadata, error) {
+func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *domain.AuthRequest, user *domain.Human, metadata []*domain.Metadata, resourceOwner string, flowType domain.FlowType) (*domain.Human, []*domain.Metadata, error) {
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePreCreation, resourceOwner, false)
 	if err != nil {
 		return nil, nil, err
@@ -206,7 +212,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.H
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", appendMetadataFunc(mutableMetas)),
 			),
-			actions.SetFields("mgmt", object.ManagementAPIField(l.mgmtServer)),
+			actions.SetFields("mgmt", object.ManagementField(l.mgmtServer)),
 		),
 	)
 
@@ -219,6 +225,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.H
 					return object.UserFromHuman(c, user)
 				}),
 				actions.SetFields("ctx", actionCtx),
+				actions.SetFields("authRequest", object.AuthRequestField(*authRequest)),
 			),
 		)
 
@@ -238,7 +245,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, user *domain.H
 	return user, mutableMetas.m, err
 }
 
-func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner string, flowType domain.FlowType) ([]*domain.UserGrant, error) {
+func (l *Login) customGrants(ctx context.Context, authRequest *domain.AuthRequest, resourceOwner string, flowType domain.FlowType) ([]*domain.UserGrant, error) {
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePostCreation, resourceOwner, false)
 	if err != nil {
 		return nil, err
@@ -286,7 +293,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner s
 					return nil
 				}
 			}),
-			actions.SetFields("mgmt", object.ManagementAPIField(l.mgmtServer)),
+			actions.SetFields("mgmt", l.mgmtServer),
 		),
 	)
 
@@ -297,7 +304,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner s
 			actions.SetFields("v1",
 				actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 					return func(call goja.FunctionCall) goja.Value {
-						user, err := l.query.GetUserByID(actionCtx, true, userID, false)
+						user, err := l.query.GetUserByID(actionCtx, true, authRequest.UserID, false)
 						if err != nil {
 							panic(err)
 						}
@@ -305,6 +312,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner s
 					}
 				}),
 				actions.SetFields("ctx", actionCtx),
+				actions.SetFields("authRequest", object.AuthRequestField(*authRequest)),
 			),
 		)
 
@@ -321,7 +329,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, resourceOwner s
 			return nil, err
 		}
 	}
-	return actionUserGrantsToDomain(userID, actionUserGrants), err
+	return actionUserGrantsToDomain(authRequest.UserID, actionUserGrants), err
 }
 
 func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
@@ -332,6 +340,7 @@ func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
 			return tokens.IDTokenClaims.GetClaim(claim)
 		}),
 		actions.SetFields("claimsJSON", func() (string, error) {
+			// TODO: why don't we return the struct?
 			c, err := json.Marshal(tokens.IDTokenClaims)
 			if err != nil {
 				return "", err

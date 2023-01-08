@@ -1,11 +1,11 @@
-import { login, User } from 'support/login/users';
+import { login, loginAsPredefinedUser, loginname, User } from 'support/login/users';
 import { API } from './types';
 
 const authHeaderKey = 'Authorization',
   orgIdHeaderKey = 'x-zitadel-orgid';
 
 export function apiAuth(): Cypress.Chainable<API> {
-  return login(User.IAMAdminUser, 'Password1!', false).then((token) => {
+  return loginAsPredefinedUser(User.IAMAdminUser).then((token) => {
     return <API>{
       token: token,
       mgmtBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1`,

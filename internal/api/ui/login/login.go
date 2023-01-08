@@ -3,11 +3,10 @@ package login
 import (
 	"context"
 	"fmt"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/api/grpc/management"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
@@ -42,7 +41,7 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
-	mgmtServer          *management.Server
+	mgmtServer          management.ManagementServiceServer
 }
 
 type Config struct {
@@ -75,7 +74,7 @@ func CreateLogin(config Config,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
-	mgmtServer *management.Server,
+	mgmtServer management.ManagementServiceServer,
 ) (*Login, error) {
 
 	login := &Login{

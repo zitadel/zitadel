@@ -36,6 +36,11 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 	if data.MFAType == domain.MFATypeOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, domain.BrowserInfoFromRequest(r))
+		if actionErr := l.triggerPostLocalAuthentication(r.Context(), authReq, err); actionErr != nil {
+			if err != nil {
+				err = actionErr
+			}
+		}
 		if err != nil {
 			l.renderMFAVerifySelected(w, r, authReq, step, domain.MFATypeOTP, err)
 			return
