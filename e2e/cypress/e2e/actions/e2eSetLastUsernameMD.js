@@ -1,4 +1,4 @@
-function e2eStoreStates(ctx, api) {
+function e2eSetLastUsernameMD(ctx, api) {
   const mgmt = api.v1.mgmt;
   const authRequest = ctx.v1.authRequest;
   const goCtx = ctx.v1.ctx;

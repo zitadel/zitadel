@@ -1,16 +1,15 @@
-import { appendFile } from 'fs/promises';
 import { ensureActionExists, setTriggerTypes } from 'support/api/actions';
 import { apiAuth } from 'support/api/apiauth';
 import { ensureProjectExists, ensureRoleExists } from 'support/api/projects';
 import { API } from 'support/api/types';
 import { ensureHumanUserExists, ensureUserDoesntExist, setMetadata } from 'support/api/users';
-import { login, loginAsPredefinedUser, loginname, User } from 'support/login/users';
+import { login, loginAsPredefinedUser, User } from 'support/login/users';
 
 describe('actions', () => {
   const emailVerifiedScript = 'e2eSetEmailVerified',
     addGrantScript = 'e2eAddGrant',
     addMetadataScript = 'e2eAddMetadata',
-    storeStatesScript = 'e2eStoreStates',
+    storeUsernameScript = 'e2eSetLastUsernameMD',
     projectName = 'e2eaction',
     roleKey = 'e2eactionrole',
     userFirstname = 'e2eFirstname',
@@ -108,8 +107,8 @@ describe('actions', () => {
       beforeEach(() => {
         cy.get<API>('@api').then((api) => {
           ensureHumanUserExists(api, userEmail, userPw, true).as('userId');
-          cy.readFile<string>(`${specPath}/${storeStatesScript}.js`).then((script) => {
-            ensureActionExists(api, storeStatesScript, script).as('addStoreStatesId');
+          cy.readFile<string>(`${specPath}/${storeUsernameScript}.js`).then((script) => {
+            ensureActionExists(api, storeUsernameScript, script).as('storeUsernameId');
           });
         });
       });
@@ -117,8 +116,8 @@ describe('actions', () => {
       describe('internal', () => {
         beforeEach(() => {
           cy.get<API>('@api').then((api) => {
-            cy.get<number>('@addStoreStatesId').then((storeStatesId) => {
-              setTriggerTypes(api, 3, 1, [storeStatesId]);
+            cy.get<number>('@storeUsernameId').then((storeUsernameId) => {
+              setTriggerTypes(api, 3, 1, [storeUsernameId]);
             });
           });
         });
