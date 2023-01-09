@@ -6,7 +6,7 @@ import (
 )
 
 // AuthRequestField accepts the domain.AuthRequest by value, so its not mutated
-func AuthRequestField(authRequest domain.AuthRequest) func(c *actions.FieldConfig) interface{} {
+func AuthRequestField(authRequest *domain.AuthRequest) func(c *actions.FieldConfig) interface{} {
 	return func(c *actions.FieldConfig) interface{} {
 		return c.Runtime.ToValue(authRequest)
 	}

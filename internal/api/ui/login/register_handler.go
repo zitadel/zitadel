@@ -102,7 +102,6 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	authRequest.UserID = user.AggregateID
 
 	if len(metadatas) > 0 {
 		_, err = l.command.BulkSetUserMetadata(r.Context(), user.AggregateID, resourceOwner, metadatas...)
@@ -113,7 +112,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	userGrants, err := l.customGrants(r.Context(), authRequest, resourceOwner, domain.FlowTypeInternalAuthentication)
+	userGrants, err := l.customGrants(r.Context(), user.AggregateID, authRequest, resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
 		return

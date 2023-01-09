@@ -144,7 +144,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(r.Context(), authReq, resourceOwner, domain.FlowTypeExternalAuthentication)
+	userGrants, err := l.customGrants(r.Context(), authReq.UserID, authReq, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

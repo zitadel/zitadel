@@ -80,7 +80,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 				actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
 					return object.UserFromExternalUser(c, user)
 				}),
-				actions.SetFields("authRequest", object.AuthRequestField(*req)),
+				actions.SetFields("authRequest", object.AuthRequestField(req)),
 			),
 		)
 
@@ -133,7 +133,7 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 			actions.SetFields("v1",
 				actions.SetFields("ctx", actionCtx),
 				actions.SetFields("authenticationError", authErrStr),
-				actions.SetFields("authRequest", object.AuthRequestField(*req)),
+				actions.SetFields("authRequest", object.AuthRequestField(req)),
 			),
 		)
 
@@ -225,7 +225,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 					return object.UserFromHuman(c, user)
 				}),
 				actions.SetFields("ctx", actionCtx),
-				actions.SetFields("authRequest", object.AuthRequestField(*authRequest)),
+				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 			),
 		)
 
@@ -245,7 +245,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 	return user, mutableMetas.m, err
 }
 
-func (l *Login) customGrants(ctx context.Context, authRequest *domain.AuthRequest, resourceOwner string, flowType domain.FlowType) ([]*domain.UserGrant, error) {
+func (l *Login) customGrants(ctx context.Context, userID string, authRequest *domain.AuthRequest, resourceOwner string, flowType domain.FlowType) ([]*domain.UserGrant, error) {
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePostCreation, resourceOwner, false)
 	if err != nil {
 		return nil, err
@@ -312,7 +312,7 @@ func (l *Login) customGrants(ctx context.Context, authRequest *domain.AuthReques
 					}
 				}),
 				actions.SetFields("ctx", actionCtx),
-				actions.SetFields("authRequest", object.AuthRequestField(*authRequest)),
+				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 			),
 		)
 
@@ -329,7 +329,7 @@ func (l *Login) customGrants(ctx context.Context, authRequest *domain.AuthReques
 			return nil, err
 		}
 	}
-	return actionUserGrantsToDomain(authRequest.UserID, actionUserGrants), err
+	return actionUserGrantsToDomain(userID, actionUserGrants), err
 }
 
 func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
