@@ -42,7 +42,7 @@ module.exports = {
       label: "Get started",
       collapsed: false,
       items: [
-        "guides/start/developer-quickstart",
+        "guides/start/quickstart",
       ],
     },
     {
