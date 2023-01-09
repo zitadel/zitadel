@@ -1,6 +1,7 @@
-import { apiAuth, API } from '../../support/api/apiauth';
+import { API } from 'support/api/types';
+import { apiAuth } from '../../support/api/apiauth';
 import { Policy, resetPolicy } from '../../support/api/policies';
-import { login, User } from '../../support/login/users';
+import { User } from '../../support/login/users';
 
 describe('private labeling', () => {
   const orgPath = `/org`;
@@ -10,7 +11,7 @@ describe('private labeling', () => {
       let api: API;
 
       beforeEach(() => {
-        login(user);
+        // login(user);
         cy.visit(orgPath);
         // TODO: Why force?
         cy.contains('[data-e2e="policy-card"]', 'Private Labeling').contains('button', 'Modify').click({ force: true }); // TODO: select data-e2e
@@ -61,9 +62,9 @@ function customize(theme: string, user: User) {
       cy.get('[data-e2e="save-colors-button"]').click();
       cy.get('[data-e2e="header-user-avatar"]').click();
       cy.contains('Logout All Users').click(); // TODO: select data-e2e
-      login(User.LoginPolicyUser, undefined, true, null, () => {
+      /* login(User.LoginPolicyUser, undefined, true, null, () => {
         cy.pause();
-      });
+      });*/
     });
     it('should update the primary color');
     it('should update the warning color');

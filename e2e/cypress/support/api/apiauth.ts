@@ -1,4 +1,4 @@
-import { login, loginAsPredefinedUser, loginname, User } from 'support/login/users';
+import { loginAsPredefinedUser, User } from 'support/login/users';
 import { API } from './types';
 
 const authHeaderKey = 'Authorization',

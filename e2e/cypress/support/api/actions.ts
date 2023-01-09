@@ -1,23 +1,23 @@
 import { API } from './types';
 
 export function ensureActionDoesntExist(api: API, name: string) {
-  return getAction(api, name).then((action) => {
-    if (action) {
-      return removeAction(api, name);
+  return search(api, name).then((entity) => {
+    if (entity) {
+      return remove(api, entity.id);
     }
   });
 }
 
 export function ensureActionExists(api: API, name: string, script: string): Cypress.Chainable<number> {
-  return getAction(api, name).then((action) => {
-    if (!action) {
-      return createAction(api, name, script);
+  return search(api, name).then((entity) => {
+    if (!entity) {
+      return create(api, name, script);
     }
 
-    if (action.script != script) {
-      updateAction(api, action.id, name, script);
+    if (entity.script != script) {
+      update(api, entity.id, name, script);
     }
-    return cy.wrap(<number>action.id);
+    return cy.wrap(<number>entity.id);
   });
 }
 
@@ -39,7 +39,7 @@ export function setTriggerTypes(api: API, flowType: number, triggerType: number,
     });
 }
 
-function getAction(api: API, name: string): Cypress.Chainable<any> {
+function search(api: API, name: string): Cypress.Chainable<any> {
   return cy
     .request({
       method: 'POST',
@@ -51,7 +51,7 @@ function getAction(api: API, name: string): Cypress.Chainable<any> {
     });
 }
 
-function createAction(api: API, name: string, script: string): Cypress.Chainable<number> {
+function create(api: API, name: string, script: string): Cypress.Chainable<number> {
   return cy
     .request({
       method: 'POST',
@@ -67,7 +67,7 @@ function createAction(api: API, name: string, script: string): Cypress.Chainable
     .its('body.id');
 }
 
-function updateAction(api: API, id: string, name: string, script: string) {
+function update(api: API, id: string, name: string, script: string) {
   return cy.request({
     method: 'PUT',
     url: `${api.mgmtBaseURL}/actions/${id}`,
@@ -81,7 +81,7 @@ function updateAction(api: API, id: string, name: string, script: string) {
   });
 }
 
-function removeAction(api: API, id: string) {
+function remove(api: API, id: string) {
   return cy.request({
     method: 'DELETE',
     url: `${api.mgmtBaseURL}/actions/${id}`,

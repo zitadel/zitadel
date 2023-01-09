@@ -1,6 +1,6 @@
 import { apiAuth } from '../../support/api/apiauth';
 import { ensureHumanUserExists } from '../../support/api/users';
-import { login, User } from '../../support/login/users';
+import { User } from '../../support/login/users';
 
 describe('login policy', () => {
   const orgPath = `/org`;
@@ -8,7 +8,7 @@ describe('login policy', () => {
   [User.OrgOwner].forEach((user) => {
     describe(`as user "${user}"`, () => {
       beforeEach(() => {
-        login(user);
+        // login(user);
         cy.visit(orgPath);
         // TODO: Why force?
         cy.contains('[data-e2e="policy-card"]', 'Login Policy').contains('button', 'Modify').click({ force: true }); // TODO: select data-e2e
@@ -19,9 +19,7 @@ describe('login policy', () => {
 
       // TODO: verify email
 
-      it.skip(`username and password disallowed`, () => {
-        login(User.LoginPolicyUser, '123abcABC?&*');
-      });
+      it(`username and password disallowed`);
       it(`registering is allowed`);
       it(`registering is disallowed`);
       it(`login by an external IDP is allowed`);

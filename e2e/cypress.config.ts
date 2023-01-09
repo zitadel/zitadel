@@ -30,12 +30,11 @@ export default defineConfig({
         safetoken({key, token}) {
           tokensCache.set(key,token);
           return null
-        }
-      })
-      on('task', {
+        },
         loadtoken({key}): string | null {
           return tokensCache.get(key) || null;
-        }
+        },
+        generateOTP: require("cypress-otp")
       })
     },
   },

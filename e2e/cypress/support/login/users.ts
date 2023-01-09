@@ -8,116 +8,74 @@ export enum User {
 }
 
 export function loginAsPredefinedUser(user: User) {
-  return login(loginname(<string>user, Cypress.env('ORGANIZATION')), undefined, false);
+  return login(loginname(<string>user, Cypress.env('ORGANIZATION')));
 }
 
 export function login(
   username: string,
-  pw = 'Password1!',
-  force?: boolean,
-  onUsernameScreen?: () => void,
+  pw?: string,
   onPasswordScreen?: () => void,
-  onAuthenticated?: () => void,
 ): Cypress.Chainable<string> {
+    // We want to have a clean session but miss cypresses sesssion cache
+    return cy.session(Math.random().toString(), plainLogin(username, pw, onPasswordScreen)).then(() => {
+    return cy.task('loadtoken', { key: username });
+  });
+}
+
+function plainLogin(username: string, pw = 'Password1!', onPasswordScreen?: () => void): () => void {
   const loginUrl: string = '/ui/login';
   const issuerUrl: string = '/oauth/v2';
 
-  return cy
-    .session(
-      username,
-      () => {
-        const cookies = new Map<string, string>();
+  return () => {
+    cy.intercept({
+      method: 'POST',
+      url: `${issuerUrl}/token*`,
+    }).as('token');
 
-        cy.intercept(
-          {
-            times: 6,
-          },
-          (req) => {
-            req.headers['cookie'] = requestCookies(cookies);
-            req.continue((res) => {
-              updateCookies(res.headers['set-cookie'] as string[], cookies);
-            });
-          },
-        );
+    cy.intercept({
+      method: 'POST',
+      url: `${loginUrl}/password*`,
+    }).as('password');
 
-        let userToken: string;
-        cy.intercept(
-          {
-            method: 'POST',
-            url: `${issuerUrl}/token`,
-          },
-          (req) => {
-            req.continue((res) => {
-              userToken = res.body['access_token'];
-            });
-          },
-        ).as('token');
-
-        cy.intercept({
-          method: 'POST',
-          url: `${loginUrl}/password*`,
-          times: 1,
-        }).as('password');
-
-        cy.visit(loginUrl, { retryOnNetworkFailure: true });
-
-        onUsernameScreen ? onUsernameScreen() : null;
-        cy.get('#loginName').type(username);
-        cy.get('#submit-button').click();
-
-        onPasswordScreen ? onPasswordScreen() : null;
-        cy.get('#password').type(pw);
-        cy.get('#submit-button').click();
-
-        cy.wait('@password').then((interception) => {
-          if (interception.response.body.indexOf('/ui/login/mfa/prompt') === -1) {
-            return;
-          }
-
-          cy.contains('button', 'skip').click();
-        });
-
-        cy.wait('@token').then(() => {
-          cy.task('safetoken', { key: username, token: userToken });
-        });
-
-        onAuthenticated ? onAuthenticated() : null;
-      },
+    cy.intercept(
       {
-        validate: () => {
-          if (force) {
-            throw new Error('clear session');
-          }
-        },
+        method: 'GET',
+        url: `${issuerUrl}/authorize*`,
       },
-    )
-    .then(() => {
-      return cy.task('loadtoken', { key: username });
+      (req) => {
+        req.query['login_hint'] = username;
+        req.query['prompt'] = 'login';
+        req.continue();
+      },
+    ).as('loginAuthReq');
+
+    cy.visit('/users/me');
+
+    cy.wait('@loginAuthReq');
+
+    cy.contains(username);
+
+    cy.get('#password').type(pw);
+    cy.get('#submit-button').click();
+    onPasswordScreen ? onPasswordScreen() : null;
+
+    cy.wait('@password').then((interception) => {
+      if (interception.response.body.indexOf('/ui/login/mfa/prompt') === -1) {
+        return;
+      }
+      cy.contains('button', 'skip').click();
     });
+
+    cy.wait('@token').then((interception) => {
+      cy.task('safetoken', { key: username, token: interception.response.body.access_token });
+    });
+
+    cy.get('[data-e2e="top-view-title"]');
+  };
 }
 
 export function loginname(withoutDomain: string, org?: string): string {
   return `${withoutDomain}@${org}.${host(Cypress.config('baseUrl'))}`;
-}
-
-function updateCookies(newCookies: string[] | undefined, currentCookies: Map<string, string>) {
-  if (newCookies === undefined) {
-    return;
-  }
-  newCookies.forEach((cs) => {
-    cs.split('; ').forEach((cookie) => {
-      const idx = cookie.indexOf('=');
-      currentCookies.set(cookie.substring(0, idx), cookie.substring(idx + 1));
-    });
-  });
-}
-
-function requestCookies(currentCookies: Map<string, string>): string[] {
-  let list: Array<string> = [];
-  currentCookies.forEach((val, key) => {
-    list.push(key + '=' + val);
-  });
-  return list;
 }
 
 export function host(url: string): string {

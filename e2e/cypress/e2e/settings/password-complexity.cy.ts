@@ -1,4 +1,4 @@
-import { login, User } from '../../support/login/users';
+import { User } from '../../support/login/users';
 
 describe('password complexity', () => {
   const orgPath = `/org`;
@@ -7,7 +7,7 @@ describe('password complexity', () => {
   [User.OrgOwner].forEach((user) => {
     describe(`as user "${user}"`, () => {
       beforeEach(() => {
-        login(user);
+        // login(user);
         cy.visit(orgPath);
         // TODO: Why force?
         cy.contains('[data-e2e="policy-card"]', 'Password Complexity').contains('button', 'Modify').click({ force: true }); // TODO: select data-e2e

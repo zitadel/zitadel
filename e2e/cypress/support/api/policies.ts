@@ -22,6 +22,33 @@ export function ensureDomainPolicy(
   userLoginMustBeDomain: boolean,
   validateOrgDomains: boolean,
   smtpSenderAddressMatchesInstanceDomain: boolean,
+): Cypress.Chainable<null> {
+  return cy
+    .request({
+      method: 'PUT',
+      url: `${api.adminBaseURL}/policies/domain`,
+      body: {
+        userLoginMustBeDomain: userLoginMustBeDomain,
+        validateOrgDomains: validateOrgDomains,
+        smtpSenderAddressMatchesInstanceDomain: smtpSenderAddressMatchesInstanceDomain,
+      },
+      failOnStatusCode: false,
+      ...auth(api),
+    })
+    .then((res) => {
+      if (!res.isOkStatusCode) {
+        expect(res.status).to.equal(400);
+        expect(res.body.message).to.contain('Org IAM Policy has not been changed');
+      }
+      return null;
+    });
+}
+/*
+export function legacyEnsureDomainPolicy(
+  api: API,
+  userLoginMustBeDomain: boolean,
+  validateOrgDomains: boolean,
+  smtpSenderAddressMatchesInstanceDomain: boolean,
 ): Cypress.Chainable<number> {
   return ensureSetting(
     api,
@@ -50,4 +77,8 @@ export function ensureDomainPolicy(
       smtpSenderAddressMatchesInstanceDomain: smtpSenderAddressMatchesInstanceDomain,
     },
   );
+}
+*/
+function auth(api: API) {
+  return { auth: { bearer: api.token } };
 }
