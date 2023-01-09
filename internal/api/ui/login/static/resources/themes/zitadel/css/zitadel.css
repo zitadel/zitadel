@@ -517,7 +517,6 @@ select::placeholder,
 
 a {
   text-decoration: none;
-  outline: none;
   cursor: pointer;
   margin: 2px 0;
 }
@@ -1493,7 +1492,6 @@ select::placeholder,
 
 a {
   text-decoration: none;
-  outline: none;
   cursor: pointer;
   margin: 2px 0;
 }
