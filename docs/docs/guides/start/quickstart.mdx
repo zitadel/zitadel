@@ -9,7 +9,7 @@ import VSCodeFolderView from "../../../static/img/guides/quickstart/vscode1.png"
 
 In this quick start guide, we will be learning some fundamentals on how to set up ZITADEL for user management and application security. Thereafter, we will secure a React-based Single Page Application (SPA) using ZITADEL. 
 
-The sample application allows users to securely log in to ZITADEL using the OIDC Proof Key for Code Exchange (PKCE)  flow. This flow ensures that the authorization process is secure by using a code verifier and a code challenge, which are sent to ZITADEL to obtain an access token. The access token is then used by the app to access the userinfo endpoint to retrieve and display information about the logged-in user. The app also has a logout feature that allows users to end their session and clear their access token. Overall, the app provides a simple and secure way for users to authenticate and access protected resources within ZITADEL.
+The sample application allows users to securely log in to ZITADEL using the OIDC Proof Key for Code Exchange (PKCE)  flow. This flow ensures that the authentication process is secure by using a code verifier and a code challenge, which are sent to ZITADEL to obtain an access token. The access token is then used by the app to access the userinfo endpoint to retrieve and display information about the logged-in user. The app also has a logout feature that allows users to end their session and clear their access token. Overall, the app provides a simple and secure way for users to authenticate and access protected resources within ZITADEL.
 
 
 ## ZITADEL Terminology: Instances, Organizations, Projects, Users, Roles, Authorizations and Apps
@@ -24,7 +24,7 @@ The order of creation for the above components would typically be as follows:
 <li><b>Organization</b>: An organization is a logical separation within an instance that represents a company/organization and can have one or more projects. The default organization is the one that is provided at the start of the account registration process. Typically, an instance would have one organization, but in B2B scenarios, an instance would have more than one.</li>  
 <li><b>Project</b>: A project is a logical separation within an organization and is a container for apps, roles, users and authorization policies for the resources it contains.</li> 
 <li><b>Users</b>: Users are created at the organizational level and are granted access to the resources within projects. They can be assigned different roles, which define the permissions and privileges they have within the project.</li> 
-<li><b>Roles</b>: Roles are the sets of permissions and privileges that are assigned to users within a project. They define the actions that a user is allowed to perform within the project, such as reading and writing data, or managing other users and resources.</li> 
+<li><b>Roles</b>: Roles are the sets of permissions and privileges that are assigned to users within a project.</li> 
 <li><b>Authorizations</b>: Authorization policies in ZITADEL are defined at the project level, which means that they apply to all the resources within the project. These policies are based on the roles that are assigned to users, and they determine the actions that users are allowed to perform within the project.</li> 
 <li><b>Apps</b>: Apps are the applications that are developed and managed within a project. They can be client apps that use the resources within the project, or they can be backend apps that provide the resources for other apps to use. The apps can use the OIDC or SAML protocol to authenticate users to access protected resources.</li> 
 </ul>
@@ -277,6 +277,8 @@ And with that, configuring Zitade for our application is complete. Now we can mo
 9. The React app displays this information to the user.
 10. When the user wants to log out, the React app sends a request to the ZITADEL logout endpoint, which clears the access token and ends the user's session.
 11. The user will be redirected to the login page of the app. 
+
+***The scope of this application for this quick start guide is limited to user authentication and doesn't include role-based authentication, even though we previously discussed adding roles and users.***
 
 ### 2. Prerequisites
 
