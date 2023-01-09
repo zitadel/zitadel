@@ -20,6 +20,7 @@ var (
 			http_utils.ZitadelOrgID,
 			http_utils.XUserAgent,
 			http_utils.XGrpcWeb,
+			http_utils.XRequestedWith,
 		},
 		AllowedMethods: []string{
 			http.MethodOptions,
