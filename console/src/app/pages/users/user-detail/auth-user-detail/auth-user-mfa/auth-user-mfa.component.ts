@@ -71,7 +71,6 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
         const index = list.findIndex((mfa) => mfa.otp);
         if (index === -1) {
-          console.log('OTP is available');
           this.otpDisabled$.next(false);
         }
       })
