@@ -250,14 +250,14 @@ cd .. && cd e2e/
 # Install npm dependencies
 npm install
 
-# Run all tests in a headless browser
-npm run e2e:dev
+# Run all e2e tests
+npm run e2e:dev -- --headed
 ```
 
 You can also open the test suite interactively for fast success feedback on specific tests.
 
 ```bash
-# Run all tests in a headless browser
+# Run tests interactively
 npm run open:dev
 ```
 
