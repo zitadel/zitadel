@@ -1943,6 +1943,66 @@ service AdminService {
         };
     }
 
+
+    //Returns the notification policy defined by the administrators of ZITADEL
+    rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/notification";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy";
+                };
+            };
+        };
+    }
+
+    //Updates the default notification policy of ZITADEL
+    // it impacts all organisations without a customised policy
+    rpc UpdateNotificationPolicy(UpdateNotificationPolicyRequest) returns (UpdateNotificationPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/notification";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     //Returns the default text for initial message (translation file)
     rpc GetDefaultInitMessageText(GetDefaultInitMessageTextRequest) returns (GetDefaultInitMessageTextResponse) {
         option (google.api.http) = {
@@ -4073,6 +4133,21 @@ message UpdatePrivacyPolicyRequest {
 }
 
 message UpdatePrivacyPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetNotificationPolicyRequest {}
+
+message GetNotificationPolicyResponse {
+    zitadel.policy.v1.NotificationPolicy policy = 1;
+}
+
+message UpdateNotificationPolicyRequest {
+   bool password_change = 1;
+}
+
+message UpdateNotificationPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

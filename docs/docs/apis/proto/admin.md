@@ -1072,6 +1072,31 @@ Variable {{.Lang}} can be set to have different links based on the language
     PUT: /policies/privacy
 
 
+### GetNotificationPolicy
+
+> **rpc** GetNotificationPolicy([GetNotificationPolicyRequest](#getnotificationpolicyrequest))
+[GetNotificationPolicyResponse](#getnotificationpolicyresponse)
+
+Returns the notification policy defined by the administrators of ZITADEL
+
+
+
+    GET: /policies/notification
+
+
+### UpdateNotificationPolicy
+
+> **rpc** UpdateNotificationPolicy([UpdateNotificationPolicyRequest](#updatenotificationpolicyrequest))
+[UpdateNotificationPolicyResponse](#updatenotificationpolicyresponse)
+
+Updates the default notification policy of ZITADEL
+it impacts all organisations without a customised policy
+
+
+
+    PUT: /policies/notification
+
+
 ### GetDefaultInitMessageText
 
 > **rpc** GetDefaultInitMessageText([GetDefaultInitMessageTextRequest](#getdefaultinitmessagetextrequest))
@@ -2587,6 +2612,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance |  zitadel.instance.v1.InstanceDetail | - |  |
+
+
+
+
+### GetNotificationPolicyRequest
+This is an empty request
+
+
+
+
+### GetNotificationPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.NotificationPolicy | - |  |
 
 
 
@@ -4471,6 +4513,28 @@ this is en empty request
 
 
 ### UpdateLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateNotificationPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password_change |  bool | - |  |
+
+
+
+
+### UpdateNotificationPolicyResponse
 
 
 
