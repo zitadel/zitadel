@@ -308,11 +308,50 @@ You can find an installation guide for all the different environments here:
 ## Product Management
 
 The ZITADEL Team works with an agile product management methodology.
-You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/1/views/2).
+You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/2/views/1).
 
 Every two weeks the team goes through all the new issues and decided about the priority, effort and if it is ready to start or in the backlog.
 If it is something critical or urgent we will have a look at it earlier.
-To show the community the needed information, each issue gets labels.
+To show the community the needed information, each issue gets attributes and labels.
+
+## About the attributes
+
+You can find the attributes on the project "Product Management".
+
+### State
+
+The state should reflect the progress of the issue and what is going on right now.
+
+- **No status**: Issue just got added and has to be looked at.
+- **🧐 Investigating**: We are curently investigating to find out what the problem is, which priority it should have and what has to be implemented. Or we need some more information of the author.
+- **📨 Product Backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be processed in the future. Issues with this state do not have to be completely defined yet.
+- **📝 Prioritized Product Backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
+- **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
+- **📋 Sprint Backlog**: The issue is scheduled for the current sprint.
+- **🏗 In progress**: Someone is working on this issue right now.
+- **👀 In review**: The issue is in review.
+- **✅ Done**: The issue is implemented and merged to main.
+
+### Priority
+
+Priority shows you the priority the ZITADEL team has given this issue. In general the more customers want a feature the higher the priority gets.
+
+- **🌋 Critical**: This is a security issue or something that has to be fixed urgently, because customers can't work anymore.
+- **🏔 High**: These are the issues the ZITADEL Team is currently focusing on and will be implemented as soon as possible.
+- **🏕 Medium**: After all the high issues are done these will be next.
+- **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
+
+
+### Complexity
+
+This should give you an indication how complex the issue is. It's not about the hours or effort it takes.
+Everything that is higher than 8 should be split in smaller parts.
+
+**1**, **2**, **3**, **5**, **8**, **13**
+
+### Sprint
+
+We want to deliver a new release every second week. So we plan everything in two week sprint.
 
 ## About the Labels
 
@@ -320,27 +359,6 @@ There are a few general labels that don't belong to a specific category.
 
 - **good first issue**: This label shows contibuters, that it is an easy entry point to start developing on ZITADEL.
 - **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
-
-### Priority
-
-Priority shows you the priority the ZITADEL team has given this issue. In general the more customers want a feature the higher the priority gets.
-
-- **priority: critical**: This is a security issue or something that has to be fixed urgently, because customers can't work anymore.
-- **priority: high**: These are the issues the ZITADEL Team is currently focusing on and will be implemented as soon as possible.
-- **priority: medium**: After all the high issues are done these will be next.
-- **priority: low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
-
-### State
-
-The state should reflect the progress of the issue and what is going on right now.
-
-- **state: triage**: Each issue gets this state automatically on creating and it means the ZITADEL team should have a look at it, prioritize and sort into categories or ask for more information if needed.
-- **state: tbd**: If the issue has the state tbd (to be defined) it means the team does need more information either from the author or internal.
-- **state: backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be processed in the future. Issues with this state do not have to be completely defined yet.
-- **state: ready**: An issue with the state ready is ready to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
-- **state: in progress**: Someone is working on this issue right now.
-- **state: waiting**: For some reason, this issue will have to wait. This can be a feedback that is being waited for, a dependent issue or anything else.
-- **state: duplicate**: The same issue already exists. This issue will probably be closed with a reference to the other issue.
 
 ### Category
 
@@ -362,13 +380,3 @@ The language shows you in which programming language the affected part is writte
 - **lang: go**
 - **lang: javascript**
 
-### Effort
-
-The effort should give you an indication how much work it takes. This is based on a rough estimation.
-Everything that is higher than 8 should be split in smaller parts.
-
-- **effort: 1**
-- **effort: 2**
-- **effort: 3**
-- **effort: 5**
-- **effort: 8**
