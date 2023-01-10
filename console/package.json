@@ -18,7 +18,7 @@
     "@angular/compiler": "^14.2.9",
     "@angular/core": "^14.2.9",
     "@angular/forms": "^14.2.9",
-    "@angular/material": "^14.2.3",
+    "@angular/material": "^15.0.4",
     "@angular/material-moment-adapter": "^14.2.3",
     "@angular/platform-browser": "^14.2.9",
     "@angular/platform-browser-dynamic": "^14.2.9",
