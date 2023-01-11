@@ -83,5 +83,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(FlowClearedEventType, FlowClearedEventMapper).
 		RegisterFilterEventMapper(MetadataSetType, MetadataSetEventMapper).
 		RegisterFilterEventMapper(MetadataRemovedType, MetadataRemovedEventMapper).
-		RegisterFilterEventMapper(MetadataRemovedAllType, MetadataRemovedAllEventMapper)
+		RegisterFilterEventMapper(MetadataRemovedAllType, MetadataRemovedAllEventMapper).
+		RegisterFilterEventMapper(NotificationPolicyAddedEventType, NotificationPolicyAddedEventMapper).
+		RegisterFilterEventMapper(NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper).
+		RegisterFilterEventMapper(NotificationPolicyRemovedEventType, NotificationPolicyRemovedEventMapper)
 }

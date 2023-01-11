@@ -2248,7 +2248,7 @@ service ManagementService {
         };
     }
 
-    // Update the privacy complexity policy for the organisation
+    // Update the privacy policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
     // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
@@ -2267,6 +2267,68 @@ service ManagementService {
     rpc ResetPrivacyPolicyToDefault(ResetPrivacyPolicyToDefaultRequest) returns (ResetPrivacyPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/privacy"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
+    // Returns the notification policy of the organisation
+    // With this notification privacy it can be configured how users should be notified
+    rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/notification"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    // Returns the default notification policy of the IAM
+    // With this notification privacy it can be configured how users should be notified
+    rpc GetDefaultNotificationPolicy(GetDefaultNotificationPolicyRequest) returns (GetDefaultNotificationPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/default/notification"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    // Add a custom notification policy for the organisation
+    // With this notification privacy it can be configured how users should be notified
+    rpc AddCustomNotificationPolicy(AddCustomNotificationPolicyRequest) returns (AddCustomNotificationPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/notification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Update the notification policy for the organisation
+    // With this notification privacy it can be configured how users should be notified
+    rpc UpdateCustomNotificationPolicy(UpdateCustomNotificationPolicyRequest) returns (UpdateCustomNotificationPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/notification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the notification policy of the organisation
+    // The default policy of the IAM will trigger after
+    rpc ResetNotificationPolicyToDefault(ResetNotificationPolicyToDefaultRequest) returns (ResetNotificationPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/policies/notification"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -4938,6 +5000,43 @@ message UpdateCustomPrivacyPolicyResponse {
 message ResetPrivacyPolicyToDefaultRequest {}
 
 message ResetPrivacyPolicyToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetNotificationPolicyRequest {}
+
+message GetNotificationPolicyResponse {
+    zitadel.policy.v1.NotificationPolicy policy = 1;
+}
+
+//This is an empty request
+message GetDefaultNotificationPolicyRequest {}
+
+message GetDefaultNotificationPolicyResponse {
+    zitadel.policy.v1.NotificationPolicy policy = 1;
+}
+
+message AddCustomNotificationPolicyRequest {
+    bool password_change = 1;
+}
+
+message AddCustomNotificationPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateCustomNotificationPolicyRequest {
+    bool password_change = 1;
+}
+
+message UpdateCustomNotificationPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message ResetNotificationPolicyToDefaultRequest {}
+
+message ResetNotificationPolicyToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

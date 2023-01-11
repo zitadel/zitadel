@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	NotificationPolicyProjectionTable = "projections.notification_policy"
+	NotificationPolicyProjectionTable = "projections.notification_policies"
 
 	NotificationPolicyColumnID             = "id"
 	NotificationPolicyColumnCreationDate   = "creation_date"
