@@ -1485,6 +1485,12 @@
       "DELETED": "Progetto eliminato con successo."
     }
   },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Elima ruolo",
+      "DELETE_DESCRIPTION": "Stai per eliminare un ruolo. Vuoi davvero continuare?"
+    }
+  },
   "NEXTSTEPS": {
     "TITLE": "Passi successivi"
   },

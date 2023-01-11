@@ -66,9 +66,13 @@ export class InstanceMembersComponent {
       .updateIAMMember(member.userId, selectionChange)
       .then(() => {
         this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
+        setTimeout(() => {
+          this.changePage.emit();
+        }, 1000);
       })
       .catch((error) => {
         this.toast.showError(error);
+        this.changePage.emit();
       });
   }
 
@@ -79,10 +83,13 @@ export class InstanceMembersComponent {
           .removeIAMMember(member.userId)
           .then(() => {
             this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
-            this.changePage.emit();
+            setTimeout(() => {
+              this.changePage.emit();
+            }, 1000);
           })
           .catch((error) => {
             this.toast.showError(error);
+            this.changePage.emit();
           });
       }),
     );
@@ -99,6 +106,7 @@ export class InstanceMembersComponent {
       })
       .catch((error) => {
         this.toast.showError(error);
+        this.changePage.emit();
       });
   }
 
@@ -129,6 +137,7 @@ export class InstanceMembersComponent {
             })
             .catch((error) => {
               this.toast.showError(error);
+              this.changePage.emit();
             });
         }
       }
