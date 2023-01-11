@@ -132,13 +132,13 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 			event.PreviousAggregateTypeSequence = uint64(previousAggregateTypeSequence)
 
 			if err != nil {
-				logging.WithFields(
-					"aggregate", event.AggregateType,
-					"aggregateId", event.AggregateID,
-					"aggregateType", event.AggregateType,
-					"eventType", event.Type,
-					"instanceID", event.InstanceID,
-				).WithError(err).Info("query failed")
+				// logging.WithFields(
+				// 	"aggregate", event.AggregateType,
+				// 	"aggregateId", event.AggregateID,
+				// 	"aggregateType", event.AggregateType,
+				// 	"eventType", event.Type,
+				// 	"instanceID", event.InstanceID,
+				// ).WithError(err).Info("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
 		}

@@ -72,9 +72,9 @@ func startLocalDB() (err error) {
 		Port:            26257,
 		Database:        "defaultdb",
 		MaxOpenConns:    20,
-		MaxIdleConns:    10,
+		MaxIdleConns:    20,
 		MaxConnLifetime: 30 * time.Minute,
-		MaxConnIdleTime: 1 * time.Minute,
+		MaxConnIdleTime: 10 * time.Minute,
 		User: cockroach.User{
 			Username: "root",
 			SSL:      cockroach.SSL{Mode: "disable"},
