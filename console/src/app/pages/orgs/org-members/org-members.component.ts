@@ -64,6 +64,7 @@ export class OrgMembersComponent {
       })
       .catch((error) => {
         this.toast.showError(error);
+        this.changePage.emit();
       });
   }
 
@@ -72,8 +73,12 @@ export class OrgMembersComponent {
       .updateOrgMember(member.userId, selectionChange)
       .then(() => {
         this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
+        setTimeout(() => {
+          this.changePage.emit();
+        }, 1000);
       })
       .catch((error) => {
+        this.changePage.emit();
         this.toast.showError(error);
       });
   }
@@ -85,16 +90,24 @@ export class OrgMembersComponent {
           .removeOrgMember(member.userId)
           .then(() => {
             this.toast.showInfo('ORG.TOAST.MEMBERREMOVED', true);
+            setTimeout(() => {
+              this.changePage.emit();
+            }, 1000);
           })
           .catch((error) => {
             this.toast.showError(error);
           });
       }),
-    ).then(() => {
-      setTimeout(() => {
+    )
+      .then(() => {
+        setTimeout(() => {
+          this.changePage.emit();
+        }, 1000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
         this.changePage.emit();
-      }, 1000);
-    });
+      });
   }
 
   public removeOrgMember(member: Member.AsObject): void {
@@ -109,6 +122,7 @@ export class OrgMembersComponent {
       })
       .catch((error) => {
         this.toast.showError(error);
+        this.changePage.emit();
       });
   }
 
@@ -138,6 +152,7 @@ export class OrgMembersComponent {
               }, 1000);
             })
             .catch((error) => {
+              this.changePage.emit();
               this.toast.showError(error);
             });
         }
