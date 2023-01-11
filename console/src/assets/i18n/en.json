@@ -1484,6 +1484,12 @@
       "DELETED": "Project deleted."
     }
   },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Delete role",
+      "DELETE_DESCRIPTION": "You are about to delete a role. Are you sure?"
+    }
+  },
   "NEXTSTEPS": {
     "TITLE": "Next Steps"
   },
