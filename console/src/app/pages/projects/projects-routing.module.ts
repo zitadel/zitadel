@@ -12,7 +12,7 @@ const routes: Routes = [
   },
   {
     path: 'create',
-    loadChildren: () => import('./project-create/project-create.module').then((m) => m.ProjectCreateModule),
+    loadChildren: () => import('./project-create/project-create.module'),
     canActivate: [RoleGuard],
     data: {
       animation: 'AddPage',
@@ -21,7 +21,7 @@ const routes: Routes = [
   },
   {
     path: ':projectid',
-    loadChildren: () => import('./owned-projects/owned-projects.module').then((m) => m.OwnedProjectsModule),
+    loadChildren: () => import('./owned-projects/owned-projects.module'),
   },
 ];
 
