@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -642,7 +643,7 @@ func NewUserPreferredLoginNameSearchQuery(value string, comparison TextCompariso
 }
 
 func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(userLoginNamesListCol, value, TextListContains)
+	return NewTextQuery(userLoginNamesListCol, strings.ToLower(value), TextListContains)
 }
 
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
@@ -676,7 +677,7 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 func prepareLoginNamesQuery() (string, []interface{}, error) {
 	return sq.Select(
 		userLoginNamesUserIDCol.identifier(),
-		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name,
+		"ARRAY_AGG(LOWER("+userLoginNamesNameCol.identifier()+"))::TEXT[] AS "+userLoginNamesListCol.name,
 		userLoginNamesInstanceIDCol.identifier(),
 		userLoginNamesOwnerRemovedUserCol.identifier(),
 		userLoginNamesOwnerRemovedPolicyCol.identifier(),
