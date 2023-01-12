@@ -153,7 +153,7 @@ func prepareNotificationPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Notifi
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-x0so2p", "Errors.PrivacyPolicy.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-x0so2p", "Errors.NotificationPolicy.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-Zixoooq", "Errors.Internal")
 			}

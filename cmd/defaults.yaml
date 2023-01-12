@@ -436,6 +436,8 @@ DefaultInstance:
     TOSLink: https://zitadel.com/docs/legal/terms-of-service
     PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
+  NotificationPolicy:
+    PasswordChange: true
   LabelPolicy:
     PrimaryColor: "#5469d4"
     BackgroundColor: "#fafafa"

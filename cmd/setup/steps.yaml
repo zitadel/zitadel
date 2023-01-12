@@ -30,3 +30,6 @@ FirstInstance:
       MachineKey:
         ExpirationDate:
         Type:
+
+DefaultNotificationPolicies:
+  PasswordChange: true

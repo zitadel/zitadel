@@ -82,6 +82,9 @@ type InstanceSetup struct {
 		SecondFactorCheckLifetime  time.Duration
 		MultiFactorCheckLifetime   time.Duration
 	}
+	NotificationPolicy struct {
+		PasswordChange bool
+	}
 	PrivacyPolicy struct {
 		TOSLink     string
 		PrivacyLink string
@@ -236,6 +239,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
 		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(
@@ -676,4 +680,42 @@ func (c *Commands) getInstanceWriteModelByID(ctx context.Context, orgID string) 
 		return nil, err
 	}
 	return instanceWriteModel, nil
+}
+
+func ListInstances(ctx context.Context, filter preparation.FilterToQueryReducer) ([]string, error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		EventTypes(
+			instance.InstanceAddedEventType,
+			instance.InstanceRemovedEventType,
+		).Builder())
+	if err != nil {
+		return nil, err
+	}
+
+	instances := make([]string, 0)
+	for _, event := range events {
+		switch event.(type) {
+		case *instance.InstanceAddedEvent:
+			instances = append(instances, event.Aggregate().InstanceID)
+		case *instance.InstanceRemovedEvent:
+			i := 0
+			found := false
+			for n, v := range instances {
+				if v == event.Aggregate().InstanceID {
+					i = n
+					found = true
+					break
+				}
+			}
+			if found {
+				instances[i] = instances[len(instances)-1]
+				instances = instances[:len(instances)-1]
+			}
+		}
+	}
+
+	return instances, nil
 }
