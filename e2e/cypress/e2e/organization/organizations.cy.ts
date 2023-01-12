@@ -1,5 +1,6 @@
 import { ensureOrgExists } from 'support/api/orgs';
-import { apiAuth } from '../../support/api/apiauth';
+import { newTarget } from 'support/api/target';
+import { ZITADELTarget } from 'support/commands';
 import { v4 as uuidv4 } from 'uuid';
 
 const orgPath = `/org`;
@@ -8,17 +9,30 @@ const orgNameOnCreation = 'e2eorgrename';
 const testOrgNameChange = uuidv4();
 
 describe('organizations', () => {
+  beforeEach(() => {
+    newTarget('e2eorgs').as('target');
+  });
+
+  describe('routing', () => {
+    // TODO: Fix console bug
+    it.skip('routing works', () => {
+      cy.get<ZITADELTarget>('@target').then((target) => {
+        cy.visit(`/users?type=human&org=${target.headers['x-zitadel-orgid']}`);
+        cy.contains('cnsl-nav', 'Users');
+        cy.get('tr:contains(ZITADEL Admin)', { timeout: 0 }).should('not.exist');
+      });
+    });
+  });
+
   describe('rename', () => {
     beforeEach(() => {
-      apiAuth()
-        .as('api')
-        .then((api) => {
-          ensureOrgExists(api, orgNameOnCreation)
-            .as('newOrgId')
-            .then((newOrgId) => {
-              cy.visit(`${orgPath}?org=${newOrgId}`).as('orgsite');
-            });
-        });
+      cy.get<ZITADELTarget>('@target').then((target) => {
+        ensureOrgExists(target, orgNameOnCreation)
+          .as('newOrgId')
+          .then((newOrgId) => {
+            cy.visit(`${orgPath}?org=${newOrgId}`).as('orgsite');
+          });
+      });
     });
 
     it('should rename the organization', () => {

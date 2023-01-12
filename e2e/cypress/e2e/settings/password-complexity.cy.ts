@@ -1,4 +1,4 @@
-import { User } from '../../support/login/users';
+import { User } from '../../support/login/session';
 
 describe('password complexity', () => {
   const orgPath = `/org`;

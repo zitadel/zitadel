@@ -1,14 +1,14 @@
-import { API } from 'support/api/types';
-import { apiAuth } from '../../support/api/apiauth';
+import { Context } from 'support/api/types';
+import { Context } from '../../support/api/target';
 import { Policy, resetPolicy } from '../../support/api/policies';
-import { User } from '../../support/login/users';
+import { User } from '../../support/login/session';
 
 describe('private labeling', () => {
   const orgPath = `/org`;
 
   [User.OrgOwner].forEach((user) => {
     describe(`as user "${user}"`, () => {
-      let api: API;
+      let api: Context;
 
       beforeEach(() => {
         // login(user);
@@ -26,7 +26,7 @@ describe('private labeling', () => {
 function customize(theme: string, user: User) {
   describe(`${theme} theme`, () => {
     beforeEach(() => {
-      apiAuth().then((api) => {
+      ctx().then((api) => {
         resetPolicy(api, Policy.Label);
       });
     });
@@ -41,7 +41,7 @@ function customize(theme: string, user: User) {
         cy.get('[data-e2e="image-part-logo"]')
           .find('input')
           .then(function (el) {
-            const blob = Cypress.Blob.base64StringToBlob(this.logo, 'image/png');
+            const blob = Cypress.Blob.base64StringToBlob(logo, 'image/png');
             const file = new File([blob], 'images/logo.png', { type: 'image/png' });
             const list = new DataTransfer();
 

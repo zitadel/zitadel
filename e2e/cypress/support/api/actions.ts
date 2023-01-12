@@ -1,94 +1,65 @@
-import { API } from './types';
+import { ZITADELTarget } from 'support/commands';
+import {
+  standardCreate,
+  standardEnsureDoesntExist,
+  standardEnsureExists,
+  standardRemove,
+  standardSearch,
+  standardUpdate,
+} from './standard';
 
-export function ensureActionDoesntExist(api: API, name: string) {
-  return search(api, name).then((entity) => {
-    if (entity) {
-      return remove(api, entity.id);
-    }
-  });
+export function ensureActionDoesntExist(target: ZITADELTarget, name: string) {
+  return standardEnsureDoesntExist(ensureActionExists(target, name, ''), Cypress._.curry(remove)(target));
 }
 
-export function ensureActionExists(api: API, name: string, script: string): Cypress.Chainable<number> {
-  return search(api, name).then((entity) => {
-    if (!entity) {
-      return create(api, name, script);
-    }
-
-    if (entity.script != script) {
-      update(api, entity.id, name, script);
-    }
-    return cy.wrap(<number>entity.id);
-  });
+export function ensureActionExists(target: ZITADELTarget, name: string, script: string): Cypress.Chainable<number> {
+  return standardEnsureExists(
+    create(target, name, script),
+    () => search(target, name),
+    Cypress._.curry(update)(target, name, script),
+  );
 }
 
-export function setTriggerTypes(api: API, flowType: number, triggerType: number, actionIds: Array<number>) {
+function create(target: ZITADELTarget, name: string, script: string): Cypress.Chainable<any> {
+  return standardCreate(
+    target,
+    `${target.mgmtBaseURL}/actions`,
+    {
+      name: name,
+      script: script,
+      allowedToFail: false,
+      timeout: '10s',
+    },
+    'id',
+  );
+}
+
+function search(target: ZITADELTarget, name: string): Cypress.Chainable<number> {
+  return standardSearch(target, `${target.mgmtBaseURL}/actions/_search`, (entity) => entity.name == name, 'id');
+}
+
+function update(target: ZITADELTarget, name: string, script: string, id: number) {
+  return standardUpdate(target, `${target.mgmtBaseURL}/actions/${id}`, { name: name, script: script });
+}
+
+function remove(target: ZITADELTarget, id: number) {
+  return standardRemove(target, `${target.mgmtBaseURL}/actions/${id}`);
+}
+
+export function setTriggerTypes(target: ZITADELTarget, flowType: number, triggerType: number, actionIds: Array<number>) {
   return cy
     .request({
       method: 'POST',
-      url: `${api.mgmtBaseURL}/flows/${flowType}/trigger/${triggerType}`,
+      url: `${target.mgmtBaseURL}/flows/${flowType}/trigger/${triggerType}`,
       body: {
         actionIds: actionIds,
       },
-      ...auth(api),
       failOnStatusCode: false,
+      headers: target.headers,
     })
     .then((res) => {
       if (!res.isOkStatusCode) {
         expect(res.body.message).to.contain('No Changes');
       }
     });
-}
-
-function search(api: API, name: string): Cypress.Chainable<any> {
-  return cy
-    .request({
-      method: 'POST',
-      url: `${api.mgmtBaseURL}/actions/_search`,
-      ...auth(api),
-    })
-    .then((res) => {
-      return res.body?.result?.find((action) => action.name == name) || cy.wrap(null);
-    });
-}
-
-function create(api: API, name: string, script: string): Cypress.Chainable<number> {
-  return cy
-    .request({
-      method: 'POST',
-      url: `${api.mgmtBaseURL}/actions`,
-      body: {
-        name: name,
-        script: script,
-        allowedToFail: false,
-        timeout: '10s',
-      },
-      ...auth(api),
-    })
-    .its('body.id');
-}
-
-function update(api: API, id: string, name: string, script: string) {
-  return cy.request({
-    method: 'PUT',
-    url: `${api.mgmtBaseURL}/actions/${id}`,
-    body: {
-      name: name,
-      script: script,
-      allowedToFail: false,
-      timeout: '10s',
-    },
-    ...auth(api),
-  });
-}
-
-function remove(api: API, id: string) {
-  return cy.request({
-    method: 'DELETE',
-    url: `${api.mgmtBaseURL}/actions/${id}`,
-    ...auth(api),
-  });
-}
-
-function auth(api: API) {
-  return { auth: { bearer: api.token } };
 }

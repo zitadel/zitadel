@@ -1,6 +1,6 @@
-import { apiAuth } from '../../support/api/apiauth';
-import { ensureHumanUserExists } from '../../support/api/users';
-import { User } from '../../support/login/users';
+import { Context } from '../../support/api/target';
+import { ensureHumanExists } from '../../support/api/users';
+import { User } from '../../support/login/session';
 
 describe('login policy', () => {
   const orgPath = `/org`;
@@ -12,8 +12,8 @@ describe('login policy', () => {
         cy.visit(orgPath);
         // TODO: Why force?
         cy.contains('[data-e2e="policy-card"]', 'Login Policy').contains('button', 'Modify').click({ force: true }); // TODO: select data-e2e
-        apiAuth().then((api) => {
-          ensureHumanUserExists(api, User.LoginPolicyUser);
+        ctx().then((api) => {
+          ensureHumanExists(api, User.LoginPolicyUser);
         });
       });
 

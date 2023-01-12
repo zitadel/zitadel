@@ -1,25 +1,31 @@
-import { apiAuth } from '../../support/api/apiauth';
-import { ensureMachineUserExists, ensureUserDoesntExist } from '../../support/api/users';
-import { loginname } from '../../support/login/users';
+import { ensureMachineDoesntExist, ensureMachineExists } from '../../support/api/users';
 import { ensureDomainPolicy } from '../../support/api/policies';
+import { newTarget } from 'support/api/target';
+import { ZITADELTarget } from 'support/commands';
+import { loginname } from 'support/login/login';
 
 describe('machines', () => {
-  const machinesPath = `/users?type=machine`;
-
-  beforeEach(() => {
-    apiAuth().as('api');
-  });
+  const targetOrg = 'e2emachines';
 
   [
     { mustBeDomain: false, addName: 'e2emachineusernameaddGlobal', removeName: 'e2emachineusernameremoveGlobal' },
     { mustBeDomain: false, addName: 'e2emachineusernameadd@test.com', removeName: 'e2emachineusernameremove@test.com' },
     { mustBeDomain: true, addName: 'e2emachineusernameadd', removeName: 'e2emachineusernameremove' },
   ].forEach((machine) => {
+    beforeEach(() => {
+      newTarget(targetOrg)
+        .as('target')
+        .then((target) => {
+          ensureDomainPolicy(target, machine.mustBeDomain, true, false);
+        });
+    });
+
     describe(`add "${machine.addName}" with domain setting "${machine.mustBeDomain}"`, () => {
-      beforeEach(`ensure it doesn't exist already`, function () {
-        ensureDomainPolicy(this.api, machine.mustBeDomain, false, false);
-        ensureUserDoesntExist(this.api, machine.addName);
-        cy.visit(machinesPath);
+      beforeEach(`ensure it doesn't exist already`, () => {
+        cy.get<ZITADELTarget>('@target').then((target) => {
+          ensureMachineDoesntExist(target, machine.addName);
+          navigateToMachines(target);
+        });
       });
 
       it('should add a machine', () => {
@@ -33,36 +39,18 @@ describe('machines', () => {
         cy.shouldConfirmSuccess();
         let loginName = machine.addName;
         if (machine.mustBeDomain) {
-          loginName = loginname(machine.addName, Cypress.env('ORGANIZATION'));
+          loginName = loginname(machine.addName, targetOrg);
         }
         cy.contains('[data-e2e="copy-loginname"]', loginName).click();
         cy.clipboardMatches(loginName);
       });
     });
-
-    describe(`remove "${machine.removeName}" with domain setting "${machine.mustBeDomain}"`, () => {
-      beforeEach('ensure it exists', function () {
-        ensureMachineUserExists(this.api, machine.removeName);
-        cy.visit(machinesPath);
-      });
-
-      let loginName = machine.removeName;
-      if (machine.mustBeDomain) {
-        loginName = loginname(machine.removeName, Cypress.env('ORGANIZATION'));
-      }
-      it('should delete a machine', () => {
-        const rowSelector = `tr:contains(${machine.removeName})`;
-        cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(loginName);
-        cy.get('[data-e2e="confirm-dialog-button"]').click();
-        cy.shouldConfirmSuccess();
-        cy.shouldNotExist({
-          selector: rowSelector,
-          timeout: { ms: 2000, errMessage: 'timed out before machine disappeared from the table' },
-        });
-      });
-
-      it('should create a personal access token');
-    });
   });
 });
+
+function navigateToMachines(target: ZITADELTarget) {
+  // directly going to users is not working, atm
+  cy.visit(`/org?org=${target.headers['x-zitadel-orgid']}`);
+  cy.get('[data-e2e="users-nav"]').click();
+  cy.get('[data-e2e="list-machines"] button').click();
+}

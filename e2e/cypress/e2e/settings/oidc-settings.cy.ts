@@ -1,4 +1,4 @@
-import { apiAuth } from '../../support/api/apiauth';
+import { Context } from '../../support/api/target';
 import { ensureOIDCSettingsSet } from '../../support/api/oidc-settings';
 
 describe('oidc settings', () => {
@@ -9,7 +9,7 @@ describe('oidc settings', () => {
   const refreshTokenIdleExpirationPrecondition = 2;
 
   beforeEach(`ensure they are set`, () => {
-    apiAuth().then((apiCallProperties) => {
+    ctx().then((apiCallProperties) => {
       ensureOIDCSettingsSet(
         apiCallProperties,
         accessTokenPrecondition,

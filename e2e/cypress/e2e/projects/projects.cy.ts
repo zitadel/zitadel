@@ -1,18 +1,21 @@
-import { apiAuth } from '../../support/api/apiauth';
+import { newTarget } from '../../support/api/target';
 import { ensureProjectDoesntExist, ensureProjectExists } from '../../support/api/projects';
+import { ZITADELTarget } from 'support/commands';
 
 describe('projects', () => {
   beforeEach(() => {
-    apiAuth().as('api');
+    newTarget('e2eprojects').as('target');
   });
 
   const testProjectNameCreate = 'e2eprojectcreate';
   const testProjectNameDelete = 'e2eprojectdelete';
 
   describe('add project', () => {
-    beforeEach(`ensure it doesn't exist already`, function () {
-      ensureProjectDoesntExist(this.api, testProjectNameCreate);
-      cy.visit(`/projects`);
+    beforeEach(`ensure it doesn't exist already`, () => {
+      cy.get<ZITADELTarget>('@target').then((target) => {
+        ensureProjectDoesntExist(target, testProjectNameCreate);
+        cy.visit(`/projects?org=${target.headers['x-zitadel-orgid']}`);
+      });
     });
 
     it('should add a project', () => {
@@ -26,9 +29,11 @@ describe('projects', () => {
   });
 
   describe('edit project', () => {
-    beforeEach('ensure it exists', function () {
-      ensureProjectExists(this.api, testProjectNameDelete);
-      cy.visit(`/projects`);
+    beforeEach('ensure it exists', () => {
+      cy.get<ZITADELTarget>('@target').then((target) => {
+        ensureProjectExists(target, testProjectNameDelete);
+        cy.visit(`/projects?org=${target.headers['x-zitadel-orgid']}`);
+      });
     });
 
     describe('remove project', () => {

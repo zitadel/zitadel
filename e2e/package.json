@@ -21,6 +21,6 @@
   },
   "devDependencies": {
     "@types/node": "^18.8.3",
-    "cypress": "^10.9.0"
+    "cypress": "^12.3.0"
   }
 }

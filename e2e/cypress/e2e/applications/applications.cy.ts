@@ -1,22 +1,19 @@
-import { Apps, ensureProjectExists, ensureProjectResourceDoesntExist } from '../../support/api/projects';
-import { apiAuth } from '../../support/api/apiauth';
+import { ensureOIDCAppDoesntExist } from 'support/api/oidc-applications';
+import { ensureProjectExists } from 'support/api/projects';
+import { newTarget } from '../../support/api/target';
 
 describe('applications', () => {
   const testProjectName = 'e2eprojectapplication';
   const testAppName = 'e2eappundertest';
 
-  beforeEach(() => {
-    apiAuth()
-      .as('api')
-      .then((api) => {
-        ensureProjectExists(api, testProjectName).as('projectId');
+  describe('add app', () => {
+    beforeEach(`ensure it doesn't exist already`, () => {
+      newTarget('e2eapplications').then((target) => {
+        ensureProjectExists(target, testProjectName).then((projectId) => {
+          ensureOIDCAppDoesntExist(target, projectId, testAppName);
+          cy.visit(`/projects/${projectId}?org=${target.headers['x-zitadel-orgid']}`);
+        });
       });
-  });
-
-  describe('add app', function () {
-    beforeEach(`ensure it doesn't exist already`, function () {
-      ensureProjectResourceDoesntExist(this.api, this.projectId, Apps, testAppName);
-      cy.visit(`/projects/${this.projectId}`);
     });
 
     it('add app', () => {
@@ -37,10 +34,10 @@ describe('applications', () => {
       cy.contains('[data-e2e="client-id"]', expectClientId);
       cy.clipboardMatches(expectClientId);
     });
-  });
 
-  describe('edit app', () => {
-    it('should configure an application to enable dev mode');
-    it('should configure an application to put user roles and info inside id token');
+    describe('edit app', () => {
+      it('should configure an application to enable dev mode');
+      it('should configure an application to put user roles and info inside id token');
+    });
   });
 });

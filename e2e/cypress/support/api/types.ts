@@ -1,9 +1,3 @@
-export interface API {
-  token: string;
-  mgmtBaseURL: string;
-  adminBaseURL: string;
-}
-
 export type SearchResult = {
   entity: Entity | null;
   sequence: number;

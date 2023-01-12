@@ -1,30 +1,78 @@
-import { ensureSomething } from './ensure';
-import { searchSomething } from './search';
-import { API } from './types';
-import { host } from '../login/users';
+import { ZITADELTarget } from 'support/commands';
+import { newOrgTarget } from './target';
 
-export function ensureOrgExists(api: API, name: string): Cypress.Chainable<number> {
-  return ensureSomething(
-    api,
-    () =>
-      searchSomething(
-        api,
-        encodeURI(`${api.mgmtBaseURL}/global/orgs/_by_domain?domain=${name}.${host(Cypress.config('baseUrl'))}`),
-        'GET',
-        (res) => {
-          return { entity: res.org, id: res.org?.id, sequence: parseInt(<string>res.org?.details?.sequence) };
-        },
-      ),
-    () => `${api.mgmtBaseURL}/orgs`,
-    'POST',
-    { name: name },
-    (org) => org?.name === name,
-    (res) => res.id,
-  );
+export function ensureOrgExists(target: ZITADELTarget, name: string): Cypress.Chainable<ZITADELTarget> {
+  return createOrg(target, name).then((id) => {
+    if (id) {
+      return cy.wrap(newOrgTarget(target, id));
+    }
+    return search(target, name).then((id) => {
+      if (id) {
+        return cy.wrap(newOrgTarget(target, id));
+      }
+      sleep(6_000);
+      cy.log('retrying');
+      return search(target, name).then((id) => {
+        if (id) {
+          return cy.wrap(newOrgTarget(target, id));
+        }
+        sleep(6_000);
+        cy.log('retrying');
+        debugger;
+        return search(target, name).then((id) => cy.wrap(newOrgTarget(target, id)));
+      });
+    });
+  });
 }
 
-export function getOrgUnderTest(api: API): Cypress.Chainable<number> {
-  return searchSomething(api, `${api.mgmtBaseURL}/orgs/me`, 'GET', (res) => {
-    return { entity: res.org, id: res.org.id, sequence: parseInt(<string>res.org.details.sequence) };
-  }).then((res) => res.entity.id);
+function search(target: ZITADELTarget, name: string): Cypress.Chainable<number> {
+  return cy
+    .request({
+      method: 'POST',
+      url: `${target.adminBaseURL}/orgs/_search`,
+      headers: target.headers,
+    })
+    .then((res) => {
+      return res.body?.result?.find((entity) => entity.name == name)?.id || cy.wrap(null);
+    });
+}
+
+function createOrg(target: ZITADELTarget, name: string): Cypress.Chainable<number> {
+  return cy
+    .request({
+      method: 'POST',
+      url: `${target.mgmtBaseURL}/orgs`,
+      body: { name: name },
+      headers: target.headers,
+      failOnStatusCode: false,
+    })
+    .then((res) => {
+      if (!res.isOkStatusCode) {
+        expect(res.status).to.equal(409);
+        return null;
+      }
+      return res.body.id;
+    });
+}
+
+export function removeOrg(target: ZITADELTarget): Cypress.Chainable<null> {
+  return cy
+    .request({
+      method: 'DELETE',
+      url: `${target.mgmtBaseURL}/orgs/me`,
+      headers: target.headers,
+      failOnStatusCode: false,
+    })
+    .then((res) => {
+      if (!res.isOkStatusCode) {
+        expect(res.status).to.equal(404);
+      }
+      return null;
+    });
+}
+
+function sleep(ms: number) {
+  (async () => {
+    await new Promise((f) => setTimeout(f, ms));
+  })();
 }

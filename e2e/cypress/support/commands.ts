@@ -25,6 +25,15 @@ import 'cypress-wait-until';
 //})
 //
 
+export interface ZITADELTarget {
+  headers: {
+    Authorization: string;
+    'x-zitadel-orgid': string;
+  };
+  mgmtBaseURL: string;
+  adminBaseURL: string;
+}
+
 interface ShouldNotExistOptions {
   selector: string;
   timeout?: {
@@ -51,6 +60,13 @@ declare global {
        * Custom command that asserts success is printed after a change.
        */
       shouldConfirmSuccess(): Cypress.Chainable<null>;
+    }
+  }
+
+  namespace Mocha {
+    interface Context {
+      get target(): void; // TODO: Remove
+      get api(): void; // TODO: Remove
     }
   }
 }

@@ -1,8 +1,8 @@
 import { ensureSetting } from './ensure';
-import { API } from './types';
+import { Context } from './types';
 
 export function ensureOIDCSettingsSet(
-  api: API,
+  api: Context,
   accessTokenLifetime: number,
   idTokenLifetime: number,
   refreshTokenExpiration: number,

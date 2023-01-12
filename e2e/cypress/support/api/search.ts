@@ -1,8 +1,8 @@
-import { requestHeaders } from './apiauth';
-import { API, Entity, SearchResult } from './types';
+import { ZITADELTarget } from 'support/commands';
+import { Entity, SearchResult } from './types';
 
 export function searchSomething(
-  api: API,
+  target: ZITADELTarget,
   searchPath: string,
   method: string,
   mapResult: (body: any) => SearchResult,
@@ -12,7 +12,7 @@ export function searchSomething(
     .request({
       method: method,
       url: searchPath,
-      headers: requestHeaders(api, orgId),
+      headers: target.headers,
       failOnStatusCode: method == 'POST',
     })
     .then((res) => {

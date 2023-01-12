@@ -1,76 +1,61 @@
-import { ensureItemDoesntExist, ensureItemExists } from './ensure';
-import { findFromList, searchSomething } from './search';
-import { API } from './types';
+import { ZITADELTarget } from 'support/commands';
 
-export function ensureHumanIsNotOrgMember(api: API, username: string): Cypress.Chainable<number> {
-  return ensureItemDoesntExist(
-    api,
-    `${api.mgmtBaseURL}/orgs/me/members/_search`,
-    (member: any) => (<string>member.preferredLoginName).startsWith(username),
-    (member) => `${api.mgmtBaseURL}/orgs/me/members/${member.userId}`,
-  );
+export function ensureHumanIsOrgMember(target: ZITADELTarget, userId: number, roles: string[]) {
+  return cy.request({
+    method: 'POST',
+    url: `${target.mgmtBaseURL}/orgs/me/members`,
+    body: {
+      userId: userId,
+      roles: roles,
+    },
+    headers:target.headers,
+    failOnStatusCode: false,
+  }).then(res => {
+    if (!res.isOkStatusCode){
+      expect(res.status).to.equal(409)
+    }
+  })
 }
 
-export function ensureHumanIsOrgMember(api: API, username: string, roles: string[]): Cypress.Chainable<number> {
-  return searchSomething(
-    api,
-    `${api.mgmtBaseURL}/users/_search`,
-    'POST',
-    findFromList((user) => {
-      return user.userName == username;
-    }),
-  ).then((user) => {
-    return ensureItemExists(
-      api,
-      `${api.mgmtBaseURL}/orgs/me/members/_search`,
-      (member: any) => member.userId == user.entity.id,
-      `${api.mgmtBaseURL}/orgs/me/members`,
-      {
-        userId: user.entity.id,
-        roles: roles,
-      },
-    );
-  });
+export function ensureHumanIsNotOrgMember(target: ZITADELTarget, userId: number) {
+  return cy.request({
+    method: 'DELETE',
+    url: `${target.mgmtBaseURL}/orgs/me/members/${userId}`,
+    headers:target.headers,
+    failOnStatusCode: false,
+  }).then(res => {
+    if (!res.isOkStatusCode){
+      expect(res.status).to.equal(404)
+    }
+  })
 }
 
-export function ensureHumanIsNotProjectMember(
-  api: API,
-  projectId: string,
-  username: string,
-  grantId?: number,
-): Cypress.Chainable<number> {
-  return ensureItemDoesntExist(
-    api,
-    `${api.mgmtBaseURL}/projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members/_search`,
-    (member: any) => (<string>member.preferredLoginName).startsWith(username),
-    (member) => `${api.mgmtBaseURL}/projects/${projectId}${grantId ? `grants/${grantId}/` : ''}/members/${member.userId}`,
-  );
+export function ensureHumanIsProjectMember(target: ZITADELTarget, projectId: number, userId: number, roles: string[], grantId?: number) {
+  return cy.request({
+    method: 'POST',
+    url: `${target.mgmtBaseURL}/projects/${projectId}${grantId ? `grants/${grantId}/` : ''}/members`,
+    body: {
+      userId: userId,
+      roles: roles,
+    },
+    headers:target.headers,
+    failOnStatusCode: false,
+  }).then(res => {
+    if (!res.isOkStatusCode){
+      expect(res.status).to.equal(409)
+    }
+  })
 }
 
-export function ensureHumanIsProjectMember(
-  api: API,
-  projectId: string,
-  username: string,
-  roles: string[],
-  grantId?: number,
-): Cypress.Chainable<number> {
-  return searchSomething(
-    api,
-    `${api.mgmtBaseURL}/users/_search`,
-    'POST',
-    findFromList((user) => {
-      return user.userName == username;
-    }),
-  ).then((user) => {
-    return ensureItemExists(
-      api,
-      `${api.mgmtBaseURL}/projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members/_search`,
-      (member: any) => member.userId == user.entity.id,
-      `${api.mgmtBaseURL}/projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members`,
-      {
-        userId: user.entity.id,
-        roles: roles,
-      },
-    );
-  });
+export function ensureHumanIsNotProjectMember(target: ZITADELTarget, projectId: number, userId: number, grantId?: number) {
+  return cy.request({
+    method: 'DELETE',
+    url: `${target.mgmtBaseURL}/projects/${projectId}${grantId ? `grants/${grantId}/` : ''}/members/${userId}`,
+    headers:target.headers,
+    failOnStatusCode: false,
+  }).then(res => {
+    if (!res.isOkStatusCode){
+      expect(res.status).to.equal(404)
+    }
+  })
 }

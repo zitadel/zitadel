@@ -1,9 +1,9 @@
-import { requestHeaders } from './apiauth';
+import { ZITADELTarget } from 'support/commands';
 import { findFromList as mapFromList, searchSomething } from './search';
-import { API, Entity, SearchResult } from './types';
-
+import { Entity, SearchResult } from './types';
+/*
 export function ensureItemExists(
-  api: API,
+  ctx: ZITADELTarget,
   searchPath: string,
   findInList: (entity: Entity) => boolean,
   createPath: string,
@@ -13,8 +13,8 @@ export function ensureItemExists(
   searchItemIdField?: string,
 ): Cypress.Chainable<number> {
   return ensureSomething(
-    api,
-    () => searchSomething(api, searchPath, 'POST', mapFromList(findInList, searchItemIdField), orgId),
+    ctx,
+    () => searchSomething(ctx, searchPath, 'POST', mapFromList(findInList, searchItemIdField), orgId),
     () => createPath,
     'POST',
     body,
@@ -25,15 +25,15 @@ export function ensureItemExists(
 }
 
 export function ensureItemDoesntExist(
-  api: API,
+  target: ZITADELTarget,
   searchPath: string,
   findInList: (entity: Entity) => boolean,
   deletePath: (entity: Entity) => string,
   orgId?: number,
 ): Cypress.Chainable<null> {
   return ensureSomething(
-    api,
-    () => searchSomething(api, searchPath, 'POST', mapFromList(findInList), orgId),
+    target,
+    () => searchSomething(target, searchPath, 'POST', mapFromList(findInList), orgId),
     deletePath,
     'DELETE',
     null,
@@ -42,7 +42,7 @@ export function ensureItemDoesntExist(
 }
 
 export function ensureSetting(
-  api: API,
+  api: ZITADELTarget,
   path: string,
   mapResult: (entity: any) => SearchResult,
   createPath: string,
@@ -84,7 +84,7 @@ interface EnsuredResult {
 }
 
 export function ensureSomething(
-  api: API,
+  api: ZITADELTarget,
   search: () => Cypress.Chainable<SearchResult>,
   apiPath: (entity: Entity) => string,
   ensureMethod: string,
@@ -103,7 +103,7 @@ export function ensureSomething(
         .request({
           method: ensureMethod,
           url: apiPath(sRes.entity),
-          headers: requestHeaders(api, orgId),
+          headers: api.headers,
           body: body,
           failOnStatusCode: false,
           followRedirect: false,
@@ -122,3 +122,19 @@ export function ensureSomething(
       });
     });
 }
+
+export function retry(times: number, cb: () => any): any {
+  debugger;
+  if (times <= 0) {
+    return cb();
+  }
+  // ignore Mocha errors
+  try {
+    return cb();
+  } catch (e) {
+    cy.log(e);
+  }
+  setTimeout(() => {}, 1_000);
+  return retry(times - 1, cb);
+}
+*/

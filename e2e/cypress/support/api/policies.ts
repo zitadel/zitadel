@@ -1,48 +1,58 @@
-import { requestHeaders } from './apiauth';
-import { API } from './types';
-import { ensureSetting } from './ensure';
-
-export enum Policy {
-  Label = 'label',
-}
-
-export function resetPolicy(api: API, policy: Policy) {
-  cy.request({
-    method: 'DELETE',
-    url: `${api.mgmtBaseURL}/policies/${policy}`,
-    headers: requestHeaders(api),
-  }).then((res) => {
-    expect(res.status).to.equal(200);
-    return null;
-  });
-}
+import { ZITADELTarget } from 'support/commands';
 
 export function ensureDomainPolicy(
-  api: API,
+  target: ZITADELTarget,
   userLoginMustBeDomain: boolean,
   validateOrgDomains: boolean,
   smtpSenderAddressMatchesInstanceDomain: boolean,
 ): Cypress.Chainable<null> {
-  return cy
-    .request({
-      method: 'PUT',
-      url: `${api.adminBaseURL}/policies/domain`,
-      body: {
-        userLoginMustBeDomain: userLoginMustBeDomain,
-        validateOrgDomains: validateOrgDomains,
-        smtpSenderAddressMatchesInstanceDomain: smtpSenderAddressMatchesInstanceDomain,
-      },
-      failOnStatusCode: false,
-      ...auth(api),
-    })
-    .then((res) => {
-      if (!res.isOkStatusCode) {
-        expect(res.status).to.equal(400);
-        expect(res.body.message).to.contain('Org IAM Policy has not been changed');
-      }
-      return null;
-    });
+
+  resetDomainPolicy(target)
+  setDomainPolicy(target, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain)
+
+  return null
 }
+
+function resetDomainPolicy(target: ZITADELTarget) {
+  return cy.request({
+    method: 'DELETE',
+    url: `${target.adminBaseURL}/orgs/${target.headers['x-zitadel-orgid']}/policies/domain`,
+    headers: target.headers,
+    failOnStatusCode: false
+  }).then(res => {
+    if(!res.isOkStatusCode){
+      expect(res.status).to.equal(404)
+    }
+    return res
+  });
+}
+
+function setDomainPolicy(
+  target: ZITADELTarget,
+userLoginMustBeDomain: boolean,
+validateOrgDomains: boolean,
+smtpSenderAddressMatchesInstanceDomain: boolean,
+): Cypress.Chainable<Cypress.Response<any>> {
+  return cy.request({
+    method: 'POST',
+    url: `${target.adminBaseURL}/orgs/${target.headers['x-zitadel-orgid']}/policies/domain`,
+    body:  {
+      userLoginMustBeDomain: userLoginMustBeDomain,
+      validateOrgDomains: validateOrgDomains,
+      smtpSenderAddressMatchesInstanceDomain: smtpSenderAddressMatchesInstanceDomain,
+    },
+    headers: target.headers,
+    failOnStatusCode: false
+  }).then(res => {
+    if(!res.isOkStatusCode){
+      expect(res.status).to.equal(409)
+    }
+    return res
+  });
+}
+
+
+
 /*
 export function legacyEnsureDomainPolicy(
   api: API,
@@ -79,6 +89,3 @@ export function legacyEnsureDomainPolicy(
   );
 }
 */
-function auth(api: API) {
-  return { auth: { bearer: api.token } };
-}

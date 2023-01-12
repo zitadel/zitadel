@@ -23,7 +23,6 @@ export default defineConfig({
 
   e2e: {
     baseUrl: baseUrl(),
-    experimentalSessionAndOrigin: true,
     setupNodeEvents(on, config) {
 
       on('task', {
