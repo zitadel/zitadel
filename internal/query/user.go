@@ -180,6 +180,10 @@ var (
 		name:  "loginnames",
 		table: userLoginNamesTable,
 	}
+	userLoginNamesLowerListCol = Column{
+		name:  "loginnames_lower",
+		table: userLoginNamesTable,
+	}
 	userPreferredLoginNameTable                 = loginNameTable.setAlias("preferred_login_name")
 	userPreferredLoginNameUserIDCol             = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
 	userPreferredLoginNameCol                   = LoginNameNameCol.setTable(userPreferredLoginNameTable)
@@ -643,7 +647,7 @@ func NewUserPreferredLoginNameSearchQuery(value string, comparison TextCompariso
 }
 
 func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(userLoginNamesListCol, strings.ToLower(value), TextListContains)
+	return NewTextQuery(userLoginNamesLowerListCol, strings.ToLower(value), TextListContains)
 }
 
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
@@ -677,7 +681,8 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 func prepareLoginNamesQuery() (string, []interface{}, error) {
 	return sq.Select(
 		userLoginNamesUserIDCol.identifier(),
-		"ARRAY_AGG(LOWER("+userLoginNamesNameCol.identifier()+"))::TEXT[] AS "+userLoginNamesListCol.name,
+		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name,
+		"ARRAY_AGG(LOWER("+userLoginNamesNameCol.identifier()+"))::TEXT[] AS "+userLoginNamesLowerListCol.name,
 		userLoginNamesInstanceIDCol.identifier(),
 		userLoginNamesOwnerRemovedUserCol.identifier(),
 		userLoginNamesOwnerRemovedPolicyCol.identifier(),
