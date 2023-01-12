@@ -417,6 +417,7 @@ select::placeholder,
   max-width: 150px;
   overflow-x: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .lgn-label {
@@ -516,7 +517,6 @@ select::placeholder,
 
 a {
   text-decoration: none;
-  outline: none;
   cursor: pointer;
   margin: 2px 0;
 }
@@ -525,6 +525,7 @@ a.block {
 }
 a.sub-formfield-link {
   margin: 10px 0;
+  text-decoration: underline;
 }
 
 .lgn-idp {
@@ -1391,6 +1392,7 @@ select::placeholder,
   max-width: 150px;
   overflow-x: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .lgn-label {
@@ -1490,7 +1492,6 @@ select::placeholder,
 
 a {
   text-decoration: none;
-  outline: none;
   cursor: pointer;
   margin: 2px 0;
 }
@@ -1499,6 +1500,7 @@ a.block {
 }
 a.sub-formfield-link {
   margin: 10px 0;
+  text-decoration: underline;
 }
 
 .lgn-idp {
