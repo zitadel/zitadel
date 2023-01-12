@@ -10,4 +10,4 @@ import { OrgListComponent } from './org-list.component';
   declarations: [OrgListComponent],
   imports: [CommonModule, OrgListRoutingModule, OrgTableModule, TranslateModule],
 })
-export class OrgListModule {}
+export default class OrgListModule {}
