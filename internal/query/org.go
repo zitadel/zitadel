@@ -9,7 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
+	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -68,7 +68,7 @@ type Org struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	State         domain.OrgState
+	State         domain_pkg.OrgState
 	Sequence      uint64
 
 	Name   string
@@ -162,9 +162,12 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 				sq.ILike{
 					OrgDomainDomainCol.identifier(): domain,
 				},
-				sq.Eq{
+				sq.ILike{
 					OrgColumnName.identifier(): name,
 				},
+			},
+			sq.NotEq{
+				OrgColumnState.identifier(): domain_pkg.OrgStateRemoved,
 			},
 		}).ToSql()
 	if err != nil {

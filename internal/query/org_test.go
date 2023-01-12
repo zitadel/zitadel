@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs.name = $4))"
+	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs.name ILIKE $4) AND projections.orgs.org_state <> $5)"
 	orgUniqueCols  = []string{"is_unique"}
 )
 
@@ -397,7 +397,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 			},
 			want: want{
 				isUnique:        true,
-				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "exists", ""),
+				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "exists", "", domain.OrgStateRemoved),
 			},
 		},
 		{
@@ -408,7 +408,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 			},
 			want: want{
 				isUnique:        true,
-				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "", "exists"),
+				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "", "exists", domain.OrgStateRemoved),
 			},
 		},
 		{
@@ -419,7 +419,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 			},
 			want: want{
 				isUnique:        true,
-				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "exists", "exists"),
+				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "exists", "exists", domain.OrgStateRemoved),
 			},
 		},
 		{
@@ -430,7 +430,18 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 			},
 			want: want{
 				isUnique:        false,
-				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{false}}, true, "", "not-exists", "not-exists"),
+				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{false}}, true, "", "not-exists", "not-exists", domain.OrgStateRemoved),
+			},
+		},
+		{
+			name: "no arg",
+			args: args{
+				domain: "",
+				name:   "",
+			},
+			want: want{
+				isUnique: false,
+				err:      errors.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -439,7 +450,9 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unable to mock db: %v", err)
 		}
-		tt.want.sqlExpectations(mock)
+		if tt.want.sqlExpectations != nil {
+			tt.want.sqlExpectations(mock)
+		}
 
 		t.Run(tt.name, func(t *testing.T) {
 			q := &Queries{
@@ -447,7 +460,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 			}
 
 			gotIsUnique, err := q.IsOrgUnique(context.Background(), tt.args.name, tt.args.domain)
-			if (tt.want.err == nil && err != nil) || (err != nil && tt.want.err != nil && tt.want.err(err)) {
+			if (tt.want.err == nil && err != nil) || (err != nil && tt.want.err != nil && !tt.want.err(err)) {
 				t.Errorf("Queries.IsOrgUnique() unexpected error = %v", err)
 				return
 			}
