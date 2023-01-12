@@ -155,11 +155,12 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
-				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				OrgColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+				OrgDomainIsVerifiedCol.identifier(): true,
 			},
 			sq.Or{
-				sq.Eq{
-					OrgColumnDomain.identifier(): domain,
+				sq.ILike{
+					OrgDomainDomainCol.identifier(): domain,
 				},
 				sq.Eq{
 					OrgColumnName.identifier(): name,
@@ -346,7 +347,9 @@ func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error
 
 func prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select(uniqueColumn.identifier()).
-			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(orgsTable.identifier()).
+			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID)).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {
