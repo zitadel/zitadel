@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Subscription } from 'rxjs';
 import {
   AddCustomDomainPolicyRequest,
