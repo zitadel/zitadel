@@ -36,11 +36,11 @@ describe('organizations', () => {
     });
 
     it('should rename the organization', () => {
-      cy.get('[data-e2e="actions"]').click();
-      cy.get('[data-e2e="rename"]', { timeout: 1000 }).should('be.visible').click();
+      cy.get('[data-e2e="actions"]').should("be.visible").click();
+      cy.get('[data-e2e="rename"]', { timeout: 1000 }).should("be.visible").click();
 
-      cy.get('[data-e2e="name"]').focus().clear().type(testOrgNameChange);
-      cy.get('[data-e2e="dialog-submit"]').click();
+      cy.get('[data-e2e="name"]').focus().clear().should("be.visible").type(testOrgNameChange);
+      cy.get('[data-e2e="dialog-submit"]').should("be.visible").click();
       cy.shouldConfirmSuccess();
       cy.visit(orgPath);
       cy.get('[data-e2e="top-view-title"').should('contain', testOrgNameChange);

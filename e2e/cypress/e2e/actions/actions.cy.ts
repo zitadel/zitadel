@@ -143,20 +143,20 @@ describe('actions', () => {
         cy.get<ZITADELTarget>('@target').then((target) => {
           login(postAuthOTPEmail, userPw, target.headers['x-zitadel-orgid']);
           cy.visit('/users/me?id=security');
-          cy.get('[data-e2e="add-factor"]').click();
-          cy.get('[data-e2e="add-factor-otp"]').should('be.visible').click();
+          cy.get('[data-e2e="add-factor"]').should("be.visible").click();
+          cy.get('[data-e2e="add-factor-otp"]').should("be.visible").click();
           cy.get('[data-e2e="otp-secret"]')
             .as('otpSecret')
             .then((secret) => {
               cy.task<string>('generateOTP', secret.text().trim()).then((token) => {
-                cy.get('[data-e2e="otp-code-input"]').type(token, { force: true });
-                cy.get('[data-e2e="save-otp-factor"]').click();
+                cy.get('[data-e2e="otp-code-input"]').should("be.visible").type(token, { force: true });
+                cy.get('[data-e2e="save-otp-factor"]').should("be.visible").click();
               });
             });
           login(postAuthOTPEmail, userPw, target.headers['x-zitadel-orgid'], () => {
             cy.task<string>('generateOTP').then((token) => {
-              cy.get('#code').type(token);
-              cy.get('#submit-button').click();
+              cy.get('#code').should("be.visible").type(token);
+              cy.get('#submit-button').should("be.visible").click();
             });
           });
 

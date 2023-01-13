@@ -41,11 +41,11 @@ describe('permissions', () => {
         });
 
         it('should add a manager', () => {
-          cy.get('[data-e2e="add-member-button"]').click();
-          cy.get('[data-e2e="add-member-input"]').type(testManagerLoginname);
-          cy.get('[data-e2e="user-option"]').click();
-          cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
-          cy.get('[data-e2e="confirm-add-member-button"]').click();
+          cy.get('[data-e2e="add-member-button"]').should("be.visible").click();
+          cy.get('[data-e2e="add-member-input"]').should("be.visible").type(testManagerLoginname);
+          cy.get('[data-e2e="user-option"]').should("be.visible").click();
+          cy.contains('[data-e2e="role-checkbox"]', roles[0]).should("be.visible").click();
+          cy.get('[data-e2e="confirm-add-member-button"]').should("be.visible").click();
           cy.shouldConfirmSuccess();
           cy.contains('[data-e2e="member-avatar"]', 'ee');
         });
@@ -60,14 +60,14 @@ describe('permissions', () => {
               beforeMutate(target,userId);
             navigate(target, userId);
           });
-          cy.contains('[data-e2e="member-avatar"]', 'ee').click();
+          cy.contains('[data-e2e="member-avatar"]', 'ee').should("be.visible").click();
             cy.get(rowSelector).as('managerRow');
           });
         });
 
         it('should remove a manager', () => {
-          cy.get('@managerRow').find('[data-e2e="remove-member-button"]').click({ force: true });
-          cy.get('[data-e2e="confirm-dialog-button"]').click();
+          cy.get('@managerRow').find('[data-e2e="remove-member-button"]').should("be.visible").click({ force: true });
+          cy.get('[data-e2e="confirm-dialog-button"]').should("be.visible").click();
           cy.shouldConfirmSuccess();
           cy.shouldNotExist({
             selector: rowSelector,
@@ -80,8 +80,8 @@ describe('permissions', () => {
           cy.get('@managerRow')
             .contains('[data-e2e="role"]', roles[0])
             .find('[data-e2e="remove-role-button"]')
-            .click({ force: true }); // TODO: Is this a bug?
-          cy.get('[data-e2e="confirm-dialog-button"]').click();
+            .should("be.visible").click({ force: true }); // TODO: Is this a bug?
+          cy.get('[data-e2e="confirm-dialog-button"]').should("be.visible").click();
           cy.shouldConfirmSuccess();
           cy.get('@managerRow')
             .find('[data-e2e="remove-role-button"]')
@@ -174,12 +174,12 @@ describe('permissions', () => {
           });
 
           it('should add a role', () => {
-            cy.get('[data-e2e="sidenav-element-roles"]').click();
-            cy.get('[data-e2e="add-new-role"]').click();
-            cy.get('[formcontrolname="key"]').type(testRoleName);
-            cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
-            cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
-            cy.get('[data-e2e="save-button"]').click();
+            cy.get('[data-e2e="sidenav-element-roles"]').should("be.visible").click();
+            cy.get('[data-e2e="add-new-role"]').should("be.visible").click();
+            cy.get('[formcontrolname="key"]').should("be.visible").type(testRoleName);
+            cy.get('[formcontrolname="displayName"]').should("be.visible").type('e2eroleundertestdisplay');
+            cy.get('[formcontrolname="group"]').should("be.visible").type('e2eroleundertestgroup');
+            cy.get('[data-e2e="save-button"]').should("be.visible").click();
             cy.shouldConfirmSuccess();
             cy.contains('tr', testRoleName);
           });
