@@ -11,7 +11,10 @@ describe('login policy', () => {
         // login(user);
         cy.visit(orgPath);
         // TODO: Why force?
-        cy.contains('[data-e2e="policy-card"]', 'Login Policy').contains('button', 'Modify').should("be.visible").click({ force: true }); // TODO: select data-e2e
+        cy.contains('[data-e2e="policy-card"]', 'Login Policy')
+          .contains('button', 'Modify')
+          .should('be.visible')
+          .click({ force: true }); // TODO: select data-e2e
         ctx().then((api) => {
           ensureHumanExists(api, User.LoginPolicyUser);
         });

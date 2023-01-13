@@ -32,6 +32,7 @@ export interface ZITADELTarget {
   };
   mgmtBaseURL: string;
   adminBaseURL: string;
+  org: string;
 }
 
 interface ShouldNotExistOptions {

@@ -29,21 +29,21 @@ describe('humans', () => {
       });
 
       it('should add a user', () => {
-        cy.get('[data-e2e="create-user-button"]').should("be.visible").click();
+        cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
         cy.url().should('contain', 'users/create');
-        cy.get('[formcontrolname="email"]').should("be.visible").type('dummy@dummy.com');
+        cy.get('[formcontrolname="email"]').should('be.visible').type('dummy@dummy.com');
         //force needed due to the prefilled username prefix
-        cy.get('[formcontrolname="userName"]').should("be.visible").type(user.addName);
-        cy.get('[formcontrolname="firstName"]').should("be.visible").type('e2ehumanfirstname');
-        cy.get('[formcontrolname="lastName"]').should("be.visible").type('e2ehumanlastname');
-        cy.get('[formcontrolname="phone"]').should("be.visible").type('+41 123456789');
-        cy.get('[data-e2e="create-button"]').should("be.visible").click();
+        cy.get('[formcontrolname="userName"]').should('be.visible').type(user.addName);
+        cy.get('[formcontrolname="firstName"]').should('be.visible').type('e2ehumanfirstname');
+        cy.get('[formcontrolname="lastName"]').should('be.visible').type('e2ehumanlastname');
+        cy.get('[formcontrolname="phone"]').should('be.visible').type('+41 123456789');
+        cy.get('[data-e2e="create-button"]').should('be.visible').click();
         cy.shouldConfirmSuccess();
         let loginName = user.addName;
         if (user.mustBeDomain) {
           loginName = loginname(user.addName, targetOrg);
         }
-        cy.contains('[data-e2e="copy-loginname"]', loginName).should("be.visible").click();
+        cy.contains('[data-e2e="copy-loginname"]', loginName).should('be.visible').click();
         cy.clipboardMatches(loginName);
       });
     });
@@ -58,22 +58,25 @@ describe('humans', () => {
 
       // TODO: fix exact username matching (same for machines)
       it.skip('should delete a human user', () => {
-        Cypress.$.expr[":"].textEquals = Cypress.$.expr.createPseudo((arg) => {
-          return ( elem ) => {
-              return Cypress.$(elem).text().trim().match("^" + arg + "$").length === 1;
+        Cypress.$.expr[':'].textEquals = Cypress.$.expr.createPseudo((arg) => {
+          return (elem) => {
+            return (
+              Cypress.$(elem)
+                .text()
+                .trim()
+                .match('^' + arg + '$').length === 1
+            );
           };
-      });
+        });
 
         let loginName = user.removeName;
         if (user.mustBeDomain) {
           loginName = loginname(user.removeName, targetOrg);
         }
         const rowSelector = `[data-e2e="username-cell"]:textEquals(${user.removeName})`;
-        cy.get(rowSelector)
-          .find('[data-e2e="enabled-delete-button"]')
-          .should("be.visible").click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().should("be.visible").type(loginName);
-        cy.get('[data-e2e="confirm-dialog-button"]').should("be.visible").click();
+        cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').should('be.visible').click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.visible').type(loginName);
+        cy.get('[data-e2e="confirm-dialog-button"]').should('be.visible').click();
         cy.shouldConfirmSuccess();
         cy.shouldNotExist({
           selector: rowSelector,
@@ -87,6 +90,6 @@ describe('humans', () => {
 function navigateToUsers(target: ZITADELTarget) {
   // directly going to users is not working, atm
   cy.visit(`/org?org=${target.headers['x-zitadel-orgid']}`);
-  cy.get('[data-e2e="users-nav"]').should("be.visible").click();
-  cy.get('[data-e2e="list-humans"] button').should("be.visible").click();
+  cy.get('[data-e2e="users-nav"]').should('be.visible').click();
+  cy.get('[data-e2e="list-humans"] button').should('be.visible').click();
 }

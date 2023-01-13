@@ -1,11 +1,5 @@
 import { ZITADELTarget } from 'support/commands';
-import {
-  standardCreate,
-  standardEnsureDoesntExist,
-  standardEnsureExists,
-  standardRemove,
-  standardSearch,
-} from './standard';
+import { standardCreate, standardEnsureDoesntExist, standardEnsureExists, standardRemove, standardSearch } from './standard';
 
 export function ensureProjectDoesntExist(target: ZITADELTarget, name: string) {
   return standardEnsureDoesntExist(ensureProjectExists(target, name), Cypress._.curry(remove)(target));

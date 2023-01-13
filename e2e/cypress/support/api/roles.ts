@@ -21,17 +21,17 @@ export function ensureRoleExists(api: ZITADELTarget, projectId: number, roleKey:
 }
 
 export function ensureRoleDoesntExist(api: ZITADELTarget, projectId: number, roleKey: string): Cypress.Chainable<null> {
-    return cy
-      .request({
-        method: 'DELETE',
-        url: `${api.mgmtBaseURL}/projects/${projectId}/roles/${roleKey}`,
-        headers: api.headers,
-        failOnStatusCode: false,
-      })
-      .then((res) => {
-        if (!res.isOkStatusCode) {
-          expect(res.status).to.equal(404);
-        }
-        return null;
-      });
-  }
+  return cy
+    .request({
+      method: 'DELETE',
+      url: `${api.mgmtBaseURL}/projects/${projectId}/roles/${roleKey}`,
+      headers: api.headers,
+      failOnStatusCode: false,
+    })
+    .then((res) => {
+      if (!res.isOkStatusCode) {
+        expect(res.status).to.equal(404);
+      }
+      return null;
+    });
+}

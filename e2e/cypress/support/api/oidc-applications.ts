@@ -13,10 +13,7 @@ export function ensureOIDCAppDoesntExist(target: ZITADELTarget, projectId: numbe
 }
 
 export function ensureOIDCAppExists(target: ZITADELTarget, projectId: number, name: string): Cypress.Chainable<number> {
-  return standardEnsureExists(
-    create(target, projectId, name),
-     () => search(target, projectId, name),
-    );
+  return standardEnsureExists(create(target, projectId, name), () => search(target, projectId, name));
 }
 
 function create(target: ZITADELTarget, projectId: number, name: string): Cypress.Chainable<any> {

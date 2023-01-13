@@ -68,10 +68,10 @@ export function standardSearch(
       headers: target.headers,
     })
     .then((res) => {
-        const found = res.body?.result?.find(find)
-        if (!found) {
-            cy.log("couldn't find entity")
-        }
+      const found = res.body?.result?.find(find);
+      if (!found) {
+        cy.log("couldn't find entity");
+      }
       return found?.[idField] || null;
     });
 }

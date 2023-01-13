@@ -11,7 +11,6 @@ describe('oidc settings', () => {
   const refreshTokenIdleExpirationPrecondition = 2;
 
   beforeEach(`ensure they are set`, () => {
-
     newTarget('e2eoidcsettings').then((target) => {
       ensureOIDCSettings(
         target,
@@ -25,17 +24,27 @@ describe('oidc settings', () => {
   });
 
   it(`should update oidc settings`, () => {
-    cy.get('[formcontrolname="accessTokenLifetime"]').should('value', accessTokenPrecondition).clear().should("be.visible").type('2');
-    cy.get('[formcontrolname="idTokenLifetime"]').should('value', idTokenPrecondition).clear().should("be.visible").type('24');
+    cy.get('[formcontrolname="accessTokenLifetime"]')
+      .should('value', accessTokenPrecondition)
+      .clear()
+      .should('be.visible')
+      .type('2');
+    cy.get('[formcontrolname="idTokenLifetime"]')
+      .should('value', idTokenPrecondition)
+      .clear()
+      .should('be.visible')
+      .type('24');
     cy.get('[formcontrolname="refreshTokenExpiration"]')
       .should('value', refreshTokenExpirationPrecondition)
       .clear()
-      .should("be.visible").type('30');
+      .should('be.visible')
+      .type('30');
     cy.get('[formcontrolname="refreshTokenIdleExpiration"]')
       .should('value', refreshTokenIdleExpirationPrecondition)
       .clear()
-      .should("be.visible").type('7');
-    cy.get('[data-e2e="save-button"]').should("be.visible").click();
+      .should('be.visible')
+      .type('7');
+    cy.get('[data-e2e="save-button"]').should('be.visible').click();
     cy.shouldConfirmSuccess();
   });
 });

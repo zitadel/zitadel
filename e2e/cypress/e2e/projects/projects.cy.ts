@@ -19,9 +19,9 @@ describe('projects', () => {
     });
 
     it('should add a project', () => {
-      cy.get('.add-project-button').should("be.visible").click({ force: true });
-      cy.get('input').should("be.visible").type(testProjectNameCreate);
-      cy.get('[data-e2e="continue-button"]').should("be.visible").click();
+      cy.get('.add-project-button').should('be.visible').click({ force: true });
+      cy.get('input').should('be.visible').type(testProjectNameCreate);
+      cy.get('[data-e2e="continue-button"]').should('be.visible').click();
       cy.shouldConfirmSuccess();
     });
 
@@ -39,11 +39,12 @@ describe('projects', () => {
     describe('remove project', () => {
       it('removes the project from list view', () => {
         const rowSelector = `tr:contains(${testProjectNameDelete})`;
-        cy.get('[data-e2e="toggle-grid"]').should("be.visible").click();
+        cy.get('[data-e2e="toggle-grid"]').should('be.visible').click();
         cy.get('[data-e2e="timestamp"]');
-        cy.get(rowSelector).find('[data-e2e="delete-project-button"]').should("be.visible").click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().should("be.visible").type(testProjectNameDelete);
-        cy.get('[data-e2e="confirm-dialog-button"]').should("be.visible").click();
+        // TODO: Is there a way to make the button visible?
+        cy.get(rowSelector).find('[data-e2e="delete-project-button"]').click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.visible').type(testProjectNameDelete);
+        cy.get('[data-e2e="confirm-dialog-button"]').should('be.visible').click();
         cy.shouldConfirmSuccess();
         cy.shouldNotExist({
           selector: rowSelector,
@@ -53,9 +54,10 @@ describe('projects', () => {
 
       it('removes the project from grid view', () => {
         const cardSelector = `[data-e2e="grid-card"]:contains(${testProjectNameDelete})`;
-        cy.get(cardSelector).find('[data-e2e="delete-project-button"]').should("be.visible").click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().should("be.visible").type(testProjectNameDelete);
-        cy.get('[data-e2e="confirm-dialog-button"]').should("be.visible").click();
+        // TODO: Is there a way to make the button visible?
+        cy.get(cardSelector).find('[data-e2e="delete-project-button"]').click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.visible').type(testProjectNameDelete);
+        cy.get('[data-e2e="confirm-dialog-button"]').should('be.visible').click();
         cy.shouldConfirmSuccess();
         cy.shouldNotExist({
           selector: cardSelector,

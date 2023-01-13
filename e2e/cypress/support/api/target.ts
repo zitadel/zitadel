@@ -22,6 +22,7 @@ export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainabl
           },
           mgmtBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1`,
           adminBaseURL: `${Cypress.env('BACKEND_URL')}/admin/v1`,
+          org: orgName,
         })
         .then((tmpTarget) => {
           return ensureOrgExists(tmpTarget, orgName).then((dirtyOrgTarget) => {
