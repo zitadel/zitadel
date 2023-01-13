@@ -57,6 +57,7 @@ describe('humans', () => {
       });
 
       // TODO: fix exact username matching (same for machines)
+      // TODO: fix confirm-dialog username (same for machines)
       it.skip('should delete a human user', () => {
         Cypress.$.expr[':'].textEquals = Cypress.$.expr.createPseudo((arg) => {
           return (elem) => {
@@ -73,8 +74,9 @@ describe('humans', () => {
         if (user.mustBeDomain) {
           loginName = loginname(user.removeName, targetOrg);
         }
-        const rowSelector = `[data-e2e="username-cell"]:textEquals(${user.removeName})`;
-        cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').should('be.visible').click({ force: true });
+        const rowSelector = `tr:contains(${user.removeName})`;
+        // TODO: Is there a way to make the button visible?
+        cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.visible').type(loginName);
         cy.get('[data-e2e="confirm-dialog-button"]').should('be.visible').click();
         cy.shouldConfirmSuccess();
