@@ -1,0 +1,9 @@
+[submodule "external/googleapis"]
+	path = external/googleapis
+	url = https://github.com/googleapis/googleapis.git
+[submodule "external/grpc-gateway"]
+	path = external/grpc-gateway
+	url = https://@github.com/grpc-ecosystem/grpc-gateway.git
+[submodule "external/protoc-gen-validate"]
+	path = external/protoc-gen-validate
+	url = https://github.com/envoyproxy/protoc-gen-validate.git
