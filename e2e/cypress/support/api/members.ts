@@ -33,7 +33,7 @@ export function ensureHumanIsNotOrgMember(target: ZITADELTarget, userId: number)
 export function ensureHumanIsProjectMember(target: ZITADELTarget, projectId: number, userId: number, roles: string[], grantId?: number) {
   return cy.request({
     method: 'POST',
-    url: `${target.mgmtBaseURL}/projects/${projectId}${grantId ? `grants/${grantId}/` : ''}/members`,
+    url: `${target.mgmtBaseURL}/projects/${projectId}${grantId ? `/grants/${grantId}` : ''}/members`,
     body: {
       userId: userId,
       roles: roles,

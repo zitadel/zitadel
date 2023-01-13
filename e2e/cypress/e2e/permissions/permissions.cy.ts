@@ -110,18 +110,26 @@ describe('permissions', () => {
           );
         },
         (target: ZITADELTarget) => {
-          cy.visit(`/orgs?org=${target.headers['x-zitadel-orgid']}`);
+          cy.visit(`/org?org=${target.headers['x-zitadel-orgid']}`);
         },
       );
     });
 
     describe('projects', () => {
       describe('owned projects', () => {
+
         function visitOwnedProject(target: ZITADELTarget) {
           cy.get<number>('@projectId').then((projectId) => {
             cy.visit(`/projects/${projectId}?org=${target.headers['x-zitadel-orgid']}`);
           });
         }
+
+        beforeEach(()=>{
+          cy.get<ZITADELTarget>('@target').then(target => {
+            ensureProjectExists(target, 'e2ecreateauthorization')
+            .as('projectId')
+          })
+        })
 
         describe('authorizations', () => {
           const roles = [
@@ -132,9 +140,7 @@ describe('permissions', () => {
           testAuthorizations(
             roles.map((role) => role.display),
             (target: ZITADELTarget, userId:number) => {
-              ensureProjectExists(target, 'e2ecreateauthorization')
-                .as('projectId')
-                .then((projectId) => {
+              cy.get<number>('@projectId').then((projectId) => {
                   ensureHumanIsNotProjectMember(target, projectId, userId);
                 });
             },
