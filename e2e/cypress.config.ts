@@ -28,7 +28,12 @@ export default defineConfig({
     baseUrl: baseUrl(),
     setupNodeEvents(on, config) {
       on("before:browser:launch", (browser, browserCfg) => {
-        crdPort = parseInt(browserCfg.args.find(arg => arg.startsWith('--remote-debugging-port'))?.split('=')[1]) || parseInt(process.env.CYPRESS_REMOTE_DEBUGGING_PORT) || 4201
+        const portArg = '--remote-debugging-port'
+        const passedPortArg = browserCfg.args.find(arg => arg.startsWith(portArg))
+        crdPort = parseInt(passedPortArg?.split('=')[1]) || parseInt(process.env.CYPRESS_REMOTE_DEBUGGING_PORT) || 4201
+        if (!passedPortArg) {
+          browserCfg.args.push(portArg, crdPort.toString())
+        }
       }),
       on('task', {
         safetoken({key, token}) {
