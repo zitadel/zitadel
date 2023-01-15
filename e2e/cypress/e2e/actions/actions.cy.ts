@@ -38,7 +38,6 @@ describe('actions', () => {
         });
       });
   });
-
   describe('triggers', () => {
     describe('creation', () => {
       describe('pre', () => {
@@ -54,7 +53,6 @@ describe('actions', () => {
             });
           });
         });
-
         it(`shouldn't prompt for email code and add metadata`, () => {
           cy.get<ZITADELTarget>('@target').then((target) => {
             register(preCreationEmail, target.headers['x-zitadel-orgid']).then((userId) => {
@@ -66,7 +64,6 @@ describe('actions', () => {
         });
       });
     });
-
     describe('post', () => {
       beforeEach(() => {
         cy.get<ZITADELTarget>('@target').then((target) => {
@@ -88,7 +85,6 @@ describe('actions', () => {
           });
         });
       });
-
       it(`should add a grant when registering via UI`, () => {
         cy.get<ZITADELTarget>('@target').then((target) => {
           register(postCreationEmail, target.headers['x-zitadel-orgid']).then((userId) => {
@@ -100,7 +96,6 @@ describe('actions', () => {
       });
     });
   });
-
   describe('post authentication', () => {
     beforeEach(() => {
       cy.get<ZITADELTarget>('@target').then((target) => {
@@ -111,7 +106,6 @@ describe('actions', () => {
         });
       });
     });
-
     describe('pw', () => {
       beforeEach(() => {
         cy.get<ZITADELTarget>('@target').then((target) => {
@@ -131,7 +125,6 @@ describe('actions', () => {
         });
       });
     });
-
     describe('otp', () => {
       beforeEach(() => {
         cy.get<ZITADELTarget>('@target').then((target) => {
@@ -169,50 +162,56 @@ describe('actions', () => {
         });
       });
     });
-  });
-
-  describe('otp', () => {
-    beforeEach(() => {
-      cy.get<ZITADELTarget>('@target').then((target) => {
-        ensureHumanDoesntExist(target, postAuthU2FEmail);
-        ensureHumanExists(target, postAuthU2FEmail).as('userId');
-      });
-    });
-
-    it.only('should store the username in metadata after u2f authentication', () => {
-      cy.get<ZITADELTarget>('@target').then((target) => {
-        login(postAuthU2FEmail, userPw, target.headers['x-zitadel-orgid']);
-        cy.visit('/users/me?id=security');
-        cy.get('[data-e2e="add-factor"]').should('be.visible').click();
-        cy.get('[data-e2e="add-factor-u2f"]').should('be.visible').click();
-        const factorName = 'virtualAuthenticator';
-        cy.get('[data-e2e="u2f-factor-name"]').should('be.visible').type(factorName);
-        cy.task('remoteDebuggerCommand', {
-          event: 'WebAuthn.enable',
-        });
-        cy.task('remoteDebuggerCommand', {
-          event: 'WebAuthn.addVirtualAuthenticator',
-          params: {
-            options: {
-              protocol: 'ctap2',
-              transport: 'usb',
-              hasResidentKey: true,
-              hasUserVerification: true,
-              isUserVerified: true,
-            },
-          },
-        });
-        cy.get('[data-e2e="save-factor"]').should('be.visible').click();
-        cy.contains('[data-e2e="u2f-factor-names"]', factorName);
-        login(postAuthU2FEmail, userPw, target.headers['x-zitadel-orgid'], () => {
-          cy.get('#btn-login').should('be.visible').click()
-        });
-        sessionAsPredefinedUser(User.IAMAdminUser);
-        cy.get('@userId').then((userId) => {
-          cy.visit(`/users/${userId}?org=${target.headers['x-zitadel-orgid']}&id=metadata`);
-          cy.contains('tr', 'last username used').contains(postAuthU2FEmail);
+    describe('u2f', () => {
+      beforeEach(() => {
+        cy.get<ZITADELTarget>('@target').then((target) => {
+          ensureHumanDoesntExist(target, postAuthU2FEmail);
+          ensureHumanExists(target, postAuthU2FEmail).as('userId');
         });
       });
+      it(
+        'should store the username in metadata after u2f authentication',
+        {
+          // Verifying a key that was registered in an origin other than the RP's origin fails.
+          // It is tagged here so that it can be grepped and skipped when run against a dev server.
+          tags: ['@same-origin'],
+        },
+        () => {
+          cy.get<ZITADELTarget>('@target').then((target) => {
+            login(postAuthU2FEmail, userPw, target.headers['x-zitadel-orgid']);
+            cy.visit('/users/me?id=security');
+            cy.get('[data-e2e="add-factor"]').should('be.visible').click();
+            cy.get('[data-e2e="add-factor-u2f"]').should('be.visible').click();
+            const factorName = 'virtualAuthenticator';
+            cy.get('[data-e2e="u2f-factor-name"]').should('be.visible').type(factorName);
+            cy.task('remoteDebuggerCommand', {
+              event: 'WebAuthn.enable',
+            });
+            cy.task('remoteDebuggerCommand', {
+              event: 'WebAuthn.addVirtualAuthenticator',
+              params: {
+                options: {
+                  protocol: 'ctap2',
+                  transport: 'usb',
+                  hasResidentKey: true,
+                  hasUserVerification: true,
+                  isUserVerified: true,
+                },
+              },
+            });
+            cy.get('[data-e2e="save-factor"]').should('be.visible').click();
+            cy.contains('[data-e2e="u2f-factor-names"]', factorName);
+            login(postAuthU2FEmail, userPw, target.headers['x-zitadel-orgid'], () => {
+              cy.get('#btn-login').should('be.visible').click();
+            });
+            sessionAsPredefinedUser(User.IAMAdminUser);
+            cy.get('@userId').then((userId) => {
+              cy.visit(`/users/${userId}?org=${target.headers['x-zitadel-orgid']}&id=metadata`);
+              cy.contains('tr', 'last username used').contains(postAuthU2FEmail);
+            });
+          });
+        },
+      );
     });
   });
 });
