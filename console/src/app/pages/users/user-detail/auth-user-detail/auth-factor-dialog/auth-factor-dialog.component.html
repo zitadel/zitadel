@@ -18,7 +18,7 @@
           <span>{{ 'USER.MFA.OTP' | translate }}</span>
         </div>
       </button>
-      <button mat-raised-button color="primary" (click)="selectType(AuthFactorType.U2F)">
+      <button mat-raised-button color="primary" (click)="selectType(AuthFactorType.U2F)" data-e2e="add-factor-u2f">
         <div class="u2f-btn">
           <div class="icon-row">
             <i matTooltip="Fingerprint" class="las la-fingerprint"></i>
@@ -65,7 +65,13 @@
 
     <cnsl-form-field class="form-field" label="Name" required="true">
       <cnsl-label>{{ 'USER.MFA.U2F_NAME' | translate }}</cnsl-label>
-      <input cnslInput [(ngModel)]="u2fname" required (keydown.enter)="u2fname ? submitU2F() : null" />
+      <input
+        cnslInput
+        [(ngModel)]="u2fname"
+        required
+        (keydown.enter)="u2fname ? submitU2F() : null"
+        data-e2e="u2f-factor-name"
+      />
     </cnsl-form-field>
 
     <mat-spinner diameter="30" *ngIf="u2fLoading"></mat-spinner>
@@ -85,7 +91,7 @@
     mat-raised-button
     class="ok-button"
     (click)="submitAuth()"
-    data-e2e="save-otp-factor"
+    data-e2e="save-factor"
   >
     {{ 'ACTIONS.CREATE' | translate }}
   </button>

@@ -1,6 +1,9 @@
 import { defineConfig } from 'cypress';
+import * as CRD from 'chrome-remote-interface'
 
 let tokensCache = new Map<string,string>()
+let crdPort: number
+let crdClient: Promise<CRD.Client> = null
 
 export default defineConfig({
   reporter: 'mochawesome',
@@ -24,7 +27,9 @@ export default defineConfig({
   e2e: {
     baseUrl: baseUrl(),
     setupNodeEvents(on, config) {
-
+      on("before:browser:launch", (browser, browserCfg) => {
+        crdPort = parseInt(browserCfg.args.find(arg => arg.startsWith('--remote-debugging-port'))?.split('=')[1]) || parseInt(process.env.CYPRESS_REMOTE_DEBUGGING_PORT) || 4201
+      }),
       on('task', {
         safetoken({key, token}) {
           tokensCache.set(key,token);
@@ -33,7 +38,18 @@ export default defineConfig({
         loadtoken({key}): string | null {
           return tokensCache.get(key) || null;
         },
-        generateOTP: require("cypress-otp")
+        generateOTP: require("cypress-otp"),
+        resetCRDInterface: async (args) => {
+          if (crdClient) {
+            (await crdClient).close()
+            crdClient = null
+          }
+          return null
+        },
+        remoteDebuggerCommand: async (args) => {
+          crdClient = crdClient || CRD({port: crdPort});
+          return (await crdClient).send(args.event, args.params)
+        }
       })
     },
   },

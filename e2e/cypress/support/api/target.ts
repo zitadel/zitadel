@@ -4,6 +4,7 @@ import { ensureOrgExists, removeOrg } from './orgs';
 
 export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainable<ZITADELTarget> {
   sessionAsPredefinedUser(User.IAMAdminUser);
+  cy.task('resetCRDInterface');
   return cy
     .getAllSessionStorage()
     .then((storage) => {
