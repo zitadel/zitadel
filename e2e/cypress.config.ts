@@ -32,7 +32,7 @@ export default defineConfig({
         const passedPortArg = browserCfg.args.find(arg => arg.startsWith(portArg))
         crdPort = parseInt(passedPortArg?.split('=')[1]) || parseInt(process.env.CYPRESS_REMOTE_DEBUGGING_PORT) || 4201
         if (!passedPortArg) {
-          browserCfg.args.push(portArg, crdPort.toString())
+          browserCfg.args.push(`${portArg}=${crdPort}`)
         }
       }),
       on('task', {
