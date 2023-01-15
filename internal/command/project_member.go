@@ -94,7 +94,7 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 		return nil, err
 	}
 	if errors.IsNotFound(err) {
-		return nil, err
+		return nil, nil
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
