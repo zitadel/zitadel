@@ -14,27 +14,29 @@ export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainabl
       return prunedToken;
     })
     .then((token) => {
-      return cy
-        .wrap({
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'x-zitadel-orgid': undefined,
-          },
-          mgmtBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1`,
-          adminBaseURL: `${Cypress.env('BACKEND_URL')}/admin/v1`,
-          org: orgName,
-        })
-        .then((tmpTarget) => {
-          return ensureOrgExists(tmpTarget, orgName).then((dirtyOrgTarget) => {
-            if (!cleanOrg) {
-              return cy.wrap(dirtyOrgTarget);
-            }
+      return cy.task<string>('systemToken').then(systemToken => {
+        return {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'x-zitadel-orgid': undefined,
+            },
+            mgmtBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1`,
+            adminBaseURL: `${Cypress.env('BACKEND_URL')}/admin/v1`,
+            systemBaseURL: `${Cypress.env('BACKEND_URL')}/system/v1`,
+            org: orgName,
+            systemToken: systemToken,
+        }
+      }).then((tmpTarget) => {
+        return ensureOrgExists(tmpTarget, orgName).then((dirtyOrgTarget) => {
+          if (!cleanOrg) {
+            return cy.wrap(dirtyOrgTarget);
+          }
 
-            return removeOrg(dirtyOrgTarget).then(() => {
-              return ensureOrgExists(dirtyOrgTarget, orgName);
-            });
+          return removeOrg(dirtyOrgTarget).then(() => {
+            return ensureOrgExists(dirtyOrgTarget, orgName);
           });
         });
+      });
     });
 }
 

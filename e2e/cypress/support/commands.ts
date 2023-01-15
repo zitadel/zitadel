@@ -32,6 +32,8 @@ export interface ZITADELTarget {
   };
   mgmtBaseURL: string;
   adminBaseURL: string;
+  systemBaseURL: string;
+  systemToken: string
   org: string;
 }
 
