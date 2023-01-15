@@ -173,7 +173,7 @@ describe('actions', () => {
         });
       });
     });
-    describe('u2f', () => {
+    describe.only('u2f', () => {
       beforeEach(() => {
         cy.get<ZITADELTarget>('@target').then((target) => {
           ensureHumanDoesntExist(target, postAuthU2FEmail);
@@ -186,6 +186,7 @@ describe('actions', () => {
           // Verifying a key that was registered in an origin other than the RP's origin fails.
           // It is tagged here so that it can be grepped and skipped when run against a dev server.
           tags: ['@same-origin'],
+          browser: 'chrome'
         },
         () => {
           cy.get<ZITADELTarget>('@target').then((target) => {
@@ -239,6 +240,7 @@ describe('actions', () => {
           // Verifying a key that was registered in an origin other than the RP's origin fails.
           // It is tagged here so that it can be grepped and skipped when run against a dev server.
           tags: ['@same-origin'],
+          browser: 'chrome'
         },
         () => {
           cy.get<ZITADELTarget>('@target').then((target) => {

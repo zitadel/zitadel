@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "open": "npx cypress open",
-    "e2e": "npx cypress run",
+    "e2e": "npx cypress run --browser chrome",
     "open:dev": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 npm run open -- --env grepTags='--@same-origin' --",
     "e2e:dev": "CYPRESS_BASE_URL=http://localhost:4200 CYPRESS_BACKEND_URL=http://localhost:8080 npm run e2e -- --env grepTags='--@same-origin' --",
     "lint": "prettier --check cypress",
