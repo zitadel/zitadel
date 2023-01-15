@@ -1,6 +1,3 @@
-import { Context } from 'support/api/types';
-import { Context } from '../../support/api/target';
-import { Policy, resetPolicy } from '../../support/api/policies';
 import { User } from '../../support/login/session';
 
 describe('private labeling', () => {
@@ -8,8 +5,6 @@ describe('private labeling', () => {
 
   [User.OrgOwner].forEach((user) => {
     describe(`as user "${user}"`, () => {
-      let api: Context;
-
       beforeEach(() => {
         // login(user);
         cy.visit(orgPath);
@@ -28,12 +23,6 @@ describe('private labeling', () => {
 
 function customize(theme: string, user: User) {
   describe(`${theme} theme`, () => {
-    beforeEach(() => {
-      ctx().then((api) => {
-        resetPolicy(api, Policy.Label);
-      });
-    });
-
     describe.skip('logo', () => {
       beforeEach('expand logo category', () => {
         cy.contains('[data-e2e="policy-category"]', 'Logo').should('be.visible').click(); // TODO: select data-e2e
@@ -44,7 +33,7 @@ function customize(theme: string, user: User) {
         cy.get('[data-e2e="image-part-logo"]')
           .find('input')
           .then(function (el) {
-            const blob = Cypress.Blob.base64StringToBlob(logo, 'image/png');
+            const blob = Cypress.Blob.base64StringToBlob(null, 'image/png');
             const file = new File([blob], 'images/logo.png', { type: 'image/png' });
             const list = new DataTransfer();
 

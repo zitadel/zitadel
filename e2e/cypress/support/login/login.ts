@@ -1,4 +1,11 @@
-export function login(username: string, pw = 'Password1!', orgId?: string, onPasswordScreen?: () => void, passwordless = false): void {
+export function login(
+  username: string,
+  orgId: string,
+  expectSuccess = true,
+  pw = 'Password1!',
+  onPasswordScreen?: () => void,
+  passwordless = false,
+): void {
   cy.clearAllSessionStorage();
 
   cy.intercept({
@@ -29,7 +36,7 @@ export function login(username: string, pw = 'Password1!', orgId?: string, onPas
   cy.contains(username);
 
   if (passwordless) {
-    cy.get('#btn-login').should('be.visible').click()
+    cy.get('#btn-login').should('be.visible').click();
   } else {
     cy.get('#password').should('be.visible').type(pw);
     cy.get('#submit-button').should('be.visible').click();
@@ -44,9 +51,11 @@ export function login(username: string, pw = 'Password1!', orgId?: string, onPas
     onPasswordScreen ? onPasswordScreen() : null;
   }
 
-  cy.contains('[data-e2e="top-view-subtitle"]', username).then(($el) => {
-    expect($el.text().trim()).to.equal(username);
-  });
+  if (expectSuccess) {
+    cy.contains('[data-e2e="top-view-subtitle"]', username).then(($el) => {
+      expect($el.text().trim()).to.equal(username);
+    });
+  }
 }
 
 export function loginname(withoutDomain: string, org?: string): string {

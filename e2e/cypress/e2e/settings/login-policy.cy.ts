@@ -1,4 +1,3 @@
-import { Context } from '../../support/api/target';
 import { ensureHumanExists } from '../../support/api/users';
 import { User } from '../../support/login/session';
 
@@ -15,9 +14,6 @@ describe('login policy', () => {
           .contains('button', 'Modify')
           .should('be.visible')
           .click({ force: true }); // TODO: select data-e2e
-        ctx().then((api) => {
-          ensureHumanExists(api, User.LoginPolicyUser);
-        });
       });
 
       // TODO: verify email

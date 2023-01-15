@@ -103,7 +103,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	return user, err
 }
 
-func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.AuthRequest, authenticationError error) error {
+func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.AuthRequest, authMethod string, authenticationError error) error {
 	resourceOwner := req.RequestedOrgID
 	if resourceOwner == "" {
 		resourceOwner = req.UserOrgID
@@ -123,7 +123,7 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
 
-		authErrStr := ""
+		authErrStr := "none"
 		if authenticationError != nil {
 			authErrStr = authenticationError.Error()
 		}
@@ -132,7 +132,8 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 			// TODO: add tokenCtxFields(tokens)
 			actions.SetFields("v1",
 				actions.SetFields("ctx", actionCtx),
-				actions.SetFields("authenticationError", authErrStr),
+				actions.SetFields("authMethod", authMethod),
+				actions.SetFields("authError", authErrStr),
 				actions.SetFields("authRequest", object.AuthRequestField(req)),
 			),
 		)

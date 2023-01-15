@@ -10,17 +10,12 @@ export enum User {
 }
 
 export function sessionAsPredefinedUser(user: User) {
-  return session(loginname(<string>user, Cypress.env('ORGANIZATION')));
+  return session(loginname(<string>user, Cypress.env('ORGANIZATION')), null);
 }
 
-export function session(
-  username: string,
-  pw?: string,
-  orgId?: string,
-  onPasswordScreen?: () => void,
-): Cypress.Chainable<string> {
+export function session(username: string, orgId: string): Cypress.Chainable<string> {
   // We want to have a clean session but miss cypresses sesssion cache
-  return cy.session([username, orgId], () => login(username, pw, orgId, onPasswordScreen), {
+  return cy.session([username, orgId], () => login(username, orgId), {
     cacheAcrossSpecs: true,
   });
 }

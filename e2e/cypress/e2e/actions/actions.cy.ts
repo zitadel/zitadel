@@ -12,8 +12,8 @@ import { sessionAsPredefinedUser, User } from 'support/login/session';
 describe('actions', () => {
   const emailVerifiedScript = 'e2eSetEmailVerified',
     addGrantScript = 'e2eAddGrant',
-    addMetadataScript = 'e2eAddMetadata',
-    storeUsernameScript = 'e2eSetLastUsernameMD',
+    addStaticMetadataScript = 'e2eAddStaticMetadata',
+    addAuthErrorMetadataScript = 'e2eAddAuthErrorMetadata',
     projectName = 'e2eaction',
     roleKey = 'e2eactionrole',
     preCreationEmail = 'precre@action.com',
@@ -22,7 +22,6 @@ describe('actions', () => {
     postAuthOTPEmail = 'postauthotp@action.com',
     postAuthU2FEmail = 'postauthu2f@action.com',
     postAuthPWLessEmail = 'postauthpwless@action.com',
-    userPw = 'Password1!',
     specPath = 'cypress/e2e/actions';
 
   beforeEach(() => {
@@ -39,60 +38,56 @@ describe('actions', () => {
         });
       });
   });
-  describe('triggers', () => {
-    describe('creation', () => {
-      describe('pre', () => {
-        beforeEach(() => {
-          cy.get<ZITADELTarget>('@target').then((target) => {
-            ensureHumanDoesntExist(target, preCreationEmail);
-            cy.get<number>('@emailVerifiedId').then((emailVerifiedId) => {
-              cy.readFile(`${specPath}/${addMetadataScript}.js`).then((script) => {
-                ensureActionExists(target, addMetadataScript, script).then((metadataId) => {
-                  setTriggerTypes(target, 3, 2, [emailVerifiedId, metadataId]);
-                });
-              });
-            });
-          });
-        });
-        it(`shouldn't prompt for email code and add metadata`, () => {
-          cy.get<ZITADELTarget>('@target').then((target) => {
-            register(preCreationEmail, target.headers['x-zitadel-orgid']).then((userId) => {
-              sessionAsPredefinedUser(User.IAMAdminUser);
-              cy.visit(`/users/${userId}?id=metadata&org=${target.headers['x-zitadel-orgid']}`);
-              cy.contains('tr', 'akey').contains('avalue');
+  describe('pre creation', () => {
+    beforeEach(() => {
+      cy.get<ZITADELTarget>('@target').then((target) => {
+        ensureHumanDoesntExist(target, preCreationEmail);
+        cy.get<number>('@emailVerifiedId').then((emailVerifiedId) => {
+          cy.readFile(`${specPath}/${addStaticMetadataScript}.js`).then((script) => {
+            ensureActionExists(target, addStaticMetadataScript, script).then((metadataId) => {
+              setTriggerTypes(target, 3, 2, [emailVerifiedId, metadataId]);
             });
           });
         });
       });
     });
-    describe('post', () => {
-      beforeEach(() => {
-        cy.get<ZITADELTarget>('@target').then((target) => {
-          cy.get<number>('@emailVerifiedId').then((emailVerifiedId) => {
-            setTriggerTypes(target, 3, 2, [emailVerifiedId]);
-          });
-          ensureHumanDoesntExist(target, postCreationEmail);
-          ensureProjectExists(target, projectName).then((projectId) => {
-            ensureRoleExists(target, projectId, roleKey);
-            cy.readFile<string>(`${specPath}/${addGrantScript}.js`).then((script) => {
-              ensureActionExists(
-                target,
-                addGrantScript,
-                script.replace('<PROJECT_ID>', `${projectId}`).replace('<ROLE_KEY>', roleKey),
-              ).then((addGrantId) => {
-                setTriggerTypes(target, 3, 3, [addGrantId]);
-              });
+    it(`shouldn't prompt for email code and add metadata`, () => {
+      cy.get<ZITADELTarget>('@target').then((target) => {
+        register(preCreationEmail, target.headers['x-zitadel-orgid']).then((userId) => {
+          sessionAsPredefinedUser(User.IAMAdminUser);
+          cy.visit(`/users/${userId}?id=metadata&org=${target.headers['x-zitadel-orgid']}`);
+          cy.contains('tr', 'akey').contains('avalue');
+        });
+      });
+    });
+  });
+  describe('post creation', () => {
+    beforeEach(() => {
+      cy.get<ZITADELTarget>('@target').then((target) => {
+        cy.get<number>('@emailVerifiedId').then((emailVerifiedId) => {
+          setTriggerTypes(target, 3, 2, [emailVerifiedId]);
+        });
+        ensureHumanDoesntExist(target, postCreationEmail);
+        ensureProjectExists(target, projectName).then((projectId) => {
+          ensureRoleExists(target, projectId, roleKey);
+          cy.readFile<string>(`${specPath}/${addGrantScript}.js`).then((script) => {
+            ensureActionExists(
+              target,
+              addGrantScript,
+              script.replace('<PROJECT_ID>', `${projectId}`).replace('<ROLE_KEY>', roleKey),
+            ).then((addGrantId) => {
+              setTriggerTypes(target, 3, 3, [addGrantId]);
             });
           });
         });
       });
-      it(`should add a grant when registering via UI`, () => {
-        cy.get<ZITADELTarget>('@target').then((target) => {
-          register(postCreationEmail, target.headers['x-zitadel-orgid']).then((userId) => {
-            sessionAsPredefinedUser(User.IAMAdminUser);
-            cy.visit(`/users/${userId}?id=grants&org=${target.headers['x-zitadel-orgid']}`);
-            cy.contains('tr', roleKey);
-          });
+    });
+    it(`should add a grant when registering via UI`, () => {
+      cy.get<ZITADELTarget>('@target').then((target) => {
+        register(postCreationEmail, target.headers['x-zitadel-orgid']).then((userId) => {
+          sessionAsPredefinedUser(User.IAMAdminUser);
+          cy.visit(`/users/${userId}?id=grants&org=${target.headers['x-zitadel-orgid']}`);
+          cy.contains('tr', roleKey);
         });
       });
     });
@@ -100,8 +95,8 @@ describe('actions', () => {
   describe('post authentication', () => {
     beforeEach(() => {
       cy.get<ZITADELTarget>('@target').then((target) => {
-        cy.readFile<string>(`${specPath}/${storeUsernameScript}.js`).then((script) => {
-          ensureActionExists(target, storeUsernameScript, script).then((storeUsernameId) => {
+        cy.readFile<string>(`${specPath}/${addAuthErrorMetadataScript}.js`).then((script) => {
+          ensureActionExists(target, addAuthErrorMetadataScript, script).then((storeUsernameId) => {
             setTriggerTypes(target, 3, 1, [storeUsernameId]);
           });
         });
@@ -115,13 +110,26 @@ describe('actions', () => {
         });
       });
 
-      it('should store the username in metadata after password authentication', () => {
+      it('should store password error none in metadata after successful password authentication', () => {
         cy.get<ZITADELTarget>('@target').then((target) => {
-          login(postAuthPWEmail, userPw, target.headers['x-zitadel-orgid']);
+          login(postAuthPWEmail, target.headers['x-zitadel-orgid']);
           cy.get('@userId').then((userId) => {
             sessionAsPredefinedUser(User.IAMAdminUser);
             cy.visit(`/users/${userId}?id=metadata&org=${target.headers['x-zitadel-orgid']}`);
-            cy.contains('tr', 'last username used').contains(postAuthPWEmail);
+            cy.get('tr').should('have.length', 2);
+            cy.contains('tr', 'password error').contains('none');
+          });
+        });
+      });
+
+      it('should store password error authentication failed in metadata after failed password authentication', () => {
+        cy.get<ZITADELTarget>('@target').then((target) => {
+          login(postAuthPWEmail, target.headers['x-zitadel-orgid'], false, 'this password is wrong');
+          cy.get('@userId').then((userId) => {
+            sessionAsPredefinedUser(User.IAMAdminUser);
+            cy.visit(`/users/${userId}?id=metadata&org=${target.headers['x-zitadel-orgid']}`);
+            cy.get('tr').should('have.length', 2);
+            cy.contains('tr', 'password error').contains('Errors.User.Password.Invalid');
           });
         });
       });
@@ -134,9 +142,9 @@ describe('actions', () => {
         });
       });
 
-      it('should store the username in metadata after otp authentication', () => {
+      it('should store password error none and OTP error none in metadata after successful otp authentication', () => {
         cy.get<ZITADELTarget>('@target').then((target) => {
-          login(postAuthOTPEmail, userPw, target.headers['x-zitadel-orgid']);
+          login(postAuthOTPEmail, target.headers['x-zitadel-orgid']);
           cy.visit('/users/me?id=security');
           cy.get('[data-e2e="add-factor"]').should('be.visible').click();
           cy.get('[data-e2e="add-factor-otp"]').should('be.visible').click();
@@ -148,7 +156,7 @@ describe('actions', () => {
                 cy.get('[data-e2e="save-factor"]').should('be.visible').click();
               });
             });
-          login(postAuthOTPEmail, userPw, target.headers['x-zitadel-orgid'], () => {
+          login(postAuthOTPEmail, target.headers['x-zitadel-orgid'], true, undefined, () => {
             cy.task<string>('generateOTP').then((token) => {
               cy.get('#code').should('be.visible').type(token);
               cy.get('#submit-button').should('be.visible').click();
@@ -158,7 +166,9 @@ describe('actions', () => {
           sessionAsPredefinedUser(User.IAMAdminUser);
           cy.get('@userId').then((userId) => {
             cy.visit(`/users/${userId}?org=${target.headers['x-zitadel-orgid']}&id=metadata`);
-            cy.contains('tr', 'last username used').contains(postAuthOTPEmail);
+            cy.get('tr').should('have.length', 3);
+            cy.contains('tr', 'password error').contains('none');
+            cy.contains('tr', 'OTP error').contains('none');
           });
         });
       });
@@ -171,7 +181,7 @@ describe('actions', () => {
         });
       });
       it(
-        'should store the username in metadata after u2f authentication',
+        'should store password error none and U2F error none in metadata after successful u2f authentication',
         {
           // Verifying a key that was registered in an origin other than the RP's origin fails.
           // It is tagged here so that it can be grepped and skipped when run against a dev server.
@@ -179,7 +189,7 @@ describe('actions', () => {
         },
         () => {
           cy.get<ZITADELTarget>('@target').then((target) => {
-            login(postAuthU2FEmail, userPw, target.headers['x-zitadel-orgid']);
+            login(postAuthU2FEmail, target.headers['x-zitadel-orgid']);
             cy.visit('/users/me?id=security');
             cy.get('[data-e2e="add-factor"]').should('be.visible').click();
             cy.get('[data-e2e="add-factor-u2f"]').should('be.visible').click();
@@ -202,13 +212,15 @@ describe('actions', () => {
             });
             cy.get('[data-e2e="save-factor"]').should('be.visible').click();
             cy.contains('[data-e2e="u2f-factor-names"]', factorName);
-            login(postAuthU2FEmail, userPw, target.headers['x-zitadel-orgid'], () => {
+            login(postAuthU2FEmail, target.headers['x-zitadel-orgid'], true, undefined, () => {
               cy.get('#btn-login').should('be.visible').click();
             });
             sessionAsPredefinedUser(User.IAMAdminUser);
             cy.get('@userId').then((userId) => {
               cy.visit(`/users/${userId}?org=${target.headers['x-zitadel-orgid']}&id=metadata`);
-              cy.contains('tr', 'last username used').contains(postAuthU2FEmail);
+              cy.get('tr').should('have.length', 3);
+              cy.contains('tr', 'password error').contains('none');
+              cy.contains('tr', 'U2F error').contains('none');
             });
           });
         },
@@ -222,7 +234,7 @@ describe('actions', () => {
         });
       });
       it(
-        'should store the username in metadata after passwordless authentication',
+        'should store password error none and passwordless error none in metadata after successful passwordless authentication',
         {
           // Verifying a key that was registered in an origin other than the RP's origin fails.
           // It is tagged here so that it can be grepped and skipped when run against a dev server.
@@ -230,7 +242,7 @@ describe('actions', () => {
         },
         () => {
           cy.get<ZITADELTarget>('@target').then((target) => {
-            login(postAuthPWLessEmail, userPw, target.headers['x-zitadel-orgid']);
+            login(postAuthPWLessEmail, target.headers['x-zitadel-orgid']);
             cy.visit('/users/me?id=security');
             cy.get('[data-e2e="add-passwordless"]').should('be.visible').click();
             const pwlessName = 'virtualPasswordless';
@@ -250,13 +262,16 @@ describe('actions', () => {
                 },
               },
             });
-            cy.get('[data-e2e="passwordless-new"]').should('be.visible').click()
+            cy.get('[data-e2e="passwordless-new"]').should('be.visible').click();
             cy.contains('[data-e2e="passwordless-names"]', pwlessName);
-            login(postAuthPWLessEmail, userPw, target.headers['x-zitadel-orgid'], undefined, true);
+            login(postAuthPWLessEmail, target.headers['x-zitadel-orgid'], true, undefined, undefined, true);
             sessionAsPredefinedUser(User.IAMAdminUser);
             cy.get('@userId').then((userId) => {
               cy.visit(`/users/${userId}?org=${target.headers['x-zitadel-orgid']}&id=metadata`);
-              cy.contains('tr', 'last username used').contains(postAuthPWLessEmail);
+              cy.get('tr').should('have.length', 3);
+              // TODO: Is it wrong that the action runs twice here?
+              cy.contains('tr', 'password error').contains('none');
+              cy.contains('tr', 'passwordless error').contains('none');
             });
           });
         },
