@@ -41,13 +41,6 @@ declare global {
       shouldConfirmSuccess(): Cypress.Chainable<null>;
     }
   }
-
-  namespace Mocha {
-    interface Context {
-      get target(): void; // TODO: Remove
-      get api(): void; // TODO: Remove
-    }
-  }
 }
 
 Cypress.Commands.add('clipboardMatches', { prevSubject: false }, (pattern: RegExp | string) => {
