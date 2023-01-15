@@ -21,6 +21,7 @@ describe('actions', () => {
     postAuthPWEmail = 'postauthpw@action.com',
     postAuthOTPEmail = 'postauthotp@action.com',
     postAuthU2FEmail = 'postauthu2f@action.com',
+    postAuthPWLessEmail = 'postauthpwless@action.com',
     userPw = 'Password1!',
     specPath = 'cypress/e2e/actions';
 
@@ -208,6 +209,54 @@ describe('actions', () => {
             cy.get('@userId').then((userId) => {
               cy.visit(`/users/${userId}?org=${target.headers['x-zitadel-orgid']}&id=metadata`);
               cy.contains('tr', 'last username used').contains(postAuthU2FEmail);
+            });
+          });
+        },
+      );
+    });
+    describe('passwordless', () => {
+      beforeEach(() => {
+        cy.get<ZITADELTarget>('@target').then((target) => {
+          ensureHumanDoesntExist(target, postAuthPWLessEmail);
+          ensureHumanExists(target, postAuthPWLessEmail).as('userId');
+        });
+      });
+      it(
+        'should store the username in metadata after passwordless authentication',
+        {
+          // Verifying a key that was registered in an origin other than the RP's origin fails.
+          // It is tagged here so that it can be grepped and skipped when run against a dev server.
+          tags: ['@same-origin'],
+        },
+        () => {
+          cy.get<ZITADELTarget>('@target').then((target) => {
+            login(postAuthPWLessEmail, userPw, target.headers['x-zitadel-orgid']);
+            cy.visit('/users/me?id=security');
+            cy.get('[data-e2e="add-passwordless"]').should('be.visible').click();
+            const pwlessName = 'virtualPasswordless';
+            cy.get('[data-e2e="passwordless-name"]').should('be.visible').type(pwlessName);
+            cy.task('remoteDebuggerCommand', {
+              event: 'WebAuthn.enable',
+            });
+            cy.task('remoteDebuggerCommand', {
+              event: 'WebAuthn.addVirtualAuthenticator',
+              params: {
+                options: {
+                  protocol: 'ctap2',
+                  transport: 'usb',
+                  hasResidentKey: true,
+                  hasUserVerification: true,
+                  isUserVerified: true,
+                },
+              },
+            });
+            cy.get('[data-e2e="passwordless-new"]').should('be.visible').click()
+            cy.contains('[data-e2e="passwordless-names"]', pwlessName);
+            login(postAuthPWLessEmail, userPw, target.headers['x-zitadel-orgid'], undefined, true);
+            sessionAsPredefinedUser(User.IAMAdminUser);
+            cy.get('@userId').then((userId) => {
+              cy.visit(`/users/${userId}?org=${target.headers['x-zitadel-orgid']}&id=metadata`);
+              cy.contains('tr', 'last username used').contains(postAuthPWLessEmail);
             });
           });
         },

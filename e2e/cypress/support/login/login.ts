@@ -1,4 +1,4 @@
-export function login(username: string, pw = 'Password1!', orgId?: string, onPasswordScreen?: () => void): void {
+export function login(username: string, pw = 'Password1!', orgId?: string, onPasswordScreen?: () => void, passwordless = false): void {
   cy.clearAllSessionStorage();
 
   cy.intercept({
@@ -28,18 +28,21 @@ export function login(username: string, pw = 'Password1!', orgId?: string, onPas
   cy.url().should('contain', '/login');
   cy.contains(username);
 
-  cy.get('#password').type(pw);
-  cy.get('#submit-button').click();
+  if (passwordless) {
+    cy.get('#btn-login').should('be.visible').click()
+  } else {
+    cy.get('#password').should('be.visible').type(pw);
+    cy.get('#submit-button').should('be.visible').click();
 
-  cy.wait('@password').then((interception) => {
-    cy.log('matched @password');
-    if (interception.response.body.indexOf('/ui/login/mfa/prompt') === -1) {
-      return;
-    }
-    cy.contains('button', 'skip').click();
-  });
+    cy.wait('@password').then((interception) => {
+      if (interception.response.body.indexOf('/ui/login/mfa/prompt') === -1) {
+        return;
+      }
+      cy.contains('button', 'skip').click();
+    });
 
-  onPasswordScreen ? onPasswordScreen() : null;
+    onPasswordScreen ? onPasswordScreen() : null;
+  }
 
   cy.contains('[data-e2e="top-view-subtitle"]', username).then(($el) => {
     expect($el.text().trim()).to.equal(username);
