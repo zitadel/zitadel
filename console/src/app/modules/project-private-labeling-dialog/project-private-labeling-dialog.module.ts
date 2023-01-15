@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatRadioModule } from '@angular/material/radio';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyRadioModule as MatRadioModule } from '@angular/material/legacy-radio';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { InfoSectionModule } from '../info-section/info-section.module';
