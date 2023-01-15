@@ -46,7 +46,7 @@ export default defineConfig({
         generateOTP: require("cypress-otp"),
         resetCRDInterface: async () => {
           if (crdClient) {
-            (await crdClient).close()
+            await (await crdClient).close()
             crdClient = null
           }
           return null
