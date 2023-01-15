@@ -39,7 +39,7 @@ export default defineConfig({
           return tokensCache.get(key) || null;
         },
         generateOTP: require("cypress-otp"),
-        resetCRDInterface: async (args) => {
+        resetCRDInterface: async () => {
           if (crdClient) {
             (await crdClient).close()
             crdClient = null
