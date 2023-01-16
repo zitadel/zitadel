@@ -365,7 +365,7 @@ type grants struct {
 func appendGrantFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
 	return func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
 		return func(call goja.FunctionCall) goja.Value {
-			object := objectFromFirstArgument(call)
+			object := objectFromFirstArgument(call, c.Runtime)
 			grant := actions.UserGrant{}
 			mapObjectToGrant(object, &grant)
 			mutableGrants.g = append(mutableGrants.g, grant)
@@ -374,11 +374,11 @@ func appendGrantFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(ca
 	}
 }
 
-func objectFromFirstArgument(call goja.FunctionCall) *goja.Object {
+func objectFromFirstArgument(call goja.FunctionCall, runtime *goja.Runtime) *goja.Object {
 	if len(call.Arguments) != 1 {
 		panic("exactly one argument expected")
 	}
-	object := call.Arguments[0].ToObject(c.Runtime)
+	object := call.Arguments[0].ToObject(runtime)
 	if object == nil {
 		panic("unable to unmarshal arg")
 	}
