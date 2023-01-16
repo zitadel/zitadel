@@ -10,7 +10,7 @@
     "lint:fix": "prettier --write src",
     "generate": "npm run generate:grpc",
     "pregenerate:grpc": "del-cli src/app/proto/generated && make-dir src/app/proto/generated",
-    "generate:grpc": "grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./src/app/proto/generated --grpc-web_out=import_style=typescript,mode=grpcweb:./src/app/proto/generated -I=../external/googleapis -I=../external/protoc-gen-validate -I=../external/grpc-gateway -I=../proto/ -I=node_modules/google-proto-files ../proto/zitadel/*.proto ../external/googleapis/google/api/*.proto ../external/googleapis/google/type/*.proto ../external/protoc-gen-validate/validate/*.proto ../external/grpc-gateway/protoc-gen-openapiv2/options/*.proto node_modules/google-proto-files/google/protobuf/*.proto"
+    "generate:grpc": "grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./src/app/proto/generated --grpc-web_out=import_style=typescript,mode=grpcweb:./src/app/proto/generated -I=../external/protoc-gen-validate -I=../external/grpc-gateway -I=../proto/ -I=node_modules/google-proto-files ../proto/zitadel/*.proto ../external/protoc-gen-validate/validate/*.proto ../external/grpc-gateway/protoc-gen-openapiv2/options/*.proto node_modules/google-proto-files/google/protobuf/*.proto node_modules/google-proto-files/google/api/*.proto"
   },
   "private": true,
   "dependencies": {
