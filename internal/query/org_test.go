@@ -396,8 +396,8 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 				name:   "",
 			},
 			want: want{
-				isUnique:        true,
-				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "exists", "", domain.OrgStateRemoved),
+				isUnique:        false,
+				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{false}}, true, "", "exists", "", domain.OrgStateRemoved),
 			},
 		},
 		{
@@ -407,8 +407,8 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 				name:   "exists",
 			},
 			want: want{
-				isUnique:        true,
-				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "", "exists", domain.OrgStateRemoved),
+				isUnique:        false,
+				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{false}}, true, "", "", "exists", domain.OrgStateRemoved),
 			},
 		},
 		{
@@ -418,8 +418,8 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 				name:   "exists",
 			},
 			want: want{
-				isUnique:        true,
-				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "exists", "exists", domain.OrgStateRemoved),
+				isUnique:        false,
+				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{false}}, true, "", "exists", "exists", domain.OrgStateRemoved),
 			},
 		},
 		{
@@ -429,8 +429,8 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 				name:   "not-exists",
 			},
 			want: want{
-				isUnique:        false,
-				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{false}}, true, "", "not-exists", "not-exists", domain.OrgStateRemoved),
+				isUnique:        true,
+				sqlExpectations: mockQueries(orgUniqueQuery, orgUniqueCols, [][]driver.Value{{true}}, true, "", "not-exists", "not-exists", domain.OrgStateRemoved),
 			},
 		},
 		{
