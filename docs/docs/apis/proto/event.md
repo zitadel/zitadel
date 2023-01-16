@@ -46,7 +46,7 @@ title: zitadel/event.proto
 | sequence |  uint64 | - |  |
 | creation_date |  google.protobuf.Timestamp | The timestamp the event occurred |  |
 | payload |  google.protobuf.Struct | - |  |
-| type |  string | - |  |
+| type |  zitadel.v1.LocalizedMessage | - |  |
 
 
 

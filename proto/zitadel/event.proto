@@ -3,6 +3,8 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 
+import "zitadel/message.proto";
+
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.event.v1;
@@ -20,7 +22,7 @@ message Event {
         }
     ];
     google.protobuf.Struct payload = 5;
-    string type = 6;
+    zitadel.v1.LocalizedMessage type = 6;
 }
 
 message Editor {

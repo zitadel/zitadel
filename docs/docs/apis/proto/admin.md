@@ -3137,7 +3137,7 @@ at least one argument has to be provided
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| event_types | repeated string | - |  |
+| event_types | repeated zitadel.v1.LocalizedMessage | - |  |
 
 
 

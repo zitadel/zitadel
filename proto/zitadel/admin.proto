@@ -13,6 +13,7 @@ import "zitadel/member.proto";
 import "zitadel/event.proto";
 import "zitadel/management.proto";
 import "zitadel/v1.proto";
+import "zitadel/message.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -4896,7 +4897,7 @@ message ListEventsResponse {
 message ListEventTypesRequest {}
 
 message ListEventTypesResponse {
-    repeated string event_types = 1;
+    repeated zitadel.v1.LocalizedMessage event_types = 1;
 }
 
 message ListAggregateTypesRequest {}
