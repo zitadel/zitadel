@@ -102,5 +102,6 @@ func convertEvent(event *query.Event) (*event_pb.Event, error) {
 		Sequence:     event.Sequence,
 		CreationDate: timestamppb.New(event.CreationDate),
 		Payload:      payload,
+		Type:         event.Type,
 	}, nil
 }
