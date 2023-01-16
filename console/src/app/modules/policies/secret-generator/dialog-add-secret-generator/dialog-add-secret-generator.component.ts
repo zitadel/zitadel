@@ -1,6 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+  MatLegacyDialogRef as MatDialogRef,
+} from '@angular/material/legacy-dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
 import { UpdateSecretGeneratorRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { SecretGeneratorType } from 'src/app/proto/generated/zitadel/settings_pb';
