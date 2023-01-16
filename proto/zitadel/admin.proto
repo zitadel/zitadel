@@ -4858,8 +4858,7 @@ message ListEventsRequest {
             example: "\"69629023906488334\"";
         }
     ];
-    // the event types are filtered using starts with
-    // this means that you can filter for user.machine and all the event types of user.machine.* will be returned
+    // the event types are filtered by excact match
     repeated string event_types = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"user.human.added\", \"user.machine\"]";
