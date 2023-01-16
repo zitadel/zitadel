@@ -128,7 +128,7 @@ func (t *WebAuthNTokens) Scan(src interface{}) error {
 }
 
 func (h *HumanView) IsZero() bool {
-	return h == nil || h.FirstName == ""
+	return h == nil || (h.FirstName == "" && h.Email == "")
 }
 
 type MachineView struct {
