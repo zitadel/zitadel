@@ -231,6 +231,7 @@
       "CREATE": "创建",
       "MY": "我的信息",
       "LOGINNAMES": "登录名称",
+      "LOGINMETHODS": "登录方式",
       "LOGINNAMESDESC": "这些是您的登录名:",
       "NOUSER": "没有关联的用户。",
       "REACTIVATE": "重新启用",
