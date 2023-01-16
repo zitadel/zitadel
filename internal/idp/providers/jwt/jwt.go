@@ -1,17 +1,26 @@
 package jwt
 
 import (
+	"context"
+	"encoding/base64"
 	"errors"
 	"net/url"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
-const queryAuthRequestID = "authRequestID"
+const (
+	queryAuthRequestID = "authRequestID"
+	queryUserAgentID   = "userAgentID"
+)
 
 var _ idp.Provider = (*Provider)(nil)
 
-var ErrNoTokens = errors.New("no tokens")
+var (
+	ErrNoTokens           = errors.New("no tokens")
+	ErrMissingUserAgentID = errors.New("userAgentID missing")
+)
 
 // Provider is the idp.Provider implementation for a JWT provider
 type Provider struct {
@@ -24,6 +33,7 @@ type Provider struct {
 	isCreationAllowed bool
 	isAutoCreation    bool
 	isAutoUpdate      bool
+	encryptionAlg     crypto.EncryptionAlgorithm
 }
 
 type ProviderOpts func(provider *Provider)
@@ -43,19 +53,21 @@ func WithAutoCreation() ProviderOpts {
 		p.isAutoCreation = true
 	}
 }
+
 func WithAutoUpdate() ProviderOpts {
 	return func(p *Provider) {
 		p.isAutoUpdate = true
 	}
 }
 
-func New(name, issuer, jwtEndpoint, keysEndpoint, headerName string, options ...ProviderOpts) (*Provider, error) {
+func New(name, issuer, jwtEndpoint, keysEndpoint, headerName string, encryptionAlg crypto.EncryptionAlgorithm, options ...ProviderOpts) (*Provider, error) {
 	provider := &Provider{
-		name:         name,
-		issuer:       issuer,
-		jwtEndpoint:  jwtEndpoint,
-		keysEndpoint: keysEndpoint,
-		headerName:   headerName,
+		name:          name,
+		issuer:        issuer,
+		jwtEndpoint:   jwtEndpoint,
+		keysEndpoint:  keysEndpoint,
+		headerName:    headerName,
+		encryptionAlg: encryptionAlg,
 	}
 	for _, option := range options {
 		option(provider)
@@ -68,14 +80,25 @@ func (p *Provider) Name() string {
 	return p.name
 }
 
-func (p *Provider) BeginAuth(state string) (idp.Session, error) {
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
 	redirect, err := url.Parse(p.jwtEndpoint)
 	if err != nil {
 		return nil, err
 	}
 	q := redirect.Query()
 	q.Set(queryAuthRequestID, state)
-	//TODO: userAgentID
+	if len(params) != 1 {
+		return nil, ErrMissingUserAgentID
+	}
+	userAgentID, ok := params[0].(string)
+	if !ok {
+		return nil, ErrMissingUserAgentID
+	}
+	nonce, err := p.encryptionAlg.Encrypt([]byte(userAgentID))
+	if err != nil {
+		return nil, err
+	}
+	q.Set(queryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
 	redirect.RawQuery = q.Encode()
 	return &Session{AuthURL: redirect.String()}, nil
 }

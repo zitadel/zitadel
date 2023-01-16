@@ -1,6 +1,8 @@
 package jwt
 
 import (
+	"context"
+
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -18,7 +20,7 @@ func (s *Session) GetAuthURL() string {
 	return s.AuthURL
 }
 
-func (s *Session) FetchUser() (user idp.User, err error) {
+func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
 		return idp.User{}, ErrNoTokens
 	}

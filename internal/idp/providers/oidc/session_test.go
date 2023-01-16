@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"testing"
@@ -249,7 +250,7 @@ func TestSession_FetchUser(t *testing.T) {
 				Tokens:   tt.fields.tokens,
 			}
 
-			user, err := session.FetchUser()
+			user, err := session.FetchUser(context.Background())
 			if tt.want.err != nil && !errors.Is(err, tt.want.err) {
 				a.Fail("invalid error", "expected %v, got %v", tt.want.err, err)
 			}

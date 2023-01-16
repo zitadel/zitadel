@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"testing"
 
 	"github.com/h2non/gock"
@@ -58,7 +59,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
 			a.NoError(err)
 
-			session, err := provider.BeginAuth("testState")
+			session, err := provider.BeginAuth(context.Background(), "testState")
 			a.NoError(err)
 
 			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())

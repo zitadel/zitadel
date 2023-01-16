@@ -41,8 +41,8 @@ var _ idp.Provider = (*Provider)(nil)
 // Provider is the idp.Provider implementation for AzureAD (V2 Endpoints)
 type Provider struct {
 	*oauth.Provider
-	Tenant        TenantType
-	EmailVerified bool
+	tenant        TenantType
+	emailVerified bool
 	options       []oauth.ProviderOpts
 }
 
@@ -52,14 +52,14 @@ type ProviderOptions func(*Provider)
 // default is CommonTenant
 func WithTenant(tenantType TenantType) ProviderOptions {
 	return func(p *Provider) {
-		p.Tenant = tenantType
+		p.tenant = tenantType
 	}
 }
 
 // WithEmailVerified allows to set every email received as verified
 func WithEmailVerified() ProviderOptions {
 	return func(p *Provider) {
-		p.EmailVerified = true
+		p.emailVerified = true
 	}
 }
 
@@ -71,19 +71,19 @@ func WithOAuthOptions(opts ...oauth.ProviderOpts) ProviderOptions {
 
 func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptions) (*Provider, error) {
 	provider := &Provider{
-		Tenant:  CommonTenant,
+		tenant:  CommonTenant,
 		options: make([]oauth.ProviderOpts, 0),
 	}
 	for _, opt := range opts {
 		opt(provider)
 	}
-	config := newConfig(provider.Tenant, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail})
+	config := newConfig(provider.tenant, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail})
 	rp, err := oauth.New(
 		config,
 		name,
 		userinfoURL,
 		func() oauth.UserInfoMapper {
-			return &User{isEmailVerified: provider.EmailVerified}
+			return &User{isEmailVerified: provider.emailVerified}
 		},
 		provider.options...,
 	)

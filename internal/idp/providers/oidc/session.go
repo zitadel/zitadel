@@ -23,9 +23,9 @@ func (s *Session) GetAuthURL() string {
 	return s.AuthURL
 }
 
-func (s *Session) FetchUser() (user idp.User, err error) {
+func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
-		if err = s.authorize(); err != nil {
+		if err = s.authorize(ctx); err != nil {
 			return idp.User{}, err
 		}
 	}
@@ -42,11 +42,11 @@ func (s *Session) FetchUser() (user idp.User, err error) {
 	return user, nil
 }
 
-func (s *Session) authorize() error {
+func (s *Session) authorize(ctx context.Context) error {
 	if s.Code == "" {
 		return ErrCodeMissing
 	}
-	tokens, err := rp.CodeExchange(context.TODO(), s.Code, s.Provider.RelyingParty)
+	tokens, err := rp.CodeExchange(ctx, s.Code, s.Provider.RelyingParty)
 	if err != nil {
 		return err
 	}

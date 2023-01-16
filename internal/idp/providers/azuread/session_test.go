@@ -1,6 +1,7 @@
 package azuread
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"testing"
@@ -225,7 +226,7 @@ func TestSession_FetchUser(t *testing.T) {
 				Provider: provider.Provider,
 			}
 
-			user, err := session.FetchUser()
+			user, err := session.FetchUser(context.Background())
 			if tt.want.err != nil && !tt.want.err(err) {
 				a.Fail("invalid error", err)
 			}

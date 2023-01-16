@@ -1,6 +1,10 @@
 package idp
 
+import (
+	"context"
+)
+
 type Session interface {
 	GetAuthURL() string
-	FetchUser() (User, error)
+	FetchUser(ctx context.Context) (User, error)
 }

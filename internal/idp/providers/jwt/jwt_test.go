@@ -1,27 +1,82 @@
 package jwt
 
 import (
+	"context"
+	"errors"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {
 	type fields struct {
-		name         string
-		issuer       string
-		jwtEndpoint  string
-		keysEndpoint string
-		headerName   string
+		name          string
+		issuer        string
+		jwtEndpoint   string
+		keysEndpoint  string
+		headerName    string
+		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		params []any
+	}
+	type want struct {
+		session idp.Session
+		err     func(error) bool
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		want   idp.Session
+		args   args
+		want   want
 	}{
+		{
+			name: "missing userAgentID error",
+			fields: fields{
+				issuer:       "https://jwt.com",
+				jwtEndpoint:  "https://auth.com/jwt",
+				keysEndpoint: "https://jwt.com/keys",
+				headerName:   "jwt-header",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+			},
+			args: args{
+				params: nil,
+			},
+			want: want{
+				err: func(err error) bool {
+					return errors.Is(err, ErrMissingUserAgentID)
+				},
+			},
+		},
+		{
+			name: "invalid userAgentID error",
+			fields: fields{
+				issuer:       "https://jwt.com",
+				jwtEndpoint:  "https://auth.com/jwt",
+				keysEndpoint: "https://jwt.com/keys",
+				headerName:   "jwt-header",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+			},
+			args: args{
+				params: []any{
+					0,
+				},
+			},
+			want: want{
+				err: func(err error) bool {
+					return errors.Is(err, ErrMissingUserAgentID)
+				},
+			},
+		},
 		{
 			name: "successful auth",
 			fields: fields{
@@ -29,8 +84,18 @@ func TestProvider_BeginAuth(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
 			},
-			want: &Session{AuthURL: "https://auth.com/jwt?authRequestID=testState"},
+			args: args{
+				params: []any{
+					"agent",
+				},
+			},
+			want: want{
+				session: &Session{AuthURL: "https://auth.com/jwt?authRequestID=testState&userAgentID=YWdlbnQ"},
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -38,25 +103,37 @@ func TestProvider_BeginAuth(t *testing.T) {
 			defer gock.Off()
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.jwtEndpoint, tt.fields.keysEndpoint, tt.fields.headerName)
+			provider, err := New(
+				tt.fields.name,
+				tt.fields.issuer,
+				tt.fields.jwtEndpoint,
+				tt.fields.keysEndpoint,
+				tt.fields.headerName,
+				tt.fields.encryptionAlg(t),
+			)
 			a.NoError(err)
 
-			session, err := provider.BeginAuth("testState")
-			a.NoError(err)
-
-			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
+			session, err := provider.BeginAuth(context.Background(), "testState", tt.args.params...)
+			if tt.want.err != nil && !tt.want.err(err) {
+				a.Fail("invalid error", err)
+			}
+			if tt.want.err == nil {
+				a.NoError(err)
+				a.Equal(tt.want.session.GetAuthURL(), session.GetAuthURL())
+			}
 		})
 	}
 }
 
 func TestProvider_Options(t *testing.T) {
 	type fields struct {
-		name         string
-		issuer       string
-		jwtEndpoint  string
-		keysEndpoint string
-		headerName   string
-		opts         []ProviderOpts
+		name          string
+		issuer        string
+		jwtEndpoint   string
+		keysEndpoint  string
+		headerName    string
+		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
+		opts          []ProviderOpts
 	}
 	type want struct {
 		name            string
@@ -79,7 +156,10 @@ func TestProvider_Options(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
-				opts:         nil,
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
+				opts: nil,
 			},
 			want: want{
 				name:            "jwt",
@@ -98,6 +178,9 @@ func TestProvider_Options(t *testing.T) {
 				jwtEndpoint:  "https://auth.com/jwt",
 				keysEndpoint: "https://jwt.com/keys",
 				headerName:   "jwt-header",
+				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
+					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
+				},
 				opts: []ProviderOpts{
 					WithLinkingAllowed(),
 					WithCreationAllowed(),
@@ -119,7 +202,15 @@ func TestProvider_Options(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.jwtEndpoint, tt.fields.keysEndpoint, tt.fields.headerName, tt.fields.opts...)
+			provider, err := New(
+				tt.fields.name,
+				tt.fields.issuer,
+				tt.fields.jwtEndpoint,
+				tt.fields.keysEndpoint,
+				tt.fields.headerName,
+				tt.fields.encryptionAlg(t),
+				tt.fields.opts...,
+			)
 			a.NoError(err)
 
 			a.Equal(tt.want.name, provider.Name())

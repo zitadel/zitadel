@@ -1,11 +1,14 @@
 package idp
 
-import "golang.org/x/text/language"
+import (
+	"context"
+
+	"golang.org/x/text/language"
+)
 
 type Provider interface {
 	Name() string
-	BeginAuth(state string) (Session, error)
-	//FetchUser(Session) (User, error)
+	BeginAuth(ctx context.Context, state string, params ...any) (Session, error)
 	IsLinkingAllowed() bool
 	IsCreationAllowed() bool
 	IsAutoCreation() bool

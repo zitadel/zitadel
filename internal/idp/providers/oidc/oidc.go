@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"errors"
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
@@ -72,7 +73,7 @@ func (p *Provider) Name() string {
 	return p.name
 }
 
-func (p *Provider) BeginAuth(state string) (idp.Session, error) {
+func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...any) (idp.Session, error) {
 	url := rp.AuthURL(state, p.RelyingParty)
 	return &Session{AuthURL: url, Provider: p}, nil
 }

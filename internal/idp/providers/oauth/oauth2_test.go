@@ -1,6 +1,7 @@
 package oauth
 
 import (
+	"context"
 	"testing"
 
 	"github.com/h2non/gock"
@@ -48,7 +49,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper)
 			a.NoError(err)
 
-			session, err := provider.BeginAuth("testState")
+			session, err := provider.BeginAuth(context.Background(), "testState")
 			a.NoError(err)
 
 			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())

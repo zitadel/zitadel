@@ -1,6 +1,7 @@
 package google
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -39,23 +40,10 @@ func TestProvider_BeginAuth(t *testing.T) {
 			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
 			a.NoError(err)
 
-			session, err := provider.BeginAuth("testState")
+			session, err := provider.BeginAuth(context.Background(), "testState")
 			a.NoError(err)
 
-			//authUrl, err := url.Parse(session.GetAuthURL())
-			//a.NoError(err)
-			//
 			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
-			//a.Equal("/authorize", authUrl.Path)
-			//a.Equal("clientID", authUrl.Query().Get("client_id"))
-			//a.Equal("testState", authUrl.Query().Get("state"))
-			//a.Equal("redirectURI", authUrl.Query().Get("redirect_uri"))
-			//a.Equal("openid", authUrl.Query().Get("scope"))
-			//
-			//if !tt.wantErr(t, err, fmt.Sprintf("BeginAuth(%v)", tt.fields.state)) {
-			//	return
-			//}
-			//assert.Equalf(t, tt.want, got, "BeginAuth(%v)", tt.args.state)
 		})
 	}
 }

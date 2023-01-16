@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -95,7 +96,7 @@ func TestSession_FetchUser(t *testing.T) {
 				Tokens:  tt.fields.tokens,
 			}
 
-			user, err := session.FetchUser()
+			user, err := session.FetchUser(context.Background())
 			if tt.want.err != nil && !tt.want.err(err) {
 				a.Fail("invalid error", err)
 			}
