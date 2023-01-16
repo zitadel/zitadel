@@ -29,7 +29,7 @@
     <p class="desc cnsl-secondary-text">{{ 'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate }}</p>
 
     <div class="qrcode-wrapper">
-      <qr-code *ngIf="otpurl" class="qrcode" [value]="otpurl" [size]="150" [errorCorrectionLevel]="'M'"></qr-code>
+      <qrcode *ngIf="otpurl" class="qrcode" qrcode [qrdata]="otpurl" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
 
       <div class="otp-flex" *ngIf="otpsecret">
         <span class="overflow-auto">{{ otpsecret }}</span>
