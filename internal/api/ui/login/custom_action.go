@@ -103,7 +103,16 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 	return user, err
 }
 
-func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.AuthRequest, authMethod string, authenticationError error) error {
+type authMethod string
+
+const (
+	authMethodPassword     authMethod = "password"
+	authMethodOTP          authMethod = "OTP"
+	authMethodU2F          authMethod = "U2F"
+	authMethodPasswordless authMethod = "passwordless"
+)
+
+func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.AuthRequest, authMethod authMethod, authenticationError error) error {
 	resourceOwner := req.RequestedOrgID
 	if resourceOwner == "" {
 		resourceOwner = req.UserOrgID
