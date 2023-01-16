@@ -12,4 +12,4 @@ import { GrantsComponent } from './grants.component';
   declarations: [GrantsComponent],
   imports: [CommonModule, GrantsRoutingModule, UserGrantsModule, TranslateModule, HasRoleModule, HasRolePipeModule],
 })
-export class GrantsModule {}
+export default class GrantsModule {}

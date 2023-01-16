@@ -1,6 +1,6 @@
 import { Component, EventEmitter } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
@@ -66,9 +66,13 @@ export class InstanceMembersComponent {
       .updateIAMMember(member.userId, selectionChange)
       .then(() => {
         this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
+        setTimeout(() => {
+          this.changePage.emit();
+        }, 1000);
       })
       .catch((error) => {
         this.toast.showError(error);
+        this.changePage.emit();
       });
   }
 
@@ -79,10 +83,13 @@ export class InstanceMembersComponent {
           .removeIAMMember(member.userId)
           .then(() => {
             this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
-            this.changePage.emit();
+            setTimeout(() => {
+              this.changePage.emit();
+            }, 1000);
           })
           .catch((error) => {
             this.toast.showError(error);
+            this.changePage.emit();
           });
       }),
     );
@@ -99,6 +106,7 @@ export class InstanceMembersComponent {
       })
       .catch((error) => {
         this.toast.showError(error);
+        this.changePage.emit();
       });
   }
 
@@ -129,6 +137,7 @@ export class InstanceMembersComponent {
             })
             .catch((error) => {
               this.toast.showError(error);
+              this.changePage.emit();
             });
         }
       }
