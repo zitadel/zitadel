@@ -43,6 +43,7 @@ services:
 
   e2e:
     image: cypress/included:12.3.0
+    command: "--browser chrome"
     depends_on:
       zitadel:
         condition: 'service_started'
