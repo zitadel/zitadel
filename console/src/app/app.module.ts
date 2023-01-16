@@ -1,3 +1,4 @@
+import { APP_BASE_HREF } from '@angular/common';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
@@ -181,6 +182,10 @@ const authConfig: AuthConfig = {
     ToastService,
     NavigationService,
     { provide: 'windowObject', useValue: window },
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/' + (window.location.pathname.split('/')[1] || '')
+  }
   ],
   bootstrap: [AppComponent],
 })

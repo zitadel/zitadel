@@ -1,24 +1,20 @@
 FROM node:18 as npm-base
 
+WORKDIR /console
+
+COPY external /external
+COPY proto /proto
+
 COPY console/package.json console/package-lock.json ./
 RUN npm ci
 
 COPY console .
-
-RUN npm run generate
-
-#######################
-## copy for local dev
-#######################
-FROM scratch as npm-copy
-COPY --from=npm-base /console/src/app/proto/generated /console/src/app/proto/generated
 
 #######################
 ## angular lint workspace and prod build
 #######################
 FROM npm-base as angular-build
 
-#RUN npm run lint
 RUN npm run prodbuild
 
 #######################
@@ -26,3 +22,10 @@ RUN npm run prodbuild
 #######################
 FROM scratch as angular-export
 COPY --from=angular-build /console/dist/console .
+
+##
+FROM node:18-alpine as final
+RUN npm install -g http-server
+COPY --from=angular-build /console/dist/console /site
+EXPOSE  8080
+CMD ["http-server", "--cors", "-p8080", "/site"]
