@@ -3,7 +3,6 @@ package login
 import (
 	"context"
 	"fmt"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"net/http"
 	"strings"
 	"time"
@@ -24,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 type Login struct {

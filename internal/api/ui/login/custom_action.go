@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 
 	"github.com/dop251/goja"
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -365,26 +365,24 @@ type grants struct {
 func appendGrantFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
 	return func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
 		return func(call goja.FunctionCall) goja.Value {
-			if len(call.Arguments) != 1 {
-				panic("exactly one argument expected")
-			}
-			object := call.Arguments[0].ToObject(c.Runtime)
-			if object == nil {
-				panic("unable to unmarshal arg")
-			}
+			object := objectFromFirstArgument(call)
 			grant := actions.UserGrant{}
-
 			mapObjectToGrant(object, &grant)
-
-			if grant.ProjectID == "" {
-				panic("projectId not set")
-			}
-
 			mutableGrants.g = append(mutableGrants.g, grant)
-
 			return nil
 		}
 	}
+}
+
+func objectFromFirstArgument(call goja.FunctionCall) *goja.Object {
+	if len(call.Arguments) != 1 {
+		panic("exactly one argument expected")
+	}
+	object := call.Arguments[0].ToObject(c.Runtime)
+	if object == nil {
+		panic("unable to unmarshal arg")
+	}
+	return object
 }
 
 func mapObjectToGrant(object *goja.Object, grant *actions.UserGrant) {
@@ -403,5 +401,8 @@ func mapObjectToGrant(object *goja.Object, grant *actions.UserGrant) {
 				}
 			}
 		}
+	}
+	if grant.ProjectID == "" {
+		panic("projectId not set")
 	}
 }
