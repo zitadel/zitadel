@@ -257,7 +257,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, authRequest *do
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("userGrants", &mutableUserGrants.g),
 		actions.SetFields("v1",
-			actions.SetFields("appendUserGrant", appendGrantsFunc(mutableUserGrants)),
+			actions.SetFields("appendUserGrant", appendGrantFunc(mutableUserGrants)),
 			actions.SetFields("mgmt", l.mgmtServer),
 		),
 	)
@@ -362,7 +362,7 @@ type grants struct {
 	g []actions.UserGrant
 }
 
-func appendGrantsFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
+func appendGrantFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
 	return func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
 		return func(call goja.FunctionCall) goja.Value {
 			if len(call.Arguments) != 1 {
@@ -374,22 +374,7 @@ func appendGrantsFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(c
 			}
 			grant := actions.UserGrant{}
 
-			for _, key := range object.Keys() {
-				switch key {
-				case "projectId":
-					grant.ProjectID = object.Get(key).String()
-				case "projectGrantId":
-					grant.ProjectGrantID = object.Get(key).String()
-				case "roles":
-					if roles, ok := object.Get(key).Export().([]interface{}); ok {
-						for _, role := range roles {
-							if r, ok := role.(string); ok {
-								grant.Roles = append(grant.Roles, r)
-							}
-						}
-					}
-				}
-			}
+			mapObjectToGrant(object, &grant)
 
 			if grant.ProjectID == "" {
 				panic("projectId not set")
@@ -398,6 +383,25 @@ func appendGrantsFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(c
 			mutableGrants.g = append(mutableGrants.g, grant)
 
 			return nil
+		}
+	}
+}
+
+func mapObjectToGrant(object *goja.Object, grant *actions.UserGrant) {
+	for _, key := range object.Keys() {
+		switch key {
+		case "projectId":
+			grant.ProjectID = object.Get(key).String()
+		case "projectGrantId":
+			grant.ProjectGrantID = object.Get(key).String()
+		case "roles":
+			if roles, ok := object.Get(key).Export().([]interface{}); ok {
+				for _, role := range roles {
+					if r, ok := role.(string); ok {
+						grant.Roles = append(grant.Roles, r)
+					}
+				}
+			}
 		}
 	}
 }
