@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -35,7 +34,7 @@ func NewAddUsernameUniqueConstraint(userName, resourceOwner string, userLoginMus
 	}
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueUsername,
-		strings.ToLower(uniqueUserName),
+		uniqueUserName,
 		"Errors.User.AlreadyExists")
 }
 
@@ -46,7 +45,7 @@ func NewRemoveUsernameUniqueConstraint(userName, resourceOwner string, userLogin
 	}
 	return eventstore.NewRemoveEventUniqueConstraint(
 		UniqueUsername,
-		strings.ToLower(uniqueUserName))
+		uniqueUserName)
 }
 
 type UserLockedEvent struct {
