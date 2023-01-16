@@ -1,7 +1,6 @@
 package oidc
 
 import (
-	"context"
 	"errors"
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
@@ -14,14 +13,54 @@ var _ idp.Provider = (*Provider)(nil)
 
 var ErrCodeMissing = errors.New("no auth code provided")
 
+// Provider is the idp.Provider implementation for a generic OIDC provider
 type Provider struct {
-	name string
 	rp.RelyingParty
+	options           []rp.Option
+	name              string
+	isLinkingAllowed  bool
+	isCreationAllowed bool
+	isAutoCreation    bool
+	isAutoUpdate      bool
 }
 
-func New(issuer, clientID, clientSecret, redirectURI string) (*Provider, error) {
-	provider := &Provider{}
-	relyingParty, err := rp.NewRelyingPartyOIDC(issuer, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID})
+type ProviderOpts func(provider *Provider)
+
+func WithLinkingAllowed() ProviderOpts {
+	return func(p *Provider) {
+		p.isLinkingAllowed = true
+	}
+}
+func WithCreationAllowed() ProviderOpts {
+	return func(p *Provider) {
+		p.isCreationAllowed = true
+	}
+}
+func WithAutoCreation() ProviderOpts {
+	return func(p *Provider) {
+		p.isAutoCreation = true
+	}
+}
+func WithAutoUpdate() ProviderOpts {
+	return func(p *Provider) {
+		p.isAutoUpdate = true
+	}
+}
+
+func WithRelyingPartyOption(option rp.Option) ProviderOpts {
+	return func(p *Provider) {
+		p.options = append(p.options, option)
+	}
+}
+
+func New(name, issuer, clientID, clientSecret, redirectURI string, options ...ProviderOpts) (*Provider, error) {
+	provider := &Provider{
+		name: name,
+	}
+	for _, option := range options {
+		option(provider)
+	}
+	relyingParty, err := rp.NewRelyingPartyOIDC(issuer, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID}, provider.options...)
 	if err != nil {
 		return nil, err
 	}
@@ -35,53 +74,21 @@ func (p *Provider) Name() string {
 
 func (p *Provider) BeginAuth(state string) (idp.Session, error) {
 	url := rp.AuthURL(state, p.RelyingParty)
-	return &Session{AuthURL: url}, nil
+	return &Session{AuthURL: url, Provider: p}, nil
 }
 
-func (p *Provider) FetchUser(session idp.Session) (user idp.User, err error) {
-	oidcSession, _ := session.(*Session)
-	if oidcSession.Tokens == nil {
-		if err = p.authorize(oidcSession); err != nil {
-			return idp.User{}, err
-		}
-	}
-	info, err := rp.Userinfo(
-		oidcSession.Tokens.AccessToken,
-		oidcSession.Tokens.TokenType,
-		oidcSession.Tokens.IDTokenClaims.GetSubject(),
-		p.RelyingParty,
-	)
-	if err != nil {
-		return idp.User{}, err
-	}
-	userFromClaims(info, &user)
-	return user, nil
+func (p *Provider) IsLinkingAllowed() bool {
+	return p.isLinkingAllowed
 }
 
-func (p *Provider) authorize(session *Session) error {
-	if session.Code == "" {
-		return ErrCodeMissing
-	}
-	tokens, err := rp.CodeExchange(context.TODO(), session.Code, p.RelyingParty)
-	if err != nil {
-		return err
-	}
-	session.Tokens = tokens
-	return nil
+func (p *Provider) IsCreationAllowed() bool {
+	return p.isCreationAllowed
 }
 
-func userFromClaims(info oidc.UserInfo, user *idp.User) {
-	user.ID = info.GetSubject()
-	user.FirstName = info.GetGivenName()
-	user.LastName = info.GetFamilyName()
-	user.DisplayName = info.GetName()
-	user.NickName = info.GetNickname()
-	user.PreferredUsername = info.GetPreferredUsername()
-	user.Email = info.GetEmail()
-	user.IsEmailVerified = info.IsEmailVerified()
-	user.Phone = info.GetPhoneNumber()
-	user.IsPhoneVerified = info.IsPhoneNumberVerified()
-	user.PreferredLanguage = info.GetLocale()
-	user.AvatarURL = info.GetPicture()
-	user.Profile = info.GetProfile()
+func (p *Provider) IsAutoCreation() bool {
+	return p.isAutoCreation
+}
+
+func (p *Provider) IsAutoUpdate() bool {
+	return p.isAutoUpdate
 }

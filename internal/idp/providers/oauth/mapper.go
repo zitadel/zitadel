@@ -6,6 +6,8 @@ import (
 	"golang.org/x/text/language"
 )
 
+// UserInfoMapper needs to be implemented for an oauth Provider
+// to map the info returned by the userEndpoint to an idp.User
 type UserInfoMapper interface {
 	GetID() string
 	GetDisplayName() string
@@ -18,17 +20,30 @@ type UserInfoMapper interface {
 	GetPreferredUsername() string
 	GetPhone() string
 	IsPhoneVerified() bool
-	GetPreferredLanguange() language.Tag
+	GetPreferredLanguage() language.Tag
 	GetProfile() string
 	RawData() any
 }
 
 var _ UserInfoMapper = (*UserMapper)(nil)
 
+// UserMapper is a dynamic implementation of UserInfoMapper
+// the provided values are used as keys to map the info
 type UserMapper struct {
-	ID          string
-	DisplayName string
-	info        map[string]interface{}
+	ID                string
+	FirstName         string
+	LastName          string
+	DisplayName       string
+	NickName          string
+	PreferredUsername string
+	Email             string
+	EmailVerified     bool
+	Phone             string
+	PhoneVerified     bool
+	PreferredLanguage string
+	AvatarURL         string
+	Profile           string
+	info              map[string]interface{}
 }
 
 func (u *UserMapper) UnmarshalJSON(data []byte) error {
@@ -39,57 +54,55 @@ func (u *UserMapper) UnmarshalJSON(data []byte) error {
 }
 
 func (u *UserMapper) GetID() string {
-	id, _ := u.info[u.ID].(string)
-	return id
+	return u.ID
 }
 
 func (u *UserMapper) GetFirstName() string {
-	return ""
+	return u.FirstName
 }
 
 func (u *UserMapper) GetLastName() string {
-	return ""
+	return u.LastName
 }
 
 func (u *UserMapper) GetDisplayName() string {
-	displayName, _ := u.info[u.DisplayName].(string)
-	return displayName
+	return u.DisplayName
 }
 
 func (u *UserMapper) GetNickName() string {
-	return ""
+	return u.NickName
 }
 
 func (u *UserMapper) GetPreferredUsername() string {
-	return ""
+	return u.PreferredUsername
 }
 
 func (u *UserMapper) GetEmail() string {
-	return ""
+	return u.Email
 }
 
 func (u *UserMapper) IsEmailVerified() bool {
-	return false
+	return u.EmailVerified
 }
 
 func (u *UserMapper) GetPhone() string {
-	return ""
+	return u.Phone
 }
 
 func (u *UserMapper) IsPhoneVerified() bool {
-	return false
+	return u.PhoneVerified
 }
 
-func (u *UserMapper) GetPreferredLanguange() language.Tag {
-	return language.Und
+func (u *UserMapper) GetPreferredLanguage() language.Tag {
+	return language.Make(u.PreferredLanguage)
 }
 
 func (u *UserMapper) GetAvatarURL() string {
-	return ""
+	return u.AvatarURL
 }
 
 func (u *UserMapper) GetProfile() string {
-	return ""
+	return u.Profile
 }
 
 func (u *UserMapper) RawData() any {

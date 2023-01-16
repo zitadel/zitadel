@@ -1,25 +1,19 @@
 package oidc
 
 import (
-	"encoding/json"
-	"errors"
 	"testing"
-	"time"
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
-	"golang.org/x/oauth2"
-	"golang.org/x/text/language"
-	"gopkg.in/square/go-jose.v2"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {
 	type fields struct {
+		name         string
 		issuer       string
 		clientID     string
 		clientSecret string
@@ -34,6 +28,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		{
 			name: "successful auth",
 			fields: fields{
+				name:         "oidc",
 				issuer:       "https://issuer.com",
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
@@ -60,58 +55,49 @@ func TestProvider_BeginAuth(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
 			a.NoError(err)
 
 			session, err := provider.BeginAuth("testState")
 			a.NoError(err)
 
-			//authUrl, err := url.Parse(session.GetAuthURL())
-			//a.NoError(err)
-			//
 			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
-			//a.Equal("/authorize", authUrl.Path)
-			//a.Equal("clientID", authUrl.Query().Get("client_id"))
-			//a.Equal("testState", authUrl.Query().Get("state"))
-			//a.Equal("redirectURI", authUrl.Query().Get("redirect_uri"))
-			//a.Equal("openid", authUrl.Query().Get("scope"))
-			//
-			//if !tt.wantErr(t, err, fmt.Sprintf("BeginAuth(%v)", tt.fields.state)) {
-			//	return
-			//}
-			//assert.Equalf(t, tt.want, got, "BeginAuth(%v)", tt.args.state)
 		})
 	}
 }
 
-func TestProvider_FetchUser(t *testing.T) {
+func TestProvider_Options(t *testing.T) {
 	type fields struct {
+		name         string
 		issuer       string
 		clientID     string
 		clientSecret string
 		redirectURI  string
 		httpMock     func(issuer string)
-	}
-	type args struct {
-		session idp.Session
+		opts         []ProviderOpts
 	}
 	type want struct {
-		user idp.User
-		err  error
+		name            string
+		linkingAllowed  bool
+		creationAllowed bool
+		autoCreation    bool
+		autoUpdate      bool
+		pkce            bool
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		args   args
 		want   want
 	}{
 		{
-			name: "unauthenticated session, error",
+			name: "default",
 			fields: fields{
+				name:         "oidc",
 				issuer:       "https://issuer.com",
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				opts:         nil,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
 						Get(oidc.DiscoveryEndpoint).
@@ -122,29 +108,32 @@ func TestProvider_FetchUser(t *testing.T) {
 							TokenEndpoint:         issuer + "/token",
 							UserinfoEndpoint:      issuer + "/userinfo",
 						})
-					gock.New(issuer).
-						Get("/userinfo").
-						Reply(200).
-						JSON(userinfo())
-				},
-			},
-			args: args{
-				&Session{
-					AuthURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-					Tokens:  nil,
 				},
 			},
 			want: want{
-				err: ErrCodeMissing,
+				name:            "oidc",
+				linkingAllowed:  false,
+				creationAllowed: false,
+				autoCreation:    false,
+				autoUpdate:      false,
+				pkce:            false,
 			},
 		},
 		{
-			name: "userinfo error",
+			name: "all true",
 			fields: fields{
+				name:         "oidc",
 				issuer:       "https://issuer.com",
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				opts: []ProviderOpts{
+					WithLinkingAllowed(),
+					WithCreationAllowed(),
+					WithAutoCreation(),
+					WithAutoUpdate(),
+					WithRelyingPartyOption(rp.WithPKCE(nil)),
+				},
 				httpMock: func(issuer string) {
 					gock.New(issuer).
 						Get(oidc.DiscoveryEndpoint).
@@ -155,282 +144,33 @@ func TestProvider_FetchUser(t *testing.T) {
 							TokenEndpoint:         issuer + "/token",
 							UserinfoEndpoint:      issuer + "/userinfo",
 						})
-					gock.New(issuer).
-						Get("/userinfo").
-						Reply(200).
-						JSON(userinfo())
-				},
-			},
-			args: args{
-				&Session{
-					AuthURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-					Tokens: &oidc.Tokens{
-						Token: &oauth2.Token{
-							AccessToken: "accessToken",
-							TokenType:   oidc.BearerToken,
-						},
-						IDTokenClaims: oidc.NewIDTokenClaims(
-							"https://issuer.com",
-							"sub2",
-							[]string{"clientID"},
-							time.Now().Add(1*time.Hour),
-							time.Now().Add(-1*time.Second),
-							"nonce",
-							"",
-							nil,
-							"clientID",
-							0,
-						),
-					},
 				},
 			},
 			want: want{
-				err: rp.ErrUserInfoSubNotMatching,
-			},
-		},
-		{
-			name: "successful fetch",
-			fields: fields{
-				issuer:       "https://issuer.com",
-				clientID:     "clientID",
-				clientSecret: "clientSecret",
-				redirectURI:  "redirectURI",
-				httpMock: func(issuer string) {
-					gock.New(issuer).
-						Get(oidc.DiscoveryEndpoint).
-						Reply(200).
-						JSON(&oidc.DiscoveryConfiguration{
-							Issuer:                issuer,
-							AuthorizationEndpoint: issuer + "/authorize",
-							TokenEndpoint:         issuer + "/token",
-							UserinfoEndpoint:      issuer + "/userinfo",
-						})
-					gock.New(issuer).
-						Get("/userinfo").
-						Reply(200).
-						JSON(userinfo())
-				},
-			},
-			args: args{
-				&Session{
-					AuthURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-					Tokens: &oidc.Tokens{
-						Token: &oauth2.Token{
-							AccessToken: "accessToken",
-							TokenType:   oidc.BearerToken,
-						},
-						IDTokenClaims: oidc.NewIDTokenClaims(
-							"https://issuer.com",
-							"sub",
-							[]string{"clientID"},
-							time.Now().Add(1*time.Hour),
-							time.Now().Add(-1*time.Second),
-							"nonce",
-							"",
-							nil,
-							"clientID",
-							0,
-						),
-					},
-				},
-			},
-			want: want{
-				user: idp.User{
-					ID:                "sub",
-					FirstName:         "firstname",
-					LastName:          "lastname",
-					DisplayName:       "firstname lastname",
-					NickName:          "nickname",
-					PreferredUsername: "username",
-					Email:             "email",
-					IsEmailVerified:   true,
-					Phone:             "phone",
-					IsPhoneVerified:   true,
-					PreferredLanguage: language.English,
-					AvatarURL:         "picture",
-					Profile:           "profile",
-				},
-			},
-		},
-		{
-			name: "successful fetch with token exchange",
-			fields: fields{
-				issuer:       "https://issuer.com",
-				clientID:     "clientID",
-				clientSecret: "clientSecret",
-				redirectURI:  "redirectURI",
-				httpMock: func(issuer string) {
-					gock.New(issuer).
-						Get(oidc.DiscoveryEndpoint).
-						Reply(200).
-						JSON(&oidc.DiscoveryConfiguration{
-							Issuer:                issuer,
-							AuthorizationEndpoint: issuer + "/authorize",
-							TokenEndpoint:         issuer + "/token",
-							JwksURI:               issuer + "/keys",
-							UserinfoEndpoint:      issuer + "/userinfo",
-						})
-					gock.New(issuer).
-						Post("/token").
-						BodyString("client_id=clientID&client_secret=clientSecret&code=code&grant_type=authorization_code&redirect_uri=redirectURI").
-						Reply(200).
-						JSON(tokenResponse(t, issuer))
-					gock.New(issuer).
-						Get("/keys").
-						Reply(200).
-						JSON(keys(t))
-					gock.New(issuer).
-						Get("/userinfo").
-						Reply(200).
-						JSON(userinfo())
-				},
-			},
-			args: args{
-				&Session{
-					AuthURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-					Tokens:  nil,
-					Code:    "code",
-				},
-			},
-			want: want{
-				user: idp.User{
-					ID:                "sub",
-					FirstName:         "firstname",
-					LastName:          "lastname",
-					DisplayName:       "firstname lastname",
-					NickName:          "nickname",
-					PreferredUsername: "username",
-					Email:             "email",
-					IsEmailVerified:   true,
-					Phone:             "phone",
-					IsPhoneVerified:   true,
-					PreferredLanguage: language.English,
-					AvatarURL:         "picture",
-					Profile:           "profile",
-				},
+				name:            "oidc",
+				linkingAllowed:  true,
+				creationAllowed: true,
+				autoCreation:    true,
+				autoUpdate:      true,
+				pkce:            true,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer gock.Off()
+			gock.EnableNetworking()
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.opts...)
 			a.NoError(err)
 
-			user, err := provider.FetchUser(tt.args.session)
-			if tt.want.err != nil && !errors.Is(err, tt.want.err) {
-				a.Fail("invalid error", "expected %v, got %v", tt.want.err, err)
-			}
-			if tt.want.err == nil {
-				a.NoError(err)
-				a.Equal(tt.want.user, user)
-			}
+			a.Equal(tt.want.name, provider.Name())
+			a.Equal(tt.want.linkingAllowed, provider.IsLinkingAllowed())
+			a.Equal(tt.want.creationAllowed, provider.IsCreationAllowed())
+			a.Equal(tt.want.autoCreation, provider.IsAutoCreation())
+			a.Equal(tt.want.autoUpdate, provider.IsAutoUpdate())
 		})
 	}
-}
-
-func userinfo() oidc.UserInfoSetter {
-	info := oidc.NewUserInfo()
-	info.SetSubject("sub")
-	info.SetGivenName("firstname")
-	info.SetFamilyName("lastname")
-	info.SetName("firstname lastname")
-	info.SetNickname("nickname")
-	info.SetPreferredUsername("username")
-	info.SetEmail("email", true)
-	info.SetPhone("phone", true)
-	info.SetLocale(language.English)
-	info.SetPicture("picture")
-	info.SetProfile("profile")
-	return info
-}
-
-func tokenResponse(t *testing.T, issuer string) *oidc.AccessTokenResponse {
-	claims := oidc.NewIDTokenClaims(
-		issuer,
-		"sub",
-		[]string{"clientID"},
-		time.Now().Add(1*time.Hour),
-		time.Now().Add(-1*time.Minute),
-		"",
-		"",
-		nil,
-		"clientID",
-		0,
-	)
-	privateKey, err := crypto.BytesToPrivateKey([]byte(`-----BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEAs38btwb3c7r0tMaQpGvBmY+mPwMU/LpfuPoC0k2t4RsKp0fv
-40SMl50CRrHgk395wch8PMPYbl3+8TtYAJuyrFALIj3Ff1UcKIk0hOH5DDsfh7/q
-2wFuncTmS6bifYo8CfSq2vDGnM7nZnEvxY/MfSydZdcmIqlkUpfQmtzExw9+tSe5
-Dxq6gn5JtlGgLgZGt69r5iMMrTEGhhVAXzNuMZbmlCoBru+rC8ITlTX/0V1ZcsSb
-L8tYWhthyu9x6yjo1bH85wiVI4gs0MhU8f2a+kjL/KGZbR14Ua2eo6tonBZLC5DH
-WM2TkYXgRCDPufjcgmzN0Lm91E4P8KvBcvly6QIDAQABAoIBAQCPj1nbSPcg2KZe
-73FAD+8HopyUSSK//1AP4eXfzcEECVy77g0u9+R6XlkzsZCsZ4g6NN8ounqfyw3c
-YlpAIkcFCf/dowoSjT+4LASVQyatYZwWNqjgAIU4KgMG/rKnNahPTiBYe7peMB1j
-EaPjnt8uPkCk8y7NCi3y4Pk24tt/WM5KbJK2NQhUi1csGnleDfE+0blV0l/e6C68
-W5cbnbWAroMqae/Yon3XVZiXX0m+l2f6ZzIgKaD18J+eEM8FjJC+jQKiRe1i9v3K
-nQrLwh/gn8J10FcbKn3xqslKVidzASIrNIzHT9j/Z5T9NXuAKa7IV2x+Dtdus+wq
-iBsUunwBAoGBANpYew+8i9vDwK4/SefduDTuzJ0H9lWTjtbiWQ+KYZoeJ7q3/qns
-jsmi+mjxkXxXg1RrGbNbjtbl3RXXIrUeeBB0lglRJUjc3VK7VvNoyXIWsiqhCspH
-IJ9Yuknv4mXB01m/glbSCS/xu4RTgf5aOG4jUiRb9+dCIpvDxI9gbXEVAoGBANJz
-hIJkplIJ+biTi3G1Oz17qkUkInNXzAEzKD9Atoz5AIAiR1ivOMLOlbucfjevw/Nw
-TnpkMs9xqCefKupTlsriXtZI88m7ZKzAmolYsPolOy/Jhi31h9JFVTEfKGqVS+dk
-A4ndhgdW9RUeNJPY2YVCARXQrWpueweQDA1cNaeFAoGAPJsYtXqBW6PPRM5+ZiSt
-78tk8iV2o7RMjqrPS7f+dXfvUS2nO2VVEPTzCtQarOfhpToBLT65vD6bimdn09w8
-OV0TFEz4y2u65y7m6LNqTwertpdy1ki97l0DgGhccCBH2P6GYDD2qd8wTH+dcot6
-ZF/begopGoDJ+HBzi9SZLC0CgYBZzPslHMevyBvr++GLwrallKhiWnns1/DwLiEl
-ZHrBCtuA0Z+6IwLIdZiE9tEQ+ApYTXrfVPQteqUzSwLn/IUiy5eGPpjwYushoAoR
-Q2w5QTvRN1/vKo8rVXR1woLfgBdkhFPSN1mitiNcQIhU8jpXV4PZCDOHb99FqdzK
-sqcedQKBgQCOmgbqxGsnT2WQhoOdzln+NOo6Tx+FveLLqat2KzpY59W4noeI2Awn
-HfIQgWUAW9dsjVVOXMP1jhq8U9hmH/PFWA11V/iCdk1NTxZEw87VAOeWuajpdDHG
-+iex349j8h2BcQ4Zd0FWu07gGFnS/yuDJPn6jBhRusdieEcxLRjTKg==
------END RSA PRIVATE KEY-----
-`))
-	if err != nil {
-		t.Fatal(err)
-	}
-	signer, err := jose.NewSigner(jose.SigningKey{Key: privateKey, Algorithm: "RS256"}, &jose.SignerOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	data, err := json.Marshal(claims)
-	if err != nil {
-		t.Fatal(err)
-	}
-	jws, err := signer.Sign(data)
-	if err != nil {
-		t.Fatal(err)
-	}
-	idToken, err := jws.CompactSerialize()
-	if err != nil {
-		t.Fatal(err)
-	}
-	return &oidc.AccessTokenResponse{
-		AccessToken:  "accessToken",
-		TokenType:    oidc.BearerToken,
-		RefreshToken: "",
-		ExpiresIn:    3600,
-		IDToken:      idToken,
-		State:        "testState",
-	}
-}
-
-func keys(t *testing.T) *jose.JSONWebKeySet {
-	privateKey, err := crypto.BytesToPublicKey([]byte(`-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs38btwb3c7r0tMaQpGvB
-mY+mPwMU/LpfuPoC0k2t4RsKp0fv40SMl50CRrHgk395wch8PMPYbl3+8TtYAJuy
-rFALIj3Ff1UcKIk0hOH5DDsfh7/q2wFuncTmS6bifYo8CfSq2vDGnM7nZnEvxY/M
-fSydZdcmIqlkUpfQmtzExw9+tSe5Dxq6gn5JtlGgLgZGt69r5iMMrTEGhhVAXzNu
-MZbmlCoBru+rC8ITlTX/0V1ZcsSbL8tYWhthyu9x6yjo1bH85wiVI4gs0MhU8f2a
-+kjL/KGZbR14Ua2eo6tonBZLC5DHWM2TkYXgRCDPufjcgmzN0Lm91E4P8KvBcvly
-6QIDAQAB
------END PUBLIC KEY-----
-`))
-	if err != nil {
-		t.Fatal(err)
-	}
-	return &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{Key: privateKey, Algorithm: "RS256", Use: oidc.KeyUseSignature}}}
 }

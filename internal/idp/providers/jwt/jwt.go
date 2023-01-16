@@ -4,8 +4,6 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/zitadel/oidc/v2/pkg/oidc"
-
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
@@ -15,20 +13,52 @@ var _ idp.Provider = (*Provider)(nil)
 
 var ErrNoTokens = errors.New("no tokens")
 
+// Provider is the idp.Provider implementation for a JWT provider
 type Provider struct {
-	name         string
-	issuer       string
-	jwtEndpoint  string
-	keysEndpoint string
-	headerName   string
+	name              string
+	headerName        string
+	issuer            string
+	jwtEndpoint       string
+	keysEndpoint      string
+	isLinkingAllowed  bool
+	isCreationAllowed bool
+	isAutoCreation    bool
+	isAutoUpdate      bool
 }
 
-func New(issuer, jwtEndpoint, keysEndpoint, headerName string) (*Provider, error) {
+type ProviderOpts func(provider *Provider)
+
+func WithLinkingAllowed() ProviderOpts {
+	return func(p *Provider) {
+		p.isLinkingAllowed = true
+	}
+}
+func WithCreationAllowed() ProviderOpts {
+	return func(p *Provider) {
+		p.isCreationAllowed = true
+	}
+}
+func WithAutoCreation() ProviderOpts {
+	return func(p *Provider) {
+		p.isAutoCreation = true
+	}
+}
+func WithAutoUpdate() ProviderOpts {
+	return func(p *Provider) {
+		p.isAutoUpdate = true
+	}
+}
+
+func New(name, issuer, jwtEndpoint, keysEndpoint, headerName string, options ...ProviderOpts) (*Provider, error) {
 	provider := &Provider{
+		name:         name,
 		issuer:       issuer,
 		jwtEndpoint:  jwtEndpoint,
 		keysEndpoint: keysEndpoint,
 		headerName:   headerName,
+	}
+	for _, option := range options {
+		option(provider)
 	}
 
 	return provider, nil
@@ -50,22 +80,18 @@ func (p *Provider) BeginAuth(state string) (idp.Session, error) {
 	return &Session{AuthURL: redirect.String()}, nil
 }
 
-func (p *Provider) FetchUser(session idp.Session) (user idp.User, err error) {
-	jwtSession := session.(*Session)
-	if jwtSession.Tokens == nil {
-		return idp.User{}, ErrNoTokens
-	}
-	err = mapTokenToUser(jwtSession.Tokens.IDTokenClaims, &user)
-	return user, err
+func (p *Provider) IsLinkingAllowed() bool {
+	return p.isLinkingAllowed
 }
 
-func mapTokenToUser(claims oidc.IDTokenClaims, user *idp.User) error {
-	user.ID = claims.GetSubject()
-	user.AvatarURL = claims.GetPicture()
-	user.DisplayName = claims.GetName()
-	user.Email = claims.GetEmail()
-	user.FirstName = claims.GetGivenName()
-	user.LastName = claims.GetFamilyName()
-	user.NickName = claims.GetNickname()
-	return nil
+func (p *Provider) IsCreationAllowed() bool {
+	return p.isCreationAllowed
+}
+
+func (p *Provider) IsAutoCreation() bool {
+	return p.isAutoCreation
+}
+
+func (p *Provider) IsAutoUpdate() bool {
+	return p.isAutoUpdate
 }

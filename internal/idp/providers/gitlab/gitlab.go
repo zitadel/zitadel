@@ -1,4 +1,4 @@
-package google
+package gitlab
 
 import (
 	"github.com/zitadel/zitadel/internal/idp"
@@ -7,34 +7,26 @@ import (
 
 const (
 	issuer = "https://gitlab.com"
+	name   = "GitLab"
 )
 
 var _ idp.Provider = (*Provider)(nil)
 
+// Provider is the idp.Provider implementation for Gitlab
 type Provider struct {
-	oidcProvider *oidc.Provider
+	*oidc.Provider
 }
 
-func New(clientID, clientSecret, redirectURI string) (*Provider, error) {
-	rp, err := oidc.New(issuer, clientID, clientSecret, redirectURI)
+func New(clientID, clientSecret, redirectURI string, options ...oidc.ProviderOpts) (*Provider, error) {
+	return NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI, options...)
+}
+
+func NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI string, options ...oidc.ProviderOpts) (*Provider, error) {
+	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, options...)
 	if err != nil {
 		return nil, err
 	}
-	provider := &Provider{
-		oidcProvider: rp,
-	}
-
-	return provider, nil
-}
-
-func (p *Provider) Name() string {
-	return "gitlab"
-}
-
-func (p *Provider) BeginAuth(state string) (idp.Session, error) {
-	return p.oidcProvider.BeginAuth(state)
-}
-
-func (p *Provider) FetchUser(session idp.Session) (idp.User, error) {
-	return p.oidcProvider.FetchUser(session)
+	return &Provider{
+		Provider: rp,
+	}, nil
 }

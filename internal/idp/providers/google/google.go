@@ -7,34 +7,24 @@ import (
 
 const (
 	issuer = "https://accounts.google.com"
+	name   = "Google"
 )
 
 var _ idp.Provider = (*Provider)(nil)
 
+// Provider is the idp.Provider implementation for Google
 type Provider struct {
-	oidcProvider *oidc.Provider
+	*oidc.Provider
 }
 
-func New(clientID, clientSecret, redirectURI string) (*Provider, error) {
-	rp, err := oidc.New(issuer, clientID, clientSecret, redirectURI)
+func New(clientID, clientSecret, redirectURI string, opts ...oidc.ProviderOpts) (*Provider, error) {
+	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, opts...)
 	if err != nil {
 		return nil, err
 	}
 	provider := &Provider{
-		oidcProvider: rp,
+		Provider: rp,
 	}
 
 	return provider, nil
-}
-
-func (p *Provider) Name() string {
-	return "google"
-}
-
-func (p *Provider) BeginAuth(state string) (idp.Session, error) {
-	return p.oidcProvider.BeginAuth(state)
-}
-
-func (p *Provider) FetchUser(session idp.Session) (idp.User, error) {
-	return p.oidcProvider.FetchUser(session)
 }

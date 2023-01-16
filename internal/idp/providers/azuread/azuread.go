@@ -17,6 +17,11 @@ const (
 	userinfoURL      string = "https://graph.microsoft.com/oidc/userinfo"
 )
 
+// TenantType are the well known tenant types to scope the users that can authenticate. TenantType is not an
+// exclusive list of Azure Tenants which can be used. A consumer can also use their own Tenant ID to scope
+// authentication to their specific Tenant either through the Tenant ID or the friendly domain name.
+//
+// see also https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols#endpoints
 type TenantType string
 
 const (
@@ -33,48 +38,60 @@ const (
 
 var _ idp.Provider = (*Provider)(nil)
 
+// Provider is the idp.Provider implementation for AzureAD (V2 Endpoints)
 type Provider struct {
-	provider *oauth.Provider
-	name     string
-}
-
-type ProviderOpts struct {
+	*oauth.Provider
 	Tenant        TenantType
 	EmailVerified bool
+	options       []oauth.ProviderOpts
 }
 
-func New(clientID, clientSecret, redirectURI string, opts ProviderOpts) (*Provider, error) {
-	if opts.Tenant == "" {
-		opts.Tenant = CommonTenant
+type ProviderOptions func(*Provider)
+
+// WithTenant allows to set a TenantType (can also be a tenantID)
+// default is CommonTenant
+func WithTenant(tenantType TenantType) ProviderOptions {
+	return func(p *Provider) {
+		p.Tenant = tenantType
 	}
-	config := newConfig(opts.Tenant, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail})
+}
+
+// WithEmailVerified allows to set every email received as verified
+func WithEmailVerified() ProviderOptions {
+	return func(p *Provider) {
+		p.EmailVerified = true
+	}
+}
+
+func WithOAuthOptions(opts ...oauth.ProviderOpts) ProviderOptions {
+	return func(p *Provider) {
+		p.options = append(p.options, opts...)
+	}
+}
+
+func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptions) (*Provider, error) {
+	provider := &Provider{
+		Tenant:  CommonTenant,
+		options: make([]oauth.ProviderOpts, 0),
+	}
+	for _, opt := range opts {
+		opt(provider)
+	}
+	config := newConfig(provider.Tenant, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail})
 	rp, err := oauth.New(
 		config,
+		name,
 		userinfoURL,
 		func() oauth.UserInfoMapper {
-			return &User{isEmailVerified: opts.EmailVerified}
+			return &User{isEmailVerified: provider.EmailVerified}
 		},
+		provider.options...,
 	)
 	if err != nil {
 		return nil, err
 	}
-	provider := &Provider{
-		provider: rp,
-	}
-
+	provider.Provider = rp
 	return provider, nil
-}
-
-func (p *Provider) Name() string {
-	return p.name
-}
-
-func (p *Provider) BeginAuth(state string) (idp.Session, error) {
-	return p.provider.BeginAuth(state)
-}
-
-func (p *Provider) FetchUser(session idp.Session) (idp.User, error) {
-	return p.provider.FetchUser(session)
 }
 
 func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes []string) *oauth2.Config {
@@ -146,7 +163,7 @@ func (u *User) IsPhoneVerified() bool {
 	return false //TODO: ?
 }
 
-func (u *User) GetPreferredLanguange() language.Tag {
+func (u *User) GetPreferredLanguage() language.Tag {
 	return language.Und //TODO: ?
 }
 

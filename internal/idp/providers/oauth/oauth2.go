@@ -1,12 +1,9 @@
 package oauth
 
 import (
-	"context"
 	"errors"
-	"net/http"
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	httphelper "github.com/zitadel/oidc/v2/pkg/http"
 	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -16,20 +13,58 @@ var _ idp.Provider = (*Provider)(nil)
 
 var ErrCodeMissing = errors.New("no auth code provided")
 
+// Provider is the idp.Provider implementation for a generic OAuth 2.0 provider
 type Provider struct {
-	name string
 	rp.RelyingParty
-	userEndpoint string
-	userMapper   func() UserInfoMapper
+	options           []rp.Option
+	name              string
+	userEndpoint      string
+	userMapper        func() UserInfoMapper
+	isLinkingAllowed  bool
+	isCreationAllowed bool
+	isAutoCreation    bool
+	isAutoUpdate      bool
 }
 
-func New(config *oauth2.Config, userEndpoint string, userMapper func() UserInfoMapper) (*Provider, error) {
+type ProviderOpts func(provider *Provider)
+
+func WithLinkingAllowed() ProviderOpts {
+	return func(p *Provider) {
+		p.isLinkingAllowed = true
+	}
+}
+func WithCreationAllowed() ProviderOpts {
+	return func(p *Provider) {
+		p.isCreationAllowed = true
+	}
+}
+func WithAutoCreation() ProviderOpts {
+	return func(p *Provider) {
+		p.isAutoCreation = true
+	}
+}
+func WithAutoUpdate() ProviderOpts {
+	return func(p *Provider) {
+		p.isAutoUpdate = true
+	}
+}
+
+func WithRelyingPartyOption(option rp.Option) ProviderOpts {
+	return func(p *Provider) {
+		p.options = append(p.options, option)
+	}
+}
+
+func New(config *oauth2.Config, name, userEndpoint string, userMapper func() UserInfoMapper, options ...ProviderOpts) (*Provider, error) {
 	provider := &Provider{
+		name:         name,
 		userEndpoint: userEndpoint,
 		userMapper:   userMapper,
 	}
-
-	relyingParty, err := rp.NewRelyingPartyOAuth(config)
+	for _, option := range options {
+		option(provider)
+	}
+	relyingParty, err := rp.NewRelyingPartyOAuth(config, provider.options...)
 	if err != nil {
 		return nil, err
 	}
@@ -43,55 +78,21 @@ func (p *Provider) Name() string {
 
 func (p *Provider) BeginAuth(state string) (idp.Session, error) {
 	url := rp.AuthURL(state, p.RelyingParty)
-	return &Session{AuthURL: url}, nil
+	return &Session{AuthURL: url, Provider: p}, nil
 }
 
-func (p *Provider) FetchUser(session idp.Session) (user idp.User, err error) {
-	oauthSession, _ := session.(*Session)
-	if oauthSession.Tokens == nil {
-		if err = p.authorize(oauthSession); err != nil {
-			return idp.User{}, err
-		}
-	}
-	req, err := http.NewRequest("GET", p.userEndpoint, nil)
-	if err != nil {
-		return idp.User{}, err
-	}
-	req.Header.Set("authorization", oauthSession.Tokens.TokenType+" "+oauthSession.Tokens.AccessToken)
-	mapper := p.userMapper()
-	if err := httphelper.HttpRequest(p.RelyingParty.HttpClient(), req, &mapper); err != nil {
-		return idp.User{}, err
-	}
-	err = mapClaims(mapper, &user)
-	return user, err
+func (p *Provider) IsLinkingAllowed() bool {
+	return p.isLinkingAllowed
 }
 
-func (p *Provider) authorize(session *Session) error {
-	if session.Code == "" {
-		return ErrCodeMissing
-	}
-	tokens, err := rp.CodeExchange(context.TODO(), session.Code, p.RelyingParty)
-	if err != nil {
-		return err
-	}
-	session.Tokens = tokens
-	return nil
+func (p *Provider) IsCreationAllowed() bool {
+	return p.isCreationAllowed
 }
 
-func mapClaims(mapper UserInfoMapper, user *idp.User) error {
-	user.ID = mapper.GetID()
-	user.FirstName = mapper.GetFirstName()
-	user.LastName = mapper.GetLastName()
-	user.DisplayName = mapper.GetDisplayName()
-	user.NickName = mapper.GetNickName()
-	user.PreferredUsername = mapper.GetPreferredUsername()
-	user.Email = mapper.GetEmail()
-	user.IsEmailVerified = mapper.IsEmailVerified()
-	user.Phone = mapper.GetPhone()
-	user.IsPhoneVerified = mapper.IsPhoneVerified()
-	user.PreferredLanguage = mapper.GetPreferredLanguange()
-	user.AvatarURL = mapper.GetAvatarURL()
-	user.Profile = mapper.GetProfile()
-	user.RawData = mapper.RawData()
-	return nil
+func (p *Provider) IsAutoCreation() bool {
+	return p.isAutoCreation
+}
+
+func (p *Provider) IsAutoUpdate() bool {
+	return p.isAutoUpdate
 }
