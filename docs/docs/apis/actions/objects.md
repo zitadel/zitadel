@@ -129,7 +129,7 @@ The first argument is always the [API context](#api-context).
 The methods, arguments and return values are [mapped to JavaScript notation](#javascript-notation).
 The following example shows how to use the `mgmt` object.
 ```js reference
-https://github.com/zitadel/actions/blob/main/examples/use_mgmt_api.js
+https://github.com/zitadel/actions/blob/main/examples/store_last_auth_error.js
 ```
 
 ## JavaScript Notation
