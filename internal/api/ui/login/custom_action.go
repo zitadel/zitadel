@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 
 	"github.com/dop251/goja"
-	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -252,48 +252,12 @@ func (l *Login) customGrants(ctx context.Context, userID string, authRequest *do
 		return nil, err
 	}
 
-	actionUserGrants := make([]actions.UserGrant, 0)
+	mutableUserGrants := &grants{g: make([]actions.UserGrant, 0)}
 
 	apiFields := actions.WithAPIFields(
-		actions.SetFields("userGrants", &actionUserGrants),
+		actions.SetFields("userGrants", &mutableUserGrants.g),
 		actions.SetFields("v1",
-			actions.SetFields("appendUserGrant", func(c *actions.FieldConfig) interface{} {
-				return func(call goja.FunctionCall) goja.Value {
-					if len(call.Arguments) != 1 {
-						panic("exactly one argument expected")
-					}
-					object := call.Arguments[0].ToObject(c.Runtime)
-					if object == nil {
-						panic("unable to unmarshal arg")
-					}
-					grant := actions.UserGrant{}
-
-					for _, key := range object.Keys() {
-						switch key {
-						case "projectId":
-							grant.ProjectID = object.Get(key).String()
-						case "projectGrantId":
-							grant.ProjectGrantID = object.Get(key).String()
-						case "roles":
-							if roles, ok := object.Get(key).Export().([]interface{}); ok {
-								for _, role := range roles {
-									if r, ok := role.(string); ok {
-										grant.Roles = append(grant.Roles, r)
-									}
-								}
-							}
-						}
-					}
-
-					if grant.ProjectID == "" {
-						panic("projectId not set")
-					}
-
-					actionUserGrants = append(actionUserGrants, grant)
-
-					return nil
-				}
-			}),
+			actions.SetFields("appendUserGrant", appendGrantsFunc(mutableUserGrants)),
 			actions.SetFields("mgmt", l.mgmtServer),
 		),
 	)
@@ -330,7 +294,7 @@ func (l *Login) customGrants(ctx context.Context, userID string, authRequest *do
 			return nil, err
 		}
 	}
-	return actionUserGrantsToDomain(userID, actionUserGrants), err
+	return actionUserGrantsToDomain(userID, mutableUserGrants.g), err
 }
 
 func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
@@ -391,5 +355,49 @@ func appendMetadataFunc(mutableMetas *metas) func(goja.FunctionCall) goja.Value 
 				Value: value,
 			})
 		return nil
+	}
+}
+
+type grants struct {
+	g []actions.UserGrant
+}
+
+func appendGrantsFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
+	return func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
+		return func(call goja.FunctionCall) goja.Value {
+			if len(call.Arguments) != 1 {
+				panic("exactly one argument expected")
+			}
+			object := call.Arguments[0].ToObject(c.Runtime)
+			if object == nil {
+				panic("unable to unmarshal arg")
+			}
+			grant := actions.UserGrant{}
+
+			for _, key := range object.Keys() {
+				switch key {
+				case "projectId":
+					grant.ProjectID = object.Get(key).String()
+				case "projectGrantId":
+					grant.ProjectGrantID = object.Get(key).String()
+				case "roles":
+					if roles, ok := object.Get(key).Export().([]interface{}); ok {
+						for _, role := range roles {
+							if r, ok := role.(string); ok {
+								grant.Roles = append(grant.Roles, r)
+							}
+						}
+					}
+				}
+			}
+
+			if grant.ProjectID == "" {
+				panic("projectId not set")
+			}
+
+			mutableGrants.g = append(mutableGrants.g, grant)
+
+			return nil
+		}
 	}
 }
