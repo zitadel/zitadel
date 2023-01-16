@@ -438,9 +438,11 @@ EventTypes:
         failed: La vérification de l'initialisation a échoué
     token:
       added: Jeton d'accès créé
+      removed: 'asdf'
     username:
       reserved: Nom d'utilisateur réservé
       released: Nom d'utilisateur libéré
+      changed: 'asdf'
     email:
       reserved: Adresse e-mail réservée
       released: Adresse email libérée
@@ -518,6 +520,8 @@ EventTypes:
           check:
             succeeded: Vérification de l'OTP multifactorielle réussie
             failed: La vérification de l'OTP multifactorielle a échoué
+          init:
+            skipped: 'asdf'
         u2f:
           token:
             added: Ajout d'un jeton U2F multifacteur
@@ -580,6 +584,7 @@ EventTypes:
       code:
         added: Code du numéro de téléphone généré
         sent: Code du numéro de téléphone envoyé
+      removed: 'asdf'
     profile:
       changed: Profil de l'utilisateur modifié
     address:
@@ -592,6 +597,8 @@ EventTypes:
         check:
           succeeded: Vérification de l'OTP multifactorielle réussie
           failed: Échec de la vérification de l'OTP multifactorielle
+        init:
+          skipped: 'asdf'
       init:
         skipped: L'initialisation du multifacteur a été ignorée
     signed:
@@ -611,6 +618,12 @@ EventTypes:
       set: Ensemble de métadonnées de l'utilisateur
       removed: Métadonnées de l'utilisateur supprimées
       removed.all: Suppression de toutes les métadonnées utilisateur
+    domain:
+      claimed: 'asdf'
+      claimed.sent: 'asdf'
+    pat:
+      added: 'asdf'
+      removed: 'asdf'
   org:
     added: Organisation ajoutée
     changed: Organisation modifiée
@@ -657,6 +670,10 @@ EventTypes:
         config:
           added: Configuration IDP SAML ajoutée
           changed: Modification de la configuration IDP SAML
+      jwt:
+        config:
+          added: JWT IDP configuration added
+          changed: JWT IDP configuration changed
     customtext:
       set: Jeu de texte personnalisé
       removed: Texte personnalisé supprimé
@@ -670,6 +687,8 @@ EventTypes:
         idpprovider:
           added: Fournisseur d'Idp ajouté à la politique de connexion
           removed: Idp Provider supprimé de la politique de connexion
+          cascade:
+            removed: 'asdf'
         secondfactor:
           added: Second factor ajouté à la politique de connexion
           removed: Second facteur supprimé de la politique de connexion
@@ -715,12 +734,34 @@ EventTypes:
         added: Politique de confidentialité et CGU ajoutés
         changed: Politique de confidentialité et CGU modifiées
         removed: Politique de confidentialité et conditions d'utilisation supprimées
+      domain:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
+      lockout:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
     flow:
       trigger_actions:
         set: Action set
         cascade:
           removed: Cascade d'actions supprimée
         removed: Actions supprimées
+      cleared: 'asdf'
+    mail:
+      template:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
+      text:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
+    metadata:
+      removed: 'asdf'
+      removed.all: 'asdf'
+      set: 'asdf'
   project:
     added: Projet ajouté
     changed: Projet modifié
@@ -759,6 +800,9 @@ EventTypes:
       reactivated: Application réactivée
       oidc:
         secret:
+          check:
+            failed: 'asdf'
+            succeeded: 'asdf'
           verified:
             check: Vérification du secret du client OIDC réussie
             failed: La vérification du secret du client OIDC a échoué
@@ -821,6 +865,10 @@ EventTypes:
         config:
           added: Ajout de la configuration SAML IDP
           changed: Modification de la configuration de SAML IDP
+      jwt:
+        config:
+          added: 'asdf'
+          changed: 'asdf'
     customtext:
       set: Le texte a été mis en place
       removed: Le texte a été supprimé
@@ -883,12 +931,140 @@ EventTypes:
           deactivated: Fournisseur de SMS Twilio désactivé
   key_pair:
     added: Paire de clés ajoutée
+    certificate:
+      added: Certificated added
   action:
     added: Action ajoutée
     changed: Action modifiée
     deactivated: Action désactivée
     reactivated: Action réactivée
     removed: Action supprimée
+  instance:
+    added: 'asdf'
+    changed: 'asdf'
+    customtext:
+      removed: 'asdf'
+      set: 'asdf'
+      template:
+        removed: 'asdf'
+    default:
+      language:
+        set: 'asdf'
+      org:
+        set: 'asdf'
+    domain:
+      added: 'asdf'
+      primary:
+        set: 'asdf'
+      removed: 'asdf'
+    iam:
+      console:
+        set: 'asdf'
+      project:
+        set: 'asdf'
+    mail:
+      template:
+        added: 'asdf'
+        changed: 'asdf'
+      text:
+        added: 'asdf'
+        changed: 'asdf'
+    member:
+      added: 'asdf'
+      changed: 'asdf'
+      removed: 'asdf'
+      cascade:
+        removed: 'asdf'
+    notification:
+      provider:
+        debug:
+          fileadded: 'asdf'
+          filechanged: 'asdf'
+          fileremoved: 'asdf'
+          logadded: 'asdf'
+          logchanged: 'asdf'
+          logremoved: 'asdf'
+    oidc:
+      settings:
+        added: 'asdf'
+        changed: 'asdf'
+    policy:
+      domain:
+        added: 'asdf'
+        changed: 'asdf'
+      label:
+        activated: 'asdf'
+        added: 'asdf'
+        assets:
+          removed: 'asdf'
+        changed: 'asdf'
+        font:
+          added: 'asdf'
+          removed: 'asdf'
+        icon:
+          added: 'asdf'
+          removed: 'asdf'
+          dark:
+            added: 'asdf'
+            removed: 'asdf'
+        logo:
+          added: 'asdf'
+          removed: 'asdf'
+          dark:
+            added: 'asdf'
+            removed: 'asdf'
+      lockout:
+        added: 'asdf'
+        changed: 'asdf'
+      login:
+        added: 'asdf'
+        changed: 'asdf'
+        idpprovider:
+          added: 'asdf'
+          cascade:
+            removed: 'asdf'
+          removed: 'asdf'
+        multifactor:
+          added: 'asdf'
+          removed: 'asdf'
+        secondfactor:
+          added: 'asdf'
+          removed: 'asdf'
+      password:
+        age:
+          added: 'asdf'
+          changed: 'asdf'
+        complexity:
+          added: 'asdf'
+          changed: 'asdf'
+      privacy:
+        added: 'asdf'
+        changed: 'asdf'
+      security:
+        set: 'asdf'
+        
+    removed: 'asdf'
+    secret:
+      generator:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
+    sms:
+      configtwilio:
+        activated: 'asdf'
+        added: 'asdf'
+        changed: 'asdf'
+        deactivated: 'asdf'
+        removed: 'asdf'
+        token:
+          changed: 'asdf'
+    smtp:
+      config:
+        added: 'asdf'
+        changed: 'asdf'
+        password:
+          changed: 'asdf'
+        removed: 'asdf'
 
 Application:
   OIDC:

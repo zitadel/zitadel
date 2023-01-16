@@ -438,13 +438,15 @@ EventTypes:
         failed: 初始化检查失败
     token:
       added: 已创建访问令牌
+      removed: 'asdf'
     username:
       reserved: 保留用户名
       released: 用户名已发布
+      changed: 'asdf'
     email:
       reserved: 电子邮件地址已保留
       released: 电子邮件地址已发布
-      changed:  电子邮件地址已更改
+      changed: 电子邮件地址已更改
       verified: 电子邮件地址已验证
       verification:
         failed: 电子邮件验证失败
@@ -474,7 +476,7 @@ EventTypes:
         reserved: 保留用户名
         released: 用户名已发布
       email:
-        changed:  电子邮件地址已更改
+        changed: 电子邮件地址已更改
         verified: 电子邮件地址已验证
         verification:
           failed: 电子邮件地址验证失败
@@ -580,6 +582,7 @@ EventTypes:
       code:
         added: 生成的手机号码验证码
         sent: 发送手机号码验证码
+      removed: 'asdf'
     profile:
       changed: 修改用户资料
     address:
@@ -592,6 +595,8 @@ EventTypes:
         check:
           succeeded: MFA OTP 验证成功
           failed: MFA OTP 验证失败
+        init:
+          skipped: 'asdf'
       init:
         skipped: 跳过 MFA 初始化
     signed:
@@ -611,6 +616,12 @@ EventTypes:
       set: 用户元数据集
       removed: 删除用户元数据
       removed.all: 删除所有用户元数据
+    domain:
+      claimed: 'asdf'
+      claimed.sent: 'asdf'
+    pat:
+      added: 'asdf'
+      removed: 'asdf'
   org:
     added: 添加组织
     changed: 更改组织
@@ -636,7 +647,7 @@ EventTypes:
       changed: 更改组织成员
       removed: 删除组织成员
       cascade:
-        removeD: 已删除组织级联成员
+        removed: 已删除组织级联成员
     iam:
       policy:
         added: 添加系统策略
@@ -657,6 +668,10 @@ EventTypes:
         config:
           added: 添加 SAML IDP 配置
           changed: 更改 SAML IDP 配置
+      jwt:
+        config:
+          added: 'asdf'
+          changed: 'asdf'
     customtext:
       set: 设置自定义文本
       removed: 删除自定义文本
@@ -670,6 +685,8 @@ EventTypes:
         idpprovider:
           added: 添加 IDP 到登录策略
           removed: 从登录策略删除 IDP
+          cascade:
+            removed: 'asdf'
         secondfactor:
           added: 添加两步认证到登录策略
           removed: 删除两步认证到登录策略
@@ -715,12 +732,34 @@ EventTypes:
         added: 添加隐私政策和服务条款
         changed: 更改隐私政策和服务条款
         removed: 删除隐私政策和服务条款
+      domain:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
+      lockout:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
     flow:
       trigger_actions:
         set: 设置动作
         cascade:
           removed: 删除动作级联
         removed: 删除动作
+      cleared: Flow cleared
+    mail:
+      template:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
+      text:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
+    metadata:
+      removed: 'asdf'
+      removed.all: 'asdf'
+      set: 'asdf'
   project:
     added: 添加项目
     changed: 更改项目
@@ -750,7 +789,7 @@ EventTypes:
         changed: 更改访问成员
         removed: 删除访问成员
         cascade:
-          removeD: 删除管理访问级联
+          removed: 删除管理访问级联
     application:
       added: 添加应用
       changed: 更改应用
@@ -821,6 +860,10 @@ EventTypes:
         config:
           added: 添加 SAML IDP 配置
           changed: 更改 SAML IDP 配置
+      jwt:
+        config:
+          added: 'asdf'
+          changed: 'asdf'
     customtext:
       set: 设置文本
       removed: 删除文本
@@ -883,12 +926,140 @@ EventTypes:
           deactivated: 停用 Twilio SMS 提供者
   key_pair:
     added: 添加密钥对
+    certificate:
+      added: Certificated added
   action:
     added: 添加动作
     changed: 更改动作
     deactivated: 停用动作
     reactivated: 启用动作
     removed: 删除动作
+  instance:
+    added: 'asdf'
+    changed: 'asdf'
+    customtext:
+      removed: 'asdf'
+      set: 'asdf'
+      template:
+        removed: 'asdf'
+    default:
+      language:
+        set: 'asdf'
+      org:
+        set: 'asdf'
+    domain:
+      added: 'asdf'
+      primary:
+        set: 'asdf'
+      removed: 'asdf'
+    iam:
+      console:
+        set: 'asdf'
+      project:
+        set: 'asdf'
+    mail:
+      template:
+        added: 'asdf'
+        changed: 'asdf'
+      text:
+        added: 'asdf'
+        changed: 'asdf'
+    member:
+      added: 'asdf'
+      changed: 'asdf'
+      removed: 'asdf'
+      cascade:
+        removed: 'asdf'
+    notification:
+      provider:
+        debug:
+          fileadded: 'asdf'
+          filechanged: 'asdf'
+          fileremoved: 'asdf'
+          logadded: 'asdf'
+          logchanged: 'asdf'
+          logremoved: 'asdf'
+    oidc:
+      settings:
+        added: 'asdf'
+        changed: 'asdf'
+    policy:
+      domain:
+        added: 'asdf'
+        changed: 'asdf'
+      label:
+        activated: 'asdf'
+        added: 'asdf'
+        assets:
+          removed: 'asdf'
+        changed: 'asdf'
+        font:
+          added: 'asdf'
+          removed: 'asdf'
+        icon:
+          added: 'asdf'
+          removed: 'asdf'
+          dark:
+            added: 'asdf'
+            removed: 'asdf'
+        logo:
+          added: 'asdf'
+          removed: 'asdf'
+          dark:
+            added: 'asdf'
+            removed: 'asdf'
+      lockout:
+        added: 'asdf'
+        changed: 'asdf'
+      login:
+        added: 'asdf'
+        changed: 'asdf'
+        idpprovider:
+          added: 'asdf'
+          cascade:
+            removed: 'asdf'
+          removed: 'asdf'
+        multifactor:
+          added: 'asdf'
+          removed: 'asdf'
+        secondfactor:
+          added: 'asdf'
+          removed: 'asdf'
+      password:
+        age:
+          added: 'asdf'
+          changed: 'asdf'
+        complexity:
+          added: 'asdf'
+          changed: 'asdf'
+      privacy:
+        added: 'asdf'
+        changed: 'asdf'
+      security:
+        set: 'asdf'
+        
+    removed: 'asdf'
+    secret:
+      generator:
+        added: 'asdf'
+        changed: 'asdf'
+        removed: 'asdf'
+    sms:
+      configtwilio:
+        activated: 'asdf'
+        added: 'asdf'
+        changed: 'asdf'
+        deactivated: 'asdf'
+        removed: 'asdf'
+        token:
+          changed: 'asdf'
+    smtp:
+      config:
+        added: 'asdf'
+        changed: 'asdf'
+        password:
+          changed: 'asdf'
+        removed: 'asdf'
 
 Application:
   OIDC:
