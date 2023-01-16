@@ -59,6 +59,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(HumanPasswordChangedType, HumanPasswordChangedEventMapper).
 		RegisterFilterEventMapper(HumanPasswordCodeAddedType, HumanPasswordCodeAddedEventMapper).
 		RegisterFilterEventMapper(HumanPasswordCodeSentType, HumanPasswordCodeSentEventMapper).
+		RegisterFilterEventMapper(HumanPasswordChangeSentType, HumanPasswordChangeSentEventMapper).
 		RegisterFilterEventMapper(HumanPasswordCheckSucceededType, HumanPasswordCheckSucceededEventMapper).
 		RegisterFilterEventMapper(HumanPasswordCheckFailedType, HumanPasswordCheckFailedEventMapper).
 		RegisterFilterEventMapper(UserIDPLinkAddedType, UserIDPLinkAddedEventMapper).

@@ -1334,7 +1334,7 @@ Returns the custom text for domain claimed message (overwritten in eventstore)
 > **rpc** SetDefaultDomainClaimedMessageText([SetDefaultDomainClaimedMessageTextRequest](#setdefaultdomainclaimedmessagetextrequest))
 [SetDefaultDomainClaimedMessageTextResponse](#setdefaultdomainclaimedmessagetextresponse)
 
-Sets the default custom text for domain claimed phone message
+Sets the default custom text for domain claimed message
 it impacts all organisations without customized domain claimed message text
 The Following Variables can be used:
 {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
@@ -1407,6 +1407,58 @@ The default text from the translation file will trigger after
 
 
     DELETE: /text/message/passwordless_registration/{language}
+
+
+### GetDefaultPasswordChangeMessageText
+
+> **rpc** GetDefaultPasswordChangeMessageText([GetDefaultPasswordChangeMessageTextRequest](#getdefaultpasswordchangemessagetextrequest))
+[GetDefaultPasswordChangeMessageTextResponse](#getdefaultpasswordchangemessagetextresponse)
+
+Returns the default text for password change message (translation file)
+
+
+
+    GET: /text/default/message/password_change/{language}
+
+
+### GetCustomPasswordChangeMessageText
+
+> **rpc** GetCustomPasswordChangeMessageText([GetCustomPasswordChangeMessageTextRequest](#getcustompasswordchangemessagetextrequest))
+[GetCustomPasswordChangeMessageTextResponse](#getcustompasswordchangemessagetextresponse)
+
+Returns the custom text for password change message (overwritten in eventstore)
+
+
+
+    GET: /text/message/password_change/{language}
+
+
+### SetDefaultPasswordChangeMessageText
+
+> **rpc** SetDefaultPasswordChangeMessageText([SetDefaultPasswordChangeMessageTextRequest](#setdefaultpasswordchangemessagetextrequest))
+[SetDefaultPasswordChangeMessageTextResponse](#setdefaultpasswordchangemessagetextresponse)
+
+Sets the default custom text for password change message
+it impacts all organisations without customized password change message text
+The Following Variables can be used:
+{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+
+
+
+    PUT: /text/message/password_change/{language}
+
+
+### ResetCustomPasswordChangeMessageTextToDefault
+
+> **rpc** ResetCustomPasswordChangeMessageTextToDefault([ResetCustomPasswordChangeMessageTextToDefaultRequest](#resetcustompasswordchangemessagetexttodefaultrequest))
+[ResetCustomPasswordChangeMessageTextToDefaultResponse](#resetcustompasswordchangemessagetexttodefaultresponse)
+
+Removes the custom password change message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/password_change/{language}
 
 
 ### GetDefaultLoginTexts
@@ -2199,6 +2251,28 @@ This is an empty request
 
 
 
+### GetCustomPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomPasswordResetMessageTextRequest
 
 
@@ -2383,6 +2457,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org |  zitadel.org.v1.Org | - |  |
+
+
+
+
+### GetDefaultPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
 
 
 
@@ -3781,6 +3877,28 @@ this is en empty request
 
 
 
+### ResetCustomPasswordChangeMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordChangeMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomPasswordResetMessageTextToDefaultRequest
 
 
@@ -4017,6 +4135,35 @@ this is en empty request
 
 
 ### SetDefaultOrgResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| title |  string | - | string.max_len: 200<br />  |
+| pre_header |  string | - | string.max_len: 200<br />  |
+| subject |  string | - | string.max_len: 200<br />  |
+| greeting |  string | - | string.max_len: 200<br />  |
+| text |  string | - | string.max_len: 800<br />  |
+| button_text |  string | - | string.max_len: 200<br />  |
+| footer_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### SetDefaultPasswordChangeMessageTextResponse
 
 
 

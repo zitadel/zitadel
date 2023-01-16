@@ -2774,6 +2774,57 @@ The default text of the IAM will trigger after
     DELETE: /text/message/passwordless_registration/{language}
 
 
+### GetCustomPasswordChangeMessageText
+
+> **rpc** GetCustomPasswordChangeMessageText([GetCustomPasswordChangeMessageTextRequest](#getcustompasswordchangemessagetextrequest))
+[GetCustomPasswordChangeMessageTextResponse](#getcustompasswordchangemessagetextresponse)
+
+Returns the custom text for passwordless link message
+
+
+
+    GET: /text/message/password_change/{language}
+
+
+### GetDefaultPasswordChangeMessageText
+
+> **rpc** GetDefaultPasswordChangeMessageText([GetDefaultPasswordChangeMessageTextRequest](#getdefaultpasswordchangemessagetextrequest))
+[GetDefaultPasswordChangeMessageTextResponse](#getdefaultpasswordchangemessagetextresponse)
+
+Returns the custom text for passwordless link message
+
+
+
+    GET: /text/default/message/password_change/{language}
+
+
+### SetCustomPasswordChangeMessageCustomText
+
+> **rpc** SetCustomPasswordChangeMessageCustomText([SetCustomPasswordChangeMessageTextRequest](#setcustompasswordchangemessagetextrequest))
+[SetCustomPasswordChangeMessageTextResponse](#setcustompasswordchangemessagetextresponse)
+
+Sets the custom text for passwordless link message
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+
+
+
+    PUT: /text/message/password_change/{language}
+
+
+### ResetCustomPasswordChangeMessageTextToDefault
+
+> **rpc** ResetCustomPasswordChangeMessageTextToDefault([ResetCustomPasswordChangeMessageTextToDefaultRequest](#resetcustompasswordchangemessagetexttodefaultrequest))
+[ResetCustomPasswordChangeMessageTextToDefaultResponse](#resetcustompasswordchangemessagetexttodefaultresponse)
+
+Removes the custom passwordless link message text of the organisation
+The default text of the IAM will trigger after
+
+
+
+    DELETE: /text/message/password_change/{language}
+
+
 ### GetCustomLoginTexts
 
 > **rpc** GetCustomLoginTexts([GetCustomLoginTextsRequest](#getcustomlogintextsrequest))
@@ -4533,6 +4584,28 @@ This is an empty request
 
 
 
+### GetCustomPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomPasswordResetMessageTextRequest
 
 
@@ -4768,6 +4841,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordAgePolicy | - |  |
+
+
+
+
+### GetDefaultPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
 
 
 
@@ -7563,6 +7658,28 @@ This is an empty request
 
 
 
+### ResetCustomPasswordChangeMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordChangeMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomPasswordResetMessageTextToDefaultRequest
 
 
@@ -7919,6 +8036,35 @@ This is an empty request
 
 
 ### SetCustomLoginTextsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetCustomPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| title |  string | - | string.max_len: 200<br />  |
+| pre_header |  string | - | string.max_len: 200<br />  |
+| subject |  string | - | string.max_len: 200<br />  |
+| greeting |  string | - | string.max_len: 200<br />  |
+| text |  string | - | string.max_len: 800<br />  |
+| button_text |  string | - | string.max_len: 200<br />  |
+| footer_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### SetCustomPasswordChangeMessageTextResponse
 
 
 
