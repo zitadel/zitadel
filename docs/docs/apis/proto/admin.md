@@ -3152,7 +3152,7 @@ at least one argument has to be provided
 | limit |  uint32 | - |  |
 | asc |  bool | - |  |
 | editor_user_id |  string | - |  |
-| event_types | repeated string | the event types are filtered using starts with this means that you can filter for user.machine and all the event types of user.machine.* will be returned |  |
+| event_types | repeated string | the types are or filtered and must match the type exatly |  |
 | aggregate_id |  string | - |  |
 | aggregate_type |  string | - |  |
 | resource_owner |  string | - |  |
