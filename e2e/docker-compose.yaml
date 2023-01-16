@@ -38,8 +38,10 @@ services:
     user: '$UID'
     volumes:
       - .:/e2e
-    command: 'sh -c "npm ci --omit=dev && npm run lint && npx wait-on http://localhost:8080/debug/ready"'
+    command: 'sh -c "npm ci --omit=dev --verbose && npm run lint && npx wait-on http://localhost:8080/debug/ready"'
     network_mode: host
+    environment:
+      CYPRESS_CACHE_FOLDER: './.cypress-cache'
 
   e2e:
     image: cypress/included:12.3.0
@@ -56,6 +58,9 @@ services:
     volumes:
       - .:/e2e
     network_mode: host
+    environment:
+      CYPRESS_CACHE_FOLDER: './.cypress-cache'
+
 
 networks:
   zitadel:
