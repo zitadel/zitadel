@@ -4858,7 +4858,7 @@ message ListEventsRequest {
             example: "\"69629023906488334\"";
         }
     ];
-    // the event types are filtered by excact match
+    // the types are or filtered and must match the type exatly
     repeated string event_types = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"user.human.added\", \"user.machine\"]";
