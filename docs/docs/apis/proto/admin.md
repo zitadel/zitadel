@@ -3120,7 +3120,7 @@ at least one argument has to be provided
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| aggregate_types | repeated zitadel.v1.LocalizedMessage | - |  |
+| aggregate_types | repeated zitadel.event.v1.AggregateType | - |  |
 
 
 
@@ -3137,7 +3137,7 @@ at least one argument has to be provided
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| event_types | repeated zitadel.v1.LocalizedMessage | - |  |
+| event_types | repeated zitadel.event.v1.EventType | - |  |
 
 
 

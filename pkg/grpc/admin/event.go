@@ -4,24 +4,24 @@ import (
 	event_grpc "github.com/zitadel/zitadel/internal/api/grpc/event"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/pkg/grpc/message"
+	event_pb "github.com/zitadel/zitadel/pkg/grpc/event"
 )
 
 func EventTypesToPb(eventTypes []string) *ListEventTypesResponse {
-	res := &ListEventTypesResponse{EventTypes: make([]*message.LocalizedMessage, len(eventTypes))}
+	res := &ListEventTypesResponse{EventTypes: make([]*event_pb.EventType, len(eventTypes))}
 
 	for i, eventType := range eventTypes {
-		res.EventTypes[i] = message.NewLocalizedEventType(eventType)
+		res.EventTypes[i] = event_grpc.EventTypeToPb(eventType)
 	}
 
 	return res
 }
 
-func AggregateTypesToPb(eventTypes []string) *ListAggregateTypesResponse {
-	res := &ListAggregateTypesResponse{AggregateTypes: make([]*message.LocalizedMessage, len(eventTypes))}
+func AggregateTypesToPb(aggregateTypes []string) *ListAggregateTypesResponse {
+	res := &ListAggregateTypesResponse{AggregateTypes: make([]*event_pb.AggregateType, len(aggregateTypes))}
 
-	for i, eventType := range eventTypes {
-		res.AggregateTypes[i] = message.NewLocalizedAggregateType(eventType)
+	for i, aggregateType := range aggregateTypes {
+		res.AggregateTypes[i] = event_grpc.AggregateTypeToPb(aggregateType)
 	}
 
 	return res
@@ -44,7 +44,7 @@ func (resp *ListEventTypesResponse) Localizers() []middleware.Localizer {
 
 	localizers := make([]middleware.Localizer, len(resp.EventTypes))
 	for i, eventType := range resp.EventTypes {
-		localizers[i] = eventType
+		localizers[i] = eventType.Localized
 	}
 	return localizers
 }
@@ -55,8 +55,8 @@ func (resp *ListAggregateTypesResponse) Localizers() []middleware.Localizer {
 	}
 
 	localizers := make([]middleware.Localizer, len(resp.AggregateTypes))
-	for i, eventType := range resp.AggregateTypes {
-		localizers[i] = eventType
+	for i, aggregateType := range resp.AggregateTypes {
+		localizers[i] = aggregateType.Localized
 	}
 	return localizers
 }
@@ -68,7 +68,7 @@ func (resp *ListEventsResponse) Localizers() []middleware.Localizer {
 
 	localizers := make([]middleware.Localizer, 0, len(resp.Events)*2)
 	for _, event := range resp.Events {
-		localizers = append(localizers, event.Type, event.Aggregate.Type)
+		localizers = append(localizers, event.Type.Localized, event.Aggregate.Type.Localized)
 	}
 	return localizers
 }

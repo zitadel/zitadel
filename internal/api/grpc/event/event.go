@@ -39,12 +39,26 @@ func EventToPb(event *query.Event) (response *eventpb.Event, err error) {
 		},
 		Aggregate: &eventpb.Aggregate{
 			Id:            event.Aggregate.ID,
-			Type:          message.NewLocalizedAggregateType(string(event.Aggregate.Type)),
+			Type:          AggregateTypeToPb(string(event.Aggregate.Type)),
 			ResourceOwner: event.Aggregate.ResourceOwner,
 		},
 		Sequence:     event.Sequence,
 		CreationDate: timestamppb.New(event.CreationDate),
 		Payload:      payload,
-		Type:         message.NewLocalizedEventType(event.Type),
+		Type:         EventTypeToPb(event.Type),
 	}, nil
+}
+
+func EventTypeToPb(typ string) *eventpb.EventType {
+	return &eventpb.EventType{
+		Type:      typ,
+		Localized: message.NewLocalizedEventType(typ),
+	}
+}
+
+func AggregateTypeToPb(typ string) *eventpb.AggregateType {
+	return &eventpb.AggregateType{
+		Type:      typ,
+		Localized: message.NewLocalizedAggregateType(typ),
+	}
 }

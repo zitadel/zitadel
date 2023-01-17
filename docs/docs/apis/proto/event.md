@@ -16,8 +16,20 @@ title: zitadel/event.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - |  |
-| type |  zitadel.v1.LocalizedMessage | - |  |
+| type |  AggregateType | - |  |
 | resource_owner |  string | - |  |
+
+
+
+
+### AggregateType
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  string | - |  |
+| localized |  zitadel.v1.LocalizedMessage | - |  |
 
 
 
@@ -46,7 +58,19 @@ title: zitadel/event.proto
 | sequence |  uint64 | - |  |
 | creation_date |  google.protobuf.Timestamp | The timestamp the event occurred |  |
 | payload |  google.protobuf.Struct | - |  |
-| type |  zitadel.v1.LocalizedMessage | - |  |
+| type |  EventType | - |  |
+
+
+
+
+### EventType
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  string | - |  |
+| localized |  zitadel.v1.LocalizedMessage | - |  |
 
 
 

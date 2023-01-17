@@ -22,7 +22,7 @@ message Event {
         }
     ];
     google.protobuf.Struct payload = 5;
-    zitadel.v1.LocalizedMessage type = 6;
+    EventType type = 6;
 }
 
 message Editor {
@@ -33,6 +33,16 @@ message Editor {
 
 message Aggregate {
     string id = 1;
-    zitadel.v1.LocalizedMessage type = 2;
+    AggregateType type = 2;
     string resource_owner = 3;
+}
+
+message EventType {
+    string type = 1;
+    zitadel.v1.LocalizedMessage localized = 2;
+}
+
+message AggregateType {
+    string type = 1;
+    zitadel.v1.LocalizedMessage localized = 2;
 }

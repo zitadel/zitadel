@@ -4897,11 +4897,11 @@ message ListEventsResponse {
 message ListEventTypesRequest {}
 
 message ListEventTypesResponse {
-    repeated zitadel.v1.LocalizedMessage event_types = 1;
+    repeated zitadel.event.v1.EventType event_types = 1;
 }
 
 message ListAggregateTypesRequest {}
 
 message ListAggregateTypesResponse {
-    repeated zitadel.v1.LocalizedMessage aggregate_types = 1;
+    repeated zitadel.event.v1.AggregateType aggregate_types = 1;
 }
