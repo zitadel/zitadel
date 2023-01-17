@@ -46,7 +46,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and cluster
 
 ### Monitoring
-Use a appropriate Monitoring Solution to have an overview about your ZITADEL instance. In particular you may want to watch out for things like:
+Use an appropriate monitoring solution to have an overview about your ZITADEL instance. In particular you may want to watch out for things like:
 
 - [ ] CPU and memory of ZITADEL and the database
 - [ ] open database connections
