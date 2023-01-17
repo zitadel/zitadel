@@ -13,8 +13,7 @@ import { ensureHumanDoesntExist, ensureHumanExists } from 'support/api/users';
 import { ZITADELTarget } from 'support/commands';
 import { loginname } from 'support/login/login';
 
-// TODO: Unskip when nil pointer bug is fixed for members api
-describe.skip('permissions', () => {
+describe('permissions', () => {
   const targetOrg = 'e2epermissionsmyorg';
 
   beforeEach(() => {
