@@ -41,7 +41,7 @@ To apply best practices to your production setup we created a step by step check
 
 ### Security
 - [ ] use a FQDN and a trusted valid certificate for external [TLS](https://zitadel.com/docs/self-hosting/manage/tls_modes#http2) connections
-- [ ] make use of different Serviceaccounts to secure ZITADEL within your Hyperscaler or Kubernetes 
+- [ ] make use of different service accounts to secure ZITADEL within your hyperscaler or Kubernetes 
 - [ ] make use of a CDN Service if needed to ease maintainability and Firewall/DNS/WAF configuration
 - [ ] make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and cluster
 
