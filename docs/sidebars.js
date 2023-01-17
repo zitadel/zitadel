@@ -41,7 +41,9 @@ module.exports = {
       type: "category",
       label: "Get started",
       collapsed: false,
-      items: ["guides/start/quickstart"],
+      items: [
+        "guides/start/quickstart",
+      ],
     },
     {
       type: "category",

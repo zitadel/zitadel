@@ -21,7 +21,7 @@ const routes: Routes = [
   },
   {
     path: 'create',
-    loadChildren: () => import('./user-create/user-create.module').then((m) => m.UserCreateModule),
+    loadChildren: () => import('./user-create/user-create.module'),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['user.write'],
@@ -29,7 +29,7 @@ const routes: Routes = [
   },
   {
     path: 'create-machine',
-    loadChildren: () => import('./user-create-machine/user-create-machine.module').then((m) => m.UserCreateMachineModule),
+    loadChildren: () => import('./user-create-machine/user-create-machine.module'),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['user.write'],

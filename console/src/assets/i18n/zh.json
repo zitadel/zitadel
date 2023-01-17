@@ -1483,6 +1483,12 @@
       "DELETED": "项目已删除"
     }
   },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "删除角色",
+      "DELETE_DESCRIPTION": "您即将删除一个角色。你确定吗？"
+    }
+  },
   "NEXTSTEPS": {
     "TITLE": "下一步"
   },
