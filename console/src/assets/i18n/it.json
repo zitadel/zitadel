@@ -42,7 +42,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Istanza",
+    "INSTANCE": "Impostazioni",
     "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
@@ -871,7 +871,7 @@
   },
   "SETTINGS": {
     "INSTANCE": {
-      "TITLE": "Impostazioni dell'istanza",
+      "TITLE": "Impostazioni",
       "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
     },
     "ORG": {

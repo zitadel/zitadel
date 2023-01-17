@@ -42,7 +42,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "Paramètres",
     "DASHBOARD": "Accueil",
     "PERSONAL_INFO": "Informations personnelles",
     "DOCUMENTATION": "Documentation",
@@ -870,7 +870,7 @@
   },
   "SETTINGS": {
     "INSTANCE": {
-      "TITLE": "Paramètres de l'instance",
+      "TITLE": "Paramètres",
       "DESCRIPTION": "Ces paramètres s'appliqueront à toutes vos organisations, sauf s'ils ont été remplacés."
     },
     "ORG": {

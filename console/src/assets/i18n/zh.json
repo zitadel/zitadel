@@ -42,7 +42,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "实例",
+    "INSTANCE": "设置",
     "DASHBOARD": "首页",
     "PERSONAL_INFO": "个人信息",
     "DOCUMENTATION": "文档",
@@ -870,7 +870,7 @@
   },
   "SETTINGS": {
     "INSTANCE": {
-      "TITLE": "实例设置",
+      "TITLE": "设置",
       "DESCRIPTION": "这些设置将应用于您的所有组织，除非它们已被覆盖。"
     },
     "ORG": {

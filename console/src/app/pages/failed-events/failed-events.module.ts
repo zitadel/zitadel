@@ -18,13 +18,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
-import { FailedEventsRoutingModule } from './failed-events-routing.module';
 import { FailedEventsComponent } from './failed-events.component';
 
 @NgModule({
   declarations: [FailedEventsComponent],
   imports: [
-    FailedEventsRoutingModule,
     CommonModule,
     TableActionsModule,
     MatIconModule,
@@ -44,5 +42,6 @@ import { FailedEventsComponent } from './failed-events.component';
     MatTableModule,
     MatSortModule,
   ],
+  exports: [FailedEventsComponent],
 })
 export default class FailedEventsModule {}

@@ -42,7 +42,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "Settings",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
@@ -870,7 +870,7 @@
   },
   "SETTINGS": {
     "INSTANCE": {
-      "TITLE": "Instance Settings",
+      "TITLE": "Settings",
       "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
     },
     "ORG": {
