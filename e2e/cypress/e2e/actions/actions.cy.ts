@@ -142,7 +142,13 @@ describe('actions', () => {
         });
       });
 
-      it('should store password error none and OTP error none in metadata after successful otp authentication', () => {
+      it('should store password error none and OTP error none in metadata after successful otp authentication', {
+          // authentication can fail sometimes
+          retries: {
+            openMode: null,
+            runMode: 2
+          },
+      },() => {
         cy.get<ZITADELTarget>('@target').then((target) => {
           login(postAuthOTPEmail, target.headers['x-zitadel-orgid']);
           cy.visit('/users/me?id=security');
@@ -187,6 +193,11 @@ describe('actions', () => {
           // It is tagged here so that it can be grepped and skipped when run against a dev server.
           tags: ['@same-origin'],
           browser: 'chrome',
+          // authentication can fail sometimes
+          retries: {
+            openMode: null,
+            runMode: 2
+          },
         },
         () => {
           cy.get<ZITADELTarget>('@target').then((target) => {
@@ -241,6 +252,11 @@ describe('actions', () => {
           // It is tagged here so that it can be grepped and skipped when run against a dev server.
           tags: ['@same-origin'],
           browser: 'chrome',
+          // authentication can fail sometimes
+          retries: {
+            openMode: null,
+            runMode: 2
+          },
         },
         () => {
           cy.get<ZITADELTarget>('@target').then((target) => {

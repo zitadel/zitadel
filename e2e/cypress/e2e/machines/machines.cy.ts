@@ -5,7 +5,7 @@ import { ZITADELTarget } from 'support/commands';
 import { loginname } from 'support/login/login';
 
 // TODO: Fix flakiness
-describe.skip('machines', () => {
+describe('machines', () => {
   const targetOrg = 'e2emachines';
 
   [
@@ -30,6 +30,7 @@ describe.skip('machines', () => {
       });
 
       it('should add a machine', () => {
+        cy.contains('tr', machine.addName).should('not.exist')
         cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
         cy.url().should('contain', 'users/create-machine');
         //force needed due to the prefilled username prefix
