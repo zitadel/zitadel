@@ -48,7 +48,7 @@ To apply best practices to your production setup we created a step by step check
 ### Monitoring
 Use a appropriate Monitoring Solution to have an overview about your ZITADEL instance. In particular you may want to watch out for things like:
 
-- [ ] CPU and Memory of ZITADEL and the database
+- [ ] CPU and memory of ZITADEL and the database
 - [ ] open database connections
 - [ ] running instances of ZITADEL and the database
 - [ ] latency of requests
