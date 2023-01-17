@@ -438,11 +438,11 @@ EventTypes:
         failed: 初始化检查失败
     token:
       added: 已创建访问令牌
-      removed: 'asdf'
+      removed: 访问令牌被删除
     username:
       reserved: 保留用户名
       released: 用户名已发布
-      changed: 'asdf'
+      changed: 访问令牌被删除
     email:
       reserved: 电子邮件地址已保留
       released: 电子邮件地址已发布
@@ -582,7 +582,7 @@ EventTypes:
       code:
         added: 生成的手机号码验证码
         sent: 发送手机号码验证码
-      removed: 'asdf'
+      removed: 删除的电话号码
     profile:
       changed: 修改用户资料
     address:
@@ -596,7 +596,7 @@ EventTypes:
           succeeded: MFA OTP 验证成功
           failed: MFA OTP 验证失败
         init:
-          skipped: 'asdf'
+          skipped: 多因素OTP被跳过
       init:
         skipped: 跳过 MFA 初始化
     signed:
@@ -617,11 +617,11 @@ EventTypes:
       removed: 删除用户元数据
       removed.all: 删除所有用户元数据
     domain:
-      claimed: 'asdf'
-      claimed.sent: 'asdf'
+      claimed: 域名索赔
+      claimed.sent: 发送域名索赔信息
     pat:
-      added: 'asdf'
-      removed: 'asdf'
+      added: 添加了个人访问令牌
+      removed: 删除了个人访问标记
   org:
     added: 添加组织
     changed: 更改组织
@@ -670,8 +670,8 @@ EventTypes:
           changed: 更改 SAML IDP 配置
       jwt:
         config:
-          added: 'asdf'
-          changed: 'asdf'
+          added: 添加JWT IDP配置
+          changed: JWT IDP配置变更
     customtext:
       set: 设置自定义文本
       removed: 删除自定义文本
@@ -686,7 +686,7 @@ EventTypes:
           added: 添加 IDP 到登录策略
           removed: 从登录策略删除 IDP
           cascade:
-            removed: 'asdf'
+            removed: 登录政策被逐级删除
         secondfactor:
           added: 添加两步认证到登录策略
           removed: 删除两步认证到登录策略
@@ -733,13 +733,13 @@ EventTypes:
         changed: 更改隐私政策和服务条款
         removed: 删除隐私政策和服务条款
       domain:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: 添加域名政策
+        changed: 域名政策变更
+        removed: 删除域名政策
       lockout:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: 添加密码锁定政策
+        changed: 密码锁定政策改变
+        removed: 删除密码锁定政策
     flow:
       trigger_actions:
         set: 设置动作
@@ -749,17 +749,17 @@ EventTypes:
       cleared: Flow cleared
     mail:
       template:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: 添加电子邮件模板
+        changed: 电子邮件模板变更
+        removed: 电子邮件模板已被删除
       text:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: 添加电子邮件文本
+        changed: 电子邮件文本变更
+        removed: 删除电子邮件文本
     metadata:
-      removed: 'asdf'
-      removed.all: 'asdf'
-      set: 'asdf'
+      removed: 删除元数据
+      removed.all: 删除所有的元数据
+      set: 元数据集
   project:
     added: 添加项目
     changed: 更改项目
@@ -862,8 +862,8 @@ EventTypes:
           changed: 更改 SAML IDP 配置
       jwt:
         config:
-          added: 'asdf'
-          changed: 'asdf'
+          added: 添加JWT IDP配置
+          changed: JWT IDP配置变更
     customtext:
       set: 设置文本
       removed: 删除文本
@@ -935,131 +935,130 @@ EventTypes:
     reactivated: 启用动作
     removed: 删除动作
   instance:
-    added: 'asdf'
-    changed: 'asdf'
+    added: 添加实例
+    changed: 实例已删除
     customtext:
-      removed: 'asdf'
-      set: 'asdf'
+      removed: 删除自定义文本
+      set: 删除自定义文本
       template:
-        removed: 'asdf'
+        removed: 删除了自定义文本模板
     default:
       language:
-        set: 'asdf'
+        set: 默认语言设置
       org:
-        set: 'asdf'
+        set: 默认组织设置
     domain:
-      added: 'asdf'
+      added: 添加域名
       primary:
-        set: 'asdf'
-      removed: 'asdf'
+        set: 主域设置
+      removed: 域名删除
     iam:
       console:
-        set: 'asdf'
+        set: ZITADEL 控制台应用程序设置
       project:
-        set: 'asdf'
+        set: ZITADEL项目设置
     mail:
       template:
-        added: 'asdf'
-        changed: 'asdf'
+        added: 添加电子邮件模板
+        changed: 电子邮件模板变更
       text:
-        added: 'asdf'
-        changed: 'asdf'
+        added: 添加电子邮件文本
+        changed: 更改了电子邮件文本
     member:
-      added: 'asdf'
-      changed: 'asdf'
-      removed: 'asdf'
+      added: 添加实例成员
+      changed: 实例成员改变
+      removed: 删除实例成员
       cascade:
-        removed: 'asdf'
+        removed: 实例成员级联删除
     notification:
       provider:
         debug:
-          fileadded: 'asdf'
-          filechanged: 'asdf'
-          fileremoved: 'asdf'
-          logadded: 'asdf'
-          logchanged: 'asdf'
-          logremoved: 'asdf'
+          fileadded: 文件添加到调试通知提供者中
+          filechanged: 文件被调试通知提供者改变了
+          fileremoved: 从Debug Notification Provider删除的文件
+          logadded: 由调试通知提供者添加的日志
+          logchanged: Debug Notification Provider的日志发生了变化
+          logremoved: 从调试通知提供者那里删除日志
     oidc:
       settings:
-        added: 'asdf'
-        changed: 'asdf'
+        added: 添加OIDC设置
+        changed: OIDC设置改变
     policy:
       domain:
-        added: 'asdf'
-        changed: 'asdf'
+        added: 添加域名政策
+        changed: 域名政策改变
       label:
-        activated: 'asdf'
-        added: 'asdf'
+        activated: 激活标签政策
+        added: 添加标签政策
         assets:
-          removed: 'asdf'
-        changed: 'asdf'
+          removed: 从标签政策中删除的资产
+        changed: 标签政策改变
         font:
-          added: 'asdf'
-          removed: 'asdf'
+          added: 标签指南中添加了字体
+          removed: 从标签政策中删除字体
         icon:
-          added: 'asdf'
-          removed: 'asdf'
+          added: 标签指南中添加了图标
+          removed: 从标签指南中删除图标
           dark:
-            added: 'asdf'
-            removed: 'asdf'
+            added: 暗标指南中添加了图标
+            removed: 从深色标签准则中删除符号
         logo:
-          added: 'asdf'
-          removed: 'asdf'
+          added: 标签政策中添加了标识
+          removed: 从标签准则中删除标识
           dark:
-            added: 'asdf'
-            removed: 'asdf'
+            added: 标志添加到深色标签指南中
+            removed: 从暗标政策中删除标识
       lockout:
-        added: 'asdf'
-        changed: 'asdf'
+        added: 添加了密码锁定政策
+        changed: 密码锁定政策改变
       login:
-        added: 'asdf'
-        changed: 'asdf'
+        added: 添加了登录政策
+        changed: 登录政策改变
         idpprovider:
-          added: 'asdf'
+          added: 登录策略中添加了身份提供者
           cascade:
-            removed: 'asdf'
-          removed: 'asdf'
+            removed: 从登录策略中删除身份提供者级联
+          removed: 从登录策略中删除身份提供者
         multifactor:
-          added: 'asdf'
-          removed: 'asdf'
+          added: 登录策略中加入了多因素
+          removed: 从登录策略中删除多因素
         secondfactor:
-          added: 'asdf'
-          removed: 'asdf'
+          added: 登录政策中添加了第二个因素
+          removed: 从登录策略中删除第二个因素
       password:
         age:
-          added: 'asdf'
-          changed: 'asdf'
+          added: 添加了密码年龄政策
+          changed: 密码年龄政策改变
         complexity:
-          added: 'asdf'
-          changed: 'asdf'
+          added: 添加了密码复杂性策略
+          changed: 密码复杂性政策改变
       privacy:
-        added: 'asdf'
-        changed: 'asdf'
+        added: 添加了隐私政策
+        changed: 隐私政策变更
       security:
-        set: 'asdf'
-        
-    removed: 'asdf'
+        set: 安全策略集
+    removed: 删除的实例
     secret:
       generator:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: 添加密码生成器
+        changed: 密码生成器变更
+        removed: 删除密码生成器
     sms:
       configtwilio:
-        activated: 'asdf'
-        added: 'asdf'
-        changed: 'asdf'
-        deactivated: 'asdf'
-        removed: 'asdf'
+        activated: 激活Twilio短信配置
+        added: 添加Twilio短信配置
+        changed: Twilio短信配置变更
+        deactivated: Twilio SMS配置已停用
+        removed: 删除Twilio短信配置
         token:
-          changed: 'asdf'
+          changed: Twilio SMS配置中加入了令牌
     smtp:
       config:
-        added: 'asdf'
-        changed: 'asdf'
+        added: 添加SMTP节点配置
+        changed: SMTP节点配置变更
         password:
-          changed: 'asdf'
-        removed: 'asdf'
+          changed: SMTP节点配置的密码已更改
+        removed: 删除SMTP节点配置
 
 Application:
   OIDC:

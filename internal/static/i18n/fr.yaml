@@ -438,11 +438,11 @@ EventTypes:
         failed: La vérification de l'initialisation a échoué
     token:
       added: Jeton d'accès créé
-      removed: 'asdf'
+      removed: Jeton d'accès supprimée
     username:
       reserved: Nom d'utilisateur réservé
       released: Nom d'utilisateur libéré
-      changed: 'asdf'
+      changed: Nom d'utilisateur modifiée
     email:
       reserved: Adresse e-mail réservée
       released: Adresse email libérée
@@ -520,8 +520,8 @@ EventTypes:
           check:
             succeeded: Vérification de l'OTP multifactorielle réussie
             failed: La vérification de l'OTP multifactorielle a échoué
-          init:
-            skipped: 'asdf'
+          init: 
+            skipped: L'initialisation de l'OTP a été ignorée
         u2f:
           token:
             added: Ajout d'un jeton U2F multifacteur
@@ -584,7 +584,7 @@ EventTypes:
       code:
         added: Code du numéro de téléphone généré
         sent: Code du numéro de téléphone envoyé
-      removed: 'asdf'
+      removed: Le numéro de téléphone supprimée
     profile:
       changed: Profil de l'utilisateur modifié
     address:
@@ -598,7 +598,7 @@ EventTypes:
           succeeded: Vérification de l'OTP multifactorielle réussie
           failed: Échec de la vérification de l'OTP multifactorielle
         init:
-          skipped: 'asdf'
+          skipped: L'initialisation de l'multifactoriel a été ignorée
       init:
         skipped: L'initialisation du multifacteur a été ignorée
     signed:
@@ -615,15 +615,15 @@ EventTypes:
         removed: Autorisation supprimée
         changed: Autorisation modifiée
     metadata:
-      set: Ensemble de métadonnées de l'utilisateur
+      set: Métadonnées de l'utilisateur défini
       removed: Métadonnées de l'utilisateur supprimées
       removed.all: Suppression de toutes les métadonnées utilisateur
     domain:
-      claimed: 'asdf'
-      claimed.sent: 'asdf'
+      claimed: Le domaine est revendiqué
+      claimed.sent: Notification de domaine revendiqué envoyée
     pat:
-      added: 'asdf'
-      removed: 'asdf'
+      added: Jeton d'accès personnel ajouté
+      removed: Jeton d'accès personnel supprimée
   org:
     added: Organisation ajoutée
     changed: Organisation modifiée
@@ -672,10 +672,10 @@ EventTypes:
           changed: Modification de la configuration IDP SAML
       jwt:
         config:
-          added: JWT IDP configuration added
-          changed: JWT IDP configuration changed
+          added: Ajout de la configuration du fournisseur d'identité JWT
+          changed: Modification de la configuration du fournisseur d'identité JWT
     customtext:
-      set: Jeu de texte personnalisé
+      set: Texte personnalisé défini
       removed: Texte personnalisé supprimé
       template:
         removed: Modèle de texte personnalisé supprimé
@@ -686,9 +686,9 @@ EventTypes:
         removed: Politique de connexion supprimée
         idpprovider:
           added: Fournisseur d'Idp ajouté à la politique de connexion
-          removed: Idp Provider supprimé de la politique de connexion
+          removed: Idp supprimé de la politique de connexion
           cascade:
-            removed: 'asdf'
+            removed: La cascade de fournisseurs d'identité a été supprimée de la politique de connexion
         secondfactor:
           added: Second factor ajouté à la politique de connexion
           removed: Second facteur supprimé de la politique de connexion
@@ -735,33 +735,33 @@ EventTypes:
         changed: Politique de confidentialité et CGU modifiées
         removed: Politique de confidentialité et conditions d'utilisation supprimées
       domain:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: Politique de domaine ajoutée
+        changed: Politique de domaine modifié
+        removed: Politique de domaine supprimée
       lockout:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: Politique de cadenassage ajoutée
+        changed: Politique de cadenassage modifiée
+        removed: Politique de cadenassage supprimée
     flow:
       trigger_actions:
-        set: Action set
+        set: Action défini
         cascade:
           removed: Cascade d'actions supprimée
         removed: Actions supprimées
-      cleared: 'asdf'
+      cleared: Flux déblayée
     mail:
       template:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: Modèle d'email
+        changed: Modèle d'email modifiée
+        removed: Modèle d'email supprimée
       text:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: Texte de l'email ajouté
+        changed: Texte de l'email modifié
+        removed: Texte de l'email supprimé
     metadata:
-      removed: 'asdf'
-      removed.all: 'asdf'
-      set: 'asdf'
+      removed: Métadonnées supprimé
+      removed.all: métadonnées supprimé cascade
+      set: Métadonnées défini
   project:
     added: Projet ajouté
     changed: Projet modifié
@@ -801,8 +801,8 @@ EventTypes:
       oidc:
         secret:
           check:
-            failed: 'asdf'
-            succeeded: 'asdf'
+            failed: Vérifier le secret OIDC raté
+            succeeded: Vérifier le secret OIDC réussir
           verified:
             check: Vérification du secret du client OIDC réussie
             failed: La vérification du secret du client OIDC a échoué
@@ -867,8 +867,8 @@ EventTypes:
           changed: Modification de la configuration de SAML IDP
       jwt:
         config:
-          added: 'asdf'
-          changed: 'asdf'
+          added: Configuration JWT raté
+          changed: Configuration JWT modifié
     customtext:
       set: Le texte a été mis en place
       removed: Le texte a été supprimé
@@ -932,7 +932,7 @@ EventTypes:
   key_pair:
     added: Paire de clés ajoutée
     certificate:
-      added: Certificated added
+      added: Certificate ajouté
   action:
     added: Action ajoutée
     changed: Action modifiée
@@ -940,131 +940,130 @@ EventTypes:
     reactivated: Action réactivée
     removed: Action supprimée
   instance:
-    added: 'asdf'
-    changed: 'asdf'
+    added: Cas ajouté
+    changed: Cas modifié
     customtext:
-      removed: 'asdf'
-      set: 'asdf'
+      removed: Texte personnalisé suprimé
+      set: texte personnalisé
       template:
-        removed: 'asdf'
+        removed: Modèle de texte personnalisé supprimié
     default:
       language:
-        set: 'asdf'
+        set: Langue par défaut
       org:
-        set: 'asdf'
+        set: Organisation par défaut
     domain:
-      added: 'asdf'
+      added: Domaine ajouté
       primary:
-        set: 'asdf'
-      removed: 'asdf'
+        set: Domaine primaire définir
+      removed: Domaine supprimé
     iam:
       console:
-        set: 'asdf'
+        set: Application ZITADEL Console définir
       project:
-        set: 'asdf'
+        set: Projet ZITADEL définir
     mail:
       template:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Modèle de e-mail ajouté
+        changed: Modèle de e-mail modifié
       text:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Texte de l'e-mail ajouté
+        changed: Texte de l'e-mail modifié
     member:
-      added: 'asdf'
-      changed: 'asdf'
-      removed: 'asdf'
+      added: Membre ajouté
+      changed: Membre modifié
+      removed: Membre supprimié
       cascade:
-        removed: 'asdf'
+        removed: Membre supprimié en cascade
     notification:
       provider:
         debug:
-          fileadded: 'asdf'
-          filechanged: 'asdf'
-          fileremoved: 'asdf'
-          logadded: 'asdf'
-          logchanged: 'asdf'
-          logremoved: 'asdf'
+          fileadded: Debug fournisseur de notifications fichier ajouté
+          filechanged: Debug fournisseur de notifications fichier modifié
+          fileremoved: Debug fournisseur de notifications fichier supprimié
+          logadded: Debug fournisseur de notifications ajouté
+          logchanged: Debug fournisseur de notifications modifié
+          logremoved: Debug fournisseur de notifications supprimié
     oidc:
       settings:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Monture OIDC ajouté
+        changed: Monture OIDC modifié
     policy:
       domain:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Politique domaine ajouté
+        changed: Politique domaine modifié
       label:
-        activated: 'asdf'
-        added: 'asdf'
+        activated: Politique des labels activé
+        added: Politique des labels ajouté
         assets:
-          removed: 'asdf'
-        changed: 'asdf'
+          removed: L'atout de politique des labels supprimié
+        changed: Politique des labels modifié
         font:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Police de caractère ajouté
+          removed: Police de caractère supprimié
         icon:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Icône ajouté
+          removed: Icône supprimié
           dark:
-            added: 'asdf'
-            removed: 'asdf'
+            added: Icône sombre ajouté
+            removed: Icône sombre supprimié
         logo:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Logo ajouté
+          removed: Logo supprimié
           dark:
-            added: 'asdf'
-            removed: 'asdf'
+            added: Logo sombre ajouté
+            removed: Logo sombre supprimié
       lockout:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Politique de verrouillage ajouté
+        changed: Politique de verrouillage modifié
       login:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Politique de connexion ajouté
+        changed: Politique de connexion modifié
         idpprovider:
-          added: 'asdf'
+          added: Fournisseur d'identité de politique de connexion ajouté
           cascade:
-            removed: 'asdf'
-          removed: 'asdf'
+            removed: Fournisseur d'identité de politique de connexion supprimié en cascade
+          removed: Fournisseur d'identité de politique de connexion supprimé
         multifactor:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Multifactoriel ajouté
+          removed: Multifactoriel supprimié
         secondfactor:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Deuxième facteur ajouté
+          removed: Deuxième facteur supprimié
       password:
         age:
-          added: 'asdf'
-          changed: 'asdf'
+          added: Politique d'âge du mot de passe ajouté
+          changed: Politique d'âge du mot de passe modifié
         complexity:
-          added: 'asdf'
-          changed: 'asdf'
+          added: Politique de complexité des mots de passe ajouté
+          changed: Politique de complexité des mots de passe modifié
       privacy:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Politique de confidentialité ajouté
+        changed: Politique de confidentialité modifié
       security:
-        set: 'asdf'
-        
-    removed: 'asdf'
+        set: Politique de sécurité fixé   
+    removed: Instance supprimé
     secret:
       generator:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: Générateur secret ajouté
+        changed: Générateur secret modifié
+        removed: Générateur secret supprimié
     sms:
       configtwilio:
-        activated: 'asdf'
-        added: 'asdf'
-        changed: 'asdf'
-        deactivated: 'asdf'
-        removed: 'asdf'
+        activated: Configiuration Twilio SMS activé
+        added: Configiuration Twilio SMS ajouté
+        changed: Configiuration Twilio SMS modifié
+        deactivated: Configiuration Twilio SMS désactivé
+        removed: Configiuration Twilio SMS supprimié
         token:
-          changed: 'asdf'
+          changed: Jeton de configiuratione Twilio SMS modifié
     smtp:
       config:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Configuration de SMTP ajouté
+        changed: Configuration de SMTP modifié
         password:
-          changed: 'asdf'
-        removed: 'asdf'
+          changed: Mot de passe de configuration de SMTP modifié
+        removed: Configuration de SMTP supprimié
 
 Application:
   OIDC:

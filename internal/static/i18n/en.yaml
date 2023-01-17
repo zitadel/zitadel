@@ -928,7 +928,7 @@ EventTypes:
   key_pair:
     added: Key pair added
     certificate:
-      added: Certificated added
+      added: Certificate added
   action:
     added: Action added
     changed: Action changed

@@ -438,7 +438,7 @@ EventTypes:
         failed: Benutzerinitialisierung fehlgeschlagen
     token:
       added: Access Token ausgestellt
-      removed: Access Tomen gelöscht
+      removed: Access Token gelöscht
     username:
       reserved: Benutzername reserviert
       released: Benutzername freigegeben
@@ -596,7 +596,7 @@ EventTypes:
           succeeded: Multifaktor OTP Verifikation erfolgreich
           failed: Multifaktor OTP Verifikation fehlgeschlagen
         init:
-          skipped: Multifaktor OPT übersprungen
+          skipped: Multifaktor OTP übersprungen
       init:
         skipped: Multifaktor Initialisierung übersprungen
     signed:
