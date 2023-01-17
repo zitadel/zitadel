@@ -147,8 +147,6 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock()
 			a := assert.New(t)
 
-			// call the real discovery endpoint
-			gock.New("https://api.github.com").Get("/user").EnableNetworking()
 			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			a.NoError(err)
 

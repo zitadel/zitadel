@@ -214,8 +214,6 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock()
 			a := assert.New(t)
 
-			// call the real discovery endpoint
-			gock.New("https://login.microsoftonline.com/consumers/oauth2/v2.0").Get(oidc.DiscoveryEndpoint).EnableNetworking()
 			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.options...)
 			a.NoError(err)
 

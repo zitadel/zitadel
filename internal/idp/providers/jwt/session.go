@@ -16,12 +16,12 @@ type Session struct {
 	Tokens  *oidc.Tokens
 }
 
-// GetAuthURL implements the idp.Session
+// GetAuthURL implements the idp.Session interface
 func (s *Session) GetAuthURL() string {
 	return s.AuthURL
 }
 
-// FetchUser implements the idp.Session
+// FetchUser implements the idp.Session interface
 // it will map the received idToken into an idp.User
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {

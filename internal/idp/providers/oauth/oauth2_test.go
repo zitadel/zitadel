@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"golang.org/x/oauth2"
@@ -43,7 +42,6 @@ func TestProvider_BeginAuth(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			defer gock.Off()
 			a := assert.New(t)
 
 			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper)

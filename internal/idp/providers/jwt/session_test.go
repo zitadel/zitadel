@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
@@ -72,7 +71,6 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			defer gock.Off()
 			a := assert.New(t)
 
 			session := &Session{
