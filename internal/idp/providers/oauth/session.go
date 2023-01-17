@@ -2,6 +2,7 @@ package oauth
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
@@ -10,6 +11,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
+
+var ErrCodeMissing = errors.New("no auth code provided")
 
 var _ idp.Session = (*Session)(nil)
 
@@ -22,10 +25,14 @@ type Session struct {
 	Provider *Provider
 }
 
+// GetAuthURL implements the idp.Session interface
 func (s *Session) GetAuthURL() string {
 	return s.AuthURL
 }
 
+// FetchUser implements the idp.Session interface
+// it will execute an OAuth 2.0 code exchange if needed to retrieve the access token,
+// call the specified userEndpoint and map the received information into an idp.User
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
 		if err = s.authorize(ctx); err != nil {

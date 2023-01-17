@@ -27,8 +27,8 @@ type UserInfoMapper interface {
 
 var _ UserInfoMapper = (*UserMapper)(nil)
 
-// UserMapper is a dynamic implementation of UserInfoMapper
-// the provided values are used as keys to map the info
+// UserMapper is an implementation of UserInfoMapper
+// it can be used in ZITADEL actions to map the raw info
 type UserMapper struct {
 	ID                string
 	FirstName         string

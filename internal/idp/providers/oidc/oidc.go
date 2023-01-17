@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"errors"
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -11,8 +10,6 @@ import (
 )
 
 var _ idp.Provider = (*Provider)(nil)
-
-var ErrCodeMissing = errors.New("no auth code provided")
 
 // Provider is the idp.Provider implementation for a generic OIDC provider
 type Provider struct {
@@ -27,33 +24,43 @@ type Provider struct {
 
 type ProviderOpts func(provider *Provider)
 
+// WithLinkingAllowed allows end users to link the federated user to an existing one
 func WithLinkingAllowed() ProviderOpts {
 	return func(p *Provider) {
 		p.isLinkingAllowed = true
 	}
 }
+
+// WithCreationAllowed allows end users to create a new user using the federated information
 func WithCreationAllowed() ProviderOpts {
 	return func(p *Provider) {
 		p.isCreationAllowed = true
 	}
 }
+
+// WithAutoCreation enables that federated users are automatically created if not already existing
 func WithAutoCreation() ProviderOpts {
 	return func(p *Provider) {
 		p.isAutoCreation = true
 	}
 }
+
+// WithAutoUpdate enables that information retrieved from the provider is automatically used to update
+// the existing user on each authentication
 func WithAutoUpdate() ProviderOpts {
 	return func(p *Provider) {
 		p.isAutoUpdate = true
 	}
 }
 
+// WithRelyingPartyOption allows to set an additional rp.Option like rp.WithPKCE()
 func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	return func(p *Provider) {
 		p.options = append(p.options, option)
 	}
 }
 
+// New creates a generic OIDC provider
 func New(name, issuer, clientID, clientSecret, redirectURI string, options ...ProviderOpts) (*Provider, error) {
 	provider := &Provider{
 		name: name,
@@ -69,27 +76,34 @@ func New(name, issuer, clientID, clientSecret, redirectURI string, options ...Pr
 	return provider, nil
 }
 
+// Name implements the idp.Provider interface
 func (p *Provider) Name() string {
 	return p.name
 }
 
+// BeginAuth implements the idp.Provider interface
+// it will create a Session with an OIDC authorization request as AuthURL
 func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...any) (idp.Session, error) {
 	url := rp.AuthURL(state, p.RelyingParty)
 	return &Session{AuthURL: url, Provider: p}, nil
 }
 
+// IsLinkingAllowed implements the idp.Provider interface
 func (p *Provider) IsLinkingAllowed() bool {
 	return p.isLinkingAllowed
 }
 
+// IsCreationAllowed implements the idp.Provider interface
 func (p *Provider) IsCreationAllowed() bool {
 	return p.isCreationAllowed
 }
 
+// IsAutoCreation implements the idp.Provider interface
 func (p *Provider) IsAutoCreation() bool {
 	return p.isAutoCreation
 }
 
+// IsAutoUpdate implements the idp.Provider interface
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }

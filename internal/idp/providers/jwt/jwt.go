@@ -18,7 +18,7 @@ const (
 var _ idp.Provider = (*Provider)(nil)
 
 var (
-	ErrNoTokens           = errors.New("no tokens")
+	ErrNoTokens           = errors.New("no tokens provided")
 	ErrMissingUserAgentID = errors.New("userAgentID missing")
 )
 
@@ -38,28 +38,36 @@ type Provider struct {
 
 type ProviderOpts func(provider *Provider)
 
+// WithLinkingAllowed allows end users to link the federated user to an existing one
 func WithLinkingAllowed() ProviderOpts {
 	return func(p *Provider) {
 		p.isLinkingAllowed = true
 	}
 }
+
+// WithCreationAllowed allows end users to create a new user using the federated information
 func WithCreationAllowed() ProviderOpts {
 	return func(p *Provider) {
 		p.isCreationAllowed = true
 	}
 }
+
+// WithAutoCreation enables that federated users are automatically created if not already existing
 func WithAutoCreation() ProviderOpts {
 	return func(p *Provider) {
 		p.isAutoCreation = true
 	}
 }
 
+// WithAutoUpdate enables that information retrieved from the provider is automatically used to update
+// the existing user on each authentication
 func WithAutoUpdate() ProviderOpts {
 	return func(p *Provider) {
 		p.isAutoUpdate = true
 	}
 }
 
+// New creates a JWT provider
 func New(name, issuer, jwtEndpoint, keysEndpoint, headerName string, encryptionAlg crypto.EncryptionAlgorithm, options ...ProviderOpts) (*Provider, error) {
 	provider := &Provider{
 		name:          name,
@@ -76,10 +84,14 @@ func New(name, issuer, jwtEndpoint, keysEndpoint, headerName string, encryptionA
 	return provider, nil
 }
 
+// Name implements the idp.Provider interface
 func (p *Provider) Name() string {
 	return p.name
 }
 
+// BeginAuth implements the idp.Provider interface
+// it will create a Session with an AuthURL, pointing to the jwtEndpoint
+// with the authRequest and encrypted userAgent ids
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
 	redirect, err := url.Parse(p.jwtEndpoint)
 	if err != nil {
@@ -103,18 +115,22 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 	return &Session{AuthURL: redirect.String()}, nil
 }
 
+// IsLinkingAllowed implements the idp.Provider interface
 func (p *Provider) IsLinkingAllowed() bool {
 	return p.isLinkingAllowed
 }
 
+// IsCreationAllowed implements the idp.Provider interface
 func (p *Provider) IsCreationAllowed() bool {
 	return p.isCreationAllowed
 }
 
+// IsAutoCreation implements the idp.Provider interface
 func (p *Provider) IsAutoCreation() bool {
 	return p.isAutoCreation
 }
 
+// IsAutoUpdate implements the idp.Provider interface
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }

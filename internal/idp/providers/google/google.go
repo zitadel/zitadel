@@ -17,6 +17,7 @@ type Provider struct {
 	*oidc.Provider
 }
 
+// New creates a Google provider using the oidc.Provider (OIDC generic provider)
 func New(clientID, clientSecret, redirectURI string, opts ...oidc.ProviderOpts) (*Provider, error) {
 	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, opts...)
 	if err != nil {

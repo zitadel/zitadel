@@ -63,12 +63,15 @@ func WithEmailVerified() ProviderOptions {
 	}
 }
 
+// WithOAuthOptions allows to specify oauth.ProviderOpts like oauth.WithLinkingAllowed()
 func WithOAuthOptions(opts ...oauth.ProviderOpts) ProviderOptions {
 	return func(p *Provider) {
 		p.options = append(p.options, opts...)
 	}
 }
 
+// New creates an AzureAD provider using the oauth.Provider (OAuth 2.0 generic provider)
+// By default it uses the CommonTenant and unverified emails
 func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptions) (*Provider, error) {
 	provider := &Provider{
 		tenant:  CommonTenant,
@@ -112,6 +115,10 @@ func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes [
 	return c
 }
 
+// User represents the structure return on the userinfo endpoint
+//
+// AzureAD does not return an `email_verified` claim.
+// The verification can be automatically activated on the provider (WithEmailVerified())
 type User struct {
 	Sub               string `json:"sub"`
 	FamilyName        string `json:"family_name"`
@@ -140,6 +147,7 @@ func (u *User) GetDisplayName() string {
 }
 
 func (u *User) GetNickName() string {
+	// AzureAD does not provide the user's nickname
 	return ""
 }
 
@@ -156,23 +164,27 @@ func (u *User) IsEmailVerified() bool {
 }
 
 func (u *User) GetPhone() string {
-	return "" //TODO: ?
+	// AzureAD does not provide the user's phone
+	return ""
 }
 
 func (u *User) IsPhoneVerified() bool {
-	return false //TODO: ?
+	// AzureAD does not provide the user's phone
+	return false
 }
 
 func (u *User) GetPreferredLanguage() language.Tag {
-	return language.Und //TODO: ?
+	// AzureAD does not provide the user's language
+	return language.Und
+}
+
+func (u *User) GetProfile() string {
+	// AzureAD does not provide the user's profile page
+	return ""
 }
 
 func (u *User) GetAvatarURL() string {
 	return u.Picture
-}
-
-func (u *User) GetProfile() string {
-	return "" //TODO: ?
 }
 
 func (u *User) RawData() any {

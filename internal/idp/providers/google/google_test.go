@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/idp"
-	oidc2 "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {
@@ -28,7 +28,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
 			},
-			want: &oidc2.Session{
+			want: &oidc.Session{
 				AuthURL: "https://accounts.google.com/o/oauth2/v2/auth?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
 			},
 		},

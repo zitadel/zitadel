@@ -20,10 +20,13 @@ const (
 
 var _ idp.Provider = (*Provider)(nil)
 
+// New creates a GitHub.com provider using the oauth.Provider (OAuth 2.0 generic provider)
 func New(clientID, secret, callbackURL string, scopes []string, options ...oauth.ProviderOpts) (*Provider, error) {
 	return NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL, scopes, options...)
 }
 
+// NewCustomURL creates a GitHub provider using the oauth.Provider (OAuth 2.0 generic provider)
+// with custom endpoints, e.g. GitHub Enterprise server
 func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL string, scopes []string, options ...oauth.ProviderOpts) (*Provider, error) {
 	rp, err := oauth.New(
 		newConfig(clientID, secret, callbackURL, authURL, tokenURL, scopes),
@@ -111,8 +114,39 @@ type User struct {
 	} `json:"plan"`
 }
 
+func (u *User) GetID() string {
+	return strconv.Itoa(u.ID)
+}
+
+func (u *User) GetFirstName() string {
+	// GitHub does not provide the user's firstname
+	return ""
+}
+
+func (u *User) GetLastName() string {
+	// GitHub does not provide the user's lastname
+	return ""
+}
+
+func (u *User) GetDisplayName() string {
+	return u.Name
+}
+
+func (u *User) GetNickName() string {
+	return u.Login
+}
+
 func (u *User) GetPreferredUsername() string {
 	return u.Login
+}
+
+func (u *User) GetEmail() string {
+	return u.Email
+}
+
+func (u *User) IsEmailVerified() bool {
+	// GitHub validates emails themself
+	return true
 }
 
 func (u *User) GetPhone() string {
@@ -134,39 +168,8 @@ func (u *User) GetProfile() string {
 	return u.HtmlUrl
 }
 
-func (u *User) IsEmailVerified() bool {
-	// GitHub validates emails themself
-	return true
-}
-
-func (u *User) GetID() string {
-	return strconv.Itoa(u.ID)
-}
-
-func (u *User) GetDisplayName() string {
-	return u.Name
-}
-
-func (u *User) GetNickName() string {
-	return u.Login
-}
-
-func (u *User) GetEmail() string {
-	return u.Email
-}
-
 func (u *User) GetAvatarURL() string {
 	return u.AvatarUrl
-}
-
-func (u *User) GetFirstName() string {
-	// GitHub does not provide the user's firstname
-	return ""
-}
-
-func (u *User) GetLastName() string {
-	// GitHub does not provide the user's lastname
-	return ""
 }
 
 func (u *User) RawData() any {

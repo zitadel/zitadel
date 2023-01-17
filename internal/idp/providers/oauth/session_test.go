@@ -25,9 +25,6 @@ func TestProvider_FetchUser(t *testing.T) {
 		code         string
 		tokens       *oidc.Tokens
 	}
-	type args struct {
-		session idp.Session
-	}
 	type want struct {
 		user idp.User
 		err  func(error) bool
@@ -35,7 +32,6 @@ func TestProvider_FetchUser(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		args   args
 		want   want
 	}{
 		{
@@ -55,9 +51,6 @@ func TestProvider_FetchUser(t *testing.T) {
 				httpMock:     func(issuer string) {},
 				authURL:      "https://oauth2.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
 				tokens:       nil,
-			},
-			args: args{
-				&Session{},
 			},
 			want: want{
 				err: func(err error) bool {
@@ -96,9 +89,6 @@ func TestProvider_FetchUser(t *testing.T) {
 						TokenType:   oidc.BearerToken,
 					},
 				},
-			},
-			args: args{
-				&Session{},
 			},
 			want: want{
 				err: func(err error) bool {
@@ -139,9 +129,6 @@ func TestProvider_FetchUser(t *testing.T) {
 						TokenType:   oidc.BearerToken,
 					},
 				},
-			},
-			args: args{
-				&Session{},
 			},
 			want: want{
 				user: idp.User{
@@ -192,9 +179,6 @@ func TestProvider_FetchUser(t *testing.T) {
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
 				tokens:  nil,
 				code:    "code",
-			},
-			args: args{
-				&Session{},
 			},
 			want: want{
 				user: idp.User{

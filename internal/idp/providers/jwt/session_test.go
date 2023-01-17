@@ -15,12 +15,8 @@ import (
 
 func TestSession_FetchUser(t *testing.T) {
 	type fields struct {
-		issuer       string
-		jwtEndpoint  string
-		keysEndpoint string
-		headerName   string
-		authURL      string
-		tokens       *oidc.Tokens
+		authURL string
+		tokens  *oidc.Tokens
 	}
 	type want struct {
 		user idp.User
@@ -32,13 +28,8 @@ func TestSession_FetchUser(t *testing.T) {
 		want   want
 	}{
 		{
-			name: "no tokens",
-			fields: fields{
-				issuer:       "https://jwt.com",
-				jwtEndpoint:  "https://auth.com/jwt",
-				keysEndpoint: "https://jwt.com/keys",
-				headerName:   "jwt-header",
-			},
+			name:   "no tokens",
+			fields: fields{},
 			want: want{
 				err: func(err error) bool {
 					return errors.Is(err, ErrNoTokens)
@@ -48,11 +39,7 @@ func TestSession_FetchUser(t *testing.T) {
 		{
 			name: "successful fetch",
 			fields: fields{
-				issuer:       "https://jwt.com",
-				jwtEndpoint:  "https://auth.com/jwt",
-				keysEndpoint: "https://jwt.com/keys",
-				headerName:   "jwt-header",
-				authURL:      "https://auth.com/jwt?authRequestID=testState",
+				authURL: "https://auth.com/jwt?authRequestID=testState",
 				tokens: &oidc.Tokens{
 					Token: &oauth2.Token{},
 					IDTokenClaims: func() oidc.IDTokenClaims {
@@ -87,9 +74,6 @@ func TestSession_FetchUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			defer gock.Off()
 			a := assert.New(t)
-
-			//provider, err := New(tt.fields.issuer, tt.fields.jwtEndpoint, tt.fields.keysEndpoint, tt.fields.headerName)
-			//a.NoError(err)
 
 			session := &Session{
 				AuthURL: tt.fields.authURL,

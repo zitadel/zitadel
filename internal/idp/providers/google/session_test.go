@@ -9,12 +9,12 @@ import (
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	openid "github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/idp"
-	oidc2 "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
 
 func TestSession_FetchUser(t *testing.T) {
@@ -25,10 +25,7 @@ func TestSession_FetchUser(t *testing.T) {
 		httpMock     func()
 		authURL      string
 		code         string
-		tokens       *oidc.Tokens
-	}
-	type args struct {
-		session idp.Session
+		tokens       *openid.Tokens
 	}
 	type want struct {
 		user idp.User
@@ -37,7 +34,6 @@ func TestSession_FetchUser(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		args   args
 		want   want
 	}{
 		{
@@ -55,11 +51,8 @@ func TestSession_FetchUser(t *testing.T) {
 				authURL: "https://accounts.google.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
 				tokens:  nil,
 			},
-			args: args{
-				&oidc2.Session{},
-			},
 			want: want{
-				err: oidc2.ErrCodeMissing,
+				err: oidc.ErrCodeMissing,
 			},
 		},
 		{
@@ -75,12 +68,12 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://accounts.google.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &openid.Tokens{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
-						TokenType:   oidc.BearerToken,
+						TokenType:   openid.BearerToken,
 					},
-					IDTokenClaims: oidc.NewIDTokenClaims(
+					IDTokenClaims: openid.NewIDTokenClaims(
 						issuer,
 						"sub2",
 						[]string{"clientID"},
@@ -93,9 +86,6 @@ func TestSession_FetchUser(t *testing.T) {
 						0,
 					),
 				},
-			},
-			args: args{
-				&oidc2.Session{},
 			},
 			want: want{
 				err: rp.ErrUserInfoSubNotMatching,
@@ -114,12 +104,12 @@ func TestSession_FetchUser(t *testing.T) {
 						JSON(userinfo())
 				},
 				authURL: "https://accounts.google.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
-				tokens: &oidc.Tokens{
+				tokens: &openid.Tokens{
 					Token: &oauth2.Token{
 						AccessToken: "accessToken",
-						TokenType:   oidc.BearerToken,
+						TokenType:   openid.BearerToken,
 					},
-					IDTokenClaims: oidc.NewIDTokenClaims(
+					IDTokenClaims: openid.NewIDTokenClaims(
 						issuer,
 						"sub",
 						[]string{"clientID"},
@@ -132,9 +122,6 @@ func TestSession_FetchUser(t *testing.T) {
 						0,
 					),
 				},
-			},
-			args: args{
-				&oidc2.Session{},
 			},
 			want: want{
 				user: idp.User{
@@ -162,11 +149,11 @@ func TestSession_FetchUser(t *testing.T) {
 			a := assert.New(t)
 
 			// call the real discovery endpoint
-			gock.New(issuer).Get(oidc.DiscoveryEndpoint).EnableNetworking()
+			gock.New(issuer).Get(openid.DiscoveryEndpoint).EnableNetworking()
 			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
 			a.NoError(err)
 
-			session := &oidc2.Session{
+			session := &oidc.Session{
 				Provider: provider.Provider,
 				AuthURL:  tt.fields.authURL,
 				Code:     tt.fields.code,
@@ -185,8 +172,8 @@ func TestSession_FetchUser(t *testing.T) {
 	}
 }
 
-func userinfo() oidc.UserInfoSetter {
-	info := oidc.NewUserInfo()
+func userinfo() openid.UserInfoSetter {
+	info := openid.NewUserInfo()
 	info.SetSubject("sub")
 	info.SetGivenName("firstname")
 	info.SetFamilyName("lastname")

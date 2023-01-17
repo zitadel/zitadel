@@ -9,7 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
-	oidc2 "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {
@@ -32,7 +32,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
 			},
-			want: &oidc2.Session{
+			want: &oidc.Session{
 				AuthURL: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
 			},
 		},
@@ -46,7 +46,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 					WithTenant(ConsumersTenant),
 				},
 			},
-			want: &oidc2.Session{
+			want: &oidc.Session{
 				AuthURL: "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid+profile+email&state=testState",
 			},
 		},
