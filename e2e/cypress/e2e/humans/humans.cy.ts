@@ -13,7 +13,7 @@ describe('humans', () => {
     { mustBeDomain: true, addName: 'e2ehumanusernameaddSimple', removeName: 'e2ehumanusernameremoveSimple' },
   ].forEach((user) => {
     beforeEach(() => {
-      newTarget('e2ehumans')
+      newTarget(targetOrg)
         .as('target')
         .then((target) => {
           ensureDomainPolicy(target, user.mustBeDomain, true, false);
@@ -58,7 +58,7 @@ describe('humans', () => {
 
       // TODO: fix exact username matching (same for machines)
       // TODO: fix confirm-dialog username (same for machines)
-      it.skip('should delete a human user', () => {
+      it('should delete a human user', () => {
         Cypress.$.expr[':'].textEquals = Cypress.$.expr.createPseudo((arg) => {
           return (elem) => {
             return (

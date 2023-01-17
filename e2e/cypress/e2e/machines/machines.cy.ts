@@ -10,7 +10,7 @@ describe('machines', () => {
   [
     { mustBeDomain: false, addName: 'e2emachineusernameaddGlobal', removeName: 'e2emachineusernameremoveGlobal' },
     { mustBeDomain: false, addName: 'e2emachineusernameadd@test.com', removeName: 'e2emachineusernameremove@test.com' },
-    { mustBeDomain: true, addName: 'e2emachineusernameadd', removeName: 'e2emachineusernameremove' },
+    { mustBeDomain: true, addName: 'e2emachineusernameaddSimple', removeName: 'e2emachineusernameremoveSimple' },
   ].forEach((machine) => {
     beforeEach(() => {
       newTarget(targetOrg)
