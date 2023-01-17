@@ -20,6 +20,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -58,6 +59,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     },
   ];
   public currentSetting: string | undefined = this.settingsList[0].id;
+  public loginPolicy?: LoginPolicy.AsObject;
 
   constructor(
     public translate: TranslateService,
@@ -92,6 +94,12 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     this.userService.getSupportedLanguages().then((lang) => {
       this.languages = lang.languagesList;
+    });
+
+    this.userService.getMyLoginPolicy().then((policy) => {
+      if (policy.policy) {
+        this.loginPolicy = policy.policy;
+      }
     });
   }
 
