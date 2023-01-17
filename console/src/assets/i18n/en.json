@@ -231,6 +231,7 @@
       "CREATE": "Create",
       "MY": "My Information",
       "LOGINNAMES": "Login names",
+      "LOGINMETHODS": "Login methods",
       "LOGINNAMESDESC": "These are your login names:",
       "NOUSER": "No associated user.",
       "REACTIVATE": "Reactivate",
