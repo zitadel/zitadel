@@ -134,8 +134,8 @@ func TestSession_FetchUser(t *testing.T) {
 						Name:       "name",
 						Email:      "email",
 						HtmlUrl:    "htmlURL",
-						CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.Local),
-						UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.Local),
+						CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+						UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
 					},
 				},
 			},
@@ -178,7 +178,7 @@ func userinfo() *User {
 		Name:       "name",
 		Email:      "email",
 		HtmlUrl:    "htmlURL",
-		CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.Local),
-		UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.Local),
+		CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+		UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
 	}
 }
