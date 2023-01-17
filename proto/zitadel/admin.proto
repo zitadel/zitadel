@@ -10,6 +10,7 @@ import "zitadel/policy.proto";
 import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
+import "zitadel/event.proto";
 import "zitadel/management.proto";
 import "zitadel/v1.proto";
 
@@ -2544,6 +2545,39 @@ service AdminService {
             permission: "iam.read";
         };
     }
+
+    rpc ListEventTypes(ListEventTypesRequest) returns (ListEventTypesResponse) {
+        option (google.api.http) = {
+            post: "/events/types/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
+        };
+    }
+
+    rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
+        option (google.api.http) = {
+            post: "/events/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
+        };
+    }
+
+    rpc ListAggregateTypes(ListAggregateTypesRequest) returns (ListAggregateTypesResponse) {
+        option (google.api.http) = {
+            post: "/aggregates/types/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
+        };
+    }
 }
 
 
@@ -4796,4 +4830,77 @@ message ExportDataRequest {
 
 message ExportDataResponse {
     repeated DataOrg orgs = 1;
+}
+
+message ListEventsRequest {
+    // sequence represents the order of events. It's always upcounting
+    // if asc is false sequence is used as less than filter
+    // if asc is true sequence is used as greater than filter
+    // if sequence is 0 the field is ignored
+    uint64 sequence = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2\"";
+        }
+    ];
+    uint32 limit = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "20";
+            description: "Maximum amount of events returned.";
+        }
+    ];
+    bool asc = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "default is descending sorting order"
+        }
+    ];
+    string editor_user_id = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    // the types are or filtered and must match the type exatly
+    repeated string event_types = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"user.human.added\", \"user.machine\"]";
+        }
+    ];
+    string aggregate_id = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    string aggregate_type = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"user\"";
+        }
+    ];
+    string resource_owner = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    // if asc is false creation_date is used as less than filter
+    // if asc is true creation_date is used as greater than filter
+    // if creation_date is not set the field is ignored
+    google.protobuf.Timestamp creation_date = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2019-04-01T08:45:00.000000Z\"";
+        }
+    ];
+}
+
+message ListEventsResponse {
+    repeated zitadel.event.v1.Event events = 1;
+}
+
+message ListEventTypesRequest {}
+
+message ListEventTypesResponse {
+    repeated string event_types = 1;
+}
+
+message ListAggregateTypesRequest {}
+
+message ListAggregateTypesResponse {
+    repeated string aggregate_types = 1;
 }
