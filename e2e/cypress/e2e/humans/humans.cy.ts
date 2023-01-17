@@ -92,7 +92,7 @@ describe('humans', () => {
 
 function navigateToUsers(target: ZITADELTarget) {
   // directly going to users is not working, atm
-  cy.visit(`/org?org=${target.headers['x-zitadel-orgid']}`);
+  cy.visit(`/org?org=${target.orgId}`);
   cy.get('[data-e2e="users-nav"]').should('be.visible').click();
   cy.get('[data-e2e="list-humans"] button').should('be.visible').click();
 }

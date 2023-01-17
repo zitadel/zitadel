@@ -11,7 +11,7 @@ describe('applications', () => {
       newTarget('e2eapplications').then((target) => {
         ensureProjectExists(target, testProjectName).then((projectId) => {
           ensureOIDCAppDoesntExist(target, projectId, testAppName);
-          cy.visit(`/projects/${projectId}?org=${target.headers['x-zitadel-orgid']}`);
+          cy.visit(`/projects/${projectId}?org=${target.orgId}`);
         });
       });
     });

@@ -16,7 +16,7 @@ function resetDomainPolicy(target: ZITADELTarget) {
   return cy
     .request({
       method: 'DELETE',
-      url: `${target.adminBaseURL}/orgs/${target.headers['x-zitadel-orgid']}/policies/domain`,
+      url: `${target.adminBaseURL}/orgs/${target.orgId}/policies/domain`,
       headers: target.headers,
       failOnStatusCode: false,
     })
@@ -37,7 +37,7 @@ function setDomainPolicy(
   return cy
     .request({
       method: 'POST',
-      url: `${target.adminBaseURL}/orgs/${target.headers['x-zitadel-orgid']}/policies/domain`,
+      url: `${target.adminBaseURL}/orgs/${target.orgId}/policies/domain`,
       body: {
         userLoginMustBeDomain: userLoginMustBeDomain,
         validateOrgDomains: validateOrgDomains,

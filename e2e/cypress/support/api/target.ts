@@ -23,6 +23,7 @@ export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainabl
           },
           mgmtBaseURL: `${Cypress.env('BACKEND_URL')}/management/v1`,
           adminBaseURL: `${Cypress.env('BACKEND_URL')}/admin/v1`,
+          orgId: undefined,
           org: orgName,
         })
         .then((tmpTarget) => {
@@ -39,12 +40,14 @@ export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainabl
     });
 }
 
-export function newOrgTarget(target: ZITADELTarget, id: number): ZITADELTarget {
+export function newOrgTarget(target: ZITADELTarget, id: number, name: string): ZITADELTarget {
   return {
     ...target,
     headers: {
       ...target.headers,
       'x-zitadel-orgid': id.toString(),
     },
+    orgId: id,
+    org: name,
   };
 }

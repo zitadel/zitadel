@@ -1,4 +1,4 @@
-export function register(email: string, orgId: string): Cypress.Chainable<string> {
+export function register(email: string, orgId: number): Cypress.Chainable<string> {
   cy.clearAllSessionStorage();
 
   const pw = 'Password1!';

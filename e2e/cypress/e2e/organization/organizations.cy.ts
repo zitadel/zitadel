@@ -17,7 +17,7 @@ describe('organizations', () => {
     // TODO: Fix console bug
     it.skip('routing works', () => {
       cy.get<ZITADELTarget>('@target').then((target) => {
-        cy.visit(`/users?type=human&org=${target.headers['x-zitadel-orgid']}`);
+        cy.visit(`/users?type=human&org=${target.orgId}`);
         cy.contains('cnsl-nav', 'Users');
         cy.get('tr:contains(ZITADEL Admin)', { timeout: 0 }).should('not.exist');
       });

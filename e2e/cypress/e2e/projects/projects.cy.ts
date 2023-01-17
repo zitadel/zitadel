@@ -14,7 +14,7 @@ describe('projects', () => {
     beforeEach(`ensure it doesn't exist already`, () => {
       cy.get<ZITADELTarget>('@target').then((target) => {
         ensureProjectDoesntExist(target, testProjectNameCreate);
-        cy.visit(`/projects?org=${target.headers['x-zitadel-orgid']}`);
+        cy.visit(`/projects?org=${target.orgId}`);
       });
     });
 
@@ -32,7 +32,7 @@ describe('projects', () => {
     beforeEach('ensure it exists', () => {
       cy.get<ZITADELTarget>('@target').then((target) => {
         ensureProjectExists(target, testProjectNameDelete);
-        cy.visit(`/projects?org=${target.headers['x-zitadel-orgid']}`);
+        cy.visit(`/projects?org=${target.orgId}`);
       });
     });
 

@@ -1,6 +1,6 @@
 export function login(
   username: string,
-  orgId: string,
+  orgId: number,
   expectSuccess = true,
   pw = 'Password1!',
   onPasswordScreen?: () => void,

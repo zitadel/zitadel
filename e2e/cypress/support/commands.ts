@@ -10,6 +10,7 @@ export interface ZITADELTarget {
   };
   mgmtBaseURL: string;
   adminBaseURL: string;
+  orgId: number;
   org: string;
 }
 
