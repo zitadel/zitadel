@@ -465,7 +465,7 @@ DefaultInstance:
   SMTPConfiguration:
     # configuration of the host
     SMTP:
-      #for example smtp.mailtrap.io:2525
+      # must include the port, like smtp.mailtrap.io:2525. IPv6 is also supported, like [2001:db8::1]:2525
       Host:
       User:
       Password:
@@ -624,6 +624,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "events.read"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -648,6 +649,7 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
+        - "events.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"

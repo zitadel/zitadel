@@ -915,9 +915,9 @@
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
-      "SENDERADDRESS": "Sender Email address",
+      "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
-      "HOST": "Host",
+      "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
       "SETPASSWORD": "Set SMTP Password",

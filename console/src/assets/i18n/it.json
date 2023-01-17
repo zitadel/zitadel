@@ -918,7 +918,7 @@
       "TITLE": "Impostazioni SMTP",
       "SENDERADDRESS": "Indirizzo email del mittente",
       "SENDERNAME": "Nome del mittente",
-      "HOST": "Host",
+      "HOSTANDPORT": "Host e porta",
       "USER": "Utente",
       "PASSWORD": "Password",
       "SETPASSWORD": "Imposta SMTP Password",
