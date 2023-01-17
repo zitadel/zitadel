@@ -27,9 +27,8 @@ func (s *Server) ListEventTypes(ctx context.Context, in *admin_pb.ListEventTypes
 }
 
 func (s *Server) ListAggregateTypes(ctx context.Context, in *admin_pb.ListAggregateTypesRequest) (*admin_pb.ListAggregateTypesResponse, error) {
-	return &admin_pb.ListAggregateTypesResponse{
-		AggregateTypes: s.query.SearchAggregateTypes(ctx),
-	}, nil
+	aggregateTypes := s.query.SearchAggregateTypes(ctx)
+	return admin_pb.AggregateTypesToPb(aggregateTypes), nil
 }
 
 func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) (*eventstore.SearchQueryBuilder, error) {

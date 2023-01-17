@@ -425,6 +425,16 @@ Errors:
     CloseRows: SQL Statement konnte nicht abgeschlossen werden
     SQLStatement: SQL Statement konnte nicht erstellt werden
     InvalidRequest: Anfrage ist ungültig
+
+AggregateTypes:
+  action: Action
+  instance: Instanz
+  key_pair: Schlüsselpaar
+  org: Organisation
+  project: Projekt
+  user: Benutzer
+  usergrant: Benutzerberechtigung
+
 EventTypes:
   user:
     added: Benutzer hinzugefügt

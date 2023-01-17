@@ -425,6 +425,16 @@ Errors:
     CloseRows: Lo statement SQL non può essere terminato
     SQLStatement: Lo statement SQL non può essere creato
     InvalidRequest: La richiesta non è valida
+
+AggregateTypes:
+  action: Azione
+  instance: Istanza
+  key_pair: Coppia di chiavi
+  org: Organizzazione
+  project: Progetto
+  user: Utente
+  usergrant: Sovvenzione utente
+
 EventTypes:
   user:
     added: Utente aggiunto

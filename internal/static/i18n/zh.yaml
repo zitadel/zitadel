@@ -425,6 +425,16 @@ Errors:
     CloseRows: SQL 语句无法完成
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
+
+AggregateTypes:
+  action: 行动
+  instance: 实例
+  key_pair: 密钥对
+  org: 组织
+  project: 项目
+  user: 用户
+  usergrant: 用户授予
+
 EventTypes:
   user:
     added: 已添加用户

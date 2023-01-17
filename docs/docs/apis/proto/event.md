@@ -16,7 +16,7 @@ title: zitadel/event.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - |  |
-| type |  string | - |  |
+| type |  zitadel.v1.LocalizedMessage | - |  |
 | resource_owner |  string | - |  |
 
 

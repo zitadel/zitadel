@@ -33,6 +33,6 @@ message Editor {
 
 message Aggregate {
     string id = 1;
-    string type = 2;
+    zitadel.v1.LocalizedMessage type = 2;
     string resource_owner = 3;
 }

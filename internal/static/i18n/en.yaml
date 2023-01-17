@@ -426,6 +426,15 @@ Errors:
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
 
+AggregateTypes:
+  action: Action
+  instance: Instance
+  key_pair: Key Pair
+  org: Organization
+  project: Project
+  user: User
+  usergrant: User grant
+
 EventTypes:
   user:
     added: User added

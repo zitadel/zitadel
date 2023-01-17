@@ -39,7 +39,7 @@ func EventToPb(event *query.Event) (response *eventpb.Event, err error) {
 		},
 		Aggregate: &eventpb.Aggregate{
 			Id:            event.Aggregate.ID,
-			Type:          string(event.Aggregate.Type),
+			Type:          message.NewLocalizedAggregateType(string(event.Aggregate.Type)),
 			ResourceOwner: event.Aggregate.ResourceOwner,
 		},
 		Sequence:     event.Sequence,

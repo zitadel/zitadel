@@ -3120,7 +3120,7 @@ at least one argument has to be provided
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| aggregate_types | repeated string | - |  |
+| aggregate_types | repeated zitadel.v1.LocalizedMessage | - |  |
 
 
 
