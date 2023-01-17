@@ -5,7 +5,7 @@ title: Production Checklist
 
 To apply best practices to your production setup we created a step by step checklist you may wish to follow.
 
-### infrastructure configuration
+### Infrastructure Configuration
 
 - [ ] make use of configmanagement such as Terraform to provision all of the below
 - [ ] use version control to store the provisioning
