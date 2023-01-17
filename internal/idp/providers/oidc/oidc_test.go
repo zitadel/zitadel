@@ -159,7 +159,6 @@ func TestProvider_Options(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer gock.Off()
-			gock.EnableNetworking()
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
