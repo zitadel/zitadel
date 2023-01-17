@@ -188,8 +188,8 @@ Errors:
       RedirectURIInvalid: Default Redirect URI is invalid
       NotExisting: Login Policy not existing
       AlreadyExists: Login Policy already exists
-      IdpProviderAlreadyExisting: Idp Provider already existing
-      IdpProviderNotExisting: Idp Provider not existing
+      IdpProviderAlreadyExisting: Identity Provider already existing
+      IdpProviderNotExisting: Identity Provider not existing
       RegistrationNotAllowed: Registration is not allowed
       UsernamePasswordNotAllowed: Login with Username / Password is not allowed
       MFA:
@@ -295,7 +295,7 @@ Errors:
     IdpIsNotOIDC: IDP configuration is not of type oidc
     LoginPolicyInvalid: Login Policy is invalid
     LoginPolicyNotExisting: Login Policy doesn't exist
-    IdpProviderInvalid: Idp Provider is invalid
+    IdpProviderInvalid: Identity Provider is invalid
     LoginPolicy:
       NotFound: Default Login Policy not found
       NotChanged: Default Login Policy has not been changed
@@ -439,11 +439,11 @@ EventTypes:
         failed: Initialization check failed
     token:
       added: Access Token created
-      removed: 'asdf'
+      removed: Access Token removed
     username:
       reserved: Username reserved
       released: Username released
-      changed: 'asdf'
+      changed: Username changed
     email:
       reserved: Email address reserved
       released: Email address released
@@ -583,7 +583,7 @@ EventTypes:
       code:
         added: Phone number code generated
         sent: Phone number code sent
-      removed: 'asdf'
+      removed: Phone number removed
     profile:
       changed: User profile changed
     address:
@@ -597,7 +597,7 @@ EventTypes:
           succeeded: Multifactor OTP check succeeded
           failed: Multifactor OTP check failed
         init:
-          skipped: 'asdf'
+          skipped: Multifactor OTP initialization skipped
       init:
         skipped: Multifactor initialization skipped
     signed:
@@ -618,11 +618,11 @@ EventTypes:
       removed: User metadata removed
       removed.all: All user metadata removed
     domain:
-      claimed: 'asdf'
-      claimed.sent: 'asdf'
+      claimed: Domain claimed
+      claimed.sent: Domain claimed notification sent
     pat:
-      added: 'asdf'
-      removed: 'asdf'
+      added: Personal Access Token added
+      removed: Personal Access Token removed
   org:
     added: Organization added
     changed: Organization changed
@@ -684,10 +684,10 @@ EventTypes:
         changed: Login Policy changed
         removed: Login Policy removed
         idpprovider:
-          added: Idp Provider added to Login Policy
-          removed: Idp Provider removed from Login Policy
+          added: Identity Provider added to Login Policy
+          removed: Identity Provider removed from Login Policy
           cascade:
-            removed: 'asdf'
+            removed: Identity Provider cascade removed from Login Policy
         secondfactor:
           added: Second factor added to Login Policy
           removed: Second factor removed from Login Policy
@@ -734,13 +734,13 @@ EventTypes:
         changed: Privacy policy and TOS changed
         removed: Privacy policy and TOS removed
       domain:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: Domain policy added
+        changed: Domain policy changed
+        removed: Domain policy removed
       lockout:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: Lockout policy added
+        changed: Lockout policy changed
+        removed: Lockout policy removed
     flow:
       trigger_actions:
         set: Action set
@@ -750,17 +750,17 @@ EventTypes:
       cleared: Flow cleared
     mail:
       template:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: E-Mail template added
+        changed: E-Mail template changed
+        removed: E-Mail template removed
       text:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: E-Mail text added
+        changed: E-Mail text changed
+        removed: E-Mail text removed
     metadata:
-      removed: 'asdf'
-      removed.all: 'asdf'
-      set: 'asdf'
+      removed: Metadata removed
+      removed.all: All metadata removed
+      set: Metadata set
   project:
     added: Project added
     changed: Project changed
@@ -863,8 +863,8 @@ EventTypes:
           changed: SAML IDP configuration changed
       jwt:
         config:
-          added: 'asdf'
-          changed: 'asdf'
+          added: JWT configuration to identity provider added
+          changed: JWT configuration from identity provider remvoed
     customtext:
       set: Text was set
       removed: Text was removed
@@ -873,8 +873,8 @@ EventTypes:
         added: Default Login Policy added
         changed: Default Login Policy changed
         idpprovider:
-          added: Idp Provider added to Default Login Policy
-          removed: Idp Provider removed from Default Login Policy
+          added: Identity Provider added to Default Login Policy
+          removed: Identity Provider removed from Default Login Policy
       label:
         added: Label Policy added
         changed: Label Policy changed
@@ -936,131 +936,131 @@ EventTypes:
     reactivated: Action reactivated
     removed: Action removed
   instance:
-    added: 'asdf'
-    changed: 'asdf'
+    added: Instance added
+    changed: Instance changed
     customtext:
-      removed: 'asdf'
-      set: 'asdf'
+      removed: Custom text removed
+      set: Custom text set
       template:
-        removed: 'asdf'
+        removed: Template of custom text removed
     default:
       language:
-        set: 'asdf'
+        set: Default language set
       org:
-        set: 'asdf'
+        set: Default organisation set
     domain:
-      added: 'asdf'
+      added: Domain added
       primary:
-        set: 'asdf'
-      removed: 'asdf'
+        set: Primary domain set
+      removed: Domain removed
     iam:
       console:
-        set: 'asdf'
+        set: ZITADEL Console application set
       project:
-        set: 'asdf'
+        set: ZITADEL project set
     mail:
       template:
-        added: 'asdf'
-        changed: 'asdf'
+        added: E-Mail template added
+        changed: E-Mail template changed
       text:
-        added: 'asdf'
-        changed: 'asdf'
+        added: E-Mail text added
+        changed: E-Mail text changed
     member:
-      added: 'asdf'
-      changed: 'asdf'
-      removed: 'asdf'
+      added: Instance member added
+      changed: Instance member changed
+      removed: Instance member removed
       cascade:
-        removed: 'asdf'
+        removed: Instance member cascade removed
     notification:
       provider:
         debug:
-          fileadded: 'asdf'
-          filechanged: 'asdf'
-          fileremoved: 'asdf'
-          logadded: 'asdf'
-          logchanged: 'asdf'
-          logremoved: 'asdf'
+          fileadded: File debug notification provider added
+          filechanged: File debug notification provider changed
+          fileremoved: File debug notification provider removed
+          logadded: Log debug notification provider added
+          logchanged: Log debug notification provider changed
+          logremoved: Log debug notification provider removed
     oidc:
       settings:
-        added: 'asdf'
-        changed: 'asdf'
+        added: OIDC settings added
+        changed: OIDC settings changed
     policy:
       domain:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Domain policy added
+        changed: Domain policy changed
       label:
-        activated: 'asdf'
-        added: 'asdf'
+        activated: Label policy activated
+        added: Label policy added
         assets:
-          removed: 'asdf'
-        changed: 'asdf'
+          removed: Asset from label policy removed
+        changed: Label policy changed
         font:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Font added to label policy
+          removed: Font remvoed from label policy
         icon:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Icon added to label policy
+          removed: Icon removed from label policy
           dark:
-            added: 'asdf'
-            removed: 'asdf'
+            added: Icon added to dark label policy
+            removed: Icon removed from dark label policy
         logo:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Logo added to label policy
+          removed: Logo removed from label policy
           dark:
-            added: 'asdf'
-            removed: 'asdf'
+            added: Logo added to dark label policy
+            removed: Logo removed from dark label policy
       lockout:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Lockout policy added
+        changed: Lockout policy changed
       login:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Login policy added
+        changed: Login policy changed
         idpprovider:
-          added: 'asdf'
+          added: Identity Provider added to login policy
           cascade:
-            removed: 'asdf'
-          removed: 'asdf'
+            removed: Identity Provider cascade removed from login policy
+          removed: Identity Provider removed from login policy
         multifactor:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Multifactor added to login policy
+          removed: Multifactor removed from login policy
         secondfactor:
-          added: 'asdf'
-          removed: 'asdf'
+          added: Secondfactor added to login policy
+          removed: Secondfactor removed from login policy
       password:
         age:
-          added: 'asdf'
-          changed: 'asdf'
+          added: Password age policy added
+          changed: Password age policy changed
         complexity:
-          added: 'asdf'
-          changed: 'asdf'
+          added: Password complexity policy added
+          changed: Password complexity policy removed
       privacy:
-        added: 'asdf'
-        changed: 'asdf'
+        added: Privacy policy added
+        changed: Privacy policy changed
       security:
-        set: 'asdf'
+        set: Security policy set
         
-    removed: 'asdf'
+    removed: Instance removed
     secret:
       generator:
-        added: 'asdf'
-        changed: 'asdf'
-        removed: 'asdf'
+        added: Secret generator added
+        changed: Secret generator changed
+        removed: Secret generator removed
     sms:
       configtwilio:
-        activated: 'asdf'
-        added: 'asdf'
-        changed: 'asdf'
-        deactivated: 'asdf'
-        removed: 'asdf'
+        activated: Twilio SMS configuration activated
+        added: Twilio SMS configuration added
+        changed: Twilio SMS configuration changed
+        deactivated: Twilio SMS configuration deactivated
+        removed: Twilio SMS configuration removed
         token:
-          changed: 'asdf'
+          changed: Token of wilio SMS configuration changed
     smtp:
       config:
-        added: 'asdf'
-        changed: 'asdf'
+        added: SMTP configuration added
+        changed: SMTP configuration changed
         password:
-          changed: 'asdf'
-        removed: 'asdf'
+          changed: Password of SMTP configuration changed
+        removed: SMTP configuration removed
 
 Application:
   OIDC:
