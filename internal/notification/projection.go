@@ -506,11 +506,6 @@ func (p *notificationsProjection) reducePasswordChanged(event eventstore.Event) 
 			return nil, err
 		}
 
-		user, err := p.queries.GetUserByID(ctx, true, e.Aggregate().ID, false)
-		if err != nil {
-			return nil, err
-		}
-
 		ctx, origin, err := p.origin(ctx)
 		if err != nil {
 			return nil, err
@@ -525,7 +520,7 @@ func (p *notificationsProjection) reducePasswordChanged(event eventstore.Event) 
 			p.getLogProvider,
 			colors,
 			p.assetsPrefix(ctx),
-		).SendPasswordChange(notifyUser, origin, user.PreferredLoginName)
+		).SendPasswordChange(notifyUser, origin)
 		if err != nil {
 			return nil, err
 		}
