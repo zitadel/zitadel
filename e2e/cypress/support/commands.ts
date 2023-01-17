@@ -40,6 +40,11 @@ declare global {
        * Custom command that asserts success is printed after a change.
        */
       shouldConfirmSuccess(): Cypress.Chainable<null>;
+
+      /**
+       * Custom command that yields the element that exactly matches the given text.
+       */
+      containsExactly(subject: JQuery<HTMLElement>, text: string): Cypress.Chainable<JQuery<HTMLElement>>;
     }
   }
 }
@@ -95,3 +100,30 @@ Cypress.Commands.add('shouldConfirmSuccess', { prevSubject: false }, () => {
   cy.shouldNotExist({ selector: '.data-e2e-failure' });
   cy.get('.data-e2e-success');
 });
+
+
+Cypress.Commands.add('containsExactly', {prevSubject: 'element'}, (subject, text: string): Cypress.Chainable<JQuery<HTMLElement>> =>{
+  return cy.wrap(subject).then(elements$ => {
+    return Cypress.$(elements$).filter((_, el$)=> {
+      return Cypress.$(el$).text().trim() == text
+    })
+  })
+})
+
+
+function usenameCellDoesntExist(username: string){
+  cy.waitUntil(() => {
+    return getUsernameCell(username).then($el => $el.length === 0)
+  })
+}
+
+
+
+function getUsernameCell(username: string) {
+  return cy.get('[data-e2e="username-cell"]').then(elements$ => {
+    return Cypress.$(elements$).filter((_, el$)=> {
+      return Cypress.$(el$).text().trim() == username
+    })
+  })
+}
+

@@ -4,22 +4,22 @@ import { newOrgTarget } from './target';
 export function ensureOrgExists(target: ZITADELTarget, name: string): Cypress.Chainable<ZITADELTarget> {
   return createOrg(target, name).then((id) => {
     if (id) {
-      return cy.wrap(newOrgTarget(target, id));
+      return cy.wrap(newOrgTarget(target, id, name));
     }
     return search(target, name).then((id) => {
       if (id) {
-        return cy.wrap(newOrgTarget(target, id));
+        return cy.wrap(newOrgTarget(target, id, name));
       }
       sleep(6_000);
       cy.log('retrying');
       return search(target, name).then((id) => {
         if (id) {
-          return cy.wrap(newOrgTarget(target, id));
+          return cy.wrap(newOrgTarget(target, id, name));
         }
         sleep(6_000);
         cy.log('retrying');
         debugger;
-        return search(target, name).then((id) => cy.wrap(newOrgTarget(target, id)));
+        return search(target, name).then((id) => cy.wrap(newOrgTarget(target, id, name)));
       });
     });
   });

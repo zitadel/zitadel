@@ -9,6 +9,14 @@ export function ensureDomainPolicy(
   resetDomainPolicy(target);
   setDomainPolicy(target, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain);
 
+  for (let i = 0; i < 10; i++){
+    getDomainPolicy(target).should(res => {
+      res.body.userLoginMustBeDomain == userLoginMustBeDomain &&
+      res.body.validateOrgDomains == validateOrgDomains &&
+      res.body.smtpSenderAddressMatchesInstanceDomain == smtpSenderAddressMatchesInstanceDomain
+    })
+  }
+
   return null;
 }
 
@@ -52,4 +60,14 @@ function setDomainPolicy(
       }
       return res;
     });
+}
+
+function getDomainPolicy(
+  target: ZITADELTarget,
+) {
+  return cy.request({
+    method: 'GET',
+    url: `${target.adminBaseURL}/orgs/${target.orgId}/policies/domain`,
+    headers: target.headers,
+  })
 }

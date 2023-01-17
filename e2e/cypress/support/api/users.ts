@@ -1,149 +1,63 @@
 import { ZITADELTarget } from 'support/commands';
-import { loginname } from 'support/login/login';
+import { standardCreate, standardEnsureDoesntExist, standardEnsureExists, standardRemove, standardSearch } from './standard';
 
 export function ensureHumanExists(target: ZITADELTarget, username: string): Cypress.Chainable<number> {
-  return ensureUserExists(target, username, () => createHuman(target, username));
+  return standardEnsureExists(createHuman(target, username), () => search(target, username));
 }
 
 export function ensureMachineExists(target: ZITADELTarget, username: string): Cypress.Chainable<number> {
-  return ensureUserExists(target, username, () => createMachine(target, username));
+  return standardEnsureExists(createMachine(target, username), () => search(target, username));
 }
 
-function ensureUserExists(
-  target: ZITADELTarget,
-  username: string,
-  create: () => Cypress.Chainable<number>,
-): Cypress.Chainable<number> {
-  return create().then((id) => {
-    if (id) {
-      return cy.wrap(id);
-    }
-    return search(target, username).then((id) => {
-      if (id) {
-        return cy.wrap(id);
-      }
-      sleep(6_000);
-      cy.log('retrying');
-      return search(target, username).then((id) => {
-        if (id) {
-          return cy.wrap(id);
-        }
-        sleep(6_000);
-        cy.log('retrying');
-        debugger;
-        return search(target, username);
-      });
-    });
-  });
+export function ensureHumanDoesntExist(target: ZITADELTarget, username: string) {
+  return standardEnsureDoesntExist(ensureHumanExists(target, username), Cypress._.curry(remove)(target), () => search(target, username));
 }
 
-export function ensureHumanDoesntExist(api: ZITADELTarget, username: string) {
-  return ensureUserDoesntExist(api, username, ensureHumanExists);
-}
-
-export function ensureMachineDoesntExist(api: ZITADELTarget, username: string) {
-  return ensureUserDoesntExist(api, username, ensureMachineExists);
-}
-
-function ensureUserDoesntExist(
-  target: ZITADELTarget,
-  username: string,
-  ensureExists: (target: ZITADELTarget, username: string) => Cypress.Chainable<number>,
-) {
-  function ensure(loginname: string) {
-    ensureExists(target, loginname).then((userId) => {
-      remove(target, userId);
-    });
-  }
-
-  ensure(username);
-  ensure(loginname(username, target.org));
+export function ensureMachineDoesntExist(target: ZITADELTarget, username: string) {
+  return standardEnsureDoesntExist(ensureMachineExists(target, username), Cypress._.curry(remove)(target), () => search(target, username));
 }
 
 function search(target: ZITADELTarget, username: string): Cypress.Chainable<number> {
-  return cy
-    .request({
-      method: 'POST',
-      url: `${target.mgmtBaseURL}/users/_search`,
-      headers: target.headers,
-    })
-    .then((res) => {
-      return res.body?.result?.find((entity) => entity.userName == username)?.id || cy.wrap(null);
-    });
+  return standardSearch(target, `${target.mgmtBaseURL}/users/_search`, (entity) => entity.userName == username, 'id');
 }
 
 function createHuman(target: ZITADELTarget, username: string): Cypress.Chainable<number> {
-  return cy
-    .request({
-      method: 'POST',
-      url: `${target.mgmtBaseURL}/users/human/_import`,
-      body: {
-        userName: username,
-        profile: {
-          firstName: 'e2efirstName',
-          lastName: 'e2elastName',
-        },
-        email: {
-          email: 'e2e@email.ch',
-          isEmailVerified: true,
-        },
-        phone: {
-          phone: '+41 123456789',
-        },
-        password: 'Password1!',
-        passwordVhangeRequired: false,
+  return standardCreate(
+    target,
+    `${target.mgmtBaseURL}/users/human/_import`,
+    {
+      userName: username,
+      profile: {
+        firstName: 'e2efirstName',
+        lastName: 'e2elastName',
       },
-      failOnStatusCode: false,
-      headers: target.headers,
-    })
-    .then((res) => {
-      if (!res.isOkStatusCode) {
-        expect(res.status).to.equal(409);
-        return null;
-      }
-      return res.body?.userId || null;
-    });
+      email: {
+        email: 'e2e@email.ch',
+        isEmailVerified: true,
+      },
+      phone: {
+        phone: '+41 123456789',
+      },
+      password: 'Password1!',
+      passwordChangeRequired: false,
+    },
+    'userId',
+  );
 }
 
 function createMachine(target: ZITADELTarget, username: string): Cypress.Chainable<any> {
-  return cy
-    .request({
-      method: 'POST',
-      url: `${target.mgmtBaseURL}/users/machine`,
-      body: {
-        userName: username,
-        name: 'e2emachinename',
-        description: 'e2emachinedescription',
-      },
-      failOnStatusCode: false,
-      headers: target.headers,
-    })
-    .then((res) => {
-      if (!res.isOkStatusCode) {
-        expect(res.status).to.equal(409);
-        return null;
-      }
-      return res.body;
-    });
+  return standardCreate(
+    target,
+    `${target.mgmtBaseURL}/users/machine`,
+    {
+      userName: username,
+      name: 'e2emachinename',
+      description: 'e2emachinedescription',
+    },
+    'userId',
+  );
 }
 
 function remove(target: ZITADELTarget, id: number) {
-  return cy
-    .request({
-      method: 'DELETE',
-      url: `${target.mgmtBaseURL}/users/${id}`,
-      failOnStatusCode: false,
-      headers: target.headers,
-    })
-    .then((res) => {
-      if (!res.isOkStatusCode) {
-        expect(res.status).to.equal(404);
-      }
-    });
-}
-
-function sleep(ms: number) {
-  (async () => {
-    await new Promise((f) => setTimeout(f, ms));
-  })();
+  return standardRemove(target, `${target.mgmtBaseURL}/users/${id}`);
 }
