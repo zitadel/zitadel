@@ -30,7 +30,7 @@ describe('machines', () => {
       });
 
       it('should add a machine', () => {
-        cy.contains('tr', machine.addName).should('not.exist')
+        cy.contains('tr', machine.addName).should('not.exist');
         cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
         cy.url().should('contain', 'users/create-machine');
         //force needed due to the prefilled username prefix

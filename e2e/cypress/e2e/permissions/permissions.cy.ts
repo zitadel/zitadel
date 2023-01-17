@@ -15,7 +15,7 @@ import { loginname } from 'support/login/login';
 
 describe('permissions', () => {
   const targetOrg = 'e2epermissionsmyorg';
-  const foreignOrg = 'e2epermissionsforeignorg'
+  const foreignOrg = 'e2epermissionsforeignorg';
 
   beforeEach(() => {
     newTarget(targetOrg).as('target');
@@ -152,13 +152,13 @@ describe('permissions', () => {
             (target: ZITADELTarget, userId: number) => {
               cy.get<number>('@projectId').then((projectId) => {
                 ensureHumanIsNotProjectMember(target, projectId, userId);
-                  ensureHumanIsProjectMember(
-                    target,
-                    projectId,
-                    userId,
-                    roles.map((role) => role.internal),
-                  )
-                  })
+                ensureHumanIsProjectMember(
+                  target,
+                  projectId,
+                  userId,
+                  roles.map((role) => role.internal),
+                );
+              });
             },
             visitOwnedProject,
           );
@@ -197,16 +197,19 @@ describe('permissions', () => {
             { internal: 'PROJECT_GRANT_OWNER_VIEWER', display: 'Project Grant Owner Viewer' },
           ];
 
-          beforeEach(()=> {
+          beforeEach(() => {
             cy.get<ZITADELTarget>('@target').then((target) => {
-              ensureOrgExists(target, foreignOrg).as('foreignOrgTarget').then((foreignOrgTarget) => {
-              ensureProjectExists(foreignOrgTarget, 'e2eprojectgrants')
-                .as('foreignProjectId').then(foreignProjectId => {
-                  ensureProjectGrantExists(foreignOrgTarget, foreignProjectId, target.orgId).as('grantId')
-                })
-              })
-            })
-          })
+              ensureOrgExists(target, foreignOrg)
+                .as('foreignOrgTarget')
+                .then((foreignOrgTarget) => {
+                  ensureProjectExists(foreignOrgTarget, 'e2eprojectgrants')
+                    .as('foreignProjectId')
+                    .then((foreignProjectId) => {
+                      ensureProjectGrantExists(foreignOrgTarget, foreignProjectId, target.orgId).as('grantId');
+                    });
+                });
+            });
+          });
 
           testAuthorizations(
             roles.map((role) => role.display),
@@ -214,23 +217,23 @@ describe('permissions', () => {
               cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
                 cy.get<number>('@grantId').then((grantId) => {
                   ensureHumanIsNotProjectMember(target, foreignProjectId, userId, grantId);
-                })
-              })
+                });
+              });
             },
             (target: ZITADELTarget, userId: number) => {
               cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
                 cy.get<number>('@grantId').then((grantId) => {
-                        ensureHumanIsNotProjectMember(target, foreignProjectId, userId, grantId);
-                        ensureHumanIsProjectMember(
-                          target,
-                          foreignProjectId,
-                          userId,
-                          roles.map((role) => role.internal),
-                          grantId,
-                        );
-                      })
-                    })
-                  },
+                  ensureHumanIsNotProjectMember(target, foreignProjectId, userId, grantId);
+                  ensureHumanIsProjectMember(
+                    target,
+                    foreignProjectId,
+                    userId,
+                    roles.map((role) => role.internal),
+                    grantId,
+                  );
+                });
+              });
+            },
             (target: ZITADELTarget) => {
               cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
                 cy.get<number>('@grantId').then((grantId) => {

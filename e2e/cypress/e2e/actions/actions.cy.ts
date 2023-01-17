@@ -142,42 +142,46 @@ describe('actions', () => {
         });
       });
 
-      it('should store password error none and OTP error none in metadata after successful otp authentication', {
+      it(
+        'should store password error none and OTP error none in metadata after successful otp authentication',
+        {
           // authentication can fail sometimes
           retries: {
             openMode: null,
-            runMode: 2
+            runMode: 2,
           },
-      },() => {
-        cy.get<ZITADELTarget>('@target').then((target) => {
-          login(postAuthOTPEmail, target.orgId);
-          cy.visit('/users/me?id=security');
-          cy.get('[data-e2e="add-factor"]').should('be.visible').click();
-          cy.get('[data-e2e="add-factor-otp"]').should('be.visible').click();
-          cy.get('[data-e2e="otp-secret"]')
-            .as('otpSecret')
-            .then((secret) => {
-              cy.task<string>('generateOTP', secret.text().trim()).then((token) => {
-                cy.get('[data-e2e="otp-code-input"]').should('be.visible').type(token, { force: true });
-                cy.get('[data-e2e="save-factor"]').should('be.visible').click();
+        },
+        () => {
+          cy.get<ZITADELTarget>('@target').then((target) => {
+            login(postAuthOTPEmail, target.orgId);
+            cy.visit('/users/me?id=security');
+            cy.get('[data-e2e="add-factor"]').should('be.visible').click();
+            cy.get('[data-e2e="add-factor-otp"]').should('be.visible').click();
+            cy.get('[data-e2e="otp-secret"]')
+              .as('otpSecret')
+              .then((secret) => {
+                cy.task<string>('generateOTP', secret.text().trim()).then((token) => {
+                  cy.get('[data-e2e="otp-code-input"]').should('be.visible').type(token, { force: true });
+                  cy.get('[data-e2e="save-factor"]').should('be.visible').click();
+                });
+              });
+            login(postAuthOTPEmail, target.orgId, true, undefined, () => {
+              cy.task<string>('generateOTP').then((token) => {
+                cy.get('#code').should('be.visible').type(token);
+                cy.get('#submit-button').should('be.visible').click();
               });
             });
-          login(postAuthOTPEmail, target.orgId, true, undefined, () => {
-            cy.task<string>('generateOTP').then((token) => {
-              cy.get('#code').should('be.visible').type(token);
-              cy.get('#submit-button').should('be.visible').click();
+
+            sessionAsPredefinedUser(User.IAMAdminUser);
+            cy.get('@userId').then((userId) => {
+              cy.visit(`/users/${userId}?org=${target.orgId}&id=metadata`);
+              cy.get('tr').should('have.length', 3);
+              cy.contains('tr', 'password error').contains('none');
+              cy.contains('tr', 'OTP error').contains('none');
             });
           });
-
-          sessionAsPredefinedUser(User.IAMAdminUser);
-          cy.get('@userId').then((userId) => {
-            cy.visit(`/users/${userId}?org=${target.orgId}&id=metadata`);
-            cy.get('tr').should('have.length', 3);
-            cy.contains('tr', 'password error').contains('none');
-            cy.contains('tr', 'OTP error').contains('none');
-          });
-        });
-      });
+        },
+      );
     });
     describe('u2f', () => {
       beforeEach(() => {
@@ -196,7 +200,7 @@ describe('actions', () => {
           // authentication can fail sometimes
           retries: {
             openMode: null,
-            runMode: 2
+            runMode: 2,
           },
         },
         () => {
@@ -255,7 +259,7 @@ describe('actions', () => {
           // authentication can fail sometimes
           retries: {
             openMode: null,
-            runMode: 2
+            runMode: 2,
           },
         },
         () => {

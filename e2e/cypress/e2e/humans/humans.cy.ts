@@ -29,7 +29,7 @@ describe('humans', () => {
       });
 
       it('should add a user', () => {
-        cy.contains('tr', user.addName).should('not.exist')
+        cy.contains('tr', user.addName).should('not.exist');
         cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
         cy.url().should('contain', 'users/create');
         cy.get('[formcontrolname="email"]').should('be.visible').type('dummy@dummy.com');
