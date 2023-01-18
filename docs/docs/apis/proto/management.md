@@ -2550,7 +2550,7 @@ Returns the default text for password reset message
 
 Sets the custom text for password reset message
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2601,7 +2601,7 @@ Returns the default text for verify email message
 
 Sets the custom text for verify email message
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2652,7 +2652,7 @@ Returns the custom text for verify email message
 
 Sets the default custom text for verify email message
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2703,7 +2703,7 @@ Returns the custom text for domain claimed message
 
 Sets the custom text for domain claimed message
 The Following Variables can be used:
-{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2754,7 +2754,7 @@ Returns the custom text for passwordless link message
 
 Sets the custom text for passwordless link message
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2779,7 +2779,7 @@ The default text of the IAM will trigger after
 > **rpc** GetCustomPasswordChangeMessageText([GetCustomPasswordChangeMessageTextRequest](#getcustompasswordchangemessagetextrequest))
 [GetCustomPasswordChangeMessageTextResponse](#getcustompasswordchangemessagetextresponse)
 
-Returns the custom text for passwordless link message
+Returns the custom text for password change message
 
 
 
@@ -2791,7 +2791,7 @@ Returns the custom text for passwordless link message
 > **rpc** GetDefaultPasswordChangeMessageText([GetDefaultPasswordChangeMessageTextRequest](#getdefaultpasswordchangemessagetextrequest))
 [GetDefaultPasswordChangeMessageTextResponse](#getdefaultpasswordchangemessagetextresponse)
 
-Returns the custom text for passwordless link message
+Returns the custom text for password change link message
 
 
 
@@ -2803,9 +2803,9 @@ Returns the custom text for passwordless link message
 > **rpc** SetCustomPasswordChangeMessageCustomText([SetCustomPasswordChangeMessageTextRequest](#setcustompasswordchangemessagetextrequest))
 [SetCustomPasswordChangeMessageTextResponse](#setcustompasswordchangemessagetextresponse)
 
-Sets the custom text for passwordless link message
+Sets the custom text for password change message
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2817,7 +2817,7 @@ The Following Variables can be used:
 > **rpc** ResetCustomPasswordChangeMessageTextToDefault([ResetCustomPasswordChangeMessageTextToDefaultRequest](#resetcustompasswordchangemessagetexttodefaultrequest))
 [ResetCustomPasswordChangeMessageTextToDefaultResponse](#resetcustompasswordchangemessagetexttodefaultresponse)
 
-Removes the custom passwordless link message text of the organisation
+Removes the custom password change message text of the organisation
 The default text of the IAM will trigger after
 
 
