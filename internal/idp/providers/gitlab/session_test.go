@@ -8,6 +8,7 @@ import (
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	openid "github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
@@ -152,7 +153,7 @@ func TestProvider_FetchUser(t *testing.T) {
 			// call the real discovery endpoint
 			gock.New(issuer).Get(openid.DiscoveryEndpoint).EnableNetworking()
 			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.options...)
-			a.NoError(err)
+			require.NoError(t, err)
 
 			session := &oidc.Session{
 				Provider: provider.Provider,

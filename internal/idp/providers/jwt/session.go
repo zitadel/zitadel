@@ -10,28 +10,28 @@ import (
 
 var _ idp.Session = (*Session)(nil)
 
-// Session is the idp.Session implementation for the JWT provider
+// Session is the [idp.Session] implementation for the JWT provider
 type Session struct {
 	AuthURL string
 	Tokens  *oidc.Tokens
 }
 
-// GetAuthURL implements the idp.Session interface
+// GetAuthURL implements the [idp.Session] interface
 func (s *Session) GetAuthURL() string {
 	return s.AuthURL
 }
 
-// FetchUser implements the idp.Session interface
-// it will map the received idToken into an idp.User
+// FetchUser implements the [idp.Session] interface
+// it will map the received idToken into an [idp.User]
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
 		return idp.User{}, ErrNoTokens
 	}
-	err = mapTokenToUser(s.Tokens.IDTokenClaims, &user)
-	return user, err
+	mapTokenToUser(s.Tokens.IDTokenClaims, &user)
+	return user, nil
 }
 
-func mapTokenToUser(claims oidc.IDTokenClaims, user *idp.User) error {
+func mapTokenToUser(claims oidc.IDTokenClaims, user *idp.User) {
 	user.ID = claims.GetSubject()
 	user.AvatarURL = claims.GetPicture()
 	user.DisplayName = claims.GetName()
@@ -39,5 +39,4 @@ func mapTokenToUser(claims oidc.IDTokenClaims, user *idp.User) error {
 	user.FirstName = claims.GetGivenName()
 	user.LastName = claims.GetFamilyName()
 	user.NickName = claims.GetNickname()
-	return nil
 }

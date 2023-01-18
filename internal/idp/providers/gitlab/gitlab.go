@@ -12,17 +12,17 @@ const (
 
 var _ idp.Provider = (*Provider)(nil)
 
-// Provider is the idp.Provider implementation for Gitlab
+// Provider is the [idp.Provider] implementation for Gitlab
 type Provider struct {
 	*oidc.Provider
 }
 
-// New creates a GitLab.com provider using the oidc.Provider (OIDC generic provider)
+// New creates a GitLab.com provider using the [oidc.Provider] (OIDC generic provider)
 func New(clientID, clientSecret, redirectURI string, options ...oidc.ProviderOpts) (*Provider, error) {
 	return NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI, options...)
 }
 
-// NewCustomIssuer creates a GitLab provider using the oidc.Provider (OIDC generic provider)
+// NewCustomIssuer creates a GitLab provider using the [oidc.Provider] (OIDC generic provider)
 // with a custom issuer for self-managed instances
 func NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI string, options ...oidc.ProviderOpts) (*Provider, error) {
 	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, options...)

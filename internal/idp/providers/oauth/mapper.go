@@ -6,8 +6,8 @@ import (
 	"golang.org/x/text/language"
 )
 
-// UserInfoMapper needs to be implemented for an oauth Provider
-// to map the info returned by the userEndpoint to an idp.User
+// UserInfoMapper needs to be implemented for an oauth [Provider]
+// to map the info returned by the userEndpoint to an [idp.User]
 type UserInfoMapper interface {
 	GetID() string
 	GetDisplayName() string
@@ -27,7 +27,7 @@ type UserInfoMapper interface {
 
 var _ UserInfoMapper = (*UserMapper)(nil)
 
-// UserMapper is an implementation of UserInfoMapper
+// UserMapper is an implementation of [UserInfoMapper]
 // it can be used in ZITADEL actions to map the raw info
 type UserMapper struct {
 	ID                string

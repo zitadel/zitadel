@@ -22,7 +22,7 @@ var (
 	ErrMissingUserAgentID = errors.New("userAgentID missing")
 )
 
-// Provider is the idp.Provider implementation for a JWT provider
+// Provider is the [idp.Provider] implementation for a JWT provider
 type Provider struct {
 	name              string
 	headerName        string
@@ -84,21 +84,15 @@ func New(name, issuer, jwtEndpoint, keysEndpoint, headerName string, encryptionA
 	return provider, nil
 }
 
-// Name implements the idp.Provider interface
+// Name implements the [idp.Provider] interface
 func (p *Provider) Name() string {
 	return p.name
 }
 
-// BeginAuth implements the idp.Provider interface
-// it will create a Session with an AuthURL, pointing to the jwtEndpoint
+// BeginAuth implements the [idp.Provider] interface
+// it will create a [Session] with an AuthURL, pointing to the jwtEndpoint
 // with the authRequest and encrypted userAgent ids
 func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
-	redirect, err := url.Parse(p.jwtEndpoint)
-	if err != nil {
-		return nil, err
-	}
-	q := redirect.Query()
-	q.Set(queryAuthRequestID, state)
 	if len(params) != 1 {
 		return nil, ErrMissingUserAgentID
 	}
@@ -106,6 +100,12 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 	if !ok {
 		return nil, ErrMissingUserAgentID
 	}
+	redirect, err := url.Parse(p.jwtEndpoint)
+	if err != nil {
+		return nil, err
+	}
+	q := redirect.Query()
+	q.Set(queryAuthRequestID, state)
 	nonce, err := p.encryptionAlg.Encrypt([]byte(userAgentID))
 	if err != nil {
 		return nil, err
@@ -115,22 +115,22 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 	return &Session{AuthURL: redirect.String()}, nil
 }
 
-// IsLinkingAllowed implements the idp.Provider interface
+// IsLinkingAllowed implements the [idp.Provider] interface
 func (p *Provider) IsLinkingAllowed() bool {
 	return p.isLinkingAllowed
 }
 
-// IsCreationAllowed implements the idp.Provider interface
+// IsCreationAllowed implements the [idp.Provider] interface
 func (p *Provider) IsCreationAllowed() bool {
 	return p.isCreationAllowed
 }
 
-// IsAutoCreation implements the idp.Provider interface
+// IsAutoCreation implements the [idp.Provider] interface
 func (p *Provider) IsAutoCreation() bool {
 	return p.isAutoCreation
 }
 
-// IsAutoUpdate implements the idp.Provider interface
+// IsAutoUpdate implements the [idp.Provider] interface
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }

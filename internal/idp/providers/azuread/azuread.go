@@ -38,7 +38,7 @@ const (
 
 var _ idp.Provider = (*Provider)(nil)
 
-// Provider is the idp.Provider implementation for AzureAD (V2 Endpoints)
+// Provider is the [idp.Provider] implementation for AzureAD (V2 Endpoints)
 type Provider struct {
 	*oauth.Provider
 	tenant        TenantType
@@ -48,7 +48,7 @@ type Provider struct {
 
 type ProviderOptions func(*Provider)
 
-// WithTenant allows to set a TenantType (can also be a tenantID)
+// WithTenant allows to set a [TenantType] (can also be a Tenant ID)
 // default is CommonTenant
 func WithTenant(tenantType TenantType) ProviderOptions {
 	return func(p *Provider) {
@@ -63,15 +63,15 @@ func WithEmailVerified() ProviderOptions {
 	}
 }
 
-// WithOAuthOptions allows to specify oauth.ProviderOpts like oauth.WithLinkingAllowed()
+// WithOAuthOptions allows to specify [oauth.ProviderOpts] like [oauth.WithLinkingAllowed]
 func WithOAuthOptions(opts ...oauth.ProviderOpts) ProviderOptions {
 	return func(p *Provider) {
 		p.options = append(p.options, opts...)
 	}
 }
 
-// New creates an AzureAD provider using the oauth.Provider (OAuth 2.0 generic provider)
-// By default it uses the CommonTenant and unverified emails
+// New creates an AzureAD provider using the [oauth.Provider] (OAuth 2.0 generic provider)
+// By default it uses the [CommonTenant] and unverified emails
 func New(name, clientID, clientSecret, redirectURI string, opts ...ProviderOptions) (*Provider, error) {
 	provider := &Provider{
 		tenant:  CommonTenant,
@@ -115,10 +115,10 @@ func newConfig(tenant TenantType, clientID, secret, callbackURL string, scopes [
 	return c
 }
 
-// User represents the structure return on the userinfo endpoint
+// User represents the structure return on the userinfo endpoint and implements the [oauth.UserInfoMapper] interface
 //
 // AzureAD does not return an `email_verified` claim.
-// The verification can be automatically activated on the provider (WithEmailVerified())
+// The verification can be automatically activated on the provider ([WithEmailVerified])
 type User struct {
 	Sub               string `json:"sub"`
 	FamilyName        string `json:"family_name"`
@@ -130,63 +130,81 @@ type User struct {
 	isEmailVerified   bool
 }
 
+// GetID is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetID() string {
 	return u.Sub
 }
 
+// GetFirstName is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetFirstName() string {
 	return u.GivenName
 }
 
+// GetLastName is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetLastName() string {
 	return u.FamilyName
 }
 
+// GetDisplayName is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetDisplayName() string {
 	return u.Name
 }
 
+// GetNickName is an implementation of the [oauth.UserInfoMapper] interface
+// it returns an empty string because AzureAD does not provide the user's nickname
 func (u *User) GetNickName() string {
-	// AzureAD does not provide the user's nickname
 	return ""
 }
 
+// GetPreferredUsername is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetPreferredUsername() string {
 	return u.PreferredUsername
 }
 
+// GetEmail is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetEmail() string {
 	return u.Email
 }
 
+// IsEmailVerified is an implementation of the [oauth.UserInfoMapper] interface
+// returning the value specified in the creation of the [Provider]
+// Default is false because AzureAD does not return an `email_verified` claim.
+// The verification can be automatically activated on the provider ([WithEmailVerified])
 func (u *User) IsEmailVerified() bool {
 	return u.isEmailVerified
 }
 
+// GetPhone is an implementation of the [oauth.UserInfoMapper] interface
+// it returns an empty string because AzureAD does not provide the user's phone
 func (u *User) GetPhone() string {
-	// AzureAD does not provide the user's phone
 	return ""
 }
 
+// IsPhoneVerified is an implementation of the [oauth.UserInfoMapper] interface
+// it returns false because AzureAD does not provide the user's phone
 func (u *User) IsPhoneVerified() bool {
-	// AzureAD does not provide the user's phone
 	return false
 }
 
+// GetPreferredLanguage is an implementation of the [oauth.UserInfoMapper] interface
+// it returns [language.Und] because AzureAD does not provide the user's language
 func (u *User) GetPreferredLanguage() language.Tag {
 	// AzureAD does not provide the user's language
 	return language.Und
 }
 
+// GetProfile is an implementation of the [oauth.UserInfoMapper] interface
+// it returns an empty string because AzureAD does not provide the user's profile page
 func (u *User) GetProfile() string {
-	// AzureAD does not provide the user's profile page
 	return ""
 }
 
+// GetAvatarURL is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetAvatarURL() string {
 	return u.Picture
 }
 
+// RawData is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) RawData() any {
 	return u
 }

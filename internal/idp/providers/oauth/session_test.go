@@ -8,6 +8,7 @@ import (
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
 
@@ -197,7 +198,7 @@ func TestProvider_FetchUser(t *testing.T) {
 			a := assert.New(t)
 
 			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper)
-			a.NoError(err)
+			require.NoError(t, err)
 
 			session := &Session{
 				AuthURL:  tt.fields.authURL,

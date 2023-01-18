@@ -11,7 +11,7 @@ import (
 
 var _ idp.Provider = (*Provider)(nil)
 
-// Provider is the idp.Provider implementation for a generic OAuth 2.0 provider
+// Provider is the [idp.Provider] implementation for a generic OAuth 2.0 provider
 type Provider struct {
 	rp.RelyingParty
 	options           []rp.Option
@@ -55,7 +55,7 @@ func WithAutoUpdate() ProviderOpts {
 	}
 }
 
-// WithRelyingPartyOption allows to set an additional rp.Option like rp.WithPKCE()
+// WithRelyingPartyOption allows to set an additional [rp.Option] like rp.WithPKCE()
 func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	return func(p *Provider) {
 		p.options = append(p.options, option)
@@ -63,8 +63,8 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 }
 
 // New creates a generic OAuth 2.0 provider
-func New(config *oauth2.Config, name, userEndpoint string, userMapper func() UserInfoMapper, options ...ProviderOpts) (*Provider, error) {
-	provider := &Provider{
+func New(config *oauth2.Config, name, userEndpoint string, userMapper func() UserInfoMapper, options ...ProviderOpts) (provider *Provider, err error) {
+	provider = &Provider{
 		name:         name,
 		userEndpoint: userEndpoint,
 		userMapper:   userMapper,
@@ -72,42 +72,41 @@ func New(config *oauth2.Config, name, userEndpoint string, userMapper func() Use
 	for _, option := range options {
 		option(provider)
 	}
-	relyingParty, err := rp.NewRelyingPartyOAuth(config, provider.options...)
+	provider.RelyingParty, err = rp.NewRelyingPartyOAuth(config, provider.options...)
 	if err != nil {
 		return nil, err
 	}
-	provider.RelyingParty = relyingParty
 	return provider, nil
 }
 
-// Name implements the idp.Provider interface
+// Name implements the [idp.Provider] interface
 func (p *Provider) Name() string {
 	return p.name
 }
 
-// BeginAuth implements the idp.Provider interface
-// it will create a Session with an OAuth2.0 authorization request as AuthURL
+// BeginAuth implements the [idp.Provider] interface
+// it will create a [Session] with an OAuth2.0 authorization request as AuthURL
 func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...any) (idp.Session, error) {
 	url := rp.AuthURL(state, p.RelyingParty)
 	return &Session{AuthURL: url, Provider: p}, nil
 }
 
-// IsLinkingAllowed implements the idp.Provider interface
+// IsLinkingAllowed implements the [idp.Provider] interface
 func (p *Provider) IsLinkingAllowed() bool {
 	return p.isLinkingAllowed
 }
 
-// IsCreationAllowed implements the idp.Provider interface
+// IsCreationAllowed implements the [idp.Provider] interface
 func (p *Provider) IsCreationAllowed() bool {
 	return p.isCreationAllowed
 }
 
-// IsAutoCreation implements the idp.Provider interface
+// IsAutoCreation implements the [idp.Provider] interface
 func (p *Provider) IsAutoCreation() bool {
 	return p.isAutoCreation
 }
 
-// IsAutoUpdate implements the idp.Provider interface
+// IsAutoUpdate implements the [idp.Provider] interface
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }

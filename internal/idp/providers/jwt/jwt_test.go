@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
@@ -109,7 +110,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				tt.fields.headerName,
 				tt.fields.encryptionAlg(t),
 			)
-			a.NoError(err)
+			require.NoError(t, err)
 
 			session, err := provider.BeginAuth(context.Background(), "testState", tt.args.params...)
 			if tt.want.err != nil && !tt.want.err(err) {
@@ -209,7 +210,7 @@ func TestProvider_Options(t *testing.T) {
 				tt.fields.encryptionAlg(t),
 				tt.fields.opts...,
 			)
-			a.NoError(err)
+			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())
 			a.Equal(tt.want.linkingAllowed, provider.IsLinkingAllowed())

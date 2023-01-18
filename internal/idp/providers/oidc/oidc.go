@@ -11,7 +11,7 @@ import (
 
 var _ idp.Provider = (*Provider)(nil)
 
-// Provider is the idp.Provider implementation for a generic OIDC provider
+// Provider is the [idp.Provider] implementation for a generic OIDC provider
 type Provider struct {
 	rp.RelyingParty
 	options           []rp.Option
@@ -76,34 +76,34 @@ func New(name, issuer, clientID, clientSecret, redirectURI string, options ...Pr
 	return provider, nil
 }
 
-// Name implements the idp.Provider interface
+// Name implements the [idp.Provider] interface
 func (p *Provider) Name() string {
 	return p.name
 }
 
-// BeginAuth implements the idp.Provider interface
-// it will create a Session with an OIDC authorization request as AuthURL
+// BeginAuth implements the [idp.Provider] interface
+// it will create a [Session] with an OIDC authorization request as AuthURL
 func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...any) (idp.Session, error) {
 	url := rp.AuthURL(state, p.RelyingParty)
 	return &Session{AuthURL: url, Provider: p}, nil
 }
 
-// IsLinkingAllowed implements the idp.Provider interface
+// IsLinkingAllowed implements the [idp.Provider] interface
 func (p *Provider) IsLinkingAllowed() bool {
 	return p.isLinkingAllowed
 }
 
-// IsCreationAllowed implements the idp.Provider interface
+// IsCreationAllowed implements the [idp.Provider] interface
 func (p *Provider) IsCreationAllowed() bool {
 	return p.isCreationAllowed
 }
 
-// IsAutoCreation implements the idp.Provider interface
+// IsAutoCreation implements the [idp.Provider] interface
 func (p *Provider) IsAutoCreation() bool {
 	return p.isAutoCreation
 }
 
-// IsAutoUpdate implements the idp.Provider interface
+// IsAutoUpdate implements the [idp.Provider] interface
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }

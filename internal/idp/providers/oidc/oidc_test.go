@@ -6,6 +6,7 @@ import (
 
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 
@@ -54,12 +55,13 @@ func TestProvider_BeginAuth(t *testing.T) {
 			defer gock.Off()
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
+			r := require.New(t)
 
 			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
-			a.NoError(err)
+			r.NoError(err)
 
 			session, err := provider.BeginAuth(context.Background(), "testState")
-			a.NoError(err)
+			r.NoError(err)
 
 			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
 		})
@@ -163,7 +165,7 @@ func TestProvider_Options(t *testing.T) {
 			a := assert.New(t)
 
 			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.opts...)
-			a.NoError(err)
+			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())
 			a.Equal(tt.want.linkingAllowed, provider.IsLinkingAllowed())

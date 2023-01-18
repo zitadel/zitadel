@@ -20,12 +20,12 @@ const (
 
 var _ idp.Provider = (*Provider)(nil)
 
-// New creates a GitHub.com provider using the oauth.Provider (OAuth 2.0 generic provider)
+// New creates a GitHub.com provider using the [oauth.Provider] (OAuth 2.0 generic provider)
 func New(clientID, secret, callbackURL string, scopes []string, options ...oauth.ProviderOpts) (*Provider, error) {
 	return NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL, scopes, options...)
 }
 
-// NewCustomURL creates a GitHub provider using the oauth.Provider (OAuth 2.0 generic provider)
+// NewCustomURL creates a GitHub provider using the [oauth.Provider] (OAuth 2.0 generic provider)
 // with custom endpoints, e.g. GitHub Enterprise server
 func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profileURL string, scopes []string, options ...oauth.ProviderOpts) (*Provider, error) {
 	rp, err := oauth.New(
@@ -65,7 +65,7 @@ func newConfig(clientID, secret, callbackURL, authURL, tokenURL string, scopes [
 	return c
 }
 
-// User is a representation of the authenticated GH user
+// User is a representation of the authenticated GitHub user and implements the [oauth.UserInfoMapper] interface
 // https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#get-the-authenticated-user
 type User struct {
 	Login                   string      `json:"login"`
@@ -114,64 +114,81 @@ type User struct {
 	} `json:"plan"`
 }
 
+// GetID is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetID() string {
 	return strconv.Itoa(u.ID)
 }
 
+// GetFirstName is an implementation of the [oauth.UserInfoMapper] interface
+// it returns an empty string because GitHub does not provide the user's firstname
 func (u *User) GetFirstName() string {
-	// GitHub does not provide the user's firstname
 	return ""
 }
 
+// GetLastName is an implementation of the [oauth.UserInfoMapper] interface
+// it returns an empty string because GitHub does not provide the user's lastname
 func (u *User) GetLastName() string {
 	// GitHub does not provide the user's lastname
 	return ""
 }
 
+// GetDisplayName is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetDisplayName() string {
 	return u.Name
 }
 
+// GetNickName is an implementation of the [oauth.UserInfoMapper] interface
+// returning the login name of the GitHub user
 func (u *User) GetNickName() string {
 	return u.Login
 }
 
+// GetPreferredUsername is an implementation of the [oauth.UserInfoMapper] interface
+// returning the login name of the GitHub user
 func (u *User) GetPreferredUsername() string {
 	return u.Login
 }
 
+// GetEmail is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetEmail() string {
 	return u.Email
 }
 
+// IsEmailVerified is an implementation of the [oauth.UserInfoMapper] interface
+// it returns true because GitHub validates emails themselves
 func (u *User) IsEmailVerified() bool {
-	// GitHub validates emails themself
 	return true
 }
 
+// GetPhone is an implementation of the [oauth.UserInfoMapper] interface
+// it returns an empty string because GitHub does not provide the user's phone
 func (u *User) GetPhone() string {
-	// GitHub does not provide the user's phone
 	return ""
 }
 
+// IsPhoneVerified is an implementation of the [oauth.UserInfoMapper] interface
+// it returns false because GitHub does not provide the user's phone
 func (u *User) IsPhoneVerified() bool {
-	// GitHub does not provide the user's phone
 	return false
 }
 
+// GetPreferredLanguage is an implementation of the [oauth.UserInfoMapper] interface
+// it returns [language.Und] because GitHub does not provide the user's language
 func (u *User) GetPreferredLanguage() language.Tag {
-	// GitHub does not provide the user's language
 	return language.Und
 }
 
+// GetProfile is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetProfile() string {
 	return u.HtmlUrl
 }
 
+// GetAvatarURL is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) GetAvatarURL() string {
 	return u.AvatarUrl
 }
 
+// RawData is an implementation of the [oauth.UserInfoMapper] interface
 func (u *User) RawData() any {
 	return u
 }

@@ -14,7 +14,7 @@ var ErrCodeMissing = errors.New("no auth code provided")
 
 var _ idp.Session = (*Session)(nil)
 
-// Session is the idp.Session implementation for the OIDC provider
+// Session is the [idp.Session] implementation for the OIDC provider
 type Session struct {
 	Provider *Provider
 	AuthURL  string
@@ -22,14 +22,14 @@ type Session struct {
 	Tokens   *oidc.Tokens
 }
 
-// GetAuthURL implements the idp.Session interface
+// GetAuthURL implements the [idp.Session] interface
 func (s *Session) GetAuthURL() string {
 	return s.AuthURL
 }
 
-// FetchUser implements the idp.Session interface
+// FetchUser implements the [idp.Session] interface
 // it will execute an OIDC code exchange if needed to retrieve the tokens,
-// call the userinfo endpoint and map the received information into an idp.User
+// call the userinfo endpoint and map the received information into an [idp.User]
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
 		if err = s.authorize(ctx); err != nil {
@@ -49,19 +49,15 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	return user, nil
 }
 
-func (s *Session) authorize(ctx context.Context) error {
+func (s *Session) authorize(ctx context.Context) (err error) {
 	if s.Code == "" {
 		return ErrCodeMissing
 	}
-	tokens, err := rp.CodeExchange(ctx, s.Code, s.Provider.RelyingParty)
-	if err != nil {
-		return err
-	}
-	s.Tokens = tokens
-	return nil
+	s.Tokens, err = rp.CodeExchange(ctx, s.Code, s.Provider.RelyingParty)
+	return err
 }
 
-// maps the oidc.UserInfo to an idp.User using the default OIDC claims
+// maps the oidc.UserInfo to an [idp.User] using the default OIDC claims
 func userFromClaims(info oidc.UserInfo, user *idp.User) {
 	user.ID = info.GetSubject()
 	user.FirstName = info.GetGivenName()

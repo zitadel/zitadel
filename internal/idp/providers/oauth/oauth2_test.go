@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"golang.org/x/oauth2"
 
@@ -43,12 +44,13 @@ func TestProvider_BeginAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
+			r := require.New(t)
 
 			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper)
-			a.NoError(err)
+			r.NoError(err)
 
 			session, err := provider.BeginAuth(context.Background(), "testState")
-			a.NoError(err)
+			r.NoError(err)
 
 			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
 		})
@@ -138,7 +140,7 @@ func TestProvider_Options(t *testing.T) {
 			a := assert.New(t)
 
 			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper, tt.fields.options...)
-			a.NoError(err)
+			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())
 			a.Equal(tt.want.linkingAllowed, provider.IsLinkingAllowed())

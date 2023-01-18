@@ -17,7 +17,7 @@ type Provider interface {
 }
 
 // User contains the information of a federated user
-// All the data from the provider can be found in the RawData field
+// All data provided can be found in the `RawData` field
 type User struct {
 	ID                string
 	FirstName         string

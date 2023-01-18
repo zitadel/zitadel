@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
@@ -37,12 +38,13 @@ func TestProvider_BeginAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			a := assert.New(t)
+			r := require.New(t)
 
 			provider, err := New(tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.opts...)
-			a.NoError(err)
+			r.NoError(err)
 
 			session, err := provider.BeginAuth(context.Background(), "testState")
-			a.NoError(err)
+			r.NoError(err)
 
 			a.Equal(tt.want.GetAuthURL(), session.GetAuthURL())
 		})
