@@ -68,44 +68,44 @@ func newConfig(clientID, secret, callbackURL, authURL, tokenURL string, scopes [
 // User is a representation of the authenticated GitHub user and implements the [oauth.UserInfoMapper] interface
 // https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#get-the-authenticated-user
 type User struct {
-	Login                   string      `json:"login"`
-	ID                      int         `json:"id"`
-	NodeId                  string      `json:"node_id"`
-	AvatarUrl               string      `json:"avatar_url"`
-	GravatarId              string      `json:"gravatar_id"`
-	Url                     string      `json:"url"`
-	HtmlUrl                 string      `json:"html_url"`
-	FollowersUrl            string      `json:"followers_url"`
-	FollowingUrl            string      `json:"following_url"`
-	GistsUrl                string      `json:"gists_url"`
-	StarredUrl              string      `json:"starred_url"`
-	SubscriptionsUrl        string      `json:"subscriptions_url"`
-	OrganizationsUrl        string      `json:"organizations_url"`
-	ReposUrl                string      `json:"repos_url"`
-	EventsUrl               string      `json:"events_url"`
-	ReceivedEventsUrl       string      `json:"received_events_url"`
-	Type                    string      `json:"type"`
-	SiteAdmin               bool        `json:"site_admin"`
-	Name                    string      `json:"name"`
-	Company                 string      `json:"company"`
-	Blog                    string      `json:"blog"`
-	Location                string      `json:"location"`
-	Email                   string      `json:"email"`
-	Hireable                interface{} `json:"hireable"`
-	Bio                     string      `json:"bio"`
-	TwitterUsername         string      `json:"twitter_username"`
-	PublicRepos             int         `json:"public_repos"`
-	PublicGists             int         `json:"public_gists"`
-	Followers               int         `json:"followers"`
-	Following               int         `json:"following"`
-	CreatedAt               time.Time   `json:"created_at"`
-	UpdatedAt               time.Time   `json:"updated_at"`
-	PrivateGists            int         `json:"private_gists"`
-	TotalPrivateRepos       int         `json:"total_private_repos"`
-	OwnedPrivateRepos       int         `json:"owned_private_repos"`
-	DiskUsage               int         `json:"disk_usage"`
-	Collaborators           int         `json:"collaborators"`
-	TwoFactorAuthentication bool        `json:"two_factor_authentication"`
+	Login                   string    `json:"login"`
+	ID                      int       `json:"id"`
+	NodeId                  string    `json:"node_id"`
+	AvatarUrl               string    `json:"avatar_url"`
+	GravatarId              string    `json:"gravatar_id"`
+	Url                     string    `json:"url"`
+	HtmlUrl                 string    `json:"html_url"`
+	FollowersUrl            string    `json:"followers_url"`
+	FollowingUrl            string    `json:"following_url"`
+	GistsUrl                string    `json:"gists_url"`
+	StarredUrl              string    `json:"starred_url"`
+	SubscriptionsUrl        string    `json:"subscriptions_url"`
+	OrganizationsUrl        string    `json:"organizations_url"`
+	ReposUrl                string    `json:"repos_url"`
+	EventsUrl               string    `json:"events_url"`
+	ReceivedEventsUrl       string    `json:"received_events_url"`
+	Type                    string    `json:"type"`
+	SiteAdmin               bool      `json:"site_admin"`
+	Name                    string    `json:"name"`
+	Company                 string    `json:"company"`
+	Blog                    string    `json:"blog"`
+	Location                string    `json:"location"`
+	Email                   string    `json:"email"`
+	Hireable                bool      `json:"hireable"`
+	Bio                     string    `json:"bio"`
+	TwitterUsername         string    `json:"twitter_username"`
+	PublicRepos             int       `json:"public_repos"`
+	PublicGists             int       `json:"public_gists"`
+	Followers               int       `json:"followers"`
+	Following               int       `json:"following"`
+	CreatedAt               time.Time `json:"created_at"`
+	UpdatedAt               time.Time `json:"updated_at"`
+	PrivateGists            int       `json:"private_gists"`
+	TotalPrivateRepos       int       `json:"total_private_repos"`
+	OwnedPrivateRepos       int       `json:"owned_private_repos"`
+	DiskUsage               int       `json:"disk_usage"`
+	Collaborators           int       `json:"collaborators"`
+	TwoFactorAuthentication bool      `json:"two_factor_authentication"`
 	Plan                    struct {
 		Name          string `json:"name"`
 		Space         int    `json:"space"`
@@ -114,54 +114,54 @@ type User struct {
 	} `json:"plan"`
 }
 
-// GetID is an implementation of the [oauth.UserInfoMapper] interface
+// GetID is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *User) GetID() string {
 	return strconv.Itoa(u.ID)
 }
 
-// GetFirstName is an implementation of the [oauth.UserInfoMapper] interface
-// it returns an empty string because GitHub does not provide the user's firstname
+// GetFirstName is an implementation of the [oauth.UserInfoMapper] interface.
+// It returns an empty string because GitHub does not provide the user's firstname.
 func (u *User) GetFirstName() string {
 	return ""
 }
 
-// GetLastName is an implementation of the [oauth.UserInfoMapper] interface
-// it returns an empty string because GitHub does not provide the user's lastname
+// GetLastName is an implementation of the [oauth.UserInfoMapper] interface.
+// It returns an empty string because GitHub does not provide the user's lastname.
 func (u *User) GetLastName() string {
 	// GitHub does not provide the user's lastname
 	return ""
 }
 
-// GetDisplayName is an implementation of the [oauth.UserInfoMapper] interface
+// GetDisplayName is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *User) GetDisplayName() string {
 	return u.Name
 }
 
 // GetNickName is an implementation of the [oauth.UserInfoMapper] interface
-// returning the login name of the GitHub user
+// returning the login name of the GitHub user.
 func (u *User) GetNickName() string {
 	return u.Login
 }
 
 // GetPreferredUsername is an implementation of the [oauth.UserInfoMapper] interface
-// returning the login name of the GitHub user
+// returning the login name of the GitHub user.
 func (u *User) GetPreferredUsername() string {
 	return u.Login
 }
 
-// GetEmail is an implementation of the [oauth.UserInfoMapper] interface
+// GetEmail is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *User) GetEmail() string {
 	return u.Email
 }
 
-// IsEmailVerified is an implementation of the [oauth.UserInfoMapper] interface
-// it returns true because GitHub validates emails themselves
+// IsEmailVerified is an implementation of the [oauth.UserInfoMapper] interface.
+// It returns true because GitHub validates emails themselves.
 func (u *User) IsEmailVerified() bool {
 	return true
 }
 
-// GetPhone is an implementation of the [oauth.UserInfoMapper] interface
-// it returns an empty string because GitHub does not provide the user's phone
+// GetPhone is an implementation of the [oauth.UserInfoMapper] interface.
+// It returns an empty string because GitHub does not provide the user's phone.
 func (u *User) GetPhone() string {
 	return ""
 }
@@ -172,23 +172,23 @@ func (u *User) IsPhoneVerified() bool {
 	return false
 }
 
-// GetPreferredLanguage is an implementation of the [oauth.UserInfoMapper] interface
-// it returns [language.Und] because GitHub does not provide the user's language
+// GetPreferredLanguage is an implementation of the [oauth.UserInfoMapper] interface.
+// It returns [language.Und] because GitHub does not provide the user's language.
 func (u *User) GetPreferredLanguage() language.Tag {
 	return language.Und
 }
 
-// GetProfile is an implementation of the [oauth.UserInfoMapper] interface
+// GetProfile is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *User) GetProfile() string {
 	return u.HtmlUrl
 }
 
-// GetAvatarURL is an implementation of the [oauth.UserInfoMapper] interface
+// GetAvatarURL is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *User) GetAvatarURL() string {
 	return u.AvatarUrl
 }
 
-// RawData is an implementation of the [oauth.UserInfoMapper] interface
+// RawData is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *User) RawData() any {
 	return u
 }

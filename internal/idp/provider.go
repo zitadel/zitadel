@@ -16,8 +16,8 @@ type Provider interface {
 	IsAutoUpdate() bool
 }
 
-// User contains the information of a federated user
-// All data provided can be found in the `RawData` field
+// User contains the information of a federated user.
+// All data provided can be found in the `RawData` field.
 type User struct {
 	ID                string
 	FirstName         string

@@ -27,8 +27,8 @@ type UserInfoMapper interface {
 
 var _ UserInfoMapper = (*UserMapper)(nil)
 
-// UserMapper is an implementation of [UserInfoMapper]
-// it can be used in ZITADEL actions to map the raw info
+// UserMapper is an implementation of [UserInfoMapper].
+// It can be used in ZITADEL actions to map the raw info
 type UserMapper struct {
 	ID                string
 	FirstName         string
@@ -53,72 +53,72 @@ func (u *UserMapper) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &u.info)
 }
 
-// GetID is an implementation of the [oauth.UserInfoMapper] interface
+// GetID is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetID() string {
 	return u.ID
 }
 
-// GetFirstName is an implementation of the [oauth.UserInfoMapper] interface
+// GetFirstName is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetFirstName() string {
 	return u.FirstName
 }
 
-// GetLastName is an implementation of the [oauth.UserInfoMapper] interface
+// GetLastName is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetLastName() string {
 	return u.LastName
 }
 
-// GetDisplayName is an implementation of the [oauth.UserInfoMapper] interface
+// GetDisplayName is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetDisplayName() string {
 	return u.DisplayName
 }
 
-// GetNickName is an implementation of the [oauth.UserInfoMapper] interface
+// GetNickName is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetNickName() string {
 	return u.NickName
 }
 
-// GetPreferredUsername is an implementation of the [oauth.UserInfoMapper] interface
+// GetPreferredUsername is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetPreferredUsername() string {
 	return u.PreferredUsername
 }
 
-// GetEmail is an implementation of the [oauth.UserInfoMapper] interface
+// GetEmail is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetEmail() string {
 	return u.Email
 }
 
-// IsEmailVerified is an implementation of the [oauth.UserInfoMapper] interface
+// IsEmailVerified is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) IsEmailVerified() bool {
 	return u.EmailVerified
 }
 
-// GetPhone is an implementation of the [oauth.UserInfoMapper] interface
+// GetPhone is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetPhone() string {
 	return u.Phone
 }
 
-// IsPhoneVerified is an implementation of the [oauth.UserInfoMapper] interface
+// IsPhoneVerified is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) IsPhoneVerified() bool {
 	return u.PhoneVerified
 }
 
-// GetPreferredLanguage is an implementation of the [oauth.UserInfoMapper] interface
+// GetPreferredLanguage is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetPreferredLanguage() language.Tag {
 	return language.Make(u.PreferredLanguage)
 }
 
-// GetAvatarURL is an implementation of the [oauth.UserInfoMapper] interface
+// GetAvatarURL is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetAvatarURL() string {
 	return u.AvatarURL
 }
 
-// GetProfile is an implementation of the [oauth.UserInfoMapper] interface
+// GetProfile is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) GetProfile() string {
 	return u.Profile
 }
 
-// RawData is an implementation of the [oauth.UserInfoMapper] interface
+// RawData is an implementation of the [oauth.UserInfoMapper] interface.
 func (u *UserMapper) RawData() any {
 	return u.info
 }

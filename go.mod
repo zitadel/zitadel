@@ -73,7 +73,7 @@ require (
 	golang.org/x/oauth2 v0.4.0
 	golang.org/x/sync v0.1.0
 	golang.org/x/text v0.6.0
-	golang.org/x/tools v0.1.12
+	golang.org/x/tools v0.1.13-0.20220928184430-f80e98464e27
 	google.golang.org/api v0.106.0
 	google.golang.org/genproto v0.0.0-20230106154932-a12b697841d9
 	google.golang.org/grpc v1.51.0
@@ -186,6 +186,7 @@ require (
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
+	golang.org/x/pkgsite v0.0.0-20230109194820-035bfc02f3fa // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

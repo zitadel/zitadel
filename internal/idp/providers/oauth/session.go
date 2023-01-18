@@ -16,7 +16,7 @@ var ErrCodeMissing = errors.New("no auth code provided")
 
 var _ idp.Session = (*Session)(nil)
 
-// Session is the [idp.Session] implementation for the OAuth2.0 provider
+// Session is the [idp.Session] implementation for the OAuth2.0 provider.
 type Session struct {
 	AuthURL string
 	Code    string
@@ -25,14 +25,14 @@ type Session struct {
 	Provider *Provider
 }
 
-// GetAuthURL implements the [idp.Session] interface
+// GetAuthURL implements the [idp.Session] interface.
 func (s *Session) GetAuthURL() string {
 	return s.AuthURL
 }
 
-// FetchUser implements the [idp.Session] interface
-// it will execute an OAuth 2.0 code exchange if needed to retrieve the access token,
-// call the specified userEndpoint and map the received information into an [idp.User]
+// FetchUser implements the [idp.Session] interface.
+// It will execute an OAuth 2.0 code exchange if needed to retrieve the access token,
+// call the specified userEndpoint and map the received information into an [idp.User].
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
 		if err = s.authorize(ctx); err != nil {
