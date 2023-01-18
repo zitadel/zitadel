@@ -8,26 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
-func (c *Commands) getOrgNotificationPolicy(ctx context.Context, orgID string) (*domain.NotificationPolicy, error) {
-	policy, err := c.orgNotificationPolicyWriteModelByID(ctx, orgID)
-	if err != nil {
-		return nil, err
-	}
-	if policy.State == domain.PolicyStateActive {
-		return orgWriteModelToNotificationPolicy(policy), nil
-	}
-	return c.getDefaultNotificationPolicy(ctx)
-}
-
-func (c *Commands) orgNotificationPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgNotificationPolicyWriteModel, error) {
-	policy := NewOrgNotificationPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, policy)
-	if err != nil {
-		return nil, err
-	}
-	return policy, nil
-}
-
 func (c *Commands) AddNotificationPolicy(ctx context.Context, resourceOwner string, policy *domain.NotificationPolicy) (*domain.NotificationPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-x801sk2i", "Errors.ResourceOwnerMissing")
@@ -117,18 +97,6 @@ func (c *Commands) removeNotificationPolicy(ctx context.Context, existingPolicy 
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-x029n1s", "Errors.Org.NotificationPolicy.NotFound")
-	}
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
-	return org.NewNotificationPolicyRemovedEvent(ctx, orgAgg), nil
-}
-
-func (c *Commands) removeNotificationPolicyIfExists(ctx context.Context, orgID string) (*org.NotificationPolicyRemovedEvent, error) {
-	existingPolicy, err := c.orgNotificationPolicyWriteModelByID(ctx, orgID)
-	if err != nil {
-		return nil, err
-	}
-	if existingPolicy.State != domain.PolicyStateActive {
-		return nil, nil
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 	return org.NewNotificationPolicyRemovedEvent(ctx, orgAgg), nil

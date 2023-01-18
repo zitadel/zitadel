@@ -2026,6 +2026,7 @@ service AdminService {
         };
     }
 
+
     //Sets the default custom text for initial message
     // it impacts all organisations without customized initial message text
     // The Following Variables can be used:

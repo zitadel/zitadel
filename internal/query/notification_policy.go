@@ -80,7 +80,9 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.NotificationPolicyProjection.Trigger(ctx)
+		if err := projection.NotificationPolicyProjection.Trigger(ctx); err != nil {
+			return nil, err
+		}
 	}
 	eq := sq.Eq{NotificationPolicyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -109,7 +111,9 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.NotificationPolicyProjection.Trigger(ctx)
+		if err := projection.NotificationPolicyProjection.Trigger(ctx); err != nil {
+			return nil, err
+		}
 	}
 
 	stmt, scan := prepareNotificationPolicyQuery()

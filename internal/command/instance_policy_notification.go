@@ -62,20 +62,6 @@ func (c *Commands) defaultNotificationPolicyWriteModelByID(ctx context.Context) 
 	return writeModel, nil
 }
 
-func (c *Commands) getDefaultNotificationPolicy(ctx context.Context) (*domain.NotificationPolicy, error) {
-	policyWriteModel := NewInstanceNotificationPolicyWriteModel(ctx)
-	err := c.eventstore.FilterToQueryReducer(ctx, policyWriteModel)
-	if err != nil {
-		return nil, err
-	}
-	if !policyWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-09xo2p", "Errors.IAM.NotificationPolicy.NotFound")
-	}
-	policy := writeModelToNotificationPolicy(&policyWriteModel.NotificationPolicyWriteModel)
-	policy.Default = true
-	return policy, nil
-}
-
 func prepareAddDefaultNotificationPolicy(
 	a *instance.Aggregate,
 	passwordChange bool,

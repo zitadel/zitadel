@@ -52,10 +52,3 @@ func orgWriteModelToPrivacyPolicy(wm *OrgPrivacyPolicyWriteModel) *domain.Privac
 		HelpLink:    wm.HelpLink,
 	}
 }
-
-func orgWriteModelToNotificationPolicy(wm *OrgNotificationPolicyWriteModel) *domain.NotificationPolicy {
-	return &domain.NotificationPolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.NotificationPolicyWriteModel.WriteModel),
-		PasswordChange: wm.PasswordChange,
-	}
-}
