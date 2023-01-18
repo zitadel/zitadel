@@ -45,7 +45,7 @@ func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profil
 	}, nil
 }
 
-// Provider is the idp.Provider implementation for GitHub
+// Provider is the [idp.Provider] implementation for GitHub
 type Provider struct {
 	*oauth.Provider
 }
