@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
@@ -155,18 +157,35 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	if idpConfig.IsOIDC {
 		provider, err := l.getRPConfig(r.Context(), idpConfig, EndpointExternalLoginCallback)
 		if err != nil {
+			emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
+			if _, actionErr := l.runPostExternalAuthenticationActions(r.Context(), &domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+				logging.WithError(err).Error("both external user authentication and action post authentication failed")
+			}
+
 			l.renderLogin(w, r, authReq, err)
 			return
 		}
 		tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
 		if err != nil {
+			emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
+			if _, actionErr := l.runPostExternalAuthenticationActions(r.Context(), &domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+				logging.WithError(err).Error("both external user authentication and action post authentication failed")
+			}
+
 			l.renderLogin(w, r, authReq, err)
 			return
 		}
 		l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 		return
 	}
-	l.renderError(w, r, authReq, errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+
+	err = errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
+	if _, actionErr := l.runPostExternalAuthenticationActions(r.Context(), &domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+		logging.WithError(err).Error("both external user authentication and action post authentication failed")
+	}
+
+	l.renderError(w, r, authReq, err)
 }
 
 func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) (rp.RelyingParty, error) {
@@ -195,7 +214,7 @@ func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigV
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	externalUser, err := l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
+	externalUser, err := l.runPostExternalAuthenticationActions(r.Context(), externalUser, tokens, authReq, r, idpConfig, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -383,7 +402,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
 
-	user, metadata, err = l.customUserToLoginUserMapping(r.Context(), authReq, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
+	user, metadata, err = l.runPreCreationActions(r.Context(), authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, nil, nil, err)
 		return
@@ -398,7 +417,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(r.Context(), authReq.UserID, authReq, resourceOwner, domain.FlowTypeExternalAuthentication)
+	userGrants, err := l.runPostCreationActions(r.Context(), authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

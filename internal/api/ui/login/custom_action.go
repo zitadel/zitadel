@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
@@ -16,8 +17,16 @@ import (
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 )
 
-func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.ExternalUser, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView) (*domain.ExternalUser, error) {
-	resourceOwner := req.RequestedOrgID
+func (l *Login) runPostExternalAuthenticationActions(
+	ctx context.Context,
+	user *domain.ExternalUser,
+	tokens *oidc.Tokens,
+	authReq *domain.AuthRequest,
+	httpReq *http.Request,
+	config *iam_model.IDPConfigView,
+	authenticationError error,
+) (*domain.ExternalUser, error) {
+	resourceOwner := authReq.RequestedOrgID
 	if resourceOwner == "" {
 		resourceOwner = config.AggregateID
 	}
@@ -71,6 +80,11 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		),
 	)
 
+	authErrStr := "none"
+	if authenticationError != nil {
+		authErrStr = authenticationError.Error()
+	}
+
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
 
@@ -80,7 +94,9 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 				actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
 					return object.UserFromExternalUser(c, user)
 				}),
-				actions.SetFields("authRequest", object.AuthRequestField(req)),
+				actions.SetFields("authRequest", object.AuthRequestField(*authReq)),
+				actions.SetFields("httpRequest", object.HTTPRequestField(*httpReq)),
+				actions.SetFields("authError", authErrStr),
 			),
 		)
 
@@ -112,10 +128,16 @@ const (
 	authMethodPasswordless authMethod = "passwordless"
 )
 
-func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.AuthRequest, authMethod authMethod, authenticationError error) error {
-	resourceOwner := req.RequestedOrgID
+func (l *Login) runPostInternalAuthenticationActions(
+	ctx context.Context,
+	authReq *domain.AuthRequest,
+	httpReq *http.Request,
+	authMethod authMethod,
+	authenticationError error,
+) error {
+	resourceOwner := authReq.RequestedOrgID
 	if resourceOwner == "" {
-		resourceOwner = req.UserOrgID
+		resourceOwner = authReq.UserOrgID
 	}
 
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeInternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
@@ -129,13 +151,13 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 		),
 	)
 
+	authErrStr := "none"
+	if authenticationError != nil {
+		authErrStr = authenticationError.Error()
+	}
+
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
-
-		authErrStr := "none"
-		if authenticationError != nil {
-			authErrStr = authenticationError.Error()
-		}
 
 		ctxFields := actions.SetContextFields(
 			// TODO: add tokenCtxFields(tokens)
@@ -143,7 +165,8 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 				actions.SetFields("ctx", actionCtx),
 				actions.SetFields("authMethod", authMethod),
 				actions.SetFields("authError", authErrStr),
-				actions.SetFields("authRequest", object.AuthRequestField(req)),
+				actions.SetFields("authRequest", object.AuthRequestField(*authReq)),
+				actions.SetFields("httpRequest", object.HTTPRequestField(*httpReq)),
 			),
 		)
 
@@ -163,7 +186,15 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 	return err
 }
 
-func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *domain.AuthRequest, user *domain.Human, metadata []*domain.Metadata, resourceOwner string, flowType domain.FlowType) (*domain.Human, []*domain.Metadata, error) {
+func (l *Login) runPreCreationActions(
+	ctx context.Context,
+	authRequest *domain.AuthRequest,
+	httpRequest *http.Request,
+	user *domain.Human,
+	metadata []*domain.Metadata,
+	resourceOwner string,
+	flowType domain.FlowType,
+) (*domain.Human, []*domain.Metadata, error) {
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePreCreation, resourceOwner, false)
 	if err != nil {
 		return nil, nil, err
@@ -235,7 +266,8 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 					return object.UserFromHuman(c, user)
 				}),
 				actions.SetFields("ctx", actionCtx),
-				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
+				actions.SetFields("authRequest", object.AuthRequestField(*authRequest)),
+				actions.SetFields("httpRequest", object.HTTPRequestField(*httpRequest)),
 			),
 		)
 
@@ -255,7 +287,14 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 	return user, mutableMetas.m, err
 }
 
-func (l *Login) customGrants(ctx context.Context, userID string, authRequest *domain.AuthRequest, resourceOwner string, flowType domain.FlowType) ([]*domain.UserGrant, error) {
+func (l *Login) runPostCreationActions(
+	ctx context.Context,
+	userID string,
+	authRequest *domain.AuthRequest,
+	httpReq *http.Request,
+	resourceOwner string,
+	flowType domain.FlowType,
+) ([]*domain.UserGrant, error) {
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePostCreation, resourceOwner, false)
 	if err != nil {
 		return nil, err
@@ -286,7 +325,8 @@ func (l *Login) customGrants(ctx context.Context, userID string, authRequest *do
 					}
 				}),
 				actions.SetFields("ctx", actionCtx),
-				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
+				actions.SetFields("authRequest", object.AuthRequestField(*authRequest)),
+				actions.SetFields("httpRequest", object.HTTPRequestField(*httpReq)),
 			),
 		)
 

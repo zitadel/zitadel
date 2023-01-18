@@ -5,8 +5,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-// AuthRequestField accepts the domain.AuthRequest by value, so its not mutated
-func AuthRequestField(authRequest *domain.AuthRequest) func(c *actions.FieldConfig) interface{} {
+// AuthRequestField accepts the domain.AuthRequest by value, so it's not mutated
+func AuthRequestField(authRequest domain.AuthRequest) func(c *actions.FieldConfig) interface{} {
 	return func(c *actions.FieldConfig) interface{} {
 		return c.Runtime.ToValue(authRequest)
 	}
