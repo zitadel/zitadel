@@ -12,7 +12,7 @@ export function standardEnsureExists<IDType>(
       return cy.wrap(id);
     }
     return search()
-      .should((id) => id)
+      .should((id) => !!id)
       .then((id) => {
         return update(id).wrap(id);
       });

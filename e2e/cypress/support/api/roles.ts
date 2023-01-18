@@ -6,7 +6,7 @@ export function ensureRoleExists(target: ZITADELTarget, projectId: number, roleK
 }
 
 export function ensureRoleDoesntExist(target: ZITADELTarget, projectId: number, roleKey: string) {
-  return standardEnsureDoesntExist(create(target, projectId, roleKey), Cypress._.curry(remove)(target, projectId), () =>
+  return standardEnsureDoesntExist(ensureRoleExists(target, projectId, roleKey), Cypress._.curry(remove)(target, projectId), () =>
     search(target, projectId, roleKey),
   );
 }
@@ -19,7 +19,7 @@ function create(target: ZITADELTarget, projectId: number, roleKey: string) {
       roleKey: roleKey,
       displayName: roleKey,
     },
-    'roleKey',
+    'key',
   );
 }
 
@@ -27,8 +27,8 @@ function search(target: ZITADELTarget, projectId: number, roleKey: string) {
   return standardSearch<string>(
     target,
     `${target.mgmtBaseURL}/projects/${projectId}/roles/_search`,
-    (entity) => entity.roleKey === roleKey,
-    'roleKey',
+    (entity) => entity.key === roleKey,
+    'key',
   );
 }
 
