@@ -5,11 +5,11 @@ import (
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(UserGrantAddedType, UserGrantAddedEventMapper).
-		RegisterFilterEventMapper(UserGrantChangedType, UserGrantChangedEventMapper).
-		RegisterFilterEventMapper(UserGrantCascadeChangedType, UserGrantCascadeChangedEventMapper).
-		RegisterFilterEventMapper(UserGrantRemovedType, UserGrantRemovedEventMapper).
-		RegisterFilterEventMapper(UserGrantCascadeRemovedType, UserGrantCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(UserGrantDeactivatedType, UserGrantDeactivatedEventMapper).
-		RegisterFilterEventMapper(UserGrantReactivatedType, UserGrantReactivatedEventMapper)
+	es.RegisterFilterEventMapper(AggregateType, UserGrantAddedType, UserGrantAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, UserGrantChangedType, UserGrantChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, UserGrantCascadeChangedType, UserGrantCascadeChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, UserGrantRemovedType, UserGrantRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, UserGrantCascadeRemovedType, UserGrantCascadeRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, UserGrantDeactivatedType, UserGrantDeactivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, UserGrantReactivatedType, UserGrantReactivatedEventMapper)
 }

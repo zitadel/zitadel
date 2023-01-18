@@ -4,7 +4,7 @@
     <p class="desc cnsl-secondary-text">{{ 'FLOWS.DESCRIPTION' | translate }}</p>
 
     <cnsl-info-section class="max-actions" *ngIf="maxActions"
-      >{{ 'FLOWS.ACTIONSMAX' | translate: { value: maxActions } }}
+      >{{ 'FLOWS.ACTIONSMAX' | translate : { value: maxActions } }}
     </cnsl-info-section>
 
     <ng-template cnslHasRole [hasRole]="['org.action.read']">

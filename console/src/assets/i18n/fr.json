@@ -231,6 +231,7 @@
       "CREATE": "Créer",
       "MY": "Mes informations",
       "LOGINNAMES": "Noms de connexion",
+      "LOGINMETHODS": "Méthodes de connexion",
       "LOGINNAMESDESC": "Ce sont vos noms de connexion",
       "NOUSER": "Aucun utilisateur associé.",
       "REACTIVATE": "Réactiver",
@@ -916,13 +917,13 @@
       "TITLE": "Paramètres SMTP",
       "SENDERADDRESS": "Adresse e-mail de l'expéditeur",
       "SENDERNAME": "Nom de l'expéditeur",
-      "HOST": "Hôte",
+      "HOSTANDPORT": "Hôte et port",
       "USER": "Utilisateur",
       "PASSWORD": "Mot de passe",
       "SETPASSWORD": "Définir le mot de passe SMTP",
       "PASSWORDSET": "Le mot de passe SMTP a été défini avec succès.",
       "TLS": "Sécurité de la couche de transport (TLS)",
-      "SAVED": "Enregistré avec succès !",
+      "SAVED": "Enregistré avec succès!",
       "REQUIREDWARN": "Pour envoyer des notifications depuis votre domaine, vous devez entrer vos données SMTP."
     },
     "SMS": {
@@ -1482,6 +1483,12 @@
       "UPDATED": "Projet modifié.",
       "GRANTUPDATED": "Subvention modifiée.",
       "DELETED": "Projet supprimé."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Supprimer un rôle",
+      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un rôle. Êtes-vous sûr ?"
     }
   },
   "NEXTSTEPS": {

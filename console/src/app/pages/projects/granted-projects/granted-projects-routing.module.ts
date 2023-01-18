@@ -11,7 +11,7 @@ const routes: Routes = [
       type: ProjectType.PROJECTTYPE_GRANTED,
       roles: ['project.grant.member.read'],
     },
-    loadChildren: () => import('src/app/modules/project-members/project-members.module').then((m) => m.ProjectMembersModule),
+    loadChildren: () => import('src/app/modules/project-members/project-members.module'),
   },
   {
     path: ':id/grant/:grantId',

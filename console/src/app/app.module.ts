@@ -7,17 +7,16 @@ import localeIt from '@angular/common/locales/it';
 import localeEn from '@angular/common/locales/en';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
+import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
-import { QuicklinkModule } from 'ngx-quicklink';
 import { from, Observable } from 'rxjs';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
@@ -105,7 +104,6 @@ const authConfig: AuthConfig = {
     }),
     NavModule,
     MatNativeDateModule,
-    QuicklinkModule,
     HasRoleModule,
     InfoOverlayModule,
     BrowserAnimationsModule,

@@ -231,6 +231,7 @@
       "CREATE": "创建",
       "MY": "我的信息",
       "LOGINNAMES": "登录名称",
+      "LOGINMETHODS": "登录方式",
       "LOGINNAMESDESC": "这些是您的登录名:",
       "NOUSER": "没有关联的用户。",
       "REACTIVATE": "重新启用",
@@ -916,7 +917,7 @@
       "TITLE": "SMTP 设置",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
-      "HOST": "服务器地址",
+      "HOSTANDPORT": "主机和端口",
       "USER": "用户名",
       "PASSWORD": "密码",
       "SETPASSWORD": "设置 SMTP 密码",
@@ -1481,6 +1482,12 @@
       "UPDATED": "项目已修改。",
       "GRANTUPDATED": "授权已更新。",
       "DELETED": "项目已删除"
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "删除角色",
+      "DELETE_DESCRIPTION": "您即将删除一个角色。你确定吗？"
     }
   },
   "NEXTSTEPS": {

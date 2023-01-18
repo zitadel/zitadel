@@ -231,6 +231,7 @@
       "CREATE": "Create",
       "MY": "My Information",
       "LOGINNAMES": "Login names",
+      "LOGINMETHODS": "Login methods",
       "LOGINNAMESDESC": "These are your login names:",
       "NOUSER": "No associated user.",
       "REACTIVATE": "Reactivate",
@@ -914,9 +915,9 @@
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
-      "SENDERADDRESS": "Sender Email address",
+      "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
-      "HOST": "Host",
+      "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
       "SETPASSWORD": "Set SMTP Password",
@@ -1482,6 +1483,12 @@
       "UPDATED": "Project changed.",
       "GRANTUPDATED": "Grant changed.",
       "DELETED": "Project deleted."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Delete role",
+      "DELETE_DESCRIPTION": "You are about to delete a role. Are you sure?"
     }
   },
   "NEXTSTEPS": {
