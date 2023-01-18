@@ -17,6 +17,7 @@ type SearchQueryBuilder struct {
 	desc          bool
 	resourceOwner string
 	instanceID    string
+	editorUser    string
 	queries       []*SearchQuery
 	tx            *sql.Tx
 }
@@ -121,6 +122,11 @@ func (builder *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
 // SetTx ensures that the eventstore library uses the existing transaction
 func (builder *SearchQueryBuilder) SetTx(tx *sql.Tx) *SearchQueryBuilder {
 	builder.tx = tx
+	return builder
+}
+
+func (builder *SearchQueryBuilder) EditorUser(id string) *SearchQueryBuilder {
+	builder.editorUser = id
 	return builder
 }
 
@@ -245,6 +251,7 @@ func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQ
 			query.creationDateAfterFilter,
 			query.builder.resourceOwnerFilter,
 			query.builder.instanceIDFilter,
+			query.builder.editorUserFilter,
 		} {
 			if filter := f(); filter != nil {
 				if err := filter.Validate(); err != nil {
@@ -351,6 +358,13 @@ func (builder *SearchQueryBuilder) instanceIDFilter() *repository.Filter {
 		return nil
 	}
 	return repository.NewFilter(repository.FieldInstanceID, builder.instanceID, repository.OperationEquals)
+}
+
+func (builder *SearchQueryBuilder) editorUserFilter() *repository.Filter {
+	if builder.editorUser == "" {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldEditorUser, builder.editorUser, repository.OperationEquals)
 }
 
 func (query *SearchQuery) creationDateAfterFilter() *repository.Filter {
