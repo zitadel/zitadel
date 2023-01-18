@@ -448,11 +448,9 @@ EventTypes:
         failed: La vérification de l'initialisation a échoué
     token:
       added: Jeton d'accès créé
-      removed: Jeton d'accès supprimée
     username:
       reserved: Nom d'utilisateur réservé
       released: Nom d'utilisateur libéré
-      changed: Nom d'utilisateur modifiée
     email:
       reserved: Adresse e-mail réservée
       released: Adresse email libérée
@@ -530,8 +528,6 @@ EventTypes:
           check:
             succeeded: Vérification de l'OTP multifactorielle réussie
             failed: La vérification de l'OTP multifactorielle a échoué
-          init: 
-            skipped: L'initialisation de l'OTP a été ignorée
         u2f:
           token:
             added: Ajout d'un jeton U2F multifacteur
@@ -594,7 +590,6 @@ EventTypes:
       code:
         added: Code du numéro de téléphone généré
         sent: Code du numéro de téléphone envoyé
-      removed: Le numéro de téléphone supprimée
     profile:
       changed: Profil de l'utilisateur modifié
     address:
@@ -607,8 +602,6 @@ EventTypes:
         check:
           succeeded: Vérification de l'OTP multifactorielle réussie
           failed: Échec de la vérification de l'OTP multifactorielle
-        init:
-          skipped: L'initialisation de l'multifactoriel a été ignorée
       init:
         skipped: L'initialisation du multifacteur a été ignorée
     signed:
@@ -625,15 +618,9 @@ EventTypes:
         removed: Autorisation supprimée
         changed: Autorisation modifiée
     metadata:
-      set: Métadonnées de l'utilisateur défini
+      set: Ensemble de métadonnées de l'utilisateur
       removed: Métadonnées de l'utilisateur supprimées
       removed.all: Suppression de toutes les métadonnées utilisateur
-    domain:
-      claimed: Le domaine est revendiqué
-      claimed.sent: Notification de domaine revendiqué envoyée
-    pat:
-      added: Jeton d'accès personnel ajouté
-      removed: Jeton d'accès personnel supprimée
   org:
     added: Organisation ajoutée
     changed: Organisation modifiée
@@ -680,12 +667,8 @@ EventTypes:
         config:
           added: Configuration IDP SAML ajoutée
           changed: Modification de la configuration IDP SAML
-      jwt:
-        config:
-          added: Ajout de la configuration du fournisseur d'identité JWT
-          changed: Modification de la configuration du fournisseur d'identité JWT
     customtext:
-      set: Texte personnalisé défini
+      set: Jeu de texte personnalisé
       removed: Texte personnalisé supprimé
       template:
         removed: Modèle de texte personnalisé supprimé
@@ -696,9 +679,7 @@ EventTypes:
         removed: Politique de connexion supprimée
         idpprovider:
           added: Fournisseur d'Idp ajouté à la politique de connexion
-          removed: Idp supprimé de la politique de connexion
-          cascade:
-            removed: La cascade de fournisseurs d'identité a été supprimée de la politique de connexion
+          removed: Idp Provider supprimé de la politique de connexion
         secondfactor:
           added: Second factor ajouté à la politique de connexion
           removed: Second facteur supprimé de la politique de connexion
@@ -744,34 +725,12 @@ EventTypes:
         added: Politique de confidentialité et CGU ajoutés
         changed: Politique de confidentialité et CGU modifiées
         removed: Politique de confidentialité et conditions d'utilisation supprimées
-      domain:
-        added: Politique de domaine ajoutée
-        changed: Politique de domaine modifié
-        removed: Politique de domaine supprimée
-      lockout:
-        added: Politique de cadenassage ajoutée
-        changed: Politique de cadenassage modifiée
-        removed: Politique de cadenassage supprimée
     flow:
       trigger_actions:
-        set: Action défini
+        set: Action set
         cascade:
           removed: Cascade d'actions supprimée
         removed: Actions supprimées
-      cleared: Flux déblayée
-    mail:
-      template:
-        added: Modèle d'email
-        changed: Modèle d'email modifiée
-        removed: Modèle d'email supprimée
-      text:
-        added: Texte de l'email ajouté
-        changed: Texte de l'email modifié
-        removed: Texte de l'email supprimé
-    metadata:
-      removed: Métadonnées supprimé
-      removed.all: métadonnées supprimé cascade
-      set: Métadonnées défini
   project:
     added: Projet ajouté
     changed: Projet modifié
@@ -810,9 +769,6 @@ EventTypes:
       reactivated: Application réactivée
       oidc:
         secret:
-          check:
-            failed: Vérifier le secret OIDC raté
-            succeeded: Vérifier le secret OIDC réussir
           verified:
             check: Vérification du secret du client OIDC réussie
             failed: La vérification du secret du client OIDC a échoué
@@ -875,10 +831,6 @@ EventTypes:
         config:
           added: Ajout de la configuration SAML IDP
           changed: Modification de la configuration de SAML IDP
-      jwt:
-        config:
-          added: Configuration JWT raté
-          changed: Configuration JWT modifié
     customtext:
       set: Le texte a été mis en place
       removed: Le texte a été supprimé
@@ -941,139 +893,12 @@ EventTypes:
           deactivated: Fournisseur de SMS Twilio désactivé
   key_pair:
     added: Paire de clés ajoutée
-    certificate:
-      added: Certificate ajouté
   action:
     added: Action ajoutée
     changed: Action modifiée
     deactivated: Action désactivée
     reactivated: Action réactivée
     removed: Action supprimée
-  instance:
-    added: Cas ajouté
-    changed: Cas modifié
-    customtext:
-      removed: Texte personnalisé suprimé
-      set: texte personnalisé
-      template:
-        removed: Modèle de texte personnalisé supprimié
-    default:
-      language:
-        set: Langue par défaut
-      org:
-        set: Organisation par défaut
-    domain:
-      added: Domaine ajouté
-      primary:
-        set: Domaine primaire définir
-      removed: Domaine supprimé
-    iam:
-      console:
-        set: Application ZITADEL Console définir
-      project:
-        set: Projet ZITADEL définir
-    mail:
-      template:
-        added: Modèle de e-mail ajouté
-        changed: Modèle de e-mail modifié
-      text:
-        added: Texte de l'e-mail ajouté
-        changed: Texte de l'e-mail modifié
-    member:
-      added: Membre ajouté
-      changed: Membre modifié
-      removed: Membre supprimié
-      cascade:
-        removed: Membre supprimié en cascade
-    notification:
-      provider:
-        debug:
-          fileadded: Debug fournisseur de notifications fichier ajouté
-          filechanged: Debug fournisseur de notifications fichier modifié
-          fileremoved: Debug fournisseur de notifications fichier supprimié
-          logadded: Debug fournisseur de notifications ajouté
-          logchanged: Debug fournisseur de notifications modifié
-          logremoved: Debug fournisseur de notifications supprimié
-    oidc:
-      settings:
-        added: Monture OIDC ajouté
-        changed: Monture OIDC modifié
-    policy:
-      domain:
-        added: Politique domaine ajouté
-        changed: Politique domaine modifié
-      label:
-        activated: Politique des labels activé
-        added: Politique des labels ajouté
-        assets:
-          removed: L'atout de politique des labels supprimié
-        changed: Politique des labels modifié
-        font:
-          added: Police de caractère ajouté
-          removed: Police de caractère supprimié
-        icon:
-          added: Icône ajouté
-          removed: Icône supprimié
-          dark:
-            added: Icône sombre ajouté
-            removed: Icône sombre supprimié
-        logo:
-          added: Logo ajouté
-          removed: Logo supprimié
-          dark:
-            added: Logo sombre ajouté
-            removed: Logo sombre supprimié
-      lockout:
-        added: Politique de verrouillage ajouté
-        changed: Politique de verrouillage modifié
-      login:
-        added: Politique de connexion ajouté
-        changed: Politique de connexion modifié
-        idpprovider:
-          added: Fournisseur d'identité de politique de connexion ajouté
-          cascade:
-            removed: Fournisseur d'identité de politique de connexion supprimié en cascade
-          removed: Fournisseur d'identité de politique de connexion supprimé
-        multifactor:
-          added: Multifactoriel ajouté
-          removed: Multifactoriel supprimié
-        secondfactor:
-          added: Deuxième facteur ajouté
-          removed: Deuxième facteur supprimié
-      password:
-        age:
-          added: Politique d'âge du mot de passe ajouté
-          changed: Politique d'âge du mot de passe modifié
-        complexity:
-          added: Politique de complexité des mots de passe ajouté
-          changed: Politique de complexité des mots de passe modifié
-      privacy:
-        added: Politique de confidentialité ajouté
-        changed: Politique de confidentialité modifié
-      security:
-        set: Politique de sécurité fixé   
-    removed: Instance supprimé
-    secret:
-      generator:
-        added: Générateur secret ajouté
-        changed: Générateur secret modifié
-        removed: Générateur secret supprimié
-    sms:
-      configtwilio:
-        activated: Configiuration Twilio SMS activé
-        added: Configiuration Twilio SMS ajouté
-        changed: Configiuration Twilio SMS modifié
-        deactivated: Configiuration Twilio SMS désactivé
-        removed: Configiuration Twilio SMS supprimié
-        token:
-          changed: Jeton de configiuratione Twilio SMS modifié
-    smtp:
-      config:
-        added: Configuration de SMTP ajouté
-        changed: Configuration de SMTP modifié
-        password:
-          changed: Mot de passe de configuration de SMTP modifié
-        removed: Configuration de SMTP supprimié
 
 Application:
   OIDC:

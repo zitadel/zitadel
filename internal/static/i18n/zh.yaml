@@ -425,16 +425,6 @@ Errors:
     CloseRows: SQL 语句无法完成
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
-
-AggregateTypes:
-  action: 行动
-  instance: 实例
-  key_pair: 密钥对
-  org: 组织
-  project: 项目
-  user: 用户
-  usergrant: 用户授予
-
 EventTypes:
   user:
     added: 已添加用户
@@ -448,11 +438,9 @@ EventTypes:
         failed: 初始化检查失败
     token:
       added: 已创建访问令牌
-      removed: 访问令牌被删除
     username:
       reserved: 保留用户名
       released: 用户名已发布
-      changed: 访问令牌被删除
     email:
       reserved: 电子邮件地址已保留
       released: 电子邮件地址已发布
@@ -592,7 +580,6 @@ EventTypes:
       code:
         added: 生成的手机号码验证码
         sent: 发送手机号码验证码
-      removed: 删除的电话号码
     profile:
       changed: 修改用户资料
     address:
@@ -605,8 +592,6 @@ EventTypes:
         check:
           succeeded: MFA OTP 验证成功
           failed: MFA OTP 验证失败
-        init:
-          skipped: 多因素OTP被跳过
       init:
         skipped: 跳过 MFA 初始化
     signed:
@@ -626,12 +611,6 @@ EventTypes:
       set: 用户元数据集
       removed: 删除用户元数据
       removed.all: 删除所有用户元数据
-    domain:
-      claimed: 域名索赔
-      claimed.sent: 发送域名索赔信息
-    pat:
-      added: 添加了个人访问令牌
-      removed: 删除了个人访问标记
   org:
     added: 添加组织
     changed: 更改组织
@@ -678,10 +657,6 @@ EventTypes:
         config:
           added: 添加 SAML IDP 配置
           changed: 更改 SAML IDP 配置
-      jwt:
-        config:
-          added: 添加JWT IDP配置
-          changed: JWT IDP配置变更
     customtext:
       set: 设置自定义文本
       removed: 删除自定义文本
@@ -695,8 +670,6 @@ EventTypes:
         idpprovider:
           added: 添加 IDP 到登录策略
           removed: 从登录策略删除 IDP
-          cascade:
-            removed: 登录政策被逐级删除
         secondfactor:
           added: 添加两步认证到登录策略
           removed: 删除两步认证到登录策略
@@ -742,34 +715,12 @@ EventTypes:
         added: 添加隐私政策和服务条款
         changed: 更改隐私政策和服务条款
         removed: 删除隐私政策和服务条款
-      domain:
-        added: 添加域名政策
-        changed: 域名政策变更
-        removed: 删除域名政策
-      lockout:
-        added: 添加密码锁定政策
-        changed: 密码锁定政策改变
-        removed: 删除密码锁定政策
     flow:
       trigger_actions:
         set: 设置动作
         cascade:
           removed: 删除动作级联
         removed: 删除动作
-      cleared: Flow cleared
-    mail:
-      template:
-        added: 添加电子邮件模板
-        changed: 电子邮件模板变更
-        removed: 电子邮件模板已被删除
-      text:
-        added: 添加电子邮件文本
-        changed: 电子邮件文本变更
-        removed: 删除电子邮件文本
-    metadata:
-      removed: 删除元数据
-      removed.all: 删除所有的元数据
-      set: 元数据集
   project:
     added: 添加项目
     changed: 更改项目
@@ -870,10 +821,6 @@ EventTypes:
         config:
           added: 添加 SAML IDP 配置
           changed: 更改 SAML IDP 配置
-      jwt:
-        config:
-          added: 添加JWT IDP配置
-          changed: JWT IDP配置变更
     customtext:
       set: 设置文本
       removed: 删除文本
@@ -936,139 +883,12 @@ EventTypes:
           deactivated: 停用 Twilio SMS 提供者
   key_pair:
     added: 添加密钥对
-    certificate:
-      added: Certificated added
   action:
     added: 添加动作
     changed: 更改动作
     deactivated: 停用动作
     reactivated: 启用动作
     removed: 删除动作
-  instance:
-    added: 添加实例
-    changed: 实例已删除
-    customtext:
-      removed: 删除自定义文本
-      set: 删除自定义文本
-      template:
-        removed: 删除了自定义文本模板
-    default:
-      language:
-        set: 默认语言设置
-      org:
-        set: 默认组织设置
-    domain:
-      added: 添加域名
-      primary:
-        set: 主域设置
-      removed: 域名删除
-    iam:
-      console:
-        set: ZITADEL 控制台应用程序设置
-      project:
-        set: ZITADEL项目设置
-    mail:
-      template:
-        added: 添加电子邮件模板
-        changed: 电子邮件模板变更
-      text:
-        added: 添加电子邮件文本
-        changed: 更改了电子邮件文本
-    member:
-      added: 添加实例成员
-      changed: 实例成员改变
-      removed: 删除实例成员
-      cascade:
-        removed: 实例成员级联删除
-    notification:
-      provider:
-        debug:
-          fileadded: 文件添加到调试通知提供者中
-          filechanged: 文件被调试通知提供者改变了
-          fileremoved: 从Debug Notification Provider删除的文件
-          logadded: 由调试通知提供者添加的日志
-          logchanged: Debug Notification Provider的日志发生了变化
-          logremoved: 从调试通知提供者那里删除日志
-    oidc:
-      settings:
-        added: 添加OIDC设置
-        changed: OIDC设置改变
-    policy:
-      domain:
-        added: 添加域名政策
-        changed: 域名政策改变
-      label:
-        activated: 激活标签政策
-        added: 添加标签政策
-        assets:
-          removed: 从标签政策中删除的资产
-        changed: 标签政策改变
-        font:
-          added: 标签指南中添加了字体
-          removed: 从标签政策中删除字体
-        icon:
-          added: 标签指南中添加了图标
-          removed: 从标签指南中删除图标
-          dark:
-            added: 暗标指南中添加了图标
-            removed: 从深色标签准则中删除符号
-        logo:
-          added: 标签政策中添加了标识
-          removed: 从标签准则中删除标识
-          dark:
-            added: 标志添加到深色标签指南中
-            removed: 从暗标政策中删除标识
-      lockout:
-        added: 添加了密码锁定政策
-        changed: 密码锁定政策改变
-      login:
-        added: 添加了登录政策
-        changed: 登录政策改变
-        idpprovider:
-          added: 登录策略中添加了身份提供者
-          cascade:
-            removed: 从登录策略中删除身份提供者级联
-          removed: 从登录策略中删除身份提供者
-        multifactor:
-          added: 登录策略中加入了多因素
-          removed: 从登录策略中删除多因素
-        secondfactor:
-          added: 登录政策中添加了第二个因素
-          removed: 从登录策略中删除第二个因素
-      password:
-        age:
-          added: 添加了密码年龄政策
-          changed: 密码年龄政策改变
-        complexity:
-          added: 添加了密码复杂性策略
-          changed: 密码复杂性政策改变
-      privacy:
-        added: 添加了隐私政策
-        changed: 隐私政策变更
-      security:
-        set: 安全策略集
-    removed: 删除的实例
-    secret:
-      generator:
-        added: 添加密码生成器
-        changed: 密码生成器变更
-        removed: 删除密码生成器
-    sms:
-      configtwilio:
-        activated: 激活Twilio短信配置
-        added: 添加Twilio短信配置
-        changed: Twilio短信配置变更
-        deactivated: Twilio SMS配置已停用
-        removed: 删除Twilio短信配置
-        token:
-          changed: Twilio SMS配置中加入了令牌
-    smtp:
-      config:
-        added: 添加SMTP节点配置
-        changed: SMTP节点配置变更
-        password:
-          changed: SMTP节点配置的密码已更改
-        removed: 删除SMTP节点配置
 
 Application:
   OIDC:

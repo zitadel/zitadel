@@ -448,11 +448,9 @@ EventTypes:
         failed: Controllo dell'inizializzazione fallito
     token:
       added: Access Token creato
-      removed: Access Token rimossa
     username:
       reserved: Nome utente riservato
       released: Nome utente rilasciato
-      changed: Nome utente cambiato
     email:
       reserved: Indirizzo e-mail riservato
       released: Indirizzo e-mail rilasciato
@@ -592,7 +590,6 @@ EventTypes:
       code:
         added: Codice del numero di telefono generato
         sent: Codice del numero di telefono inviato
-      removed: Numero di telefon rimosso
     profile:
       changed: Profilo utente cambiato
     address:
@@ -605,8 +602,6 @@ EventTypes:
         check:
           succeeded: Controllo OTP riuscito
           failed: Controllo OTP fallito
-        init:
-          skipped: Inizializzazione saltata
       init:
         skipped: Inizializzazione saltata
     signed:
@@ -626,12 +621,6 @@ EventTypes:
       set: Set di metadati utente
       removed: Metadati utente rimossi
       removed.all: Tutti i metadati utente rimossi
-    domain:
-      claimed: Dominio rivendicato
-      claimed.sent: Notifica di dominio rivendicato inviata
-    pat:
-      added: Personal Access Token aggiunta
-      removed: Personal Access Token rimossa
   org:
     added: Organizzazione aggiunta
     changed: Organizzazione cambiata
@@ -678,10 +667,6 @@ EventTypes:
         config:
           added: Aggiunta la configurazione IDP SAML
           changed: Configurazione IDP SAML modificata
-      jwt:
-        config:
-          added: JWT IDP configuration added
-          changed: JWT IDP configuration changed
     customtext:
       set: Testo personalizzato salvato
       removed: Testo personalizzato rimosso
@@ -695,8 +680,6 @@ EventTypes:
         idpprovider:
           added: IDP aggiunto alle impostazioni di accesso
           removed: IDP rimosso dalle impostazioni di accesso
-          cascade:
-            removed: Cascata IDP rimosso dalle impostazioni di accesso
         secondfactor:
           added: Secondo fattore aggiunto alle impostazioni di accesso
           removed: Secondo fattore rimosso dalle impostazioni di accesso
@@ -742,34 +725,12 @@ EventTypes:
         added: Informativa sulla privacy e termini e condizioni aggiunti
         changed: Informativa sulla privacy e termini e condizioni cambiati
         removed: Informativa sulla privacy e termini e condizioni rimossi
-      domain:
-        added: Politica di dominio aggiunto
-        changed: Politica di dominio cambiati
-        removed: Politica di dominio rimossi
-      lockout:
-        added: Politica di blocco aggiunto
-        changed: Politica di blocco cambiati
-        removed: Politica di blocco rimossi
     flow:
       trigger_actions:
         set: azioni salvate
         cascade:
           removed: Azioni a cascata rimosse
         removed: Azioni rimosse
-      cleared: Flow cleared
-    mail:
-      template:
-        added: Modello di e-mail aggiunto
-        changed: Modello di e-mail cambiati
-        removed: Modello di e-mail rimossi
-      text:
-        added: Testo di e-mail aggiunto
-        changed: Testo di e-mail cambiati
-        removed: Testo di e-mail rimossi
-    metadata:
-      removed: metadati rimossi
-      removed.all: Tutti i metadati rimossi
-      set: metadati salvate
   project:
     added: Progetto aggiunto
     changed: Progetto cambiato
@@ -870,10 +831,6 @@ EventTypes:
         config:
           added: Aggiunta la configurazione IDP SAML
           changed: Configurazione IDP SAML modificata
-      jwt:
-        config:
-          added: Aggiunta la onfigurazione JWT IDP
-          changed: Configurazione JWT IDP modificata
     customtext:
       set: Il testo è stato impostato
       removed: Il testo è stato rimosso
@@ -936,139 +893,12 @@ EventTypes:
           deactivated: Provider SMS Twilio disattivato
   key_pair:
     added: Keypair aggiunto
-    certificate:
-      added: Certificated added
   action:
     added: Azione aggiunta
     changed: Azione cambiata
     deactivated: Azione disattivata
     reactivated: Azione riattivata
     removed: Azione rimossa
-  instance:
-    added: Esempio aggiunta
-    changed: Esempio cambiata
-    customtext:
-      removed: Testo personalizzato eliminato
-      set: Testo personalizzato impostata
-      template:
-        removed: Modello di testo personalizzato rimossa
-    default:
-      language:
-        set: lingua predefinita
-      org:
-        set: set di organizzazioni predefinite
-    domain:
-      added: Dominio aggiunto
-      primary:
-        set: set di dominio primario
-      removed: dominio remissimo
-    iam:
-      console:
-        set: set di applicazioni ZITADEL Console
-      project:
-        set: set di progetto ZITADEL
-    mail:
-      template:
-        added: aggiunto il modello dell'e-mail
-        changed: Modifica del modello dell'e-mail
-      text:
-        added: aggiunto il testo dell'e-mail
-        changed: Testo dell'e-mail modificato
-    member:
-      added: Aggiunto un membro dell'istanza
-      changed: membro dell'istanza modificato
-      removed: membro dell'istanza remissimo
-      cascade:
-        removed: Membro dell'istanza a cascata remissimo
-    notification:
-      provider:
-        debug:
-          fileadded: file aggiunto al provider di notifiche di debug
-          filechanged: file modificato dal fornitore di notifiche di debug
-          fileremoved: file eliminato dal provider di notifiche di debug
-          logadded: registro aggiunto dal fornitore di notifiche di debug
-          logchanged: registro del fornitore di notifiche di debug modificato
-          logremoved: log del provider di notifiche di debug cancellato
-    oidc:
-      settings:
-        added: aggiunta l'impostazione OIDC
-        changed: impostazione OIDC modificata
-    policy:
-      domain:
-        added: aggiunta della politica di dominio
-        changed: modifica della politica del dominio
-      label:
-        activated: politica delle etichette attivata
-        added: Aggiunta della politica delle etichette
-        assets:
-          removed: asset cancellato dalla politica delle etichette
-        changed: Modifica della politica di etichettatura
-        font:
-          added: font aggiunto alle linee guida per le etichette
-          removed: font cancellato dalla politica delle etichette
-        icon:
-          added: icona aggiunta alla linea guida per le etichette
-          removed: icona eliminata dalla linea guida per le etichette
-          dark:
-            added: icona aggiunta alla linea guida per le etichette scure
-            removed: simbolo eliminato dalla linea guida per l'etichetta scura
-        logo:
-          added: logo aggiunto alla politica delle etichette
-          removed: il logo è stato eliminato dalle linee guida per le etichette
-          dark:
-            added: logo aggiunto alle linee guida per le etichette scure
-            removed: logo cancellato dalla politica sui marchi scuri
-      lockout:
-        added: Aggiunto il criterio di blocco della password
-        changed: Modifica della politica di blocco della password
-      login:
-        added: aggiunto il criterio di accesso
-        changed: modifica della politica di accesso
-        idpprovider:
-          added: provider di identità aggiunto ai criteri di accesso
-          cascade:
-            removed:  Identity Provider a cascata eliminato dai criteri di accesso
-          removed: Identity Provider eliminato dai criteri di accesso
-        multifactor:
-          added: Multifattore aggiunto ai criteri di accesso
-          removed: Multifactor eliminato dai criteri di accesso
-        secondfactor:
-          added: aggiunta di un secondo fattore ai criteri di accesso
-          removed: il secondo fattore è stato eliminato dai criteri di accesso
-      password:
-        age:
-          added: aggiunta la politica sull'età della password
-          changed: Modifica della politica sull'età della password
-        complexity:
-          added: Aggiunto il criterio di complessità della password
-          changed: modifica del criterio di complessità della password
-      privacy:
-        added: aggiunta l'informativa sulla privacy
-        changed: modifica dell'informativa sulla privacy
-      security:
-        set: set di criteri di sicurezza
-    removed: Istanza rimosso
-    secret:
-      generator:
-        added: Aggiunto il generatore di password
-        changed: Il generatore di password è stato modificato
-        removed: generatore di password eliminato
-    sms:
-      configtwilio:
-        activated: configurazione Twilio SMS attivata
-        added: aggiunta la configurazione di Twilio SMS
-        changed: modifica della configurazione di Twilio SMS
-        deactivated: configurazione Twilio SMS disattivata
-        removed:  cancellata la configurazione di Twilio SMS
-        token:
-          changed: aggiunto un token alla configurazione di Twilio SMS
-    smtp:
-      config:
-        added: aggiunta la configurazione del nodo SMTP
-        changed: configurazione del nodo SMTP modificata
-        password:
-          changed: password della configurazione del nodo SMTP modificata
-        removed: cancellata la configurazione del nodo SMTP
 
 Application:
   OIDC:
