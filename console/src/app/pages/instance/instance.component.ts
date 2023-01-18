@@ -21,6 +21,8 @@ import {
   SECRETS,
   SECURITY,
   OIDC,
+  INSTANCEVIEWS,
+  FAILEDEVENTS,
 } from 'src/app/modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { InstanceDetail, State } from 'src/app/proto/generated/zitadel/instance_pb';
@@ -66,6 +68,9 @@ export class InstanceComponent {
     OIDC,
     SECRETS,
     SECURITY,
+    // storage
+    INSTANCEVIEWS,
+    FAILEDEVENTS,
   ];
 
   public customerPortalLink: string = '';

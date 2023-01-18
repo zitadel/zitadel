@@ -48,8 +48,6 @@
     "DOCUMENTATION": "文档",
     "INSTANCEOVERVIEW": "实例",
     "ORGS": "组织",
-    "VIEWS": "数据表",
-    "FAILEDEVENTS": "失败事件",
     "ORGANIZATION": "组织",
     "DOMAINS": "域名",
     "PROJECT": "项目",
@@ -892,7 +890,9 @@
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
       "SECRETS": "验证码外观",
-      "SECURITY": "安全设置"
+      "SECURITY": "安全设置",
+      "VIEWS": "数据表",
+      "FAILEDEVENTS": "失败事件"
     },
     "GROUPS": {
       "NOTIFICATIONS": "通知",
@@ -900,7 +900,8 @@
       "DOMAIN": "域名",
       "TEXTS": "文本和语言",
       "APPEARANCE": "外观",
-      "OTHER": "其他"
+      "OTHER": "其他",
+      "STORAGE": "记忆"
     }
   },
   "SETTING": {

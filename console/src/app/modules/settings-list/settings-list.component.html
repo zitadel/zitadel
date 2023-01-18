@@ -50,4 +50,10 @@
   <ng-container *ngIf="currentSetting === 'privacypolicy'">
     <cnsl-privacy-policy [serviceType]="PolicyComponentServiceType.ADMIN"></cnsl-privacy-policy>
   </ng-container>
+  <ng-container *ngIf="currentSetting === 'views'">
+    <cnsl-iam-views></cnsl-iam-views>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'failedevents'">
+    <cnsl-iam-failed-events></cnsl-iam-failed-events>
+  </ng-container>
 </cnsl-sidenav>

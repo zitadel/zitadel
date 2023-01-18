@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import FailedEventsModule from 'src/app/pages/failed-events/failed-events.module';
+import IamViewsModule from 'src/app/pages/iam-views/iam-views.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { CardModule } from '../card/card.module';
@@ -45,6 +47,8 @@ import { SettingsListComponent } from './settings-list.component';
     NotificationSettingsModule,
     OIDCConfigurationModule,
     SecretGeneratorModule,
+    IamViewsModule,
+    FailedEventsModule,
   ],
   exports: [SettingsListComponent],
 })

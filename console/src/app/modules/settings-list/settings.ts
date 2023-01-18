@@ -131,3 +131,15 @@ export const BRANDING: SidenavSetting = {
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
 };
+
+export const INSTANCEVIEWS: SidenavSetting = {
+  id: 'views',
+  i18nKey: 'SETTINGS.LIST.VIEWS',
+  groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
+};
+
+export const FAILEDEVENTS: SidenavSetting = {
+  id: 'failedevents',
+  i18nKey: 'SETTINGS.LIST.FAILEDEVENTS',
+  groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
+};

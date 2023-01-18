@@ -48,8 +48,6 @@
     "DOCUMENTATION": "Documentation",
     "INSTANCEOVERVIEW": "Instance",
     "ORGS": "Organisations",
-    "VIEWS": "Vues",
-    "FAILEDEVENTS": "Événements échoués",
     "ORGANIZATION": "Organisation",
     "DOMAINS": "Domaines",
     "PROJECT": "Projets",
@@ -892,7 +890,9 @@
       "PRIVACYPOLICY": "Politique de confidentialité",
       "OIDC": "Durée de vie et expiration des jetons OIDC",
       "SECRETS": "Apparence secrète",
-      "SECURITY": "Paramètres de sécurité"
+      "SECURITY": "Paramètres de sécurité",
+      "VIEWS": "Vues",
+      "FAILEDEVENTS": "Événements échoués"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
@@ -900,7 +900,8 @@
       "DOMAIN": "Domaine",
       "TEXTS": "Textes et langues",
       "APPEARANCE": "Apparence",
-      "OTHER": "Autres"
+      "OTHER": "Autres",
+      "STORAGE": "Mémoire"
     }
   },
   "SETTING": {

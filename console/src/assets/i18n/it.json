@@ -48,8 +48,6 @@
     "DOCUMENTATION": "Documentazione",
     "INSTANCEOVERVIEW": "Istanza",
     "ORGS": "Organizzazioni",
-    "VIEWS": "Views",
-    "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
     "DOMAINS": "Domini",
     "PROJECT": "Progetti",
@@ -893,7 +891,9 @@
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
       "OIDC": "OIDC Token lifetime e scadenza",
       "SECRETS": "Aspetto dei segreti",
-      "SECURITY": "Impostazioni di sicurezza"
+      "SECURITY": "Impostazioni di sicurezza",
+      "VIEWS": "Views",
+      "FAILEDEVENTS": "Eventi falliti"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifiche",
@@ -901,7 +901,8 @@
       "DOMAIN": "Dominio",
       "TEXTS": "Testi e lingue",
       "APPEARANCE": "Aussehen",
-      "OTHER": "Altro"
+      "OTHER": "Altro",
+      "STORAGE": "Memoria"
     }
   },
   "SETTING": {
