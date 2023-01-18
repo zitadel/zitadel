@@ -31,7 +31,7 @@ describe('machines', () => {
         });
 
         it('should add a machine', () => {
-          usenameCellDoesntExist(machine.addName)
+          usernameCellDoesntExist(machine.addName);
           cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
           cy.url().should('contain', 'users/create-machine');
           //force needed due to the prefilled username prefix
@@ -44,7 +44,6 @@ describe('machines', () => {
           if (machine.mustBeDomain) {
             loginName = loginname(machine.addName, targetOrg);
           }
-          // TODO: Label says loginname, so should be loginname
           cy.contains('[data-e2e="copy-loginname"]', machine.addName).should('be.visible').click();
           cy.clipboardMatches(machine.addName);
         });
@@ -59,11 +58,15 @@ describe('machines', () => {
         });
 
         it('should delete a machine', () => {
-          getUsernameCell(machine.removeName).parents('tr').find('[data-e2e="enabled-delete-button"]').click({ force: true });
+          getUsernameCell(machine.removeName)
+            .parents('tr')
+            .find('[data-e2e="enabled-delete-button"]')
+          // TODO: Is there a way to make the button visible?
+          .click({ force: true });
           cy.get('[data-e2e="confirm-dialog-input"]').focus().type(machine.removeName);
           cy.get('[data-e2e="confirm-dialog-button"]').click();
           cy.shouldConfirmSuccess();
-          usenameCellDoesntExist(machine.removeName)
+          usernameCellDoesntExist(machine.removeName);
         });
 
         it('should create a personal access token');
@@ -79,19 +82,12 @@ describe('machines', () => {
   }
 });
 
-function usenameCellDoesntExist(username: string){
+function usernameCellDoesntExist(username: string) {
   cy.waitUntil(() => {
-    return getUsernameCell(username).then($el => $el.length === 0)
-  })
+    return getUsernameCell(username).then(($el) => $el.length === 0);
+  });
 }
-
-
 
 function getUsernameCell(username: string) {
-  return cy.get('[data-e2e="username-cell"]').then(elements$ => {
-    return Cypress.$(elements$).filter((_, el$)=> {
-      return Cypress.$(el$).text().trim() == username
-    })
-  })
+  return cy.get('[data-e2e="username-cell"]').containsExactly(username);
 }
-

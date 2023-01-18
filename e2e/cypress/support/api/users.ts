@@ -10,11 +10,15 @@ export function ensureMachineExists(target: ZITADELTarget, username: string): Cy
 }
 
 export function ensureHumanDoesntExist(target: ZITADELTarget, username: string) {
-  return standardEnsureDoesntExist(ensureHumanExists(target, username), Cypress._.curry(remove)(target), () => search(target, username));
+  return standardEnsureDoesntExist(ensureHumanExists(target, username), Cypress._.curry(remove)(target), () =>
+    search(target, username),
+  );
 }
 
 export function ensureMachineDoesntExist(target: ZITADELTarget, username: string) {
-  return standardEnsureDoesntExist(ensureMachineExists(target, username), Cypress._.curry(remove)(target), () => search(target, username));
+  return standardEnsureDoesntExist(ensureMachineExists(target, username), Cypress._.curry(remove)(target), () =>
+    search(target, username),
+  );
 }
 
 function search(target: ZITADELTarget, username: string): Cypress.Chainable<number> {

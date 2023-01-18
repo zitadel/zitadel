@@ -9,15 +9,21 @@ export function standardEnsureExists(
     if (id) {
       return cy.wrap(id);
     }
-    return search().should((id) => id).then(id => {
-      return update(id).wrap(id)
-    });
+    return search()
+      .should((id) => id)
+      .then((id) => {
+        return update(id).wrap(id);
+      });
   });
 }
 
-export function standardEnsureDoesntExist(ensureExists: Cypress.Chainable<number>, remove: (id: number) => any, search: () => Cypress.Chainable<number>) {
-  ensureExists.then(remove).then(()=> {
-    search().should((id) => !id)
+export function standardEnsureDoesntExist(
+  ensureExists: Cypress.Chainable<number>,
+  remove: (id: number) => any,
+  search: () => Cypress.Chainable<number>,
+) {
+  ensureExists.then(remove).then(() => {
+    search().should((id) => !id);
   });
 }
 
