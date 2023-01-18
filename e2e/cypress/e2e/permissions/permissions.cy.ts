@@ -1,5 +1,7 @@
 import { ensureProjectGrantExists } from 'support/api/grants';
 import {
+  ensureHumanIsGrantedProjectMember,
+  ensureHumanIsNotGrantedProjectMember,
   ensureHumanIsNotOrgMember,
   ensureHumanIsNotProjectMember,
   ensureHumanIsOrgMember,
@@ -106,10 +108,10 @@ describe('permissions', () => {
       testAuthorizations(
         roles.map((role) => role.display),
         (target: ZITADELTarget, userId: number) => {
-          ensureHumanIsNotOrgMember(target, userId);
+          ensureHumanIsNotOrgMember(target, userId, roles[0].internal);
         },
         (target: ZITADELTarget, userId: number) => {
-          ensureHumanIsNotOrgMember(target, userId);
+          ensureHumanIsNotOrgMember(target, userId, roles[0].internal);
           ensureHumanIsOrgMember(
             target,
             userId,
@@ -146,12 +148,12 @@ describe('permissions', () => {
             roles.map((role) => role.display),
             (target: ZITADELTarget, userId: number) => {
               cy.get<number>('@projectId').then((projectId) => {
-                ensureHumanIsNotProjectMember(target, projectId, userId);
+                ensureHumanIsNotProjectMember(target, projectId, userId, roles[0].internal);
               });
             },
             (target: ZITADELTarget, userId: number) => {
               cy.get<number>('@projectId').then((projectId) => {
-                ensureHumanIsNotProjectMember(target, projectId, userId);
+                ensureHumanIsNotProjectMember(target, projectId, userId, roles[0].internal);
                 ensureHumanIsProjectMember(
                   target,
                   projectId,
@@ -216,20 +218,20 @@ describe('permissions', () => {
             (target: ZITADELTarget, userId: number) => {
               cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
                 cy.get<number>('@grantId').then((grantId) => {
-                  ensureHumanIsNotProjectMember(target, foreignProjectId, userId, grantId);
+                  ensureHumanIsNotGrantedProjectMember(target, foreignProjectId, grantId, userId, roles[0].internal);
                 });
               });
             },
             (target: ZITADELTarget, userId: number) => {
               cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
                 cy.get<number>('@grantId').then((grantId) => {
-                  ensureHumanIsNotProjectMember(target, foreignProjectId, userId, grantId);
-                  ensureHumanIsProjectMember(
+                  ensureHumanIsNotGrantedProjectMember(target, foreignProjectId, grantId, userId, roles[0].internal);
+                  ensureHumanIsGrantedProjectMember(
                     target,
                     foreignProjectId,
+                    grantId,
                     userId,
                     roles.map((role) => role.internal),
-                    grantId,
                   );
                 });
               });

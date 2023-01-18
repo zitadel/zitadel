@@ -9,7 +9,7 @@ import {
 } from './standard';
 
 export function ensureActionDoesntExist(target: ZITADELTarget, name: string) {
-  return standardEnsureDoesntExist(ensureActionExists(target, name, ''), Cypress._.curry(remove)(target));
+  return standardEnsureDoesntExist(ensureActionExists(target, name, ''), Cypress._.curry(remove)(target), () => search(target, name));
 }
 
 export function ensureActionExists(target: ZITADELTarget, name: string, script: string): Cypress.Chainable<number> {
