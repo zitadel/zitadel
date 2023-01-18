@@ -6,8 +6,10 @@ export function ensureRoleExists(target: ZITADELTarget, projectId: number, roleK
 }
 
 export function ensureRoleDoesntExist(target: ZITADELTarget, projectId: number, roleKey: string) {
-  return standardEnsureDoesntExist(ensureRoleExists(target, projectId, roleKey), Cypress._.curry(remove)(target, projectId), () =>
-    search(target, projectId, roleKey),
+  return standardEnsureDoesntExist(
+    ensureRoleExists(target, projectId, roleKey),
+    Cypress._.curry(remove)(target, projectId),
+    () => search(target, projectId, roleKey),
   );
 }
 
