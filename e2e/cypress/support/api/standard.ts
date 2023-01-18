@@ -1,10 +1,12 @@
 import { ZITADELTarget } from 'support/commands';
 
-export function standardEnsureExists(
-  create: Cypress.Chainable<number>,
-  search: () => Cypress.Chainable<number>,
-  update: (id: number) => Cypress.Chainable<any> = () => cy.wrap(null),
-): Cypress.Chainable<number> {
+type IDType = number | string;
+
+export function standardEnsureExists<IDType>(
+  create: Cypress.Chainable<IDType>,
+  search: () => Cypress.Chainable<IDType>,
+  update: (id: IDType) => Cypress.Chainable<any> = () => cy.wrap(null),
+): Cypress.Chainable<IDType> {
   return create.then((id) => {
     if (id) {
       return cy.wrap(id);
@@ -17,17 +19,23 @@ export function standardEnsureExists(
   });
 }
 
-export function standardEnsureDoesntExist(
-  ensureExists: Cypress.Chainable<number>,
-  remove: (id: number) => any,
-  search: () => Cypress.Chainable<number>,
-) {
-  ensureExists.then(remove).then(() => {
+export function standardEnsureDoesntExist<IDType>(
+  ensureExists: Cypress.Chainable<IDType>,
+  remove: (id: IDType) => any,
+  search: () => Cypress.Chainable<IDType>,
+): Cypress.Chainable<null> {
+  return ensureExists.then(remove).then(() => {
     search().should((id) => !id);
+    return null;
   });
 }
 
-export function standardCreate(target: ZITADELTarget, url: string, body: any, idField: string): Cypress.Chainable<number> {
+export function standardCreate<IDType>(
+  target: ZITADELTarget,
+  url: string,
+  body: any,
+  idField: string,
+): Cypress.Chainable<IDType> {
   return cy
     .request({
       method: 'POST',
@@ -45,12 +53,12 @@ export function standardCreate(target: ZITADELTarget, url: string, body: any, id
     });
 }
 
-export function standardSearch(
+export function standardSearch<IDType>(
   target: ZITADELTarget,
   url: string,
   find: (entity: any) => boolean,
   idField: string,
-): Cypress.Chainable<number> {
+): Cypress.Chainable<IDType> {
   return cy
     .request({
       method: 'POST',
@@ -96,10 +104,4 @@ export function standardRemove(target: ZITADELTarget, url: string) {
         expect(res.status).to.equal(404);
       }
     });
-}
-
-function sleep(ms: number) {
-  (async () => {
-    await new Promise((f) => setTimeout(f, ms));
-  })();
 }

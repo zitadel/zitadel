@@ -62,8 +62,8 @@ describe('humans', () => {
           getUsernameCell(user.removeName)
             .parents('tr')
             .find('[data-e2e="enabled-delete-button"]')
-          // TODO: Is there a way to make the button visible?
-          .click({ force: true });
+            // TODO: Is there a way to make the button visible?
+            .click({ force: true });
           cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.visible').type(user.removeName);
           cy.get('[data-e2e="confirm-dialog-button"]').should('be.visible').click();
           cy.shouldConfirmSuccess();
@@ -80,7 +80,6 @@ function navigateToUsers(target: ZITADELTarget) {
   cy.get('[data-e2e="users-nav"]').should('be.visible').click();
   cy.get('[data-e2e="list-humans"] button').should('be.visible').click();
 }
-
 
 function usernameCellDoesntExist(username: string) {
   cy.waitUntil(() => {

@@ -61,8 +61,8 @@ describe('machines', () => {
           getUsernameCell(machine.removeName)
             .parents('tr')
             .find('[data-e2e="enabled-delete-button"]')
-          // TODO: Is there a way to make the button visible?
-          .click({ force: true });
+            // TODO: Is there a way to make the button visible?
+            .click({ force: true });
           cy.get('[data-e2e="confirm-dialog-input"]').focus().type(machine.removeName);
           cy.get('[data-e2e="confirm-dialog-button"]').click();
           cy.shouldConfirmSuccess();

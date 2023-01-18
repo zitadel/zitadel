@@ -1,78 +1,21 @@
 import { ZITADELTarget } from 'support/commands';
+import { standardCreate, standardEnsureExists, standardRemove, standardSearch } from './standard';
 import { newOrgTarget } from './target';
 
 export function ensureOrgExists(target: ZITADELTarget, name: string): Cypress.Chainable<ZITADELTarget> {
-  return createOrg(target, name).then((id) => {
-    if (id) {
-      return cy.wrap(newOrgTarget(target, id, name));
-    }
-    return search(target, name).then((id) => {
-      if (id) {
-        return cy.wrap(newOrgTarget(target, id, name));
-      }
-      sleep(6_000);
-      cy.log('retrying');
-      return search(target, name).then((id) => {
-        if (id) {
-          return cy.wrap(newOrgTarget(target, id, name));
-        }
-        sleep(6_000);
-        cy.log('retrying');
-        debugger;
-        return search(target, name).then((id) => cy.wrap(newOrgTarget(target, id, name)));
-      });
-    });
+  return standardEnsureExists(create(target, name), () => search(target, name)).then((id) => {
+    return newOrgTarget(target, id, name);
   });
 }
 
-function search(target: ZITADELTarget, name: string): Cypress.Chainable<number> {
-  return cy
-    .request({
-      method: 'POST',
-      url: `${target.adminBaseURL}/orgs/_search`,
-      headers: target.headers,
-    })
-    .then((res) => {
-      return res.body?.result?.find((entity) => entity.name == name)?.id || cy.wrap(null);
-    });
+function search(target: ZITADELTarget, name: string) {
+  return standardSearch<number>(target, `${target.adminBaseURL}/orgs/_search`, (entity) => entity.name == name, 'id');
 }
 
-function createOrg(target: ZITADELTarget, name: string): Cypress.Chainable<number> {
-  return cy
-    .request({
-      method: 'POST',
-      url: `${target.mgmtBaseURL}/orgs`,
-      body: { name: name },
-      headers: target.headers,
-      failOnStatusCode: false,
-    })
-    .then((res) => {
-      if (!res.isOkStatusCode) {
-        expect(res.status).to.equal(409);
-        return null;
-      }
-      return res.body.id;
-    });
+function create(target: ZITADELTarget, name: string) {
+  return standardCreate<number>(target, `${target.mgmtBaseURL}/orgs`, { name: name }, 'id');
 }
 
-export function removeOrg(target: ZITADELTarget): Cypress.Chainable<null> {
-  return cy
-    .request({
-      method: 'DELETE',
-      url: `${target.mgmtBaseURL}/orgs/me`,
-      headers: target.headers,
-      failOnStatusCode: false,
-    })
-    .then((res) => {
-      if (!res.isOkStatusCode) {
-        expect(res.status).to.equal(404);
-      }
-      return null;
-    });
-}
-
-function sleep(ms: number) {
-  (async () => {
-    await new Promise((f) => setTimeout(f, ms));
-  })();
+export function remove(target: ZITADELTarget) {
+  return standardRemove(target, `${target.mgmtBaseURL}/orgs/me`);
 }

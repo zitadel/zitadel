@@ -1,6 +1,6 @@
 import { ZITADELTarget } from 'support/commands';
 import { sessionAsPredefinedUser, User } from 'support/login/session';
-import { ensureOrgExists, removeOrg } from './orgs';
+import { ensureOrgExists, remove } from './orgs';
 
 export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainable<ZITADELTarget> {
   sessionAsPredefinedUser(User.IAMAdminUser);
@@ -32,7 +32,7 @@ export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainabl
               return cy.wrap(dirtyOrgTarget);
             }
 
-            return removeOrg(dirtyOrgTarget).then(() => {
+            return remove(dirtyOrgTarget).then(() => {
               return ensureOrgExists(dirtyOrgTarget, orgName);
             });
           });

@@ -9,10 +9,12 @@ import {
 } from './standard';
 
 export function ensureActionDoesntExist(target: ZITADELTarget, name: string) {
-  return standardEnsureDoesntExist(ensureActionExists(target, name, ''), Cypress._.curry(remove)(target), () => search(target, name));
+  return standardEnsureDoesntExist(ensureActionExists(target, name, ''), Cypress._.curry(remove)(target), () =>
+    search(target, name),
+  );
 }
 
-export function ensureActionExists(target: ZITADELTarget, name: string, script: string): Cypress.Chainable<number> {
+export function ensureActionExists(target: ZITADELTarget, name: string, script: string) {
   return standardEnsureExists(
     create(target, name, script),
     () => search(target, name),
@@ -20,8 +22,8 @@ export function ensureActionExists(target: ZITADELTarget, name: string, script: 
   );
 }
 
-function create(target: ZITADELTarget, name: string, script: string): Cypress.Chainable<any> {
-  return standardCreate(
+function create(target: ZITADELTarget, name: string, script: string) {
+  return standardCreate<number>(
     target,
     `${target.mgmtBaseURL}/actions`,
     {
@@ -34,8 +36,8 @@ function create(target: ZITADELTarget, name: string, script: string): Cypress.Ch
   );
 }
 
-function search(target: ZITADELTarget, name: string): Cypress.Chainable<number> {
-  return standardSearch(target, `${target.mgmtBaseURL}/actions/_search`, (entity) => entity.name == name, 'id');
+function search(target: ZITADELTarget, name: string) {
+  return standardSearch<number>(target, `${target.mgmtBaseURL}/actions/_search`, (entity) => entity.name == name, 'id');
 }
 
 function update(target: ZITADELTarget, name: string, script: string, id: number) {

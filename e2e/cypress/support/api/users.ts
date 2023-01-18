@@ -1,11 +1,11 @@
 import { ZITADELTarget } from 'support/commands';
 import { standardCreate, standardEnsureDoesntExist, standardEnsureExists, standardRemove, standardSearch } from './standard';
 
-export function ensureHumanExists(target: ZITADELTarget, username: string): Cypress.Chainable<number> {
+export function ensureHumanExists(target: ZITADELTarget, username: string) {
   return standardEnsureExists(createHuman(target, username), () => search(target, username));
 }
 
-export function ensureMachineExists(target: ZITADELTarget, username: string): Cypress.Chainable<number> {
+export function ensureMachineExists(target: ZITADELTarget, username: string) {
   return standardEnsureExists(createMachine(target, username), () => search(target, username));
 }
 
@@ -21,12 +21,17 @@ export function ensureMachineDoesntExist(target: ZITADELTarget, username: string
   );
 }
 
-function search(target: ZITADELTarget, username: string): Cypress.Chainable<number> {
-  return standardSearch(target, `${target.mgmtBaseURL}/users/_search`, (entity) => entity.userName == username, 'id');
+function search(target: ZITADELTarget, username: string) {
+  return standardSearch<number>(
+    target,
+    `${target.mgmtBaseURL}/users/_search`,
+    (entity) => entity.userName == username,
+    'id',
+  );
 }
 
-function createHuman(target: ZITADELTarget, username: string): Cypress.Chainable<number> {
-  return standardCreate(
+function createHuman(target: ZITADELTarget, username: string) {
+  return standardCreate<number>(
     target,
     `${target.mgmtBaseURL}/users/human/_import`,
     {
@@ -49,8 +54,8 @@ function createHuman(target: ZITADELTarget, username: string): Cypress.Chainable
   );
 }
 
-function createMachine(target: ZITADELTarget, username: string): Cypress.Chainable<any> {
-  return standardCreate(
+function createMachine(target: ZITADELTarget, username: string) {
+  return standardCreate<number>(
     target,
     `${target.mgmtBaseURL}/users/machine`,
     {

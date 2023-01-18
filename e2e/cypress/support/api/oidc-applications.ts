@@ -1,23 +1,20 @@
 import { ZITADELTarget } from 'support/commands';
-import {
-  standardCreate,
-  standardEnsureDoesntExist,
-  standardEnsureExists,
-  standardRemove,
-  standardSearch,
-  standardUpdate,
-} from './standard';
+import { standardCreate, standardEnsureDoesntExist, standardEnsureExists, standardRemove, standardSearch } from './standard';
 
 export function ensureOIDCAppDoesntExist(target: ZITADELTarget, projectId: number, name: string) {
-  return standardEnsureDoesntExist(ensureOIDCAppExists(target, projectId, name), Cypress._.curry(remove)(target, projectId));
+  return standardEnsureDoesntExist(
+    ensureOIDCAppExists(target, projectId, name),
+    Cypress._.curry(remove)(target, projectId),
+    () => search(target, projectId, name),
+  );
 }
 
-export function ensureOIDCAppExists(target: ZITADELTarget, projectId: number, name: string): Cypress.Chainable<number> {
+export function ensureOIDCAppExists(target: ZITADELTarget, projectId: number, name: string) {
   return standardEnsureExists(create(target, projectId, name), () => search(target, projectId, name));
 }
 
-function create(target: ZITADELTarget, projectId: number, name: string): Cypress.Chainable<any> {
-  return standardCreate(
+function create(target: ZITADELTarget, projectId: number, name: string) {
+  return standardCreate<number>(
     target,
     `${target.mgmtBaseURL}/projects/${projectId}/apps/oidc`,
     {
@@ -32,8 +29,8 @@ function create(target: ZITADELTarget, projectId: number, name: string): Cypress
   );
 }
 
-function search(target: ZITADELTarget, projectId: number, name: string): Cypress.Chainable<number> {
-  return standardSearch(
+function search(target: ZITADELTarget, projectId: number, name: string) {
+  return standardSearch<number>(
     target,
     `${target.mgmtBaseURL}/projects/${projectId}/apps/_search`,
     (entity) => entity.name == name,
