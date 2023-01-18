@@ -16,7 +16,7 @@ describe('machines', () => {
     { mustBeDomain: false, addName: 'e2emachineusernameadd@test.com', removeName: 'e2emachineusernameremove@test.com' },
     { mustBeDomain: true, addName: 'e2emachineusernameaddSimple', removeName: 'e2emachineusernameremoveSimple' },
   ].forEach((machine) => {
-    describe(`must ${machine.mustBeDomain ? '' : 'not '}be domain`, () => {
+    describe(`${machine.mustBeDomain ? 'must' : 'can'} be domain`, () => {
       beforeEach(() => {
         cy.get<ZITADELTarget>('@target').then((target) => {
           ensureDomainPolicy(target, machine.mustBeDomain, true, false);

@@ -1,8 +1,8 @@
 import { ZITADELTarget } from 'support/commands';
 import { sessionAsPredefinedUser, User } from 'support/login/session';
-import { ensureOrgExists, remove } from './orgs';
+import { ensureOrgExists } from './orgs';
 
-export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainable<ZITADELTarget> {
+export function newTarget(orgName: string): Cypress.Chainable<ZITADELTarget> {
   sessionAsPredefinedUser(User.IAMAdminUser);
   cy.task('resetCRDInterface');
   return cy
@@ -27,15 +27,7 @@ export function newTarget(orgName: string, cleanOrg?: boolean): Cypress.Chainabl
           org: orgName,
         })
         .then((tmpTarget) => {
-          return ensureOrgExists(tmpTarget, orgName).then((dirtyOrgTarget) => {
-            if (!cleanOrg) {
-              return cy.wrap(dirtyOrgTarget);
-            }
-
-            return remove(dirtyOrgTarget).then(() => {
-              return ensureOrgExists(dirtyOrgTarget, orgName);
-            });
-          });
+          return ensureOrgExists(tmpTarget, orgName);
         });
     });
 }

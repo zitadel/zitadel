@@ -15,7 +15,7 @@ describe('humans', () => {
     { mustBeDomain: false, addName: 'e2ehumanusernameadd@test.com', removeName: 'e2ehumanusernameremove@test.com' },
     { mustBeDomain: true, addName: 'e2ehumanusernameaddSimple', removeName: 'e2ehumanusernameremoveSimple' },
   ].forEach((user) => {
-    describe(`must ${user.mustBeDomain ? '' : 'not '}be domain`, () => {
+    describe(`${user.mustBeDomain ? 'must' : 'can'} be domain`, () => {
       beforeEach(() => {
         cy.get<ZITADELTarget>('@target').then((target) => {
           ensureDomainPolicy(target, user.mustBeDomain, true, false);
