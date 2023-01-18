@@ -1,6 +1,7 @@
 import 'cypress-wait-until';
 // @ts-ignore
 import * as regGrep from '@cypress/grep';
+import { debug } from 'console';
 regGrep();
 
 export interface ZITADELTarget {
@@ -45,7 +46,7 @@ declare global {
       /**
        * Custom command that yields the element that exactly matches the given text.
        */
-      containsExactly<E extends Node = HTMLElement>(content: string | number | RegExp): Cypress.Chainable<JQuery<E>>;
+      getContainingExactText<E extends Node = HTMLElement>(content: string): Cypress.Chainable<JQuery<E>>;
     }
   }
 }
@@ -103,13 +104,15 @@ Cypress.Commands.add('shouldConfirmSuccess', { prevSubject: false }, () => {
 });
 
 Cypress.Commands.add(
-  'containsExactly',
+  'getContainingExactText',
   { prevSubject: true },
   (subject: JQuery<HTMLElement>, text: string): Cypress.Chainable<JQuery<HTMLElement>> => {
-    return cy.wrap(subject).then((elements$) => {
-      return Cypress.$(elements$).filter((_, el$) => {
-        return Cypress.$(el$).text().trim() == text;
-      });
+    return cy.wrap(subject).then(($elements) => {
+      return Cypress.$($elements)
+        .filter((_, $el) => {
+          return Cypress.$($el).text().trim() == text;
+        })
+        .first();
     });
   },
 );
