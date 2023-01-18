@@ -7,6 +7,20 @@
   [hasContributors]="true"
   stateTooltip="{{ 'INSTANCE.STATE.' + instance?.state | translate }}"
 >
+  <a
+    *ngIf="customerPortalLink && instance?.id"
+    topButtons
+    mat-raised-button
+    color="primary"
+    class="customer-portal-link"
+    [href]="customerPortalLink + '/' + instance?.id"
+    target="_blank"
+    rel="noreferrer"
+  >
+    <span>{{ 'MENU.CUSTOMERPORTAL' | translate }}</span>
+    <i class="las la-external-link-alt"></i>
+  </a>
+
   <cnsl-contributors
     topContributors
     [totalResult]="totalMemberResult"

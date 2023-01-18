@@ -87,7 +87,6 @@ export class NavComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
 
   public BreadcrumbType: any = BreadcrumbType;
-  public customerPortalLink: string = '';
 
   constructor(
     public authService: GrpcAuthService,
@@ -96,22 +95,9 @@ export class NavComponent implements OnDestroy {
     public mgmtService: ManagementService,
     private router: Router,
     private breakpointObserver: BreakpointObserver,
-    private http: HttpClient,
     private shortcutService: KeyboardShortcutsService,
   ) {
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
-    this.loadEnvironment();
-  }
-
-  public loadEnvironment(): void {
-    this.http
-      .get('./assets/environment.json')
-      .pipe(take(1))
-      .subscribe((data: any) => {
-        if (data && data.customer_portal) {
-          this.customerPortalLink = data.customer_portal;
-        }
-      });
   }
 
   public toggleAdminHide(): void {

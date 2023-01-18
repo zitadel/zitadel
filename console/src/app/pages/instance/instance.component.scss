@@ -6,6 +6,17 @@
   $background: map-get($theme, background);
 }
 
+.customer-portal-link {
+  display: flex;
+  align-items: center;
+
+  i {
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    margin-right: -0.25rem;
+  }
+}
+
 .instance-table-title {
   font-size: 1.2rem;
   letter-spacing: 0.05em;

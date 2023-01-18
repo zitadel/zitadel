@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -66,6 +67,9 @@ export class InstanceComponent {
     SECRETS,
     SECURITY,
   ];
+
+  public customerPortalLink: string = '';
+
   constructor(
     public adminService: AdminService,
     private dialog: MatDialog,
@@ -73,8 +77,10 @@ export class InstanceComponent {
     breadcrumbService: BreadcrumbService,
     private router: Router,
     activatedRoute: ActivatedRoute,
+    private http: HttpClient,
   ) {
     this.loadMembers();
+    this.loadEnvironment();
 
     const instanceBread = new Breadcrumb({
       type: BreadcrumbType.INSTANCE,
@@ -111,6 +117,18 @@ export class InstanceComponent {
         this.id = id;
       }
     });
+  }
+
+  public loadEnvironment(): void {
+    this.http
+      .get('./assets/environment.json')
+      .pipe(take(1))
+      .subscribe((data: any) => {
+        if (data && data.customer_portal) {
+          this.customerPortalLink = data.customer_portal;
+          console.log(this.customerPortalLink);
+        }
+      });
   }
 
   public loadMembers(): void {

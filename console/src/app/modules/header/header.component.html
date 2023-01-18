@@ -38,7 +38,7 @@
     </ng-template>
 
     <ng-container *ngFor="let bread of breadcrumbService.breadcrumbs$ | async as bc; index as i">
-      <!-- <ng-container *ngIf="bread.type === BreadcrumbType.INSTANCE">
+      <ng-container *ngIf="bread.type === BreadcrumbType.INSTANCE">
         <ng-template cnslHasRole [hasRole]="['iam.read']">
           <svg
             class="slash hide-on-small"
@@ -60,9 +60,9 @@
             </a>
           </div>
         </ng-template>
-      </ng-container> -->
+      </ng-container>
 
-      <ng-container *ngIf="bread.type === BreadcrumbType.ORG || bread.type === BreadcrumbType.INSTANCE">
+      <ng-container *ngIf="bread.type === BreadcrumbType.ORG">
         <svg
           class="slash"
           viewBox="0 0 24 24"
