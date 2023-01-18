@@ -3,6 +3,7 @@ syntax = "proto3";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/instance.proto";
+import "zitadel/member.proto";
 import "zitadel/auth_n_key.proto";
 
 import "google/api/annotations.proto";
@@ -166,6 +167,19 @@ service SystemService {
   rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "authenticated";
+    };
+  }
+
+  //Returns all instance members matching the request
+  // all queries need to match (ANDed)
+  rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
+    option (google.api.http) = {
+      post: "/instances/{instance_id}/members/_search";
+      body: "*";
     };
 
     option (zitadel.v1.auth_option) = {
@@ -489,6 +503,17 @@ message RemoveInstanceRequest {
 
 message RemoveInstanceResponse {
   zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListIAMMembersRequest {
+  zitadel.v1.ListQuery query = 1;
+  string instance_id = 2;
+  repeated zitadel.member.v1.SearchQuery queries = 3;
+}
+
+message ListIAMMembersResponse {
+  zitadel.v1.ListDetails details = 1;
+  repeated zitadel.member.v1.Member result = 2;
 }
 
 message GetUsageRequest {
