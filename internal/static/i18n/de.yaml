@@ -1037,11 +1037,11 @@ EventTypes:
           removed: Zweitfaktor von Login Richtlinie gelöscht
       password:
         age:
-          added: Password Alter Richtlinie hinzugefügt
-          changed: Password Alter Richtlinie geändert
+          added: Passwort Alterungsrichtlinie hinzugefügt
+          changed: Passwort Alterungsrichtlinie geändert
         complexity:
-          added: Password Komplexitätsrichtlinie hinzugefügt
-          changed: Password Komplexitätsrichtlinie geändert
+          added: Passwort Komplexitätsrichtlinie hinzugefügt
+          changed: Passwort Komplexitätsrichtlinie geändert
       privacy:
         added: Datenschutzrichtlinie hinzugefügt
         changed: Datenschutzrichtlinie geändert
@@ -1065,11 +1065,11 @@ EventTypes:
           changed: Token zu Twilio SMS Konfiguration hinzugefügt
     smtp:
       config:
-        added: SMTP Knofiguration hinzugefügt
-        changed: SMTP Knofiguration geändert
+        added: SMTP Konfiguration hinzugefügt
+        changed: SMTP Konfiguration geändert
         password:
-          changed: Passwort von SMTP Knofiguration geändert
-        removed: SMTP Knofiguration gelöscht
+          changed: Passwort von SMTP Konfiguration geändert
+        removed: SMTP Konfiguration gelöscht
 
 Application:
   OIDC:
