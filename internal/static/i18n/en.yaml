@@ -1062,7 +1062,7 @@ EventTypes:
         deactivated: Twilio SMS configuration deactivated
         removed: Twilio SMS configuration removed
         token:
-          changed: Token of wilio SMS configuration changed
+          changed: Token of Twilio SMS configuration changed
     smtp:
       config:
         added: SMTP configuration added
