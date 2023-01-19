@@ -113,7 +113,7 @@ Errors:
       HasLower: Passwort beinhaltet keinen Kleinbuchstaben
       HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
-      HasSymbol: Passwort beinhaltet kein Icon
+      HasSymbol: Passwort beinhaltet kein Symbol
     ExternalIDP:
       Invalid: Externer IDP ungültig
       IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
@@ -653,11 +653,11 @@ EventTypes:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben
     member:
-      added: Organisations member hinzugefügt
-      changed: Organisations member geändert
-      removed: Organisations member entfernt
+      added: Organisationsmitglied hinzugefügt
+      changed: Organisationsmitglied geändert
+      removed: Organisationsmitglied entfernt
       cascade:
-        removed: Organisations member kaskadiert entfernt
+        removed: Organisationsmitglied kaskadiert entfernt
     iam:
       policy:
         added: System Richtlinie der Organisation hinzugefügt
@@ -756,7 +756,7 @@ EventTypes:
         cascade:
           removed: Aktionen kaskadiert entfernt
         removed: Aktionen entfernt
-      cleared: Flow cleared
+      cleared: Flow zurückgesetzt
     mail:
       template:
         added: E-Mail Vorlage hinzugefügt
@@ -777,11 +777,11 @@ EventTypes:
     reactivated: Projekt reaktiviert
     removed: Projekt entfernt
     member:
-      added: Projekt member hinzugefügt
-      changed: Projekt member geändert
-      removed: Projekt member entfernt
+      added: Projektmitglied hinzugefügt
+      changed: Projektmitglied geändert
+      removed: Projektmitglied entfernt
       cascade:
-        removed: Projekt member kaskadiert entfernt
+        removed: Projektmitglied kaskadiert entfernt
     role:
       added: Projektrolle hinzugefügt
       changed: Projektrolle geändert
@@ -795,11 +795,11 @@ EventTypes:
       cascade:
         changed: Verwaltungszugriff geändert
       member:
-        added: Verwaltungszugriffs member hinzugefügt
-        changed: Verwaltungszugriffs member geändert
-        removed: Verwaltungszugriffs member entfernt
+        added: Verwaltungszugriffsmitglied hinzugefügt
+        changed: Verwaltungszugriffsmitglied geändert
+        removed: Verwaltungszugriffsmitglied entfernt
         cascade:
-          removed: Verwaltungszugriffs member kaskadiert entfernt
+          removed: Verwaltungszugriffsmitglied kaskadiert entfernt
     application:
       added: Applikation hinzugefügt
       changed: Applikation geändert
@@ -850,11 +850,11 @@ EventTypes:
       iam:
         set: ZITADEL Projekt gesetzt
     member:
-      added: ZITADEL Member hinzugefügt
-      changed: ZITADEL Member geändert
-      removed: ZITADEL Member entfernt
+      added: ZITADEL Mitglied hinzugefügt
+      changed: ZITADEL Mitglied geändert
+      removed: ZITADEL Mitglied entfernt
       cascade:
-        removed: ZITADEL Member kaskadiert entfernt
+        removed: ZITADEL Mitglied kaskadiert entfernt
     idp:
       config:
         added: IDP Konfiguration hinzugefügt
@@ -975,11 +975,11 @@ EventTypes:
         added: E-Mail Text hinzugefügt
         changed: E-Mail Text geändert
     member:
-      added: Instanz member hinzugefügt
-      changed: Instanz member geändert
-      removed: Instanz member gelöscht
+      added: Instanzmitglied hinzugefügt
+      changed: Instanzmitglied geändert
+      removed: Instanzmitglied gelöscht
       cascade:
-        removed: Instanz member kaskadierend gelöscht
+        removed: Instanzmitglied kaskadierend gelöscht
     notification: 
       provider:
         debug:
