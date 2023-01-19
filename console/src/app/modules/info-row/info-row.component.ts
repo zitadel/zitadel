@@ -39,10 +39,18 @@ export class InfoRowComponent {
     let email: string = '';
     let phone: string = '';
     if (this.loginPolicy) {
-      if (!this.loginPolicy?.disableLoginWithEmail && this.user.human?.email?.email) {
+      if (
+        !this.loginPolicy?.disableLoginWithEmail &&
+        this.user.human?.email?.email &&
+        this.user.human.email.isEmailVerified
+      ) {
         email = this.user.human?.email?.email;
       }
-      if (!this.loginPolicy?.disableLoginWithPhone && this.user.human?.phone?.phone) {
+      if (
+        !this.loginPolicy?.disableLoginWithPhone &&
+        this.user.human?.phone?.phone &&
+        this.user.human.phone.isPhoneVerified
+      ) {
         phone = this.user.human?.phone?.phone;
       }
     }

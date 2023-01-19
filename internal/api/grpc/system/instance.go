@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
+	"github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
@@ -92,6 +93,23 @@ func (s *Server) RemoveInstance(ctx context.Context, req *system_pb.RemoveInstan
 	}
 	return &system_pb.RemoveInstanceResponse{
 		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
+func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembersRequest) (*system_pb.ListIAMMembersResponse, error) {
+	ctx = authz.WithInstanceID(ctx, req.InstanceId)
+	queries, err := ListIAMMembersRequestToQuery(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IAMMembers(ctx, queries, false)
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.ListIAMMembersResponse{
+		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		//TODO: resource owner of user of the member instead of the membership resource owner
+		Result: member.MembersToPb("", res.Members),
 	}, nil
 }
 
