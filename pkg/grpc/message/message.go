@@ -12,6 +12,10 @@ func NewLocalizedEventType(key string) *LocalizedMessage {
 	return &LocalizedMessage{Key: "EventTypes." + key}
 }
 
+func NewLocalizedAggregateType(key string) *LocalizedMessage {
+	return &LocalizedMessage{Key: "AggregateTypes." + key}
+}
+
 func NewLocalizedMessage(key string) *LocalizedMessage {
 	return &LocalizedMessage{Key: key}
 }
