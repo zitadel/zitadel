@@ -188,8 +188,8 @@ Errors:
       RedirectURIInvalid: Default Redirect URI is invalid
       NotExisting: Login Policy not existing
       AlreadyExists: Login Policy already exists
-      IdpProviderAlreadyExisting: Idp Provider already existing
-      IdpProviderNotExisting: Idp Provider not existing
+      IdpProviderAlreadyExisting: Identity Provider already existing
+      IdpProviderNotExisting: Identity Provider not existing
       RegistrationNotAllowed: Registration is not allowed
       UsernamePasswordNotAllowed: Login with Username / Password is not allowed
       MFA:
@@ -295,7 +295,7 @@ Errors:
     IdpIsNotOIDC: IDP configuration is not of type oidc
     LoginPolicyInvalid: Login Policy is invalid
     LoginPolicyNotExisting: Login Policy doesn't exist
-    IdpProviderInvalid: Idp Provider is invalid
+    IdpProviderInvalid: Identity Provider is invalid
     LoginPolicy:
       NotFound: Default Login Policy not found
       NotChanged: Default Login Policy has not been changed
@@ -425,6 +425,16 @@ Errors:
     CloseRows: SQL Statement could not be finished
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
+
+AggregateTypes:
+  action: Action
+  instance: Instance
+  key_pair: Key Pair
+  org: Organization
+  project: Project
+  user: User
+  usergrant: User grant
+
 EventTypes:
   user:
     added: User added
@@ -438,13 +448,15 @@ EventTypes:
         failed: Initialization check failed
     token:
       added: Access Token created
+      removed: Access Token removed
     username:
       reserved: Username reserved
       released: Username released
+      changed: Username changed
     email:
       reserved: Email address reserved
       released: Email address released
-      changed:  Email address changed
+      changed: Email address changed
       verified: Email address verified
       verification:
         failed: Email address verification failed
@@ -474,7 +486,7 @@ EventTypes:
         reserved: Username reserved
         released: Username released
       email:
-        changed:  Email address changed
+        changed: Email address changed
         verified: Email address verified
         verification:
           failed: Email address verification failed
@@ -580,6 +592,7 @@ EventTypes:
       code:
         added: Phone number code generated
         sent: Phone number code sent
+      removed: Phone number removed
     profile:
       changed: User profile changed
     address:
@@ -592,6 +605,8 @@ EventTypes:
         check:
           succeeded: Multifactor OTP check succeeded
           failed: Multifactor OTP check failed
+        init:
+          skipped: Multifactor OTP initialization skipped
       init:
         skipped: Multifactor initialization skipped
     signed:
@@ -611,6 +626,12 @@ EventTypes:
       set: User metadata set
       removed: User metadata removed
       removed.all: All user metadata removed
+    domain:
+      claimed: Domain claimed
+      claimed.sent: Domain claimed notification sent
+    pat:
+      added: Personal Access Token added
+      removed: Personal Access Token removed
   org:
     added: Organization added
     changed: Organization changed
@@ -636,7 +657,7 @@ EventTypes:
       changed: Organization member changed
       removed: Organization member removed
       cascade:
-        removeD: Organization member cascade removed
+        removed: Organization member cascade removed
     iam:
       policy:
         added: System policy added
@@ -657,6 +678,10 @@ EventTypes:
         config:
           added: SAML IDP configuration added
           changed: SAML IDP configuration changed
+      jwt:
+        config:
+          added: JWT IDP configuration added
+          changed: JWT IDP configuration changed
     customtext:
       set: Custom text set
       removed: Custom text removed
@@ -668,8 +693,10 @@ EventTypes:
         changed: Login Policy changed
         removed: Login Policy removed
         idpprovider:
-          added: Idp Provider added to Login Policy
-          removed: Idp Provider removed from Login Policy
+          added: Identity Provider added to Login Policy
+          removed: Identity Provider removed from Login Policy
+          cascade:
+            removed: Identity Provider cascade removed from Login Policy
         secondfactor:
           added: Second factor added to Login Policy
           removed: Second factor removed from Login Policy
@@ -715,12 +742,34 @@ EventTypes:
         added: Privacy policy and TOS added
         changed: Privacy policy and TOS changed
         removed: Privacy policy and TOS removed
+      domain:
+        added: Domain policy added
+        changed: Domain policy changed
+        removed: Domain policy removed
+      lockout:
+        added: Lockout policy added
+        changed: Lockout policy changed
+        removed: Lockout policy removed
     flow:
       trigger_actions:
         set: Action set
         cascade:
           removed: Actions cascade removed
         removed: Actions removed
+      cleared: Flow cleared
+    mail:
+      template:
+        added: E-Mail template added
+        changed: E-Mail template changed
+        removed: E-Mail template removed
+      text:
+        added: E-Mail text added
+        changed: E-Mail text changed
+        removed: E-Mail text removed
+    metadata:
+      removed: Metadata removed
+      removed.all: All metadata removed
+      set: Metadata set
   project:
     added: Project added
     changed: Project changed
@@ -750,7 +799,7 @@ EventTypes:
         changed: Management access member changed
         removed: Management access member removed
         cascade:
-          removeD: Management access cascade removed
+          removed: Management access cascade removed
     application:
       added: Application added
       changed: Application changed
@@ -821,6 +870,10 @@ EventTypes:
         config:
           added: SAML IDP configuration added
           changed: SAML IDP configuration changed
+      jwt:
+        config:
+          added: JWT configuration to identity provider added
+          changed: JWT configuration from identity provider remvoed
     customtext:
       set: Text was set
       removed: Text was removed
@@ -829,8 +882,8 @@ EventTypes:
         added: Default Login Policy added
         changed: Default Login Policy changed
         idpprovider:
-          added: Idp Provider added to Default Login Policy
-          removed: Idp Provider removed from Default Login Policy
+          added: Identity Provider added to Default Login Policy
+          removed: Identity Provider removed from Default Login Policy
       label:
         added: Label Policy added
         changed: Label Policy changed
@@ -883,12 +936,140 @@ EventTypes:
           deactivated: Twilio SMS provider deactivated
   key_pair:
     added: Key pair added
+    certificate:
+      added: Certificate added
   action:
     added: Action added
     changed: Action changed
     deactivated: Action deactivated
     reactivated: Action reactivated
     removed: Action removed
+  instance:
+    added: Instance added
+    changed: Instance changed
+    customtext:
+      removed: Custom text removed
+      set: Custom text set
+      template:
+        removed: Template of custom text removed
+    default:
+      language:
+        set: Default language set
+      org:
+        set: Default organisation set
+    domain:
+      added: Domain added
+      primary:
+        set: Primary domain set
+      removed: Domain removed
+    iam:
+      console:
+        set: ZITADEL Console application set
+      project:
+        set: ZITADEL project set
+    mail:
+      template:
+        added: E-Mail template added
+        changed: E-Mail template changed
+      text:
+        added: E-Mail text added
+        changed: E-Mail text changed
+    member:
+      added: Instance member added
+      changed: Instance member changed
+      removed: Instance member removed
+      cascade:
+        removed: Instance member cascade removed
+    notification:
+      provider:
+        debug:
+          fileadded: File debug notification provider added
+          filechanged: File debug notification provider changed
+          fileremoved: File debug notification provider removed
+          logadded: Log debug notification provider added
+          logchanged: Log debug notification provider changed
+          logremoved: Log debug notification provider removed
+    oidc:
+      settings:
+        added: OIDC settings added
+        changed: OIDC settings changed
+    policy:
+      domain:
+        added: Domain policy added
+        changed: Domain policy changed
+      label:
+        activated: Label policy activated
+        added: Label policy added
+        assets:
+          removed: Asset from label policy removed
+        changed: Label policy changed
+        font:
+          added: Font added to label policy
+          removed: Font remvoed from label policy
+        icon:
+          added: Icon added to label policy
+          removed: Icon removed from label policy
+          dark:
+            added: Icon added to dark label policy
+            removed: Icon removed from dark label policy
+        logo:
+          added: Logo added to label policy
+          removed: Logo removed from label policy
+          dark:
+            added: Logo added to dark label policy
+            removed: Logo removed from dark label policy
+      lockout:
+        added: Lockout policy added
+        changed: Lockout policy changed
+      login:
+        added: Login policy added
+        changed: Login policy changed
+        idpprovider:
+          added: Identity Provider added to login policy
+          cascade:
+            removed: Identity Provider cascade removed from login policy
+          removed: Identity Provider removed from login policy
+        multifactor:
+          added: Multifactor added to login policy
+          removed: Multifactor removed from login policy
+        secondfactor:
+          added: Secondfactor added to login policy
+          removed: Secondfactor removed from login policy
+      password:
+        age:
+          added: Password age policy added
+          changed: Password age policy changed
+        complexity:
+          added: Password complexity policy added
+          changed: Password complexity policy removed
+      privacy:
+        added: Privacy policy added
+        changed: Privacy policy changed
+      security:
+        set: Security policy set
+        
+    removed: Instance removed
+    secret:
+      generator:
+        added: Secret generator added
+        changed: Secret generator changed
+        removed: Secret generator removed
+    sms:
+      configtwilio:
+        activated: Twilio SMS configuration activated
+        added: Twilio SMS configuration added
+        changed: Twilio SMS configuration changed
+        deactivated: Twilio SMS configuration deactivated
+        removed: Twilio SMS configuration removed
+        token:
+          changed: Token of Twilio SMS configuration changed
+    smtp:
+      config:
+        added: SMTP configuration added
+        changed: SMTP configuration changed
+        password:
+          changed: Password of SMTP configuration changed
+        removed: SMTP configuration removed
 
 Application:
   OIDC:

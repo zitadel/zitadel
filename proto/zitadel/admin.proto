@@ -13,6 +13,7 @@ import "zitadel/member.proto";
 import "zitadel/event.proto";
 import "zitadel/management.proto";
 import "zitadel/v1.proto";
+import "zitadel/message.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -4854,27 +4855,32 @@ message ListEventsRequest {
         }
     ];
     string editor_user_id = 4 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
         }
     ];
     // the types are or filtered and must match the type exatly
     repeated string event_types = 5 [
+        (validate.rules).repeated = {max_items: 30},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"user.human.added\", \"user.machine\"]";
         }
     ];
     string aggregate_id = 6 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
         }
     ];
-    string aggregate_type = 7 [
+    repeated string aggregate_types = 7 [
+        (validate.rules).repeated = {max_items: 10},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"user\"";
         }
     ];
     string resource_owner = 8 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
         }
@@ -4896,11 +4902,11 @@ message ListEventsResponse {
 message ListEventTypesRequest {}
 
 message ListEventTypesResponse {
-    repeated string event_types = 1;
+    repeated zitadel.event.v1.EventType event_types = 1;
 }
 
 message ListAggregateTypesRequest {}
 
 message ListAggregateTypesResponse {
-    repeated string aggregate_types = 1;
+    repeated zitadel.event.v1.AggregateType aggregate_types = 1;
 }
