@@ -40,6 +40,10 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 	if req.AggregateId != "" {
 		aggregateIDs = append(aggregateIDs, req.AggregateId)
 	}
+	aggregateTypes := make([]eventstore.AggregateType, 0, 1)
+	for i, aggregateType := range req.AggregateTypes {
+		aggregateTypes[i] = eventstore.AggregateType(aggregateType)
+	}
 
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderDesc().
@@ -49,7 +53,7 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		EditorUser(req.EditorUserId).
 		AddQuery().
 		AggregateIDs(aggregateIDs...).
-		AggregateTypes(eventstore.AggregateType(req.AggregateType)).
+		AggregateTypes(aggregateTypes...).
 		EventTypes(eventTypes...).
 		CreationDateAfter(req.CreationDate.AsTime()).
 		SequenceGreater(req.Sequence).
