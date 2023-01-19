@@ -113,7 +113,7 @@ Errors:
       HasLower: Passwort beinhaltet keinen Kleinbuchstaben
       HasUpper: Passwort beinhaltet keinen Grossbuchstaben
       HasNumber: Passwort beinhaltet keine Nummer
-      HasSymbol: Passwort beinhaltet kein Symbol
+      HasSymbol: Passwort beinhaltet kein Icon
     ExternalIDP:
       Invalid: Externer IDP ungültig
       IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
@@ -628,7 +628,7 @@ EventTypes:
       removed.all: Alle Benutzer Metadaten gelöscht
     domain:
       claimed: Domain beansprucht
-      claimed.sent: Domain beanspruchungs Information gesendet
+      claimed.sent: Domain Beanspruchungs Information gesendet
     pat:
       added: Personal Access Token hinzugefügt
       removed: Personal Access Token gelöscht
@@ -653,11 +653,11 @@ EventTypes:
       reserved: Name der Organisation reserviert
       released: Name der Organisation freigegeben
     member:
-      added: Organisationsmitglied hinzugefügt
-      changed: Organisationsmitglied geändert
-      removed: Organisationsmitglied entfernt
+      added: Organisations member hinzugefügt
+      changed: Organisations member geändert
+      removed: Organisations member entfernt
       cascade:
-        removed: Organisationsmitglied kaskadiert entfernt
+        removed: Organisations member kaskadiert entfernt
     iam:
       policy:
         added: System Richtlinie der Organisation hinzugefügt
@@ -777,11 +777,11 @@ EventTypes:
     reactivated: Projekt reaktiviert
     removed: Projekt entfernt
     member:
-      added: Projektmitglied hinzugefügt
-      changed: Projektmitglied geändert
-      removed: Projektmitglied entfernt
+      added: Projekt member hinzugefügt
+      changed: Projekt member geändert
+      removed: Projekt member entfernt
       cascade:
-        removed: Projektmitglied kaskadiert entfernt
+        removed: Projekt member kaskadiert entfernt
     role:
       added: Projektrolle hinzugefügt
       changed: Projektrolle geändert
@@ -795,11 +795,11 @@ EventTypes:
       cascade:
         changed: Verwaltungszugriff geändert
       member:
-        added: Verwaltungszugriffsmitglied hinzugefügt
-        changed: Verwaltungszugriffsmitglied geändert
-        removed: Verwaltungszugriffsmitglied entfernt
+        added: Verwaltungszugriffs member hinzugefügt
+        changed: Verwaltungszugriffs member geändert
+        removed: Verwaltungszugriffs member entfernt
         cascade:
-          removed: Verwaltungszugriffsmitglied kaskadiert entfernt
+          removed: Verwaltungszugriffs member kaskadiert entfernt
     application:
       added: Applikation hinzugefügt
       changed: Applikation geändert
@@ -850,11 +850,11 @@ EventTypes:
       iam:
         set: ZITADEL Projekt gesetzt
     member:
-      added: ZITADEL Mitglied hinzugefügt
-      changed: ZITADEL Mitglied geändert
-      removed: ZITADEL Mitglied entfernt
+      added: ZITADEL Member hinzugefügt
+      changed: ZITADEL Member geändert
+      removed: ZITADEL Member entfernt
       cascade:
-        removed: ZITADEL Mitglied kaskadiert entfernt
+        removed: ZITADEL Member kaskadiert entfernt
     idp:
       config:
         added: IDP Konfiguration hinzugefügt
@@ -975,11 +975,11 @@ EventTypes:
         added: E-Mail Text hinzugefügt
         changed: E-Mail Text geändert
     member:
-      added: Instanzmitglied hinzugefügt
-      changed: Instanzmitglied geändert
-      removed: Instanzmitglied gelöscht
+      added: Instanz member hinzugefügt
+      changed: Instanz member geändert
+      removed: Instanz member gelöscht
       cascade:
-        removed: Instanzmitglieder kaskadierend gelöscht
+        removed: Instanz member kaskadierend gelöscht
     notification: 
       provider:
         debug:
@@ -1001,23 +1001,23 @@ EventTypes:
         activated: Label Richtlinie aktiviert
         added: Label Richtlinie hinzugefügt
         assets:
-          removed: Asset von Label Richtlinie gelöscht
+          removed: Assets von Label Richtlinie gelöscht
         changed: Label Richtlinie geändert
         font:
           added: Schriftart zu Label Richtlinie hinzugefügt
           removed: Schriftart von Label Richtlinie gelöscht
         icon:
-          added: Symbol zu Label Richtlinie hinzugefügt
-          removed: Symbol von Label Richtlinie gelöscht
+          added: Icon zu Label Richtlinie hinzugefügt
+          removed: Icon von Label Richtlinie gelöscht
           dark:
-            added: Symbol zu dunkler Label Richtlinie hinzugefügt
-            removed: Symbol von dunkler Label Richtlinie gelöscht
+            added: Icon (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Icon (dunkler Modus) von Label Richtlinie gelöscht
         logo:
           added: Logo zu Label Richtlinie hinzugefügt
           removed: Logo von Label Richtlinie gelöscht
           dark:
-            added: Logo zu dunkler Label Richtlinie hinzugefügt
-            removed: Logo von dunkler Label Richtlinie gelöscht
+            added: Logo (dunkler Modus) zu Label Richtlinie hinzugefügt
+            removed: Logo (dunkler Modus) von Label Richtlinie gelöscht
       lockout:
         added: Passwortaussperrrichtlinie hinzugefügt
         changed: Passwortaussperrrichtlinie geändert
