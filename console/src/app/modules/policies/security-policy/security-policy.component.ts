@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
 import { SetDefaultLanguageResponse, SetSecurityPolicyRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
