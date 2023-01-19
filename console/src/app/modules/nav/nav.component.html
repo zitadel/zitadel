@@ -101,17 +101,19 @@
                   </a>
                 </ng-template>
 
-                <ng-template cnslHasRole [hasRole]="['org.read']">
-                  <a
-                    class="nav-item"
-                    [routerLinkActive]="['active']"
-                    [routerLinkActiveOptions]="{ exact: false }"
-                    [routerLink]="['/org-settings']"
-                    *ngIf="['policy.read'] | hasRole | async"
-                  >
-                    <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
-                  </a>
-                </ng-template>
+                <ng-container *ngIf="$any(orgLength | async).length > 1">
+                  <ng-template cnslHasRole [hasRole]="['org.read']">
+                    <a
+                      class="nav-item"
+                      [routerLinkActive]="['active']"
+                      [routerLinkActiveOptions]="{ exact: false }"
+                      [routerLink]="['/org-settings']"
+                      *ngIf="['policy.read'] | hasRole | async"
+                    >
+                      <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
+                    </a>
+                  </ng-template>
+                </ng-container>
               </ng-container>
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>

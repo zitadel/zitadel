@@ -5,7 +5,7 @@ import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/cor
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, forkJoin, map, merge, Observable, Subject, switchMap, take } from 'rxjs';
-import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -126,6 +126,14 @@ export class NavComponent implements OnDestroy {
     }).pipe(
       map(({ owned, granted }) => {
         return (owned ?? 0) + (granted ?? 0);
+      }),
+    );
+  }
+
+  public get orgLength(): Observable<Org.AsObject[]> {
+    return this.authService.cachedOrgs.pipe(
+      map((orgs) => {
+        return orgs.filter((org) => org.state === OrgState.ORG_STATE_ACTIVE);
       }),
     );
   }
