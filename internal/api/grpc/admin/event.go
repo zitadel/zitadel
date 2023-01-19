@@ -40,7 +40,7 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 	if req.AggregateId != "" {
 		aggregateIDs = append(aggregateIDs, req.AggregateId)
 	}
-	aggregateTypes := make([]eventstore.AggregateType, 0, 1)
+	aggregateTypes := make([]eventstore.AggregateType, 0, len(req.AggregateTypes))
 	for i, aggregateType := range req.AggregateTypes {
 		aggregateTypes[i] = eventstore.AggregateType(aggregateType)
 	}
