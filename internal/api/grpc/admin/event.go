@@ -8,6 +8,10 @@ import (
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
+const (
+	maxLimit = 1000
+)
+
 func (s *Server) ListEvents(ctx context.Context, in *admin_pb.ListEventsRequest) (*admin_pb.ListEventsResponse, error) {
 	filter, err := eventRequestToFilter(ctx, in)
 	if err != nil {
@@ -18,7 +22,7 @@ func (s *Server) ListEvents(ctx context.Context, in *admin_pb.ListEventsRequest)
 		return nil, err
 	}
 
-	return admin_pb.EventsToPb(events)
+	return admin_pb.EventsToPb(ctx, events)
 }
 
 func (s *Server) ListEventTypes(ctx context.Context, in *admin_pb.ListEventTypesRequest) (*admin_pb.ListEventTypesResponse, error) {
@@ -40,15 +44,19 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 	if req.AggregateId != "" {
 		aggregateIDs = append(aggregateIDs, req.AggregateId)
 	}
-	aggregateTypes := make([]eventstore.AggregateType, 0, len(req.AggregateTypes))
+	aggregateTypes := make([]eventstore.AggregateType, len(req.AggregateTypes))
 	for i, aggregateType := range req.AggregateTypes {
 		aggregateTypes[i] = eventstore.AggregateType(aggregateType)
+	}
+	limit := uint64(req.Limit)
+	if limit == 0 || limit > maxLimit {
+		limit = maxLimit
 	}
 
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderDesc().
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
-		Limit(uint64(req.Limit)).
+		Limit(limit).
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
 		AddQuery().

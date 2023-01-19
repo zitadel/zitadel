@@ -1,9 +1,12 @@
 package admin
 
 import (
+	"context"
+
 	event_grpc "github.com/zitadel/zitadel/internal/api/grpc/event"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	event_pb "github.com/zitadel/zitadel/pkg/grpc/event"
 )
 
@@ -27,7 +30,9 @@ func AggregateTypesToPb(aggregateTypes []string) *ListAggregateTypesResponse {
 	return res
 }
 
-func EventsToPb(events []*query.Event) (*ListEventsResponse, error) {
+func EventsToPb(ctx context.Context, events []*query.Event) (_ *ListEventsResponse, err error) {
+	_, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	res, err := event_grpc.EventsToPb(events)
 	if err != nil {
 		return nil, err
