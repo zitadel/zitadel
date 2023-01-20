@@ -1,4 +1,4 @@
-import { ensureActionExists, setTriggerTypes } from 'support/api/actions';
+import { ensureActionExists, resetAllTriggers, triggerActions } from 'support/api/actions';
 import { ensureDomainPolicy } from 'support/api/policies';
 import { ensureProjectExists } from 'support/api/projects';
 import { ensureRoleExists } from 'support/api/roles';
@@ -10,19 +10,18 @@ import { register } from 'support/login/register';
 import { sessionAsPredefinedUser, User } from 'support/login/session';
 
 describe('actions', () => {
-  const emailVerifiedScript = 'e2eSetEmailVerified',
-    addGrantScript = 'e2eAddGrant',
-    addStaticMetadataScript = 'e2eAddStaticMetadata',
-    addAuthErrorMetadataScript = 'e2eAddAuthErrorMetadata',
-    projectName = 'e2eaction',
-    roleKey = 'e2eactionrole',
-    preCreationEmail = 'precre@action.com',
-    postCreationEmail = 'postcre@action.com',
-    postAuthPWEmail = 'postauthpw@action.com',
-    postAuthOTPEmail = 'postauthotp@action.com',
-    postAuthU2FEmail = 'postauthu2f@action.com',
-    postAuthPWLessEmail = 'postauthpwless@action.com',
-    specPath = 'cypress/e2e/actions';
+  const specPath = 'cypress/e2e/actions';
+  const emailVerifiedScript = 'e2eSetEmailVerified';
+  const addGrantScript = 'e2eAddGrant';
+  const setMetadataScript = 'e2eSetMetadata';
+  const projectName = 'e2eaction';
+  const roleKey = 'e2eactionrole';
+  const preCreationEmail = 'precre@action.com';
+  const postCreationEmail = 'postcre@action.com';
+  const postAuthPWEmail = 'postauthpw@action.com';
+  const postAuthOTPEmail = 'postauthotp@action.com';
+  const postAuthU2FEmail = 'postauthu2f@action.com';
+  const postAuthPWLessEmail = 'postauthpwless@action.com';
 
   beforeEach(() => {
     newTarget('e2eactions')
@@ -33,19 +32,45 @@ describe('actions', () => {
           ensureActionExists(target, emailVerifiedScript, script)
             .as('emailVerifiedId')
             .then((emailVerifiedId) => {
-              setTriggerTypes(target, 3, 2, [emailVerifiedId]);
+              resetAllTriggers(target);
+              triggerActions(target, 3, 2, [emailVerifiedId]);
             });
         });
       });
   });
   describe('pre creation', () => {
+    const validKey = `a valid key`;
+    const validValue = `a valid value`;
+    const tooLongKey = `${'toolongkey'.repeat(20)}-overflow`;
+    const mustNotExist = 'must not exist';
+    const validActionName = 'e2eSetValidMetadata';
+    const invalidActionName = 'e2eSetInvalidMetadata';
+
     beforeEach(() => {
       cy.get<ZITADELTarget>('@target').then((target) => {
         ensureHumanDoesntExist(target, preCreationEmail);
         cy.get<number>('@emailVerifiedId').then((emailVerifiedId) => {
-          cy.readFile(`${specPath}/${addStaticMetadataScript}.js`).then((script) => {
-            ensureActionExists(target, addStaticMetadataScript, script).then((metadataId) => {
-              setTriggerTypes(target, 3, 2, [emailVerifiedId, metadataId]);
+          cy.readFile(`${specPath}/${setMetadataScript}.js`).then((metadataScript) => {
+            ensureActionExists(
+              target,
+              validActionName,
+              metadataScript
+                .replace('<IDENTIFIER>', validActionName)
+                .replace('<KEY>', validKey)
+                .replace('<VALUE>', validValue),
+              false,
+            ).then((setValidMetaId) => {
+              ensureActionExists(
+                target,
+                invalidActionName,
+                metadataScript
+                  .replace('<IDENTIFIER>', invalidActionName)
+                  .replace('<KEY>', tooLongKey)
+                  .replace('<VALUE>', mustNotExist),
+                true,
+              ).then((setInvalidMetaId) => {
+                triggerActions(target, 3, 2, [emailVerifiedId, setValidMetaId, setInvalidMetaId]);
+              });
             });
           });
         });
@@ -57,6 +82,7 @@ describe('actions', () => {
           sessionAsPredefinedUser(User.IAMAdminUser);
           cy.visit(`/users/${userId}?id=metadata&org=${target.orgId}`);
           cy.contains('tr', 'akey').contains('avalue');
+          cy.contains('tr', mustNotExist).contains(tooLongKey).should('not.exist');
         });
       });
     });
@@ -65,7 +91,7 @@ describe('actions', () => {
     beforeEach(() => {
       cy.get<ZITADELTarget>('@target').then((target) => {
         cy.get<number>('@emailVerifiedId').then((emailVerifiedId) => {
-          setTriggerTypes(target, 3, 2, [emailVerifiedId]);
+          triggerActions(target, 3, 2, [emailVerifiedId]);
         });
         ensureHumanDoesntExist(target, postCreationEmail);
         ensureProjectExists(target, projectName).then((projectId) => {
@@ -76,7 +102,7 @@ describe('actions', () => {
               addGrantScript,
               script.replace('<PROJECT_ID>', `${projectId}`).replace('<ROLE_KEY>', roleKey),
             ).then((addGrantId) => {
-              setTriggerTypes(target, 3, 3, [addGrantId]);
+              triggerActions(target, 3, 3, [addGrantId]);
             });
           });
         });
@@ -95,9 +121,17 @@ describe('actions', () => {
   describe('post authentication', () => {
     beforeEach(() => {
       cy.get<ZITADELTarget>('@target').then((target) => {
-        cy.readFile<string>(`${specPath}/${addAuthErrorMetadataScript}.js`).then((script) => {
-          ensureActionExists(target, addAuthErrorMetadataScript, script).then((storeUsernameId) => {
-            setTriggerTypes(target, 3, 1, [storeUsernameId]);
+        cy.readFile<string>(`${specPath}/${setMetadataScript}.js`).then((script) => {
+          const setAuthError = 'setAuthError';
+          ensureActionExists(
+            target,
+            setAuthError,
+            script
+              .replace('<IDENTIFIER>', setAuthError)
+              .replace('<KEY>', '${ctx.v1.authMethod} error')
+              .replace('<VALUE>', '${ctx.v1.authError}'),
+          ).then((addMetadataId) => {
+            triggerActions(target, 3, 1, [addMetadataId]);
           });
         });
       });

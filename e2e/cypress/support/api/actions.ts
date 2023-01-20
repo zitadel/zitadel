@@ -14,22 +14,22 @@ export function ensureActionDoesntExist(target: ZITADELTarget, name: string) {
   );
 }
 
-export function ensureActionExists(target: ZITADELTarget, name: string, script: string) {
+export function ensureActionExists(target: ZITADELTarget, name: string, script: string, allowedToFail = false) {
   return standardEnsureExists(
-    create(target, name, script),
+    create(target, name, script, allowedToFail),
     () => search(target, name),
-    Cypress._.curry(update)(target, name, script),
+    Cypress._.curry(update)(target, name, script, allowedToFail),
   );
 }
 
-function create(target: ZITADELTarget, name: string, script: string) {
+function create(target: ZITADELTarget, name: string, script: string, allowedToFail: boolean) {
   return standardCreate<number>(
     target,
     `${target.mgmtBaseURL}/actions`,
     {
       name: name,
       script: script,
-      allowedToFail: false,
+      allowedToFail: allowedToFail,
       timeout: '10s',
     },
     'id',
@@ -40,15 +40,19 @@ function search(target: ZITADELTarget, name: string) {
   return standardSearch<number>(target, `${target.mgmtBaseURL}/actions/_search`, (entity) => entity.name == name, 'id');
 }
 
-function update(target: ZITADELTarget, name: string, script: string, id: number) {
-  return standardUpdate(target, `${target.mgmtBaseURL}/actions/${id}`, { name: name, script: script });
+function update(target: ZITADELTarget, name: string, script: string, allowedToFail: boolean, id: number) {
+  return standardUpdate(target, `${target.mgmtBaseURL}/actions/${id}`, {
+    name: name,
+    script: script,
+    allowedToFail: allowedToFail,
+  });
 }
 
 function remove(target: ZITADELTarget, id: number) {
   return standardRemove(target, `${target.mgmtBaseURL}/actions/${id}`);
 }
 
-export function setTriggerTypes(target: ZITADELTarget, flowType: number, triggerType: number, actionIds: Array<number>) {
+export function triggerActions(target: ZITADELTarget, flowType: number, triggerType: number, actionIds: Array<number>) {
   return cy
     .request({
       method: 'POST',
@@ -64,4 +68,12 @@ export function setTriggerTypes(target: ZITADELTarget, flowType: number, trigger
         expect(res.body.message).to.contain('No Changes');
       }
     });
+}
+
+export function resetAllTriggers(target: ZITADELTarget) {
+  [
+    { flow: 3, trigger: 1 },
+    { flow: 3, trigger: 2 },
+    { flow: 3, trigger: 3 },
+  ].forEach((combo) => triggerActions(target, combo.flow, combo.trigger, []));
 }

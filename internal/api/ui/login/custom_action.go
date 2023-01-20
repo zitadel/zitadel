@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/zitadel/zitadel/pkg/grpc/management"
+
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -238,6 +240,17 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 			),
 		)
+
+		dummyMeta := &management.SetUserMetadataRequest{
+			Id:    "197465206836709948",
+			Key:   "key",
+			Value: []byte("value"),
+		}
+
+		// TODO: Why is SetUserMetadata not available in the script? It works here.
+		res, dummyErr := l.mgmtServer.SetUserMetadata(actionCtx, dummyMeta)
+		res = res
+		dummyErr = dummyErr
 
 		err = actions.Run(
 			actionCtx,
