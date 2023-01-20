@@ -10,7 +10,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
@@ -20,12 +19,12 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		orgID  string
-		policy *domain.NotificationPolicy
+		ctx            context.Context
+		orgID          string
+		passwordChange bool
 	}
 	type res struct {
-		want *domain.NotificationPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -42,10 +41,9 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				orgID:          "",
+				passwordChange: true,
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -67,11 +65,9 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				orgID:          "org1",
+				passwordChange: true,
 			},
 			res: res{
 				err: caos_errs.IsErrorAlreadyExists,
@@ -96,19 +92,13 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				orgID:          "org1",
+				passwordChange: true,
 			},
 			res: res{
-				want: &domain.NotificationPolicy{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					PasswordChange: true,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -131,19 +121,13 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.NotificationPolicy{
-					PasswordChange: false,
-				},
+				ctx:            context.Background(),
+				orgID:          "org1",
+				passwordChange: false,
 			},
 			res: res{
-				want: &domain.NotificationPolicy{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					PasswordChange: false,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -153,7 +137,7 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddNotificationPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
+			got, err := r.AddNotificationPolicy(tt.args.ctx, tt.args.orgID, tt.args.passwordChange)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -172,12 +156,12 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		orgID  string
-		policy *domain.NotificationPolicy
+		ctx            context.Context
+		orgID          string
+		passwordChange bool
 	}
 	type res struct {
-		want *domain.NotificationPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -194,10 +178,8 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				passwordChange: true,
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -212,11 +194,9 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				orgID:          "org1",
+				passwordChange: true,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -238,11 +218,9 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				orgID:          "org1",
+				passwordChange: true,
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -271,19 +249,13 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				policy: &domain.NotificationPolicy{
-					PasswordChange: false,
-				},
+				ctx:            context.Background(),
+				orgID:          "org1",
+				passwordChange: false,
 			},
 			res: res{
-				want: &domain.NotificationPolicy{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "org1",
-						ResourceOwner: "org1",
-					},
-					PasswordChange: false,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -293,7 +265,7 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeNotificationPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
+			got, err := r.ChangeNotificationPolicy(tt.args.ctx, tt.args.orgID, tt.args.passwordChange)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

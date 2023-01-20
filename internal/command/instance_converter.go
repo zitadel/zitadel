@@ -130,13 +130,6 @@ func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolic
 	}
 }
 
-func writeModelToNotificationPolicy(wm *NotificationPolicyWriteModel) *domain.NotificationPolicy {
-	return &domain.NotificationPolicy{
-		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
-		PasswordChange: wm.PasswordChange,
-	}
-}
-
 func writeModelToIDPConfig(wm *IDPConfigWriteModel) *domain.IDPConfig {
 	return &domain.IDPConfig{
 		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),

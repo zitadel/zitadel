@@ -6,12 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
@@ -22,6 +20,7 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 	}
 	type args struct {
 		ctx            context.Context
+		resourceOwner  string
 		passwordChange bool
 	}
 	type res struct {
@@ -51,6 +50,7 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:            context.Background(),
+				resourceOwner:  "INSTANCE",
 				passwordChange: true,
 			},
 			res: res{
@@ -65,8 +65,7 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
+							eventFromEventPusher(
 								instance.NewNotificationPolicyAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
@@ -77,7 +76,8 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:            authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx:            context.Background(),
+				resourceOwner:  "INSTANCE",
 				passwordChange: true,
 			},
 			res: res{
@@ -94,8 +94,7 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
+							eventFromEventPusher(
 								instance.NewNotificationPolicyAddedEvent(context.Background(),
 									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
@@ -106,7 +105,8 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:            authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx:            context.Background(),
+				resourceOwner:  "INSTANCE",
 				passwordChange: true,
 			},
 			res: res{
@@ -121,7 +121,7 @@ func TestCommandSide_AddDefaultNotificationPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultNotificationPolicy(tt.args.ctx, tt.args.passwordChange)
+			got, err := r.AddDefaultNotificationPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.passwordChange)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -140,11 +140,12 @@ func TestCommandSide_ChangeDefaultNotificationPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.NotificationPolicy
+		ctx            context.Context
+		resourceOwner  string
+		passwordChange bool
 	}
 	type res struct {
-		want *domain.NotificationPolicy
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -162,10 +163,9 @@ func TestCommandSide_ChangeDefaultNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				resourceOwner:  "INSTANCE",
+				passwordChange: true,
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -187,10 +187,9 @@ func TestCommandSide_ChangeDefaultNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				resourceOwner:  "INSTANCE",
+				passwordChange: true,
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -220,18 +219,13 @@ func TestCommandSide_ChangeDefaultNotificationPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
-				policy: &domain.NotificationPolicy{
-					PasswordChange: true,
-				},
+				ctx:            context.Background(),
+				resourceOwner:  "INSTANCE",
+				passwordChange: true,
 			},
 			res: res{
-				want: &domain.NotificationPolicy{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					PasswordChange: true,
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -241,7 +235,7 @@ func TestCommandSide_ChangeDefaultNotificationPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultNotificationPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.ChangeDefaultNotificationPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.passwordChange)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

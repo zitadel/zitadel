@@ -164,10 +164,3 @@ func prepareNotificationPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Notifi
 			return policy, nil
 		}
 }
-
-func (p *NotificationPolicy) ToDomain() *domain.NotificationPolicy {
-	return &domain.NotificationPolicy{
-		PasswordChange: p.PasswordChange,
-		Default:        p.IsDefault,
-	}
-}

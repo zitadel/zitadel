@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -17,14 +18,14 @@ func (s *Server) GetNotificationPolicy(ctx context.Context, _ *admin_pb.GetNotif
 }
 
 func (s *Server) UpdateNotificationPolicy(ctx context.Context, req *admin_pb.UpdateNotificationPolicyRequest) (*admin_pb.UpdateNotificationPolicyResponse, error) {
-	result, err := s.command.ChangeDefaultNotificationPolicy(ctx, UpdateNotificationPolicyToDomain(req))
+	result, err := s.command.ChangeDefaultNotificationPolicy(ctx, authz.GetInstance(ctx).InstanceID(), req.GetPasswordChange())
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateNotificationPolicyResponse{
 		Details: object.ChangeToDetailsPb(
 			result.Sequence,
-			result.ChangeDate,
+			result.EventDate,
 			result.ResourceOwner,
 		),
 	}, nil

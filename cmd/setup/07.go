@@ -55,7 +55,7 @@ func (mig *DefaultNotificationPolicies) Execute(ctx context.Context) error {
 			return err
 		}
 		if !alreadyExists {
-			_, err := cmd.AddDefaultNotificationPolicy(authz.WithInstanceID(ctx, instanceID), mig.PasswordChange)
+			_, err := cmd.AddDefaultNotificationPolicy(authz.WithInstanceID(ctx, instanceID), instanceID, mig.PasswordChange)
 			if err != nil {
 				return err
 			}

@@ -26,28 +26,28 @@ func (s *Server) GetDefaultNotificationPolicy(ctx context.Context, _ *mgmt_pb.Ge
 }
 
 func (s *Server) AddCustomNotificationPolicy(ctx context.Context, req *mgmt_pb.AddCustomNotificationPolicyRequest) (*mgmt_pb.AddCustomNotificationPolicyResponse, error) {
-	result, err := s.command.AddNotificationPolicy(ctx, authz.GetCtxData(ctx).OrgID, AddNotificationPolicyToDomain(req))
+	result, err := s.command.AddNotificationPolicy(ctx, authz.GetCtxData(ctx).OrgID, req.GetPasswordChange())
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddCustomNotificationPolicyResponse{
 		Details: object.AddToDetailsPb(
 			result.Sequence,
-			result.ChangeDate,
+			result.EventDate,
 			result.ResourceOwner,
 		),
 	}, nil
 }
 
 func (s *Server) UpdateCustomNotificationPolicy(ctx context.Context, req *mgmt_pb.UpdateCustomNotificationPolicyRequest) (*mgmt_pb.UpdateCustomNotificationPolicyResponse, error) {
-	result, err := s.command.ChangeNotificationPolicy(ctx, authz.GetCtxData(ctx).OrgID, UpdateNotificationPolicyToDomain(req))
+	result, err := s.command.ChangeNotificationPolicy(ctx, authz.GetCtxData(ctx).OrgID, req.GetPasswordChange())
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateCustomNotificationPolicyResponse{
 		Details: object.ChangeToDetailsPb(
 			result.Sequence,
-			result.ChangeDate,
+			result.EventDate,
 			result.ResourceOwner,
 		),
 	}, nil
