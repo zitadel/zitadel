@@ -1,0 +1,71 @@
+.spinner-wr {
+  margin: 0.5rem 0;
+}
+
+.policy-applied-to {
+  margin: -1rem 0 0 0;
+  font-size: 14px;
+}
+
+.complexity-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .row {
+    display: flex;
+    align-items: center;
+    padding: 0.3rem 0;
+
+    .number-toggle-row {
+      display: flex;
+      align-items: center;
+      margin-left: 1rem;
+
+      .icon {
+        margin-right: 1rem;
+      }
+
+      .left-desc {
+        font-size: 0.9rem;
+      }
+    }
+
+    .slide-toggle {
+      margin-left: 2.25rem;
+
+      .slide-toggle-row {
+        display: flex;
+        align-items: center;
+        margin-left: 2.25rem;
+
+        .icon {
+          margin-right: 1rem;
+        }
+
+        .left-desc {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .length-wrapper {
+      display: flex;
+      align-items: center;
+      margin-right: -0.6rem;
+    }
+  }
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-start;
+
+  button {
+    display: block;
+  }
+}

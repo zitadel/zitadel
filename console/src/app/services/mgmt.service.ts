@@ -24,6 +24,8 @@ import {
   AddCustomLockoutPolicyResponse,
   AddCustomLoginPolicyRequest,
   AddCustomLoginPolicyResponse,
+  AddCustomNotificationPolicyRequest,
+  AddCustomNotificationPolicyResponse,
   AddCustomPasswordAgePolicyRequest,
   AddCustomPasswordAgePolicyResponse,
   AddCustomPasswordComplexityPolicyRequest,
@@ -156,6 +158,8 @@ import {
   GetLoginPolicyResponse,
   GetMyOrgRequest,
   GetMyOrgResponse,
+  GetNotificationPolicyRequest,
+  GetNotificationPolicyResponse,
   GetOIDCInformationRequest,
   GetOIDCInformationResponse,
   GetOrgByDomainGlobalRequest,
@@ -357,6 +361,8 @@ import {
   ResetLockoutPolicyToDefaultResponse,
   ResetLoginPolicyToDefaultRequest,
   ResetLoginPolicyToDefaultResponse,
+  ResetNotificationPolicyToDefaultRequest,
+  ResetNotificationPolicyToDefaultResponse,
   ResetPasswordAgePolicyToDefaultRequest,
   ResetPasswordAgePolicyToDefaultResponse,
   ResetPasswordComplexityPolicyToDefaultRequest,
@@ -403,6 +409,8 @@ import {
   UpdateCustomLockoutPolicyResponse,
   UpdateCustomLoginPolicyRequest,
   UpdateCustomLoginPolicyResponse,
+  UpdateCustomNotificationPolicyRequest,
+  UpdateCustomNotificationPolicyResponse,
   UpdateCustomPasswordAgePolicyRequest,
   UpdateCustomPasswordAgePolicyResponse,
   UpdateCustomPasswordComplexityPolicyRequest,
@@ -1369,6 +1377,30 @@ export class ManagementService {
     } else {
       return 'POLICY.PWD_COMPLEXITY.PATTERNERROR';
     }
+  }
+
+  /* notification policy */
+
+  public getNotificationPolicy(): Promise<GetNotificationPolicyResponse.AsObject> {
+    const req = new GetNotificationPolicyRequest();
+    return this.grpcService.mgmt.getNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetNotificationPolicyToDefault(): Promise<ResetNotificationPolicyToDefaultResponse.AsObject> {
+    const req = new ResetNotificationPolicyToDefaultRequest();
+    return this.grpcService.mgmt.resetNotificationPolicyToDefault(req, null).then((resp) => resp.toObject());
+  }
+
+  public addCustomNotificationPolicy(
+    req: AddCustomNotificationPolicyRequest,
+  ): Promise<AddCustomNotificationPolicyResponse.AsObject> {
+    return this.grpcService.mgmt.addCustomNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateCustomNotificationPolicy(
+    req: UpdateCustomNotificationPolicyRequest,
+  ): Promise<UpdateCustomNotificationPolicyResponse.AsObject> {
+    return this.grpcService.mgmt.updateCustomNotificationPolicy(req, null).then((resp) => resp.toObject());
   }
 
   public getUserByID(id: string): Promise<GetUserByIDResponse.AsObject> {

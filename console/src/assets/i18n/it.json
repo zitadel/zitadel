@@ -1008,6 +1008,11 @@
       "NUMBERERROR": "Deve includere una cifra.",
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
     },
+    "NOTIFICATION": {
+      "TITLE": "Notifiche",
+      "DESCRIPTION": "Determina su quali modifiche verranno inviate le notifiche",
+      "PASSWORDCHANGE": "Cambiamento della password"
+    },
     "PRIVATELABELING": {
       "TITLE": "Branding",
       "DESCRIPTION": "Dai al login il tuo stile personalizzato e modifica il suo comportamento.",

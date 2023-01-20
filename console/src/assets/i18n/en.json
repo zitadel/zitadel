@@ -1007,6 +1007,11 @@
       "NUMBERERROR": "Must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
     },
+    "NOTIFICATION": {
+      "TITLE": "Notification",
+      "DESCRIPTION": "Determines on which changes, notifications will be sent.",
+      "PASSWORDCHANGE": "Password change"
+    },
     "PRIVATELABELING": {
       "TITLE": "Branding",
       "DESCRIPTION": "Give the login your personalized style and modify its behavior.",

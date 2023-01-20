@@ -1007,6 +1007,11 @@
       "NUMBERERROR": "Doit inclure un chiffre.",
       "PATTERNERROR": "Le mot de passe ne correspond pas au modèle requis."
     },
+    "NOTIFICATION": {
+      "TITLE": "Notifications",
+      "DESCRIPTION": "Détermine sur quels changements, les notifications seront envoyées",
+      "PASSWORDCHANGE": "Changement de mot de passe"
+    },
     "PRIVATELABELING": {
       "TITLE": "Image de marque",
       "DESCRIPTION": "Donnez au login votre style personnalisé et modifiez son comportement.",

@@ -1007,6 +1007,11 @@
       "NUMBERERROR": "密码必须包含数字。",
       "PATTERNERROR": "密码不符合要求。"
     },
+    "NOTIFICATION": {
+      "TITLE": "通知",
+      "DESCRIPTION": "确定将发送哪些更改、通知",
+      "PASSWORDCHANGE": "更改密码"
+    },
     "PRIVATELABELING": {
       "TITLE": "品牌标识",
       "DESCRIPTION": "为登录提供您的个性化风格并修改其行为。",

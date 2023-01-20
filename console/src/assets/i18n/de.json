@@ -1007,6 +1007,11 @@
       "NUMBERERROR": "Muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
+    "NOTIFICATION": {
+      "TITLE": "Notification",
+      "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
+      "PASSWORDCHANGE": "Passwordänderung"
+    },
     "PRIVATELABELING": {
       "TITLE": "Branding",
       "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",

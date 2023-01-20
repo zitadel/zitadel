@@ -204,6 +204,10 @@ import {
   GetSecurityPolicyResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
+  GetNotificationPolicyRequest,
+  GetNotificationPolicyResponse,
+  UpdateNotificationPolicyRequest,
+  UpdateNotificationPolicyResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -482,6 +486,17 @@ export class AdminService {
     req.setLanguage(language);
 
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  /* notification policy */
+
+  public getNotificationPolicy(): Promise<GetNotificationPolicyResponse.AsObject> {
+    const req = new GetNotificationPolicyRequest();
+    return this.grpcService.admin.getNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateNotificationPolicy(req: UpdateNotificationPolicyRequest): Promise<UpdateNotificationPolicyResponse.AsObject> {
+    return this.grpcService.admin.updateNotificationPolicy(req, null).then((resp) => resp.toObject());
   }
 
   /* security policy */

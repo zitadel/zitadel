@@ -16,10 +16,10 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { CardModule } from '../../card/card.module';
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
-import { PasswordComplexityPolicyComponent } from './password-complexity-policy.component';
+import { NotificationPolicyComponent } from './notification-policy.component';
 
 @NgModule({
-  declarations: [PasswordComplexityPolicyComponent],
+  declarations: [NotificationPolicyComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -38,6 +38,6 @@ import { PasswordComplexityPolicyComponent } from './password-complexity-policy.
     MatProgressSpinnerModule,
     InfoSectionModule,
   ],
-  exports: [PasswordComplexityPolicyComponent],
+  exports: [NotificationPolicyComponent],
 })
-export class PasswordComplexityPolicyModule {}
+export class NotificationPolicyModule {}
