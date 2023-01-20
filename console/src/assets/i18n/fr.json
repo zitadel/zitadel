@@ -883,7 +883,7 @@
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
       "COMPLEXITY": "Complexité du mot de passe",
-      "NOTIFICATIONS": "Fournisseurs de notifications et SMTP",
+      "NOTIFICATIONS": "Paramètres de notification",
       "NOTIFICATIONS_DESC": "Paramètres SMTP et SMS",
       "MESSAGETEXTS": "Textes des messages",
       "IDP": "Fournisseurs d'identité",
@@ -1006,6 +1006,11 @@
       "SYMBOLERROR": "Doit inclure un symbole/un signe de ponctuation.",
       "NUMBERERROR": "Doit inclure un chiffre.",
       "PATTERNERROR": "Le mot de passe ne correspond pas au modèle requis."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notifications",
+      "DESCRIPTION": "Détermine sur quels changements, les notifications seront envoyées",
+      "PASSWORDCHANGE": "Changement de mot de passe"
     },
     "PRIVATELABELING": {
       "TITLE": "Image de marque",

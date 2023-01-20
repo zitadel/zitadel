@@ -226,8 +226,8 @@ Errors:
       NotExisting: La politique Org IAM n'existe pas
       AlreadyExists: La politique IAM d'Org existe déjà
     NotificationPolicy:
-      NotFound: La politique notification n'a pas été trouvé
-      NotChanged: La politique notification n'a pas été modifié
+      NotFound: La politique notification n'a pas été trouvée
+      NotChanged: La politique notification n'a pas été modifiée
       AlreadyExists: La politique notification existe déjà
   Project:
     ProjectIDMissing: Id de projet manquant
@@ -356,8 +356,8 @@ Errors:
       AlreadyExists: La politique IAM d'Org existe déjà
       NotChanged: La politique IAM d'Org n'a pas été modifiée
     NotificationPolicy:
-      NotFound: La politique de notification par défaut n'a pas été trouvé
-      NotChanged: La politique de notification par défaut n'a pas été modifié
+      NotFound: La politique de notification par défaut n'a pas été trouvée
+      NotChanged: La politique de notification par défaut n'a pas été modifiée
       AlreadyExists: La ppolitique de notification par défaut existe déjà
   Policy:
     AlreadyExists: La politique existe déjà
@@ -724,8 +724,8 @@ EventTypes:
         changed: Politique de confidentialité et CGU modifiées
         removed: Politique de confidentialité et conditions d'utilisation supprimées
       notification:
-        added: Politique de notification ajoutés
-        changed: Politique de notification modifiées
+        added: Politique de notification ajoutée
+        changed: Politique de notification modifiée
         removed: Politique de notification supprimée
     flow:
       trigger_actions:

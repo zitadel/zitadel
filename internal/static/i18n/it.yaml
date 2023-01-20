@@ -724,9 +724,9 @@ EventTypes:
         changed: Informativa sulla privacy e termini e condizioni cambiati
         removed: Informativa sulla privacy e termini e condizioni rimossi
       notification:
-        added: Politica di notifica aggiunta
-        changed: Politica di notifica cambiati
-        removed: Politica di notifica rimossa
+        added: Impostazione di notifica creata
+        changed: Impostazione di notifica cambiata
+        removed: Impostazione di notifica rimossa
     flow:
       trigger_actions:
         set: azioni salvate
