@@ -82,7 +82,8 @@ describe('actions', () => {
           sessionAsPredefinedUser(User.IAMAdminUser);
           cy.visit(`/users/${userId}?id=metadata&org=${target.orgId}`);
           cy.contains('tr', 'akey').contains('avalue');
-          cy.contains('tr', mustNotExist).contains(tooLongKey).should('not.exist');
+          cy.contains('tr', mustNotExist).should('not.exist')
+          cy.contains('tr', tooLongKey).should('not.exist');
         });
       });
     });
