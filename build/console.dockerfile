@@ -2,7 +2,7 @@ FROM node:18 as npm-base
 
 WORKDIR /console
 
-COPY external /external
+COPY third_party /third_party
 COPY proto /proto
 
 COPY console/package.json console/package-lock.json ./
@@ -15,7 +15,7 @@ COPY console .
 #######################
 FROM npm-base as angular-build
 
-RUN npm run prodbuild
+RUN npm run build
 
 #######################
 ## Only Copy Assets

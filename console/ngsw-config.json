@@ -6,40 +6,28 @@
       "name": "app",
       "installMode": "prefetch",
       "resources": {
-        "files": [
-          "/favicon.ico",
-          "/index.html",
-          "/manifest.webmanifest",
-          "/assets/i18n/**",
-          "/*.css",
-          "/*.js"
-        ]
+        "files": ["/favicon.ico", "/index.html", "/manifest.webmanifest", "/assets/i18n/**", "/*.css", "/*.js"]
       }
-    }, {
+    },
+    {
       "name": "assets",
       "installMode": "lazy",
       "updateMode": "prefetch",
       "resources": {
-        "files": [
-          "/assets/**",
-          "!/assets/i18n/**",
-          "/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
-        ]
+        "files": ["/assets/**", "!/assets/i18n/**", "/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"]
       }
     }
   ],
   "dataGroups": [
     {
-        "name": "api-freshness",
-        "urls": [
-          "/GetMyzitadelPermissions"
-        ],
-        "cacheConfig": {
-          "strategy": "freshness",
-          "maxSize": 100,
-          "maxAge": "1d",
-          "timeout": "0s"
-        }
+      "name": "api-freshness",
+      "urls": ["/GetMyzitadelPermissions"],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 100,
+        "maxAge": "1d",
+        "timeout": "0s"
       }
+    }
   ]
 }

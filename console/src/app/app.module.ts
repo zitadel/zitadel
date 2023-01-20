@@ -184,8 +184,8 @@ const authConfig: AuthConfig = {
     { provide: 'windowObject', useValue: window },
     {
       provide: APP_BASE_HREF,
-      useValue: '/' + (window.location.pathname.split('/')[1] || '')
-  }
+      useValue: '/' + (window.location.pathname.split('/')[1] || ''),
+    },
   ],
   bootstrap: [AppComponent],
 })
