@@ -14,7 +14,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
 )
 
@@ -29,8 +28,21 @@ func TestSession_FetchUser(t *testing.T) {
 		tokens       *openid.Tokens
 	}
 	type want struct {
-		user idp.User
-		err  error
+		err               error
+		id                string
+		firstName         string
+		lastName          string
+		displayName       string
+		nickName          string
+		preferredUsername string
+		email             string
+		isEmailVerified   bool
+		phone             string
+		isPhoneVerified   bool
+		preferredLanguage language.Tag
+		avatarURL         string
+		profile           string
+		hostedDomain      string
 	}
 	tests := []struct {
 		name   string
@@ -125,21 +137,20 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 			},
 			want: want{
-				user: idp.User{
-					ID:                "sub",
-					FirstName:         "firstname",
-					LastName:          "lastname",
-					DisplayName:       "firstname lastname",
-					NickName:          "nickname",
-					PreferredUsername: "username",
-					Email:             "email",
-					IsEmailVerified:   true,
-					Phone:             "phone",
-					IsPhoneVerified:   true,
-					PreferredLanguage: language.English,
-					AvatarURL:         "picture",
-					Profile:           "profile",
-				},
+				id:                "sub",
+				firstName:         "firstname",
+				lastName:          "lastname",
+				displayName:       "firstname lastname",
+				nickName:          "",
+				preferredUsername: "email",
+				email:             "email",
+				isEmailVerified:   true,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.English,
+				avatarURL:         "picture",
+				profile:           "",
+				hostedDomain:      "hosted domain",
 			},
 		},
 	}
@@ -167,7 +178,19 @@ func TestSession_FetchUser(t *testing.T) {
 			}
 			if tt.want.err == nil {
 				a.NoError(err)
-				a.Equal(tt.want.user, user)
+				a.Equal(tt.want.id, user.GetID())
+				a.Equal(tt.want.firstName, user.GetFirstName())
+				a.Equal(tt.want.lastName, user.GetLastName())
+				a.Equal(tt.want.displayName, user.GetDisplayName())
+				a.Equal(tt.want.nickName, user.GetNickname())
+				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
+				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
+				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
+				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
+				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
+				a.Equal(tt.want.profile, user.GetProfile())
 			}
 		})
 	}
@@ -179,12 +202,9 @@ func userinfo() openid.UserInfoSetter {
 	info.SetGivenName("firstname")
 	info.SetFamilyName("lastname")
 	info.SetName("firstname lastname")
-	info.SetNickname("nickname")
-	info.SetPreferredUsername("username")
 	info.SetEmail("email", true)
-	info.SetPhone("phone", true)
 	info.SetLocale(language.English)
 	info.SetPicture("picture")
-	info.SetProfile("profile")
+	info.AppendClaims("hd", "hosted domain")
 	return info
 }

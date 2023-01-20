@@ -20,6 +20,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		userMapper   func(info oidc.UserInfo) idp.User
 		httpMock     func(issuer string)
 	}
 	tests := []struct {
@@ -35,6 +36,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
 						Get(oidc.DiscoveryEndpoint).
@@ -57,7 +59,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 			a := assert.New(t)
 			r := require.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.userMapper)
 			r.NoError(err)
 
 			session, err := provider.BeginAuth(context.Background(), "testState")
@@ -75,8 +77,9 @@ func TestProvider_Options(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
-		httpMock     func(issuer string)
+		userMapper   func(info oidc.UserInfo) idp.User
 		opts         []ProviderOpts
+		httpMock     func(issuer string)
 	}
 	type want struct {
 		name            string
@@ -99,6 +102,7 @@ func TestProvider_Options(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				userMapper:   DefaultMapper,
 				opts:         nil,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
@@ -129,6 +133,7 @@ func TestProvider_Options(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				userMapper:   DefaultMapper,
 				opts: []ProviderOpts{
 					WithLinkingAllowed(),
 					WithCreationAllowed(),
@@ -164,7 +169,7 @@ func TestProvider_Options(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.opts...)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.userMapper, tt.fields.opts...)
 			require.NoError(t, err)
 
 			a.Equal(tt.want.name, provider.Name())

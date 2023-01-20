@@ -36,20 +36,19 @@ func (s *Session) GetAuthURL() string {
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
 		if err = s.authorize(ctx); err != nil {
-			return idp.User{}, err
+			return nil, err
 		}
 	}
 	req, err := http.NewRequest("GET", s.Provider.userEndpoint, nil)
 	if err != nil {
-		return idp.User{}, err
+		return nil, err
 	}
 	req.Header.Set("authorization", s.Tokens.TokenType+" "+s.Tokens.AccessToken)
 	mapper := s.Provider.userMapper()
 	if err := httphelper.HttpRequest(s.Provider.RelyingParty.HttpClient(), req, &mapper); err != nil {
-		return idp.User{}, err
+		return nil, err
 	}
-	mapUser(mapper, &user)
-	return user, nil
+	return mapper, nil
 }
 
 func (s *Session) authorize(ctx context.Context) (err error) {
@@ -61,21 +60,4 @@ func (s *Session) authorize(ctx context.Context) (err error) {
 		return err
 	}
 	return nil
-}
-
-func mapUser(mapper UserInfoMapper, user *idp.User) {
-	user.ID = mapper.GetID()
-	user.FirstName = mapper.GetFirstName()
-	user.LastName = mapper.GetLastName()
-	user.DisplayName = mapper.GetDisplayName()
-	user.NickName = mapper.GetNickName()
-	user.PreferredUsername = mapper.GetPreferredUsername()
-	user.Email = mapper.GetEmail()
-	user.IsEmailVerified = mapper.IsEmailVerified()
-	user.Phone = mapper.GetPhone()
-	user.IsPhoneVerified = mapper.IsPhoneVerified()
-	user.PreferredLanguage = mapper.GetPreferredLanguage()
-	user.AvatarURL = mapper.GetAvatarURL()
-	user.Profile = mapper.GetProfile()
-	user.RawData = mapper.RawData()
 }

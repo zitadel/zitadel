@@ -32,7 +32,7 @@ func NewCustomURL(name, clientID, secret, callbackURL, authURL, tokenURL, profil
 		newConfig(clientID, secret, callbackURL, authURL, tokenURL, scopes),
 		name,
 		profileURL,
-		func() oauth.UserInfoMapper {
+		func() idp.User {
 			return new(User)
 		},
 		options...,
@@ -65,7 +65,7 @@ func newConfig(clientID, secret, callbackURL, authURL, tokenURL string, scopes [
 	return c
 }
 
-// User is a representation of the authenticated GitHub user and implements the [oauth.UserInfoMapper] interface
+// User is a representation of the authenticated GitHub user and implements the [idp.User] interface
 // https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#get-the-authenticated-user
 type User struct {
 	Login                   string    `json:"login"`
@@ -114,81 +114,76 @@ type User struct {
 	} `json:"plan"`
 }
 
-// GetID is an implementation of the [oauth.UserInfoMapper] interface.
+// GetID is an implementation of the [idp.User] interface.
 func (u *User) GetID() string {
 	return strconv.Itoa(u.ID)
 }
 
-// GetFirstName is an implementation of the [oauth.UserInfoMapper] interface.
+// GetFirstName is an implementation of the [idp.User] interface.
 // It returns an empty string because GitHub does not provide the user's firstname.
 func (u *User) GetFirstName() string {
 	return ""
 }
 
-// GetLastName is an implementation of the [oauth.UserInfoMapper] interface.
+// GetLastName is an implementation of the [idp.User] interface.
 // It returns an empty string because GitHub does not provide the user's lastname.
 func (u *User) GetLastName() string {
 	// GitHub does not provide the user's lastname
 	return ""
 }
 
-// GetDisplayName is an implementation of the [oauth.UserInfoMapper] interface.
+// GetDisplayName is an implementation of the [idp.User] interface.
 func (u *User) GetDisplayName() string {
 	return u.Name
 }
 
-// GetNickName is an implementation of the [oauth.UserInfoMapper] interface
+// GetNickname is an implementation of the [idp.User] interface
 // returning the login name of the GitHub user.
-func (u *User) GetNickName() string {
+func (u *User) GetNickname() string {
 	return u.Login
 }
 
-// GetPreferredUsername is an implementation of the [oauth.UserInfoMapper] interface
+// GetPreferredUsername is an implementation of the [idp.User] interface
 // returning the login name of the GitHub user.
 func (u *User) GetPreferredUsername() string {
 	return u.Login
 }
 
-// GetEmail is an implementation of the [oauth.UserInfoMapper] interface.
+// GetEmail is an implementation of the [idp.User] interface.
 func (u *User) GetEmail() string {
 	return u.Email
 }
 
-// IsEmailVerified is an implementation of the [oauth.UserInfoMapper] interface.
+// IsEmailVerified is an implementation of the [idp.User] interface.
 // It returns true because GitHub validates emails themselves.
 func (u *User) IsEmailVerified() bool {
 	return true
 }
 
-// GetPhone is an implementation of the [oauth.UserInfoMapper] interface.
+// GetPhone is an implementation of the [idp.User] interface.
 // It returns an empty string because GitHub does not provide the user's phone.
 func (u *User) GetPhone() string {
 	return ""
 }
 
-// IsPhoneVerified is an implementation of the [oauth.UserInfoMapper] interface
+// IsPhoneVerified is an implementation of the [idp.User] interface
 // it returns false because GitHub does not provide the user's phone
 func (u *User) IsPhoneVerified() bool {
 	return false
 }
 
-// GetPreferredLanguage is an implementation of the [oauth.UserInfoMapper] interface.
+// GetPreferredLanguage is an implementation of the [idp.User] interface.
 // It returns [language.Und] because GitHub does not provide the user's language.
 func (u *User) GetPreferredLanguage() language.Tag {
 	return language.Und
 }
 
-// GetProfile is an implementation of the [oauth.UserInfoMapper] interface.
+// GetProfile is an implementation of the [idp.User] interface.
 func (u *User) GetProfile() string {
 	return u.HtmlUrl
 }
 
-// GetAvatarURL is an implementation of the [oauth.UserInfoMapper] interface.
+// GetAvatarURL is an implementation of the [idp.User] interface.
 func (u *User) GetAvatarURL() string {
 	return u.AvatarUrl
-}
-
-// RawData is an implementation of the [oauth.UserInfoMapper] interface.
-func (u *User) RawData() any {
-	return u
 }

@@ -25,7 +25,7 @@ func New(clientID, clientSecret, redirectURI string, options ...oidc.ProviderOpt
 // NewCustomIssuer creates a GitLab provider using the [oidc.Provider] (OIDC generic provider)
 // with a custom issuer for self-managed instances
 func NewCustomIssuer(name, issuer, clientID, clientSecret, redirectURI string, options ...oidc.ProviderOpts) (*Provider, error) {
-	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, options...)
+	rp, err := oidc.New(name, issuer, clientID, clientSecret, redirectURI, oidc.DefaultMapper, options...)
 	if err != nil {
 		return nil, err
 	}

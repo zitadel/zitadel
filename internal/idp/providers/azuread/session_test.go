@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -30,8 +31,21 @@ func TestSession_FetchUser(t *testing.T) {
 		tokens       *oidc.Tokens
 	}
 	type want struct {
-		user idp.User
-		err  func(error) bool
+		err               func(error) bool
+		user              idp.User
+		id                string
+		firstName         string
+		lastName          string
+		displayName       string
+		nickName          string
+		preferredUsername string
+		email             string
+		isEmailVerified   bool
+		phone             string
+		isPhoneVerified   bool
+		preferredLanguage language.Tag
+		avatarURL         string
+		profile           string
 	}
 	tests := []struct {
 		name   string
@@ -129,25 +143,29 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 			},
 			want: want{
-				user: idp.User{
-					ID:                "sub",
-					DisplayName:       "firstname lastname",
+				user: &User{
+					Sub:               "sub",
+					FamilyName:        "lastname",
+					GivenName:         "firstname",
+					Name:              "firstname lastname",
 					PreferredUsername: "username",
 					Email:             "email",
-					AvatarURL:         "picture",
-					FirstName:         "firstname",
-					LastName:          "lastname",
-					RawData: &User{
-						Sub:               "sub",
-						FamilyName:        "lastname",
-						GivenName:         "firstname",
-						Name:              "firstname lastname",
-						PreferredUsername: "username",
-						Email:             "email",
-						Picture:           "picture",
-						isEmailVerified:   false,
-					},
+					Picture:           "picture",
+					isEmailVerified:   false,
 				},
+				id:                "sub",
+				firstName:         "firstname",
+				lastName:          "lastname",
+				displayName:       "firstname lastname",
+				nickName:          "",
+				preferredUsername: "username",
+				email:             "email",
+				isEmailVerified:   false,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "picture",
+				profile:           "",
 			},
 		},
 		{
@@ -186,26 +204,29 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 			},
 			want: want{
-				user: idp.User{
-					ID:                "sub",
-					DisplayName:       "firstname lastname",
+				user: &User{
+					Sub:               "sub",
+					FamilyName:        "lastname",
+					GivenName:         "firstname",
+					Name:              "firstname lastname",
 					PreferredUsername: "username",
 					Email:             "email",
-					IsEmailVerified:   true,
-					AvatarURL:         "picture",
-					FirstName:         "firstname",
-					LastName:          "lastname",
-					RawData: &User{
-						Sub:               "sub",
-						FamilyName:        "lastname",
-						GivenName:         "firstname",
-						Name:              "firstname lastname",
-						PreferredUsername: "username",
-						Email:             "email",
-						Picture:           "picture",
-						isEmailVerified:   true,
-					},
+					Picture:           "picture",
+					isEmailVerified:   true,
 				},
+				id:                "sub",
+				firstName:         "firstname",
+				lastName:          "lastname",
+				displayName:       "firstname lastname",
+				nickName:          "",
+				preferredUsername: "username",
+				email:             "email",
+				isEmailVerified:   true,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "picture",
+				profile:           "",
 			},
 		},
 	}
@@ -232,6 +253,19 @@ func TestSession_FetchUser(t *testing.T) {
 			if tt.want.err == nil {
 				a.NoError(err)
 				a.Equal(tt.want.user, user)
+				a.Equal(tt.want.id, user.GetID())
+				a.Equal(tt.want.firstName, user.GetFirstName())
+				a.Equal(tt.want.lastName, user.GetLastName())
+				a.Equal(tt.want.displayName, user.GetDisplayName())
+				a.Equal(tt.want.nickName, user.GetNickname())
+				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
+				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
+				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
+				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
+				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
+				a.Equal(tt.want.profile, user.GetProfile())
 			}
 		})
 	}

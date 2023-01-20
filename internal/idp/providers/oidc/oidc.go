@@ -20,6 +20,7 @@ type Provider struct {
 	isCreationAllowed bool
 	isAutoCreation    bool
 	isAutoUpdate      bool
+	userInfoMapper    func(info oidc.UserInfo) idp.User
 }
 
 type ProviderOpts func(provider *Provider)
@@ -60,19 +61,25 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	}
 }
 
+type UserInfoMapper func(info oidc.UserInfo) idp.User
+
+var DefaultMapper UserInfoMapper = func(info oidc.UserInfo) idp.User {
+	return NewUser(info)
+}
+
 // New creates a generic OIDC provider
-func New(name, issuer, clientID, clientSecret, redirectURI string, options ...ProviderOpts) (*Provider, error) {
-	provider := &Provider{
-		name: name,
+func New(name, issuer, clientID, clientSecret, redirectURI string, userInfoMapper UserInfoMapper, options ...ProviderOpts) (provider *Provider, err error) {
+	provider = &Provider{
+		name:           name,
+		userInfoMapper: userInfoMapper,
 	}
 	for _, option := range options {
 		option(provider)
 	}
-	relyingParty, err := rp.NewRelyingPartyOIDC(issuer, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID}, provider.options...)
+	provider.RelyingParty, err = rp.NewRelyingPartyOIDC(issuer, clientID, clientSecret, redirectURI, []string{oidc.ScopeOpenID}, provider.options...)
 	if err != nil {
 		return nil, err
 	}
-	provider.RelyingParty = relyingParty
 	return provider, nil
 }
 

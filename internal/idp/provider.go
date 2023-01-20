@@ -17,20 +17,18 @@ type Provider interface {
 }
 
 // User contains the information of a federated user.
-// All data provided can be found in the `RawData` field.
-type User struct {
-	ID                string
-	FirstName         string
-	LastName          string
-	DisplayName       string
-	NickName          string
-	PreferredUsername string
-	Email             string
-	IsEmailVerified   bool
-	Phone             string
-	IsPhoneVerified   bool
-	PreferredLanguage language.Tag
-	AvatarURL         string
-	Profile           string
-	RawData           any
+type User interface {
+	GetID() string
+	GetFirstName() string
+	GetLastName() string
+	GetDisplayName() string
+	GetNickname() string
+	GetPreferredUsername() string
+	GetEmail() string
+	IsEmailVerified() bool
+	GetPhone() string
+	IsPhoneVerified() bool
+	GetPreferredLanguage() language.Tag
+	GetAvatarURL() string
+	GetProfile() string
 }

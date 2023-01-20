@@ -27,14 +27,27 @@ func TestSession_FetchUser(t *testing.T) {
 		clientID     string
 		clientSecret string
 		redirectURI  string
+		userMapper   func(oidc.UserInfo) idp.User
 		httpMock     func(issuer string)
 		authURL      string
 		code         string
 		tokens       *oidc.Tokens
 	}
 	type want struct {
-		user idp.User
-		err  error
+		err               error
+		id                string
+		firstName         string
+		lastName          string
+		displayName       string
+		nickName          string
+		preferredUsername string
+		email             string
+		isEmailVerified   bool
+		phone             string
+		isPhoneVerified   bool
+		preferredLanguage language.Tag
+		avatarURL         string
+		profile           string
 	}
 	tests := []struct {
 		name   string
@@ -49,6 +62,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
 						Get(oidc.DiscoveryEndpoint).
@@ -79,6 +93,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
 						Get(oidc.DiscoveryEndpoint).
@@ -126,6 +141,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
 						Get(oidc.DiscoveryEndpoint).
@@ -162,21 +178,19 @@ func TestSession_FetchUser(t *testing.T) {
 				},
 			},
 			want: want{
-				user: idp.User{
-					ID:                "sub",
-					FirstName:         "firstname",
-					LastName:          "lastname",
-					DisplayName:       "firstname lastname",
-					NickName:          "nickname",
-					PreferredUsername: "username",
-					Email:             "email",
-					IsEmailVerified:   true,
-					Phone:             "phone",
-					IsPhoneVerified:   true,
-					PreferredLanguage: language.English,
-					AvatarURL:         "picture",
-					Profile:           "profile",
-				},
+				id:                "sub",
+				firstName:         "firstname",
+				lastName:          "lastname",
+				displayName:       "firstname lastname",
+				nickName:          "nickname",
+				preferredUsername: "username",
+				email:             "email",
+				isEmailVerified:   true,
+				phone:             "phone",
+				isPhoneVerified:   true,
+				preferredLanguage: language.English,
+				avatarURL:         "picture",
+				profile:           "profile",
 			},
 		},
 		{
@@ -187,6 +201,7 @@ func TestSession_FetchUser(t *testing.T) {
 				clientID:     "clientID",
 				clientSecret: "clientSecret",
 				redirectURI:  "redirectURI",
+				userMapper:   DefaultMapper,
 				httpMock: func(issuer string) {
 					gock.New(issuer).
 						Get(oidc.DiscoveryEndpoint).
@@ -217,21 +232,19 @@ func TestSession_FetchUser(t *testing.T) {
 				code:    "code",
 			},
 			want: want{
-				user: idp.User{
-					ID:                "sub",
-					FirstName:         "firstname",
-					LastName:          "lastname",
-					DisplayName:       "firstname lastname",
-					NickName:          "nickname",
-					PreferredUsername: "username",
-					Email:             "email",
-					IsEmailVerified:   true,
-					Phone:             "phone",
-					IsPhoneVerified:   true,
-					PreferredLanguage: language.English,
-					AvatarURL:         "picture",
-					Profile:           "profile",
-				},
+				id:                "sub",
+				firstName:         "firstname",
+				lastName:          "lastname",
+				displayName:       "firstname lastname",
+				nickName:          "nickname",
+				preferredUsername: "username",
+				email:             "email",
+				isEmailVerified:   true,
+				phone:             "phone",
+				isPhoneVerified:   true,
+				preferredLanguage: language.English,
+				avatarURL:         "picture",
+				profile:           "profile",
 			},
 		},
 	}
@@ -241,7 +254,7 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.userMapper)
 			require.NoError(t, err)
 
 			session := &Session{
@@ -257,7 +270,19 @@ func TestSession_FetchUser(t *testing.T) {
 			}
 			if tt.want.err == nil {
 				a.NoError(err)
-				a.Equal(tt.want.user, user)
+				a.Equal(tt.want.id, user.GetID())
+				a.Equal(tt.want.firstName, user.GetFirstName())
+				a.Equal(tt.want.lastName, user.GetLastName())
+				a.Equal(tt.want.displayName, user.GetDisplayName())
+				a.Equal(tt.want.nickName, user.GetNickname())
+				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
+				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
+				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
+				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
+				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
+				a.Equal(tt.want.profile, user.GetProfile())
 			}
 		})
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
@@ -33,8 +34,21 @@ func TestSession_FetchUser(t *testing.T) {
 		session idp.Session
 	}
 	type want struct {
-		user idp.User
-		err  func(error) bool
+		err               func(error) bool
+		user              idp.User
+		id                string
+		firstName         string
+		lastName          string
+		displayName       string
+		nickName          string
+		preferredUsername string
+		email             string
+		isEmailVerified   bool
+		phone             string
+		isPhoneVerified   bool
+		preferredLanguage language.Tag
+		avatarURL         string
+		profile           string
 	}
 	tests := []struct {
 		name   string
@@ -118,27 +132,30 @@ func TestSession_FetchUser(t *testing.T) {
 				&oauth.Session{},
 			},
 			want: want{
-				user: idp.User{
-					ID:                "1",
-					DisplayName:       "name",
-					NickName:          "login",
-					PreferredUsername: "login",
-					Email:             "email",
-					IsEmailVerified:   true,
-					AvatarURL:         "avatarURL",
-					Profile:           "htmlURL",
-					RawData: &User{
-						Login:      "login",
-						ID:         1,
-						AvatarUrl:  "avatarURL",
-						GravatarId: "gravatarID",
-						Name:       "name",
-						Email:      "email",
-						HtmlUrl:    "htmlURL",
-						CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
-						UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
-					},
+				user: &User{
+					Login:      "login",
+					ID:         1,
+					AvatarUrl:  "avatarURL",
+					GravatarId: "gravatarID",
+					Name:       "name",
+					Email:      "email",
+					HtmlUrl:    "htmlURL",
+					CreatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
+					UpdatedAt:  time.Date(2023, 01, 10, 11, 10, 35, 0, time.UTC),
 				},
+				id:                "1",
+				firstName:         "",
+				lastName:          "",
+				displayName:       "name",
+				nickName:          "login",
+				preferredUsername: "login",
+				email:             "email",
+				isEmailVerified:   true,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "avatarURL",
+				profile:           "htmlURL",
 			},
 		},
 	}
@@ -165,6 +182,19 @@ func TestSession_FetchUser(t *testing.T) {
 			if tt.want.err == nil {
 				a.NoError(err)
 				a.Equal(tt.want.user, user)
+				a.Equal(tt.want.id, user.GetID())
+				a.Equal(tt.want.firstName, user.GetFirstName())
+				a.Equal(tt.want.lastName, user.GetLastName())
+				a.Equal(tt.want.displayName, user.GetDisplayName())
+				a.Equal(tt.want.nickName, user.GetNickname())
+				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
+				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
+				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
+				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
+				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
+				a.Equal(tt.want.profile, user.GetProfile())
 			}
 		})
 	}

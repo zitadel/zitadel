@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
@@ -21,14 +22,27 @@ func TestProvider_FetchUser(t *testing.T) {
 		name         string
 		userEndpoint string
 		httpMock     func(issuer string)
-		userMapper   func() UserInfoMapper
+		userMapper   func() idp.User
 		authURL      string
 		code         string
 		tokens       *oidc.Tokens
 	}
 	type want struct {
-		user idp.User
-		err  func(error) bool
+		err               func(error) bool
+		user              idp.User
+		id                string
+		firstName         string
+		lastName          string
+		displayName       string
+		nickName          string
+		preferredUsername string
+		email             string
+		isEmailVerified   bool
+		phone             string
+		isPhoneVerified   bool
+		preferredLanguage language.Tag
+		avatarURL         string
+		profile           string
 	}
 	tests := []struct {
 		name   string
@@ -78,7 +92,7 @@ func TestProvider_FetchUser(t *testing.T) {
 						Get("/user").
 						Reply(http.StatusInternalServerError)
 				},
-				userMapper: func() UserInfoMapper {
+				userMapper: func() idp.User {
 					return &UserMapper{
 						ID: "userID",
 					}
@@ -120,7 +134,7 @@ func TestProvider_FetchUser(t *testing.T) {
 							"custom": "claim",
 						})
 				},
-				userMapper: func() UserInfoMapper {
+				userMapper: func() idp.User {
 					return &UserMapper{}
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
@@ -132,12 +146,25 @@ func TestProvider_FetchUser(t *testing.T) {
 				},
 			},
 			want: want{
-				user: idp.User{
-					RawData: map[string]interface{}{
+				user: &UserMapper{
+					info: map[string]interface{}{
 						"userID": "id",
 						"custom": "claim",
 					},
 				},
+				id:                "",
+				firstName:         "",
+				lastName:          "",
+				displayName:       "",
+				nickName:          "",
+				preferredUsername: "",
+				email:             "",
+				isEmailVerified:   false,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "",
+				profile:           "",
 			},
 		},
 		{
@@ -174,7 +201,7 @@ func TestProvider_FetchUser(t *testing.T) {
 							"custom": "claim",
 						})
 				},
-				userMapper: func() UserInfoMapper {
+				userMapper: func() idp.User {
 					return &UserMapper{}
 				},
 				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=user&state=testState",
@@ -182,12 +209,25 @@ func TestProvider_FetchUser(t *testing.T) {
 				code:    "code",
 			},
 			want: want{
-				user: idp.User{
-					RawData: map[string]interface{}{
+				user: &UserMapper{
+					info: map[string]interface{}{
 						"userID": "id",
 						"custom": "claim",
 					},
 				},
+				id:                "",
+				firstName:         "",
+				lastName:          "",
+				displayName:       "",
+				nickName:          "",
+				preferredUsername: "",
+				email:             "",
+				isEmailVerified:   false,
+				phone:             "",
+				isPhoneVerified:   false,
+				preferredLanguage: language.Und,
+				avatarURL:         "",
+				profile:           "",
 			},
 		},
 	}
@@ -214,6 +254,19 @@ func TestProvider_FetchUser(t *testing.T) {
 			if tt.want.err == nil {
 				a.NoError(err)
 				a.Equal(tt.want.user, user)
+				a.Equal(tt.want.id, user.GetID())
+				a.Equal(tt.want.firstName, user.GetFirstName())
+				a.Equal(tt.want.lastName, user.GetLastName())
+				a.Equal(tt.want.displayName, user.GetDisplayName())
+				a.Equal(tt.want.nickName, user.GetNickname())
+				a.Equal(tt.want.preferredUsername, user.GetPreferredUsername())
+				a.Equal(tt.want.email, user.GetEmail())
+				a.Equal(tt.want.isEmailVerified, user.IsEmailVerified())
+				a.Equal(tt.want.phone, user.GetPhone())
+				a.Equal(tt.want.isPhoneVerified, user.IsPhoneVerified())
+				a.Equal(tt.want.preferredLanguage, user.GetPreferredLanguage())
+				a.Equal(tt.want.avatarURL, user.GetAvatarURL())
+				a.Equal(tt.want.profile, user.GetProfile())
 			}
 		})
 	}

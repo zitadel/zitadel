@@ -17,7 +17,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		config       *oauth2.Config
 		name         string
 		userEndpoint string
-		userMapper   func() UserInfoMapper
+		userMapper   func() idp.User
 	}
 	tests := []struct {
 		name   string
@@ -62,7 +62,7 @@ func TestProvider_Options(t *testing.T) {
 		config       *oauth2.Config
 		name         string
 		userEndpoint string
-		userMapper   func() UserInfoMapper
+		userMapper   func() idp.User
 		options      []ProviderOpts
 	}
 	type want struct {

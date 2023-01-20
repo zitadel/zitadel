@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
@@ -33,7 +34,7 @@ func (s *Session) GetAuthURL() string {
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
 		if err = s.authorize(ctx); err != nil {
-			return idp.User{}, err
+			return nil, err
 		}
 	}
 	info, err := rp.Userinfo(
@@ -43,10 +44,10 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		s.Provider.RelyingParty,
 	)
 	if err != nil {
-		return idp.User{}, err
+		return nil, err
 	}
-	userFromClaims(info, &user)
-	return user, nil
+	u := s.Provider.userInfoMapper(info)
+	return u, nil
 }
 
 func (s *Session) authorize(ctx context.Context) (err error) {
@@ -57,19 +58,42 @@ func (s *Session) authorize(ctx context.Context) (err error) {
 	return err
 }
 
-// maps the oidc.UserInfo to an [idp.User] using the default OIDC claims
-func userFromClaims(info oidc.UserInfo, user *idp.User) {
-	user.ID = info.GetSubject()
-	user.FirstName = info.GetGivenName()
-	user.LastName = info.GetFamilyName()
-	user.DisplayName = info.GetName()
-	user.NickName = info.GetNickname()
-	user.PreferredUsername = info.GetPreferredUsername()
-	user.Email = info.GetEmail()
-	user.IsEmailVerified = info.IsEmailVerified()
-	user.Phone = info.GetPhoneNumber()
-	user.IsPhoneVerified = info.IsPhoneNumberVerified()
-	user.PreferredLanguage = info.GetLocale()
-	user.AvatarURL = info.GetPicture()
-	user.Profile = info.GetProfile()
+func NewUser(info oidc.UserInfo) *User {
+	return &User{UserInfo: info}
+}
+
+type User struct {
+	oidc.UserInfo
+}
+
+func (u *User) GetID() string {
+	return u.GetSubject()
+}
+
+func (u *User) GetFirstName() string {
+	return u.GetGivenName()
+}
+
+func (u *User) GetLastName() string {
+	return u.GetFamilyName()
+}
+
+func (u *User) GetDisplayName() string {
+	return u.GetName()
+}
+
+func (u *User) GetPhone() string {
+	return u.GetPhoneNumber()
+}
+
+func (u *User) IsPhoneVerified() bool {
+	return u.IsPhoneNumberVerified()
+}
+
+func (u *User) GetPreferredLanguage() language.Tag {
+	return u.GetLocale()
+}
+
+func (u *User) GetAvatarURL() string {
+	return u.GetPicture()
 }
