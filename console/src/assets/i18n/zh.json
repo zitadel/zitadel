@@ -883,7 +883,7 @@
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
       "COMPLEXITY": "密码复杂性",
-      "NOTIFICATIONS": "通知服务商",
+      "NOTIFICATIONS": "通知设置",
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",

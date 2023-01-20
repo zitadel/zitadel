@@ -25,8 +25,8 @@
     <cnsl-idp-settings [serviceType]="serviceType"></cnsl-idp-settings>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'notifications' && serviceType === PolicyComponentServiceType.ADMIN">
-    <cnsl-notification-settings [serviceType]="serviceType"></cnsl-notification-settings>
     <cnsl-notification-policy [serviceType]="serviceType"></cnsl-notification-policy>
+    <cnsl-notification-settings [serviceType]="serviceType"></cnsl-notification-settings>
   </ng-container>
 
   <ng-container *ngIf="currentSetting === 'notifications' && serviceType === PolicyComponentServiceType.MGMT">

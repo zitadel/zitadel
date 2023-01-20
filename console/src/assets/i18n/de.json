@@ -883,7 +883,7 @@
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
       "COMPLEXITY": "Passwordkomplexität",
-      "NOTIFICATIONS": "Benachrichtigungen",
+      "NOTIFICATIONS": "Benachrichtigungseinstellungen",
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identity Provider",
