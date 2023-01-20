@@ -247,7 +247,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 			Value: []byte("value"),
 		}
 
-		// TODO: Why is SetUserMetadata not available in the script? It works here.
+		// TODO: Why is SetUserMetadata not available in the script? It works here. Fix, then remove this debugging code.
 		res, dummyErr := l.mgmtServer.SetUserMetadata(actionCtx, dummyMeta)
 		res = res
 		dummyErr = dummyErr
