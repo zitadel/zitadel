@@ -1944,6 +1944,31 @@ service AdminService {
         };
     }
 
+    //Add a default notification policy for ZITADEL
+    // it impacts all organisations without a customised policy
+    rpc AddNotificationPolicy(AddNotificationPolicyRequest) returns (AddNotificationPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/notification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy";
+                };
+            };
+        };
+    }
+
 
     //Returns the notification policy defined by the administrators of ZITADEL
     rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
@@ -4219,6 +4244,14 @@ message UpdatePrivacyPolicyRequest {
 }
 
 message UpdatePrivacyPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddNotificationPolicyRequest {
+    bool password_change = 1;
+}
+
+message AddNotificationPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

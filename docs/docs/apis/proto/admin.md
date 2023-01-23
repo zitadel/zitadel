@@ -1072,6 +1072,19 @@ Variable {{.Lang}} can be set to have different links based on the language
     PUT: /policies/privacy
 
 
+### AddNotificationPolicy
+
+> **rpc** AddNotificationPolicy([AddNotificationPolicyRequest](#addnotificationpolicyrequest))
+[AddNotificationPolicyResponse](#addnotificationpolicyresponse)
+
+Add a default notification policy for ZITADEL
+it impacts all organisations without a customised policy
+
+
+
+    POST: /policies/notification
+
+
 ### GetNotificationPolicy
 
 > **rpc** GetNotificationPolicy([GetNotificationPolicyRequest](#getnotificationpolicyrequest))
@@ -1860,6 +1873,28 @@ This is an empty request
 
 
 ### AddMultiFactorToLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddNotificationPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password_change |  bool | - |  |
+
+
+
+
+### AddNotificationPolicyResponse
 
 
 

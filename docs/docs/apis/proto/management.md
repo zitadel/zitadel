@@ -2259,7 +2259,7 @@ The default policy of the IAM will trigger after
 [GetNotificationPolicyResponse](#getnotificationpolicyresponse)
 
 Returns the notification policy of the organisation
-With this notification privacy it can be configured how users should be notified
+With this notification policy it can be configured how users should be notified
 
 
 

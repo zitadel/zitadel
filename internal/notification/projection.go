@@ -482,6 +482,9 @@ func (p *notificationsProjection) reducePasswordChanged(event eventstore.Event) 
 	}
 
 	notificationPolicy, err := p.queries.NotificationPolicyByOrg(ctx, true, e.Aggregate().ResourceOwner, false)
+	if errors.IsNotFound(err) {
+		return crdb.NewNoOpStatement(e), nil
+	}
 	if err != nil {
 		return nil, err
 	}
