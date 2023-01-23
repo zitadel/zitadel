@@ -1153,7 +1153,7 @@
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
         "PL": "Autenticazione Passwordless",
-        "PC:": "Cambiamento della password"
+        "PC": "Cambiamento della password"
       },
       "CHIPS": {
         "firstname": "Nome",

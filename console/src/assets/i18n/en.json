@@ -1152,7 +1152,7 @@
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passwordless",
-        "PC:": "Password Change"
+        "PC": "Password Change"
       },
       "CHIPS": {
         "firstname": "Firstname",
