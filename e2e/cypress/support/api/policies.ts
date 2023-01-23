@@ -38,7 +38,7 @@ export function ensureDomainPolicy(
         (body.policy.validateOrgDomains ? body.policy.validateOrgDomains : false) == validateOrgDomains &&
         (body.policy.smtpSenderAddressMatchesInstanceDomain ? body.policy.smtpSenderAddressMatchesInstanceDomain : false) ==
           smtpSenderAddressMatchesInstanceDomain
-) {
+      ) {
         return { ...result, entity: body.policy };
       }
       return result;

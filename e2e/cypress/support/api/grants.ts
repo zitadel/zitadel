@@ -15,8 +15,8 @@ export function ensureProjectGrantExists(
       `${api.mgmtBaseURL}/projects/${foreignProjectId}/grants`,
       { granted_org_id: orgUnderTest },
       foreignOrgId,
-    'grantId',
-    'grantId',
-  );
+      'grantId',
+      'grantId',
+    );
   });
 }

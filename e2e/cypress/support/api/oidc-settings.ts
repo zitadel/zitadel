@@ -24,18 +24,18 @@ export function ensureOIDCSettingsSet(
         body.settings.idTokenLifetime === hoursToDuration(idTokenLifetime) &&
         body.settings.refreshTokenExpiration === daysToDuration(refreshTokenExpiration) &&
         body.settings.refreshTokenIdleExpiration === daysToDuration(refreshTokenIdleExpiration)
-) {
+      ) {
         return { ...result, entity: body.settings };
       }
       return result;
     },
     `${api.adminBaseURL}/settings/oidc`,
     {
-        accessTokenLifetime: hoursToDuration(accessTokenLifetime),
-        idTokenLifetime: hoursToDuration(idTokenLifetime),
-        refreshTokenExpiration: daysToDuration(refreshTokenExpiration),
-        refreshTokenIdleExpiration: daysToDuration(refreshTokenIdleExpiration),
-      },
+      accessTokenLifetime: hoursToDuration(accessTokenLifetime),
+      idTokenLifetime: hoursToDuration(idTokenLifetime),
+      refreshTokenExpiration: daysToDuration(refreshTokenExpiration),
+      refreshTokenIdleExpiration: daysToDuration(refreshTokenIdleExpiration),
+    },
   );
 }
 

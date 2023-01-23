@@ -25,11 +25,11 @@ export function ensureHumanIsOrgMember(api: API, username: string, roles: string
       `${api.mgmtBaseURL}/orgs/me/members/_search`,
       (member: any) => member.userId == user.entity.id,
       `${api.mgmtBaseURL}/orgs/me/members`,
-    {
+      {
         userId: user.entity.id,
-      roles: roles,
-    },
-  );
+        roles: roles,
+      },
+    );
   });
 }
 
@@ -67,10 +67,10 @@ export function ensureHumanIsProjectMember(
       `${api.mgmtBaseURL}/projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members/_search`,
       (member: any) => member.userId == user.entity.id,
       `${api.mgmtBaseURL}/projects/${projectId}/${grantId ? `grants/${grantId}/` : ''}members`,
-    {
+      {
         userId: user.entity.id,
-      roles: roles,
-    },
-  );
+        roles: roles,
+      },
+    );
   });
 }
