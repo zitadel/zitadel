@@ -65,7 +65,7 @@ A user selected **Register** on the overview page after external authentication.
   - `v1`
     - `user` [*human*](./objects#human-user)
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
-- `api`
+- `api`  
   The second parameter contains the following fields
   - `metadata`  
     Array of [*metadata*](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
