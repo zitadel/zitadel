@@ -85,16 +85,6 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s5LastFailed = &LastFailed{dbClient: dbClient}
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient}
 
-	if steps.DefaultNotificationPolicies != nil {
-		steps.DefaultNotificationPolicies = &DefaultNotificationPolicies{es: eventstoreClient, PasswordChange: steps.DefaultNotificationPolicies.PasswordChange}
-		steps.DefaultNotificationPolicies.es = eventstoreClient
-		steps.DefaultNotificationPolicies.defaults = config.SystemDefaults
-		steps.DefaultNotificationPolicies.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
-		steps.DefaultNotificationPolicies.externalDomain = config.ExternalDomain
-		steps.DefaultNotificationPolicies.externalSecure = config.ExternalSecure
-		steps.DefaultNotificationPolicies.externalPort = config.ExternalPort
-	}
-
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
 
@@ -123,10 +113,6 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 5")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s6OwnerRemoveColumns)
 	logging.OnError(err).Fatal("unable to migrate step 6")
-	if steps.DefaultNotificationPolicies != nil {
-		err = migration.Migrate(ctx, eventstoreClient, steps.DefaultNotificationPolicies)
-		logging.OnError(err).Fatal("unable to migrate step 7")
-	}
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
