@@ -750,6 +750,16 @@
       "DELETE": "删除",
       "DELETESUCCESS": "失败的事件被移除。"
     },
+    "EVENTS": {
+      "TITLE": "活动",
+      "DESCRIPTION": "此视图显示ZITADEL的事件",
+      "EDITOR": "编辑",
+      "AGGREGATE": "总数",
+      "SEQUENCE": "序列",
+      "CREATIONDATE": "创建于",
+      "TYPE": "通知",
+      "PAYLOAD": "有效载荷"
+    },
     "TOAST": {
       "MEMBERREMOVED": "管理者已删除。",
       "MEMBERSADDED": "已添加多个管理者。",

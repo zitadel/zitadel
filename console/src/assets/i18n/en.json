@@ -750,6 +750,16 @@
       "DELETE": "Remove",
       "DELETESUCCESS": "Failed events removed."
     },
+    "EVENTS": {
+      "TITLE": "Events",
+      "DESCRIPTION": "This view shows all occured events.",
+      "EDITOR": "Editor",
+      "AGGREGATE": "Aggregate",
+      "SEQUENCE": "Sequence",
+      "CREATIONDATE": "Created At",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload"
+    },
     "TOAST": {
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERSADDED": "Managers added.",

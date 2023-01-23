@@ -142,6 +142,14 @@ const routes: Routes = [
     },
   },
   {
+    path: 'events',
+    loadChildren: () => import('./pages/events/events.module'),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read'],
+    },
+  },
+  {
     path: 'settings',
     loadChildren: () => import('./pages/instance-settings/instance-settings.module'),
     canActivate: [AuthGuard, RoleGuard],

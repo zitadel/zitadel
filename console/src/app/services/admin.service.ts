@@ -204,6 +204,10 @@ import {
   GetSecurityPolicyResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
+  ListEventsResponse,
+  ListEventsRequest,
+  ListEventTypesRequest,
+  ListEventTypesResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -214,6 +218,14 @@ import { GrpcService } from './grpc.service';
 })
 export class AdminService {
   constructor(private readonly grpcService: GrpcService) {}
+
+  public listEvents(req: ListEventsRequest): Promise<ListEventsResponse.AsObject> {
+    return this.grpcService.admin.listEvents(req, null).then((resp) => resp.toObject());
+  }
+
+  public listEventTypes(req: ListEventTypesRequest): Promise<ListEventTypesResponse.AsObject> {
+    return this.grpcService.admin.listEventTypes(req, null).then((resp) => resp.toObject());
+  }
 
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();

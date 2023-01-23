@@ -750,6 +750,16 @@
       "DELETE": "Supprimer",
       "DELETESUCCESS": "Événements échoués supprimés."
     },
+    "EVENTS": {
+      "TITLE": "Événements",
+      "DESCRIPTION": "Cette vue montre les événements de ZITADEL.",
+      "EDITOR": "Éditeur",
+      "AGGREGATE": "Aggregate",
+      "SEQUENCE": "Séquence",
+      "CREATIONDATE": "Créé à",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload"
+    },
     "TOAST": {
       "MEMBERREMOVED": "Gestionnaire supprimé.",
       "MEMBERSADDED": "Gestionnaires ajoutés.",
