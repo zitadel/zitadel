@@ -1152,7 +1152,7 @@
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
         "PL": "Passwortlos",
-        "PC:": "Passwordwechsel"
+        "PC": "Passwordwechsel"
       },
       "CHIPS": {
         "firstname": "Vorname",
