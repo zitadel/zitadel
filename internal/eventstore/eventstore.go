@@ -254,7 +254,7 @@ func (es *Eventstore) RegisterFilterEventMapper(aggregateType AggregateType, eve
 
 func (es *Eventstore) appendEventType(typ EventType) {
 	i := sort.SearchStrings(es.eventTypes, string(typ))
-	if i > 0 && es.eventTypes[i-1] == string(typ) {
+	if i < len(es.eventTypes) && es.eventTypes[i] == string(typ) {
 		return
 	}
 	es.eventTypes = append(es.eventTypes[:i], append([]string{string(typ)}, es.eventTypes[i:]...)...)

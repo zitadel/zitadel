@@ -3120,7 +3120,7 @@ at least one argument has to be provided
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| aggregate_types | repeated string | - |  |
+| aggregate_types | repeated zitadel.event.v1.AggregateType | - |  |
 
 
 
@@ -3137,7 +3137,7 @@ at least one argument has to be provided
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| event_types | repeated string | - |  |
+| event_types | repeated zitadel.event.v1.EventType | - |  |
 
 
 
@@ -3151,11 +3151,11 @@ at least one argument has to be provided
 | sequence |  uint64 | sequence represents the order of events. It's always upcounting if asc is false sequence is used as less than filter if asc is true sequence is used as greater than filter if sequence is 0 the field is ignored |  |
 | limit |  uint32 | - |  |
 | asc |  bool | - |  |
-| editor_user_id |  string | - |  |
-| event_types | repeated string | the types are or filtered and must match the type exatly |  |
-| aggregate_id |  string | - |  |
-| aggregate_type |  string | - |  |
-| resource_owner |  string | - |  |
+| editor_user_id |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
+| event_types | repeated string | the types are or filtered and must match the type exatly | repeated.max_items: 30<br />  |
+| aggregate_id |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
+| aggregate_types | repeated string | - | repeated.max_items: 10<br />  |
+| resource_owner |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
 | creation_date |  google.protobuf.Timestamp | if asc is false creation_date is used as less than filter if asc is true creation_date is used as greater than filter if creation_date is not set the field is ignored |  |
 
 
