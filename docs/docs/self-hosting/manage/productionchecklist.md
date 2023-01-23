@@ -57,4 +57,4 @@ Use an appropriate monitoring solution to have an overview about your ZITADEL in
 - [ ] requests by URL/endpoint
 - [ ] lifetime of TLS certificates
 - [ ] ZITADEL and database logs
-- [ ] ZITADEL [metrics](https://zitadel.com/docs/apis/observability/metrics)
+- [ ] ZITADEL [metrics](/docs/apis/observability/metrics)
