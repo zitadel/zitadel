@@ -181,7 +181,7 @@ ZITADEL did not create the user yet.
 
 ### Post Creation
 
-A user registers directly at ZITADEL.
+A user registers directly at ZITADEL.  
 ZITADEL successfully created the user.
 
 #### Parameters of Post Creation
