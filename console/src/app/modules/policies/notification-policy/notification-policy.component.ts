@@ -56,6 +56,7 @@ export class NotificationPolicyComponent implements OnInit {
     this.getData()
       .then((data) => {
         if (data.policy) {
+          this.hasNotificationPolicy = true;
           this.notificationData = data.policy;
           this.isDefault = data.policy.isDefault;
           this.loading = false;
