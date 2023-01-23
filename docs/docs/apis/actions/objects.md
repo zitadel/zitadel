@@ -63,7 +63,7 @@ title: Objects
 - `username` *string*
 - `loginNames` Array of *string*
 - `preferredLoginName` *string*
-- `human`
+- `human`  
   Set if the user is human
   - `firstName` *string*
   - `lastName` *string*
