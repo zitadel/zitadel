@@ -1,7 +1,7 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
@@ -20,6 +20,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
@@ -58,6 +59,7 @@ export class UserDetailComponent implements OnInit {
 
   public settingsList: SidenavSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
   public currentSetting: string | undefined = 'general';
+  public loginPolicy?: LoginPolicy.AsObject;
 
   constructor(
     public translate: TranslateService,
@@ -137,6 +139,12 @@ export class UserDetailComponent implements OnInit {
 
   public ngOnInit(): void {
     this.refreshUser();
+
+    this.mgmtUserService.getLoginPolicy().then((policy) => {
+      if (policy.policy) {
+        this.loginPolicy = policy.policy;
+      }
+    });
   }
 
   public changeUsername(): void {

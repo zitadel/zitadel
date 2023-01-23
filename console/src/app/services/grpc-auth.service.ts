@@ -30,6 +30,8 @@ import {
   GetMyEmailResponse,
   GetMyLabelPolicyRequest,
   GetMyLabelPolicyResponse,
+  GetMyLoginPolicyRequest,
+  GetMyLoginPolicyResponse,
   GetMyPasswordComplexityPolicyRequest,
   GetMyPasswordComplexityPolicyResponse,
   GetMyPhoneRequest,
@@ -485,6 +487,11 @@ export class GrpcAuthService {
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
     return this.grpcService.auth.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
+  public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse.AsObject> {
+    const req = new GetMyLoginPolicyRequest();
+    return this.grpcService.auth.getMyLoginPolicy(req, null).then((resp) => resp.toObject());
   }
 
   public removeMyPhone(): Promise<RemoveMyPhoneResponse.AsObject> {

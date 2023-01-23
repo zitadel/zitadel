@@ -1566,6 +1566,42 @@ Exports data from instance
     POST: /export
 
 
+### ListEventTypes
+
+> **rpc** ListEventTypes([ListEventTypesRequest](#listeventtypesrequest))
+[ListEventTypesResponse](#listeventtypesresponse)
+
+
+
+
+
+    POST: /events/types/_search
+
+
+### ListEvents
+
+> **rpc** ListEvents([ListEventsRequest](#listeventsrequest))
+[ListEventsResponse](#listeventsresponse)
+
+
+
+
+
+    POST: /events/_search
+
+
+### ListAggregateTypes
+
+> **rpc** ListAggregateTypes([ListAggregateTypesRequest](#listaggregatetypesrequest))
+[ListAggregateTypesResponse](#listaggregatetypesresponse)
+
+
+
+
+
+    POST: /aggregates/types/_search
+
+
 
 
 
@@ -3068,6 +3104,70 @@ at least one argument has to be provided
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | is_unique |  bool | - |  |
+
+
+
+
+### ListAggregateTypesRequest
+
+
+
+
+
+### ListAggregateTypesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| aggregate_types | repeated zitadel.event.v1.AggregateType | - |  |
+
+
+
+
+### ListEventTypesRequest
+
+
+
+
+
+### ListEventTypesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| event_types | repeated zitadel.event.v1.EventType | - |  |
+
+
+
+
+### ListEventsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sequence |  uint64 | sequence represents the order of events. It's always upcounting if asc is false sequence is used as less than filter if asc is true sequence is used as greater than filter if sequence is 0 the field is ignored |  |
+| limit |  uint32 | - |  |
+| asc |  bool | - |  |
+| editor_user_id |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
+| event_types | repeated string | the types are or filtered and must match the type exatly | repeated.max_items: 30<br />  |
+| aggregate_id |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
+| aggregate_types | repeated string | - | repeated.max_items: 10<br />  |
+| resource_owner |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
+| creation_date |  google.protobuf.Timestamp | if asc is false creation_date is used as less than filter if asc is true creation_date is used as greater than filter if creation_date is not set the field is ignored |  |
+
+
+
+
+### ListEventsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| events | repeated zitadel.event.v1.Event | - |  |
 
 
 

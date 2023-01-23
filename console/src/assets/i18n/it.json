@@ -231,6 +231,7 @@
       "CREATE": "Crea",
       "MY": "Le mie informazioni",
       "LOGINNAMES": "Loginnames",
+      "LOGINMETHODS": "Metodi di accesso",
       "LOGINNAMESDESC": "Questi sono i nomi di accesso:",
       "NOUSER": "Nessun utente associato.",
       "REACTIVATE": "Riattiva",
@@ -917,7 +918,7 @@
       "TITLE": "Impostazioni SMTP",
       "SENDERADDRESS": "Indirizzo email del mittente",
       "SENDERNAME": "Nome del mittente",
-      "HOST": "Host",
+      "HOSTANDPORT": "Host e porta",
       "USER": "Utente",
       "PASSWORD": "Password",
       "SETPASSWORD": "Imposta SMTP Password",
@@ -1483,6 +1484,12 @@
       "UPDATED": "Progetto cambiato con successo.",
       "GRANTUPDATED": "Grant cambiato con successo.",
       "DELETED": "Progetto eliminato con successo."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Elima ruolo",
+      "DELETE_DESCRIPTION": "Stai per eliminare un ruolo. Vuoi davvero continuare?"
     }
   },
   "NEXTSTEPS": {
