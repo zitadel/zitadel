@@ -52,8 +52,8 @@ describe('permissions', () => {
 
         beforeEach(() => {
           cy.contains('[data-e2e="member-avatar"]', 'ee').click();
-            cy.get(rowSelector).as('managerRow');
-          });
+          cy.get(rowSelector).as('managerRow');
+        });
 
         it('should remove a manager', () => {
           cy.get('@managerRow').find('[data-e2e="remove-member-button"]').click({ force: true });
@@ -110,7 +110,7 @@ describe('permissions', () => {
       describe('owned projects', () => {
         beforeEach(function () {
           ensureProjectExists(this.api, 'e2eprojectpermission').as('projectId');
-          });
+        });
 
         const visitOwnedProject: Mocha.HookFunction = function () {
           cy.visit(`/projects/${this.projectId}`);
@@ -129,12 +129,12 @@ describe('permissions', () => {
             },
             function () {
               ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname);
-                ensureHumanIsProjectMember(
+              ensureHumanIsProjectMember(
                 this.api,
                 this.projectId,
                 testManagerLoginname,
-                  roles.map((role) => role.internal),
-                );
+                roles.map((role) => role.internal),
+              );
             },
             visitOwnedProject,
           );
@@ -145,7 +145,7 @@ describe('permissions', () => {
 
           beforeEach(function () {
             ensureProjectResourceDoesntExist(this.api, this.projectId, Roles, testRoleName);
-              });
+          });
 
           beforeEach(visitOwnedProject);
 
@@ -197,9 +197,9 @@ describe('permissions', () => {
                 this.api,
                 this.projectId,
                 testManagerLoginname,
-                    roles.map((role) => role.internal),
+                roles.map((role) => role.internal),
                 this.grantId,
-                  );
+              );
             },
             visitGrantedProject,
           );

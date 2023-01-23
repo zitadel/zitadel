@@ -10,8 +10,8 @@ describe('applications', () => {
       .as('api')
       .then((api) => {
         ensureProjectExists(api, testProjectName).as('projectId');
-        });
       });
+  });
 
   describe('add app', function () {
     beforeEach(`ensure it doesn't exist already`, function () {
@@ -39,8 +39,8 @@ describe('applications', () => {
     });
   });
 
-    describe('edit app', () => {
-      it('should configure an application to enable dev mode');
-      it('should configure an application to put user roles and info inside id token');
-    });
+  describe('edit app', () => {
+    it('should configure an application to enable dev mode');
+    it('should configure an application to put user roles and info inside id token');
   });
+});

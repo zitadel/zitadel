@@ -14,11 +14,11 @@ describe('organizations', () => {
         .as('api')
         .then((api) => {
           ensureOrgExists(api, orgNameOnCreation)
-          .as('newOrgId')
-          .then((newOrgId) => {
-            cy.visit(`${orgPath}?org=${newOrgId}`).as('orgsite');
-          });
-      });
+            .as('newOrgId')
+            .then((newOrgId) => {
+              cy.visit(`${orgPath}?org=${newOrgId}`).as('orgsite');
+            });
+        });
     });
 
     it('should rename the organization', () => {
