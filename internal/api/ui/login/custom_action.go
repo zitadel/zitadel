@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
@@ -69,7 +67,6 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", appendMetadataFunc(mutableMetas)),
 			),
-			actions.SetFields("mgmt", object.ManagementField(l.mgmtServer)),
 		),
 	)
 
@@ -125,11 +122,7 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 		return err
 	}
 
-	apiFields := actions.WithAPIFields(
-		actions.SetFields("v1",
-			actions.SetFields("mgmt", l.mgmtServer),
-		),
-	)
+	apiFields := actions.WithAPIFields()
 
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
@@ -224,7 +217,6 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", appendMetadataFunc(mutableMetas)),
 			),
-			actions.SetFields("mgmt", object.ManagementField(l.mgmtServer)),
 		),
 	)
 
@@ -240,17 +232,6 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 			),
 		)
-
-		dummyMeta := &management.SetUserMetadataRequest{
-			Id:    "197465206836709948",
-			Key:   "key",
-			Value: []byte("value"),
-		}
-
-		// TODO: Why is SetUserMetadata not available in the script? It works here. Fix, then remove this debugging code.
-		res, dummyErr := l.mgmtServer.SetUserMetadata(actionCtx, dummyMeta)
-		res = res
-		dummyErr = dummyErr
 
 		err = actions.Run(
 			actionCtx,
@@ -280,7 +261,6 @@ func (l *Login) customGrants(ctx context.Context, userID string, authRequest *do
 		actions.SetFields("userGrants", &mutableUserGrants.g),
 		actions.SetFields("v1",
 			actions.SetFields("appendUserGrant", appendGrantFunc(mutableUserGrants)),
-			actions.SetFields("mgmt", l.mgmtServer),
 		),
 	)
 

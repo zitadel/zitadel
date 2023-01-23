@@ -41,7 +41,6 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
-	mgmtServer          management.ManagementServiceServer
 }
 
 type Config struct {
@@ -76,7 +75,6 @@ func CreateLogin(config Config,
 	csrfCookieKey []byte,
 	mgmtServer management.ManagementServiceServer,
 ) (*Login, error) {
-
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
 		samlAuthCallbackURL: samlAuthCallbackURL,
@@ -88,7 +86,6 @@ func CreateLogin(config Config,
 		authRepo:            authRepo,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
-		mgmtServer:          mgmtServer,
 	}
 	statikFS, err := fs.NewWithNamespace("login")
 	if err != nil {
