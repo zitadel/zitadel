@@ -45,6 +45,7 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 			err = actionErr
 		}
 	}
+
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames {
 			l.renderLogin(w, r, authReq, err)

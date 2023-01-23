@@ -75,7 +75,6 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 
 		ctxFieldOptions := append(tokenCtxFields(tokens),
 			actions.SetFields("v1",
-				actions.SetFields("ctx", actionCtx),
 				actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
 					return object.UserFromExternalUser(c, user)
 				}),
@@ -135,7 +134,6 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 		ctxFields := actions.SetContextFields(
 			// TODO: add tokenCtxFields(tokens)
 			actions.SetFields("v1",
-				actions.SetFields("ctx", actionCtx),
 				actions.SetFields("authMethod", authMethod),
 				actions.SetFields("authError", authErrStr),
 				actions.SetFields("authRequest", object.AuthRequestField(req)),
@@ -228,7 +226,6 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 				actions.SetFields("user", func(c *actions.FieldConfig) interface{} {
 					return object.UserFromHuman(c, user)
 				}),
-				actions.SetFields("ctx", actionCtx),
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 			),
 		)
@@ -278,7 +275,6 @@ func (l *Login) customGrants(ctx context.Context, userID string, authRequest *do
 						return object.UserFromQuery(c, user)
 					}
 				}),
-				actions.SetFields("ctx", actionCtx),
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 			),
 		)

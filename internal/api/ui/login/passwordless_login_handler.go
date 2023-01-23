@@ -63,11 +63,13 @@ func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Re
 		return
 	}
 	err = l.authRepo.VerifyPasswordless(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, authReq.AgentID, credData, domain.BrowserInfoFromRequest(r))
+
 	if actionErr := l.triggerPostLocalAuthentication(r.Context(), authReq, authMethodPasswordless, err); actionErr != nil {
 		if err != nil {
 			err = actionErr
 		}
 	}
+
 	if err != nil {
 		l.renderPasswordlessVerification(w, r, authReq, formData.PasswordLogin, err)
 		return
