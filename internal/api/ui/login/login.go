@@ -23,7 +23,6 @@ import (
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 type Login struct {
@@ -73,7 +72,6 @@ func CreateLogin(config Config,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
-	mgmtServer management.ManagementServiceServer,
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
