@@ -4,16 +4,16 @@ title: Objects
 
 ## External User
 
-- `externalId` *string*
+- `externalId` *string*  
   User id from the identity provider
-- `externalIdpId` *string*
+- `externalIdpId` *string*  
   Id of the identity provider
 - `human`
   - `firstName` *string*
   - `lastName` *string*
   - `nickName` *string*
   - `displayName` *string*
-  - `preferredLanguage` *string*
+  - `preferredLanguage` *string*  
     In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
   - `email` *string*
   - `isEmailVerified` *boolean*
@@ -43,11 +43,11 @@ title: Objects
 
 ## user grant
 
-- `projectId` *string*
+- `projectId` *string*  
   Required. Id of the project to be granted
-- `projectGrantId` *string*
+- `projectGrantId` *string*  
   If the grant is for a project grant
-- `roles` Array of *string*
+- `roles` Array of *string*  
   Containing the roles
 
 ## user
@@ -56,9 +56,9 @@ title: Objects
 - `creationDate` *Date*
 - `changeDate` *Date*
 - `resourceOwner` *string*
-- `sequence` *number*
+- `sequence` *number*  
   Unsigned 64 bit integer
-- `state` *number*
+- `state` *number*  
   <ul><li>0: unspecified</li><li>1: active</li><li>2: inactive</li><li>3: deleted</li><li>4: locked</li><li>5: suspended</li><li>6: initial</li></ul>
 - `username` *string*
 - `loginNames` Array of *string*
@@ -70,15 +70,15 @@ title: Objects
   - `nickName` *string*
   - `displayName` *string*
   - `avatarKey` *string*
-  - `preferredLanguage` *string*
+  - `preferredLanguage` *string*  
     In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
-  - `gender` *number*
+  - `gender` *number*  
     <ul><li>0: unspecified</li><li>1: female</li><li>2: male</li><li>3: diverse</li></ul>
   - `email` *string*
   - `isEmailVerified` *boolean*
   - `phone` *string*
   - `isPhoneVerified` *boolean*
-- `machine`
+- `machine`  
   Set if the user is a machine
   - `name` *string*
   - `description` *string*
@@ -90,7 +90,7 @@ title: Objects
 - `changeDate` *Date*
 - `resourceOwner` *string*
 - `sequence` *number*
-- `state` *number*
+- `state` *number*  
   <ul><li>0: unspecified</li><li>1: active</li><li>2: inactive</li><li>3: deleted</li><li>4: locked</li><li>5: suspended</li><li>6: initial</li></ul>
 - `username` *string*
 - `loginNames` Array of *string*
@@ -100,7 +100,7 @@ title: Objects
   - `lastName` *string*
   - `nickName` *string*
   - `displayName` *string*
-  - `preferredLanguage` *string*
+  - `preferredLanguage` *string*  
     In [RFC 5646](https://www.rfc-editor.org/rfc/rfc5646) fromat
 - `email`
   - `email` *string*
@@ -108,10 +108,6 @@ title: Objects
 - `phone`
   - `phone` *string*
   - `isPhoneVerified` *boolean*
-
-## API Context
-
-This object has to be passed as first argument to all [`mgmt` API methods](#management-api).
 
 ## Auth Request
 
@@ -121,22 +117,3 @@ The latest code provides the following fields and methods which are all availabl
 ```go reference
 https://github.com/zitadel/zitadel/blob/main/internal/domain/auth_request.go
 ```
-
-## Management API
-
-The `mgmt` object contains all the methods that implement the [management API](/docs/apis/proto/management).
-The first argument is always the [API context](#api-context).
-The methods, arguments and return values are [mapped to JavaScript notation](#javascript-notation).
-The following example shows how to use the `mgmt` object.
-```js reference
-https://github.com/zitadel/actions/blob/main/examples/store_last_auth_error.js
-```
-
-## JavaScript Notation
-
-ZITADEL is written in Golang but ZITADEL action scripts are written in JavaScript.
-The languages have different notations for fields and methods.
-If a field or method is available in Golang, it starts with a capital letter.
-These available fields and methods are then available in the actions,
-but in JavaScript, they start with a lowercase letter.
-See an example at the [`mgmt` API usage description](#management-api)
