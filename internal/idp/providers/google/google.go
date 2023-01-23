@@ -25,11 +25,9 @@ func New(clientID, clientSecret, redirectURI string, opts ...oidc.ProviderOpts) 
 	if err != nil {
 		return nil, err
 	}
-	provider := &Provider{
+	return &Provider{
 		Provider: rp,
-	}
-
-	return provider, nil
+	}, nil
 }
 
 var userMapper = func(info openid.UserInfo) idp.User {
