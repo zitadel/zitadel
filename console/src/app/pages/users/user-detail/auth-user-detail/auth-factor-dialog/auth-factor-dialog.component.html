@@ -18,7 +18,7 @@
           <span>{{ 'USER.MFA.OTP' | translate }}</span>
         </div>
       </button>
-      <button mat-raised-button color="primary" (click)="selectType(AuthFactorType.U2F)" data-e2e="add-factor-u2f">
+      <button mat-raised-button color="primary" (click)="selectType(AuthFactorType.U2F)">
         <div class="u2f-btn">
           <div class="icon-row">
             <i matTooltip="Fingerprint" class="las la-fingerprint"></i>
@@ -38,7 +38,7 @@
       <qrcode *ngIf="otpurl" class="qrcode" qrcode [qrdata]="otpurl" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
 
       <div class="otp-flex" *ngIf="otpsecret">
-        <span class="overflow-auto" data-e2e="otp-secret">{{ otpsecret }}</span>
+        <span class="overflow-auto">{{ otpsecret }}</span>
         <button
           color="primary"
           [disabled]="copied === otpsecret"
@@ -56,7 +56,7 @@
 
     <cnsl-form-field class="formfield" label="Access Code" required="true">
       <cnsl-label>Code</cnsl-label>
-      <input cnslInput [(ngModel)]="otpcode" data-e2e="otp-code-input" />
+      <input cnslInput [(ngModel)]="otpcode" />
     </cnsl-form-field>
   </div>
 
@@ -65,13 +65,7 @@
 
     <cnsl-form-field class="form-field" label="Name" required="true">
       <cnsl-label>{{ 'USER.MFA.U2F_NAME' | translate }}</cnsl-label>
-      <input
-        cnslInput
-        [(ngModel)]="u2fname"
-        required
-        (keydown.enter)="u2fname ? submitU2F() : null"
-        data-e2e="u2f-factor-name"
-      />
+      <input cnslInput [(ngModel)]="u2fname" required (keydown.enter)="u2fname ? submitU2F() : null" />
     </cnsl-form-field>
 
     <mat-spinner diameter="30" *ngIf="u2fLoading"></mat-spinner>
@@ -91,7 +85,6 @@
     mat-raised-button
     class="ok-button"
     (click)="submitAuth()"
-    data-e2e="save-factor"
   >
     {{ 'ACTIONS.CREATE' | translate }}
   </button>

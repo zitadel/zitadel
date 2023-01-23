@@ -22,7 +22,6 @@
       mat-raised-button
       color="primary"
       matTooltip="{{ 'ACTIONS.NEW' | translate }}"
-      data-e2e="add-factor"
     >
       <mat-icon class="icon">add</mat-icon>
       <span>{{ 'USER.MFA.ADD' | translate }}</span>
@@ -40,7 +39,7 @@
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MFA.NAME' | translate }}</th>
         <td mat-cell *matCellDef="let mfa">
-          <span *ngIf="mfa?.u2f?.name" class="centered" data-e2e="u2f-factor-names">
+          <span *ngIf="mfa?.u2f?.name" class="centered">
             {{ mfa.u2f.name }}
           </span>
         </td>

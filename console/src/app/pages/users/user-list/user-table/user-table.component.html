@@ -139,7 +139,7 @@
         >
           {{ 'USER.PROFILE.USERNAME' | translate }}
         </th>
-        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id] : null" data-e2e="username-cell">
+        <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id] : null">
           {{ user.userName }}
         </td>
       </ng-container>

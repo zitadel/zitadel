@@ -1,57 +1,42 @@
-import { ZITADELTarget } from 'support/commands';
+import { ensureSetting } from './ensure';
+import { API } from './types';
 
-export function ensureOIDCSettings(
-  target: ZITADELTarget,
+export function ensureOIDCSettingsSet(
+  api: API,
   accessTokenLifetime: number,
   idTokenLifetime: number,
   refreshTokenExpiration: number,
   refreshTokenIdleExpiration: number,
-) {
-  updateOIDCSettings(target, accessTokenLifetime, idTokenLifetime, refreshTokenExpiration, refreshTokenIdleExpiration);
-  return getOIDCSettings(target).should(
-    (res) =>
-      res.body.accessTokenLifetime == accessTokenLifetime &&
-      res.body.idTokenLifetime == idTokenLifetime &&
-      res.body.refreshTokenExpiration == refreshTokenExpiration &&
-      res.body.refreshTokenIdleExpiration == refreshTokenIdleExpiration,
-  );
-}
+): Cypress.Chainable<number> {
+  return ensureSetting(
+    api,
+    `${api.adminBaseURL}/settings/oidc`,
+    (body: any) => {
+      const result = {
+        sequence: body.settings?.details?.sequence,
+        id: body.settings.id,
+        entity: null,
+      };
 
-function getOIDCSettings(target: ZITADELTarget) {
-  return cy.request({
-    method: 'GET',
-    url: `${target.adminBaseURL}/settings/oidc`,
-    headers: target.headers,
-  });
-}
-
-function updateOIDCSettings(
-  target: ZITADELTarget,
-  accessTokenLifetime: number,
-  idTokenLifetime: number,
-  refreshTokenExpiration: number,
-  refreshTokenIdleExpiration: number,
+      if (
+        body.settings &&
+        body.settings.accessTokenLifetime === hoursToDuration(accessTokenLifetime) &&
+        body.settings.idTokenLifetime === hoursToDuration(idTokenLifetime) &&
+        body.settings.refreshTokenExpiration === daysToDuration(refreshTokenExpiration) &&
+        body.settings.refreshTokenIdleExpiration === daysToDuration(refreshTokenIdleExpiration)
 ) {
-  return cy
-    .request({
-      method: 'PUT',
-      url: `${target.adminBaseURL}/settings/oidc`,
-      body: {
+        return { ...result, entity: body.settings };
+      }
+      return result;
+    },
+    `${api.adminBaseURL}/settings/oidc`,
+    {
         accessTokenLifetime: hoursToDuration(accessTokenLifetime),
         idTokenLifetime: hoursToDuration(idTokenLifetime),
         refreshTokenExpiration: daysToDuration(refreshTokenExpiration),
         refreshTokenIdleExpiration: daysToDuration(refreshTokenIdleExpiration),
       },
-      headers: target.headers,
-      failOnStatusCode: false,
-    })
-    .then((res) => {
-      if (!res.isOkStatusCode) {
-        expect(res.status).to.equal(400);
-        expect(res.body.message).to.contain('No changes');
-      }
-      return res;
-    });
+  );
 }
 
 function hoursToDuration(hours: number): string {

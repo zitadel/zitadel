@@ -1,19 +1,29 @@
 import 'cypress-wait-until';
-// @ts-ignore
-import * as regGrep from '@cypress/grep';
-import { debug } from 'console';
-regGrep();
-
-export interface ZITADELTarget {
-  headers: {
-    Authorization: string;
-    'x-zitadel-orgid': string;
-  };
-  mgmtBaseURL: string;
-  adminBaseURL: string;
-  orgId: number;
-  org: string;
-}
+//
+//namespace Cypress {
+//    interface Chainable {
+//        /**
+//         * Custom command that authenticates a user.
+//         *
+//         * @example cy.consolelogin('hodor', 'hodor1234')
+//         */
+//        consolelogin(username: string, password: string): void
+//    }
+//}
+//
+//Cypress.Commands.add('consolelogin', { prevSubject: false }, (username: string, password: string) => {
+//
+//    window.sessionStorage.removeItem("zitadel:access_token")
+//    cy.visit(Cypress.config('baseUrl')/ui/console).then(() => {
+//        // fill the fields and push button
+//        cy.get('#loginName').type(username, { log: false })
+//        cy.get('#submit-button').click()
+//        cy.get('#password').type(password, { log: false })
+//        cy.get('#submit-button').click()
+//        cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
+//    })
+//})
+//
 
 interface ShouldNotExistOptions {
   selector: string;
@@ -41,12 +51,6 @@ declare global {
        * Custom command that asserts success is printed after a change.
        */
       shouldConfirmSuccess(): Cypress.Chainable<null>;
-    }
-    interface Chainable<Subject = any> {
-      /**
-       * Custom command that yields the element that exactly matches the given text.
-       */
-      getContainingExactText<E extends Node = HTMLElement>(content: string): Cypress.Chainable<JQuery<E>>;
     }
   }
 }
@@ -102,17 +106,3 @@ Cypress.Commands.add('shouldConfirmSuccess', { prevSubject: false }, () => {
   cy.shouldNotExist({ selector: '.data-e2e-failure' });
   cy.get('.data-e2e-success');
 });
-
-Cypress.Commands.add(
-  'getContainingExactText',
-  { prevSubject: true },
-  (subject: JQuery<HTMLElement>, text: string): Cypress.Chainable<JQuery<HTMLElement>> => {
-    return cy.wrap(subject).then(($elements) => {
-      return Cypress.$($elements)
-        .filter((_, $el) => {
-          return Cypress.$($el).text().trim() == text;
-        })
-        .first();
-    });
-  },
-);

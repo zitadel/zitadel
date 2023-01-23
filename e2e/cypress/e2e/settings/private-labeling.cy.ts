@@ -1,18 +1,19 @@
-import { User } from '../../support/login/session';
+import { apiAuth, API } from '../../support/api/apiauth';
+import { Policy, resetPolicy } from '../../support/api/policies';
+import { login, User } from '../../support/login/users';
 
 describe('private labeling', () => {
   const orgPath = `/org`;
 
   [User.OrgOwner].forEach((user) => {
     describe(`as user "${user}"`, () => {
+      let api: API;
+
       beforeEach(() => {
-        // login(user);
+        login(user);
         cy.visit(orgPath);
         // TODO: Why force?
-        cy.contains('[data-e2e="policy-card"]', 'Private Labeling')
-          .contains('button', 'Modify')
-          .should('be.visible')
-          .click({ force: true }); // TODO: select data-e2e
+        cy.contains('[data-e2e="policy-card"]', 'Private Labeling').contains('button', 'Modify').click({ force: true }); // TODO: select data-e2e
       });
 
       customize('white', user);
@@ -23,9 +24,15 @@ describe('private labeling', () => {
 
 function customize(theme: string, user: User) {
   describe(`${theme} theme`, () => {
+    beforeEach(() => {
+      apiAuth().then((api) => {
+        resetPolicy(api, Policy.Label);
+      });
+    });
+
     describe.skip('logo', () => {
       beforeEach('expand logo category', () => {
-        cy.contains('[data-e2e="policy-category"]', 'Logo').should('be.visible').click(); // TODO: select data-e2e
+        cy.contains('[data-e2e="policy-category"]', 'Logo').click(); // TODO: select data-e2e
         cy.fixture('logo.png').as('logo');
       });
 
@@ -33,7 +40,7 @@ function customize(theme: string, user: User) {
         cy.get('[data-e2e="image-part-logo"]')
           .find('input')
           .then(function (el) {
-            const blob = Cypress.Blob.base64StringToBlob(null, 'image/png');
+            const blob = Cypress.Blob.base64StringToBlob(this.logo, 'image/png');
             const file = new File([blob], 'images/logo.png', { type: 'image/png' });
             const list = new DataTransfer();
 
@@ -49,14 +56,14 @@ function customize(theme: string, user: User) {
     it('should update an icon');
     it('should delete an icon');
     it.skip('should update the background color', () => {
-      cy.contains('[data-e2e="color"]', 'Background Color').find('button').should('be.visible').click(); // TODO: select data-e2e
-      cy.get('color-editable-input').find('input').clear().should('be.visible').type('#ae44dc');
-      cy.get('[data-e2e="save-colors-button"]').should('be.visible').click();
-      cy.get('[data-e2e="header-user-avatar"]').should('be.visible').click();
-      cy.contains('Logout All Users').should('be.visible').click(); // TODO: select data-e2e
-      /* login(User.LoginPolicyUser, undefined, true, null, () => {
+      cy.contains('[data-e2e="color"]', 'Background Color').find('button').click(); // TODO: select data-e2e
+      cy.get('color-editable-input').find('input').clear().type('#ae44dc');
+      cy.get('[data-e2e="save-colors-button"]').click();
+      cy.get('[data-e2e="header-user-avatar"]').click();
+      cy.contains('Logout All Users').click(); // TODO: select data-e2e
+      login(User.LoginPolicyUser, undefined, true, null, () => {
         cy.pause();
-      });*/
+      });
     });
     it('should update the primary color');
     it('should update the warning color');

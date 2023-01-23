@@ -1,59 +1,44 @@
 import { ensureProjectGrantExists } from 'support/api/grants';
 import {
-  ensureHumanIsGrantedProjectMember,
-  ensureHumanIsNotGrantedProjectMember,
+  ensureHumanIsOrgMember,
   ensureHumanIsNotOrgMember,
   ensureHumanIsNotProjectMember,
-  ensureHumanIsOrgMember,
   ensureHumanIsProjectMember,
 } from 'support/api/members';
 import { ensureOrgExists } from 'support/api/orgs';
-import { ensureProjectExists } from 'support/api/projects';
-import { ensureRoleDoesntExist } from 'support/api/roles';
-import { newTarget } from 'support/api/target';
-import { ensureHumanDoesntExist, ensureHumanExists } from 'support/api/users';
-import { ZITADELTarget } from 'support/commands';
-import { loginname } from 'support/login/login';
+import { ensureHumanUserExists, ensureUserDoesntExist } from 'support/api/users';
+import { loginname } from 'support/login/users';
+import { apiAuth } from '../../support/api/apiauth';
+import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from '../../support/api/projects';
 
 describe('permissions', () => {
-  const targetOrg = 'e2epermissionsmyorg';
-  const foreignOrg = 'e2epermissionsforeignorg';
-
   beforeEach(() => {
-    newTarget(targetOrg).as('target');
+    apiAuth().as('api');
   });
 
   describe('management', () => {
-    const testManagerLoginname = loginname('e2ehumanmanager', targetOrg);
+    const testManagerLoginname = loginname('e2ehumanmanager', Cypress.env('ORGANIZATION'));
     function testAuthorizations(
       roles: string[],
-      beforeCreate: (target: ZITADELTarget, userId: number) => void,
-      beforeMutate: (target: ZITADELTarget, userId: number) => void,
-      navigate: (target: ZITADELTarget, userId: number) => void,
+      beforeCreate: Mocha.HookFunction,
+      beforeMutate: Mocha.HookFunction,
+      navigate: Mocha.HookFunction,
     ) {
-      beforeEach(() => {
-        cy.get<ZITADELTarget>('@target').then((target) => {
-          ensureHumanDoesntExist(target, testManagerLoginname);
-          ensureHumanExists(target, testManagerLoginname).as('userId');
-        });
+      beforeEach(function () {
+        ensureUserDoesntExist(this.api, testManagerLoginname);
+        ensureHumanUserExists(this.api, testManagerLoginname);
       });
 
       describe('create authorization', () => {
-        beforeEach(() => {
-          cy.get<ZITADELTarget>('@target').then((target) => {
-            cy.get<number>('@userId').then((userId) => {
-              beforeCreate(target, userId);
-              navigate(target, userId);
-            });
-          });
-        });
+        beforeEach(beforeCreate);
+        beforeEach(navigate);
 
         it('should add a manager', () => {
-          cy.get('[data-e2e="add-member-button"]').should('be.visible').click();
-          cy.get('[data-e2e="add-member-input"]').should('be.visible').type(testManagerLoginname);
-          cy.get('[data-e2e="user-option"]').should('be.visible').click();
-          cy.contains('[data-e2e="role-checkbox"]', roles[0]).should('be.visible').click();
-          cy.get('[data-e2e="confirm-add-member-button"]').should('be.visible').click();
+          cy.get('[data-e2e="add-member-button"]').click();
+          cy.get('[data-e2e="add-member-input"]').type(testManagerLoginname);
+          cy.get('[data-e2e="user-option"]').click();
+          cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
+          cy.get('[data-e2e="confirm-add-member-button"]').click();
           cy.shouldConfirmSuccess();
           cy.contains('[data-e2e="member-avatar"]', 'ee');
         });
@@ -62,21 +47,17 @@ describe('permissions', () => {
       describe('mutate authorization', () => {
         const rowSelector = `tr:contains(${testManagerLoginname})`;
 
+        beforeEach(beforeMutate);
+        beforeEach(navigate);
+
         beforeEach(() => {
-          cy.get<ZITADELTarget>('@target').then((target) => {
-            cy.get<number>('@userId').then((userId) => {
-              beforeMutate(target, userId);
-              navigate(target, userId);
-            });
-            cy.contains('[data-e2e="member-avatar"]', 'ee').should('be.visible').click();
+          cy.contains('[data-e2e="member-avatar"]', 'ee').click();
             cy.get(rowSelector).as('managerRow');
           });
-        });
 
         it('should remove a manager', () => {
-          // TODO: Is there a way to make th button visible?
           cy.get('@managerRow').find('[data-e2e="remove-member-button"]').click({ force: true });
-          cy.get('[data-e2e="confirm-dialog-button"]').should('be.visible').click();
+          cy.get('[data-e2e="confirm-dialog-button"]').click();
           cy.shouldConfirmSuccess();
           cy.shouldNotExist({
             selector: rowSelector,
@@ -89,8 +70,8 @@ describe('permissions', () => {
           cy.get('@managerRow')
             .contains('[data-e2e="role"]', roles[0])
             .find('[data-e2e="remove-role-button"]')
-            .click({ force: true }); // TODO: Is there a way to make th button visible?
-          cy.get('[data-e2e="confirm-dialog-button"]').should('be.visible').click();
+            .click({ force: true }); // TODO: Is this a bug?
+          cy.get('[data-e2e="confirm-dialog-button"]').click();
           cy.shouldConfirmSuccess();
           cy.get('@managerRow')
             .find('[data-e2e="remove-role-button"]')
@@ -107,36 +88,33 @@ describe('permissions', () => {
 
       testAuthorizations(
         roles.map((role) => role.display),
-        (target: ZITADELTarget, userId: number) => {
-          ensureHumanIsNotOrgMember(target, userId, roles[0].internal);
+        function () {
+          ensureHumanIsNotOrgMember(this.api, testManagerLoginname);
         },
-        (target: ZITADELTarget, userId: number) => {
-          ensureHumanIsNotOrgMember(target, userId, roles[0].internal);
+        function () {
+          ensureHumanIsNotOrgMember(this.api, testManagerLoginname);
           ensureHumanIsOrgMember(
-            target,
-            userId,
+            this.api,
+            testManagerLoginname,
             roles.map((role) => role.internal),
           );
         },
-        (target: ZITADELTarget) => {
-          cy.visit(`/org?org=${target.orgId}`);
+        () => {
+          cy.visit('/orgs');
+          cy.contains('tr', Cypress.env('ORGANIZATION')).click();
         },
       );
     });
 
     describe('projects', () => {
       describe('owned projects', () => {
-        function visitOwnedProject(target: ZITADELTarget) {
-          cy.get<number>('@projectId').then((projectId) => {
-            cy.visit(`/projects/${projectId}?org=${target.orgId}`);
+        beforeEach(function () {
+          ensureProjectExists(this.api, 'e2eprojectpermission').as('projectId');
           });
-        }
 
-        beforeEach(() => {
-          cy.get<ZITADELTarget>('@target').then((target) => {
-            ensureProjectExists(target, 'e2ecreateauthorization').as('projectId');
-          });
-        });
+        const visitOwnedProject: Mocha.HookFunction = function () {
+          cy.visit(`/projects/${this.projectId}`);
+        };
 
         describe('authorizations', () => {
           const roles = [
@@ -146,21 +124,17 @@ describe('permissions', () => {
 
           testAuthorizations(
             roles.map((role) => role.display),
-            (target: ZITADELTarget, userId: number) => {
-              cy.get<number>('@projectId').then((projectId) => {
-                ensureHumanIsNotProjectMember(target, projectId, userId, roles[0].internal);
-              });
+            function () {
+              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname);
             },
-            (target: ZITADELTarget, userId: number) => {
-              cy.get<number>('@projectId').then((projectId) => {
-                ensureHumanIsNotProjectMember(target, projectId, userId, roles[0].internal);
+            function () {
+              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname);
                 ensureHumanIsProjectMember(
-                  target,
-                  projectId,
-                  userId,
+                this.api,
+                this.projectId,
+                testManagerLoginname,
                   roles.map((role) => role.internal),
                 );
-              });
             },
             visitOwnedProject,
           );
@@ -169,22 +143,19 @@ describe('permissions', () => {
         describe('roles', () => {
           const testRoleName = 'e2eroleundertestname';
 
-          beforeEach(() => {
-            cy.get<ZITADELTarget>('@target').then((target) => {
-              cy.get<number>('@projectId').then((projectId) => {
-                ensureRoleDoesntExist(target, projectId, testRoleName);
-                visitOwnedProject(target);
+          beforeEach(function () {
+            ensureProjectResourceDoesntExist(this.api, this.projectId, Roles, testRoleName);
               });
-            });
-          });
+
+          beforeEach(visitOwnedProject);
 
           it('should add a role', () => {
-            cy.get('[data-e2e="sidenav-element-roles"]').should('be.visible').click();
-            cy.get('[data-e2e="add-new-role"]').should('be.visible').click();
-            cy.get('[formcontrolname="key"]').should('be.visible').type(testRoleName);
-            cy.get('[formcontrolname="displayName"]').should('be.visible').type('e2eroleundertestdisplay');
-            cy.get('[formcontrolname="group"]').should('be.visible').type('e2eroleundertestgroup');
-            cy.get('[data-e2e="save-button"]').should('be.visible').click();
+            cy.get('[data-e2e="sidenav-element-roles"]').click();
+            cy.get('[data-e2e="add-new-role"]').click();
+            cy.get('[formcontrolname="key"]').type(testRoleName);
+            cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
+            cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
+            cy.get('[data-e2e="save-button"]').click();
             cy.shouldConfirmSuccess();
             cy.contains('tr', testRoleName);
           });
@@ -193,56 +164,44 @@ describe('permissions', () => {
       });
 
       describe('granted projects', () => {
+        beforeEach(function () {
+          ensureOrgExists(this.api, 'e2eforeignorg')
+            .as('foreignOrgId')
+            .then((foreignOrgId) => {
+              ensureProjectExists(this.api, 'e2eprojectgrants', foreignOrgId)
+                .as('projectId')
+                .then((projectId) => {
+                  ensureProjectGrantExists(this.api, foreignOrgId, projectId).as('grantId');
+                });
+            });
+        });
+
+        const visitGrantedProject: Mocha.HookFunction = function () {
+          cy.visit(`/granted-projects/${this.projectId}/grant/${this.grantId}`);
+        };
+
         describe('authorizations', () => {
           const roles = [
             { internal: 'PROJECT_GRANT_OWNER', display: 'Project Grant Owner' },
             { internal: 'PROJECT_GRANT_OWNER_VIEWER', display: 'Project Grant Owner Viewer' },
           ];
 
-          beforeEach(() => {
-            cy.get<ZITADELTarget>('@target').then((target) => {
-              ensureOrgExists(target, foreignOrg)
-                .as('foreignOrgTarget')
-                .then((foreignOrgTarget) => {
-                  ensureProjectExists(foreignOrgTarget, 'e2eprojectgrants')
-                    .as('foreignProjectId')
-                    .then((foreignProjectId) => {
-                      ensureProjectGrantExists(foreignOrgTarget, foreignProjectId, target.orgId).as('grantId');
-                    });
-                });
-            });
-          });
-
           testAuthorizations(
             roles.map((role) => role.display),
-            (target: ZITADELTarget, userId: number) => {
-              cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
-                cy.get<number>('@grantId').then((grantId) => {
-                  ensureHumanIsNotGrantedProjectMember(target, foreignProjectId, grantId, userId, roles[0].internal);
-                });
-              });
+            function () {
+              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname, this.grantId);
             },
-            (target: ZITADELTarget, userId: number) => {
-              cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
-                cy.get<number>('@grantId').then((grantId) => {
-                  ensureHumanIsNotGrantedProjectMember(target, foreignProjectId, grantId, userId, roles[0].internal);
-                  ensureHumanIsGrantedProjectMember(
-                    target,
-                    foreignProjectId,
-                    grantId,
-                    userId,
+            function () {
+              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname, this.grantId);
+              ensureHumanIsProjectMember(
+                this.api,
+                this.projectId,
+                testManagerLoginname,
                     roles.map((role) => role.internal),
+                this.grantId,
                   );
-                });
-              });
             },
-            (target: ZITADELTarget) => {
-              cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
-                cy.get<number>('@grantId').then((grantId) => {
-                  cy.visit(`/granted-projects/${foreignProjectId}/grant/${grantId}?org=${target.orgId}`);
-                });
-              });
-            },
+            visitGrantedProject,
           );
         });
       });

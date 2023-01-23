@@ -1,24 +1,22 @@
-import { ZITADELTarget } from 'support/commands';
-import { standardCreate, standardEnsureExists, standardSearch } from './standard';
+import { ensureItemExists } from './ensure';
+import { getOrgUnderTest } from './orgs';
+import { API } from './types';
 
-export function ensureProjectGrantExists(target: ZITADELTarget, projectId: number, grantOrgId: number) {
-  return standardEnsureExists(create(target, projectId, grantOrgId), () => search(target, projectId, grantOrgId));
-}
-
-function create(target: ZITADELTarget, projectId: number, grantedOrgId: number) {
-  return standardCreate<number>(
-    target,
-    `${target.mgmtBaseURL}/projects/${projectId}/grants`,
-    { grantedOrgId: grantedOrgId },
+export function ensureProjectGrantExists(
+  api: API,
+  foreignOrgId: number,
+  foreignProjectId: number,
+): Cypress.Chainable<number> {
+  return getOrgUnderTest(api).then((orgUnderTest) => {
+    return ensureItemExists(
+      api,
+      `${api.mgmtBaseURL}/projectgrants/_search`,
+      (grant: any) => grant.grantedOrgId == orgUnderTest && grant.projectId == foreignProjectId,
+      `${api.mgmtBaseURL}/projects/${foreignProjectId}/grants`,
+      { granted_org_id: orgUnderTest },
+      foreignOrgId,
+    'grantId',
     'grantId',
   );
-}
-
-function search(target: ZITADELTarget, projectId: number, grantedOrgId: number) {
-  return standardSearch<number>(
-    target,
-    `${target.mgmtBaseURL}/projects/${projectId}/grants/_search`,
-    (entity) => entity.projectId == projectId && entity.grantedOrgId == grantedOrgId,
-    'grantId',
-  );
+  });
 }

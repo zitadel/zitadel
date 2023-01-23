@@ -1,48 +1,53 @@
-import { ZITADELTarget } from 'support/commands';
-import { standardCreate, standardRemove } from './standard';
+import { requestHeaders } from './apiauth';
+import { API } from './types';
+import { ensureSetting } from './ensure';
+
+export enum Policy {
+  Label = 'label',
+}
+
+export function resetPolicy(api: API, policy: Policy) {
+  cy.request({
+    method: 'DELETE',
+    url: `${api.mgmtBaseURL}/policies/${policy}`,
+    headers: requestHeaders(api),
+  }).then((res) => {
+    expect(res.status).to.equal(200);
+    return null;
+  });
+}
 
 export function ensureDomainPolicy(
-  target: ZITADELTarget,
+  api: API,
   userLoginMustBeDomain: boolean,
   validateOrgDomains: boolean,
   smtpSenderAddressMatchesInstanceDomain: boolean,
+): Cypress.Chainable<number> {
+  return ensureSetting(
+    api,
+    `${api.adminBaseURL}/policies/domain`,
+    (body: any) => {
+      const result = {
+        sequence: parseInt(<string>body.policy?.details?.sequence),
+        id: body.policy?.details?.resourceOwner,
+        entity: null,
+      };
+      if (
+        body.policy &&
+        (body.policy.userLoginMustBeDomain ? body.policy.userLoginMustBeDomain : false) == userLoginMustBeDomain &&
+        (body.policy.validateOrgDomains ? body.policy.validateOrgDomains : false) == validateOrgDomains &&
+        (body.policy.smtpSenderAddressMatchesInstanceDomain ? body.policy.smtpSenderAddressMatchesInstanceDomain : false) ==
+          smtpSenderAddressMatchesInstanceDomain
 ) {
-  resetDomainPolicy(target);
-  setDomainPolicy(target, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain);
-  return getDomainPolicy(target).should(
-    (res) =>
-      res.body.userLoginMustBeDomain == userLoginMustBeDomain &&
-      res.body.validateOrgDomains == validateOrgDomains &&
-      res.body.smtpSenderAddressMatchesInstanceDomain == smtpSenderAddressMatchesInstanceDomain,
-  );
-}
-
-function resetDomainPolicy(target: ZITADELTarget) {
-  return standardRemove(target, `${target.adminBaseURL}/orgs/${target.orgId}/policies/domain`);
-}
-
-function setDomainPolicy(
-  target: ZITADELTarget,
-  userLoginMustBeDomain: boolean,
-  validateOrgDomains: boolean,
-  smtpSenderAddressMatchesInstanceDomain: boolean,
-) {
-  return standardCreate(
-    target,
-    `${target.adminBaseURL}/orgs/${target.orgId}/policies/domain`,
+        return { ...result, entity: body.policy };
+      }
+      return result;
+    },
+    `${api.adminBaseURL}/policies/domain`,
     {
       userLoginMustBeDomain: userLoginMustBeDomain,
       validateOrgDomains: validateOrgDomains,
       smtpSenderAddressMatchesInstanceDomain: smtpSenderAddressMatchesInstanceDomain,
     },
-    'no id',
   );
-}
-
-function getDomainPolicy(target: ZITADELTarget) {
-  return cy.request({
-    method: 'GET',
-    url: `${target.adminBaseURL}/orgs/${target.orgId}/policies/domain`,
-    headers: target.headers,
-  });
 }

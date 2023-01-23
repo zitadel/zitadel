@@ -96,7 +96,6 @@
                 [routerLinkActive]="['active']"
                 [routerLinkActiveOptions]="{ exact: true }"
                 [routerLink]="['/']"
-                data-e2e="dashboard-nav"
               >
                 <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
               </a>
@@ -108,7 +107,6 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org']"
-                    data-e2e="org-nav"
                   >
                     <span class="label">{{ 'MENU.ORGANIZATION' | translate }}</span>
                   </a>
@@ -120,7 +118,6 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/projects']"
-                    data-e2e="projects-nav"
                   >
                     <div class="c_label">
                       <span> {{ 'MENU.PROJECT' | translate }} </span>
@@ -142,7 +139,6 @@
                     [routerLinkActive]="['active']"
                     [routerLink]="['/users']"
                     [routerLinkActiveOptions]="{ exact: false }"
-                    data-e2e="users-nav"
                   >
                     <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
                   </a>
@@ -154,7 +150,6 @@
                     [routerLinkActive]="['active']"
                     [routerLink]="['/grants']"
                     [routerLinkActiveOptions]="{ exact: true }"
-                    data-e2e="grants-nav"
                   >
                     <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
                   </a>
@@ -166,7 +161,6 @@
                     [routerLinkActive]="['active']"
                     [routerLink]="['/actions']"
                     [routerLinkActiveOptions]="{ exact: true }"
-                    data-e2e="actions-nav"
                   >
                     <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
                   </a>
@@ -178,7 +172,6 @@
                     [routerLinkActive]="['active']"
                     [routerLink]="['/domains']"
                     [routerLinkActiveOptions]="{ exact: true }"
-                    data-e2e="domains-nav"
                   >
                     <span class="label">{{ 'MENU.DOMAINS' | translate }}</span>
                   </a>
@@ -191,7 +184,6 @@
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org-settings']"
                     *ngIf="['policy.read'] | hasRole | async"
-                    data-e2e="settings-nav"
                   >
                     <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
                   </a>

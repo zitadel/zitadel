@@ -1,104 +1,68 @@
+import { apiAuth } from '../../support/api/apiauth';
+import { ensureHumanUserExists, ensureUserDoesntExist } from '../../support/api/users';
+import { loginname } from '../../support/login/users';
 import { ensureDomainPolicy } from '../../support/api/policies';
-import { ZITADELTarget } from 'support/commands';
-import { newTarget } from 'support/api/target';
-import { ensureHumanDoesntExist, ensureHumanExists } from 'support/api/users';
-import { loginname } from 'support/login/login';
 
 describe('humans', () => {
-  const targetOrg = 'e2ehumans';
-  beforeEach(() => {
-    newTarget(targetOrg).as('target');
-  });
+  const humansPath = `/users?type=human`;
 
   [
     { mustBeDomain: false, addName: 'e2ehumanusernameaddGlobal', removeName: 'e2ehumanusernameremoveGlobal' },
     { mustBeDomain: false, addName: 'e2ehumanusernameadd@test.com', removeName: 'e2ehumanusernameremove@test.com' },
-    { mustBeDomain: true, addName: 'e2ehumanusernameaddSimple', removeName: 'e2ehumanusernameremoveSimple' },
+    { mustBeDomain: true, addName: 'e2ehumanusernameadd', removeName: 'e2ehumanusernameremove' },
   ].forEach((user) => {
-    describe(`${user.mustBeDomain ? 'must' : 'can'} be domain`, () => {
       beforeEach(() => {
-        cy.get<ZITADELTarget>('@target').then((target) => {
-          ensureDomainPolicy(target, user.mustBeDomain, true, false);
-        });
+      apiAuth().as('api');
       });
 
-      describe(`add ${user.addName}`, () => {
-        beforeEach(`ensure it doesn't exist already`, () => {
-          cy.get<ZITADELTarget>('@target').then((target) => {
-            ensureHumanDoesntExist(target, user.addName);
-            navigateToUsers(target);
-          });
+    describe(`add "${user.addName}" with domain setting "${user.mustBeDomain}"`, () => {
+      beforeEach(`ensure it doesn't exist already`, function () {
+        ensureDomainPolicy(this.api, user.mustBeDomain, true, false);
+        ensureUserDoesntExist(this.api, user.addName);
+        cy.visit(humansPath);
         });
 
         it('should add a user', () => {
-          usernameCellDoesntExist(user.addName);
-          cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
+        cy.get('[data-e2e="create-user-button"]').click();
           cy.url().should('contain', 'users/create');
-          cy.get('[formcontrolname="email"]').should('be.visible').type('dummy@dummy.com');
+        cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
           //force needed due to the prefilled username prefix
-          cy.get('[formcontrolname="userName"]').should('be.visible').type(user.addName);
-          cy.get('[formcontrolname="firstName"]').should('be.visible').type('e2ehumanfirstname');
-          cy.get('[formcontrolname="lastName"]').should('be.visible').type('e2ehumanlastname');
-          cy.get('[formcontrolname="phone"]').should('be.visible').type('+41 123456789');
-          cy.get('[data-e2e="create-button"]').should('be.visible').click();
+        cy.get('[formcontrolname="userName"]').type(user.addName);
+        cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
+        cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
+        cy.get('[formcontrolname="phone"]').type('+41 123456789');
+        cy.get('[data-e2e="create-button"]').click();
           cy.shouldConfirmSuccess();
           let loginName = user.addName;
           if (user.mustBeDomain) {
-            loginName = loginname(user.addName, targetOrg);
+          loginName = loginname(user.addName, Cypress.env('ORGANIZATION'));
           }
-          // TODO: Should contain loginname, not username
-          cy.contains('[data-e2e="copy-loginname"]', user.addName).should('be.visible').click();
-          cy.clipboardMatches(user.addName);
-          cy.get<ZITADELTarget>('@target').then((target) => {
-            navigateToUsers(target);
-          });
-          usernameCellExists(user.addName);
+        cy.contains('[data-e2e="copy-loginname"]', loginName).click();
+        cy.clipboardMatches(loginName);
         });
       });
 
-      describe(`remove ${user.removeName}`, () => {
-        beforeEach('ensure it exists', () => {
-          cy.get<ZITADELTarget>('@target').then((target) => {
-            ensureHumanExists(target, user.removeName);
-            navigateToUsers(target);
-          });
+    describe(`remove "${user.removeName}" with domain setting "${user.mustBeDomain}"`, () => {
+      beforeEach('ensure it exists', function () {
+        ensureHumanUserExists(this.api, user.removeName);
+        cy.visit(humansPath);
         });
 
-        let test: Mocha.TestFunction | Mocha.PendingTestFunction = it;
+      let loginName = user.removeName;
         if (user.mustBeDomain) {
-          // This is flaky
-          test = it.skip;
+        loginName = loginname(user.removeName, Cypress.env('ORGANIZATION'));
         }
-
-        test('should delete a human user', () => {
-          usernameCellExists(user.removeName)
-            .parents('tr')
-            .find('[data-e2e="enabled-delete-button"]')
-            // TODO: Is there a way to make the button visible?
-            .click({ force: true });
-          cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.visible').type(user.removeName);
-          cy.get('[data-e2e="confirm-dialog-button"]').should('be.visible').click();
+      it('should delete a human user', () => {
+        const rowSelector = `tr:contains(${user.removeName})`;
+        cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(loginName);
+        cy.get('[data-e2e="confirm-dialog-button"]').click();
           cy.shouldConfirmSuccess();
-          usernameCellDoesntExist(user.removeName);
+        cy.shouldNotExist({
+          selector: rowSelector,
+          timeout: { ms: 2000, errMessage: 'timed out before human disappeared from the table' },
         });
       });
     });
   });
 });
-
-function navigateToUsers(target: ZITADELTarget) {
-  // directly going to users is not working, atm
-  cy.visit(`/org?org=${target.orgId}`);
-  cy.get('[data-e2e="users-nav"]').should('be.visible').click();
-  cy.get('[data-e2e="list-humans"] button').should('be.visible').click();
-}
-
-function usernameCellDoesntExist(username: string) {
-  expect(Cypress.$('[data-e2e="username-cell"]')).to.satisfy(($el: JQuery<HTMLElement>) => {
-    return $el.length == 0 || cy.wrap($el).getContainingExactText(username).should('not.exist');
-  });
-}
-
-function usernameCellExists(username: string) {
-  return cy.get('[data-e2e="username-cell"]').getContainingExactText(username).should('exist');
-}

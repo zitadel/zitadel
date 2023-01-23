@@ -1,10 +1,6 @@
 import { defineConfig } from 'cypress';
-import * as CRD from 'chrome-remote-interface'
 
 let tokensCache = new Map<string,string>()
-let crdPort: number
-let crdClient: Promise<CRD.Client> = null
-let browserName: string
 
 export default defineConfig({
   reporter: 'mochawesome',
@@ -26,41 +22,18 @@ export default defineConfig({
 
   e2e: {
     baseUrl: baseUrl(),
+    experimentalSessionAndOrigin: true,
     setupNodeEvents(on, config) {
-      on("before:browser:launch", (browser, browserCfg) => {
-        browserName = browser.name
-        const portArg = '--remote-debugging-port'
-        const passedPortArg = browserCfg.args.find(arg => arg.startsWith(portArg))
-        crdPort = parseInt(passedPortArg?.split('=')[1]) || parseInt(process.env.CYPRESS_REMOTE_DEBUGGING_PORT) || 4201
-        if (!passedPortArg) {
-          browserCfg.args.push(`${portArg}=${crdPort}`)
-        }
-      }),
+
       on('task', {
         safetoken({key, token}) {
           tokensCache.set(key,token);
           return null
-        },
+        }
+      })
+      on('task', {
         loadtoken({key}): string | null {
           return tokensCache.get(key) || null;
-        },
-        generateOTP: require("cypress-otp"),
-        resetCRDInterface: async () => {
-          if (browserName != "crome"){
-            return Promise.resolve(null)
-          }
-          if (crdClient) {
-            await (await crdClient).close()
-            crdClient = null
-          }
-          return Promise.resolve(null)
-        },
-        remoteDebuggerCommand: async (args) => {
-          if (browserName != 'chrome'){
-            throw new Error("remoteDebuggerCommand is only available when run in chrome");
-          }
-          crdClient = crdClient || CRD({port: crdPort});
-          return (await crdClient).send(args.event, args.params)
         }
       })
     },
