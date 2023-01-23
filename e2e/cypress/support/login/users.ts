@@ -146,4 +146,3 @@ export enum User {
   function stripProtocol(url: string): string {
     return url.replace('http://', '').replace('https://', '');
   }
-  
