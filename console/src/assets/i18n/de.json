@@ -1151,7 +1151,8 @@
         "VP": "Telefonnummerverifikation",
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
-        "PL": "Passwortlos"
+        "PL": "Passwortlos",
+        "PC:": "Passwordwechsel"
       },
       "CHIPS": {
         "firstname": "Vorname",

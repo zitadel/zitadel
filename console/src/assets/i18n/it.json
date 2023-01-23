@@ -1152,7 +1152,8 @@
         "VP": "Verificazione del telefono",
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
-        "PL": "Autenticazione Passwordless"
+        "PL": "Autenticazione Passwordless",
+        "PC:": "Cambiamento della password"
       },
       "CHIPS": {
         "firstname": "Nome",

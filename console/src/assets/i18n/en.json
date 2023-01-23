@@ -1151,7 +1151,8 @@
         "VP": "Verify Phone",
         "PR": "Password Reset",
         "DC": "Domain Claim",
-        "PL": "Passwordless"
+        "PL": "Passwordless",
+        "PC:": "Password Change"
       },
       "CHIPS": {
         "firstname": "Firstname",

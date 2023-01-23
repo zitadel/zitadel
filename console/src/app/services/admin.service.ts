@@ -208,6 +208,12 @@ import {
   GetNotificationPolicyResponse,
   UpdateNotificationPolicyRequest,
   UpdateNotificationPolicyResponse,
+  GetDefaultPasswordChangeMessageTextResponse,
+  GetDefaultPasswordChangeMessageTextRequest,
+  GetCustomPasswordChangeMessageTextResponse,
+  SetDefaultPasswordChangeMessageTextRequest,
+  SetDefaultPasswordChangeMessageTextResponse,
+  GetCustomPasswordChangeMessageTextRequest,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -348,6 +354,24 @@ export class AdminService {
     req: SetDefaultPasswordlessRegistrationMessageTextRequest,
   ): Promise<SetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultPasswordChangeMessageText(
+    req: GetDefaultPasswordChangeMessageTextRequest,
+  ): Promise<GetDefaultPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomPasswordChangeMessageText(
+    req: GetCustomPasswordChangeMessageTextRequest,
+  ): Promise<GetCustomPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultPasswordChangeMessageText(
+    req: SetDefaultPasswordChangeMessageTextRequest,
+  ): Promise<SetDefaultPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
   }
 
   public SetUpOrg(org: SetUpOrgRequest.Org, human: SetUpOrgRequest.Human): Promise<SetUpOrgResponse.AsObject> {

@@ -1151,7 +1151,8 @@
         "VP": "Vérifier le téléphone",
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
-        "PL": "Sans mot de passe"
+        "PL": "Sans mot de passe",
+        "PC:": "Changement de mot de passe"
       },
       "CHIPS": {
         "firstname": "Prénom",

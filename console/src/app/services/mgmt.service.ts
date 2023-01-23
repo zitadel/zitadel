@@ -110,6 +110,8 @@ import {
   GetCustomInitMessageTextResponse,
   GetCustomLoginTextsRequest,
   GetCustomLoginTextsResponse,
+  GetCustomPasswordChangeMessageTextRequest,
+  GetCustomPasswordChangeMessageTextResponse,
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
@@ -126,6 +128,8 @@ import {
   GetDefaultLabelPolicyResponse,
   GetDefaultLoginTextsRequest,
   GetDefaultLoginTextsResponse,
+  GetDefaultPasswordChangeMessageTextRequest,
+  GetDefaultPasswordChangeMessageTextResponse,
   GetDefaultPasswordComplexityPolicyRequest,
   GetDefaultPasswordComplexityPolicyResponse,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
@@ -347,6 +351,8 @@ import {
   ResetCustomInitMessageTextToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
   ResetCustomLoginTextsToDefaultResponse,
+  ResetCustomPasswordChangeMessageTextToDefaultRequest,
+  ResetCustomPasswordChangeMessageTextToDefaultResponse,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse,
   ResetCustomPasswordResetMessageTextToDefaultRequest,
@@ -637,6 +643,26 @@ export class ManagementService {
     req: GetDefaultPasswordlessRegistrationMessageTextRequest,
   ): Promise<GetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultPasswordChangeMessageText(
+    req: GetDefaultPasswordChangeMessageTextRequest,
+  ): Promise<GetDefaultPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomPasswordChangeMessageText(
+    req: GetCustomPasswordChangeMessageTextRequest,
+  ): Promise<GetCustomPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomPasswordChangeMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomPasswordChangeMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordChangeMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomPasswordChangeMessageTextToDefault(req, null).then((resp) => resp.toObject());
   }
 
   public getCustomPasswordlessRegistrationMessageText(
