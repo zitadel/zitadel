@@ -35,7 +35,7 @@ To apply best practices to your production setup we created a step by step check
 ### ZITADEL configuration
 - [ ] configure a valid [SMTP Server](/docs/guides/manage/console/instance-settings#smtp) and test emails
 - [ ] Add [Custom Branding](/docs/guides/manage/customize/branding) if required
-- [ ] configure a valid [SMS Service](https://zitadel.com/docs/guides/manage/console/instance-settings#sms) such as Twilio if needed
+- [ ] configure a valid [SMS Service](/docs/guides/manage/console/instance-settings#sms) such as Twilio if needed
 - [ ] configure your privacy policy, terms of service and a help Link if needed
 - [ ] secure your [masterkey](https://zitadel.com/docs/self-hosting/manage/configure)
 - [ ] declare and apply zitadel configuration using the zitadel terraform [provider](https://github.com/zitadel/terraform-provider-zitadel) 
