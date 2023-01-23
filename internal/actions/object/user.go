@@ -11,7 +11,21 @@ import (
 )
 
 func UserFromExternalUser(c *actions.FieldConfig, user *domain.ExternalUser) goja.Value {
-	return c.Runtime.ToValue(&externalUser{
+	return c.Runtime.ToValue(externalUserFromDomain(user))
+}
+
+func externalUsersFromDomain(users []*domain.ExternalUser) []*externalUser {
+	externalUsers := make([]*externalUser, len(users))
+
+	for i, user := range users {
+		externalUsers[i] = externalUserFromDomain(user)
+	}
+
+	return externalUsers
+}
+
+func externalUserFromDomain(user *domain.ExternalUser) *externalUser {
+	return &externalUser{
 		ExternalId:    user.ExternalUserID,
 		ExternalIdpId: user.ExternalUserID,
 		Human: human{
@@ -25,7 +39,7 @@ func UserFromExternalUser(c *actions.FieldConfig, user *domain.ExternalUser) goj
 			Phone:             user.Phone,
 			IsPhoneVerified:   user.IsPhoneVerified,
 		},
-	})
+	}
 }
 
 func UserFromHuman(c *actions.FieldConfig, user *domain.Human) goja.Value {
@@ -95,6 +109,7 @@ func humanFromQuery(c *actions.FieldConfig, user *query.User) goja.Value {
 		},
 	})
 }
+
 func machineFromQuery(c *actions.FieldConfig, user *query.User) goja.Value {
 	return c.Runtime.ToValue(&machineUser{
 		Id:                 user.ID,
