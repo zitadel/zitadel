@@ -17,25 +17,24 @@
   </button>
 </ng-template>
 
-<cnsl-card *ngIf="notificationData">
-  <div class="complexity-content">
-    <div class="row">
-      <mat-checkbox
-        class="slide-toggle"
-        color="primary"
-        name="hasUppercase"
-        ngDefaultControl
-        [(ngModel)]="notificationData.passwordChange"
-        [disabled]="(['policy.write'] | hasRole | async) === false"
-      >
-        <div class="slide-toggle-row">
-          <mat-icon class="icon" svgIcon="mdi_format-letter-case-upper"></mat-icon>
-          <span class="left-desc">{{ 'POLICY.NOTIFICATION.PASSWORDCHANGE' | translate }}</span>
-        </div>
-      </mat-checkbox>
+<div class="notification-policy-card">
+  <cnsl-card *ngIf="notificationData">
+    <div class="notification-policy-content">
+      <div class="row">
+        <mat-checkbox
+          class="slide-toggle"
+          color="primary"
+          name="hasUppercase"
+          ngDefaultControl
+          [(ngModel)]="notificationData.passwordChange"
+          [disabled]="(['policy.write'] | hasRole | async) === false"
+        >
+          {{ 'POLICY.NOTIFICATION.PASSWORDCHANGE' | translate }}
+        </mat-checkbox>
+      </div>
     </div>
-  </div>
-</cnsl-card>
+  </cnsl-card>
+</div>
 
 <div class="btn-container">
   <button
