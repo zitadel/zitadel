@@ -214,6 +214,8 @@ import {
   SetDefaultPasswordChangeMessageTextRequest,
   SetDefaultPasswordChangeMessageTextResponse,
   GetCustomPasswordChangeMessageTextRequest,
+  AddNotificationPolicyRequest,
+  AddNotificationPolicyResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -521,6 +523,10 @@ export class AdminService {
 
   public updateNotificationPolicy(req: UpdateNotificationPolicyRequest): Promise<UpdateNotificationPolicyResponse.AsObject> {
     return this.grpcService.admin.updateNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public addNotificationPolicy(req: AddNotificationPolicyRequest): Promise<AddNotificationPolicyResponse.AsObject> {
+    return this.grpcService.admin.addNotificationPolicy(req, null).then((resp) => resp.toObject());
   }
 
   /* security policy */

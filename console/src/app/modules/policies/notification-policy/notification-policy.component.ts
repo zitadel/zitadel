@@ -1,6 +1,7 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import {
+  AddNotificationPolicyRequest,
   GetNotificationPolicyResponse as AdminGetNotificationPolicyResponse,
   UpdateNotificationPolicyRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
@@ -8,7 +9,7 @@ import {
   AddCustomNotificationPolicyRequest,
   GetNotificationPolicyResponse as MgmtGetNotificationPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { NotificationPolicy, PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { NotificationPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -33,6 +34,8 @@ export class NotificationPolicyComponent implements OnInit {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
 
+  public isDefault: boolean = false;
+  private hasNotificationPolicy: boolean = false;
   constructor(private toast: ToastService, private injector: Injector, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
@@ -50,12 +53,21 @@ export class NotificationPolicyComponent implements OnInit {
   public fetchData(): void {
     this.loading = true;
 
-    this.getData().then((data) => {
-      if (data.policy) {
-        this.notificationData = data.policy;
+    this.getData()
+      .then((data) => {
+        if (data.policy) {
+          this.notificationData = data.policy;
+          this.isDefault = data.policy.isDefault;
+          this.loading = false;
+        }
+      })
+      .catch((error) => {
         this.loading = false;
-      }
-    });
+        if (error && error.code === 5) {
+          console.log(error);
+          this.hasNotificationPolicy = false;
+        }
+      });
   }
 
   private async getData(): Promise<
@@ -87,6 +99,7 @@ export class NotificationPolicyComponent implements OnInit {
             .resetNotificationPolicyToDefault()
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+              this.isDefault = true;
               setTimeout(() => {
                 this.fetchData();
               }, 1000);
@@ -109,6 +122,7 @@ export class NotificationPolicyComponent implements OnInit {
             (this.service as ManagementService)
               .addCustomNotificationPolicy(req)
               .then(() => {
+                this.isDefault = false;
                 this.toast.showInfo('POLICY.TOAST.SET', true);
               })
               .catch((error) => {
@@ -120,6 +134,7 @@ export class NotificationPolicyComponent implements OnInit {
             (this.service as ManagementService)
               .updateCustomNotificationPolicy(req)
               .then(() => {
+                this.isDefault = false;
                 this.toast.showInfo('POLICY.TOAST.SET', true);
               })
               .catch((error) => {
@@ -128,26 +143,34 @@ export class NotificationPolicyComponent implements OnInit {
           }
           break;
         case PolicyComponentServiceType.ADMIN:
-          const req = new UpdateNotificationPolicyRequest();
-          req.setPasswordChange(this.notificationData.passwordChange);
-          (this.service as AdminService)
-            .updateNotificationPolicy(req)
-            .then(() => {
-              this.toast.showInfo('POLICY.TOAST.SET', true);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
+          if (this.hasNotificationPolicy) {
+            const req = new UpdateNotificationPolicyRequest();
+            req.setPasswordChange(this.notificationData.passwordChange);
+            (this.service as AdminService)
+              .updateNotificationPolicy(req)
+              .then(() => {
+                this.isDefault = false;
+                this.toast.showInfo('POLICY.TOAST.SET', true);
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
+          } else {
+            const req = new AddNotificationPolicyRequest();
+            req.setPasswordChange(this.notificationData.passwordChange);
+            (this.service as AdminService)
+              .addNotificationPolicy(req)
+              .then(() => {
+                this.isDefault = false;
+                this.hasNotificationPolicy = true;
+                this.toast.showInfo('POLICY.TOAST.SET', true);
+              })
+              .catch((error) => {
+                this.toast.showError(error);
+              });
+          }
           break;
       }
-    }
-  }
-
-  public get isDefault(): boolean {
-    if (this.notificationData && this.serviceType === PolicyComponentServiceType.MGMT) {
-      return (this.notificationData as NotificationPolicy.AsObject).isDefault;
-    } else {
-      return false;
     }
   }
 }
