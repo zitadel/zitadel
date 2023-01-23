@@ -2,7 +2,9 @@
   <h1 class="views-title">{{ 'IAM.EVENTS.TITLE' | translate }}</h1>
   <p class="views-desc cnsl-secondary-text">{{ 'IAM.EVENTS.DESCRIPTION' | translate }}</p>
 
-  <cnsl-refresh-table (refreshed)="loadViews()" [dataSize]="dataSource.data.length" [loading]="loading$ | async">
+  <cnsl-refresh-table (refreshed)="refresh()" [dataSize]="dataSource.data.length" [loading]="loading$ | async">
+    <cnsl-filter-org actions (filterChanged)="applySearchQuery($any($event))" (filterOpen)="filterOpen = $event">
+    </cnsl-filter-org>
     <table [dataSource]="dataSource" mat-table class="table views-table" aria-label="Views" matSort>
       <ng-container matColumnDef="editor">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'IAM.EVENTS.EDITOR' | translate }}</th>
