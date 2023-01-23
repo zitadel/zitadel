@@ -41,7 +41,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] declare and apply zitadel configuration using the zitadel terraform [provider](https://github.com/zitadel/terraform-provider-zitadel) 
 
 ### Security
-- [ ] use a FQDN and a trusted valid certificate for external [TLS](https://zitadel.com/docs/self-hosting/manage/tls_modes#http2) connections
+- [ ] use a FQDN and a trusted valid certificate for external [TLS](/docs/self-hosting/manage/tls_modes#http2) connections
 - [ ] make use of different service accounts to secure ZITADEL within your hyperscaler or Kubernetes 
 - [ ] make use of a CDN service if needed to ease maintainability and firewall/DNS/WAF configuration
 - [ ] make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and cluster
