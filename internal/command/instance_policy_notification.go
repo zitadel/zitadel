@@ -103,22 +103,3 @@ func prepareChangeDefaultNotificationPolicy(
 		}, nil
 	}
 }
-
-func ExistsDefaultNotificationPolicy(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID string) (bool, error) {
-	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		OrderAsc().
-		AddQuery().
-		AggregateTypes(instance.AggregateType).
-		AggregateIDs(instanceID).
-		EventTypes(
-			instance.NotificationPolicyAddedEventType,
-		).Builder())
-	if err != nil {
-		return false, err
-	}
-
-	if len(events) > 0 {
-		return true, nil
-	}
-	return false, nil
-}
