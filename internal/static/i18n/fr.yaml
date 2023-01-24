@@ -433,6 +433,16 @@ Errors:
     CloseRows: L'instruction SQL n'a pas pu être terminée
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
+
+AggregateTypes:
+  action: Action
+  instance: Instance
+  key_pair: Paire de clés
+  org: Organisation
+  project: Projet
+  user: Utilisateur
+  usergrant: Subvention de l'utilisateur
+
 EventTypes:
   user:
     added: Utilisateur ajouté

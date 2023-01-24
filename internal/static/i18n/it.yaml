@@ -433,6 +433,16 @@ Errors:
     CloseRows: Lo statement SQL non può essere terminato
     SQLStatement: Lo statement SQL non può essere creato
     InvalidRequest: La richiesta non è valida
+
+AggregateTypes:
+  action: Azione
+  instance: Istanza
+  key_pair: Coppia di chiavi
+  org: Organizzazione
+  project: Progetto
+  user: Utente
+  usergrant: Sovvenzione utente
+
 EventTypes:
   user:
     added: Utente aggiunto
@@ -644,7 +654,7 @@ EventTypes:
       changed: Membro dell'organizzazione cambiato
       removed: Membro dell'organizzazione rimosso
       cascade:
-        removeD: Cascata di membri dell'organizzazione rimossa
+        removed: Cascata di membri dell'organizzazione rimossa
     iam:
       policy:
         added: Impostazioni IAM aggiunti
@@ -744,7 +754,7 @@ EventTypes:
       changed: Membro del progetto cambiato
       removed: Membro del progetto rimosso
       cascade:
-        removeD: Cascata di membri del progetto rimossa
+        removed: Cascata di membri del progetto rimossa
     role:
       added: Ruolo del progetto aggiunto
       changed: Il ruolo del progetto è cambiato
