@@ -19,11 +19,15 @@ func AuthRequestField(authRequest *domain.AuthRequest) func(c *actions.FieldConf
 
 func AuthRequestFromDomain(c *actions.FieldConfig, request *domain.AuthRequest) goja.Value {
 	return c.Runtime.ToValue(&authRequest{
-		Id:                       request.ID,
-		AgentId:                  request.AgentID,
-		CreationDate:             request.CreationDate,
-		ChangeDate:               request.ChangeDate,
-		BrowserInfo:              &browserInfo{},
+		Id:           request.ID,
+		AgentId:      request.AgentID,
+		CreationDate: request.CreationDate,
+		ChangeDate:   request.ChangeDate,
+		BrowserInfo: &browserInfo{
+			UserAgent:      request.BrowserInfo.UserAgent,
+			AcceptLanguage: request.BrowserInfo.AcceptLanguage,
+			RemoteIp:       request.BrowserInfo.RemoteIP,
+		},
 		ApplicationId:            request.ApplicationID,
 		CallbackUri:              request.CallbackURI,
 		TransferState:            request.TransferState,

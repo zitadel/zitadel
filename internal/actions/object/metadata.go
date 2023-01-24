@@ -68,9 +68,7 @@ type Metadata struct {
 	value []byte
 }
 
-// func AppendMetadataFunc(metadata *MetadataList) func(goja.FunctionCall) goja.Value {
 func (md *MetadataList) AppendMetadataFunc(call goja.FunctionCall) goja.Value {
-	// return func(call goja.FunctionCall) goja.Value {
 	if len(call.Arguments) != 2 {
 		panic("exactly 2 (key, value) arguments expected")
 	}
@@ -88,7 +86,6 @@ func (md *MetadataList) AppendMetadataFunc(call goja.FunctionCall) goja.Value {
 			value: value,
 		})
 	return nil
-	// }
 }
 
 func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
@@ -110,23 +107,15 @@ func MetadataListToDomain(metadataList *MetadataList) []*domain.Metadata {
 func MetadataField(metadata *MetadataList) func(c *actions.FieldConfig) interface{} {
 	return func(c *actions.FieldConfig) interface{} {
 		for _, md := range metadata.Metadata {
-			// var val interface{}
 			if json.Valid(md.value) {
 				err := json.Unmarshal(md.value, &md.Value)
 				if err != nil {
 					panic(err)
 				}
 			}
-
-			// metadata.Metadata[i] = &Metadata{
-			// 	Key:   md.Key,
-			// 	Value: c.Runtime.ToValue(val),
-			// 	value: md.value,
-			// }
 		}
 
 		return metadata.Metadata
-		// return MetadataListFromDomain(c, metadata)
 	}
 }
 
@@ -143,8 +132,7 @@ func MetadataListFromDomain(metadata []*domain.Metadata) *MetadataList {
 		}
 
 		list.Metadata[i] = &Metadata{
-			Key: md.Key,
-			// Value: c.Runtime.ToValue(val),
+			Key:   md.Key,
 			value: md.Value,
 		}
 	}

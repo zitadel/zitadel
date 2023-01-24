@@ -29,7 +29,6 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		return nil, err
 	}
 
-	// mutableMetas := &metas{m: user.Metadatas}
 	metadataList := object.MetadataListFromDomain(user.Metadatas)
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {
@@ -122,7 +121,6 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 	}
 
 	apiFields := actions.WithAPIFields()
-
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
 
@@ -162,8 +160,6 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 	}
 
 	metadataList := object.MetadataListFromDomain(metadata)
-	// mutableMetas := &metas{m: metadata}
-
 	apiFields := actions.WithAPIFields(
 		actions.SetFields("setFirstName", func(firstName string) {
 			user.FirstName = firstName
@@ -311,95 +307,3 @@ func tokenCtxFields(tokens *oidc.Tokens) []actions.FieldOption {
 		}),
 	}
 }
-
-// func actionUserGrantsToDomain(userID string, actionUserGrants []object.UserGrant) []*domain.UserGrant {
-// 	if actionUserGrants == nil {
-// 		return nil
-// 	}
-// 	userGrants := make([]*domain.UserGrant, len(actionUserGrants))
-// 	for i, grant := range actionUserGrants {
-// 		userGrants[i] = &domain.UserGrant{
-// 			UserID:         userID,
-// 			ProjectID:      grant.ProjectID,
-// 			ProjectGrantID: grant.ProjectGrantID,
-// 			RoleKeys:       grant.Roles,
-// 		}
-// 	}
-// 	return userGrants
-// }
-
-// type metas struct {
-// 	m []*domain.Metadata
-// }
-
-// func appendMetadataFunc(mutableMetas *metas) func(goja.FunctionCall) goja.Value {
-// 	return func(call goja.FunctionCall) goja.Value {
-// 		if len(call.Arguments) != 2 {
-// 			panic("exactly 2 (key, value) arguments expected")
-// 		}
-// 		key := call.Arguments[0].Export().(string)
-// 		val := call.Arguments[1].Export()
-
-// 		value, err := json.Marshal(val)
-// 		if err != nil {
-// 			logging.WithError(err).Debug("unable to marshal")
-// 			panic(err)
-// 		}
-
-// 		mutableMetas.m = append(mutableMetas.m,
-// 			&domain.Metadata{
-// 				Key:   key,
-// 				Value: value,
-// 			})
-// 		return nil
-// 	}
-// }
-
-// type grants struct {
-// 	g []object.UserGrant
-// }
-
-// func appendGrantFunc(mutableGrants *grants) func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
-// 	return func(c *actions.FieldConfig) func(call goja.FunctionCall) goja.Value {
-// 		return func(call goja.FunctionCall) goja.Value {
-// 			firstArg := objectFromFirstArgument(call, c.Runtime)
-// 			grant := object.UserGrant{}
-// 			mapObjectToGrant(firstArg, &grant)
-// 			mutableGrants.g = append(mutableGrants.g, grant)
-// 			return nil
-// 		}
-// 	}
-// }
-
-// func objectFromFirstArgument(call goja.FunctionCall, runtime *goja.Runtime) *goja.Object {
-// 	if len(call.Arguments) != 1 {
-// 		panic("exactly one argument expected")
-// 	}
-// 	object := call.Arguments[0].ToObject(runtime)
-// 	if object == nil {
-// 		panic("unable to unmarshal arg")
-// 	}
-// 	return object
-// }
-
-// func mapObjectToGrant(object *goja.Object, grant *object.UserGrant) {
-// 	for _, key := range object.Keys() {
-// 		switch key {
-// 		case "projectId":
-// 			grant.ProjectID = object.Get(key).String()
-// 		case "projectGrantId":
-// 			grant.ProjectGrantID = object.Get(key).String()
-// 		case "roles":
-// 			if roles, ok := object.Get(key).Export().([]interface{}); ok {
-// 				for _, role := range roles {
-// 					if r, ok := role.(string); ok {
-// 						grant.Roles = append(grant.Roles, r)
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// 	if grant.ProjectID == "" {
-// 		panic("projectId not set")
-// 	}
-// }
