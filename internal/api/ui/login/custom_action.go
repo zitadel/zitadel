@@ -239,7 +239,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 			return nil, nil, err
 		}
 	}
-	return user, metadata, err
+	return user, object.MetadataListToDomain(metadataList), err
 }
 
 func (l *Login) customGrants(ctx context.Context, userID string, authRequest *domain.AuthRequest, resourceOwner string, flowType domain.FlowType) ([]*domain.UserGrant, error) {
