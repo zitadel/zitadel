@@ -41,7 +41,7 @@ PasswordlessRegistration:
   Text: 我们收到了为无密码登录添加令牌的请求。请使用下面的按钮添加您的令牌或设备以进行无密码登录。
   ButtonText: 添加无密码登录
 PasswordChange:
-  Title: Zitadel - 用户的密码已经改变
+  Title: ZITADEL - 用户的密码已经改变
   PreHeader: 更改密码
   Subject: 用户的密码已经改变
   Greeting: 你好 {{.FirstName}} {{.LastName}},

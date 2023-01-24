@@ -41,7 +41,7 @@ PasswordlessRegistration:
   Text: Nous avons reçu une demande d'ajout d'un jeton pour la connexion sans mot de passe. Veuillez utiliser le bouton ci-dessous pour ajouter votre jeton ou dispositif pour la connexion sans mot de passe.
   ButtonText: Ajouter une connexion sans mot de passe
 PasswordChange:
-  Title: Zitadel - Le mot de passe de l'utilisateur a changé
+  Title: ZITADEL - Le mot de passe de l'utilisateur a changé
   PreHeader: Modifier le mot de passe
   Subject: Le mot de passe de l'utilisateur a changé
   Greeting: Bonjour {{.FirstName}} {{.LastName}},

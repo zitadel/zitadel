@@ -41,7 +41,7 @@ PasswordlessRegistration:
   Text: We received a request to add a token for passwordless login. Please use the button below to add your token or device for passwordless login.
   ButtonText: Add Passwordless Login
 PasswordChange:
-  Title: Zitadel - Password of user has changed
+  Title: ZITADEL - Password of user has changed
   PreHeader: Change password
   Subject: Password of user has changed
   Greeting: Hello {{.FirstName}} {{.LastName}},
