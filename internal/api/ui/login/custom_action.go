@@ -62,7 +62,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		actions.SetFields("setPhoneVerified", func(verified bool) {
 			user.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", &user.Metadatas),
+		actions.SetFields("metadata", &metadataList.Metadata),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
@@ -210,7 +210,7 @@ func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *d
 			}
 			user.Phone.IsPhoneVerified = verified
 		}),
-		actions.SetFields("metadata", object.MetadataField(metadataList)),
+		actions.SetFields("metadata", &metadataList.Metadata),
 		actions.SetFields("v1",
 			actions.SetFields("user",
 				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
