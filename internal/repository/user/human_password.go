@@ -16,7 +16,7 @@ import (
 const (
 	passwordEventPrefix             = humanEventPrefix + "password."
 	HumanPasswordChangedType        = passwordEventPrefix + "changed"
-	HumanPasswordChangeSentType     = passwordEventPrefix + "changed.sent"
+	HumanPasswordChangeSentType     = passwordEventPrefix + "change.sent"
 	HumanPasswordCodeAddedType      = passwordEventPrefix + "code.added"
 	HumanPasswordCodeSentType       = passwordEventPrefix + "code.sent"
 	HumanPasswordCheckSucceededType = passwordEventPrefix + "check.succeeded"
