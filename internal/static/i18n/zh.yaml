@@ -444,7 +444,7 @@ EventTypes:
     email:
       reserved: 电子邮件地址已保留
       released: 电子邮件地址已发布
-      changed:  电子邮件地址已更改
+      changed: 电子邮件地址已更改
       verified: 电子邮件地址已验证
       verification:
         failed: 电子邮件验证失败
@@ -474,7 +474,7 @@ EventTypes:
         reserved: 保留用户名
         released: 用户名已发布
       email:
-        changed:  电子邮件地址已更改
+        changed: 电子邮件地址已更改
         verified: 电子邮件地址已验证
         verification:
           failed: 电子邮件地址验证失败
@@ -636,7 +636,7 @@ EventTypes:
       changed: 更改组织成员
       removed: 删除组织成员
       cascade:
-        removeD: 已删除组织级联成员
+        removed: 已删除组织级联成员
     iam:
       policy:
         added: 添加系统策略
@@ -750,7 +750,7 @@ EventTypes:
         changed: 更改访问成员
         removed: 删除访问成员
         cascade:
-          removeD: 删除管理访问级联
+          removed: 删除管理访问级联
     application:
       added: 添加应用
       changed: 更改应用

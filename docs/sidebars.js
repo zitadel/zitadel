@@ -271,6 +271,7 @@ module.exports = {
       collapsed: false,
       items: [
         "self-hosting/manage/production",
+        "self-hosting/manage/productionchecklist",
         "self-hosting/manage/configure/configure",
         "self-hosting/manage/reverseproxy/reverse_proxy",
         "self-hosting/manage/custom-domain",
