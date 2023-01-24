@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
+import { ListEventsRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { OrgNameQuery, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
@@ -17,15 +18,10 @@ enum SubQuery {
   templateUrl: './filter-events.component.html',
   styleUrls: ['./filter-events.component.scss'],
 })
-export class FilterOrgComponent extends FilterComponent implements OnInit {
-  public SubQuery: any = SubQuery;
-  public searchQueries: OrgQuery[] = [];
+export class FilterEventsComponent implements OnInit {
+  @Output() public filterChanged: EventEmitter<ListEventsRequest> = new EventEmitter();
 
-  public states: OrgState[] = [OrgState.ORG_STATE_ACTIVE, OrgState.ORG_STATE_INACTIVE];
-
-  constructor(router: Router, protected route: ActivatedRoute) {
-    super(router, route);
-  }
+  constructor(router: Router, protected route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.route.queryParams.pipe(take(1)).subscribe((params) => {
@@ -49,75 +45,71 @@ export class FilterOrgComponent extends FilterComponent implements OnInit {
           }
         });
 
-        this.searchQueries = orgQueries.filter((q) => q !== undefined) as OrgQuery[];
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : undefined);
-        // this.showFilter = true;
-        // this.filterOpen.emit(true);
+        // this.searchQueries = orgQueries.filter((q) => q !== undefined) as OrgQuery[];
+        // this.filterChanged.emit(this.searchQueries ? this.searchQueries : undefined);
       }
     });
   }
 
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {
-    if (event.checked) {
-      switch (subquery) {
-        case SubQuery.NAME:
-          const nq = new OrgNameQuery();
-          nq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-          nq.setName('');
-
-          const oq = new OrgQuery();
-          oq.setNameQuery(nq);
-
-          this.searchQueries.push(oq);
-          break;
-      }
-    } else {
-      switch (subquery) {
-        case SubQuery.NAME:
-          const index_dn = this.searchQueries.findIndex((q) => (q as OrgQuery).toObject().nameQuery !== undefined);
-          if (index_dn > -1) {
-            this.searchQueries.splice(index_dn, 1);
-          }
-          break;
-      }
-    }
+    // if (event.checked) {
+    //   switch (subquery) {
+    //     case SubQuery.NAME:
+    //       const nq = new OrgNameQuery();
+    //       nq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+    //       nq.setName('');
+    //       const oq = new OrgQuery();
+    //       oq.setNameQuery(nq);
+    //       this.searchQueries.push(oq);
+    //       break;
+    //   }
+    // } else {
+    //   switch (subquery) {
+    //     case SubQuery.NAME:
+    //       const index_dn = this.searchQueries.findIndex((q) => (q as OrgQuery).toObject().nameQuery !== undefined);
+    //       if (index_dn > -1) {
+    //         this.searchQueries.splice(index_dn, 1);
+    //       }
+    //       break;
+    //   }
+    // }
   }
 
   public setValue(subquery: SubQuery, query: any, event: any) {
-    const value = event?.target?.value ?? event.value;
-    switch (subquery) {
-      case SubQuery.NAME:
-        (query as OrgNameQuery).setName(value);
-        this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
-        break;
-    }
+    // const value = event?.target?.value ?? event.value;
+    // switch (subquery) {
+    //   case SubQuery.NAME:
+    //     (query as OrgNameQuery).setName(value);
+    //     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    //     break;
+    // }
   }
 
   public getSubFilter(subquery: SubQuery): any {
-    switch (subquery) {
-      case SubQuery.NAME:
-        const dn = this.searchQueries.find((q) => (q as OrgQuery).toObject().nameQuery !== undefined);
-        if (dn) {
-          return (dn as OrgQuery).getNameQuery();
-        } else {
-          return undefined;
-        }
-    }
+    // switch (subquery) {
+    //   case SubQuery.NAME:
+    //     const dn = this.searchQueries.find((q) => (q as OrgQuery).toObject().nameQuery !== undefined);
+    //     if (dn) {
+    //       return (dn as OrgQuery).getNameQuery();
+    //     } else {
+    //       return undefined;
+    //     }
+    // }
   }
 
   public setMethod(query: any, event: any) {
-    (query as UserNameQuery).setMethod(event.value);
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    // (query as UserNameQuery).setMethod(event.value);
+    // this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
   }
 
   public emitFilter(): void {
-    this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
-    this.showFilter = false;
-    this.filterOpen.emit(false);
+    // this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
+    // this.showFilter = false;
+    // this.filterOpen.emit(false);
   }
 
   public resetFilter(): void {
-    this.searchQueries = [];
-    this.emitFilter();
+    // this.searchQueries = [];
+    // this.emitFilter();
   }
 }

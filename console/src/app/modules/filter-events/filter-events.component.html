@@ -1,7 +1,7 @@
-<cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()" [queryCount]="searchQueries.length">
+<div>
   <div class="filter-row" id="filtercomp">
     <div class="email-query">
-      <mat-checkbox
+      <!-- <mat-checkbox
         id="name"
         class="cb"
         [checked]="getSubFilter(SubQuery.NAME)"
@@ -20,7 +20,7 @@
         <cnsl-form-field class="filter-input-value">
           <input cnslInput name="value" [value]="eq.getName()" (change)="setValue(SubQuery.NAME, eq, $event)" />
         </cnsl-form-field>
-      </div>
+      </div> -->
     </div>
   </div>
-</cnsl-filter>
+</div>

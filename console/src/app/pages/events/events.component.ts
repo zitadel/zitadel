@@ -25,6 +25,7 @@ enum EventFieldName {
   TYPE = 'type',
   PAYLOAD = 'payload',
 }
+const initRequest = new ListEventsRequest().setLimit(20);
 
 @Component({
   selector: 'cnsl-events',
@@ -55,13 +56,8 @@ export class EventsComponent {
 
   @ViewChild(MatSort) public sort!: MatSort;
 
-  private searchQueries: any[] = [];
   private destroy$: Subject<void> = new Subject();
-  private requestOrgs$: BehaviorSubject<Request> = new BehaviorSubject<Request>({
-    limit: this.initialLimit,
-    offset: 0,
-    queries: [],
-  });
+  private requestOrgs$: BehaviorSubject<Request> = new BehaviorSubject<Request>(initRequest);
   private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
 
   constructor(
@@ -81,7 +77,7 @@ export class EventsComponent {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.requestOrgs$.next({ limit: this.initialLimit, offset: 0, queries: this.searchQueries });
+    this.requestOrgs$.next(initRequest);
 
     this.requestOrgsObservable$.pipe(switchMap((req) => this.loadEvents(req))).subscribe((orgs) => {
       this.dataSource = new MatTableDataSource<Event.AsObject>(orgs);
@@ -130,39 +126,8 @@ export class EventsComponent {
     }
   }
 
-  public applySearchQuery(searchQueries: OrgQuery[]): void {
-    this.searchQueries = searchQueries;
-    this.requestOrgs$.next({
-      limit: this.paginator ? this.paginator.pageSize : this.initialLimit,
-      offset: this.paginator ? this.paginator.pageSize * this.paginator.pageIndex : 0,
-      queries: this.searchQueries,
-    });
-  }
-
-  public setFilter(key: OrgListSearchKey): void {
-    setTimeout(() => {
-      if (this.filter) {
-        (this.filter as any).nativeElement.focus();
-      }
-    }, 100);
-
-    if (this.orgSearchKey !== key) {
-      this.orgSearchKey = key;
-    } else {
-      this.orgSearchKey = undefined;
-      this.refresh();
-    }
-  }
-
-  public setAndNavigateToOrg(org: Org.AsObject): void {
-    if (org.state !== OrgState.ORG_STATE_REMOVED) {
-      this.authService.setActiveOrg(org);
-      this.router.navigate(['/org']);
-    } else {
-      this.translate.get('ORG.TOAST.ORG_WAS_DELETED').subscribe((data) => {
-        this.toast.showInfo(data);
-      });
-    }
+  public applySearchQuery(req: ListEventsRequest): void {
+    // this.requestOrgs$.next(req);
   }
 
   public changePage(): void {

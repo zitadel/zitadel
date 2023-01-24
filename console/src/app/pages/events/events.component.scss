@@ -1,7 +1,21 @@
-.views-title {
+.events-title {
   margin: 2rem 0 0 0;
 }
 
-.views-desc {
+.events-desc {
   font-size: 14px;
+}
+
+.editor-row {
+  display: flex;
+  align-items: center;
+
+  .name {
+    margin-left: 1rem;
+  }
+}
+
+.aggregate-row {
+  display: flex;
+  flex-direction: column;
 }

@@ -20,6 +20,8 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 
 import { EventsComponent } from './events.component';
 import { EventsRoutingModule } from './events-routing.module';
+import { FilterEventsModule } from 'src/app/modules/filter-events/filter-events.module';
+import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 
 @NgModule({
   declarations: [EventsComponent],
@@ -29,12 +31,14 @@ import { EventsRoutingModule } from './events-routing.module';
     TableActionsModule,
     MatIconModule,
     CardModule,
+    FilterEventsModule,
     HasRolePipeModule,
     MatButtonModule,
     CopyToClipboardModule,
     InputModule,
     TranslateModule,
     InfoSectionModule,
+    AvatarModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
     RefreshTableModule,

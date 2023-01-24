@@ -9,10 +9,10 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { FilterModule } from '../filter/filter.module';
 import { InputModule } from '../input/input.module';
-import { FilterOrgComponent } from './filter-org.component';
+import { FilterEventsComponent } from './filter-events.component';
 
 @NgModule({
-  declarations: [FilterOrgComponent],
+  declarations: [FilterEventsComponent],
   imports: [
     CommonModule,
     FilterModule,
@@ -24,6 +24,6 @@ import { FilterOrgComponent } from './filter-org.component';
     TranslateModule,
     RouterModule,
   ],
-  exports: [FilterOrgComponent],
+  exports: [FilterEventsComponent],
 })
-export class FilterOrgModule {}
+export class FilterEventsModule {}
