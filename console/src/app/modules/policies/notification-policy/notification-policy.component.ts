@@ -27,7 +27,7 @@ export class NotificationPolicyComponent implements OnInit {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;
 
-  public notificationData?: NotificationPolicy.AsObject;
+  public notificationData?: NotificationPolicy.AsObject = { isDefault: false, passwordChange: false };
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
