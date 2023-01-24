@@ -8,7 +8,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) AddDefaultNotificationPolicy(ctx context.Context, resourceOwner string, passwordChange bool) (*domain.ObjectDetails, error) {
@@ -35,18 +34,6 @@ func (c *Commands) ChangeDefaultNotificationPolicy(ctx context.Context, resource
 		return nil, err
 	}
 	return pushedEventsToObjectDetails(pushedEvents), nil
-}
-
-func (c *Commands) defaultNotificationPolicyWriteModelByID(ctx context.Context) (policy *InstanceNotificationPolicyWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	writeModel := NewInstanceNotificationPolicyWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-	return writeModel, nil
 }
 
 func prepareAddDefaultNotificationPolicy(
