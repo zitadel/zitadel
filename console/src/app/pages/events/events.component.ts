@@ -4,7 +4,7 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
-import { ListEventsRequest, View } from 'src/app/proto/generated/zitadel/admin_pb';
+import { ListEventsRequest, ListEventTypesRequest, View } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
@@ -82,6 +82,8 @@ export class EventsComponent {
     this.requestOrgsObservable$.pipe(switchMap((req) => this.loadEvents(req))).subscribe((orgs) => {
       this.dataSource = new MatTableDataSource<Event.AsObject>(orgs);
     });
+
+    this.load();
   }
 
   public loadEvents(request: Request): Observable<Event.AsObject[]> {
@@ -108,6 +110,14 @@ export class EventsComponent {
       }),
       finalize(() => this.loadingSubject.next(false)),
     );
+  }
+
+  public load() {
+    const req = new ListEventTypesRequest();
+
+    return this.adminService.listEventTypes(req).then((list) => {
+      list.eventTypesList.forEach((el) => console.log(el));
+    });
   }
 
   public refresh(): void {
