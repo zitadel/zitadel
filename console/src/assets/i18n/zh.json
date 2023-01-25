@@ -883,7 +883,7 @@
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
       "COMPLEXITY": "密码复杂性",
-      "NOTIFICATIONS": "通知服务商",
+      "NOTIFICATIONS": "通知设置",
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",
@@ -1006,6 +1006,11 @@
       "SYMBOLERROR": "密码必须包含符号/标点符号。",
       "NUMBERERROR": "密码必须包含数字。",
       "PATTERNERROR": "密码不符合要求。"
+    },
+    "NOTIFICATION": {
+      "TITLE": "通知",
+      "DESCRIPTION": "确定将发送哪些更改、通知",
+      "PASSWORDCHANGE": "更改密码"
     },
     "PRIVATELABELING": {
       "TITLE": "品牌标识",
@@ -1145,7 +1150,8 @@
         "VP": "验证手机号码",
         "PR": "重置密码",
         "DC": "域名声明",
-        "PL": "无密码身份验证"
+        "PL": "无密码身份验证",
+        "PC": "修改密码"
       },
       "CHIPS": {
         "firstname": "名",

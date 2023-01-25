@@ -225,6 +225,10 @@ Errors:
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy doesn't exist
       AlreadyExists: Org IAM Policy already exists
+    NotificationPolicy:
+      NotFound: Notification Policy not found
+      NotChanged: Notification Policy not changed
+      AlreadyExists: Notification Policy already exists
   Project:
     ProjectIDMissing: Project Id missing
     AlreadyExists: Project already exists on organization
@@ -351,6 +355,10 @@ Errors:
       NotExisting: Org IAM Policy not existing
       AlreadyExists: Org IAM Policy already exists
       NotChanged: Org IAM Policy has not been changed
+    NotificationPolicy:
+      NotFound: Default Notification Policy not found
+      NotChanged: Default Notification Policy not changed
+      AlreadyExists: Default Notification Policy already exists
   Policy:
     AlreadyExists: Policy already exists
     Label:
@@ -750,6 +758,10 @@ EventTypes:
         added: Lockout policy added
         changed: Lockout policy changed
         removed: Lockout policy removed
+      notification:
+        added: Notification policy added
+        changed: Notification policy changed
+        removed: Notification policy removed
     flow:
       trigger_actions:
         set: Action set
@@ -1047,7 +1059,7 @@ EventTypes:
         changed: Privacy policy changed
       security:
         set: Security policy set
-        
+
     removed: Instance removed
     secret:
       generator:

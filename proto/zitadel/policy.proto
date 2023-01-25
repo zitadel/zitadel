@@ -285,3 +285,9 @@ message PrivacyPolicy {
     bool is_default = 4;
     string help_link = 5;
 }
+
+message NotificationPolicy {
+    zitadel.v1.ObjectDetails details = 1;
+    bool is_default = 2;
+    bool password_change = 3;
+}

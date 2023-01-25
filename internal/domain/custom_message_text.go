@@ -13,6 +13,7 @@ const (
 	VerifyPhoneMessageType              = "VerifyPhone"
 	DomainClaimedMessageType            = "DomainClaimed"
 	PasswordlessRegistrationMessageType = "PasswordlessRegistration"
+	PasswordChangeMessageType           = "PasswordChange"
 	MessageTitle                        = "Title"
 	MessagePreHeader                    = "PreHeader"
 	MessageSubject                      = "Subject"
@@ -29,6 +30,7 @@ type MessageTexts struct {
 	VerifyPhone              CustomMessageText
 	DomainClaimed            CustomMessageText
 	PasswordlessRegistration CustomMessageText
+	PasswordChange           CustomMessageText
 }
 
 type CustomMessageText struct {
@@ -65,6 +67,8 @@ func (m *MessageTexts) GetMessageTextByType(msgType string) *CustomMessageText {
 		return &m.DomainClaimed
 	case PasswordlessRegistrationMessageType:
 		return &m.PasswordlessRegistration
+	case PasswordChangeMessageType:
+		return &m.PasswordChange
 	}
 	return nil
 }
@@ -75,5 +79,6 @@ func IsMessageTextType(textType string) bool {
 		textType == VerifyEmailMessageType ||
 		textType == VerifyPhoneMessageType ||
 		textType == DomainClaimedMessageType ||
-		textType == PasswordlessRegistrationMessageType
+		textType == PasswordlessRegistrationMessageType ||
+		textType == PasswordChangeMessageType
 }

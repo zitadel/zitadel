@@ -167,7 +167,7 @@ This object is based on the Golang struct [http.Request](https://pkg.go.dev/net/
 - `contentLength` *number*
 - `transferEncoding` Array of *string*
 - `host` *string*
-- `form` Map *string* of Array of *string* 
+- `form` Map *string* of Array of *string*
 - `postForm` Map *string* of Array of *string*
 - `trailer` Map *string* of Array of *string*
 - `remoteAddr` *string*

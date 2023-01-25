@@ -40,3 +40,10 @@ PasswordlessRegistration:
   Greeting: 'Ciao {{.FirstName}} {{.LastName}},'
   Text: Abbiamo ricevuto una richiesta per aggiungere l'autenticazione passwordless. Usa il pulsante qui sotto per aggiungere il tuo token o dispositivo per il login senza password.
   ButtonText: Attiva passwordless
+PasswordChange:
+  Title: ZITADEL - La password dell'utente è stata modificata
+  PreHeader: Modifica della password
+  Subject: La password dell'utente è stata modificata
+  Greeting: Ciao {{.FirstName}} {{.LastName}},
+  Text: La password del vostro utente è cambiata; se questa modifica non è stata fatta da voi, vi consigliamo di reimpostare immediatamente la vostra password.
+  ButtonText: Login
