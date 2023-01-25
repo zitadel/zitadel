@@ -2231,7 +2231,7 @@ Variable {{.Lang}} can be set to have different links based on the language
 > **rpc** UpdateCustomPrivacyPolicy([UpdateCustomPrivacyPolicyRequest](#updatecustomprivacypolicyrequest))
 [UpdateCustomPrivacyPolicyResponse](#updatecustomprivacypolicyresponse)
 
-Update the privacy complexity policy for the organisation
+Update the privacy policy for the organisation
 With this policy privacy relevant things can be configured (e.g. tos link)
 Variable {{.Lang}} can be set to have different links based on the language
 
@@ -2251,6 +2251,71 @@ The default policy of the IAM will trigger after
 
 
     DELETE: /policies/privacy
+
+
+### GetNotificationPolicy
+
+> **rpc** GetNotificationPolicy([GetNotificationPolicyRequest](#getnotificationpolicyrequest))
+[GetNotificationPolicyResponse](#getnotificationpolicyresponse)
+
+Returns the notification policy of the organisation
+With this notification policy it can be configured how users should be notified
+
+
+
+    GET: /policies/notification
+
+
+### GetDefaultNotificationPolicy
+
+> **rpc** GetDefaultNotificationPolicy([GetDefaultNotificationPolicyRequest](#getdefaultnotificationpolicyrequest))
+[GetDefaultNotificationPolicyResponse](#getdefaultnotificationpolicyresponse)
+
+Returns the default notification policy of the IAM
+With this notification privacy it can be configured how users should be notified
+
+
+
+    GET: /policies/default/notification
+
+
+### AddCustomNotificationPolicy
+
+> **rpc** AddCustomNotificationPolicy([AddCustomNotificationPolicyRequest](#addcustomnotificationpolicyrequest))
+[AddCustomNotificationPolicyResponse](#addcustomnotificationpolicyresponse)
+
+Add a custom notification policy for the organisation
+With this notification privacy it can be configured how users should be notified
+
+
+
+    POST: /policies/notification
+
+
+### UpdateCustomNotificationPolicy
+
+> **rpc** UpdateCustomNotificationPolicy([UpdateCustomNotificationPolicyRequest](#updatecustomnotificationpolicyrequest))
+[UpdateCustomNotificationPolicyResponse](#updatecustomnotificationpolicyresponse)
+
+Update the notification policy for the organisation
+With this notification privacy it can be configured how users should be notified
+
+
+
+    PUT: /policies/notification
+
+
+### ResetNotificationPolicyToDefault
+
+> **rpc** ResetNotificationPolicyToDefault([ResetNotificationPolicyToDefaultRequest](#resetnotificationpolicytodefaultrequest))
+[ResetNotificationPolicyToDefaultResponse](#resetnotificationpolicytodefaultresponse)
+
+Removes the notification policy of the organisation
+The default policy of the IAM will trigger after
+
+
+
+    DELETE: /policies/notification
 
 
 ### GetLabelPolicy
@@ -2485,7 +2550,7 @@ Returns the default text for password reset message
 
 Sets the custom text for password reset message
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2536,7 +2601,7 @@ Returns the default text for verify email message
 
 Sets the custom text for verify email message
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2587,7 +2652,7 @@ Returns the custom text for verify email message
 
 Sets the default custom text for verify email message
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2638,7 +2703,7 @@ Returns the custom text for domain claimed message
 
 Sets the custom text for domain claimed message
 The Following Variables can be used:
-{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2689,7 +2754,7 @@ Returns the custom text for passwordless link message
 
 Sets the custom text for passwordless link message
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -2707,6 +2772,57 @@ The default text of the IAM will trigger after
 
 
     DELETE: /text/message/passwordless_registration/{language}
+
+
+### GetCustomPasswordChangeMessageText
+
+> **rpc** GetCustomPasswordChangeMessageText([GetCustomPasswordChangeMessageTextRequest](#getcustompasswordchangemessagetextrequest))
+[GetCustomPasswordChangeMessageTextResponse](#getcustompasswordchangemessagetextresponse)
+
+Returns the custom text for password change message
+
+
+
+    GET: /text/message/password_change/{language}
+
+
+### GetDefaultPasswordChangeMessageText
+
+> **rpc** GetDefaultPasswordChangeMessageText([GetDefaultPasswordChangeMessageTextRequest](#getdefaultpasswordchangemessagetextrequest))
+[GetDefaultPasswordChangeMessageTextResponse](#getdefaultpasswordchangemessagetextresponse)
+
+Returns the custom text for password change link message
+
+
+
+    GET: /text/default/message/password_change/{language}
+
+
+### SetCustomPasswordChangeMessageCustomText
+
+> **rpc** SetCustomPasswordChangeMessageCustomText([SetCustomPasswordChangeMessageTextRequest](#setcustompasswordchangemessagetextrequest))
+[SetCustomPasswordChangeMessageTextResponse](#setcustompasswordchangemessagetextresponse)
+
+Sets the custom text for password change message
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
+
+
+
+    PUT: /text/message/password_change/{language}
+
+
+### ResetCustomPasswordChangeMessageTextToDefault
+
+> **rpc** ResetCustomPasswordChangeMessageTextToDefault([ResetCustomPasswordChangeMessageTextToDefaultRequest](#resetcustompasswordchangemessagetexttodefaultrequest))
+[ResetCustomPasswordChangeMessageTextToDefaultResponse](#resetcustompasswordchangemessagetexttodefaultresponse)
+
+Removes the custom password change message text of the organisation
+The default text of the IAM will trigger after
+
+
+
+    DELETE: /text/message/password_change/{language}
 
 
 ### GetCustomLoginTexts
@@ -3216,6 +3332,28 @@ This is an empty request
 
 
 ### AddCustomLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddCustomNotificationPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password_change |  bool | - |  |
+
+
+
+
+### AddCustomNotificationPolicyResponse
 
 
 
@@ -4446,6 +4584,28 @@ This is an empty request
 
 
 
+### GetCustomPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomPasswordResetMessageTextRequest
 
 
@@ -4651,6 +4811,23 @@ This is an empty request
 
 
 
+### GetDefaultNotificationPolicyRequest
+This is an empty request
+
+
+
+
+### GetDefaultNotificationPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.NotificationPolicy | - |  |
+
+
+
+
 ### GetDefaultPasswordAgePolicyRequest
 This is an empty request
 
@@ -4664,6 +4841,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordAgePolicy | - |  |
+
+
+
+
+### GetDefaultPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
 
 
 
@@ -5030,6 +5229,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org |  zitadel.org.v1.Org | - |  |
+
+
+
+
+### GetNotificationPolicyRequest
+This is an empty request
+
+
+
+
+### GetNotificationPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.NotificationPolicy | - |  |
 
 
 
@@ -7442,6 +7658,28 @@ This is an empty request
 
 
 
+### ResetCustomPasswordChangeMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordChangeMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomPasswordResetMessageTextToDefaultRequest
 
 
@@ -7571,6 +7809,23 @@ This is an empty request
 
 
 ### ResetLoginPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetNotificationPolicyToDefaultRequest
+This is an empty request
+
+
+
+
+### ResetNotificationPolicyToDefaultResponse
 
 
 
@@ -7781,6 +8036,35 @@ This is an empty request
 
 
 ### SetCustomLoginTextsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetCustomPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| title |  string | - | string.max_len: 200<br />  |
+| pre_header |  string | - | string.max_len: 200<br />  |
+| subject |  string | - | string.max_len: 200<br />  |
+| greeting |  string | - | string.max_len: 200<br />  |
+| text |  string | - | string.max_len: 800<br />  |
+| button_text |  string | - | string.max_len: 200<br />  |
+| footer_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### SetCustomPasswordChangeMessageTextResponse
 
 
 
@@ -8224,6 +8508,28 @@ This is an empty request
 
 
 ### UpdateCustomLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateCustomNotificationPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password_change |  bool | - |  |
+
+
+
+
+### UpdateCustomNotificationPolicyResponse
 
 
 

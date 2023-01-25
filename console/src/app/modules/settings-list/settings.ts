@@ -92,6 +92,15 @@ export const NOTIFICATIONS: SidenavSetting = {
   },
 };
 
+export const NOTIFICATION_POLICY: SidenavSetting = {
+  id: 'notifications',
+  i18nKey: 'SETTINGS.LIST.NOTIFICATIONS',
+  groupI18nKey: 'SETTINGS.GROUPS.NOTIFICATIONS',
+  requiredRoles: {
+    [PolicyComponentServiceType.MGMT]: ['policy.read'],
+  },
+};
+
 export const MESSAGETEXTS: SidenavSetting = {
   id: 'messagetexts',
   i18nKey: 'SETTINGS.LIST.MESSAGETEXTS',
