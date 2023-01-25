@@ -759,7 +759,20 @@
       "SEQUENCE": "Sequence",
       "CREATIONDATE": "Created At",
       "TYPE": "Type",
-      "PAYLOAD": "Payload"
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "USER": {
+          "BTN": "Filter by User"
+        },
+        "AGGREGATE": {
+          "BTN": "Filter by Aggregate",
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID"
+        },
+        "TYPE": {
+          "BTN": "Filter by Type"
+        }
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Manager removed.",

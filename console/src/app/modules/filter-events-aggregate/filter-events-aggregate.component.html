@@ -1,0 +1,30 @@
+<div class="filter-events-aggregate-wrapper">
+  <form [formGroup]="aggregateForm">
+    <cnsl-form-field class="events-aggregate-form-field">
+      <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.TYPELABEL' | translate }}</cnsl-label>
+
+      <!-- <input
+          cnslInput
+          *ngIf="singleOutput"
+          type="text"
+          placeholder="Search for the user loginname"
+          #usernameInput
+          [formControl]="myControl"
+          [matAutocomplete]="auto"
+        /> -->
+
+      <mat-select formControlName="aggregateType">
+        <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate">
+          <div *ngIf="aggregate.localized && aggregate.localized.localizedMessage">
+            {{ aggregate.localized.localizedMessage }}
+          </div>
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="filter-input-value">
+      <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.IDLABEL' | translate }}</cnsl-label>
+      <input cnslInput name="aggregateId" formControlName="aggregateId" />
+    </cnsl-form-field>
+  </form>
+</div>

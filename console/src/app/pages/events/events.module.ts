@@ -23,6 +23,7 @@ import { EventsRoutingModule } from './events-routing.module';
 import { FilterEventsModule } from 'src/app/modules/filter-events/filter-events.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { FilterEventsAggregateModule } from 'src/app/modules/filter-events-aggregate/filter-events-aggregate.module';
 
 @NgModule({
   declarations: [EventsComponent],
@@ -40,6 +41,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
     TranslateModule,
     InfoSectionModule,
     AvatarModule,
+    FilterEventsAggregateModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
     RefreshTableModule,

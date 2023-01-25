@@ -2,37 +2,77 @@
   <h1 class="events-title">{{ 'IAM.EVENTS.TITLE' | translate }}</h1>
   <p class="events-desc cnsl-secondary-text">{{ 'IAM.EVENTS.DESCRIPTION' | translate }}</p>
 
-  <cnsl-refresh-table (refreshed)="refresh()" [dataSize]="dataSource.data.length" [loading]="loading$ | async">
+  <cnsl-refresh-table
+    [hideRefresh]="true"
+    (refreshed)="refresh()"
+    [dataSize]="dataSource.data.length"
+    [loading]="loading$ | async"
+  >
     <!-- <cnsl-filter-events actions (filterChanged)="applySearchQuery($any($event))"> </cnsl-filter-events> -->
+    <div class="events-filter-row">
+      <div class="filter-user-button-wrapper">
+        <button
+          mat-stroked-button
+          cdkOverlayOrigin
+          #triggeruser="cdkOverlayOrigin"
+          matRipple
+          id="userfilterbutton"
+          class="user-filter-button"
+          (click)="showUserFilter = !showUserFilter"
+        >
+          {{ 'IAM.EVENTS.FILTERS.USER.BTN' | translate }}
+        </button>
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="triggeruser"
+          [flexibleDimensions]="true"
+          [lockPosition]="true"
+          [cdkConnectedOverlayOffsetY]="10"
+          [cdkConnectedOverlayHasBackdrop]="true"
+          [cdkConnectedOverlayPositions]="positions"
+          cdkConnectedOverlayBackdropClass="transparent-backdrop"
+          [cdkConnectedOverlayOpen]="showUserFilter"
+          (backdropClick)="showUserFilter = false"
+          (detach)="showUserFilter = false"
+        >
+          <cnsl-filter-events class="context_card" *ngIf="showUserFilter" (closedCard)="showUserFilter = false">
+          </cnsl-filter-events>
+        </ng-template>
+      </div>
 
-    <div class="filter-button-wrapper">
-      <button
-        mat-stroked-button
-        cdkOverlayOrigin
-        #trigger="cdkOverlayOrigin"
-        matRipple
-        id="userfilterbutton"
-        class="user-filter-button"
-        (click)="showUserFilter = !showUserFilter"
-      >
-        Filter by user
-      </button>
-      <ng-template
-        cdkConnectedOverlay
-        [cdkConnectedOverlayOrigin]="trigger"
-        [flexibleDimensions]="true"
-        [lockPosition]="true"
-        [cdkConnectedOverlayOffsetY]="10"
-        [cdkConnectedOverlayHasBackdrop]="true"
-        [cdkConnectedOverlayPositions]="positions"
-        cdkConnectedOverlayBackdropClass="transparent-backdrop"
-        [cdkConnectedOverlayOpen]="showUserFilter"
-        (backdropClick)="showUserFilter = false"
-        (detach)="showUserFilter = false"
-      >
-        <cnsl-filter-events class="context_card" *ngIf="showUserFilter" (closedCard)="showUserFilter = false">
-        </cnsl-filter-events>
-      </ng-template>
+      <div class="filter-aggregate-button-wrapper">
+        <button
+          mat-stroked-button
+          cdkOverlayOrigin
+          #triggeraggregate="cdkOverlayOrigin"
+          matRipple
+          id="aggregatefilterbutton"
+          class="aggregate-filter-button"
+          (click)="showAggregateFilter = !showAggregateFilter"
+        >
+          {{ 'IAM.EVENTS.FILTERS.AGGREGATE.BTN' | translate }}
+        </button>
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="triggeraggregate"
+          [flexibleDimensions]="true"
+          [lockPosition]="true"
+          [cdkConnectedOverlayOffsetY]="10"
+          [cdkConnectedOverlayHasBackdrop]="true"
+          [cdkConnectedOverlayPositions]="positions"
+          cdkConnectedOverlayBackdropClass="transparent-backdrop"
+          [cdkConnectedOverlayOpen]="showAggregateFilter"
+          (backdropClick)="showAggregateFilter = false"
+          (detach)="showAggregateFilter = false"
+        >
+          <cnsl-filter-events-aggregate
+            class="context_card"
+            *ngIf="showAggregateFilter"
+            (closedCard)="showAggregateFilter = false"
+          >
+          </cnsl-filter-events-aggregate>
+        </ng-template>
+      </div>
     </div>
 
     <table [dataSource]="dataSource" mat-table class="table views-table" aria-label="Views" matSort>

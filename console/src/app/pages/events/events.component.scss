@@ -64,11 +64,20 @@
   //   }
 }
 
-.filter-button-wrapper {
+.events-filter-row {
   display: flex;
-  justify-content: space-between;
-  position: relative;
-  user-select: none;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 0.5rem;
+
+  .filter-user-button-wrapper,
+  .filter-aggregate-button-wrapper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    user-select: none;
+    margin-left: 1rem;
+  }
 }
 
 .aggregate-row {

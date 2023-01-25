@@ -35,6 +35,8 @@ const initRequest = new ListEventsRequest().setLimit(20);
 })
 export class EventsComponent {
   public showUserFilter: boolean = false;
+  public showAggregateFilter: boolean = false;
+
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
@@ -125,10 +127,6 @@ export class EventsComponent {
 
     this.adminService.listEventTypes(req).then((list) => {
       console.log(list.eventTypesList);
-    });
-
-    this.adminService.listAggregateTypes(req).then((list) => {
-      console.log(list.aggregateTypesList);
     });
   }
 

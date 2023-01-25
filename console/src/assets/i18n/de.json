@@ -759,7 +759,20 @@
       "SEQUENCE": "Sequenz",
       "CREATIONDATE": "Erstelldatum",
       "TYPE": "Typ",
-      "PAYLOAD": "Payload"
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "USER": {
+          "BTN": "Nach Benutzer filtern"
+        },
+        "AGGREGATE": {
+          "BTN": "Nach Aggregate filtern",
+          "TYPELABEL": "Aggregate Typ",
+          "IDLABEL": "ID"
+        },
+        "TYPE": {
+          "BTN": "Nach Typ filtern"
+        }
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Manager entfernt.",
