@@ -1,7 +1,6 @@
 package object
 
 import (
-	"crypto/tls"
 	"io"
 	"net/http"
 	"net/url"
@@ -47,7 +46,6 @@ func HTTPRequestField(httpRequest http.Request) func(c *actions.FieldConfig) int
 			Trailer:          httpRequest.Trailer,
 			RemoteAddr:       httpRequest.RemoteAddr,
 			RequestURI:       httpRequest.RequestURI,
-			Tls:              httpRequest.TLS,
 		})
 	}
 }
@@ -67,5 +65,4 @@ type httpRequestCopy struct {
 	Trailer          map[string][]string
 	RemoteAddr       string
 	RequestURI       string
-	Tls              *tls.ConnectionState
 }
