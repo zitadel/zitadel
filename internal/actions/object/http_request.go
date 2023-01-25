@@ -21,14 +21,16 @@ func HTTPRequestField(httpRequest http.Request) func(c *actions.FieldConfig) int
 			body = string(b)
 		}
 
-		httpRequest.ParseForm()
 		form := make(map[string][]string)
-		for k, v := range httpRequest.Form {
-			form[k] = v
-		}
 		postForm := make(map[string][]string)
-		for k, v := range httpRequest.PostForm {
-			postForm[k] = v
+		err = httpRequest.ParseForm()
+		if err == nil {
+			for k, v := range httpRequest.Form {
+				form[k] = v
+			}
+			for k, v := range httpRequest.PostForm {
+				postForm[k] = v
+			}
 		}
 
 		return c.Runtime.ToValue(&httpRequestCopy{
