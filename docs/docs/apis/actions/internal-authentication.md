@@ -18,6 +18,7 @@ Each validation step triggers the action.
         - `authError` *string*  
           This is a verification errors string representation. If the verification succeeds, this is "none"
         - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
+        - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
 - `api`  
   The second parameter contains the following fields
     - `metadata`  
@@ -39,6 +40,7 @@ ZITADEL did not create the user yet.
     - `v1`
         - `user` [*human*](./objects#human-user)
         - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
+        - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
 - `api`  
   The second parameter contains the following fields
     - `metadata`  
@@ -83,6 +85,7 @@ ZITADEL successfully created the user.
     - `v1`
         - `getUser()` [*user*](./objects#user)
         - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
+        - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
 - `api`  
   The second parameter contains the following fields
     - `userGrants` Array of [*userGrant*](./objects#user-grant)'s
