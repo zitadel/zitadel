@@ -134,6 +134,12 @@ The first parameter contains the following fields
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
 - `api`  
   The second parameter contains the following fields
+  - `metadata`  
+    Array of [*metadata*](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
+  - `v1`
+    - `user`
+      - `appendMetadata(string, Any)`  
+        The first parameter represents the key and the second a value which will be stored
 
 ### Pre Creation
 

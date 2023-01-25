@@ -109,7 +109,7 @@ const (
 	authMethodPasswordless authMethod = "passwordless"
 )
 
-func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.AuthRequest, authMethod authMethod, authenticationError error) error {
+func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.AuthRequest, authMethod authMethod, authenticationError error) ([]*domain.Metadata, error) {
 	resourceOwner := req.RequestedOrgID
 	if resourceOwner == "" {
 		resourceOwner = req.UserOrgID
@@ -117,10 +117,18 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeInternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	apiFields := actions.WithAPIFields()
+	metadataList := object.MetadataListFromDomain(nil)
+	apiFields := actions.WithAPIFields(
+		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("v1",
+			actions.SetFields("user",
+				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+			),
+		),
+	)
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
 
@@ -147,10 +155,10 @@ func (l *Login) triggerPostLocalAuthentication(ctx context.Context, req *domain.
 		)
 		cancel()
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return err
+	return object.MetadataListToDomain(metadataList), err
 }
 
 func (l *Login) customUserToLoginUserMapping(ctx context.Context, authRequest *domain.AuthRequest, user *domain.Human, metadata []*domain.Metadata, resourceOwner string, flowType domain.FlowType) (*domain.Human, []*domain.Metadata, error) {
