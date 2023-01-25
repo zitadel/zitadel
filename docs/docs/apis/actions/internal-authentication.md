@@ -1,5 +1,5 @@
 ---
-title: External Authentication
+title: Internal Authentication
 ---
 
 ## Post Authentication
