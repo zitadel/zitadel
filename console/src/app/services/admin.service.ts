@@ -208,6 +208,8 @@ import {
   ListEventsRequest,
   ListEventTypesRequest,
   ListEventTypesResponse,
+  ListAggregateTypesRequest,
+  ListAggregateTypesResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -225,6 +227,10 @@ export class AdminService {
 
   public listEventTypes(req: ListEventTypesRequest): Promise<ListEventTypesResponse.AsObject> {
     return this.grpcService.admin.listEventTypes(req, null).then((resp) => resp.toObject());
+  }
+
+  public listAggregateTypes(req: ListAggregateTypesRequest): Promise<ListAggregateTypesResponse.AsObject> {
+    return this.grpcService.admin.listAggregateTypes(req, null).then((resp) => resp.toObject());
   }
 
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {

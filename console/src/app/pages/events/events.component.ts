@@ -104,6 +104,8 @@ export class EventsComponent {
     //   }
 
     const req = new ListEventsRequest();
+    // req.setEditorUserId()
+    req.setEditorUserId;
 
     return from(this.adminService.listEvents(req)).pipe(
       map((resp) => {
@@ -121,9 +123,13 @@ export class EventsComponent {
   public load() {
     const req = new ListEventTypesRequest();
 
-    // return this.adminService.listEventTypes(req).then((list) => {
-    //   list.eventTypesList.forEach((el) => console.log(el));
-    // });
+    this.adminService.listEventTypes(req).then((list) => {
+      console.log(list.eventTypesList);
+    });
+
+    this.adminService.listAggregateTypes(req).then((list) => {
+      console.log(list.aggregateTypesList);
+    });
   }
 
   public refresh(): void {

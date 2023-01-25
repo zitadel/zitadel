@@ -40,7 +40,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'IAM.EVENTS.EDITOR' | translate }}</th>
         <td mat-cell *matCellDef="let event">
           <div class="editor-row" *ngIf="event.editor as editor">
-            <cnsl-avatar
+            <!-- <cnsl-avatar
               *ngIf="editor && editor.displayName; else cog"
               class="avatar"
               [name]="editor.displayName"
@@ -53,7 +53,8 @@
               <cnsl-avatar [forColor]="editor?.preferredLoginName ?? 'franz'" [isMachine]="true">
                 <i class="las la-robot"></i>
               </cnsl-avatar> </ng-template
-            ><span class="name">{{ editor.displayName }}</span>
+            > -->
+            <span class="name">{{ editor.displayName }}</span>
           </div>
         </td>
       </ng-container>
@@ -85,7 +86,7 @@
       <ng-container matColumnDef="type">
         <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.TYPE' | translate }}</th>
         <td mat-cell *matCellDef="let event">
-          <span>{{ event?.type }}</span>
+          <span *ngIf="event.type?.localized?.localizedMessage">{{ event.type.localized.localizedMessage }}</span>
         </td>
       </ng-container>
 
@@ -93,6 +94,9 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.PAYLOAD' | translate }}</th>
         <td mat-cell *matCellDef="let event">
           <span>{{ event?.payload | json }}</span>
+          <div class="btn-wrapper">
+            <button class="open-in-dialog-btn" mat-icon-button><mat-icon svgIcon="mdi_arrow_expand"></mat-icon></button>
+          </div>
         </td>
       </ng-container>
 

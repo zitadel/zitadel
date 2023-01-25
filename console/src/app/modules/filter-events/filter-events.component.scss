@@ -137,7 +137,7 @@ input {
 .events-user-mat-option {
   padding: 0 !important;
 
-  .mat-select-text {
+  .mat-option-text:first-child {
     display: none;
   }
 
