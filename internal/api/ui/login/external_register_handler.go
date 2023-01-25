@@ -161,7 +161,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		return
 	}
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, externalUser, idpConfig)
-	user, metadata, err = l.customExternalUserToLoginUserMapping(r.Context(), user, nil, authReq, idpConfig, metadata, resourceOwner)
+	user, metadata, err = l.customUserToLoginUserMapping(r.Context(), authReq, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -177,7 +177,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(r.Context(), authReq.UserID, nil, authReq, idpConfig, resourceOwner)
+	userGrants, err := l.customGrants(r.Context(), authReq.UserID, authReq, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

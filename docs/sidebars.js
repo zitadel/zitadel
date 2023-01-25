@@ -232,8 +232,9 @@ module.exports = {
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
-        "apis/actions/login-flow",
-        "apis/actions/register-flow",
+        "apis/actions/internal-authentication",
+        "apis/actions/external-authentication",
+        "apis/actions/complement-token",
         "apis/actions/objects",
       ]
     },

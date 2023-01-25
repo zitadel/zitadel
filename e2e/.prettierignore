@@ -7,3 +7,6 @@ node_modules
 cypress/screenshots/
 cypress/videos/
 cypress/results/
+
+# not compiling code
+cypress/e2e/actions/e2eSetMetadata.js

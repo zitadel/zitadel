@@ -1,16 +1,14 @@
 ---
-title: Login flows
+title: Complement Token Flow
 ---
-
-## Complement Token
 
 This flow is executed during the creation of tokens and token introspection.
 
-### Pre Userinfo creation
+## Pre Userinfo creation
 
 This trigger is called before userinfo are set in the token or response.
 
-#### Parameters of Pre Userinfo creation
+### Parameters of Pre Userinfo creation
 
 - `ctx`  
   The first parameter contains the following fields:
@@ -27,11 +25,11 @@ This trigger is called before userinfo are set in the token or response.
       - `setMetadata(string, Any)`  
         Key of the metadata and any value
 
-### Pre access token creation
+## Pre access token creation
 
 This trigger is called before the claims are set in the access token and the token type is `jwt`.
 
-#### Parameters of Pre access token creation
+### Parameters of Pre access token creation
 
 - `ctx`  
   The first parameter contains the following fields:

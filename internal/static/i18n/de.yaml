@@ -1117,6 +1117,7 @@ Action:
       Unspecified: Unspezifiziert
       ExternalAuthentication:  Externe Authentifizierung
       CustomiseToken: Token ergänzen
+      InternalAuthentication:  Interne Authentifizierung
   TriggerType:
     Unspecified: Unspezifiziert
     PostAuthentication: Nach Authentifizierung

@@ -1,16 +1,14 @@
 ---
-title: Register flows
+title: External Authentication Flow
 ---
-
-## External Authentication
 
 This flow is executed if the user logs in using an [identity provider](../../guides/integrate/identity-brokering) or using a [jwt token](../../concepts/structure/jwt_idp).
 
-### Post Authentication
+## Post Authentication
 
 A user has authenticated externally. ZITADEL retrieved and mapped the external information.
 
-#### Parameters of post authentication action
+### Parameters of Post Authentication Action
 
 - `ctx`  
 The first parameter contains the following fields
@@ -24,6 +22,7 @@ The first parameter contains the following fields
     The id token which will be returned to the user
   - `v1`
     - `externalUser()` [*externalUser*](./objects#external-user)
+    - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
 - `api`  
   The second parameter contains the following fields
   - `v1`
@@ -53,16 +52,17 @@ The first parameter contains the following fields
   - `metadata`  
     Array of [*metadata*](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
 
-### Pre Creation
+## Pre Creation
 
 A user selected **Register** on the overview page after external authentication. ZITADEL did not create the user yet.
 
-#### Parameters of Pre Creation
+### Parameters of Pre Creation
 
 - `ctx`  
   The first parameter contains the following fields
   - `v1`
     - `user` [*human*](./objects#human-user)
+    - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
 - `api`  
   The second parameter contains the following fields
   - `metadata`  
@@ -95,16 +95,17 @@ A user selected **Register** on the overview page after external authentication.
       - `appendMetadata(string, Any)`  
         The first parameter represents the key and the second a value which will be stored
 
-### Post Creation
+## Post Creation
 
 A user selected **Register** on the overview page after external authentication and ZITADEL successfully created the user.
 
-#### Parameters of Post Creation
+### Parameters of Post Creation
 
 - `ctx`  
   The first parameter contains the following fields
   - `v1`
     - `getUser()` [*user*](./objects#user)
+    - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
 - `api`  
   The second parameter contains the following fields
   - `userGrants` Array of [*userGrant*](./objects#user-grant)'s
