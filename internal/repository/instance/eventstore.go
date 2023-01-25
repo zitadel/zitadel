@@ -89,5 +89,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, InstanceDomainRemovedEventType, DomainRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, InstanceAddedEventType, InstanceAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, InstanceChangedEventType, InstanceChangedEventMapper).
-		RegisterFilterEventMapper(AggregateType, InstanceRemovedEventType, InstanceRemovedEventMapper)
+		RegisterFilterEventMapper(AggregateType, InstanceRemovedEventType, InstanceRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, NotificationPolicyAddedEventType, NotificationPolicyAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper)
 }

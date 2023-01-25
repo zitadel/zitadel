@@ -11,6 +11,7 @@ import { IdpSettingsModule } from '../policies/idp-settings/idp-settings.module'
 import { LoginPolicyModule } from '../policies/login-policy/login-policy.module';
 import { LoginTextsPolicyModule } from '../policies/login-texts/login-texts.module';
 import { MessageTextsPolicyModule } from '../policies/message-texts/message-texts.module';
+import { NotificationPolicyModule } from '../policies/notification-policy/notification-policy.module';
 import { NotificationSettingsModule } from '../policies/notification-settings/notification-settings.module';
 import { OIDCConfigurationModule } from '../policies/oidc-configuration/oidc-configuration.module';
 import { PasswordComplexityPolicyModule } from '../policies/password-complexity-policy/password-complexity-policy.module';
@@ -34,6 +35,7 @@ import { SettingsListComponent } from './settings-list.component';
     PasswordLockoutPolicyModule,
     PrivateLabelingPolicyModule,
     GeneralSettingsModule,
+    NotificationPolicyModule,
     IdpSettingsModule,
     PrivacyPolicyModule,
     MessageTextsPolicyModule,

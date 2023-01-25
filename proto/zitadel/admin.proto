@@ -1945,6 +1945,91 @@ service AdminService {
         };
     }
 
+    //Add a default notification policy for ZITADEL
+    // it impacts all organisations without a customised policy
+    rpc AddNotificationPolicy(AddNotificationPolicyRequest) returns (AddNotificationPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/notification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy";
+                };
+            };
+        };
+    }
+
+
+    //Returns the notification policy defined by the administrators of ZITADEL
+    rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/notification";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy";
+                };
+            };
+        };
+    }
+
+    //Updates the default notification policy of ZITADEL
+    // it impacts all organisations without a customised policy
+    rpc UpdateNotificationPolicy(UpdateNotificationPolicyRequest) returns (UpdateNotificationPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/notification";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     //Returns the default text for initial message (translation file)
     rpc GetDefaultInitMessageText(GetDefaultInitMessageTextRequest) returns (GetDefaultInitMessageTextResponse) {
         option (google.api.http) = {
@@ -1967,10 +2052,11 @@ service AdminService {
         };
     }
 
+
     //Sets the default custom text for initial message
     // it impacts all organisations without customized initial message text
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultInitMessageText(SetDefaultInitMessageTextRequest) returns (SetDefaultInitMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/init/{language}";
@@ -2019,7 +2105,7 @@ service AdminService {
     //Sets the default custom text for password reset message
     // it impacts all organisations without customized password reset message text
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultPasswordResetMessageText(SetDefaultPasswordResetMessageTextRequest) returns (SetDefaultPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordreset/{language}";
@@ -2069,7 +2155,7 @@ service AdminService {
     //Sets the default custom text for verify email message
     // it impacts all organisations without customized verify email message text
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultVerifyEmailMessageText(SetDefaultVerifyEmailMessageTextRequest) returns (SetDefaultVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyemail/{language}";
@@ -2118,7 +2204,7 @@ service AdminService {
     //Sets the default custom text for verify phone message
     // it impacts all organisations without customized verify phone message text
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultVerifyPhoneMessageText(SetDefaultVerifyPhoneMessageTextRequest) returns (SetDefaultVerifyPhoneMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyphone/{language}";
@@ -2164,10 +2250,10 @@ service AdminService {
         };
     }
 
-    //Sets the default custom text for domain claimed phone message
+    //Sets the default custom text for domain claimed message
     // it impacts all organisations without customized domain claimed message text
     // The Following Variables can be used:
-    // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultDomainClaimedMessageText(SetDefaultDomainClaimedMessageTextRequest) returns (SetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/domainclaimed/{language}";
@@ -2216,7 +2302,7 @@ service AdminService {
     //Sets the default custom text for passwordless registration message
     // it impacts all organisations without customized passwordless registration message text
     // The Following Variables can be used:
-    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultPasswordlessRegistrationMessageText(SetDefaultPasswordlessRegistrationMessageTextRequest) returns (SetDefaultPasswordlessRegistrationMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordless_registration/{language}";
@@ -2239,6 +2325,57 @@ service AdminService {
             permission: "policy.delete"
         };
     }
+
+
+    //Returns the default text for password change message (translation file)
+    rpc GetDefaultPasswordChangeMessageText(GetDefaultPasswordChangeMessageTextRequest) returns (GetDefaultPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/password_change/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for password change message (overwritten in eventstore)
+    rpc GetCustomPasswordChangeMessageText(GetCustomPasswordChangeMessageTextRequest) returns (GetCustomPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/password_change/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for password change message
+    // it impacts all organisations without customized password change message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
+    rpc SetDefaultPasswordChangeMessageText(SetDefaultPasswordChangeMessageTextRequest) returns (SetDefaultPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/password_change/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    // Removes the custom password change message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomPasswordChangeMessageTextToDefault(ResetCustomPasswordChangeMessageTextToDefaultRequest) returns (ResetCustomPasswordChangeMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/password_change/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
 
     //Returns the default custom texts for login ui (translation file)
     rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
@@ -4111,6 +4248,29 @@ message UpdatePrivacyPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message AddNotificationPolicyRequest {
+    bool password_change = 1;
+}
+
+message AddNotificationPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetNotificationPolicyRequest {}
+
+message GetNotificationPolicyResponse {
+    zitadel.policy.v1.NotificationPolicy policy = 1;
+}
+
+message UpdateNotificationPolicyRequest {
+   bool password_change = 1;
+}
+
+message UpdateNotificationPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultInitMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -4330,6 +4490,51 @@ message ResetCustomDomainClaimedMessageTextToDefaultRequest {
 message ResetCustomDomainClaimedMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
+
+message GetDefaultPasswordChangeMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultPasswordChangeMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomPasswordChangeMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomPasswordChangeMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultPasswordChangeMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultPasswordChangeMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomPasswordChangeMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomPasswordChangeMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 
 message GetDefaultPasswordlessRegistrationMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];

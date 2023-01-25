@@ -225,6 +225,10 @@ Errors:
       Empty: Org IAM Policy ist leer
       NotExisting: Org IAM Policy existiert nicht
       AlreadyExists: Org IAM Policy existiert bereits
+    NotificationPolicy:
+      NotFound: Notification Policy konnte nicht gefunden werden
+      NotChanged: Notification Policy wurde nicht verändert
+      AlreadyExists: Notification Policy existiert bereits
   Project:
     ProjectIDMissing: Project ID fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
@@ -351,6 +355,10 @@ Errors:
       AlreadyExists: Default Org IAM Policy existiert bereits
       Empty: Default Org IAM Policy leer
       NotChanged: Default Org IAM Policy wurde nicht verändert
+    NotificationPolicy:
+      NotFound: Default Notification Policy konnte nicht gefunden werden
+      NotChanged: Default Notification Policy wurde nicht verändert
+      AlreadyExists: Default Notification Policy existiert bereits
   Policy:
     AlreadyExists: Policy existiert bereits
     Label:
@@ -750,6 +758,10 @@ EventTypes:
         added: Passwortaussperrrichtlinie hinzugefügt
         changed: Passwortaussperrrichtlinie geändert
         removed: Passwortaussperrrichtlinie gelöscht
+      notification:
+        added: Notifikation Richtlinie hinzugefügt
+        changed: Notifikation Richtlinie geändert
+        removed: Notifikation Richtlinie entfernt
     flow:
       trigger_actions:
         set: Aktionen festgelegt
@@ -980,7 +992,7 @@ EventTypes:
       removed: Instanzmitglied gelöscht
       cascade:
         removed: Instanzmitglied kaskadierend gelöscht
-    notification: 
+    notification:
       provider:
         debug:
           fileadded: Datei zu Debug Notification Provider hinzugefügt
@@ -1047,7 +1059,7 @@ EventTypes:
         changed: Datenschutzrichtlinie geändert
       security:
         set: Sicherheitsrichtlinie gesetzt
-        
+
     removed: Instanz gelöscht
     secret:
       generator:
