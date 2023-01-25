@@ -52,6 +52,10 @@ var (
 	}
 )
 
+func LoginHintLink(origin, username string) string {
+	return origin + HandlerPrefix + "?login_hint=" + username
+}
+
 func (i *spaHandler) Open(name string) (http.File, error) {
 	ret, err := i.fileSystem.Open(name)
 	if !os.IsNotExist(err) || path.Ext(name) != "" {

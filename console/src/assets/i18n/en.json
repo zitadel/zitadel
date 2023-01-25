@@ -883,7 +883,7 @@
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notification providers and SMTP",
+      "NOTIFICATIONS": "Notification settings",
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
@@ -1006,6 +1006,11 @@
       "SYMBOLERROR": "Must include a symbol/punctuation mark.",
       "NUMBERERROR": "Must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notification",
+      "DESCRIPTION": "Determines on which changes, notifications will be sent.",
+      "PASSWORDCHANGE": "Password change"
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
@@ -1146,7 +1151,8 @@
         "VP": "Verify Phone",
         "PR": "Password Reset",
         "DC": "Domain Claim",
-        "PL": "Passwordless"
+        "PL": "Passwordless",
+        "PC": "Password Change"
       },
       "CHIPS": {
         "firstname": "Firstname",
