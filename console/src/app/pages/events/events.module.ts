@@ -22,6 +22,7 @@ import { EventsComponent } from './events.component';
 import { EventsRoutingModule } from './events-routing.module';
 import { FilterEventsModule } from 'src/app/modules/filter-events/filter-events.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
   declarations: [EventsComponent],
@@ -47,6 +48,7 @@ import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
     LocalizedDatePipeModule,
     MatTableModule,
     MatSortModule,
+    OverlayModule,
   ],
   exports: [],
 })

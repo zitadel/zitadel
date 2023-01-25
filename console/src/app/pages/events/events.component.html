@@ -4,6 +4,37 @@
 
   <cnsl-refresh-table (refreshed)="refresh()" [dataSize]="dataSource.data.length" [loading]="loading$ | async">
     <!-- <cnsl-filter-events actions (filterChanged)="applySearchQuery($any($event))"> </cnsl-filter-events> -->
+
+    <div class="filter-button-wrapper">
+      <button
+        mat-stroked-button
+        cdkOverlayOrigin
+        #trigger="cdkOverlayOrigin"
+        matRipple
+        id="userfilterbutton"
+        class="user-filter-button"
+        (click)="showUserFilter = !showUserFilter"
+      >
+        Filter by user
+      </button>
+      <ng-template
+        cdkConnectedOverlay
+        [cdkConnectedOverlayOrigin]="trigger"
+        [flexibleDimensions]="true"
+        [lockPosition]="true"
+        [cdkConnectedOverlayOffsetY]="10"
+        [cdkConnectedOverlayHasBackdrop]="true"
+        [cdkConnectedOverlayPositions]="positions"
+        cdkConnectedOverlayBackdropClass="transparent-backdrop"
+        [cdkConnectedOverlayOpen]="showUserFilter"
+        (backdropClick)="showUserFilter = false"
+        (detach)="showUserFilter = false"
+      >
+        <cnsl-filter-events class="context_card" *ngIf="showUserFilter" (closedCard)="showUserFilter = false">
+        </cnsl-filter-events>
+      </ng-template>
+    </div>
+
     <table [dataSource]="dataSource" mat-table class="table views-table" aria-label="Views" matSort>
       <ng-container matColumnDef="editor">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'IAM.EVENTS.EDITOR' | translate }}</th>

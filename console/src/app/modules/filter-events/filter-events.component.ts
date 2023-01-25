@@ -1,16 +1,32 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
-import { ActivatedRoute, Router } from '@angular/router';
-import { take } from 'rxjs';
-import { ListEventsRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import {
+  AfterContentChecked,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import { UntypedFormControl } from '@angular/forms';
+import {
+  MatLegacyAutocomplete as MatAutocomplete,
+  MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent,
+} from '@angular/material/legacy-autocomplete';
+import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
+import { from, of, Subject } from 'rxjs';
+import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { ListUsersResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { OrgNameQuery, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
-import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { LoginNameQuery, SearchQuery, User } from 'src/app/proto/generated/zitadel/user_pb';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
-import { FilterComponent } from '../filter/filter.component';
-
-enum SubQuery {
-  NAME,
+export enum UserTarget {
+  SELF = 'self',
+  EXTERNAL = 'external',
 }
 
 @Component({
@@ -18,98 +34,162 @@ enum SubQuery {
   templateUrl: './filter-events.component.html',
   styleUrls: ['./filter-events.component.scss'],
 })
-export class FilterEventsComponent implements OnInit {
-  @Output() public filterChanged: EventEmitter<ListEventsRequest> = new EventEmitter();
+export class FilterEventsComponent implements OnInit, AfterContentChecked {
+  public selectable: boolean = true;
+  public removable: boolean = true;
+  public addOnBlur: boolean = true;
+  public separatorKeysCodes: number[] = [ENTER, COMMA];
 
-  constructor(router: Router, protected route: ActivatedRoute) {}
+  public myControl: UntypedFormControl = new UntypedFormControl();
+  public globalLoginNameControl: UntypedFormControl = new UntypedFormControl();
 
-  ngOnInit(): void {
-    this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      const { filter } = params;
-      if (filter) {
-        const stringifiedFilters = filter as string;
-        const filters: OrgQuery.AsObject[] = JSON.parse(stringifiedFilters) as OrgQuery.AsObject[];
+  public loginNames: string[] = [];
+  @Input() public users: Array<User.AsObject> = [];
+  @Input() public editState: boolean = true;
+  public filteredUsers: Array<User.AsObject> = [];
+  public isLoading: boolean = false;
+  @Input() public target: UserTarget = UserTarget.SELF;
+  public hint: string = '';
+  public UserTarget: any = UserTarget;
+  @ViewChild('usernameInput') public usernameInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
+  @Output() public selectionChanged: EventEmitter<User.AsObject[]> = new EventEmitter();
+  @Input() public singleOutput: boolean = false;
 
-        const orgQueries = filters.map((filter) => {
-          if (filter.nameQuery) {
-            const orgQuery = new OrgQuery();
+  private unsubscribed$: Subject<void> = new Subject();
+  constructor(private userService: ManagementService, private toast: ToastService, private cdref: ChangeDetectorRef) {}
 
-            const orgNameQuery = new OrgNameQuery();
-            orgNameQuery.setName(filter.nameQuery.name);
-            orgNameQuery.setMethod(filter.nameQuery.method);
+  public ngOnInit(): void {
+    if (this.target === UserTarget.EXTERNAL) {
+      this.filteredUsers = [];
+      this.unsubscribed$.next(); // clear old subscription
+    } else if (this.target === UserTarget.SELF) {
+      this.getFilteredResults(); // new subscription
+    }
+  }
 
-            orgQuery.setNameQuery(orgNameQuery);
-            return orgQuery;
+  public ngAfterContentChecked(): void {
+    this.cdref.detectChanges();
+  }
+
+  private getFilteredResults(): void {
+    this.myControl.valueChanges
+      .pipe(
+        debounceTime(200),
+        takeUntil(this.unsubscribed$),
+        tap(() => (this.isLoading = true)),
+        switchMap((value) => {
+          const query = new SearchQuery();
+
+          const lnQuery = new LoginNameQuery();
+          lnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+          lnQuery.setLoginName(value);
+
+          query.setLoginNameQuery(lnQuery);
+
+          if (this.target === UserTarget.SELF) {
+            return from(this.userService.listUsers(10, 0, [query]));
           } else {
-            return undefined;
+            return of();
+          }
+        }),
+      )
+      .subscribe((userresp: ListUsersResponse.AsObject | unknown) => {
+        this.isLoading = false;
+        if (this.target === UserTarget.SELF && userresp) {
+          this.filteredUsers = (userresp as ListUsersResponse.AsObject).resultList;
+        }
+      });
+  }
+
+  public displayFn(user?: User.AsObject): string {
+    return user ? `${user.preferredLoginName}` : '';
+  }
+
+  public add(event: MatChipInputEvent): void {
+    if (!this.matAutocomplete.isOpen) {
+      const input = event.chipInput?.inputElement;
+      const value = event.value;
+
+      if ((value || '').trim()) {
+        const index = this.filteredUsers.findIndex((user) => {
+          if (user.preferredLoginName) {
+            return user.preferredLoginName === value;
+          } else {
+            return false;
           }
         });
-
-        // this.searchQueries = orgQueries.filter((q) => q !== undefined) as OrgQuery[];
-        // this.filterChanged.emit(this.searchQueries ? this.searchQueries : undefined);
+        if (index > -1) {
+          if (this.users && this.users.length > 0) {
+            this.users.push(this.filteredUsers[index]);
+            this.selectionChanged.emit(this.users);
+          } else {
+            this.users = [this.filteredUsers[index]];
+            this.selectionChanged.emit(this.users);
+          }
+        }
       }
-    });
+
+      if (input) {
+        input.value = '';
+      }
+    }
   }
 
-  public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {
-    // if (event.checked) {
-    //   switch (subquery) {
-    //     case SubQuery.NAME:
-    //       const nq = new OrgNameQuery();
-    //       nq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-    //       nq.setName('');
-    //       const oq = new OrgQuery();
-    //       oq.setNameQuery(nq);
-    //       this.searchQueries.push(oq);
-    //       break;
-    //   }
-    // } else {
-    //   switch (subquery) {
-    //     case SubQuery.NAME:
-    //       const index_dn = this.searchQueries.findIndex((q) => (q as OrgQuery).toObject().nameQuery !== undefined);
-    //       if (index_dn > -1) {
-    //         this.searchQueries.splice(index_dn, 1);
-    //       }
-    //       break;
-    //   }
-    // }
+  public remove(user: User.AsObject): void {
+    const index = this.users.indexOf(user);
+
+    if (index >= 0) {
+      this.users.splice(index, 1);
+      this.selectionChanged.emit(this.users);
+    }
   }
 
-  public setValue(subquery: SubQuery, query: any, event: any) {
-    // const value = event?.target?.value ?? event.value;
-    // switch (subquery) {
-    //   case SubQuery.NAME:
-    //     (query as OrgNameQuery).setName(value);
-    //     this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
-    //     break;
-    // }
+  public selected(event: MatAutocompleteSelectedEvent): void {
+    const index = this.filteredUsers.findIndex((user) => user === event.option.value);
+    if (index !== -1) {
+      if (this.singleOutput) {
+        this.selectionChanged.emit([this.filteredUsers[index]]);
+      } else {
+        if (this.users && this.users.length > 0) {
+          this.users.push(this.filteredUsers[index]);
+        } else {
+          this.users = [this.filteredUsers[index]];
+        }
+
+        this.selectionChanged.emit(this.users);
+
+        this.usernameInput.nativeElement.value = '';
+        this.myControl.setValue(null);
+      }
+    }
   }
 
-  public getSubFilter(subquery: SubQuery): any {
-    // switch (subquery) {
-    //   case SubQuery.NAME:
-    //     const dn = this.searchQueries.find((q) => (q as OrgQuery).toObject().nameQuery !== undefined);
-    //     if (dn) {
-    //       return (dn as OrgQuery).getNameQuery();
-    //     } else {
-    //       return undefined;
-    //     }
-    // }
+  public changeTarget(): void {
+    if (this.target === UserTarget.SELF) {
+      this.target = UserTarget.EXTERNAL;
+      this.filteredUsers = [];
+      this.unsubscribed$.next(); // clear old subscription
+    } else if (this.target === UserTarget.EXTERNAL) {
+      this.target = UserTarget.SELF;
+      this.getFilteredResults(); // new subscription
+    }
   }
 
-  public setMethod(query: any, event: any) {
-    // (query as UserNameQuery).setMethod(event.value);
-    // this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
-  }
-
-  public emitFilter(): void {
-    // this.filterChanged.emit(this.searchQueries ? this.searchQueries : []);
-    // this.showFilter = false;
-    // this.filterOpen.emit(false);
-  }
-
-  public resetFilter(): void {
-    // this.searchQueries = [];
-    // this.emitFilter();
+  public getGlobalUser(): void {
+    this.userService
+      .getUserByLoginNameGlobal(this.globalLoginNameControl.value)
+      .then((resp) => {
+        if (this.singleOutput && resp.user) {
+          this.users = [resp.user];
+          this.selectionChanged.emit([this.users[0]]);
+        } else if (resp.user) {
+          this.users.push(resp.user);
+          this.selectionChanged.emit(this.users);
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 }

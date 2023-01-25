@@ -1,28 +1,37 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
-import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
-import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { FilterModule } from '../filter/filter.module';
 import { InputModule } from '../input/input.module';
 import { FilterEventsComponent } from './filter-events.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatLegacyChipsModule } from '@angular/material/legacy-chips';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { AvatarModule } from '../avatar/avatar.module';
+import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
 
 @NgModule({
   declarations: [FilterEventsComponent],
   imports: [
     CommonModule,
-    FilterModule,
-    InputModule,
-    MatSelectModule,
-    MatCheckboxModule,
+    MatAutocompleteModule,
+    MatLegacyChipsModule,
     MatButtonModule,
+    InputModule,
     MatIconModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    FormsModule,
+    MatTooltipModule,
     TranslateModule,
-    RouterModule,
+    MatLegacyCheckboxModule,
+    MatSelectModule,
+    AvatarModule,
   ],
   exports: [FilterEventsComponent],
 })

@@ -15,6 +15,13 @@
   }
 }
 
+.filter-button-wrapper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  user-select: none;
+}
+
 .aggregate-row {
   display: flex;
   flex-direction: column;

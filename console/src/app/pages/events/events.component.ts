@@ -14,6 +14,7 @@ import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Router } from '@angular/router';
 import { ToastService } from 'src/app/services/toast.service';
 import { TranslateService } from '@ngx-translate/core';
+import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
 
 type Request = ListEventsRequest;
 
@@ -33,6 +34,11 @@ const initRequest = new ListEventsRequest().setLimit(20);
   styleUrls: ['./events.component.scss'],
 })
 export class EventsComponent {
+  public showUserFilter: boolean = false;
+  public positions: ConnectedPosition[] = [
+    new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
+    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+  ];
   //   public orgSearchKey: OrgListSearchKey | undefined = undefined;
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
@@ -115,9 +121,9 @@ export class EventsComponent {
   public load() {
     const req = new ListEventTypesRequest();
 
-    return this.adminService.listEventTypes(req).then((list) => {
-      list.eventTypesList.forEach((el) => console.log(el));
-    });
+    // return this.adminService.listEventTypes(req).then((list) => {
+    //   list.eventTypesList.forEach((el) => console.log(el));
+    // });
   }
 
   public refresh(): void {
