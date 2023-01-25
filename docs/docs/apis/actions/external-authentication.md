@@ -1,5 +1,5 @@
 ---
-title: External Authentication
+title: External Authentication Flow
 ---
 
 This flow is executed if the user logs in using an [identity provider](../../guides/integrate/identity-brokering) or using a [jwt token](../../concepts/structure/jwt_idp).

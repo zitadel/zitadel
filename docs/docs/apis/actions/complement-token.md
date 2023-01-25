@@ -1,5 +1,5 @@
 ---
-title: Complement Token
+title: Complement Token Flow
 ---
 
 This flow is executed during the creation of tokens and token introspection.

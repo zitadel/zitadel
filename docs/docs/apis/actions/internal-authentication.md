@@ -1,5 +1,5 @@
 ---
-title: Internal Authentication
+title: Internal Authentication Flow
 ---
 
 ## Post Authentication
