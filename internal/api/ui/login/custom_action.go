@@ -131,7 +131,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 	httpReq *http.Request,
 	authMethod authMethod,
 	authenticationError error,
-) error {
+) ([]*domain.Metadata, error) {
 	resourceOwner := authReq.RequestedOrgID
 	if resourceOwner == "" {
 		resourceOwner = authReq.UserOrgID
@@ -139,10 +139,18 @@ func (l *Login) runPostInternalAuthenticationActions(
 
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeInternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	apiFields := actions.WithAPIFields()
+	metadataList := object.MetadataListFromDomain(nil)
+	apiFields := actions.WithAPIFields(
+		actions.SetFields("metadata", &metadataList.Metadata),
+		actions.SetFields("v1",
+			actions.SetFields("user",
+				actions.SetFields("appendMetadata", metadataList.AppendMetadataFunc),
+			),
+		),
+	)
 	for _, a := range triggerActions {
 		actionCtx, cancel := context.WithTimeout(ctx, a.Timeout())
 
@@ -169,10 +177,10 @@ func (l *Login) runPostInternalAuthenticationActions(
 		)
 		cancel()
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return err
+	return object.MetadataListToDomain(metadataList), err
 }
 
 func (l *Login) runPreCreationActions(
