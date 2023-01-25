@@ -32,7 +32,6 @@ func AuthRequestFromDomain(c *actions.FieldConfig, request *domain.AuthRequest) 
 		CallbackUri:              request.CallbackURI,
 		TransferState:            request.TransferState,
 		Prompt:                   request.Prompt,
-		PossibleLoas:             request.PossibleLOAs,
 		UiLocales:                request.UiLocales,
 		LoginHint:                request.LoginHint,
 		MaxAuthAge:               request.MaxAuthAge,
@@ -68,7 +67,6 @@ type authRequest struct {
 	CallbackUri   string
 	TransferState string
 	Prompt        []domain.Prompt
-	PossibleLoas  []domain.LevelOfAssurance
 	UiLocales     []string
 	LoginHint     string
 	MaxAuthAge    *time.Duration

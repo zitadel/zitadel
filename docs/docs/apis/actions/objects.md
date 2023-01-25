@@ -119,15 +119,13 @@ This object contains context information about the request to the [authorization
 - `changeDate` *Date*
 - `browserInfo` *browserInfo*
   - `userAgent` *string*
-  - `acceptLanguage` "string"
+  - `acceptLanguage` *string*
   - `remoteIp` *string*
 - `applicationId` *string*
 - `callbackUri` *string*
 - `transferState` *string*
 - `prompt` Array of *Number*  
-  <ul><li>0: not set up</li><li>1: second factor</li><li>2: multi factor</li><li>3: factor certified</li></ul>
-- `possibleLoas` Array of *Number*  
-  <ul><li>0: OTP</li><li>1: U2F</li><li>2: U2F User verification</li></ul>
+   <ul><li>0: not specified</li><li>1: none</li><li>2: login</li><li>3: consent</li><li>4: select_account</li><li>5: create</li></ul>
 - `uiLocales` Array of *string*
 - `loginHint` *string*
 - `maxAuthAge` *Number*  
