@@ -16,6 +16,7 @@ import (
 const (
 	passwordEventPrefix             = humanEventPrefix + "password."
 	HumanPasswordChangedType        = passwordEventPrefix + "changed"
+	HumanPasswordChangeSentType     = passwordEventPrefix + "change.sent"
 	HumanPasswordCodeAddedType      = passwordEventPrefix + "code.added"
 	HumanPasswordCodeSentType       = passwordEventPrefix + "code.sent"
 	HumanPasswordCheckSucceededType = passwordEventPrefix + "check.succeeded"
@@ -140,6 +141,34 @@ func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Ag
 
 func HumanPasswordCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanPasswordCodeSentEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}, nil
+}
+
+type HumanPasswordChangeSentEvent struct {
+	eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanPasswordChangeSentEvent) Data() interface{} {
+	return nil
+}
+
+func (e *HumanPasswordChangeSentEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewHumanPasswordChangeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPasswordChangeSentEvent {
+	return &HumanPasswordChangeSentEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanPasswordChangeSentType,
+		),
+	}
+}
+
+func HumanPasswordChangeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
+	return &HumanPasswordChangeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

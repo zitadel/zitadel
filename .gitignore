@@ -19,6 +19,7 @@ profile.cov
 __debug_bin
 debug
 sandbox.go
+/cmd/dev/
 
 # IDE
 .idea

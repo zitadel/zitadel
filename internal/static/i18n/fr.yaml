@@ -225,6 +225,10 @@ Errors:
       Empty: La politique IAM d'Org est vide
       NotExisting: La politique Org IAM n'existe pas
       AlreadyExists: La politique IAM d'Org existe déjà
+    NotificationPolicy:
+      NotFound: La politique notification n'a pas été trouvée
+      NotChanged: La politique notification n'a pas été modifiée
+      AlreadyExists: La politique notification existe déjà
   Project:
     ProjectIDMissing: Id de projet manquant
     AlreadyExists: Le projet existe déjà dans l'organisation
@@ -351,6 +355,10 @@ Errors:
       NotExisting: La politique IAM d'Org n'existe pas
       AlreadyExists: La politique IAM d'Org existe déjà
       NotChanged: La politique IAM d'Org n'a pas été modifiée
+    NotificationPolicy:
+      NotFound: La politique de notification par défaut n'a pas été trouvée
+      NotChanged: La politique de notification par défaut n'a pas été modifiée
+      AlreadyExists: La ppolitique de notification par défaut existe déjà
   Policy:
     AlreadyExists: La politique existe déjà
     Label:
@@ -725,6 +733,10 @@ EventTypes:
         added: Politique de confidentialité et CGU ajoutés
         changed: Politique de confidentialité et CGU modifiées
         removed: Politique de confidentialité et conditions d'utilisation supprimées
+      notification:
+        added: Politique de notification ajoutée
+        changed: Politique de notification modifiée
+        removed: Politique de notification supprimée
     flow:
       trigger_actions:
         set: Action set
@@ -934,6 +946,7 @@ Action:
       Unspecified: Non spécifié
       ExternalAuthentication: Authentification externe
       CustomiseToken: Compléter Token
+      InternalAuthentication: Authentification interne
   TriggerType:
     Unspecified: Non spécifié
     PostAuthentication: Authentification postérieure
