@@ -72,7 +72,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	err = l.authRepo.VerifyMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID, credData, domain.BrowserInfoFromRequest(r))
 
-	metadata, actionErr := l.runPostInternalAuthenticationActions(r.Context(), authReq, r, authMethodU2F, err)
+	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodU2F, err)
 	if err == nil && actionErr == nil && len(metadata) > 0 {
 		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
 	} else if actionErr != nil && err == nil {

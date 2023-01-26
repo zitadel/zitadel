@@ -91,7 +91,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	// without breaking existing actions.
 	// Also, if that field is needed, we probably also should provide it
 	// for ExternalAuthentication.
-	user, metadatas, err := l.runPreCreationActions(r.Context(), authRequest, r, data.toHumanDomain(), make([]*domain.Metadata, 0), resourceOwner, domain.FlowTypeInternalAuthentication)
+	user, metadatas, err := l.runPreCreationActions(authRequest, r, data.toHumanDomain(), make([]*domain.Metadata, 0), resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -112,7 +112,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	userGrants, err := l.runPostCreationActions(r.Context(), user.AggregateID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
+	userGrants, err := l.runPostCreationActions(user.AggregateID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
 		return

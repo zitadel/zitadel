@@ -121,7 +121,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		resourceOwner = authReq.RequestedOrgID
 	}
 	externalUser, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(tokens, idpConfig)
-	externalUser, err := l.runPostExternalAuthenticationActions(r.Context(), externalUser, tokens, authReq, r, idpConfig, nil)
+	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens, authReq, r, idpConfig, nil)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -161,7 +161,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		return
 	}
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, externalUser, idpConfig)
-	user, metadata, err = l.runPreCreationActions(r.Context(), authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
+	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -177,7 +177,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.runPostCreationActions(r.Context(), authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
+	userGrants, err := l.runPostCreationActions(authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

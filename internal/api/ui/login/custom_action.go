@@ -17,15 +17,16 @@ import (
 )
 
 func (l *Login) runPostExternalAuthenticationActions(
-	ctx context.Context,
 	user *domain.ExternalUser,
 	tokens *oidc.Tokens,
-	authReq *domain.AuthRequest,
-	httpReq *http.Request,
+	authRequest *domain.AuthRequest,
+	httpRequest *http.Request,
 	config *iam_model.IDPConfigView,
 	authenticationError error,
 ) (*domain.ExternalUser, error) {
-	resourceOwner := authReq.RequestedOrgID
+	ctx := httpRequest.Context()
+
+	resourceOwner := authRequest.RequestedOrgID
 	if resourceOwner == "" {
 		resourceOwner = config.AggregateID
 	}
@@ -91,8 +92,8 @@ func (l *Login) runPostExternalAuthenticationActions(
 				actions.SetFields("externalUser", func(c *actions.FieldConfig) interface{} {
 					return object.UserFromExternalUser(c, user)
 				}),
-				actions.SetFields("authRequest", object.AuthRequestField(authReq)),
-				actions.SetFields("httpRequest", object.HTTPRequestField(*httpReq)),
+				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
+				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
 				actions.SetFields("authError", authErrStr),
 			),
 		)
@@ -126,15 +127,16 @@ const (
 )
 
 func (l *Login) runPostInternalAuthenticationActions(
-	ctx context.Context,
-	authReq *domain.AuthRequest,
-	httpReq *http.Request,
+	authRequest *domain.AuthRequest,
+	httpRequest *http.Request,
 	authMethod authMethod,
 	authenticationError error,
 ) ([]*domain.Metadata, error) {
-	resourceOwner := authReq.RequestedOrgID
+	ctx := httpRequest.Context()
+
+	resourceOwner := authRequest.RequestedOrgID
 	if resourceOwner == "" {
-		resourceOwner = authReq.UserOrgID
+		resourceOwner = authRequest.UserOrgID
 	}
 
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeInternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
@@ -162,8 +164,8 @@ func (l *Login) runPostInternalAuthenticationActions(
 			actions.SetFields("v1",
 				actions.SetFields("authMethod", authMethod),
 				actions.SetFields("authError", authErrStr),
-				actions.SetFields("authRequest", object.AuthRequestField(authReq)),
-				actions.SetFields("httpRequest", object.HTTPRequestField(*httpReq)),
+				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
+				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
 			),
 		)
 
@@ -184,7 +186,6 @@ func (l *Login) runPostInternalAuthenticationActions(
 }
 
 func (l *Login) runPreCreationActions(
-	ctx context.Context,
 	authRequest *domain.AuthRequest,
 	httpRequest *http.Request,
 	user *domain.Human,
@@ -192,6 +193,8 @@ func (l *Login) runPreCreationActions(
 	resourceOwner string,
 	flowType domain.FlowType,
 ) (*domain.Human, []*domain.Metadata, error) {
+	ctx := httpRequest.Context()
+
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePreCreation, resourceOwner, false)
 	if err != nil {
 		return nil, nil, err
@@ -261,7 +264,7 @@ func (l *Login) runPreCreationActions(
 					return object.UserFromHuman(c, user)
 				}),
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
-				actions.SetFields("httpRequest", object.HTTPRequestField(*httpRequest)),
+				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
 			),
 		)
 
@@ -282,13 +285,14 @@ func (l *Login) runPreCreationActions(
 }
 
 func (l *Login) runPostCreationActions(
-	ctx context.Context,
 	userID string,
 	authRequest *domain.AuthRequest,
-	httpReq *http.Request,
+	httpRequest *http.Request,
 	resourceOwner string,
 	flowType domain.FlowType,
 ) ([]*domain.UserGrant, error) {
+	ctx := httpRequest.Context()
+
 	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePostCreation, resourceOwner, false)
 	if err != nil {
 		return nil, err
@@ -318,7 +322,7 @@ func (l *Login) runPostCreationActions(
 					}
 				}),
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
-				actions.SetFields("httpRequest", object.HTTPRequestField(*httpReq)),
+				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
 			),
 		)
 

@@ -68,7 +68,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 	token, err := getToken(r, idpConfig.JWTHeaderName)
 	if err != nil {
 		emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
-		if _, actionErr := l.runPostExternalAuthenticationActions(r.Context(), &domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+		if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
 			logging.WithError(err).Error("both external user authentication and action post authentication failed")
 		}
 
@@ -78,14 +78,14 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 	tokenClaims, err := validateToken(r.Context(), token, idpConfig)
 	tokens := &oidc.Tokens{IDToken: token, IDTokenClaims: tokenClaims, Token: &oauth2.Token{}}
 	if err != nil {
-		if _, actionErr := l.runPostExternalAuthenticationActions(r.Context(), &domain.ExternalUser{}, tokens, authReq, r, idpConfig, err); actionErr != nil {
+		if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, tokens, authReq, r, idpConfig, err); actionErr != nil {
 			logging.WithError(err).Error("both external user authentication and action post authentication failed")
 		}
 		l.renderError(w, r, authReq, err)
 		return
 	}
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	externalUser, err = l.runPostExternalAuthenticationActions(r.Context(), externalUser, tokens, authReq, r, idpConfig, nil)
+	externalUser, err = l.runPostExternalAuthenticationActions(externalUser, tokens, authReq, r, idpConfig, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -137,7 +137,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 	}
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
-	user, metadata, err = l.runPreCreationActions(r.Context(), authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
+	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -152,7 +152,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.runPostCreationActions(r.Context(), authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
+	userGrants, err := l.runPostCreationActions(authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

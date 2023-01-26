@@ -157,7 +157,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		provider, err := l.getRPConfig(r.Context(), idpConfig, EndpointExternalLoginCallback)
 		if err != nil {
 			emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
-			if _, actionErr := l.runPostExternalAuthenticationActions(r.Context(), &domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+			if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
 				logging.WithError(err).Error("both external user authentication and action post authentication failed")
 			}
 
@@ -167,7 +167,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
 		if err != nil {
 			emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
-			if _, actionErr := l.runPostExternalAuthenticationActions(r.Context(), &domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+			if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
 				logging.WithError(err).Error("both external user authentication and action post authentication failed")
 			}
 
@@ -180,7 +180,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 
 	err = errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
-	if _, actionErr := l.runPostExternalAuthenticationActions(r.Context(), &domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+	if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
 		logging.WithError(err).Error("both external user authentication and action post authentication failed")
 	}
 
@@ -213,7 +213,7 @@ func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigV
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	externalUser, err := l.runPostExternalAuthenticationActions(r.Context(), externalUser, tokens, authReq, r, idpConfig, nil)
+	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens, authReq, r, idpConfig, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -401,7 +401,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
 
-	user, metadata, err = l.runPreCreationActions(r.Context(), authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
+	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, nil, nil, err)
 		return
@@ -416,7 +416,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.runPostCreationActions(r.Context(), authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
+	userGrants, err := l.runPostCreationActions(authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

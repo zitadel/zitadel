@@ -18,6 +18,12 @@ func AuthRequestField(authRequest *domain.AuthRequest) func(c *actions.FieldConf
 }
 
 func AuthRequestFromDomain(c *actions.FieldConfig, request *domain.AuthRequest) goja.Value {
+	var maxAuthAge *time.Duration
+	if request.MaxAuthAge != nil {
+		maxAuthAgeCopy := *request.MaxAuthAge
+		maxAuthAge = &maxAuthAgeCopy
+	}
+
 	return c.Runtime.ToValue(&authRequest{
 		Id:           request.ID,
 		AgentId:      request.AgentID,
@@ -34,7 +40,7 @@ func AuthRequestFromDomain(c *actions.FieldConfig, request *domain.AuthRequest) 
 		Prompt:                   request.Prompt,
 		UiLocales:                request.UiLocales,
 		LoginHint:                request.LoginHint,
-		MaxAuthAge:               request.MaxAuthAge,
+		MaxAuthAge:               maxAuthAge,
 		InstanceId:               request.InstanceID,
 		Request:                  requestFromDomain(request.Request),
 		UserId:                   request.UserID,
