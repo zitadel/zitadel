@@ -11,7 +11,7 @@ const routes: Routes = [
     children: [
       {
         path: 'create',
-        loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then((m) => m.IdpCreateModule),
+        loadChildren: () => import('src/app/modules/idp-create/idp-create.module'),
         canActivate: [RoleGuard],
         data: {
           roles: ['org.idp.write'],
@@ -20,7 +20,7 @@ const routes: Routes = [
       },
       {
         path: ':id',
-        loadChildren: () => import('src/app/modules/idp/idp.module').then((m) => m.IdpModule),
+        loadChildren: () => import('src/app/modules/idp/idp.module'),
         canActivate: [RoleGuard],
         data: {
           roles: ['org.idp.read'],
@@ -31,7 +31,7 @@ const routes: Routes = [
   },
   {
     path: 'members',
-    loadChildren: () => import('./org-members/org-members.module').then((m) => m.OrgMembersModule),
+    loadChildren: () => import('./org-members/org-members.module'),
   },
   {
     path: '',

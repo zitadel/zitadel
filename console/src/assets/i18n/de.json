@@ -231,6 +231,7 @@
       "CREATE": "Erstellen",
       "MY": "Meine Informationen",
       "LOGINNAMES": "Login-Namen",
+      "LOGINMETHODS": "Anmeldemethoden",
       "LOGINNAMESDESC": "Mit diesen Namen kannst Du Dich anmelden.",
       "NOUSER": "Kein Benutzer",
       "REACTIVATE": "Reaktivieren",
@@ -882,7 +883,7 @@
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
       "COMPLEXITY": "Passwordkomplexität",
-      "NOTIFICATIONS": "Benachrichtigungen",
+      "NOTIFICATIONS": "Benachrichtigungseinstellungen",
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identity Provider",
@@ -916,7 +917,7 @@
       "TITLE": "SMTP Einstellungen",
       "SENDERADDRESS": "Sender Email-Adresse",
       "SENDERNAME": "Sender Name",
-      "HOST": "Host",
+      "HOSTANDPORT": "Host und Port",
       "USER": "Benutzer",
       "PASSWORD": "Passwort",
       "SETPASSWORD": "SMTP Passwort setzen",
@@ -1005,6 +1006,11 @@
       "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
       "NUMBERERROR": "Muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notification",
+      "DESCRIPTION": "Legt fest, bei welchen Änderungen Benachrichtigungen gesendet werden",
+      "PASSWORDCHANGE": "Passwordänderung"
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
@@ -1145,7 +1151,8 @@
         "VP": "Telefonnummerverifikation",
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
-        "PL": "Passwortlos"
+        "PL": "Passwortlos",
+        "PC": "Passwordwechsel"
       },
       "CHIPS": {
         "firstname": "Vorname",
@@ -1482,6 +1489,12 @@
       "UPDATED": "Projekt gespeichert.",
       "GRANTUPDATED": "Berechtigung geändert.",
       "DELETED": "Projekt gelöscht."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Rolle löschen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff eine Rolle zu entfernen. Wollen Sie fortfahren?"
     }
   },
   "NEXTSTEPS": {

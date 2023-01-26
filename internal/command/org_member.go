@@ -145,7 +145,8 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 		return nil, err
 	}
 	if errors.IsNotFound(err) {
-		return nil, nil
+		// empty response because we have no data that match the request
+		return &domain.ObjectDetails{}, nil
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
