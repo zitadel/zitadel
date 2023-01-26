@@ -18,7 +18,7 @@ func HTTPRequestField(request *http.Request) func(c *actions.FieldConfig) interf
 			Form:          copyMap(request.Form),
 			PostForm:      copyMap(request.PostForm),
 			RemoteAddr:    request.RemoteAddr,
-			Header:        copyMap(request.Header),
+			Headers:       copyMap(request.Header),
 		})
 	}
 }
@@ -32,7 +32,7 @@ type httpRequest struct {
 	Form          map[string][]string
 	PostForm      map[string][]string
 	RemoteAddr    string
-	Header        map[string][]string
+	Headers       map[string][]string
 }
 
 func copyMap(src map[string][]string) map[string][]string {
