@@ -54,9 +54,16 @@
       </div>
     </div>
 
-    <table [dataSource]="dataSource" mat-table class="table views-table" aria-label="Views" matSort>
+    <table
+      [dataSource]="dataSource"
+      mat-table
+      class="table views-table"
+      aria-label="Views"
+      matSort
+      (matSortChange)="sortChange($event)"
+    >
       <ng-container matColumnDef="editor">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'IAM.EVENTS.EDITOR' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.EDITOR' | translate }}</th>
         <td mat-cell *matCellDef="let event">
           <div class="editor-row" *ngIf="event.editor as editor">
             <!-- <cnsl-avatar
@@ -79,7 +86,7 @@
       </ng-container>
 
       <ng-container matColumnDef="aggregate">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'IAM.EVENTS.AGGREGATE' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.AGGREGATE' | translate }}</th>
         <td mat-cell *matCellDef="let event">
           <div class="aggregate-row">
             <span class="id">{{ event.aggregate.resourceOwner }}</span
@@ -91,7 +98,7 @@
       </ng-container>
 
       <ng-container matColumnDef="sequence">
-        <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.SEQUENCE' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'IAM.EVENTS.SEQUENCE' | translate }}</th>
         <td mat-cell *matCellDef="let event">{{ event.sequence }}</td>
       </ng-container>
 
@@ -124,7 +131,14 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    <cnsl-paginator #paginator class="paginator" [hidePagination]="true" [length]="dataSource.data.length || 0">
+    <cnsl-paginator
+      #paginator
+      class="paginator"
+      [pageSize]="INITPAGESIZE"
+      (page)="changePage($event)"
+      [pageSizeOptions]="[10, 20, 50, 100]"
+      [length]="dataSource.data.length || 0"
+    >
     </cnsl-paginator>
   </cnsl-refresh-table>
 </div>

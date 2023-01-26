@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
@@ -8,7 +8,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
+import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Router } from '@angular/router';
 import { ToastService } from 'src/app/services/toast.service';
@@ -32,7 +32,8 @@ enum EventFieldName {
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
 })
-export class EventsComponent {
+export class EventsComponent implements OnInit {
+  public INITPAGESIZE = 20;
   public showFilter: boolean = false;
   public ActionKeysType: any = ActionKeysType;
 
@@ -40,7 +41,6 @@ export class EventsComponent {
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
   ];
-  //   public orgSearchKey: OrgListSearchKey | undefined = undefined;
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild('input') public filter!: Input;
@@ -56,7 +56,6 @@ export class EventsComponent {
   ];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  public initialLimit: number = 20;
   public timestamp: Timestamp.AsObject | undefined = undefined;
   public totalResult: number = 0;
   public filterOpen: boolean = false;
@@ -86,27 +85,23 @@ export class EventsComponent {
       }),
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
-
-    // this.requestOrgs$.next(initRequest);
-
-    // this.requestOrgsObservable$.pipe(switchMap((req) => this.loadEvents(req))).subscribe((orgs) => {
-    //   this.dataSource = new MatTableDataSource<Event.AsObject>(orgs);
-    // });
-    this.loadEvents();
   }
 
-  public loadEvents(filteredRequest?: ListEventsRequest): void {
+  ngOnInit(): void {
+    const req = new ListEventsRequest();
+    req.setLimit(this.paginator?.pageSize ?? this.INITPAGESIZE);
+    this.loadEvents(req);
+  }
+
+  public loadEvents(filteredRequest: ListEventsRequest): void {
     this.loadingSubject.next(true);
 
     let sortingField: EventFieldName | undefined = undefined;
-    if (this.sort?.active && this.sort?.direction) sortingField = this.sort.active as EventFieldName;
-    //   switch (this.sort.active) {
-    //     case 'name':
-    //       sortingField = OrgFieldName.ORG_FIELD_NAME_NAME;
-    //       break;
-    //   }
+    if (this.sort?.active === EventFieldName.SEQUENCE && this.sort?.direction) {
+      sortingField = EventFieldName.SEQUENCE;
+    }
 
-    this.currentRequest = filteredRequest ?? new ListEventsRequest();
+    this.currentRequest = filteredRequest;
     console.log('load', this.currentRequest.toObject());
 
     this.adminService
@@ -132,7 +127,8 @@ export class EventsComponent {
   public sortChange(sortState: Sort) {
     if (sortState.direction && sortState.active) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-      this.refresh();
+      this.currentRequest.setAsc(sortState.direction === 'asc' ? true : false);
+      this.loadEvents(this.currentRequest);
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
@@ -151,8 +147,14 @@ export class EventsComponent {
     // this.requestOrgs$.next(req);
   }
 
-  public changePage(): void {
-    this.refresh();
+  public changePage(event: PageEvent): void {
+    this.currentRequest.setLimit(event.pageSize);
+    // todo use cursor to load more and add batch to local datasource
+    // const lastSequenceOnNext = this.dataSource.data[this.dataSource.data.length - 1].sequence; // desc
+    // const lastSequenceOnPrevious = this.dataSource.data[this.dataSource.data.length - 1].sequence; // desc
+
+    // this.currentRequest.setSequence();
+    this.loadEvents(this.currentRequest);
   }
 
   public gotoRouterLink(rL: any) {
