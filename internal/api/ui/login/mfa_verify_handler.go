@@ -37,7 +37,7 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, domain.BrowserInfoFromRequest(r))
 
-		metadata, actionErr := l.triggerPostLocalAuthentication(r.Context(), authReq, authMethodOTP, err)
+		metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodOTP, err)
 		if err == nil && actionErr == nil && len(metadata) > 0 {
 			_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
 		} else if actionErr != nil && err == nil {

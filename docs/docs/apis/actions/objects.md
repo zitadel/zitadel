@@ -153,3 +153,17 @@ This object contains context information about the request to the [authorization
   <ul><li>0: OTP</li><li>1: U2F</li><li>2: U2F User verification</li></ul>
 - `audience` Array of *string*
 - `authTime` *Date*
+
+## HTTP Request
+
+This object is based on the Golang struct [http.Request](https://pkg.go.dev/net/http#Request), some attributes are removed as not all provided information is usable in this context.
+
+- `method` *string*
+- `url` *string*
+- `proto` *string*
+- `contentLength` *number*
+- `host` *string*
+- `form` Map *string* of Array of *string*
+- `postForm` Map *string* of Array of *string*
+- `remoteAddr` *string*
+- `headers` Map *string* of Array of *string*

@@ -22,7 +22,10 @@ The first parameter contains the following fields
     The id token which will be returned to the user
   - `v1`
     - `externalUser()` [*externalUser*](./objects#external-user)
+    - `authError` *string*  
+      This is a verification errors string representation. If the verification succeeds, this is "none"
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
+    - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
 - `api`  
   The second parameter contains the following fields
   - `v1`
@@ -63,6 +66,7 @@ A user selected **Register** on the overview page after external authentication.
   - `v1`
     - `user` [*human*](./objects#human-user)
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
+    - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
 - `api`  
   The second parameter contains the following fields
   - `metadata`  
@@ -106,6 +110,7 @@ A user selected **Register** on the overview page after external authentication 
   - `v1`
     - `getUser()` [*user*](./objects#user)
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
+    - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
 - `api`  
   The second parameter contains the following fields
   - `userGrants` Array of [*userGrant*](./objects#user-grant)'s

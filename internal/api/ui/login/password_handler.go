@@ -40,7 +40,7 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 	}
 	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, authReq.AgentID, domain.BrowserInfoFromRequest(r))
 
-	metadata, actionErr := l.triggerPostLocalAuthentication(r.Context(), authReq, authMethodPassword, err)
+	metadata, actionErr := l.runPostInternalAuthenticationActions(authReq, r, authMethodPassword, err)
 	if err == nil && actionErr == nil && len(metadata) > 0 {
 		_, err = l.command.BulkSetUserMetadata(r.Context(), authReq.UserID, authReq.UserOrgID, metadata...)
 	} else if actionErr != nil && err == nil {
