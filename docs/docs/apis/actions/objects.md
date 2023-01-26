@@ -161,14 +161,9 @@ This object is based on the Golang struct [http.Request](https://pkg.go.dev/net/
 - `method` *string*
 - `url` *string*
 - `proto` *string*
-- `protoMajor` *number*
-- `protoMinor` *number*
-- `body` *string*
 - `contentLength` *number*
-- `transferEncoding` Array of *string*
 - `host` *string*
 - `form` Map *string* of Array of *string*
 - `postForm` Map *string* of Array of *string*
-- `trailer` Map *string* of Array of *string*
 - `remoteAddr` *string*
-- `requestURI` *string*
+- `header` Map *string* of Array of *string*
