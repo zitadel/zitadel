@@ -371,8 +371,9 @@ export class UserDetailComponent implements OnInit {
           .then(() => {
             const params: Params = {
               deferredReload: true,
+              type: this.user.human ? 'humans' : 'machines',
             };
-            this.router.navigate(['/users/list', this.user.human ? 'humans' : 'machines'], { queryParams: params });
+            this.router.navigate(['/users'], { queryParams: params });
             this.toast.showInfo('USER.TOAST.DELETED', true);
           })
           .catch((error) => {
