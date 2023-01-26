@@ -26,6 +26,7 @@
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
 @import 'src/app/pages/projects/apps/redirect-uris/redirect-uris.component';
 @import 'src/app/modules/filter-events/filter-events.component';
+@import 'src/app/modules/filter-events-user/filter-events-user.component';
 @import 'src/app/modules/filter-events-aggregate/filter-events-aggregate.component';
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
@@ -80,6 +81,7 @@
   @include search-user-autocomplete-theme($theme);
   @include project-role-chips-theme($theme);
   @include card-theme($theme);
+  @include filter-events-theme($theme);
   @include filter-events-user-theme($theme);
   @include filter-events-aggregate-theme($theme);
   @include footer-theme($theme);

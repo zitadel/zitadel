@@ -1,0 +1,171 @@
+@use '@angular/material' as mat;
+
+@mixin filter-events-user-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $lighter-primary-color: mat.get-color-from-palette($primary, 300);
+  $darker-primary-color: mat.get-color-from-palette($primary, 700);
+
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $secondary-text: map-get($foreground, secondary-text);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  $link-hover-color: if($is-dark-theme, mat.get-color-from-palette($primary, 200), $primary-color);
+  $link-color: if($is-dark-theme, $lighter-primary-color, $primary-color);
+
+  //   .filter-events-user-wrapper {
+  //     border-radius: 0.5rem;
+  //     z-index: 200;
+  //     border: 1px solid #ffffff30;
+  //     display: flex;
+  //     flex-direction: column;
+  //     align-items: center;
+  //     padding: 0.5rem 1rem;
+  //     min-width: 220px;
+  //     max-width: 260px;
+  //     padding-bottom: 0.5rem;
+  //     position: relative;
+  //     color: map-get($foreground, text);
+  //     background: map-get($background, cards);
+
+  //     .events-user-autocomplete-found {
+  //       margin: 0.5rem 0;
+  //       border-radius: 0.5rem;
+  //       padding: 0.5rem 0;
+  //       max-width: 500px;
+  //       width: 100%;
+  //       box-sizing: border-box;
+
+  //       .add-user-row {
+  //         margin-left: -4px;
+  //       }
+
+  //       .found-user-row {
+  //         display: flex;
+  //         align-items: center;
+  //         padding: 0.25rem 0;
+
+  //         button {
+  //           visibility: hidden;
+  //         }
+
+  //         &:hover {
+  //           button {
+  //             visibility: visible;
+  //           }
+  //         }
+  //       }
+
+  //       .found-label {
+  //         font-size: 14px;
+  //       }
+
+  //       .user-name-column {
+  //         display: flex;
+  //         flex-direction: column;
+  //         justify-content: center;
+
+  //         .smaller {
+  //           font-size: 13px;
+  //         }
+  //       }
+
+  //       .fill-space {
+  //         flex: 1;
+  //       }
+
+  //       .search-user-dl-btn {
+  //         transition: color 0.2s ease;
+
+  //         &:not(:hover) {
+  //           color: $secondary-text;
+  //         }
+  //       }
+  //     }
+
+  //     .user-autocomplete-target-desc {
+  //       font-size: 14px;
+  //       display: block;
+  //       margin-top: 0.5rem;
+
+  //       a {
+  //         color: $link-color;
+  //         transition: color 0.2s ease;
+
+  //         &:hover {
+  //           cursor: pointer;
+  //           color: $link-hover-color;
+  //           text-decoration: underline;
+  //         }
+  //       }
+  //     }
+  //   }
+}
+
+.events-user-create-form-field {
+  flex: 1;
+
+  &.more-space {
+    margin-bottom: 1rem;
+  }
+}
+
+.line {
+  display: flex;
+  max-width: 500px;
+
+  button {
+    margin-top: 30px;
+  }
+}
+
+.sm-dlt {
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.circle {
+  margin-right: 0.5rem;
+}
+
+input {
+  max-width: 500px;
+  display: block;
+}
+
+.events-user-mat-option {
+  padding: 0 !important;
+
+  .mat-option-text:first-child {
+    display: none;
+  }
+
+  .events-user-option {
+    display: flex;
+    align-items: center;
+
+    .events-user-option-column {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+
+      span {
+        line-height: normal;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .smaller {
+        font-size: 13px;
+      }
+    }
+
+    .fill-space {
+      flex-grow: 1;
+    }
+  }
+}

@@ -761,17 +761,23 @@
       "TYPE": "Typ",
       "PAYLOAD": "Payload",
       "FILTERS": {
+        "BTN": "Filter",
         "USER": {
-          "BTN": "Nach Benutzer filtern"
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by User"
         },
         "AGGREGATE": {
-          "BTN": "Nach Aggregate filtern",
-          "TYPELABEL": "Aggregate Typ",
-          "IDLABEL": "ID"
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by Aggregate"
         },
         "TYPE": {
-          "BTN": "Nach Typ filtern"
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filter by Type"
         }
+      },
+      "DIALOG": {
+        "TITLE": "Event Detail"
       }
     },
     "TOAST": {

@@ -756,22 +756,30 @@
       "DESCRIPTION": "This view shows all occured events.",
       "EDITOR": "Editor",
       "AGGREGATE": "Aggregate",
+      "AGGREGATEID": "Aggregate ID",
+      "AGGREGATETYPE": "Aggregate Type",
       "SEQUENCE": "Sequence",
       "CREATIONDATE": "Created At",
       "TYPE": "Type",
       "PAYLOAD": "Payload",
       "FILTERS": {
+        "BTN": "Filter",
         "USER": {
-          "BTN": "Filter by User"
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by User"
         },
         "AGGREGATE": {
-          "BTN": "Filter by Aggregate",
           "TYPELABEL": "Aggregate Type",
-          "IDLABEL": "ID"
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by Aggregate"
         },
         "TYPE": {
-          "BTN": "Filter by Type"
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filter by Type"
         }
+      },
+      "DIALOG": {
+        "TITLE": "Event Detail"
       }
     },
     "TOAST": {

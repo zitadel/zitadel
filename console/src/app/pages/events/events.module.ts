@@ -23,7 +23,9 @@ import { EventsRoutingModule } from './events-routing.module';
 import { FilterEventsModule } from 'src/app/modules/filter-events/filter-events.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { FilterEventsAggregateModule } from 'src/app/modules/filter-events-aggregate/filter-events-aggregate.module';
+import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
+import { DisplayJsonDialogModule } from 'src/app/modules/display-json-dialog/display-json-dialog.module';
+import { MatLegacyDialogModule } from '@angular/material/legacy-dialog';
 
 @NgModule({
   declarations: [EventsComponent],
@@ -35,19 +37,21 @@ import { FilterEventsAggregateModule } from 'src/app/modules/filter-events-aggre
     CardModule,
     FilterEventsModule,
     HasRolePipeModule,
+    MatLegacyDialogModule,
     MatButtonModule,
     CopyToClipboardModule,
     InputModule,
     TranslateModule,
     InfoSectionModule,
     AvatarModule,
-    FilterEventsAggregateModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
     RefreshTableModule,
+    ActionKeysModule,
     PaginatorModule,
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
+    DisplayJsonDialogModule,
     MatTableModule,
     MatSortModule,
     OverlayModule,

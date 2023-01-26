@@ -10,67 +10,46 @@
   >
     <!-- <cnsl-filter-events actions (filterChanged)="applySearchQuery($any($event))"> </cnsl-filter-events> -->
     <div class="events-filter-row">
-      <div class="filter-user-button-wrapper">
+      <div class="filter-button-wrapper">
         <button
           mat-stroked-button
           cdkOverlayOrigin
-          #triggeruser="cdkOverlayOrigin"
+          #triggereventfilter="cdkOverlayOrigin"
           matRipple
-          id="userfilterbutton"
-          class="user-filter-button"
-          (click)="showUserFilter = !showUserFilter"
+          id="eventfilterbutton"
+          class="cnsl-action-button"
+          (click)="showFilter = !showFilter"
         >
-          {{ 'IAM.EVENTS.FILTERS.USER.BTN' | translate }}
-        </button>
-        <ng-template
-          cdkConnectedOverlay
-          [cdkConnectedOverlayOrigin]="triggeruser"
-          [flexibleDimensions]="true"
-          [lockPosition]="true"
-          [cdkConnectedOverlayOffsetY]="10"
-          [cdkConnectedOverlayHasBackdrop]="true"
-          [cdkConnectedOverlayPositions]="positions"
-          cdkConnectedOverlayBackdropClass="transparent-backdrop"
-          [cdkConnectedOverlayOpen]="showUserFilter"
-          (backdropClick)="showUserFilter = false"
-          (detach)="showUserFilter = false"
-        >
-          <cnsl-filter-events class="context_card" *ngIf="showUserFilter" (closedCard)="showUserFilter = false">
-          </cnsl-filter-events>
-        </ng-template>
-      </div>
-
-      <div class="filter-aggregate-button-wrapper">
-        <button
-          mat-stroked-button
-          cdkOverlayOrigin
-          #triggeraggregate="cdkOverlayOrigin"
-          matRipple
-          id="aggregatefilterbutton"
-          class="aggregate-filter-button"
-          (click)="showAggregateFilter = !showAggregateFilter"
-        >
-          {{ 'IAM.EVENTS.FILTERS.AGGREGATE.BTN' | translate }}
-        </button>
-        <ng-template
-          cdkConnectedOverlay
-          [cdkConnectedOverlayOrigin]="triggeraggregate"
-          [flexibleDimensions]="true"
-          [lockPosition]="true"
-          [cdkConnectedOverlayOffsetY]="10"
-          [cdkConnectedOverlayHasBackdrop]="true"
-          [cdkConnectedOverlayPositions]="positions"
-          cdkConnectedOverlayBackdropClass="transparent-backdrop"
-          [cdkConnectedOverlayOpen]="showAggregateFilter"
-          (backdropClick)="showAggregateFilter = false"
-          (detach)="showAggregateFilter = false"
-        >
-          <cnsl-filter-events-aggregate
-            class="context_card"
-            *ngIf="showAggregateFilter"
-            (closedCard)="showAggregateFilter = false"
+          <i class="las la-filter no-margin"></i>
+          <span>{{ 'ACTIONS.FILTER' | translate }}</span>
+          <!-- <span *ngIf="queryCount" class="filter-count">{{ queryCount }}</span> -->
+          <cnsl-action-keys
+            [doNotUseContrast]="true"
+            [type]="ActionKeysType.FILTER"
+            (actionTriggered)="showFilter = !showFilter"
           >
-          </cnsl-filter-events-aggregate>
+          </cnsl-action-keys>
+        </button>
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="triggereventfilter"
+          [flexibleDimensions]="true"
+          [lockPosition]="true"
+          [cdkConnectedOverlayOffsetY]="10"
+          [cdkConnectedOverlayHasBackdrop]="true"
+          [cdkConnectedOverlayPositions]="positions"
+          cdkConnectedOverlayBackdropClass="transparent-backdrop"
+          [cdkConnectedOverlayOpen]="showFilter"
+          (backdropClick)="showFilter = false"
+          (detach)="showFilter = false"
+        >
+          <cnsl-filter-events
+            class="context_card"
+            (closedCard)="showFilter = false"
+            (requestChanged)="loadEvents($event)"
+            [initialRequest]="currentRequest"
+          >
+          </cnsl-filter-events>
         </ng-template>
       </div>
     </div>
@@ -103,7 +82,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'IAM.EVENTS.AGGREGATE' | translate }}</th>
         <td mat-cell *matCellDef="let event">
           <div class="aggregate-row">
-            <span>{{ event.aggregate.resourceOwner }}</span
+            <span class="id">{{ event.aggregate.resourceOwner }}</span
             ><span class="state" *ngIf="event.aggregate?.type?.localized?.localizedMessage">{{
               event.aggregate.type.localized.localizedMessage
             }}</span>
@@ -135,7 +114,9 @@
         <td mat-cell *matCellDef="let event">
           <span>{{ event?.payload | json }}</span>
           <div class="btn-wrapper">
-            <button class="open-in-dialog-btn" mat-icon-button><mat-icon svgIcon="mdi_arrow_expand"></mat-icon></button>
+            <button class="open-in-dialog-btn" mat-icon-button (click)="openDialog(event)">
+              <mat-icon svgIcon="mdi_arrow_expand"></mat-icon>
+            </button>
           </div>
         </td>
       </ng-container>

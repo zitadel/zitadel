@@ -1,150 +1,104 @@
-<div class="filter-events-user-wrapper">
-  <div class="events-user-autocomplete-found" *ngIf="users.length > 0">
-    <div class="found-user-row" *ngFor="let user of users; index as i">
-      <div class="circle">
-        <cnsl-avatar
-          *ngIf="
-            user.human &&
-              user.human.profile &&
-              user.human.profile.displayName &&
-              user.human.profile.firstName &&
-              user.human.profile.lastName;
-            else cog
-          "
-          class="avatar"
-          [name]="user.human.profile.displayName"
-          [avatarUrl]="user.human.profile.avatarUrl || ''"
-          [forColor]="user.preferredLoginName"
-          [size]="32"
-        >
-        </cnsl-avatar>
-        <ng-template #cog>
-          <cnsl-avatar class="avatar" [forColor]="user.preferredLoginName" [isMachine]="true" [size]="32"> </cnsl-avatar>
-        </ng-template>
-      </div>
-
-      <div class="user-name-column" *ngIf="user.human">
-        <span>{{ user.human.profile?.displayName }}</span>
-        <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
-      </div>
-      <div class="user-name-column" *ngIf="user.machine">
-        <span>{{ user.machine.name }}</span>
-        <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
-      </div>
-      <span class="fill-space"></span>
-      <button class="search-user-dl-btn" matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" mat-icon-button color="warn">
-        <i class="las la-minus-circle" (click)="users.splice(i, 1)"></i>
-      </button>
-    </div>
-    <div class="add-user-row" *ngIf="!editState">
-      <button (click)="editState = true" mat-icon-button>
-        <mat-icon>add</mat-icon>
-      </button>
-    </div>
+<div class="filter-events-wrapper">
+  <div class="filter-events-top">
+    <button mat-stroked-button (click)="reset()">{{ 'ACTIONS.RESET' | translate }}</button>
+    <span class="filter-middle">{{ 'FILTER.TITLE' | translate }}</span>
+    <button mat-raised-button color="primary" (click)="finish()">{{ 'ACTIONS.FINISH' | translate }}</button>
   </div>
+  <form [formGroup]="form">
+    <!-- <cnsl-form-field class="events-aggregate-form-field">
+      <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.TYPELABEL' | translate }}</cnsl-label>
 
-  <form *ngIf="editState">
-    <ng-container *ngIf="target && target === UserTarget.SELF">
-      <div class="line">
-        <cnsl-form-field class="events-user-create-form-field more-space">
-          <cnsl-label>{{ 'USER.SEARCH.ADDITIONAL' | translate }}</cnsl-label>
+      <mat-select formControlName="aggregateType">
+        <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate">
+          <div *ngIf="aggregate.localized && aggregate.localized.localizedMessage">
+            {{ aggregate.localized.localizedMessage }}
+          </div>
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
 
-          <input
-            cnslInput
-            *ngIf="singleOutput"
-            type="text"
-            placeholder="Search for the user loginname"
-            #usernameInput
-            [formControl]="myControl"
-            [matAutocomplete]="auto"
-          />
+    <cnsl-form-field class="filter-input-value">
+      <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.IDLABEL' | translate }}</cnsl-label>
+      <input cnslInput name="aggregateId" formControlName="aggregateId" />
+    </cnsl-form-field> -->
 
-          <input
-            *ngIf="!singleOutput"
-            cnslInput
-            #usernameInput
-            [formControl]="myControl"
-            placeholder="johndoe@domain.com"
-            [matAutocomplete]="auto"
-            data-e2e="add-member-input"
-          />
+    <div class="filter-events-section">
+      <div class="checkbox-wrapper">
+        <mat-checkbox id="userFilterSet" class="cb" [(ngModel)]="userFilterSet" [ngModelOptions]="{ standalone: true }"
+          >{{ 'IAM.EVENTS.FILTERS.USER.CHECKBOX' | translate }}
+        </mat-checkbox>
+      </div>
+      <div class="filter-events-sub" *ngIf="userFilterSet">
+        <cnsl-form-field class="filter-input-value">
+          <cnsl-label>{{ 'IAM.EVENTS.FILTERS.USER.IDLABEL' | translate }}</cnsl-label>
+          <input cnslInput name="userId" formControlName="userId" />
+        </cnsl-form-field>
+      </div>
+    </div>
 
-          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
-            <!-- <mat-select-trigger>
-              {{myControl.value?.[0] || ''}}
-              <span *ngIf="(myControl.value?.length || 0) > 1" class="example-additional-selection">
-                (+{{ (myControl.value?.length || 0) - 1 }} {{ myControl.value?.length === 2 ? 'other' : 'others' }})
-              </span>
-            </mat-select-trigger> -->
-            <mat-option *ngIf="isLoading" class="is-loading">
-              <mat-spinner diameter="30"></mat-spinner>
-            </mat-option>
-            <mat-option class="events-user-mat-option" *ngFor="let user of filteredUsers" [value]="user">
-              <div class="events-user-option" data-e2e="user-option">
-                <div class="circle">
-                  <cnsl-avatar
-                    *ngIf="
-                      user.human &&
-                        user.human.profile &&
-                        user.human.profile.displayName &&
-                        user.human.profile.firstName &&
-                        user.human.profile.lastName;
-                      else cog
-                    "
-                    class="avatar"
-                    [name]="user.human.profile.displayName"
-                    [avatarUrl]="user.human.profile.avatarUrl || ''"
-                    [forColor]="user.preferredLoginName"
-                    [size]="32"
-                  >
-                  </cnsl-avatar>
-                  <ng-template #cog>
-                    <cnsl-avatar class="avatar" [forColor]="user.preferredLoginName" [isMachine]="true" [size]="32">
-                    </cnsl-avatar>
-                  </ng-template>
-                </div>
-                <div class="events-user-option-column">
-                  <span>{{
-                    user.human && user.human.profile && user.human.profile.displayName
-                      ? user.human.profile.displayName
-                      : user.machine?.name
-                  }}</span>
-                  <span class="fill-space"></span>
-                  <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
-                </div>
-                <span class="fill-space"></span>
-                <mat-icon>check_circle</mat-icon>
+    <div class="filter-events-section">
+      <div class="checkbox-wrapper">
+        <mat-checkbox
+          id="aggregateFilterSet"
+          class="cb"
+          [(ngModel)]="aggregateFilterSet"
+          [ngModelOptions]="{ standalone: true }"
+          >{{ 'IAM.EVENTS.FILTERS.AGGREGATE.CHECKBOX' | translate }}
+        </mat-checkbox>
+      </div>
+      <div class="filter-events-sub" *ngIf="aggregateFilterSet">
+        <cnsl-form-field class="aggregate-type-select">
+          <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.TYPELABEL' | translate }}</cnsl-label>
+
+          <mat-select formControlName="aggregateTypesList" multiple>
+            <mat-select-trigger>
+              {{ aggregateTypesFormValue?.value[0]?.localized?.localizedMessage || '' }}
+              <small *ngIf="(aggregateTypesFormValue?.value.length || 0) > 1" class="cnsl-secondary-text">
+                (+{{ (aggregateTypesFormValue?.value.length || 0) - 1 }}
+                {{ aggregateTypesFormValue?.value.length === 2 ? 'other' : 'others' }})
+              </small>
+            </mat-select-trigger>
+            <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate">
+              <div *ngIf="aggregate.localized && aggregate.localized.localizedMessage">
+                {{ aggregate.localized.localizedMessage }}
               </div>
             </mat-option>
-          </mat-autocomplete>
-
-          <span class="user-autocomplete-target-desc">
-            {{ 'USER.TARGET.SELF' | translate }}
-            <a (click)="changeTarget()"
-              ><strong>{{ 'USER.TARGET.CLICKHERE' | translate }}</strong></a
-            >
-          </span>
-        </cnsl-form-field>
-      </div>
-    </ng-container>
-
-    <ng-container *ngIf="target && target === UserTarget.EXTERNAL">
-      <div class="line">
-        <cnsl-form-field class="user-create-form-field more-space">
-          <cnsl-label>{{ 'USER.SEARCH.ADDITIONAL-EXTERNAL' | translate }}</cnsl-label>
-          <input cnslInput type="text" [formControl]="globalLoginNameControl" placeholder="example@externaldomain.com" />
-          <span class="user-autocomplete-target-desc">
-            {{ (target === UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate }}
-            <a (click)="changeTarget()"
-              ><strong>{{ 'USER.TARGET.CLICKHERE' | translate }}</strong></a
-            >
-          </span>
+          </mat-select>
         </cnsl-form-field>
 
-        <button color="primary" mat-icon-button (click)="getGlobalUser()">
-          <mat-icon>add</mat-icon>
-        </button>
+        <cnsl-form-field class="filter-input-value">
+          <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.IDLABEL' | translate }}</cnsl-label>
+          <input cnslInput name="aggregateId" formControlName="aggregateId" />
+        </cnsl-form-field>
       </div>
-    </ng-container>
+    </div>
+
+    <div class="filter-events-section">
+      <div class="checkbox-wrapper">
+        <mat-checkbox id="typeFilterSet" class="cb" [(ngModel)]="typeFilterSet" [ngModelOptions]="{ standalone: true }"
+          >{{ 'IAM.EVENTS.FILTERS.TYPE.CHECKBOX' | translate }}
+        </mat-checkbox>
+      </div>
+      <div class="filter-events-sub" *ngIf="typeFilterSet">
+        <cnsl-form-field class="event-types-select">
+          <cnsl-label>{{ 'IAM.EVENTS.FILTERS.TYPE.TYPELABEL' | translate }}</cnsl-label>
+
+          <mat-select formControlName="eventTypesList" multiple>
+            <mat-select-trigger>
+              {{ typesFormValue?.value[0]?.localized?.localizedMessage || '' }}
+              <small *ngIf="(typesFormValue?.value.length || 0) > 1" class="cnsl-secondary-text">
+                (+{{ (typesFormValue?.value.length || 0) - 1 }}
+                {{ typesFormValue?.value.length === 2 ? 'other' : 'others' }})
+              </small>
+            </mat-select-trigger>
+            <mat-option *ngFor="let type of eventTypes" [value]="type">
+              <div *ngIf="type.localized && type.localized.localizedMessage">
+                {{ type.localized.localizedMessage }}
+              </div>
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+      </div>
+    </div>
   </form>
 </div>

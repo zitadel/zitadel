@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { Component, Input, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
@@ -15,8 +14,9 @@ import { Router } from '@angular/router';
 import { ToastService } from 'src/app/services/toast.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-
-type Request = ListEventsRequest;
+import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
+import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 
 enum EventFieldName {
   EDITOR = 'editor',
@@ -26,7 +26,6 @@ enum EventFieldName {
   TYPE = 'type',
   PAYLOAD = 'payload',
 }
-const initRequest = new ListEventsRequest().setLimit(20);
 
 @Component({
   selector: 'cnsl-events',
@@ -34,8 +33,8 @@ const initRequest = new ListEventsRequest().setLimit(20);
   styleUrls: ['./events.component.scss'],
 })
 export class EventsComponent {
-  public showUserFilter: boolean = false;
-  public showAggregateFilter: boolean = false;
+  public showFilter: boolean = false;
+  public ActionKeysType: any = ActionKeysType;
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
@@ -48,11 +47,11 @@ export class EventsComponent {
 
   public dataSource: MatTableDataSource<Event.AsObject> = new MatTableDataSource<Event.AsObject>([]);
   public displayedColumns: string[] = [
-    EventFieldName.EDITOR,
+    EventFieldName.TYPE,
     EventFieldName.AGGREGATE,
+    EventFieldName.EDITOR,
     EventFieldName.SEQUENCE,
     EventFieldName.CREATIONDATE,
-    EventFieldName.TYPE,
     EventFieldName.PAYLOAD,
   ];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -62,11 +61,13 @@ export class EventsComponent {
   public totalResult: number = 0;
   public filterOpen: boolean = false;
 
+  public currentRequest: ListEventsRequest = new ListEventsRequest();
+
   @ViewChild(MatSort) public sort!: MatSort;
 
   private destroy$: Subject<void> = new Subject();
-  private requestOrgs$: BehaviorSubject<Request> = new BehaviorSubject<Request>(initRequest);
-  private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
+  //   private requestOrgs$: BehaviorSubject<ListEventsRequest> = new BehaviorSubject<ListEventsRequest>(initRequest);
+  //   private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
 
   constructor(
     private adminService: AdminService,
@@ -75,6 +76,7 @@ export class EventsComponent {
     private router: Router,
     private toast: ToastService,
     private translate: TranslateService,
+    private dialog: MatDialog,
   ) {
     const breadcrumbs = [
       new Breadcrumb({
@@ -85,16 +87,15 @@ export class EventsComponent {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.requestOrgs$.next(initRequest);
+    // this.requestOrgs$.next(initRequest);
 
-    this.requestOrgsObservable$.pipe(switchMap((req) => this.loadEvents(req))).subscribe((orgs) => {
-      this.dataSource = new MatTableDataSource<Event.AsObject>(orgs);
-    });
-
-    this.load();
+    // this.requestOrgsObservable$.pipe(switchMap((req) => this.loadEvents(req))).subscribe((orgs) => {
+    //   this.dataSource = new MatTableDataSource<Event.AsObject>(orgs);
+    // });
+    this.loadEvents();
   }
 
-  public loadEvents(request: Request): Observable<Event.AsObject[]> {
+  public loadEvents(filteredRequest?: ListEventsRequest): void {
     this.loadingSubject.next(true);
 
     let sortingField: EventFieldName | undefined = undefined;
@@ -105,36 +106,27 @@ export class EventsComponent {
     //       break;
     //   }
 
-    const req = new ListEventsRequest();
-    // req.setEditorUserId()
-    req.setEditorUserId;
+    this.currentRequest = filteredRequest ?? new ListEventsRequest();
+    console.log('load', this.currentRequest.toObject());
 
-    return from(this.adminService.listEvents(req)).pipe(
-      map((resp) => {
+    this.adminService
+      .listEvents(this.currentRequest)
+      .then((resp) => {
         this.totalResult = resp?.eventsList.length ?? 0;
+        this.dataSource = new MatTableDataSource<Event.AsObject>(resp.eventsList);
+        this.loadingSubject.next(false);
         return resp.eventsList;
-      }),
-      catchError((error) => {
-        this.toast.showError(error);
-        return of([]);
-      }),
-      finalize(() => this.loadingSubject.next(false)),
-    );
-  }
-
-  public load() {
-    const req = new ListEventTypesRequest();
-
-    this.adminService.listEventTypes(req).then((list) => {
-      console.log(list.eventTypesList);
-    });
+      })
+      .catch((error) => {
+        this.loadingSubject.next(false);
+      });
   }
 
   public refresh(): void {
     const req = new ListEventsRequest();
     req.setLimit(this.paginator.pageSize);
     // req.setSequence()
-    this.requestOrgs$.next(req);
+    // this.requestOrgs$.next(req);
   }
 
   public sortChange(sortState: Sort) {
@@ -144,6 +136,15 @@ export class EventsComponent {
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
+  }
+
+  public openDialog(event: Event.AsObject): void {
+    this.dialog.open(DisplayJsonDialogComponent, {
+      data: {
+        event: event,
+      },
+      //   width: '400px',
+    });
   }
 
   public applySearchQuery(req: ListEventsRequest): void {
