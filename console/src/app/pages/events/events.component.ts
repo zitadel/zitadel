@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
-import { ListEventsRequest, ListEventTypesRequest, View } from 'src/app/proto/generated/zitadel/admin_pb';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { scan } from 'rxjs/operators';
+import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
@@ -34,6 +34,7 @@ enum EventFieldName {
 })
 export class EventsComponent implements OnInit {
   public INITPAGESIZE = 20;
+
   public showFilter: boolean = false;
   public ActionKeysType: any = ActionKeysType;
 
@@ -54,8 +55,6 @@ export class EventsComponent implements OnInit {
     EventFieldName.CREATIONDATE,
     EventFieldName.PAYLOAD,
   ];
-  private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public timestamp: Timestamp.AsObject | undefined = undefined;
   public totalResult: number = 0;
   public filterOpen: boolean = false;
@@ -67,6 +66,11 @@ export class EventsComponent implements OnInit {
   private destroy$: Subject<void> = new Subject();
   //   private requestOrgs$: BehaviorSubject<ListEventsRequest> = new BehaviorSubject<ListEventsRequest>(initRequest);
   //   private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
+
+  public _done: BehaviorSubject<any> = new BehaviorSubject(false);
+  public loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private _data: BehaviorSubject<Event.AsObject[]> = new BehaviorSubject<Event.AsObject[]>([]);
+  public data!: Observable<Event.AsObject[]>;
 
   constructor(
     private adminService: AdminService,
@@ -85,35 +89,62 @@ export class EventsComponent implements OnInit {
       }),
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
+
+    this.data = this._data.asObservable().pipe(
+      scan((acc, val) => {
+        console.log('scan');
+        return false ? val.concat(acc) : acc.concat(val);
+      }),
+    );
+    // .pipe(
+    //   scan((acc, val) => {
+    //     console.log(val);
+    //     return false ? val.concat(acc) : acc.concat(val);
+    //   }),
+    //   tap((data) => {
+    //     console.log(data);
+    //     this.dataSource = new MatTableDataSource<Event.AsObject>(data);
+    //   }),
   }
 
   ngOnInit(): void {
     const req = new ListEventsRequest();
-    req.setLimit(this.paginator?.pageSize ?? this.INITPAGESIZE);
+    req.setLimit(this.INITPAGESIZE);
     this.loadEvents(req);
   }
 
-  public loadEvents(filteredRequest: ListEventsRequest): void {
+  public loadEvents(filteredRequest: ListEventsRequest): Promise<any> | void {
     this.loadingSubject.next(true);
 
-    let sortingField: EventFieldName | undefined = undefined;
-    if (this.sort?.active === EventFieldName.SEQUENCE && this.sort?.direction) {
-      sortingField = EventFieldName.SEQUENCE;
-    }
+    // let sortingField: EventFieldName | undefined = undefined;
+    // if (this.sort?.active === EventFieldName.SEQUENCE && this.sort?.direction) {
+    //   sortingField = EventFieldName.SEQUENCE;
+    // }
 
     this.currentRequest = filteredRequest;
     console.log('load', this.currentRequest.toObject());
 
-    this.adminService
+    if (this._done.value) {
+      this.loadingSubject.next(false);
+      console.log('done');
+      return;
+    }
+
+    return this.adminService
       .listEvents(this.currentRequest)
-      .then((resp) => {
-        this.totalResult = resp?.eventsList.length ?? 0;
-        this.dataSource = new MatTableDataSource<Event.AsObject>(resp.eventsList);
+      .then((res: ListEventsResponse.AsObject) => {
+        this._data.next(res.eventsList);
+
         this.loadingSubject.next(false);
-        return resp.eventsList;
+
+        if (res.eventsList.length === 0) {
+          this._done.next(true);
+        }
       })
       .catch((error) => {
+        console.error(error);
         this.loadingSubject.next(false);
+        this._data.next([]);
       });
   }
 
@@ -139,7 +170,6 @@ export class EventsComponent implements OnInit {
       data: {
         event: event,
       },
-      //   width: '400px',
     });
   }
 
@@ -155,6 +185,23 @@ export class EventsComponent implements OnInit {
 
     // this.currentRequest.setSequence();
     this.loadEvents(this.currentRequest);
+  }
+
+  public more(): void {
+    const sequence = this.getCursor();
+    this.currentRequest.setSequence(sequence);
+    this.loadEvents(this.currentRequest);
+  }
+
+  // Determines the snapshot to paginate query
+  private getCursor(): number {
+    const current = this._data.value;
+
+    if (current.length) {
+      const sequence = current[current.length - 1].sequence;
+      return sequence;
+    }
+    return 0;
   }
 
   public gotoRouterLink(rL: any) {

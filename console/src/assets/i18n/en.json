@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Previous",
     "NEXT": "Next",
-    "COUNT": "Total Results"
+    "COUNT": "Total Results",
+    "MORE": "More"
   },
   "FOOTER": {
     "LINKS": {

@@ -6,7 +6,7 @@
     [hideRefresh]="true"
     (refreshed)="refresh()"
     [dataSize]="dataSource.data.length"
-    [loading]="loading$ | async"
+    [loading]="loadingSubject | async"
   >
     <!-- <cnsl-filter-events actions (filterChanged)="applySearchQuery($any($event))"> </cnsl-filter-events> -->
     <div class="events-filter-row">
@@ -134,10 +134,11 @@
     <cnsl-paginator
       #paginator
       class="paginator"
-      [pageSize]="INITPAGESIZE"
-      (page)="changePage($event)"
-      [pageSizeOptions]="[10, 20, 50, 100]"
-      [length]="dataSource.data.length || 0"
+      [hidePagination]="true"
+      [showMoreButton]="true"
+      [disableShowMore]="this._done | async"
+      (moreRequested)="more()"
+      [length]="dataSource.data.length"
     >
     </cnsl-paginator>
   </cnsl-refresh-table>
