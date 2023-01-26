@@ -1,0 +1,8 @@
+version: v1
+name: buf.build/zitadel/zitadel
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - MINIMAL
