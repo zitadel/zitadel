@@ -9,48 +9,7 @@
     [loading]="_loading | async"
   >
     <div class="events-filter-row">
-      <div class="filter-button-wrapper">
-        <button
-          mat-stroked-button
-          cdkOverlayOrigin
-          #triggereventfilter="cdkOverlayOrigin"
-          matRipple
-          id="eventfilterbutton"
-          class="cnsl-action-button"
-          (click)="showFilter = !showFilter"
-        >
-          <i class="las la-filter no-margin"></i>
-          <span>{{ 'ACTIONS.FILTER' | translate }}</span>
-          <cnsl-action-keys
-            [doNotUseContrast]="true"
-            [type]="ActionKeysType.FILTER"
-            (actionTriggered)="showFilter = !showFilter"
-          >
-          </cnsl-action-keys>
-        </button>
-        <ng-template
-          cdkConnectedOverlay
-          [cdkConnectedOverlayOrigin]="triggereventfilter"
-          [flexibleDimensions]="true"
-          [lockPosition]="true"
-          [cdkConnectedOverlayOffsetY]="10"
-          [cdkConnectedOverlayHasBackdrop]="true"
-          [cdkConnectedOverlayPositions]="positions"
-          cdkConnectedOverlayBackdropClass="transparent-backdrop"
-          [cdkConnectedOverlayOpen]="showFilter"
-          (backdropClick)="showFilter = false"
-          (detach)="showFilter = false"
-        >
-          <cnsl-filter-events
-            class="context_card"
-            (closedCard)="showFilter = false"
-            (requestChanged)="filterChanged($event)"
-            [request]="currentRequest"
-            (triggeredFinish)="showFilter = false"
-          >
-          </cnsl-filter-events>
-        </ng-template>
-      </div>
+      <cnsl-filter-events (requestChanged)="filterChanged($event)" [request]="currentRequest"> </cnsl-filter-events>
     </div>
 
     <table

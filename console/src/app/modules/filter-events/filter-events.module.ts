@@ -14,6 +14,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AvatarModule } from '../avatar/avatar.module';
 import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
+import { ActionKeysModule } from '../action-keys/action-keys.module';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
   declarations: [FilterEventsComponent],
@@ -25,6 +27,7 @@ import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
     InputModule,
     MatIconModule,
     ReactiveFormsModule,
+    OverlayModule,
     MatProgressSpinnerModule,
     FormsModule,
     MatTooltipModule,
@@ -32,6 +35,7 @@ import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
     MatLegacyCheckboxModule,
     MatSelectModule,
     AvatarModule,
+    ActionKeysModule,
   ],
   exports: [FilterEventsComponent],
 })
