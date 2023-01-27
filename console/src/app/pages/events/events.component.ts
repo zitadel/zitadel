@@ -32,14 +32,6 @@ export class EventsComponent implements OnInit {
   public INITPAGESIZE = 20;
   public sortAsc = false;
 
-  public showFilter: boolean = false;
-  public ActionKeysType: any = ActionKeysType;
-
-  public positions: ConnectedPosition[] = [
-    new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
-    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
-  ];
-
   public displayedColumns: string[] = [
     EventFieldName.TYPE,
     EventFieldName.AGGREGATE,
