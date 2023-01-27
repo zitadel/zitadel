@@ -56,6 +56,7 @@ export class FilterEventsComponent implements OnInit, OnDestroy {
     private toast: ToastService, // private cdref: ChangeDetectorRef,
   ) {
     this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
+      console.log('filter form changed');
       const req = new ListEventsRequest();
       if (value.aggregateId) {
         req.setAggregateId(value.aggregateId);
@@ -77,9 +78,10 @@ export class FilterEventsComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    console.log('init');
     this.getAggregateTypes();
     this.getEventTypes();
+
+    // do use direct bindings to request or compare form values with init value
 
     if (this.initialRequest) {
       const req = this.initialRequest.toObject();

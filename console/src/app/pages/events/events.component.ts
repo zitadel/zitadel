@@ -55,9 +55,6 @@ export class EventsComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   public dataSource: MatTableDataSource<Event.AsObject> = new MatTableDataSource<Event.AsObject>([]);
 
-  //   private subscription: Subscription = new Subscription();
-  //   private destroy$: Subject<void> = new Subject();
-
   public _done: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public done: Observable<boolean> = this._done.asObservable();
 
@@ -92,18 +89,12 @@ export class EventsComponent implements OnInit {
   public loadEvents(filteredRequest: ListEventsRequest): Promise<void> {
     this._loading.next(true);
 
-    // let sortingField: EventFieldName | undefined = undefined;
-    // if (this.sort?.active === EventFieldName.SEQUENCE && this.sort?.direction) {
-    //   sortingField = EventFieldName.SEQUENCE;
-    // }
-
     this.currentRequest = filteredRequest;
     console.log('load', this.currentRequest.toObject());
 
     return this.adminService
       .listEvents(this.currentRequest)
       .then((res: ListEventsResponse.AsObject) => {
-        console.log(res.eventsList);
         this._data.next(res.eventsList);
 
         const concat = this.dataSource.data.concat(res.eventsList);
