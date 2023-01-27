@@ -44,7 +44,7 @@
           <cnsl-filter-events
             class="context_card"
             (closedCard)="showFilter = false"
-            (requestChanged)="loadEvents($event)"
+            (requestChanged)="filterChanged($event)"
             [initialRequest]="currentRequest"
           >
           </cnsl-filter-events>
@@ -96,7 +96,9 @@
       </ng-container>
 
       <ng-container matColumnDef="sequence">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'IAM.EVENTS.SEQUENCE' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header [start]="'desc'" [disableClear]="true">
+          {{ 'IAM.EVENTS.SEQUENCE' | translate }}
+        </th>
         <td mat-cell *matCellDef="let event">{{ event.sequence }}</td>
       </ng-container>
 

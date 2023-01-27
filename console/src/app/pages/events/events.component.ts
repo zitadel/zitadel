@@ -1,13 +1,11 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { BehaviorSubject, from, Observable, of, Subject, Subscription } from 'rxjs';
-import { catchError, scan, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
-import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { ToastService } from 'src/app/services/toast.service';
@@ -32,6 +30,7 @@ enum EventFieldName {
 })
 export class EventsComponent implements OnInit {
   public INITPAGESIZE = 20;
+  public sortAsc = false;
 
   public showFilter: boolean = false;
   public ActionKeysType: any = ActionKeysType;
@@ -133,13 +132,20 @@ export class EventsComponent implements OnInit {
   }
 
   public sortChange(sortState: Sort) {
-    // if (sortState.direction && sortState.active) {
-    //   this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    //   this.currentRequest.setAsc(sortState.direction === 'asc' ? true : false);
-    //   this.loadEvents(this.currentRequest);
-    // } else {
-    //   this._liveAnnouncer.announce('Sorting cleared');
-    // }
+    if (sortState.direction && sortState.active) {
+      this.dataSource = new MatTableDataSource<Event.AsObject>([]);
+
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+      this.sortAsc = sortState.direction === 'asc';
+
+      this.currentRequest = new ListEventsRequest();
+      this.currentRequest.setLimit(this.INITPAGESIZE);
+      this.currentRequest.setAsc(this.sortAsc ? true : false);
+
+      this.loadEvents(this.currentRequest);
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }
   }
 
   public openDialog(event: Event.AsObject): void {
@@ -153,6 +159,21 @@ export class EventsComponent implements OnInit {
   public more(): void {
     const sequence = this.getCursor();
     this.currentRequest.setSequence(sequence);
+    this.loadEvents(this.currentRequest);
+  }
+
+  public filterChanged(filterRequest: ListEventsRequest) {
+    this.dataSource = new MatTableDataSource<Event.AsObject>([]);
+
+    this.currentRequest = new ListEventsRequest();
+    this.currentRequest.setLimit(this.INITPAGESIZE);
+    this.currentRequest.setAsc(this.sortAsc ? true : false);
+
+    this.currentRequest.setAggregateTypesList(filterRequest.getAggregateTypesList());
+    this.currentRequest.setAggregateId(filterRequest.getAggregateId());
+    this.currentRequest.setEventTypesList(filterRequest.getEventTypesList());
+    this.currentRequest.setEditorUserId(filterRequest.getEditorUserId());
+
     this.loadEvents(this.currentRequest);
   }
 
