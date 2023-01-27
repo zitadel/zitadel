@@ -4,34 +4,23 @@
     <span class="filter-middle">{{ 'FILTER.TITLE' | translate }}</span>
     <button mat-raised-button color="primary" (click)="finish()">{{ 'ACTIONS.FINISH' | translate }}</button>
   </div>
-  <form [formGroup]="form">
-    <!-- <cnsl-form-field class="events-aggregate-form-field">
-      <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.TYPELABEL' | translate }}</cnsl-label>
-
-      <mat-select formControlName="aggregateType">
-        <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate">
-          <div *ngIf="aggregate.localized && aggregate.localized.localizedMessage">
-            {{ aggregate.localized.localizedMessage }}
-          </div>
-        </mat-option>
-      </mat-select>
-    </cnsl-form-field>
-
-    <cnsl-form-field class="filter-input-value">
-      <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.IDLABEL' | translate }}</cnsl-label>
-      <input cnslInput name="aggregateId" formControlName="aggregateId" />
-    </cnsl-form-field> -->
-
+  <div>
+    <div *ngIf="isLoading" class="sp_wrapper"><mat-spinner diameter="20"></mat-spinner></div>
     <div class="filter-events-section">
       <div class="checkbox-wrapper">
-        <mat-checkbox id="userFilterSet" class="cb" [(ngModel)]="userFilterSet" [ngModelOptions]="{ standalone: true }"
+        <mat-checkbox id="userFilterSet" class="cb" [(ngModel)]="userFilterSet" (change)="resetUserValues($event)"
           >{{ 'IAM.EVENTS.FILTERS.USER.CHECKBOX' | translate }}
         </mat-checkbox>
       </div>
       <div class="filter-events-sub" *ngIf="userFilterSet">
         <cnsl-form-field class="filter-input-value">
           <cnsl-label>{{ 'IAM.EVENTS.FILTERS.USER.IDLABEL' | translate }}</cnsl-label>
-          <input cnslInput name="userId" formControlName="userId" />
+          <input
+            cnslInput
+            name="userId"
+            [value]="request.getEditorUserId()"
+            (input)="request.setEditorUserId($any($event.target).value); emitChange()"
+          />
         </cnsl-form-field>
       </div>
     </div>
@@ -42,7 +31,7 @@
           id="aggregateFilterSet"
           class="cb"
           [(ngModel)]="aggregateFilterSet"
-          [ngModelOptions]="{ standalone: true }"
+          (change)="resetAggregateValues($event)"
           >{{ 'IAM.EVENTS.FILTERS.AGGREGATE.CHECKBOX' | translate }}
         </mat-checkbox>
       </div>
@@ -50,15 +39,19 @@
         <cnsl-form-field class="aggregate-type-select">
           <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.TYPELABEL' | translate }}</cnsl-label>
 
-          <mat-select formControlName="aggregateTypesList" multiple>
+          <mat-select
+            [value]="request.getAggregateTypesList()"
+            (selectionChange)="request.setAggregateTypesList($event.value); emitChange()"
+            multiple
+          >
             <mat-select-trigger>
-              {{ aggregateTypesFormValue?.value[0]?.localized?.localizedMessage || '' }}
-              <small *ngIf="(aggregateTypesFormValue?.value.length || 0) > 1" class="cnsl-secondary-text">
-                (+{{ (aggregateTypesFormValue?.value.length || 0) - 1 }}
-                {{ aggregateTypesFormValue?.value.length === 2 ? 'other' : 'others' }})
+              {{ aggregateTypeObject(request.getAggregateTypesList()[0])?.localized?.localizedMessage || '' }}
+              <small *ngIf="(request.getAggregateTypesList().length || 0) > 1" class="cnsl-secondary-text">
+                (+{{ (request.getAggregateTypesList().length || 0) - 1 }}
+                {{ request.getAggregateTypesList().length === 2 ? 'other' : 'others' }})
               </small>
             </mat-select-trigger>
-            <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate">
+            <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate.type">
               <div *ngIf="aggregate.localized && aggregate.localized.localizedMessage">
                 {{ aggregate.localized.localizedMessage }}
               </div>
@@ -68,30 +61,39 @@
 
         <cnsl-form-field class="filter-input-value">
           <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.IDLABEL' | translate }}</cnsl-label>
-          <input cnslInput name="aggregateId" formControlName="aggregateId" />
+          <input
+            cnslInput
+            name="aggregateId"
+            [value]="request.getAggregateId()"
+            (input)="request.setAggregateId($any($event.target).value); emitChange()"
+          />
         </cnsl-form-field>
       </div>
     </div>
 
     <div class="filter-events-section">
       <div class="checkbox-wrapper">
-        <mat-checkbox id="typeFilterSet" class="cb" [(ngModel)]="typeFilterSet" [ngModelOptions]="{ standalone: true }"
+        <mat-checkbox id="typeFilterSet" class="cb" [(ngModel)]="eventTypeFilterSet" (change)="resetTypeValues($event)"
           >{{ 'IAM.EVENTS.FILTERS.TYPE.CHECKBOX' | translate }}
         </mat-checkbox>
       </div>
-      <div class="filter-events-sub" *ngIf="typeFilterSet">
+      <div class="filter-events-sub" *ngIf="eventTypeFilterSet">
         <cnsl-form-field class="event-types-select">
           <cnsl-label>{{ 'IAM.EVENTS.FILTERS.TYPE.TYPELABEL' | translate }}</cnsl-label>
 
-          <mat-select formControlName="eventTypesList" multiple>
+          <mat-select
+            [value]="request.getEventTypesList()"
+            (selectionChange)="request.setEventTypesList($event.value); emitChange()"
+            multiple
+          >
             <mat-select-trigger>
-              {{ typesFormValue?.value[0]?.localized?.localizedMessage || '' }}
-              <small *ngIf="(typesFormValue?.value.length || 0) > 1" class="cnsl-secondary-text">
-                (+{{ (typesFormValue?.value.length || 0) - 1 }}
-                {{ typesFormValue?.value.length === 2 ? 'other' : 'others' }})
+              {{ eventTypeObject(request.getEventTypesList()[0])?.localized?.localizedMessage || '' }}
+              <small *ngIf="(request.getEventTypesList().length || 0) > 1" class="cnsl-secondary-text">
+                (+{{ (request.getEventTypesList().length || 0) - 1 }}
+                {{ request.getEventTypesList().length === 2 ? 'other' : 'others' }})
               </small>
             </mat-select-trigger>
-            <mat-option *ngFor="let type of eventTypes" [value]="type">
+            <mat-option *ngFor="let type of eventTypes" [value]="type.type">
               <div *ngIf="type.localized && type.localized.localizedMessage">
                 {{ type.localized.localizedMessage }}
               </div>
@@ -100,5 +102,5 @@
         </cnsl-form-field>
       </div>
     </div>
-  </form>
+  </div>
 </div>

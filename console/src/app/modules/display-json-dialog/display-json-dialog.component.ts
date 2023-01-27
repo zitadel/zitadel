@@ -4,6 +4,7 @@ import {
   MatLegacyDialogRef as MatDialogRef,
 } from '@angular/material/legacy-dialog';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
+import { Struct } from 'google-protobuf/google/protobuf/struct_pb';
 
 @Component({
   selector: 'cnsl-display-json-dialog',
@@ -16,8 +17,14 @@ export class DisplayJsonDialogComponent {
 
   constructor(public dialogRef: MatDialogRef<DisplayJsonDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.event = data.event;
-    this.payload = data.event.payload.fieldsMap;
-    console.log(this.event);
+    if ((data.event as Event.AsObject) && data.event.payload) {
+      console.log((data.event as Event.AsObject).payload?.fieldsMap);
+      this.payload = (data.event as Event.AsObject).payload?.fieldsMap;
+      //   .map((field) => {
+      //     const [key, value] = field;
+      //     return { [key]: value };
+      //   });
+    }
   }
 
   public closeDialog(): void {
