@@ -62,6 +62,7 @@ const (
 	MachineUserInstanceIDCol = "instance_id"
 	MachineNameCol           = "name"
 	MachineDescriptionCol    = "description"
+	MachineCredentialsCol    = "credentials"
 
 	// notify
 	UserNotifySuffix       = "notifications"
@@ -120,6 +121,7 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(MachineUserInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineDescriptionCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MachineCredentialsCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
 			crdb.NewPrimaryKey(MachineUserInstanceIDCol, MachineUserIDCol),
 			UserMachineSuffix,
@@ -275,6 +277,14 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reduceHumanPasswordChanged,
+				},
+				{
+					Event:  user.MachineCredentialsSetType,
+					Reduce: p.reduceMachineCredentialsSet,
+				},
+				{
+					Event:  user.MachineCredentialsRemovedType,
+					Reduce: p.reduceMachineCredentialsRemoved,
 				},
 			},
 		},
@@ -904,6 +914,44 @@ func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*ha
 			handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(UserNotifySuffix),
+	), nil
+}
+
+func (p *userProjection) reduceMachineCredentialsSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineCredentialsSetEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x0p1n1i", "reduce.wrong.event.type %s", user.MachineCredentialsSetType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(MachineCredentialsCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+			handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
+		},
+		crdb.WithTableSuffix(UserMachineSuffix),
+	), nil
+}
+
+func (p *userProjection) reduceMachineCredentialsRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineCredentialsRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x0p6n1i", "reduce.wrong.event.type %s", user.MachineCredentialsRemovedType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(MachineCredentialsCol, false),
+		},
+		[]handler.Condition{
+			handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+			handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
+		},
+		crdb.WithTableSuffix(UserMachineSuffix),
 	), nil
 }
 

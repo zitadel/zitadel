@@ -89,6 +89,8 @@ Errors:
         AlreadyExisting: Machine key already existing
     PAT:
       NotFound: Personal Access Token not found
+    Credentials:
+      NotFound: Credentials not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
     WrongType: Not allowed for this user type

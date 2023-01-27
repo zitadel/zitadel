@@ -581,6 +581,30 @@ Changes a machine user
     PUT: /users/{user_id}/machine
 
 
+### SetMachineCredentials
+
+> **rpc** SetMachineCredentials([SetMachineCredentialsRequest](#setmachinecredentialsrequest))
+[SetMachineCredentialsResponse](#setmachinecredentialsresponse)
+
+Generates and sets new machine credentials
+
+
+
+    PUT: /users/{user_id}/credentials
+
+
+### RemoveMachineCredentials
+
+> **rpc** RemoveMachineCredentials([RemoveMachineCredentialsRequest](#removemachinecredentialsrequest))
+[RemoveMachineCredentialsResponse](#removemachinecredentialsresponse)
+
+Removes machine credentials
+
+
+
+    DELETE: /users/{user_id}/credentials
+
+
 ### GetMachineKeyByIDs
 
 > **rpc** GetMachineKeyByIDs([GetMachineKeyByIDsRequest](#getmachinekeybyidsrequest))
@@ -7152,6 +7176,28 @@ This is an empty request
 
 
 
+### RemoveMachineCredentialsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveMachineCredentialsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveMachineKeyRequest
 
 
@@ -8233,6 +8279,30 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetMachineCredentialsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+
+
+
+
+### SetMachineCredentialsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| client_secret |  bytes | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
