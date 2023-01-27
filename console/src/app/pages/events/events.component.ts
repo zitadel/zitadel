@@ -1,18 +1,16 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { scan } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of, Subject, Subscription } from 'rxjs';
+import { catchError, scan, take, tap } from 'rxjs/operators';
 import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
+import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { Router } from '@angular/router';
 import { ToastService } from 'src/app/services/toast.service';
-import { TranslateService } from '@ngx-translate/core';
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
@@ -43,10 +41,6 @@ export class EventsComponent implements OnInit {
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
   ];
 
-  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  @ViewChild('input') public filter!: Input;
-
-  public dataSource: MatTableDataSource<Event.AsObject> = new MatTableDataSource<Event.AsObject>([]);
   public displayedColumns: string[] = [
     EventFieldName.TYPE,
     EventFieldName.AGGREGATE,
@@ -55,30 +49,28 @@ export class EventsComponent implements OnInit {
     EventFieldName.CREATIONDATE,
     EventFieldName.PAYLOAD,
   ];
-  public timestamp: Timestamp.AsObject | undefined = undefined;
-  public totalResult: number = 0;
-  public filterOpen: boolean = false;
 
   public currentRequest: ListEventsRequest = new ListEventsRequest();
 
   @ViewChild(MatSort) public sort!: MatSort;
+  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
+  public dataSource: MatTableDataSource<Event.AsObject> = new MatTableDataSource<Event.AsObject>([]);
 
-  private destroy$: Subject<void> = new Subject();
-  //   private requestOrgs$: BehaviorSubject<ListEventsRequest> = new BehaviorSubject<ListEventsRequest>(initRequest);
-  //   private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
+  //   private subscription: Subscription = new Subscription();
+  //   private destroy$: Subject<void> = new Subject();
 
-  public _done: BehaviorSubject<any> = new BehaviorSubject(false);
-  public loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public _done: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public done: Observable<boolean> = this._done.asObservable();
+
+  public _loading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
   private _data: BehaviorSubject<Event.AsObject[]> = new BehaviorSubject<Event.AsObject[]>([]);
-  public data!: Observable<Event.AsObject[]>;
 
   constructor(
     private adminService: AdminService,
     private breadcrumbService: BreadcrumbService,
     private _liveAnnouncer: LiveAnnouncer,
-    private router: Router,
     private toast: ToastService,
-    private translate: TranslateService,
     private dialog: MatDialog,
   ) {
     const breadcrumbs = [
@@ -89,32 +81,17 @@ export class EventsComponent implements OnInit {
       }),
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
-
-    this.data = this._data.asObservable().pipe(
-      scan((acc, val) => {
-        console.log('scan');
-        return false ? val.concat(acc) : acc.concat(val);
-      }),
-    );
-    // .pipe(
-    //   scan((acc, val) => {
-    //     console.log(val);
-    //     return false ? val.concat(acc) : acc.concat(val);
-    //   }),
-    //   tap((data) => {
-    //     console.log(data);
-    //     this.dataSource = new MatTableDataSource<Event.AsObject>(data);
-    //   }),
   }
 
   ngOnInit(): void {
     const req = new ListEventsRequest();
     req.setLimit(this.INITPAGESIZE);
+
     this.loadEvents(req);
   }
 
-  public loadEvents(filteredRequest: ListEventsRequest): Promise<any> | void {
-    this.loadingSubject.next(true);
+  public loadEvents(filteredRequest: ListEventsRequest): Promise<void> {
+    this._loading.next(true);
 
     // let sortingField: EventFieldName | undefined = undefined;
     // if (this.sort?.active === EventFieldName.SEQUENCE && this.sort?.direction) {
@@ -124,26 +101,26 @@ export class EventsComponent implements OnInit {
     this.currentRequest = filteredRequest;
     console.log('load', this.currentRequest.toObject());
 
-    if (this._done.value) {
-      this.loadingSubject.next(false);
-      console.log('done');
-      return;
-    }
-
     return this.adminService
       .listEvents(this.currentRequest)
       .then((res: ListEventsResponse.AsObject) => {
+        console.log(res.eventsList);
         this._data.next(res.eventsList);
 
-        this.loadingSubject.next(false);
+        const concat = this.dataSource.data.concat(res.eventsList);
+        this.dataSource = new MatTableDataSource<Event.AsObject>(concat);
+
+        this._loading.next(false);
 
         if (res.eventsList.length === 0) {
           this._done.next(true);
+        } else {
+          this._done.next(false);
         }
       })
       .catch((error) => {
         console.error(error);
-        this.loadingSubject.next(false);
+        this._loading.next(false);
         this._data.next([]);
       });
   }
@@ -156,13 +133,13 @@ export class EventsComponent implements OnInit {
   }
 
   public sortChange(sortState: Sort) {
-    if (sortState.direction && sortState.active) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-      this.currentRequest.setAsc(sortState.direction === 'asc' ? true : false);
-      this.loadEvents(this.currentRequest);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
+    // if (sortState.direction && sortState.active) {
+    //   this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+    //   this.currentRequest.setAsc(sortState.direction === 'asc' ? true : false);
+    //   this.loadEvents(this.currentRequest);
+    // } else {
+    //   this._liveAnnouncer.announce('Sorting cleared');
+    // }
   }
 
   public openDialog(event: Event.AsObject): void {
@@ -173,27 +150,12 @@ export class EventsComponent implements OnInit {
     });
   }
 
-  public applySearchQuery(req: ListEventsRequest): void {
-    // this.requestOrgs$.next(req);
-  }
-
-  public changePage(event: PageEvent): void {
-    this.currentRequest.setLimit(event.pageSize);
-    // todo use cursor to load more and add batch to local datasource
-    // const lastSequenceOnNext = this.dataSource.data[this.dataSource.data.length - 1].sequence; // desc
-    // const lastSequenceOnPrevious = this.dataSource.data[this.dataSource.data.length - 1].sequence; // desc
-
-    // this.currentRequest.setSequence();
-    this.loadEvents(this.currentRequest);
-  }
-
   public more(): void {
     const sequence = this.getCursor();
     this.currentRequest.setSequence(sequence);
     this.loadEvents(this.currentRequest);
   }
 
-  // Determines the snapshot to paginate query
   private getCursor(): number {
     const current = this._data.value;
 
@@ -202,9 +164,5 @@ export class EventsComponent implements OnInit {
       return sequence;
     }
     return 0;
-  }
-
-  public gotoRouterLink(rL: any) {
-    this.router.navigate(rL);
   }
 }

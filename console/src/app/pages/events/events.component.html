@@ -6,9 +6,8 @@
     [hideRefresh]="true"
     (refreshed)="refresh()"
     [dataSize]="dataSource.data.length"
-    [loading]="loadingSubject | async"
+    [loading]="_loading | async"
   >
-    <!-- <cnsl-filter-events actions (filterChanged)="applySearchQuery($any($event))"> </cnsl-filter-events> -->
     <div class="events-filter-row">
       <div class="filter-button-wrapper">
         <button
@@ -22,7 +21,6 @@
         >
           <i class="las la-filter no-margin"></i>
           <span>{{ 'ACTIONS.FILTER' | translate }}</span>
-          <!-- <span *ngIf="queryCount" class="filter-count">{{ queryCount }}</span> -->
           <cnsl-action-keys
             [doNotUseContrast]="true"
             [type]="ActionKeysType.FILTER"
@@ -136,7 +134,7 @@
       class="paginator"
       [hidePagination]="true"
       [showMoreButton]="true"
-      [disableShowMore]="this._done | async"
+      [disableShowMore]="_done | async"
       (moreRequested)="more()"
       [length]="dataSource.data.length"
     >
