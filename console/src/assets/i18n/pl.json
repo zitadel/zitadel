@@ -181,17 +181,17 @@
     "UNDERORGCONTEXT": "Na stronach organizacji",
     "SIDEWIDE": "Skróty dostępne na całej stronie",
     "SHORTCUTS": {
-      "HOME": "<strong>I</strong>dź do Strony <strong>G</strong>łównej",
-      "INSTANCE": "<strong>I</strong>dź do <strong>I</strong>nstancji",
-      "ORG": "<strong>I</strong>dź do <strong>O</strong>rganizacji",
-      "ORGSETTINGS": "<strong>I</strong>dź do <strong>U</strong>stawień organizacji",
-      "ORGSWITCHER": "Zmień organizację",
-      "ME": "Idź do własnego profilu",
-      "PROJECTS": "<strong>I</strong>dź do <strong>P</strong>rojektów",
-      "USERS": "<strong>I</strong>dź do <strong>U</strong>żytkowników",
-      "USERGRANTS": "<strong>I</strong>dź do <strong>A</strong>utoryzacji",
-      "ACTIONS": "<strong>I</strong>dź do Działań i <strong>P</strong>rzepływów",
-      "DOMAINS": "<strong>I</strong>dź do <strong>D</strong>omen"
+      "HOME": "Idź do Strony Głównej",
+      "INSTANCE": "Idź do <strong>I</strong>nstancji",
+      "ORG": "Idź do <strong>O</strong>rganizacji",
+      "ORGSETTINGS": "Idź do Ustawień organizacji",
+      "ORGSWITCHER": "Przełącz organizację",
+      "ME": "Idź do Własnego Profilu",
+      "PROJECTS": "Idź do <strong>P</strong>rojektów",
+      "USERS": "Idź do <strong>U</strong>żytkowników",
+      "USERGRANTS": "Idź do <strong>A</strong>utoryzacji",
+      "ACTIONS": "Idź do Działań i Przepływów",
+      "DOMAINS": "Idź do <strong>D</strong>omen"
     }
   },
   "RESOURCEID": "Identyfikator zasobu",
@@ -553,8 +553,8 @@
       "ADDITIONAL-EXTERNAL": "Nazwa użytkownika (organizacja zewnętrzna)"
     },
     "TARGET": {
-      "SELF": "Jeśli chcesz udzielić uprawnień użytkownikowi innej organizacji",
-      "EXTERNAL": "Aby udzielić uprawnień użytkownikowi swojej organizacji",
+      "SELF": "Jeśli chcesz udzielić dostęp użytkownikowi innej organizacji",
+      "EXTERNAL": "Aby udzielić dostęp użytkownikowi swojej organizacji",
       "CLICKHERE": "kliknij tutaj"
     },
     "SIGNEDOUT": "Jesteś wylogowany. Kliknij przycisk \"Zaloguj się\", aby zalogować się ponownie.",
@@ -608,7 +608,7 @@
         "UNKNOWN": "Nieznany",
         "ORG": "Organizacja",
         "PROJECT": "Projekt",
-        "GRANTEDPROJECT": "Przyznany projekt"
+        "GRANTEDPROJECT": "Udzielony projekt"
       }
     },
     "PERSONALACCESSTOKEN": {
@@ -1188,7 +1188,7 @@
       "HASLOWERCASE": "zawiera małe litery",
       "HASUPPERCASE": "zawiera duże litery",
       "SHOWLOCKOUTFAILURES": "pokaż blokady nieudanych prób",
-      "MAXATTEMPTS": "Maksymalna liczba prób hasła",
+      "MAXATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
       "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniu",
       "MAXAGEDAYS": "Maksymalny wiek w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
@@ -1284,7 +1284,7 @@
         "OWNED": "Własne Projekty",
         "GRANTED": "Udzielone Projekty ",
         "OWNED_SINGULAR": "Własny Projekt",
-        "GRANTED_SINGULAR": "Projekt Udzielony"
+        "GRANTED_SINGULAR": "Udzielony Projekt"
       },
       "PRIVATELABEL": {
         "TITLE": "Ustawienia Brandingu",
@@ -1360,32 +1360,32 @@
       "USERID": "Identyfikator użytkownika"
     },
     "GRANT": {
-      "EMPTY": "Brak przyznanych organizacji.",
-      "TITLE": "Granty projektu",
-      "DESCRIPTION": "Zezwól innemu podmiotowi na korzystanie z Twojego projektu.",
+      "EMPTY": "Brak organizacji z udzielonym dostępem.",
+      "TITLE": "Dostęp do projektu",
+      "DESCRIPTION": "Zezwól innej organizacji na korzystanie z Twojego projektu.",
       "EDITTITLE": "Edytuj role",
       "CREATE": {
-        "TITLE": "Utwórz grant dla organizacji",
+        "TITLE": "Utwórz dostęp dla organizacji",
         "SEL_USERS": "Wybierz użytkowników, którym chcesz udzielić dostępu",
         "SEL_PROJECT": "Wyszukaj projekt",
-        "SEL_ROLES": "Wybierz role, które mają zostać dodane do grantu",
+        "SEL_ROLES": "Wybierz role, które mają zostać dodane do udzielenia ",
         "SEL_USER": "Wybierz użytkowników",
         "SEL_ORG": "Ustaw domenę",
-        "SEL_ORG_DESC": "Wprowadź pełną domenę, aby określić organizację, której chcesz udzielić grantu.",
+        "SEL_ORG_DESC": "Wprowadź pełną domenę, aby określić organizację, której chcesz udzielić dostępu.",
         "ORG_TITLE": "Organizacja",
-        "ORG_DESCRIPTION": "Masz zamiar przyznać użytkownikowi grant dla organizacji {{name}}.",
-        "ORG_DESCRIPTION_DESC": "Przełącz kontekst w nagłówku powyżej, aby przyznać użytkownikowi grant dla innej organizacji.",
+        "ORG_DESCRIPTION": "Masz zamiar udzielić użytkownikowi dostęp dla organizacji {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Przełącz kontekst w nagłówku powyżej, aby udzielić użytkownikowi dostępu dla innej organizacji.",
         "SEL_ORG_FORMFIELD": "Pełna domena",
         "SEL_ORG_BUTTON": "Wyszukaj organizację",
         "FOR_ORG": "Grant jest tworzony dla:"
       },
       "DETAIL": {
-        "TITLE": "Przyznane uprawnienia do projektu",
+        "TITLE": "Udzielone uprawnienia do projektu",
         "DESC": "Możesz wybrać, które role mogą być używane przez określoną organizację oraz wybierać menedżerów",
         "MEMBERTITLE": "Menedżerowie",
-        "MEMBERDESC": "To są menedżerowie przyznanej organizacji. Dodaj tutaj użytkowników, którzy powinni uzyskać dostęp do edycji danych projektu.",
+        "MEMBERDESC": "To są menedżerowie organizacji z udzielonym dostępem. Dodaj tutaj użytkowników, którzy powinni uzyskać dostęp do edycji danych projektu.",
         "PROJECTNAME": "Nazwa projektu",
-        "GRANTEDORG": "Organizacja, której udzielono uprawnień",
+        "GRANTEDORG": "Organizacja, której udzielono dostępu",
         "RESOURCEOWNER": "Właściciel zasobów"
       },
       "STATE": "Status",
@@ -1399,7 +1399,7 @@
       "MEMBERS": "Menedżerowie",
       "ORG": "Organizacja",
       "PROJECTNAME": "Nazwa projektu",
-      "GRANTEDORG": "Organizacja, której udzielono uprawnień",
+      "GRANTEDORG": "Organizacja, której udzielono dostępu",
       "GRANTEDORGDOMAIN": "Domena",
       "RESOURCEOWNER": "Właściciel zasobów",
       "GRANTEDORGNAME": "Nazwa organizacji",
@@ -1411,17 +1411,17 @@
       "NOROLES": "Brak ról",
       "TYPE": "Typ",
       "TOAST": {
-        "PROJECTGRANTUSERGRANTADDED": "Utworzono przyznanie projektu.",
-        "PROJECTGRANTADDED": "Utworzono przyznanie projektu.",
-        "PROJECTGRANTCHANGED": "Zmieniono przyznanie projektu.",
-        "PROJECTGRANTMEMBERADDED": "Dodano menedżera przyznania.",
-        "PROJECTGRANTMEMBERCHANGED": "Zmieniono menedżera przyznania.",
-        "PROJECTGRANTMEMBERREMOVED": "Usunięto menedżera przyznania.",
-        "PROJECTGRANTUPDATED": "Zaktualizowano przyznanie projektu"
+        "PROJECTGRANTUSERGRANTADDED": "Utworzono nowe udzielenie dostępu.",
+        "PROJECTGRANTADDED": "Utworzono nowe udzielenie dostępu.",
+        "PROJECTGRANTCHANGED": "Zmieniono udzielenie dostępu do projektu.",
+        "PROJECTGRANTMEMBERADDED": "Dodano menedżera udzielenia dostępu.",
+        "PROJECTGRANTMEMBERCHANGED": "Zmieniono menedżera udzielenia dostępu.",
+        "PROJECTGRANTMEMBERREMOVED": "Usunięto menedżera udzielenia dostępu.",
+        "PROJECTGRANTUPDATED": "Zaktualizowano udzielenie dostępu do projektu"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Usuń przyznanie projektu",
-        "DELETE_DESCRIPTION": "Zamierzasz usunąć przyznanie projektu. Czy na pewno?"
+        "DELETE_TITLE": "Usuń udzielenia dostępu do projektu",
+        "DELETE_DESCRIPTION": "Zamierzasz usunąć udzielenie dostępu do projektu. Czy na pewno?"
       },
       "ROLES": "Role projektu"
     },
@@ -1435,7 +1435,7 @@
       "ADDNEWLINE": "Dodaj dodatkową rolę",
       "KEY": "Klucz",
       "TITLE": "Role",
-      "DESCRIPTION": "Zdefiniuj role, które mogą być używane do tworzenia przyznań projektów.",
+      "DESCRIPTION": "Zdefiniuj role, które mogą być używane do udzielenia dostępu do projektów.",
       "NAME": "Nazwa",
       "DISPLAY_NAME": "Nazwa wyświetlana",
       "GROUP": "Grupa",
@@ -1599,17 +1599,17 @@
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "Bez hasła",
-      "MULTIFACTORDESCRIPTION": "Zdefiniuj swoje wielofaktory dla uwierzytelniania bez hasła tutaj.",
-      "SECONDFACTORTITLE": "Uwierzytelnianie wielofaktorowe",
-      "SECONDFACTORDESCRIPTION": "Zdefiniuj dalsze możliwe faktory, za pomocą których możesz zabezpieczyć uwierzytelnianie hasłem."
+      "MULTIFACTORDESCRIPTION": "Zdefiniuj tutaj swoje metody wieloskładnikowe do uwierzytelniania bez hasła.",
+      "SECONDFACTORTITLE": "Uwierzytelnianie wieloskładnikowe",
+      "SECONDFACTORDESCRIPTION": "Zdefiniuj dalsze możliwe składniki, za pomocą których możesz zabezpieczyć uwierzytelnianie hasłem."
     },
     "CREATE": {
-      "TITLE": "Nowy faktor",
-      "DESCRIPTION": "Wybierz swój nowy typ faktora."
+      "TITLE": "Nowy składnik",
+      "DESCRIPTION": "Wybierz swój nowy typ składnik."
     },
     "DELETE": {
-      "TITLE": "Usuń faktor",
-      "DESCRIPTION": "Zamierzasz usunąć faktor z ustawień logowania. Czy jesteś pewny?"
+      "TITLE": "Usuń składnik",
+      "DESCRIPTION": "Zamierzasz usunąć składnik z ustawień logowania. Czy jesteś pewny?"
     },
     "TOAST": {
       "ADDED": "Dodano pomyślnie.",
