@@ -40,7 +40,7 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'it', 'fr'];
+  public languages: string[] = ['de', 'en', 'it', 'fr', 'pl'];
 
   public ChangeType: any = ChangeType;
 

@@ -911,7 +911,8 @@
       "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1101,7 +1102,8 @@
         "en": "英语",
         "it": "意大利语",
         "fr": "法语",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1863,7 +1865,8 @@
     "en": "英语",
     "it": "意大利语",
     "fr": "法语",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "添加管理者",

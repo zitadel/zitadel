@@ -43,7 +43,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
 export class UserCreateComponent implements OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en', 'it', 'fr'];
+  public languages: string[] = ['de', 'en', 'it', 'fr', 'pl'];
   public userForm!: UntypedFormGroup;
   public pwdForm!: UntypedFormGroup;
   private destroyed$: Subject<void> = new Subject();
