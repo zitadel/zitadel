@@ -237,10 +237,10 @@ ExternalRegistrationUserOverview:
   NicknameLabel: 昵称
   PhoneLabel: 手机号码
   LanguageLabel: 语言
-  German: 德语
-  English: 英语
-  Italian: 意大利语
-  French: 法语
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
   Polish: Polski
   TosAndPrivacyLabel: 条款和条款

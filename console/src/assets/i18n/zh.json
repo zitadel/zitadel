@@ -1098,10 +1098,10 @@
       "UNSAVED_DESCRIPTION": "您在未保存的情况下进行了更改。您现在要保存吗？",
       "LOCALE": "本地化",
       "LOCALES": {
-        "de": "德语",
-        "en": "英语",
-        "it": "意大利语",
-        "fr": "法语",
+        "de": "Deutsch",
+        "en": "English",
+        "it": "Italiano",
+        "fr": "Français",
         "zh": "简体中文",
         "pl": "Polski"
       },
@@ -1861,10 +1861,10 @@
     "3": "其他"
   },
   "LANGUAGES": {
-    "de": "德语",
-    "en": "英语",
-    "it": "意大利语",
-    "fr": "法语",
+    "de": "Deutsch",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
     "zh": "简体中文",
     "pl": "Polski"
   },
