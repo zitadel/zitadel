@@ -141,8 +141,8 @@
     "PROJECT_OWNER_VIEWER": "Ma uprawnienie do przeglądania całego projektu",
     "PROJECT_OWNER_GLOBAL": "Ma uprawnienia do całego projektu",
     "PROJECT_OWNER_VIEWER_GLOBAL": "Ma uprawnienia do przeglądania całego projektu",
-    "PROJECT_GRANT_OWNER": "Ma uprawnienia do zarządzania grantem projektu",
-    "PROJECT_GRANT_OWNER_VIEWER": "Ma uprawnienia do przeglądania grantu projektu"
+    "PROJECT_GRANT_OWNER": "Ma uprawnienia do zarządzania przydzielaniem dostępu do projektu",
+    "PROJECT_GRANT_OWNER_VIEWER": "Ma uprawnienia do przeglądania przydzielonych dostępów do projektu"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -1365,7 +1365,7 @@
       "DESCRIPTION": "Zezwól innej organizacji na korzystanie z Twojego projektu.",
       "EDITTITLE": "Edytuj role",
       "CREATE": {
-        "TITLE": "Utwórz dostęp dla organizacji",
+        "TITLE": "Udziel dostęp organizacji",
         "SEL_USERS": "Wybierz użytkowników, którym chcesz udzielić dostępu",
         "SEL_PROJECT": "Wyszukaj projekt",
         "SEL_ROLES": "Wybierz role, które mają zostać dodane do udzielenia ",
@@ -1377,7 +1377,7 @@
         "ORG_DESCRIPTION_DESC": "Przełącz kontekst w nagłówku powyżej, aby udzielić użytkownikowi dostępu dla innej organizacji.",
         "SEL_ORG_FORMFIELD": "Pełna domena",
         "SEL_ORG_BUTTON": "Wyszukaj organizację",
-        "FOR_ORG": "Grant jest tworzony dla:"
+        "FOR_ORG": "Dostęp udzielany:"
       },
       "DETAIL": {
         "TITLE": "Udzielone uprawnienia do projektu",
@@ -1489,7 +1489,7 @@
       "DEACTIVATED": "Dezaktywowano.",
       "CREATED": "Projekt utworzony.",
       "UPDATED": "Projekt zmieniony.",
-      "GRANTUPDATED": "Grant zmieniony.",
+      "GRANTUPDATED": "Udzielony dostęp zmieniony.",
       "DELETED": "Projekt usunięty."
     }
   },
@@ -1741,8 +1741,8 @@
       "REDIRECTSECTION": "Adresy URI przekierowania",
       "POSTLOGOUTREDIRECT": "Adresy URI po wylogowaniu",
       "RESPONSESECTION": "Typy odpowiedzi",
-      "GRANTSECTION": "Typy grantów",
-      "GRANTTITLE": "Wybierz swoje typy grantów. Uwaga: Implicit jest dostępny tylko dla aplikacji opartych na przeglądarce.",
+      "GRANTSECTION": "Typy udzielania dostępu",
+      "GRANTTITLE": "Wybierz swoje typy udzielania dostępu. Uwaga: Implicit jest dostępny tylko dla aplikacji opartych na przeglądarce.",
       "APPTYPE": {
         "0": "Web",
         "1": "Agent użytkownika",
@@ -1755,7 +1755,7 @@
         "2": "Token-ID Token"
       },
       "REFRESHTOKEN": "Token odświeżający",
-      "GRANTTYPE": "Rodzaj grantów",
+      "GRANTTYPE": "Rodzaj udzielania dostępu",
       "GRANT": {
         "0": "Kod autoryzacyjny",
         "1": "Implicite",
