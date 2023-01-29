@@ -57,6 +57,9 @@ import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
 import { QRCodeModule } from 'angularx-qrcode';
+import { PhoneDetailComponent } from './phone-detail/phone-detail.component';
+import { CountryCallingCodesService } from 'src/app/services/country-calling-codes.service';
+import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 
 @NgModule({
   declarations: [
@@ -75,7 +78,9 @@ import { QRCodeModule } from 'angularx-qrcode';
     DialogU2FComponent,
     DialogPasswordlessComponent,
     AuthFactorDialogComponent,
+    PhoneDetailComponent,
   ],
+  providers: [CountryCallingCodesService],
   imports: [
     ChangesModule,
     CommonModule,
@@ -120,6 +125,7 @@ import { QRCodeModule } from 'angularx-qrcode';
     InputModule,
     MachineKeysModule,
     InfoSectionModule,
+    MatSelectModule,
   ],
 })
 export class UserDetailModule {}

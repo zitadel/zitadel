@@ -424,7 +424,8 @@
         "PREVIEW": "Anteprima",
         "DELETESUCCESS": "Rimosso con successo!",
         "CROPPERERROR": "È successo un errore durante il caricamento del tuo file. Prova un formato e una dimensione diversi, se necessario."
-      }
+      },
+      "COUNTRY": "Nazione"
     },
     "MACHINE": {
       "TITLE": "Dettagli dell'utente del servizio",

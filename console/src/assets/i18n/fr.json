@@ -424,7 +424,8 @@
         "PREVIEW": "Prévisualiser",
         "DELETESUCCESS": "Supprimé avec succès !",
         "CROPPERERROR": "Une erreur s'est produite lors du téléchargement de votre fichier. Essayez un autre format et une autre taille si nécessaire."
-      }
+      },
+      "COUNTRY": "Pays"
     },
     "MACHINE": {
       "TITLE": "Détails de l'utilisateur du service",

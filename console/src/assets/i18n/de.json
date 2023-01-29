@@ -424,7 +424,8 @@
         "PREVIEW": "Vorschau",
         "DELETESUCCESS": "Erfolgreich gelöscht!",
         "CROPPERERROR": "Ein Fehler beim hochladen Ihrer Datei ist fehlgeschlagen. Versuchen Sie es mit ggf mit einem anderen Format und Grösse."
-      }
+      },
+      "COUNTRY": "Land"
     },
     "MACHINE": {
       "TITLE": "Details Service-Benutzer",

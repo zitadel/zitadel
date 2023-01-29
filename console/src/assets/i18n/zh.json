@@ -424,7 +424,8 @@
         "PREVIEW": "预览",
         "DELETESUCCESS": "删除成功！",
         "CROPPERERROR": "上传文件时出错。如有必要，请尝试不同的格式和大小。"
-      }
+      },
+      "COUNTRY": "国家"
     },
     "MACHINE": {
       "TITLE": "服务用户详情",

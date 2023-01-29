@@ -424,7 +424,8 @@
         "PREVIEW": "Preview",
         "DELETESUCCESS": "Deleted successfully!",
         "CROPPERERROR": "An error while uploading your file occurred. Try a different format and size if necessary."
-      }
+      },
+      "COUNTRY": "Country"
     },
     "MACHINE": {
       "TITLE": "Service User Details",
