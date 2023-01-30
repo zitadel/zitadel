@@ -21,6 +21,11 @@ enum EventFieldName {
   PAYLOAD = 'payload',
 }
 
+type LoadRequest = {
+  req: ListEventsRequest;
+  override: boolean;
+};
+
 @Component({
   selector: 'cnsl-events',
   templateUrl: './events.component.html',
@@ -40,9 +45,10 @@ export class EventsComponent implements OnDestroy {
     EventFieldName.PAYLOAD,
   ];
 
-  public currentRequest$: BehaviorSubject<ListEventsRequest> = new BehaviorSubject(
-    new ListEventsRequest().setLimit(this.INITPAGESIZE),
-  );
+  public currentRequest$: BehaviorSubject<LoadRequest> = new BehaviorSubject<LoadRequest>({
+    req: new ListEventsRequest().setLimit(this.INITPAGESIZE),
+    override: true,
+  });
 
   @ViewChild(MatSort) public sort!: MatSort;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
@@ -71,12 +77,16 @@ export class EventsComponent implements OnDestroy {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.currentRequest$.pipe(takeUntil(this.destroy$)).subscribe((req) => {
+    this.currentRequest$.pipe(takeUntil(this.destroy$)).subscribe(({ req, override }) => {
       this._loading.next(true);
-      console.log('exe', req.toObject());
       this.adminService
         .listEvents(req)
         .then((res: ListEventsResponse) => {
+          if (override) {
+            this._data = new BehaviorSubject<Event[]>([]);
+            this.dataSource = new MatTableDataSource<Event>([]);
+          }
+
           const eventList = res.getEventsList();
           this._data.next(eventList);
 
@@ -104,9 +114,9 @@ export class EventsComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  public loadEvents(filteredRequest: ListEventsRequest): void {
-    this.currentRequest$.next(filteredRequest);
-    console.log('load', this.currentRequest$.value.toObject());
+  public loadEvents(filteredRequest: ListEventsRequest, override: boolean = false): void {
+    this.currentRequest$.next({ req: filteredRequest, override });
+    const { req } = this.currentRequest$.value;
   }
 
   public refresh(): void {
@@ -116,18 +126,15 @@ export class EventsComponent implements OnDestroy {
 
   public sortChange(sortState: Sort) {
     if (sortState.direction && sortState.active) {
-      this._data = new BehaviorSubject<Event[]>([]);
-      this.dataSource = new MatTableDataSource<Event>([]);
-
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
       this.sortAsc = sortState.direction === 'asc';
 
-      const req = this.currentRequest$.value;
+      const { req } = this.currentRequest$.value;
 
       req.setLimit(this.INITPAGESIZE);
       req.setAsc(this.sortAsc ? true : false);
 
-      this.loadEvents(req);
+      this.loadEvents(req, true);
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
@@ -144,15 +151,13 @@ export class EventsComponent implements OnDestroy {
 
   public more(): void {
     const sequence = this.getCursor();
-    const req = this.currentRequest$.value;
+    const { req } = this.currentRequest$.value;
     req.setSequence(sequence);
     this.loadEvents(req);
   }
 
   public filterChanged(filterRequest: ListEventsRequest) {
     console.log('filterchanged');
-    this._data = new BehaviorSubject<Event[]>([]);
-    this.dataSource = new MatTableDataSource<Event>([]);
 
     const req = new ListEventsRequest();
     req.setLimit(this.INITPAGESIZE);
@@ -163,7 +168,7 @@ export class EventsComponent implements OnDestroy {
     req.setEventTypesList(filterRequest.getEventTypesList());
     req.setEditorUserId(filterRequest.getEditorUserId());
 
-    this.loadEvents(req);
+    this.loadEvents(req, true);
   }
 
   private getCursor(): number {

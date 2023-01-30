@@ -67,36 +67,37 @@ export class FilterEventsComponent implements OnInit {
   public ngOnInit(): void {
     this.loadAvailableTypes().then(() => {
       this.route.queryParams.pipe(take(1)).subscribe((params) => {
-        this.loadAvailableTypes().then();
-        const { filter } = params;
-        if (filter) {
-          const stringifiedFilters = filter as string;
-          const filters: ListEventsRequest.AsObject = JSON.parse(stringifiedFilters);
+        this.loadAvailableTypes().then(() => {
+          const { filter } = params;
+          if (filter) {
+            const stringifiedFilters = filter as string;
+            const filters: ListEventsRequest.AsObject = JSON.parse(stringifiedFilters);
 
-          if (filters.aggregateId) {
-            this.request.setAggregateId(filters.aggregateId);
-            this.aggregateId?.setValue(filters.aggregateId);
-            this.aggregateFilterSet?.setValue(true);
+            if (filters.aggregateId) {
+              this.request.setAggregateId(filters.aggregateId);
+              this.aggregateId?.setValue(filters.aggregateId);
+              this.aggregateFilterSet?.setValue(true);
+            }
+            if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
+              const values = this.aggregateTypes.filter((agg) => filters.aggregateTypesList.includes(agg.type));
+              this.request.setAggregateTypesList(filters.aggregateTypesList);
+              this.aggregateTypesList?.setValue(values);
+              this.aggregateFilterSet?.setValue(true);
+            }
+            if (filters.editorUserId) {
+              this.request.setEditorUserId(filters.editorUserId);
+              this.editorUserId?.setValue(filters.editorUserId);
+              this.userFilterSet?.setValue(true);
+            }
+            if (filters.eventTypesList && filters.eventTypesList.length) {
+              const values = this.eventTypes.filter((ev) => filters.eventTypesList.includes(ev.type));
+              this.request.setEventTypesList(filters.eventTypesList);
+              this.eventTypesList?.setValue(values);
+              this.eventTypesFilterSet?.setValue(true);
+            }
+            this.emitChange();
           }
-          if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
-            const values = this.aggregateTypes.filter((agg) => filters.aggregateTypesList.includes(agg.type));
-            this.request.setAggregateTypesList(filters.aggregateTypesList);
-            this.aggregateTypesList?.setValue(values);
-            this.aggregateFilterSet?.setValue(true);
-          }
-          if (filters.editorUserId) {
-            this.request.setEditorUserId(filters.editorUserId);
-            this.editorUserId?.setValue(filters.editorUserId);
-            this.userFilterSet?.setValue(true);
-          }
-          if (filters.eventTypesList && filters.eventTypesList.length) {
-            const values = this.eventTypes.filter((ev) => filters.eventTypesList.includes(ev.type));
-            this.request.setEventTypesList(filters.eventTypesList);
-            this.eventTypesList?.setValue(values);
-            this.eventTypesFilterSet?.setValue(true);
-          }
-          this.emitChange();
-        }
+        });
       });
     });
   }
