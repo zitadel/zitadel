@@ -8302,7 +8302,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | client_id |  string | - |  |
-| client_secret |  bytes | - |  |
+| client_secret |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 

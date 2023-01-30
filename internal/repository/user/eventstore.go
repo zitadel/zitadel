@@ -114,5 +114,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, MachineKeyAddedEventType, MachineKeyAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, MachineKeyRemovedEventType, MachineKeyRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, PersonalAccessTokenAddedType, PersonalAccessTokenAddedEventMapper).
-		RegisterFilterEventMapper(AggregateType, PersonalAccessTokenRemovedType, PersonalAccessTokenRemovedEventMapper)
+		RegisterFilterEventMapper(AggregateType, PersonalAccessTokenRemovedType, PersonalAccessTokenRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MachineCredentialsSetType, MachineCredentialsSetEventMapper).
+		RegisterFilterEventMapper(AggregateType, MachineCredentialsRemovedType, MachineCredentialsRemovedEventMapper).
+		RegisterFilterEventMapper(AggregateType, MachineCredentialsCheckSucceededType, MachineCredentialsCheckSucceededEventMapper).
+		RegisterFilterEventMapper(AggregateType, MachineCredentialsCheckFailedType, MachineCredentialsCheckFailedEventMapper)
 }

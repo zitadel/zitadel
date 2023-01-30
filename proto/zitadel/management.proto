@@ -3645,7 +3645,7 @@ message SetMachineCredentialsRequest {
 
 message SetMachineCredentialsResponse {
     string client_id = 1;
-    bytes client_secret = 2;
+    string client_secret = 2;
     zitadel.v1.ObjectDetails details = 3;
 }
 

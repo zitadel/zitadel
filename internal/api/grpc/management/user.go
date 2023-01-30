@@ -768,7 +768,7 @@ func (s *Server) SetMachineCredentials(ctx context.Context, req *mgmt_pb.SetMach
 	}
 	return &mgmt_pb.SetMachineCredentialsResponse{
 		ClientId:     set.ClientID,
-		ClientSecret: []byte(set.ClientSecret),
+		ClientSecret: set.ClientSecret,
 		Details:      obj_grpc.DomainToAddDetailsPb(details),
 	}, nil
 }

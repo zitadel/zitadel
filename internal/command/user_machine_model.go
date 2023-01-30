@@ -88,7 +88,9 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserUnlockedType,
 			user.UserDeactivatedType,
 			user.UserReactivatedType,
-			user.UserRemovedType).
+			user.UserRemovedType,
+			user.MachineCredentialsSetType,
+			user.MachineCredentialsRemovedType).
 		Builder()
 }
 
