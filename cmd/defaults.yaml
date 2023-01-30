@@ -436,6 +436,8 @@ DefaultInstance:
     TOSLink: https://zitadel.com/docs/legal/terms-of-service
     PrivacyLink: https://zitadel.com/docs/legal/privacy-policy
     HelpLink: ""
+  NotificationPolicy:
+    PasswordChange: true
   LabelPolicy:
     PrimaryColor: "#5469d4"
     BackgroundColor: "#fafafa"
@@ -465,7 +467,7 @@ DefaultInstance:
   SMTPConfiguration:
     # configuration of the host
     SMTP:
-      #for example smtp.mailtrap.io:2525
+      # must include the port, like smtp.mailtrap.io:2525. IPv6 is also supported, like [2001:db8::1]:2525
       Host:
       User:
       Password:
@@ -514,6 +516,14 @@ DefaultInstance:
       Greeting: Hallo {{.FirstName}} {{.LastName}},
       Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue Email hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
       ButtonText: Login
+    - MessageTextType: PasswordChange
+      Language: de
+      Title: ZITADEL - Passwort von Benutzer wurde geändert
+      PreHeader: Passwort Änderung
+      Subject: Passwort von Benutzer wurde geändert
+      Greeting: Hallo {{.FirstName}} {{.LastName}},
+      Text: Das Password vom Benutzer wurde geändert. Wenn diese Änderung von jemand anderem gemacht wurde, empfehlen wir die sofortige Zurücksetzung ihres Passworts.
+      ButtonText: Login
     - MessageTextType: InitCode
       Language: en
       Title: Zitadel - Initialize User
@@ -553,6 +563,14 @@ DefaultInstance:
       Subject: Domain has been claimed
       Greeting: Hello {{.FirstName}} {{.LastName}},
       Text: The domain {{.Domain}} has been claimed by an organisation. Your current user {{.UserName}} is not part of this organisation. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
+      ButtonText: Login
+    - MessageTextType: PasswordChange
+      Language: en
+      Title: ZITADEL - Password of user has changed
+      PreHeader: Change password
+      Subject: Password of user has changed
+      Greeting: Hello {{.FirstName}} {{.LastName}},
+      Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
 
 InternalAuthZ:
@@ -624,6 +642,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "events.read"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -648,6 +667,7 @@ InternalAuthZ:
         - "project.app.read"
         - "project.grant.read"
         - "project.grant.member.read"
+        - "events.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"

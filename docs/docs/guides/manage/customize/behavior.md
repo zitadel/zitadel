@@ -35,7 +35,7 @@ https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js
 
 ## Run the action when a user registers
 
-Now, make the action hook into the [external authentication flow](../../../apis/actions/register-flow#external-authentication).
+Now, make the action hook into the [external authentication flow](../../../apis/actions/external-authentication).
 
 1. In the **Flows <i className="las la-exchange-alt"></i>** section, select the **+ New** button.
 1. Select the **Flow Type** _External Authentication_.

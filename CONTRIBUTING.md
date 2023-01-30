@@ -110,7 +110,7 @@ We add the label "good first issue" for problems we think are a good starting po
 ### Backend / Login
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/v22.1/start-a-local-cluster-in-docker-mac.html) on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run a [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) on your local machine.
 With [goreleaser](https://opencollective.com/goreleaser), you build a debuggable ZITADEL binary and run it using [delve](https://github.com/go-delve/delve).
 Then, you test your changes via the console your binary is serving at http://<span because="breaks the link"></span>localhost:8080 and by verifying the database.
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
@@ -175,7 +175,7 @@ docker compose --file ./e2e/docker-compose.yaml down
 ### Console
 
 By executing the commands from this section, you run everything you need to develop the console locally.
-Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](https://www.cockroachlabs.com/docs/v22.1/start-a-local-cluster-in-docker-mac.html) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
+Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](https://www.cockroachlabs.com/docs/stable/start-a-local-cluster-in-docker-mac.html) and the [latest release of ZITADEL](https://github.com/zitadel/zitadel/releases/latest) on your local machine.
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 
@@ -259,14 +259,14 @@ npm run lint:fix
 # Install npm dependencies
 npm install
 
-# Run all tests in a headless browser
-npm run e2e:dev
+# Run all e2e tests
+npm run e2e:dev -- --headed
 ```
 
 You can also open the test suite interactively for fast success feedback on specific tests.
 
 ```bash
-# Run all tests in a headless browser
+# Run tests interactively
 npm run open:dev
 ```
 

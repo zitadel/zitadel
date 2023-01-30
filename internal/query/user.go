@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -177,6 +178,10 @@ var (
 	userLoginNamesOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userLoginNamesTable)
 	userLoginNamesListCol               = Column{
 		name:  "loginnames",
+		table: userLoginNamesTable,
+	}
+	userLoginNamesLowerListCol = Column{
+		name:  "loginnames_lower",
 		table: userLoginNamesTable,
 	}
 	userPreferredLoginNameTable                 = loginNameTable.setAlias("preferred_login_name")
@@ -642,7 +647,7 @@ func NewUserPreferredLoginNameSearchQuery(value string, comparison TextCompariso
 }
 
 func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(userLoginNamesListCol, value, TextListContains)
+	return NewTextQuery(userLoginNamesLowerListCol, strings.ToLower(value), TextListContains)
 }
 
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
@@ -677,6 +682,7 @@ func prepareLoginNamesQuery() (string, []interface{}, error) {
 	return sq.Select(
 		userLoginNamesUserIDCol.identifier(),
 		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name,
+		"ARRAY_AGG(LOWER("+userLoginNamesNameCol.identifier()+"))::TEXT[] AS "+userLoginNamesLowerListCol.name,
 		userLoginNamesInstanceIDCol.identifier(),
 		userLoginNamesOwnerRemovedUserCol.identifier(),
 		userLoginNamesOwnerRemovedPolicyCol.identifier(),

@@ -37,7 +37,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
 
   public error: string = '';
-  public otpAvailable: boolean = false;
+  public otpDisabled$ = new BehaviorSubject<boolean>(true);
 
   constructor(private service: GrpcAuthService, private toast: ToastService, private dialog: MatDialog) {}
 
@@ -52,7 +52,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public addAuthFactor(): void {
     const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
       data: {
-        otpDisabled: !this.otpAvailable,
+        otpDisabled$: this.otpDisabled$,
       },
     });
 
@@ -71,7 +71,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
         const index = list.findIndex((mfa) => mfa.otp);
         if (index === -1) {
-          this.otpAvailable = true;
+          this.otpDisabled$.next(false);
         }
       })
       .catch((error) => {
