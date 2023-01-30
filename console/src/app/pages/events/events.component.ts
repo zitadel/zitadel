@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -9,8 +9,6 @@ import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { ToastService } from 'src/app/services/toast.service';
-import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 
@@ -28,9 +26,10 @@ enum EventFieldName {
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
 })
-export class EventsComponent implements OnInit {
+export class EventsComponent implements OnDestroy {
   public INITPAGESIZE = 20;
   public sortAsc = false;
+  private destroy$: Subject<void> = new Subject();
 
   public displayedColumns: string[] = [
     EventFieldName.TYPE,
@@ -41,7 +40,9 @@ export class EventsComponent implements OnInit {
     EventFieldName.PAYLOAD,
   ];
 
-  public currentRequest: ListEventsRequest = new ListEventsRequest();
+  public currentRequest$: BehaviorSubject<ListEventsRequest> = new BehaviorSubject(
+    new ListEventsRequest().setLimit(this.INITPAGESIZE),
+  );
 
   @ViewChild(MatSort) public sort!: MatSort;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
@@ -69,43 +70,43 @@ export class EventsComponent implements OnInit {
       }),
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
+
+    this.currentRequest$.pipe(takeUntil(this.destroy$)).subscribe((req) => {
+      this._loading.next(true);
+      console.log('exe', req.toObject());
+      this.adminService
+        .listEvents(req)
+        .then((res: ListEventsResponse) => {
+          const eventList = res.getEventsList();
+          this._data.next(eventList);
+
+          const concat = this.dataSource.data.concat(eventList);
+          this.dataSource = new MatTableDataSource<Event>(concat);
+
+          this._loading.next(false);
+
+          if (eventList.length === 0) {
+            this._done.next(true);
+          } else {
+            this._done.next(false);
+          }
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+          this._loading.next(false);
+          this._data.next([]);
+        });
+    });
   }
 
-  ngOnInit(): void {
-    const req = new ListEventsRequest();
-    req.setLimit(this.INITPAGESIZE);
-
-    this.loadEvents(req);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  public loadEvents(filteredRequest: ListEventsRequest): Promise<void> {
-    this._loading.next(true);
-
-    this.currentRequest = filteredRequest;
-    console.log('load', this.currentRequest.toObject());
-
-    return this.adminService
-      .listEvents(this.currentRequest)
-      .then((res: ListEventsResponse) => {
-        const eventList = res.getEventsList();
-        this._data.next(eventList);
-
-        const concat = this.dataSource.data.concat(eventList);
-        this.dataSource = new MatTableDataSource<Event>(concat);
-
-        this._loading.next(false);
-
-        if (eventList.length === 0) {
-          this._done.next(true);
-        } else {
-          this._done.next(false);
-        }
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-        this._loading.next(false);
-        this._data.next([]);
-      });
+  public loadEvents(filteredRequest: ListEventsRequest): void {
+    this.currentRequest$.next(filteredRequest);
+    console.log('load', this.currentRequest$.value.toObject());
   }
 
   public refresh(): void {
@@ -121,11 +122,12 @@ export class EventsComponent implements OnInit {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
       this.sortAsc = sortState.direction === 'asc';
 
-      this.currentRequest = new ListEventsRequest();
-      this.currentRequest.setLimit(this.INITPAGESIZE);
-      this.currentRequest.setAsc(this.sortAsc ? true : false);
+      const req = this.currentRequest$.value;
 
-      this.loadEvents(this.currentRequest);
+      req.setLimit(this.INITPAGESIZE);
+      req.setAsc(this.sortAsc ? true : false);
+
+      this.loadEvents(req);
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
@@ -142,8 +144,9 @@ export class EventsComponent implements OnInit {
 
   public more(): void {
     const sequence = this.getCursor();
-    this.currentRequest.setSequence(sequence);
-    this.loadEvents(this.currentRequest);
+    const req = this.currentRequest$.value;
+    req.setSequence(sequence);
+    this.loadEvents(req);
   }
 
   public filterChanged(filterRequest: ListEventsRequest) {
@@ -151,16 +154,16 @@ export class EventsComponent implements OnInit {
     this._data = new BehaviorSubject<Event[]>([]);
     this.dataSource = new MatTableDataSource<Event>([]);
 
-    this.currentRequest = new ListEventsRequest();
-    this.currentRequest.setLimit(this.INITPAGESIZE);
-    this.currentRequest.setAsc(this.sortAsc ? true : false);
+    const req = new ListEventsRequest();
+    req.setLimit(this.INITPAGESIZE);
+    req.setAsc(this.sortAsc ? true : false);
 
-    this.currentRequest.setAggregateTypesList(filterRequest.getAggregateTypesList());
-    this.currentRequest.setAggregateId(filterRequest.getAggregateId());
-    this.currentRequest.setEventTypesList(filterRequest.getEventTypesList());
-    this.currentRequest.setEditorUserId(filterRequest.getEditorUserId());
+    req.setAggregateTypesList(filterRequest.getAggregateTypesList());
+    req.setAggregateId(filterRequest.getAggregateId());
+    req.setEventTypesList(filterRequest.getEventTypesList());
+    req.setEditorUserId(filterRequest.getEditorUserId());
 
-    this.loadEvents(this.currentRequest);
+    this.loadEvents(req);
   }
 
   private getCursor(): number {
