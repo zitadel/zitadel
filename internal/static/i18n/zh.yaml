@@ -225,6 +225,10 @@ Errors:
       Empty: 组织 IAM 策略为空
       NotExisting: 组织 IAM 策略不存在
       AlreadyExists: 组织 IAM 策略已存在
+    NotificationPolicy:
+      NotFound: 未找到通知政策
+      NotChanged: 通知政策没有改变
+      AlreadyExists: 已经存在的通知政策
   Project:
     ProjectIDMissing: P缺少项目 ID
     AlreadyExists: 项目以存在于组织中
@@ -351,6 +355,10 @@ Errors:
       NotExisting: 组织 IAM 策略不存在
       AlreadyExists: 组织 IAM 策略已存在
       NotChanged: 组织 IAM 策略未更改
+    NotificationPolicy:
+      NotFound: 没有找到默认的通知政策
+      NotChanged: 默认的通知政策没有改变
+      AlreadyExists: 默认的通知政策已经存在
   Policy:
     AlreadyExists: 策略已存在
     Label:
@@ -715,6 +723,10 @@ EventTypes:
         added: 添加隐私政策和服务条款
         changed: 更改隐私政策和服务条款
         removed: 删除隐私政策和服务条款
+      notification:
+        added: 增加了通知政策
+        changed: 通知政策改变
+        removed: 删除了通知政策
     flow:
       trigger_actions:
         set: 设置动作
@@ -924,6 +936,7 @@ Action:
       Unspecified: 未指定的
       ExternalAuthentication: 外部认证
       CustomiseToken: 自定义令牌
+      InternalAuthentication: 内部认证
   TriggerType:
     Unspecified: 未指定的
     PostAuthentication: 后期认证

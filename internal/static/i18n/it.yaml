@@ -225,6 +225,10 @@ Errors:
       Empty: Mancano le impostazioni Org IAM
       NotExisting: Impostazioni Org IAM non esistenti
       AlreadyExists: Impostazioni Org IAM già esistenti
+    NotificationPolicy:
+      NotFound: Impostazioni di notifica non trovate
+      NotChanged: Impostazioni di notifica non è stato cambiato
+      AlreadyExists: Impostazioni di notifica già esistente
   Project:
     ProjectIDMissing: ID del progetto mancante
     AlreadyExists: Il progetto è già stato creato nell'organizzazione
@@ -351,6 +355,10 @@ Errors:
       NotExisting: Impostazioni Org IAM non esistenti
       AlreadyExists: Impostazioni Org IAM già esistenti
       NotChanged: Impostazioni Org IAM non sono state cambiate
+    NotificationPolicy:
+      NotFound: Impostazioni di notifica predefinite non trovate
+      NotChanged: Impostazioni di notifica predefinite non è stato cambiato
+      AlreadyExists: Impostazioni di notifica predefinite già esistente
   Policy:
     AlreadyExists: Impostazioni già esistenti
     Label:
@@ -725,6 +733,10 @@ EventTypes:
         added: Informativa sulla privacy e termini e condizioni aggiunti
         changed: Informativa sulla privacy e termini e condizioni cambiati
         removed: Informativa sulla privacy e termini e condizioni rimossi
+      notification:
+        added: Impostazione di notifica creata
+        changed: Impostazione di notifica cambiata
+        removed: Impostazione di notifica rimossa
     flow:
       trigger_actions:
         set: azioni salvate
@@ -934,6 +946,7 @@ Action:
       Unspecified: Non specificato
       ExternalAuthentication: Autenticazione esterna
       CustomiseToken: Completare Token
+      InternalAuthentication: Autenticazione interna
   TriggerType:
     Unspecified: Non specificato
     PostAuthentication: Post-autenticazione

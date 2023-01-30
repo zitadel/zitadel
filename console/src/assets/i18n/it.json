@@ -919,7 +919,7 @@
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "Complessità della password",
-      "NOTIFICATIONS": "Notifiche",
+      "NOTIFICATIONS": "Impostazioni di notifica",
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Identity Providers",
@@ -1042,6 +1042,11 @@
       "SYMBOLERROR": "Deve includere un simbolo/segno di punteggiatura.",
       "NUMBERERROR": "Deve includere una cifra.",
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notifiche",
+      "DESCRIPTION": "Determina su quali modifiche verranno inviate le notifiche",
+      "PASSWORDCHANGE": "Cambiamento della password"
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
@@ -1182,7 +1187,8 @@
         "VP": "Verificazione del telefono",
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
-        "PL": "Autenticazione Passwordless"
+        "PL": "Autenticazione Passwordless",
+        "PC": "Cambiamento della password"
       },
       "CHIPS": {
         "firstname": "Nome",

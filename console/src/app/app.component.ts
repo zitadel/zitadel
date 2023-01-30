@@ -207,7 +207,6 @@ export class AppComponent implements OnDestroy {
           .getActiveOrg()
           .then(async (org) => {
             this.org = org;
-
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })

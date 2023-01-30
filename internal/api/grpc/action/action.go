@@ -17,6 +17,8 @@ func FlowTypeToDomain(flowType string) domain.FlowType {
 		return domain.FlowTypeExternalAuthentication
 	case domain.FlowTypeCustomiseToken.ID():
 		return domain.FlowTypeCustomiseToken
+	case domain.FlowTypeInternalAuthentication.ID():
+		return domain.FlowTypeInternalAuthentication
 	default:
 		return domain.FlowTypeUnspecified
 	}
