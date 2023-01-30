@@ -14,14 +14,14 @@
   </button>
   <ng-template
     cdkConnectedOverlay
-    [cdkConnectedOverlayOrigin]="triggereventfilter"
+    [cdkConnectedOverlayHasBackdrop]="true"
     [flexibleDimensions]="true"
     [lockPosition]="true"
     [cdkConnectedOverlayOffsetY]="10"
-    [cdkConnectedOverlayHasBackdrop]="true"
     [cdkConnectedOverlayPositions]="positions"
-    cdkConnectedOverlayBackdropClass="transparent-backdrop"
+    [cdkConnectedOverlayOrigin]="triggereventfilter"
     [cdkConnectedOverlayOpen]="showFilter"
+    cdkConnectedOverlayBackdropClass="transparent-backdrop"
     (backdropClick)="showFilter = false"
     (detach)="showFilter = false"
   >
@@ -33,7 +33,7 @@
           {{ 'ACTIONS.FINISH' | translate }}
         </button>
       </div>
-      <form [formGroup]="form" (ngSubmit)="emitChange()">
+      <form *ngIf="form" [formGroup]="form" (ngSubmit)="emitChange()">
         <div *ngIf="isLoading" class="sp_wrapper"><mat-spinner diameter="20"></mat-spinner></div>
         <div class="filter-events-section">
           <div class="checkbox-wrapper">
@@ -64,15 +64,14 @@
                 name="aggregateTypesList"
                 formControlName="aggregateTypesList"
                 [multiple]="true"
-                [compareWith]="compareTypes"
               >
                 <mat-select-trigger>
                   <span *ngIf="aggregateTypesList?.value && aggregateTypesList?.value.length">{{
                     aggregateTypesList?.value[0]?.localized?.localizedMessage || ''
                   }}</span>
-                  <small *ngIf="(aggregateTypesList?.value.length || 0) > 1" class="cnsl-secondary-text">
-                    (+{{ (aggregateTypesList?.value.length || 0) - 1 }}
-                    {{ aggregateTypesList?.value.length === 2 ? 'other' : 'others' }})
+                  <small *ngIf="(aggregateTypesList?.value?.length || 0) > 1" class="cnsl-secondary-text">
+                    (+{{ (aggregateTypesList?.value?.length || 0) - 1 }}
+                    {{ aggregateTypesList?.value?.length === 2 ? 'other' : 'others' }})
                   </small>
                 </mat-select-trigger>
                 <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate">
@@ -104,20 +103,14 @@
             <cnsl-form-field class="event-types-select">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.TYPE.TYPELABEL' | translate }}</cnsl-label>
 
-              <mat-select
-                id="eventTypesList"
-                id="eventTypesList"
-                formControlName="eventTypesList"
-                [multiple]="true"
-                [compareWith]="compareTypes"
-              >
+              <mat-select id="eventTypesList" name="eventTypesList" formControlName="eventTypesList" [multiple]="true">
                 <mat-select-trigger>
                   <span *ngIf="eventTypesList?.value && eventTypesList?.value.length">{{
                     eventTypesList?.value[0]?.localized?.localizedMessage || ''
                   }}</span>
                   <small *ngIf="(eventTypesList?.value?.length || 0) > 1" class="cnsl-secondary-text">
-                    (+{{ (eventTypesList?.value.length || 0) - 1 }}
-                    {{ eventTypesList?.value.length === 2 ? 'other' : 'others' }})
+                    (+{{ (eventTypesList?.value?.length || 0) - 1 }}
+                    {{ eventTypesList?.value?.length === 2 ? 'other' : 'others' }})
                   </small>
                 </mat-select-trigger>
                 <mat-option *ngFor="let eventType of eventTypes" [value]="eventType">

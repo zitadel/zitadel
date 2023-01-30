@@ -13,7 +13,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/f
 import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
 import { MatLegacySelectChange } from '@angular/material/legacy-select';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ListAggregateTypesRequest, ListEventsRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AggregateType, EventType } from 'src/app/proto/generated/zitadel/event_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -47,7 +47,7 @@ export class FilterEventsComponent implements OnInit {
   public isLoading: boolean = false;
 
   @Output() public requestChanged: EventEmitter<ListEventsRequest> = new EventEmitter();
-  public form = new FormGroup({
+  public form: FormGroup = new FormGroup({
     userFilterSet: new FormControl(false),
     editorUserId: new FormControl(''),
     aggregateFilterSet: new FormControl(false),
@@ -60,47 +60,58 @@ export class FilterEventsComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private toast: ToastService,
-    private cdref: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
-  ) {
-    this.form.valueChanges.subscribe(() => {
-      this.cdref.detectChanges();
+  ) {}
+
+  public ngOnInit(): void {
+    this.loadAvailableTypes().then(() => {
+      this.route.queryParams.pipe(take(1)).subscribe((params) => {
+        this.loadAvailableTypes().then();
+        const { filter } = params;
+        if (filter) {
+          const stringifiedFilters = filter as string;
+          const filters: ListEventsRequest.AsObject = JSON.parse(stringifiedFilters);
+
+          if (filters.aggregateId) {
+            this.request.setAggregateId(filters.aggregateId);
+            this.aggregateId?.setValue(filters.aggregateId);
+            this.aggregateFilterSet?.setValue(true);
+          }
+          if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
+            const values = this.aggregateTypes.filter((agg) => filters.aggregateTypesList.includes(agg.type));
+            this.request.setAggregateTypesList(filters.aggregateTypesList);
+            this.aggregateTypesList?.setValue(values);
+            this.aggregateFilterSet?.setValue(true);
+          }
+          if (filters.editorUserId) {
+            this.request.setEditorUserId(filters.editorUserId);
+            this.editorUserId?.setValue(filters.editorUserId);
+            this.userFilterSet?.setValue(true);
+          }
+          if (filters.eventTypesList && filters.eventTypesList.length) {
+            const values = this.eventTypes.filter((ev) => filters.eventTypesList.includes(ev.type));
+            this.request.setEventTypesList(filters.eventTypesList);
+            this.eventTypesList?.setValue(values);
+            this.eventTypesFilterSet?.setValue(true);
+          }
+          this.emitChange();
+        }
+      });
     });
   }
 
-  public ngOnInit(): void {
-    this.getAggregateTypes();
-    this.getEventTypes();
-
-    this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      const { filter } = params;
-      if (filter) {
-        const stringifiedFilters = filter as string;
-        const filters: ListEventsRequest.AsObject = JSON.parse(stringifiedFilters);
-
-        console.log('set filter from url', filters);
-
-        if (filters.aggregateId) {
-          this.request.setAggregateId(filters.aggregateId);
-          this.aggregateFilterSet?.setValue(true);
-        }
-        if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
-          this.request.setAggregateTypesList(filters.aggregateTypesList);
-          this.aggregateFilterSet?.setValue(true);
-        }
-        if (filters.editorUserId) {
-          this.request.setEditorUserId(filters.editorUserId);
-          this.userFilterSet?.setValue(true);
-        }
-        if (filters.eventTypesList && filters.eventTypesList.length) {
-          this.request.setEventTypesList(filters.eventTypesList);
-          this.eventTypesFilterSet?.setValue(true);
-        }
-        // this.cdref.detectChanges();
-        this.emitChange();
-      }
-    });
+  private loadAvailableTypes(): Promise<void> {
+    this.isLoading = true;
+    const aT = this.getAggregateTypes();
+    const eT = this.getEventTypes();
+    return Promise.all([aT, eT])
+      .then(() => {
+        this.isLoading = false;
+      })
+      .catch(() => {
+        this.isLoading = false;
+      });
   }
 
   public reset(): void {
@@ -113,10 +124,10 @@ export class FilterEventsComponent implements OnInit {
     this.emitChange();
   }
 
-  private getAggregateTypes(): void {
+  private getAggregateTypes(): Promise<void> {
     const req = new ListAggregateTypesRequest();
 
-    this.adminService
+    return this.adminService
       .listAggregateTypes(req)
       .then((list) => {
         this.aggregateTypes = list.aggregateTypesList ?? [];
@@ -126,10 +137,10 @@ export class FilterEventsComponent implements OnInit {
       });
   }
 
-  private getEventTypes(): void {
+  private getEventTypes(): Promise<void> {
     const req = new ListAggregateTypesRequest();
 
-    this.adminService
+    return this.adminService
       .listEventTypes(req)
       .then((list) => {
         this.eventTypes = list.eventTypesList ?? [];
@@ -139,34 +150,7 @@ export class FilterEventsComponent implements OnInit {
       });
   }
 
-  public aggregateTypeObject(type: string): AggregateType.AsObject | null {
-    const index = this.aggregateTypes.findIndex((agg) => agg.type === type);
-    if (index > -1) {
-      return this.aggregateTypes[index];
-    } else {
-      return null;
-    }
-  }
-
-  public eventTypeObject(type: string): EventType.AsObject | null {
-    const index = this.eventTypes.findIndex((eventType) => eventType.type === type);
-    if (index > -1) {
-      return this.eventTypes[index];
-    } else {
-      return null;
-    }
-  }
-
-  public compareTypes(t1: EventType.AsObject | AggregateType.AsObject, t2: EventType.AsObject | AggregateType.AsObject) {
-    console.log(t1, t2);
-    if (t1.type && t2.type) {
-      return t1.type === t2.type;
-    }
-    return false;
-  }
-
   public emitChange(): void {
-    console.log(this.form.value);
     const formValues = this.form.value;
 
     const constructRequest = new ListEventsRequest();
@@ -176,17 +160,19 @@ export class FilterEventsComponent implements OnInit {
       constructRequest.setEditorUserId(formValues.editorUserId);
       filterObject.editorUserId = formValues.editorUserId;
     }
-    if (formValues.aggregateFilterSet && formValues.aggregateTypesList) {
-      constructRequest.setAggregateTypesList(formValues.aggregateTypesList.map((eventType) => eventType.type));
-      filterObject.aggregateTypesList = formValues.aggregateTypesList.map((eventType) => eventType.type);
+    if (formValues.aggregateFilterSet && formValues.aggregateTypesList && formValues.aggregateTypesList.length) {
+      constructRequest.setAggregateTypesList(
+        formValues.aggregateTypesList.map((aggType: AggregateType.AsObject) => aggType.type),
+      );
+      filterObject.aggregateTypesList = formValues.aggregateTypesList.map((aggType: AggregateType.AsObject) => aggType.type);
     }
     if (formValues.aggregateFilterSet && formValues.aggregateId) {
       constructRequest.setAggregateId(formValues.aggregateId);
       filterObject.aggregateId = formValues.aggregateId;
     }
-    if (formValues.eventTypesFilterSet && formValues.eventTypesList) {
-      constructRequest.setEventTypesList(formValues.eventTypesList.map((eventType) => eventType.type));
-      filterObject.eventTypesList = formValues.eventTypesList.map((eventType) => eventType.type);
+    if (formValues.eventTypesFilterSet && formValues.eventTypesList && formValues.eventTypesList.length) {
+      constructRequest.setEventTypesList(formValues.eventTypesList.map((eventType: EventType.AsObject) => eventType.type));
+      filterObject.eventTypesList = formValues.eventTypesList.map((eventType: EventType.AsObject) => eventType.type);
     }
 
     this.requestChanged.emit(constructRequest);

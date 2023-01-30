@@ -115,6 +115,7 @@ export class EventsComponent implements OnInit {
 
   public sortChange(sortState: Sort) {
     if (sortState.direction && sortState.active) {
+      this._data = new BehaviorSubject<Event[]>([]);
       this.dataSource = new MatTableDataSource<Event>([]);
 
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
@@ -146,6 +147,8 @@ export class EventsComponent implements OnInit {
   }
 
   public filterChanged(filterRequest: ListEventsRequest) {
+    console.log('filterchanged');
+    this._data = new BehaviorSubject<Event[]>([]);
     this.dataSource = new MatTableDataSource<Event>([]);
 
     this.currentRequest = new ListEventsRequest();
