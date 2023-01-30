@@ -323,7 +323,7 @@ You can find the attributes on the project "Product Management".
 The state should reflect the progress of the issue and what is going on right now.
 
 - **No status**: Issue just got added and has to be looked at.
-- **🧐 Investigating**: We are curently investigating to find out what the problem is, which priority it should have and what has to be implemented. Or we need some more information of the author.
+- **🧐 Investigating**: We are currently investigating to find out what the problem is, which priority it should have and what has to be implemented. Or we need some more information from the author.
 - **📨 Product Backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be processed in the future. Issues with this state do not have to be completely defined yet.
 - **📝 Prioritized Product Backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
 - **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
