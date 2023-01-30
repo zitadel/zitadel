@@ -626,9 +626,9 @@ service ManagementService {
     }
 
     // Generates and sets new machine credentials
-    rpc SetMachineCredentials(SetMachineCredentialsRequest) returns (SetMachineCredentialsResponse) {
+    rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
         option (google.api.http) = {
-            put: "/users/{user_id}/credentials"
+            put: "/users/{user_id}/secret"
             body: "*"
         };
 
@@ -638,9 +638,9 @@ service ManagementService {
     }
 
     // Removes machine credentials
-    rpc RemoveMachineCredentials(RemoveMachineCredentialsRequest) returns (RemoveMachineCredentialsResponse) {
+    rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/credentials"
+            delete: "/users/{user_id}/secret"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -3639,21 +3639,21 @@ message UpdateMachineResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message SetMachineCredentialsRequest {
+message GenerateMachineSecretRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
 }
 
-message SetMachineCredentialsResponse {
+message GenerateMachineSecretResponse {
     string client_id = 1;
     string client_secret = 2;
     zitadel.v1.ObjectDetails details = 3;
 }
 
-message RemoveMachineCredentialsRequest {
+message RemoveMachineSecretRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveMachineCredentialsResponse {
+message RemoveMachineSecretResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

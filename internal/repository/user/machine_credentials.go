@@ -11,44 +11,44 @@ import (
 )
 
 const (
-	machineCredentialsPrefix             = machineEventPrefix + "credentials."
-	MachineCredentialsSetType            = machineCredentialsPrefix + "set"
-	MachineCredentialsRemovedType        = machineCredentialsPrefix + "removed"
-	MachineCredentialsCheckSucceededType = machineCredentialsPrefix + "check.succeeded"
-	MachineCredentialsCheckFailedType    = machineCredentialsPrefix + "check.failed"
+	machineSecretPrefix             = machineEventPrefix + "credentials."
+	MachineSecretSetType            = machineSecretPrefix + "set"
+	MachineSecretRemovedType        = machineSecretPrefix + "removed"
+	MachineSecretCheckSucceededType = machineSecretPrefix + "check.succeeded"
+	MachineSecretCheckFailedType    = machineSecretPrefix + "check.failed"
 )
 
-type MachineCredentialsSetEvent struct {
+type MachineSecretSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 }
 
-func (e *MachineCredentialsSetEvent) Data() interface{} {
+func (e *MachineSecretSetEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineCredentialsSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineSecretSetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewMachineCredentialsSetEvent(
+func NewMachineSecretSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	clientSecret *crypto.CryptoValue,
-) *MachineCredentialsSetEvent {
-	return &MachineCredentialsSetEvent{
+) *MachineSecretSetEvent {
+	return &MachineSecretSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			MachineCredentialsSetType,
+			MachineSecretSetType,
 		),
 		ClientSecret: clientSecret,
 	}
 }
 
-func MachineCredentialsSetEventMapper(event *repository.Event) (eventstore.Event, error) {
-	credentialsSet := &MachineCredentialsSetEvent{
+func MachineSecretSetEventMapper(event *repository.Event) (eventstore.Event, error) {
+	credentialsSet := &MachineSecretSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, credentialsSet)
@@ -59,33 +59,33 @@ func MachineCredentialsSetEventMapper(event *repository.Event) (eventstore.Event
 	return credentialsSet, nil
 }
 
-type MachineCredentialsRemovedEvent struct {
+type MachineSecretRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineCredentialsRemovedEvent) Data() interface{} {
+func (e *MachineSecretRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineCredentialsRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineSecretRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewMachineCredentialsRemovedEvent(
+func NewMachineSecretRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-) *MachineCredentialsRemovedEvent {
-	return &MachineCredentialsRemovedEvent{
+) *MachineSecretRemovedEvent {
+	return &MachineSecretRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			MachineCredentialsRemovedType,
+			MachineSecretRemovedType,
 		),
 	}
 }
 
-func MachineCredentialsRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	credentialsRemoved := &MachineCredentialsRemovedEvent{
+func MachineSecretRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	credentialsRemoved := &MachineSecretRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, credentialsRemoved)
@@ -96,33 +96,33 @@ func MachineCredentialsRemovedEventMapper(event *repository.Event) (eventstore.E
 	return credentialsRemoved, nil
 }
 
-type MachineCredentialsCheckSucceededEvent struct {
+type MachineSecretCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineCredentialsCheckSucceededEvent) Data() interface{} {
+func (e *MachineSecretCheckSucceededEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineCredentialsCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewMachineCredentialsCheckSucceededEvent(
+func NewMachineSecretCheckSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-) *MachineCredentialsCheckSucceededEvent {
-	return &MachineCredentialsCheckSucceededEvent{
+) *MachineSecretCheckSucceededEvent {
+	return &MachineSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			MachineCredentialsCheckSucceededType,
+			MachineSecretCheckSucceededType,
 		),
 	}
 }
 
-func MachineCredentialsCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
-	check := &MachineCredentialsCheckSucceededEvent{
+func MachineSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
+	check := &MachineSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, check)
@@ -133,33 +133,33 @@ func MachineCredentialsCheckSucceededEventMapper(event *repository.Event) (event
 	return check, nil
 }
 
-type MachineCredentialsCheckFailedEvent struct {
+type MachineSecretCheckFailedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MachineCredentialsCheckFailedEvent) Data() interface{} {
+func (e *MachineSecretCheckFailedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineCredentialsCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineSecretCheckFailedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewMachineCredentialsCheckFailedEvent(
+func NewMachineSecretCheckFailedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-) *MachineCredentialsCheckFailedEvent {
-	return &MachineCredentialsCheckFailedEvent{
+) *MachineSecretCheckFailedEvent {
+	return &MachineSecretCheckFailedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			MachineCredentialsCheckFailedType,
+			MachineSecretCheckFailedType,
 		),
 	}
 }
 
-func MachineCredentialsCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	check := &MachineCredentialsCheckFailedEvent{
+func MachineSecretCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	check := &MachineSecretCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, check)

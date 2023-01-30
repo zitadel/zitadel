@@ -78,6 +78,11 @@ message Machine {
             example: "\"The one and only IAM\"";
         }
     ];
+    bool has_secret = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"true\"";
+        }
+    ];
 }
 
 message Profile {

@@ -1421,7 +1421,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users6_machines (user_id, instance_id, name, description) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.users6_machines2 (user_id, instance_id, name, description) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1468,7 +1468,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users6_machines (user_id, instance_id, name, description) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.users6_machines2 (user_id, instance_id, name, description) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1509,7 +1509,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users6_machines SET (name, description) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users6_machines2 SET (name, description) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"machine-name",
 								"description",
@@ -1549,7 +1549,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users6_machines SET name = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users6_machines2 SET name = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"machine-name",
 								"agg-id",
@@ -1588,7 +1588,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users6_machines SET description = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users6_machines2 SET description = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"description",
 								"agg-id",
@@ -1615,6 +1615,68 @@ func TestUserProjection_reduces(t *testing.T) {
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{},
+				},
+			},
+		},
+		{
+			name: "reduceMachineSecretSet",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.MachineSecretSetType),
+					user.AggregateType,
+					[]byte(`{
+						"client_secret": {}
+					}`),
+				), user.MachineSecretSetEventMapper),
+			},
+			reduce: (&userProjection{}).reduceMachineSecretSet,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users6_machines2 SET (sequence, change_date, has_secret) = ($1, $2, $3) WHERE (user_id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								uint64(15),
+								anyArg{},
+								true,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceMachineSecretSet",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.MachineSecretRemovedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.MachineSecretRemovedEventMapper),
+			},
+			reduce: (&userProjection{}).reduceMachineSecretRemoved,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users6_machines2 SET (sequence, change_date, has_secret) = ($1, $2, $3) WHERE (user_id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								uint64(15),
+								anyArg{},
+								false,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
 				},
 			},
 		},

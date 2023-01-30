@@ -66,9 +66,9 @@ func (wm *MachineWriteModel) Reduce() error {
 			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
-		case *user.MachineCredentialsSetEvent:
+		case *user.MachineSecretSetEvent:
 			wm.ClientSecret = e.ClientSecret
-		case *user.MachineCredentialsRemovedEvent:
+		case *user.MachineSecretRemovedEvent:
 			wm.ClientSecret = nil
 		}
 	}
@@ -89,8 +89,8 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserDeactivatedType,
 			user.UserReactivatedType,
 			user.UserRemovedType,
-			user.MachineCredentialsSetType,
-			user.MachineCredentialsRemovedType).
+			user.MachineSecretSetType,
+			user.MachineSecretRemovedType).
 		Builder()
 }
 

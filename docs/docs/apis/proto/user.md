@@ -133,6 +133,7 @@ title: zitadel/user.proto
 | ----- | ---- | ----------- | ----------- |
 | name |  string | - |  |
 | description |  string | - |  |
+| has_secret |  bool | - |  |
 
 
 

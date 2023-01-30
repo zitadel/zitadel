@@ -581,28 +581,28 @@ Changes a machine user
     PUT: /users/{user_id}/machine
 
 
-### SetMachineCredentials
+### GenerateMachineSecret
 
-> **rpc** SetMachineCredentials([SetMachineCredentialsRequest](#setmachinecredentialsrequest))
-[SetMachineCredentialsResponse](#setmachinecredentialsresponse)
+> **rpc** GenerateMachineSecret([GenerateMachineSecretRequest](#generatemachinesecretrequest))
+[GenerateMachineSecretResponse](#generatemachinesecretresponse)
 
 Generates and sets new machine credentials
 
 
 
-    PUT: /users/{user_id}/credentials
+    PUT: /users/{user_id}/secret
 
 
-### RemoveMachineCredentials
+### RemoveMachineSecret
 
-> **rpc** RemoveMachineCredentials([RemoveMachineCredentialsRequest](#removemachinecredentialsrequest))
-[RemoveMachineCredentialsResponse](#removemachinecredentialsresponse)
+> **rpc** RemoveMachineSecret([RemoveMachineSecretRequest](#removemachinesecretrequest))
+[RemoveMachineSecretResponse](#removemachinesecretresponse)
 
 Removes machine credentials
 
 
 
-    DELETE: /users/{user_id}/credentials
+    DELETE: /users/{user_id}/secret
 
 
 ### GetMachineKeyByIDs
@@ -4449,6 +4449,30 @@ This is an empty request
 
 
 
+### GenerateMachineSecretRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+
+
+
+
+### GenerateMachineSecretResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| client_secret |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### GenerateOrgDomainValidationRequest
 
 
@@ -7176,28 +7200,6 @@ This is an empty request
 
 
 
-### RemoveMachineCredentialsRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### RemoveMachineCredentialsResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### RemoveMachineKeyRequest
 
 
@@ -7211,6 +7213,28 @@ This is an empty request
 
 
 ### RemoveMachineKeyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveMachineSecretRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveMachineSecretResponse
 
 
 
@@ -8279,30 +8303,6 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### SetMachineCredentialsRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| user_id |  string | - | string.min_len: 1<br />  |
-
-
-
-
-### SetMachineCredentialsResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| client_id |  string | - |  |
-| client_secret |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 

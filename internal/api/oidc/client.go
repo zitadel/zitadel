@@ -216,7 +216,7 @@ func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecre
 	if err != nil {
 		return nil, err
 	}
-	if _, err := o.command.VerifyMachineCredentials(ctx, user.ID, user.ResourceOwner, clientSecret); err != nil {
+	if _, err := o.command.VerifyMachineSecret(ctx, user.ID, user.ResourceOwner, clientSecret); err != nil {
 		return nil, err
 	}
 	return &clientCredentialsClient{
