@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Précédent",
     "NEXT": "Suivant",
-    "COUNT": "Résultats totaux"
+    "COUNT": "Résultats totaux",
+    "MORE": "plus"
   },
   "FOOTER": {
     "LINKS": {
@@ -755,11 +756,34 @@
       "TITLE": "Événements",
       "DESCRIPTION": "Cette vue montre les événements de ZITADEL.",
       "EDITOR": "Éditeur",
-      "AGGREGATE": "Aggregate",
-      "SEQUENCE": "Séquence",
+      "AGGREGATE": "agrégat",
+      "AGGREGATEID": "agrégat ID",
+      "AGGREGATETYPE": "type d'agrégat",
+      "SEQUENCE": "séquence",
       "CREATIONDATE": "Créé à",
       "TYPE": "Type",
-      "PAYLOAD": "Payload"
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtre",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer par éditeur"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer par agrégat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtrer par type"
+        },
+        "OTHER": "autre",
+        "OTHERS": "autres"
+      },
+      "DIALOG": {
+        "TITLE": "Détail de l'événement"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Gestionnaire supprimé.",

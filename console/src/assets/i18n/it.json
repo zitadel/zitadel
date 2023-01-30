@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Precedente",
     "NEXT": "Avanti",
-    "COUNT": "Risultati totali"
+    "COUNT": "Risultati totali",
+    "MORE": "avanti"
   },
   "FOOTER": {
     "LINKS": {
@@ -753,13 +754,36 @@
     },
     "EVENTS": {
       "TITLE": "Eventi",
-      "DESCRIPTION": "Questa vista mostra gli eventi di ZITADEL.",
+      "DESCRIPTION": "Questa vista mostra tutti gli eventi in arrivo",
       "EDITOR": "Editore",
-      "AGGREGATE": "Aggregate",
+      "AGGREGATE": "Aggregato",
+      "AGGREGATEID": "ID aggregato",
+      "AGGREGATETYPE": "Tipo aggregato",
       "SEQUENCE": "Sequenza",
-      "CREATIONDATE": "Data di creazione",
+      "CREATIONDATE": "Creato",
       "TYPE": "Tipo",
-      "PAYLOAD": "Payload"
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtra",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "filtra per editore"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "filtra per aggregato"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtra per tipo"
+        },
+        "OTHER": "altro",
+        "OTHERS": "altri"
+      },
+      "DIALOG": {
+        "TITLE": "Dettaglio dell'evento"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Manager rimosso.",

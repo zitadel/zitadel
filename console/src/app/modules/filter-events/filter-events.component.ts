@@ -53,9 +53,9 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
     editorUserId: new FormControl(''),
     aggregateFilterSet: new FormControl(false),
     aggregateId: new FormControl(''),
-    aggregateTypesList: new FormControl<string[]>([]),
+    aggregateTypesList: new FormControl<AggregateType.AsObject[]>([]),
     eventTypesFilterSet: new FormControl(false),
-    eventTypesList: new FormControl<string[]>([]),
+    eventTypesList: new FormControl<EventType.AsObject[]>([]),
   });
 
   constructor(
@@ -136,28 +136,6 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
     });
   }
 
-  //   public resetAggregateValues(event: MatCheckboxChange): void {
-  //     if (!event.checked) {
-  //       this.request.setAggregateId('');
-  //       this.request.setAggregateTypesList([]);
-  //       this.emitChange();
-  //     }
-  //   }
-
-  //   public resetUserValues(event: MatCheckboxChange): void {
-  //     if (!event.checked) {
-  //       this.request.setEditorUserId('');
-  //       this.emitChange();
-  //     }
-  //   }
-
-  //   public resetTypeValues(event: MatCheckboxChange): void {
-  //     if (!event.checked) {
-  //       this.request.setEventTypesList([]);
-  //       this.emitChange();
-  //     }
-  //   }
-
   public aggregateTypeObject(type: string): AggregateType.AsObject | null {
     const index = this.aggregateTypes.findIndex((agg) => agg.type === type);
     if (index > -1) {
@@ -176,10 +154,10 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
     }
   }
 
-  public compareTypes(t1: string, t2: string) {
+  public compareTypes(t1: EventType.AsObject | AggregateType.AsObject, t2: EventType.AsObject | AggregateType.AsObject) {
     console.log(t1, t2);
-    if (t1 && t2) {
-      return t1 === t2;
+    if (t1.type && t2.type) {
+      return t1.type === t2.type;
     }
     return false;
   }
@@ -196,16 +174,16 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
       filterObject.editorUserId = formValues.editorUserId;
     }
     if (formValues.aggregateFilterSet && formValues.aggregateTypesList) {
-      constructRequest.setAggregateTypesList(formValues.aggregateTypesList);
-      filterObject.aggregateTypesList = formValues.aggregateTypesList;
+      constructRequest.setAggregateTypesList(formValues.aggregateTypesList.map((eventType) => eventType.type));
+      filterObject.aggregateTypesList = formValues.aggregateTypesList.map((eventType) => eventType.type);
     }
     if (formValues.aggregateFilterSet && formValues.aggregateId) {
       constructRequest.setAggregateId(formValues.aggregateId);
       filterObject.aggregateId = formValues.aggregateId;
     }
     if (formValues.eventTypesFilterSet && formValues.eventTypesList) {
-      constructRequest.setEventTypesList(formValues.eventTypesList);
-      filterObject.eventTypesList = formValues.eventTypesList;
+      constructRequest.setEventTypesList(formValues.eventTypesList.map((eventType) => eventType.type));
+      filterObject.eventTypesList = formValues.eventTypesList.map((eventType) => eventType.type);
     }
 
     this.requestChanged.emit(constructRequest);

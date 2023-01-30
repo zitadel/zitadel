@@ -58,17 +58,22 @@
             <cnsl-form-field class="aggregate-type-select">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.TYPELABEL' | translate }}</cnsl-label>
 
-              <mat-select name="aggregateTypesList" formControlName="aggregateTypesList" multiple>
+              <mat-select
+                name="aggregateTypesList"
+                formControlName="aggregateTypesList"
+                multiple
+                [compareWith]="compareTypes"
+              >
                 <mat-select-trigger>
                   <span *ngIf="aggregateTypesList?.value && aggregateTypesList?.value.length">{{
-                    aggregateTypeObject(aggregateTypesList?.value[0])?.localized?.localizedMessage || ''
+                    aggregateTypesList?.value[0]?.localized?.localizedMessage || ''
                   }}</span>
-                  <small *ngIf="(request.getAggregateTypesList().length || 0) > 1" class="cnsl-secondary-text">
-                    (+{{ (request.getAggregateTypesList().length || 0) - 1 }}
-                    {{ request.getAggregateTypesList().length === 2 ? 'other' : 'others' }})
+                  <small *ngIf="(aggregateTypesList?.value.length || 0) > 1" class="cnsl-secondary-text">
+                    (+{{ (aggregateTypesList?.value.length || 0) - 1 }}
+                    {{ aggregateTypesList?.value.length === 2 ? 'other' : 'others' }})
                   </small>
                 </mat-select-trigger>
-                <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate.type">
+                <mat-option *ngFor="let aggregate of aggregateTypes" [value]="aggregate">
                   <span *ngIf="aggregate.localized && aggregate.localized.localizedMessage">
                     {{ aggregate.localized.localizedMessage }}
                   </span>
@@ -89,21 +94,21 @@
               >{{ 'IAM.EVENTS.FILTERS.TYPE.CHECKBOX' | translate }}
             </mat-checkbox>
           </div>
-          <div class="filter-events-sub" *ngIf="eventTypeFilterSet">
+          <div class="filter-events-sub" *ngIf="eventTypeFilterSet?.value">
             <cnsl-form-field class="event-types-select">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.TYPE.TYPELABEL' | translate }}</cnsl-label>
 
-              <mat-select formControlName="eventTypesList" multiple>
+              <mat-select formControlName="eventTypesList" multiple [compareWith]="compareTypes">
                 <mat-select-trigger>
                   <span *ngIf="eventTypesList?.value && eventTypesList?.value.length">{{
-                    eventTypeObject(eventTypesList?.value[0])?.localized?.localizedMessage || ''
+                    eventTypesList?.value[0]?.localized?.localizedMessage || ''
                   }}</span>
-                  <small *ngIf="(request.getEventTypesList().length || 0) > 1" class="cnsl-secondary-text">
-                    (+{{ (request.getEventTypesList().length || 0) - 1 }}
-                    {{ request.getEventTypesList().length === 2 ? 'other' : 'others' }})
+                  <small *ngIf="(eventTypesList?.value.length || 0) > 1" class="cnsl-secondary-text">
+                    (+{{ (eventTypesList?.value.length || 0) - 1 }}
+                    {{ eventTypesList?.value.length === 2 ? 'other' : 'others' }})
                   </small>
                 </mat-select-trigger>
-                <mat-option *ngFor="let type of eventTypes" [value]="type.type">
+                <mat-option *ngFor="let type of eventTypes" [value]="type">
                   <ng-container *ngIf="type.localized && type.localized.localizedMessage">
                     {{ type.localized.localizedMessage }}
                   </ng-container>

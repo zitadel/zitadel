@@ -777,7 +777,9 @@
         "TYPE": {
           "TYPELABEL": "Type",
           "CHECKBOX": "Filter by Type"
-        }
+        },
+        "OTHER": "other",
+        "OTHERS": "others"
       },
       "DIALOG": {
         "TITLE": "Event Detail"

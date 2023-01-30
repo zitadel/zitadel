@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
-    "COUNT": "Ergebnisse"
+    "COUNT": "Ergebnisse",
+    "MORE": "mehr"
   },
   "FOOTER": {
     "LINKS": {
@@ -753,9 +754,11 @@
     },
     "EVENTS": {
       "TITLE": "Events",
-      "DESCRIPTION": "Diese Ansicht zeigt die Events von ZITADEL.",
+      "DESCRIPTION": "Diese Ansicht zeigt alle eingetroffenen Events.",
       "EDITOR": "Editor",
       "AGGREGATE": "Aggregate",
+      "AGGREGATEID": "Aggregate ID",
+      "AGGREGATETYPE": "Aggregate Typ",
       "SEQUENCE": "Sequenz",
       "CREATIONDATE": "Erstelldatum",
       "TYPE": "Typ",
@@ -764,17 +767,19 @@
         "BTN": "Filter",
         "USER": {
           "IDLABEL": "ID",
-          "CHECKBOX": "Filter by User"
+          "CHECKBOX": "Nach Editor filtern"
         },
         "AGGREGATE": {
-          "TYPELABEL": "Aggregate Type",
+          "TYPELABEL": "Aggregate Typ",
           "IDLABEL": "ID",
-          "CHECKBOX": "Filter by Aggregate"
+          "CHECKBOX": "Nach Aggregate filtern"
         },
         "TYPE": {
-          "TYPELABEL": "Type",
-          "CHECKBOX": "Filter by Type"
-        }
+          "TYPELABEL": "Typ",
+          "CHECKBOX": "Nach Typ filtern"
+        },
+        "OTHER": "weiterer",
+        "OTHERS": "weitere"
       },
       "DIALOG": {
         "TITLE": "Event Detail"

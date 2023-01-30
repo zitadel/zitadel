@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "上一页",
     "NEXT": "下一页",
-    "COUNT": "总数"
+    "COUNT": "总数",
+    "MORE": "显示更多"
   },
   "FOOTER": {
     "LINKS": {
@@ -753,13 +754,36 @@
     },
     "EVENTS": {
       "TITLE": "活动",
-      "DESCRIPTION": "此视图显示ZITADEL的事件",
+      "DESCRIPTION": "该视图显示所有传入的事件",
       "EDITOR": "编辑",
       "AGGREGATE": "总数",
+      "AGGREGATEID": "汇总的ID",
+      "AGGREGATETYPE": "骨料类型",
       "SEQUENCE": "序列",
-      "CREATIONDATE": "创建于",
-      "TYPE": "通知",
-      "PAYLOAD": "有效载荷"
+      "CREATIONDATE": "创建日期",
+      "TYPE": "类型",
+      "PAYLOAD": "有效载荷",
+      "FILTERS": {
+        "BTN": "过滤器",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "按用户过滤"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "骨料类型",
+          "IDLABEL": "ID",
+          "CHECKBOX": "按总量过滤"
+        },
+        "TYPE": {
+          "TYPELABEL": "类型",
+          "CHECKBOX": "按类型过滤"
+        },
+        "OTHER": "其他",
+        "OTHERS": "其他"
+      },
+      "DIALOG": {
+        "TITLE": "事件的细节"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "管理者已删除。",
