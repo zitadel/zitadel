@@ -9,6 +9,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
 import { MatLegacySelectChange } from '@angular/material/legacy-select';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -38,10 +39,6 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
   ];
 
-  public userFilterSet: boolean = false;
-  public aggregateFilterSet: boolean = false;
-  public eventTypeFilterSet: boolean = false;
-
   @Input() public request: ListEventsRequest = new ListEventsRequest();
 
   public aggregateTypes: AggregateType.AsObject[] = [];
@@ -51,6 +48,15 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
 
   @Output() public requestChanged: EventEmitter<ListEventsRequest> = new EventEmitter();
   private destroy$: Subject<void> = new Subject();
+  public form = new FormGroup({
+    userFilterSet: new FormControl(false),
+    editorUserId: new FormControl(''),
+    aggregateFilterSet: new FormControl(false),
+    aggregateId: new FormControl(''),
+    aggregateTypesList: new FormControl<string[]>([]),
+    eventTypesFilterSet: new FormControl(false),
+    eventTypesList: new FormControl<string[]>([]),
+  });
 
   constructor(
     private adminService: AdminService,
@@ -75,20 +81,19 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
         const filters: ListEventsRequest.AsObject = JSON.parse(stringifiedFilters);
         if (filters.aggregateId) {
           this.request.setAggregateId(filters.aggregateId);
-          this.aggregateFilterSet = true;
+          this.aggregateFilterSet?.setValue(true);
         }
         if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
           this.request.setAggregateTypesList(filters.aggregateTypesList);
-          this.aggregateFilterSet = true;
+          this.aggregateFilterSet?.setValue(true);
         }
         if (filters.editorUserId) {
           this.request.setEditorUserId(filters.editorUserId);
-          console.log('set user filter');
-          this.userFilterSet = true;
+          this.userFilterSet?.setValue(true);
         }
         if (filters.eventTypesList && filters.eventTypesList.length) {
           this.request.setEventTypesList(filters.eventTypesList);
-          this.eventTypeFilterSet = true;
+          this.eventTypeFilterSet?.setValue(true);
         }
         this.emitChange();
         this.cdref.detectChanges();
@@ -97,16 +102,13 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
   }
 
   public reset(): void {
-    this.request = new ListEventsRequest();
-    this.request.setLimit(20);
-    this.userFilterSet = false;
-    this.aggregateFilterSet = false;
-    this.eventTypeFilterSet = false;
+    this.form.reset();
     this.emitChange();
   }
 
   public finish(): void {
     this.showFilter = false;
+    this.emitChange();
   }
 
   ngOnDestroy(): void {
@@ -134,27 +136,27 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
     });
   }
 
-  public resetAggregateValues(event: MatCheckboxChange): void {
-    if (!event.checked) {
-      this.request.setAggregateId('');
-      this.request.setAggregateTypesList([]);
-      this.emitChange();
-    }
-  }
+  //   public resetAggregateValues(event: MatCheckboxChange): void {
+  //     if (!event.checked) {
+  //       this.request.setAggregateId('');
+  //       this.request.setAggregateTypesList([]);
+  //       this.emitChange();
+  //     }
+  //   }
 
-  public resetUserValues(event: MatCheckboxChange): void {
-    if (!event.checked) {
-      this.request.setEditorUserId('');
-      this.emitChange();
-    }
-  }
+  //   public resetUserValues(event: MatCheckboxChange): void {
+  //     if (!event.checked) {
+  //       this.request.setEditorUserId('');
+  //       this.emitChange();
+  //     }
+  //   }
 
-  public resetTypeValues(event: MatCheckboxChange): void {
-    if (!event.checked) {
-      this.request.setEventTypesList([]);
-      this.emitChange();
-    }
-  }
+  //   public resetTypeValues(event: MatCheckboxChange): void {
+  //     if (!event.checked) {
+  //       this.request.setEventTypesList([]);
+  //       this.emitChange();
+  //     }
+  //   }
 
   public aggregateTypeObject(type: string): AggregateType.AsObject | null {
     const index = this.aggregateTypes.findIndex((agg) => agg.type === type);
@@ -174,31 +176,39 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
     }
   }
 
-  public updateAggregateTypesList(event: MatLegacySelectChange): void {
-    console.log(event.value);
-    this.request.setAggregateTypesList(event.value);
-    this.emitChange();
+  public compareTypes(t1: string, t2: string) {
+    console.log(t1, t2);
+    if (t1 && t2) {
+      return t1 === t2;
+    }
+    return false;
   }
 
   public emitChange(): void {
-    console.log(this.request.toObject());
-    this.requestChanged.emit(this.request);
+    console.log(this.form.value);
+    const formValues = this.form.value;
 
-    const req = this.request.toObject();
-
+    const constructRequest = new ListEventsRequest();
     let filterObject: Partial<ListEventsRequest.AsObject> = {};
-    if (req.aggregateId) {
-      filterObject.aggregateId = req.aggregateId;
+
+    if (formValues.userFilterSet && formValues.editorUserId) {
+      constructRequest.setEditorUserId(formValues.editorUserId);
+      filterObject.editorUserId = formValues.editorUserId;
     }
-    if (req && req.aggregateTypesList.length) {
-      filterObject.aggregateTypesList = req.aggregateTypesList;
+    if (formValues.aggregateFilterSet && formValues.aggregateTypesList) {
+      constructRequest.setAggregateTypesList(formValues.aggregateTypesList);
+      filterObject.aggregateTypesList = formValues.aggregateTypesList;
     }
-    if (req.editorUserId) {
-      filterObject.editorUserId = req.editorUserId;
+    if (formValues.aggregateFilterSet && formValues.aggregateId) {
+      constructRequest.setAggregateId(formValues.aggregateId);
+      filterObject.aggregateId = formValues.aggregateId;
     }
-    if (req.eventTypesList && req.eventTypesList.length) {
-      filterObject.eventTypesList = req.eventTypesList;
+    if (formValues.eventTypesFilterSet && formValues.eventTypesList) {
+      constructRequest.setEventTypesList(formValues.eventTypesList);
+      filterObject.eventTypesList = formValues.eventTypesList;
     }
+
+    this.requestChanged.emit(constructRequest);
 
     if (Object.keys(filterObject).length) {
       this.router.navigate([], {
@@ -217,5 +227,33 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
         skipLocationChange: false,
       });
     }
+  }
+
+  public get userFilterSet(): AbstractControl | null {
+    return this.form.get('userFilterSet');
+  }
+
+  public get aggregateFilterSet(): AbstractControl | null {
+    return this.form.get('aggregateFilterSet');
+  }
+
+  public get eventTypeFilterSet(): AbstractControl | null {
+    return this.form.get('eventTypeFilterSet');
+  }
+
+  public get editorUserId(): AbstractControl | null {
+    return this.form.get('editorUserId');
+  }
+
+  public get aggregateId(): AbstractControl | null {
+    return this.form.get('aggregateId');
+  }
+
+  public get aggregateTypesList(): AbstractControl | null {
+    return this.form.get('aggregateTypesList');
+  }
+
+  public get eventTypesList(): AbstractControl | null {
+    return this.form.get('eventTypesList');
   }
 }

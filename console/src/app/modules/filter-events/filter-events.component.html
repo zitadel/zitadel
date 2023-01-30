@@ -32,48 +32,37 @@
         <span class="filter-middle">{{ 'FILTER.TITLE' | translate }}</span>
         <button mat-raised-button color="primary" (click)="finish()">{{ 'ACTIONS.FINISH' | translate }}</button>
       </div>
-      <div>
+      <form [formGroup]="form" (ngSubmit)="emitChange()">
         <div *ngIf="isLoading" class="sp_wrapper"><mat-spinner diameter="20"></mat-spinner></div>
         <div class="filter-events-section">
           <div class="checkbox-wrapper">
-            <mat-checkbox id="userFilterSet" class="cb" [(ngModel)]="userFilterSet" (change)="resetUserValues($event)"
+            <mat-checkbox id="userFilterSet" class="cb" formControlName="userFilterSet"
               >{{ 'IAM.EVENTS.FILTERS.USER.CHECKBOX' | translate }}
             </mat-checkbox>
           </div>
-          <div class="filter-events-sub" *ngIf="userFilterSet">
+          <div class="filter-events-sub" *ngIf="userFilterSet?.value">
             <cnsl-form-field class="filter-input-value">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.USER.IDLABEL' | translate }}</cnsl-label>
-              <input
-                cnslInput
-                name="userId"
-                [value]="request.getEditorUserId()"
-                (input)="request.setEditorUserId($any($event.target).value); emitChange()"
-              />
+              <input cnslInput name="editorUserId" formControlName="editorUserId" />
             </cnsl-form-field>
           </div>
         </div>
 
         <div class="filter-events-section">
           <div class="checkbox-wrapper">
-            <mat-checkbox
-              id="aggregateFilterSet"
-              class="cb"
-              [(ngModel)]="aggregateFilterSet"
-              (change)="resetAggregateValues($event)"
+            <mat-checkbox id="aggregateFilterSet" class="cb" formControlName="aggregateFilterSet"
               >{{ 'IAM.EVENTS.FILTERS.AGGREGATE.CHECKBOX' | translate }}
             </mat-checkbox>
           </div>
-          <div class="filter-events-sub" *ngIf="aggregateFilterSet">
+          <div class="filter-events-sub" *ngIf="aggregateFilterSet?.value">
             <cnsl-form-field class="aggregate-type-select">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.TYPELABEL' | translate }}</cnsl-label>
 
-              <mat-select
-                [value]="request.getAggregateTypesList()"
-                (selectionChange)="updateAggregateTypesList($event)"
-                multiple
-              >
+              <mat-select name="aggregateTypesList" formControlName="aggregateTypesList" multiple>
                 <mat-select-trigger>
-                  {{ aggregateTypeObject(request.getAggregateTypesList()[0])?.localized?.localizedMessage || '' }}
+                  <span *ngIf="aggregateTypesList?.value && aggregateTypesList?.value.length">{{
+                    aggregateTypeObject(aggregateTypesList?.value[0])?.localized?.localizedMessage || ''
+                  }}</span>
                   <small *ngIf="(request.getAggregateTypesList().length || 0) > 1" class="cnsl-secondary-text">
                     (+{{ (request.getAggregateTypesList().length || 0) - 1 }}
                     {{ request.getAggregateTypesList().length === 2 ? 'other' : 'others' }})
@@ -89,19 +78,14 @@
 
             <cnsl-form-field class="filter-input-value">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.IDLABEL' | translate }}</cnsl-label>
-              <input
-                cnslInput
-                name="aggregateId"
-                [value]="request.getAggregateId()"
-                (input)="request.setAggregateId($any($event.target).value); emitChange()"
-              />
+              <input formControlName="aggregateId" cnslInput name="aggregateId" />
             </cnsl-form-field>
           </div>
         </div>
 
         <div class="filter-events-section">
           <div class="checkbox-wrapper">
-            <mat-checkbox id="typeFilterSet" class="cb" [(ngModel)]="eventTypeFilterSet" (change)="resetTypeValues($event)"
+            <mat-checkbox id="typeFilterSet" class="cb" formControlName="eventTypesFilterSet"
               >{{ 'IAM.EVENTS.FILTERS.TYPE.CHECKBOX' | translate }}
             </mat-checkbox>
           </div>
@@ -109,28 +93,26 @@
             <cnsl-form-field class="event-types-select">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.TYPE.TYPELABEL' | translate }}</cnsl-label>
 
-              <mat-select
-                [value]="request.getEventTypesList()"
-                (selectionChange)="request.setEventTypesList($event.value); emitChange()"
-                multiple
-              >
+              <mat-select formControlName="eventTypesList" multiple>
                 <mat-select-trigger>
-                  {{ eventTypeObject(request.getEventTypesList()[0])?.localized?.localizedMessage || '' }}
+                  <span *ngIf="eventTypesList?.value && eventTypesList?.value.length">{{
+                    eventTypeObject(eventTypesList?.value[0])?.localized?.localizedMessage || ''
+                  }}</span>
                   <small *ngIf="(request.getEventTypesList().length || 0) > 1" class="cnsl-secondary-text">
                     (+{{ (request.getEventTypesList().length || 0) - 1 }}
                     {{ request.getEventTypesList().length === 2 ? 'other' : 'others' }})
                   </small>
                 </mat-select-trigger>
                 <mat-option *ngFor="let type of eventTypes" [value]="type.type">
-                  <span *ngIf="type.localized && type.localized.localizedMessage">
+                  <ng-container *ngIf="type.localized && type.localized.localizedMessage">
                     {{ type.localized.localizedMessage }}
-                  </span>
+                  </ng-container>
                 </mat-option>
               </mat-select>
             </cnsl-form-field>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   </ng-template>
 </div>

@@ -98,8 +98,9 @@
   justify-content: center;
 }
 
-.aggregate-type-select {
+.aggregate-type-select,
+.event-type-select {
   .mat-option-text {
-    flex-grow: auto;
+    flex-grow: inherit !important;
   }
 }
