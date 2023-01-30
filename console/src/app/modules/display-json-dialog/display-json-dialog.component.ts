@@ -20,10 +20,6 @@ export class DisplayJsonDialogComponent {
     if ((data.event as Event.AsObject) && data.event.payload) {
       console.log((data.event as Event.AsObject).payload?.fieldsMap);
       this.payload = (data.event as Event.AsObject).payload?.fieldsMap;
-      //   .map((field) => {
-      //     const [key, value] = field;
-      //     return { [key]: value };
-      //   });
     }
   }
 

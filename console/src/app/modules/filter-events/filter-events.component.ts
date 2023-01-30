@@ -30,7 +30,7 @@ export enum UserTarget {
   templateUrl: './filter-events.component.html',
   styleUrls: ['./filter-events.component.scss'],
 })
-export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChecked {
+export class FilterEventsComponent implements OnInit, AfterContentChecked {
   public showFilter: boolean = false;
   public ActionKeysType: any = ActionKeysType;
 
@@ -47,7 +47,6 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
   public isLoading: boolean = false;
 
   @Output() public requestChanged: EventEmitter<ListEventsRequest> = new EventEmitter();
-  private destroy$: Subject<void> = new Subject();
   public form = new FormGroup({
     userFilterSet: new FormControl(false),
     editorUserId: new FormControl(''),
@@ -93,10 +92,10 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
         }
         if (filters.eventTypesList && filters.eventTypesList.length) {
           this.request.setEventTypesList(filters.eventTypesList);
-          this.eventTypeFilterSet?.setValue(true);
+          this.eventTypesFilterSet?.setValue(true);
         }
-        this.emitChange();
         this.cdref.detectChanges();
+        this.emitChange();
       }
     });
   }
@@ -111,29 +110,30 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
     this.emitChange();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  //   public ngAfterContentChecked(): void {
-  //     this.cdref.detectChanges();
-  //   }
-
   private getAggregateTypes(): void {
     const req = new ListAggregateTypesRequest();
 
-    this.adminService.listAggregateTypes(req).then((list) => {
-      this.aggregateTypes = list.aggregateTypesList ?? [];
-    });
+    this.adminService
+      .listAggregateTypes(req)
+      .then((list) => {
+        this.aggregateTypes = list.aggregateTypesList ?? [];
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   private getEventTypes(): void {
     const req = new ListAggregateTypesRequest();
 
-    this.adminService.listEventTypes(req).then((list) => {
-      this.eventTypes = list.eventTypesList ?? [];
-    });
+    this.adminService
+      .listEventTypes(req)
+      .then((list) => {
+        this.eventTypes = list.eventTypesList ?? [];
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public aggregateTypeObject(type: string): AggregateType.AsObject | null {
@@ -215,8 +215,8 @@ export class FilterEventsComponent implements OnInit, OnDestroy, AfterContentChe
     return this.form.get('aggregateFilterSet');
   }
 
-  public get eventTypeFilterSet(): AbstractControl | null {
-    return this.form.get('eventTypeFilterSet');
+  public get eventTypesFilterSet(): AbstractControl | null {
+    return this.form.get('eventTypesFilterSet');
   }
 
   public get editorUserId(): AbstractControl | null {
