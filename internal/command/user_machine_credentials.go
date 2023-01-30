@@ -3,6 +3,8 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -119,6 +121,12 @@ func (c *Commands) VerifyMachineCredentials(ctx context.Context, userID string, 
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
+	for _, cmd := range cmds {
+		if cmd.Type() == user.MachineCredentialsCheckFailedType {
+			logging.OnError(err).Error("could not push event MachineCredentialsCheckFailed")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3kjh", "Errors.User.Credentials.ClientSecretInvalid")
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
