@@ -926,8 +926,6 @@ func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handle
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(UserSequenceCol, e.Sequence()),
-			handler.NewCol(UserChangeDateCol, e.CreationDate()),
 			handler.NewCol(MachineHasSecretCol, true),
 		},
 		[]handler.Condition{
@@ -947,8 +945,6 @@ func (p *userProjection) reduceMachineSecretRemoved(event eventstore.Event) (*ha
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(UserSequenceCol, e.Sequence()),
-			handler.NewCol(UserChangeDateCol, e.CreationDate()),
 			handler.NewCol(MachineHasSecretCol, false),
 		},
 		[]handler.Condition{
