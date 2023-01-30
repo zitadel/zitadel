@@ -24,14 +24,14 @@ var (
 		", projections.users6_humans.first_name" +
 		", projections.users6_humans.last_name" +
 		", projections.users6_humans.display_name" +
-		", projections.users6_machines.name" +
+		", projections.users6_machines2.name" +
 		", projections.users6_humans.avatar_key" +
 		", COUNT(*) OVER () " +
 		"FROM projections.instance_members3 AS members " +
 		"LEFT JOIN projections.users6_humans " +
 		"ON members.user_id = projections.users6_humans.user_id AND members.instance_id = projections.users6_humans.instance_id " +
-		"LEFT JOIN projections.users6_machines " +
-		"ON members.user_id = projections.users6_machines.user_id AND members.instance_id = projections.users6_machines.instance_id " +
+		"LEFT JOIN projections.users6_machines2 " +
+		"ON members.user_id = projections.users6_machines2.user_id AND members.instance_id = projections.users6_machines2.instance_id " +
 		"LEFT JOIN projections.login_names2 " +
 		"ON members.user_id = projections.login_names2.user_id AND members.instance_id = projections.login_names2.instance_id " +
 		"WHERE projections.login_names2.is_primary = $1")

@@ -45,13 +45,14 @@ var (
 		` projections.users6_humans.is_email_verified,` +
 		` projections.users6_humans.phone,` +
 		` projections.users6_humans.is_phone_verified,` +
-		` projections.users6_machines.user_id,` +
-		` projections.users6_machines.name,` +
-		` projections.users6_machines.description,` +
+		` projections.users6_machines2.user_id,` +
+		` projections.users6_machines2.name,` +
+		` projections.users6_machines2.description,` +
+		` projections.users6_machines2.has_secret,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users6` +
 		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id` +
-		` LEFT JOIN projections.users6_machines ON projections.users6.id = projections.users6_machines.user_id AND projections.users6.instance_id = projections.users6_machines.instance_id` +
+		` LEFT JOIN projections.users6_machines2 ON projections.users6.id = projections.users6_machines2.user_id AND projections.users6.instance_id = projections.users6_machines2.instance_id` +
 		` LEFT JOIN` +
 		` (` + loginNamesQuery + `) AS login_names` +
 		` ON login_names.user_id = projections.users6.id AND login_names.instance_id = projections.users6.instance_id` +
@@ -86,6 +87,7 @@ var (
 		"user_id",
 		"name",
 		"description",
+		"has_secret",
 		"count",
 	}
 	profileQuery = `SELECT projections.users6.id,` +
@@ -259,13 +261,14 @@ var (
 		` projections.users6_humans.is_email_verified,` +
 		` projections.users6_humans.phone,` +
 		` projections.users6_humans.is_phone_verified,` +
-		` projections.users6_machines.user_id,` +
-		` projections.users6_machines.name,` +
-		` projections.users6_machines.description,` +
+		` projections.users6_machines2.user_id,` +
+		` projections.users6_machines2.name,` +
+		` projections.users6_machines2.description,` +
+		` projections.users6_machines2.has_secret,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.users6` +
 		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id` +
-		` LEFT JOIN projections.users6_machines ON projections.users6.id = projections.users6_machines.user_id AND projections.users6.instance_id = projections.users6_machines.instance_id` +
+		` LEFT JOIN projections.users6_machines2 ON projections.users6.id = projections.users6_machines2.user_id AND projections.users6.instance_id = projections.users6_machines2.instance_id` +
 		` LEFT JOIN` +
 		` (` + loginNamesQuery + `) AS login_names` +
 		` ON login_names.user_id = projections.users6.id AND login_names.instance_id = projections.users6.instance_id` +
@@ -300,6 +303,7 @@ var (
 		"user_id",
 		"name",
 		"description",
+		"has_secret",
 		"count",
 	}
 )
@@ -372,6 +376,7 @@ func Test_UserPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						1,
 					},
 				),
@@ -439,6 +444,7 @@ func Test_UserPrepares(t *testing.T) {
 						"id",
 						"name",
 						"description",
+						true,
 						1,
 					},
 				),
@@ -457,6 +463,7 @@ func Test_UserPrepares(t *testing.T) {
 				Machine: &Machine{
 					Name:        "name",
 					Description: "description",
+					HasSecret:   true,
 				},
 			},
 		},
@@ -1036,6 +1043,7 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 						},
 					},
 				),
@@ -1111,6 +1119,7 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 						},
 						{
 							"id",
@@ -1140,6 +1149,7 @@ func Test_UserPrepares(t *testing.T) {
 							"id",
 							"name",
 							"description",
+							true,
 						},
 					},
 				),
@@ -1188,6 +1198,7 @@ func Test_UserPrepares(t *testing.T) {
 						Machine: &Machine{
 							Name:        "name",
 							Description: "description",
+							HasSecret:   true,
 						},
 					},
 				},
