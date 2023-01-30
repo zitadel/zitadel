@@ -9,6 +9,8 @@ import { DisplayJsonDialogComponent } from './display-json-dialog.component';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { FormsModule } from '@angular/forms';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
+import { ToPayloadPipeModule } from 'src/app/pipes/to-payload/to-payload.module';
+import { ToObjectPipeModule } from 'src/app/pipes/to-object/to-object.module';
 
 @NgModule({
   declarations: [DisplayJsonDialogComponent],
@@ -20,6 +22,8 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
     MatIconModule,
     CodemirrorModule,
     TimestampToDatePipeModule,
+    ToObjectPipeModule,
+    ToPayloadPipeModule,
     LocalizedDatePipeModule,
   ],
   exports: [DisplayJsonDialogComponent],

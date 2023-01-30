@@ -63,7 +63,11 @@ export class FilterEventsComponent implements OnInit, AfterContentChecked {
     private cdref: ChangeDetectorRef,
     private route: ActivatedRoute,
     private router: Router,
-  ) {}
+  ) {
+    this.form.valueChanges.subscribe(() => {
+      this.cdref.detectChanges();
+    });
+  }
 
   public ngAfterContentChecked(): void {
     this.cdref.detectChanges();

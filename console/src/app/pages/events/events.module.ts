@@ -26,6 +26,8 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { DisplayJsonDialogModule } from 'src/app/modules/display-json-dialog/display-json-dialog.module';
 import { MatLegacyDialogModule } from '@angular/material/legacy-dialog';
+import { ToObjectPipeModule } from 'src/app/pipes/to-object/to-object.module';
+import { ToPayloadPipeModule } from 'src/app/pipes/to-payload/to-payload.module';
 
 @NgModule({
   declarations: [EventsComponent],
@@ -36,6 +38,8 @@ import { MatLegacyDialogModule } from '@angular/material/legacy-dialog';
     MatIconModule,
     CardModule,
     FilterEventsModule,
+    ToObjectPipeModule,
+    ToPayloadPipeModule,
     HasRolePipeModule,
     MatLegacyDialogModule,
     MatButtonModule,

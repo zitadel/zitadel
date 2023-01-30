@@ -45,14 +45,14 @@ export class EventsComponent implements OnInit {
 
   @ViewChild(MatSort) public sort!: MatSort;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  public dataSource: MatTableDataSource<Event.AsObject> = new MatTableDataSource<Event.AsObject>([]);
+  public dataSource: MatTableDataSource<Event> = new MatTableDataSource<Event>([]);
 
   public _done: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public done: Observable<boolean> = this._done.asObservable();
 
   public _loading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  private _data: BehaviorSubject<Event.AsObject[]> = new BehaviorSubject<Event.AsObject[]>([]);
+  private _data: BehaviorSubject<Event[]> = new BehaviorSubject<Event[]>([]);
 
   constructor(
     private adminService: AdminService,
@@ -84,39 +84,49 @@ export class EventsComponent implements OnInit {
     this.currentRequest = filteredRequest;
     console.log('load', this.currentRequest.toObject());
 
-    return this.adminService
-      .listEvents(this.currentRequest)
-      .then((res: ListEventsResponse.AsObject) => {
-        this._data.next(res.eventsList);
+    return (
+      this.adminService
+        .listEvents(this.currentRequest)
+        //   .then((resp) => {
+        //     const eventsList = resp.getEventsList();
+        //     eventsList.map((event) => {
+        //       const payload = event.getPayload();
+        //       const pl = payload?.toJavaScript();
+        //       console.log(pl);
+        //     });
+        //     return resp.toObject();
+        //   })
+        .then((res: ListEventsResponse) => {
+          const eventList = res.getEventsList();
+          this._data.next(eventList);
 
-        const concat = this.dataSource.data.concat(res.eventsList);
-        this.dataSource = new MatTableDataSource<Event.AsObject>(concat);
+          const concat = this.dataSource.data.concat(eventList);
+          this.dataSource = new MatTableDataSource<Event>(concat);
 
-        this._loading.next(false);
+          this._loading.next(false);
 
-        if (res.eventsList.length === 0) {
-          this._done.next(true);
-        } else {
-          this._done.next(false);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        this._loading.next(false);
-        this._data.next([]);
-      });
+          if (eventList.length === 0) {
+            this._done.next(true);
+          } else {
+            this._done.next(false);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          this._loading.next(false);
+          this._data.next([]);
+        })
+    );
   }
 
   public refresh(): void {
     const req = new ListEventsRequest();
     req.setLimit(this.paginator.pageSize);
-    // req.setSequence()
-    // this.requestOrgs$.next(req);
   }
 
   public sortChange(sortState: Sort) {
     if (sortState.direction && sortState.active) {
-      this.dataSource = new MatTableDataSource<Event.AsObject>([]);
+      this.dataSource = new MatTableDataSource<Event>([]);
 
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
       this.sortAsc = sortState.direction === 'asc';
@@ -131,11 +141,12 @@ export class EventsComponent implements OnInit {
     }
   }
 
-  public openDialog(event: Event.AsObject): void {
+  public openDialog(event: Event): void {
     this.dialog.open(DisplayJsonDialogComponent, {
       data: {
         event: event,
       },
+      width: '450px',
     });
   }
 
@@ -146,7 +157,7 @@ export class EventsComponent implements OnInit {
   }
 
   public filterChanged(filterRequest: ListEventsRequest) {
-    this.dataSource = new MatTableDataSource<Event.AsObject>([]);
+    this.dataSource = new MatTableDataSource<Event>([]);
 
     this.currentRequest = new ListEventsRequest();
     this.currentRequest.setLimit(this.INITPAGESIZE);
@@ -164,7 +175,7 @@ export class EventsComponent implements OnInit {
     const current = this._data.value;
 
     if (current.length) {
-      const sequence = current[current.length - 1].sequence;
+      const sequence = current[current.length - 1].toObject().sequence;
       return sequence;
     }
     return 0;

@@ -221,8 +221,8 @@ import { GrpcService } from './grpc.service';
 export class AdminService {
   constructor(private readonly grpcService: GrpcService) {}
 
-  public listEvents(req: ListEventsRequest): Promise<ListEventsResponse.AsObject> {
-    return this.grpcService.admin.listEvents(req, null).then((resp) => resp.toObject());
+  public listEvents(req: ListEventsRequest): Promise<ListEventsResponse> {
+    return this.grpcService.admin.listEvents(req, null).then((resp) => resp);
   }
 
   public listEventTypes(req: ListEventTypesRequest): Promise<ListEventTypesResponse.AsObject> {

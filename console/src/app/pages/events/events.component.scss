@@ -73,11 +73,15 @@
 
 .editor-row {
   display: flex;
-  align-items: center;
+  flex-direction: column;
 
-  //   .name {
-  //     margin-left: 1rem;
-  //   }
+  .name {
+    margin-bottom: 0.25rem;
+  }
+
+  .state {
+    align-self: flex-start;
+  }
 }
 
 .events-filter-row {
