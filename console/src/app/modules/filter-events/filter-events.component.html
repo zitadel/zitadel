@@ -2,14 +2,13 @@
   <button
     mat-stroked-button
     cdkOverlayOrigin
-    #triggereventfilter="cdkOverlayOrigin"
-    matRipple
-    id="eventfilterbutton"
-    class="cnsl-action-button"
     (click)="showFilter = !showFilter"
+    class="cnsl-action-button"
+    #triggereventfilter="cdkOverlayOrigin"
   >
     <i class="las la-filter no-margin"></i>
     <span>{{ 'ACTIONS.FILTER' | translate }}</span>
+    <span *ngIf="queryCount" class="filter-count">{{ queryCount }}</span>
     <cnsl-action-keys [doNotUseContrast]="true" [type]="ActionKeysType.FILTER" (actionTriggered)="showFilter = !showFilter">
     </cnsl-action-keys>
   </button>
@@ -28,29 +27,31 @@
   >
     <div class="filter-events-wrapper">
       <div class="filter-events-top">
-        <button mat-stroked-button (click)="reset()">{{ 'ACTIONS.RESET' | translate }}</button>
+        <button mat-stroked-button type="button" (click)="reset()">{{ 'ACTIONS.RESET' | translate }}</button>
         <span class="filter-middle">{{ 'FILTER.TITLE' | translate }}</span>
-        <button mat-raised-button color="primary" (click)="finish()">{{ 'ACTIONS.FINISH' | translate }}</button>
+        <button mat-raised-button color="primary" type="button" (click)="finish()">
+          {{ 'ACTIONS.FINISH' | translate }}
+        </button>
       </div>
       <form [formGroup]="form" (ngSubmit)="emitChange()">
         <div *ngIf="isLoading" class="sp_wrapper"><mat-spinner diameter="20"></mat-spinner></div>
         <div class="filter-events-section">
           <div class="checkbox-wrapper">
-            <mat-checkbox id="userFilterSet" class="cb" formControlName="userFilterSet"
+            <mat-checkbox id="userFilterSet" name="userFilterSet" class="cb" formControlName="userFilterSet"
               >{{ 'IAM.EVENTS.FILTERS.USER.CHECKBOX' | translate }}
             </mat-checkbox>
           </div>
           <div class="filter-events-sub" *ngIf="userFilterSet?.value">
             <cnsl-form-field class="filter-input-value">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.USER.IDLABEL' | translate }}</cnsl-label>
-              <input cnslInput name="editorUserId" formControlName="editorUserId" />
+              <input cnslInput id="editorUserId" name="editorUserId" formControlName="editorUserId" />
             </cnsl-form-field>
           </div>
         </div>
 
         <div class="filter-events-section">
           <div class="checkbox-wrapper">
-            <mat-checkbox id="aggregateFilterSet" class="cb" formControlName="aggregateFilterSet"
+            <mat-checkbox id="aggregateFilterSet" name="aggregateFilterSet" class="cb" formControlName="aggregateFilterSet"
               >{{ 'IAM.EVENTS.FILTERS.AGGREGATE.CHECKBOX' | translate }}
             </mat-checkbox>
           </div>
@@ -59,9 +60,10 @@
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.TYPELABEL' | translate }}</cnsl-label>
 
               <mat-select
+                id="aggregateTypesList"
                 name="aggregateTypesList"
                 formControlName="aggregateTypesList"
-                multiple
+                [multiple]="true"
                 [compareWith]="compareTypes"
               >
                 <mat-select-trigger>
@@ -83,14 +85,18 @@
 
             <cnsl-form-field class="filter-input-value">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.AGGREGATE.IDLABEL' | translate }}</cnsl-label>
-              <input formControlName="aggregateId" cnslInput name="aggregateId" />
+              <input id="aggregateId" formControlName="aggregateId" cnslInput name="aggregateId" />
             </cnsl-form-field>
           </div>
         </div>
 
         <div class="filter-events-section">
           <div class="checkbox-wrapper">
-            <mat-checkbox id="typeFilterSet" class="cb" formControlName="eventTypesFilterSet"
+            <mat-checkbox
+              id="eventTypesFilterSet"
+              name="eventTypesFilterSet"
+              class="cb"
+              formControlName="eventTypesFilterSet"
               >{{ 'IAM.EVENTS.FILTERS.TYPE.CHECKBOX' | translate }}
             </mat-checkbox>
           </div>
@@ -98,19 +104,25 @@
             <cnsl-form-field class="event-types-select">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.TYPE.TYPELABEL' | translate }}</cnsl-label>
 
-              <mat-select formControlName="eventTypesList" multiple [compareWith]="compareTypes">
+              <mat-select
+                id="eventTypesList"
+                id="eventTypesList"
+                formControlName="eventTypesList"
+                [multiple]="true"
+                [compareWith]="compareTypes"
+              >
                 <mat-select-trigger>
                   <span *ngIf="eventTypesList?.value && eventTypesList?.value.length">{{
                     eventTypesList?.value[0]?.localized?.localizedMessage || ''
                   }}</span>
-                  <small *ngIf="(eventTypesList?.value.length || 0) > 1" class="cnsl-secondary-text">
+                  <small *ngIf="(eventTypesList?.value?.length || 0) > 1" class="cnsl-secondary-text">
                     (+{{ (eventTypesList?.value.length || 0) - 1 }}
                     {{ eventTypesList?.value.length === 2 ? 'other' : 'others' }})
                   </small>
                 </mat-select-trigger>
-                <mat-option *ngFor="let type of eventTypes" [value]="type">
-                  <ng-container *ngIf="type.localized && type.localized.localizedMessage">
-                    {{ type.localized.localizedMessage }}
+                <mat-option *ngFor="let eventType of eventTypes" [value]="eventType">
+                  <ng-container *ngIf="eventType.localized && eventType.localized.localizedMessage">
+                    {{ eventType.localized.localizedMessage }}
                   </ng-container>
                 </mat-option>
               </mat-select>

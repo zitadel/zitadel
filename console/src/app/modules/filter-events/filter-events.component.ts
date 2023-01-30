@@ -30,7 +30,7 @@ export enum UserTarget {
   templateUrl: './filter-events.component.html',
   styleUrls: ['./filter-events.component.scss'],
 })
-export class FilterEventsComponent implements OnInit, AfterContentChecked {
+export class FilterEventsComponent implements OnInit {
   public showFilter: boolean = false;
   public ActionKeysType: any = ActionKeysType;
 
@@ -39,7 +39,7 @@ export class FilterEventsComponent implements OnInit, AfterContentChecked {
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
   ];
 
-  @Input() public request: ListEventsRequest = new ListEventsRequest();
+  private request: ListEventsRequest = new ListEventsRequest();
 
   public aggregateTypes: AggregateType.AsObject[] = [];
   public eventTypes: Array<EventType.AsObject> = [];
@@ -69,10 +69,6 @@ export class FilterEventsComponent implements OnInit, AfterContentChecked {
     });
   }
 
-  public ngAfterContentChecked(): void {
-    this.cdref.detectChanges();
-  }
-
   public ngOnInit(): void {
     this.getAggregateTypes();
     this.getEventTypes();
@@ -82,6 +78,9 @@ export class FilterEventsComponent implements OnInit, AfterContentChecked {
       if (filter) {
         const stringifiedFilters = filter as string;
         const filters: ListEventsRequest.AsObject = JSON.parse(stringifiedFilters);
+
+        console.log('set filter from url', filters);
+
         if (filters.aggregateId) {
           this.request.setAggregateId(filters.aggregateId);
           this.aggregateFilterSet?.setValue(true);
@@ -98,7 +97,7 @@ export class FilterEventsComponent implements OnInit, AfterContentChecked {
           this.request.setEventTypesList(filters.eventTypesList);
           this.eventTypesFilterSet?.setValue(true);
         }
-        this.cdref.detectChanges();
+        // this.cdref.detectChanges();
         this.emitChange();
       }
     });
@@ -237,5 +236,22 @@ export class FilterEventsComponent implements OnInit, AfterContentChecked {
 
   public get eventTypesList(): AbstractControl | null {
     return this.form.get('eventTypesList');
+  }
+
+  public get queryCount(): number {
+    let count = 0;
+    if (this.userFilterSet?.value && this.editorUserId?.value) {
+      ++count;
+    }
+    if (this.aggregateFilterSet?.value && this.aggregateId?.value) {
+      ++count;
+    }
+    if (this.aggregateFilterSet?.value && this.aggregateTypesList?.value && this.aggregateTypesList.value.length) {
+      ++count;
+    }
+    if (this.eventTypesFilterSet?.value && this.eventTypesList?.value && this.eventTypesList.value.length) {
+      ++count;
+    }
+    return count;
   }
 }

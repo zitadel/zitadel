@@ -8,8 +8,8 @@
     [dataSize]="dataSource.data.length"
     [loading]="_loading | async"
   >
-    <div class="events-filter-row">
-      <cnsl-filter-events (requestChanged)="filterChanged($event)"> </cnsl-filter-events>
+    <div actions>
+      <cnsl-filter-events (requestChanged)="filterChanged($event)"></cnsl-filter-events>
     </div>
 
     <table

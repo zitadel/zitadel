@@ -84,39 +84,28 @@ export class EventsComponent implements OnInit {
     this.currentRequest = filteredRequest;
     console.log('load', this.currentRequest.toObject());
 
-    return (
-      this.adminService
-        .listEvents(this.currentRequest)
-        //   .then((resp) => {
-        //     const eventsList = resp.getEventsList();
-        //     eventsList.map((event) => {
-        //       const payload = event.getPayload();
-        //       const pl = payload?.toJavaScript();
-        //       console.log(pl);
-        //     });
-        //     return resp.toObject();
-        //   })
-        .then((res: ListEventsResponse) => {
-          const eventList = res.getEventsList();
-          this._data.next(eventList);
+    return this.adminService
+      .listEvents(this.currentRequest)
+      .then((res: ListEventsResponse) => {
+        const eventList = res.getEventsList();
+        this._data.next(eventList);
 
-          const concat = this.dataSource.data.concat(eventList);
-          this.dataSource = new MatTableDataSource<Event>(concat);
+        const concat = this.dataSource.data.concat(eventList);
+        this.dataSource = new MatTableDataSource<Event>(concat);
 
-          this._loading.next(false);
+        this._loading.next(false);
 
-          if (eventList.length === 0) {
-            this._done.next(true);
-          } else {
-            this._done.next(false);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          this._loading.next(false);
-          this._data.next([]);
-        })
-    );
+        if (eventList.length === 0) {
+          this._done.next(true);
+        } else {
+          this._done.next(false);
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this._loading.next(false);
+        this._data.next([]);
+      });
   }
 
   public refresh(): void {

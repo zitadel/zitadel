@@ -10,8 +10,8 @@ import { FilterEventsComponent } from './filter-events.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatLegacyChipsModule } from '@angular/material/legacy-chips';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatLegacyTooltipModule } from '@angular/material/legacy-tooltip';
 import { AvatarModule } from '../avatar/avatar.module';
 import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
@@ -21,6 +21,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
   declarations: [FilterEventsComponent],
   imports: [
     CommonModule,
+    FormsModule,
     MatAutocompleteModule,
     MatLegacyChipsModule,
     MatButtonModule,
@@ -28,9 +29,8 @@ import { OverlayModule } from '@angular/cdk/overlay';
     MatIconModule,
     ReactiveFormsModule,
     OverlayModule,
-    MatProgressSpinnerModule,
-    FormsModule,
-    MatTooltipModule,
+    MatLegacyProgressSpinnerModule,
+    MatLegacyTooltipModule,
     TranslateModule,
     MatLegacyCheckboxModule,
     MatSelectModule,
