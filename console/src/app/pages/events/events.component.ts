@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, Observable, Subject, takeUntil } from 'rxjs';
 import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -79,36 +79,44 @@ export class EventsComponent implements OnDestroy {
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
-    this.currentRequest$.pipe(takeUntil(this.destroy$)).subscribe(({ req, override }) => {
-      this._loading.next(true);
-      this.adminService
-        .listEvents(req)
-        .then((res: ListEventsResponse) => {
-          if (override) {
-            this._data = new BehaviorSubject<Event[]>([]);
-            this.dataSource = new MatTableDataSource<Event>([]);
-          }
+    this.currentRequest$
+      .pipe(
+        distinctUntilChanged(({ req: prev }, { req: next }) => {
+          return JSON.stringify(prev.toObject()) === JSON.stringify(next.toObject());
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(({ req, override }) => {
+        console.log('load');
+        this._loading.next(true);
+        this.adminService
+          .listEvents(req)
+          .then((res: ListEventsResponse) => {
+            if (override) {
+              this._data = new BehaviorSubject<Event[]>([]);
+              this.dataSource = new MatTableDataSource<Event>([]);
+            }
 
-          const eventList = res.getEventsList();
-          this._data.next(eventList);
+            const eventList = res.getEventsList();
+            this._data.next(eventList);
 
-          const concat = this.dataSource.data.concat(eventList);
-          this.dataSource = new MatTableDataSource<Event>(concat);
+            const concat = this.dataSource.data.concat(eventList);
+            this.dataSource = new MatTableDataSource<Event>(concat);
 
-          this._loading.next(false);
+            this._loading.next(false);
 
-          if (eventList.length === 0) {
-            this._done.next(true);
-          } else {
-            this._done.next(false);
-          }
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-          this._loading.next(false);
-          this._data.next([]);
-        });
-    });
+            if (eventList.length === 0) {
+              this._done.next(true);
+            } else {
+              this._done.next(false);
+            }
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+            this._loading.next(false);
+            this._data.next([]);
+          });
+      });
   }
 
   ngOnDestroy(): void {
@@ -118,7 +126,6 @@ export class EventsComponent implements OnDestroy {
 
   public loadEvents(filteredRequest: ListEventsRequest, override: boolean = false): void {
     this.currentRequest$.next({ req: filteredRequest, override });
-    const { req } = this.currentRequest$.value;
   }
 
   public refresh(): void {
@@ -172,7 +179,9 @@ export class EventsComponent implements OnDestroy {
     req.setCreationDate(filterRequest.getCreationDate());
     const isAsc: boolean = filterRequest.getAsc();
     req.setAsc(isAsc);
-    this.sort.sort({ id: 'sequence', start: isAsc ? 'asc' : 'desc', disableClear: true });
+    if (this.sortAsc !== isAsc) {
+      this.sort.sort({ id: 'sequence', start: isAsc ? 'asc' : 'desc', disableClear: true });
+    }
 
     this.loadEvents(req, true);
   }
