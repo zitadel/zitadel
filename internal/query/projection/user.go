@@ -922,17 +922,28 @@ func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handle
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x0p1n1i", "reduce.wrong.event.type %s", user.MachineSecretSetType)
 	}
-
-	return crdb.NewUpdateStatement(
+	return crdb.NewMultiStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(MachineHasSecretCol, true),
-		},
-		[]handler.Condition{
-			handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
-			handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
-		},
-		crdb.WithTableSuffix(UserMachineSuffix),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(UserChangeDateCol, e.CreationDate()),
+				handler.NewCol(UserSequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MachineHasSecretCol, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserMachineSuffix),
+		),
 	), nil
 }
 
@@ -942,16 +953,28 @@ func (p *userProjection) reduceMachineSecretRemoved(event eventstore.Event) (*ha
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x0p6n1i", "reduce.wrong.event.type %s", user.MachineSecretRemovedType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return crdb.NewMultiStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(MachineHasSecretCol, false),
-		},
-		[]handler.Condition{
-			handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
-			handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
-		},
-		crdb.WithTableSuffix(UserMachineSuffix),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(UserChangeDateCol, e.CreationDate()),
+				handler.NewCol(UserSequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MachineHasSecretCol, false),
+			},
+			[]handler.Condition{
+				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserMachineSuffix),
+		),
 	), nil
 }
 
