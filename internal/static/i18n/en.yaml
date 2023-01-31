@@ -90,6 +90,7 @@ Errors:
       Secret:
         NotExisting: Secret doesn't exist
         Invalid: Secret is invalid
+        CouldNotGenerate: Secret could not be generated
     PAT:
       NotFound: Personal Access Token not found
     NotHuman: The User must be personal

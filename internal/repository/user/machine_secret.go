@@ -53,7 +53,7 @@ func MachineSecretSetEventMapper(event *repository.Event) (eventstore.Event, err
 	}
 	err := json.Unmarshal(event.Data, credentialsSet)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-lrv2di", "unable to unmarshal machine added")
+		return nil, errors.ThrowInternal(err, "USER-lopbqu", "unable to unmarshal machine secret set")
 	}
 
 	return credentialsSet, nil
@@ -90,7 +90,7 @@ func MachineSecretRemovedEventMapper(event *repository.Event) (eventstore.Event,
 	}
 	err := json.Unmarshal(event.Data, credentialsRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-lrv2ei", "unable to unmarshal machine added")
+		return nil, errors.ThrowInternal(err, "USER-quox9j2", "unable to unmarshal machine secret removed")
 	}
 
 	return credentialsRemoved, nil
@@ -127,7 +127,7 @@ func MachineSecretCheckSucceededEventMapper(event *repository.Event) (eventstore
 	}
 	err := json.Unmarshal(event.Data, check)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-x9000ja", "unable to unmarshal machine added")
+		return nil, errors.ThrowInternal(err, "USER-x002n1p", "unable to unmarshal machine secret check succeeded")
 	}
 
 	return check, nil
@@ -164,7 +164,7 @@ func MachineSecretCheckFailedEventMapper(event *repository.Event) (eventstore.Ev
 	}
 	err := json.Unmarshal(event.Data, check)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-x9000ja", "unable to unmarshal machine added")
+		return nil, errors.ThrowInternal(err, "USER-x7901b1l", "unable to unmarshal machine secret check failed")
 	}
 
 	return check, nil
