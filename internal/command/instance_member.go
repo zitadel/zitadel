@@ -126,7 +126,8 @@ func (c *Commands) RemoveInstanceMember(ctx context.Context, userID string) (*do
 		return nil, err
 	}
 	if errors.IsNotFound(err) {
-		return nil, nil
+		// empty response because we have no data that match the request
+		return &domain.ObjectDetails{}, nil
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&memberWriteModel.MemberWriteModel.WriteModel)

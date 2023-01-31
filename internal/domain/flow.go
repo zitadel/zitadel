@@ -20,6 +20,7 @@ const (
 	FlowTypeUnspecified FlowType = iota
 	FlowTypeExternalAuthentication
 	FlowTypeCustomiseToken
+	FlowTypeInternalAuthentication
 	flowTypeCount
 )
 
@@ -49,6 +50,12 @@ func (s FlowType) TriggerTypes() []TriggerType {
 			TriggerTypePreUserinfoCreation,
 			TriggerTypePreAccessTokenCreation,
 		}
+	case FlowTypeInternalAuthentication:
+		return []TriggerType{
+			TriggerTypePostAuthentication,
+			TriggerTypePreCreation,
+			TriggerTypePostCreation,
+		}
 	default:
 		return nil
 	}
@@ -71,6 +78,8 @@ func (s FlowType) LocalizationKey() string {
 		return "Action.Flow.Type.ExternalAuthentication"
 	case FlowTypeCustomiseToken:
 		return "Action.Flow.Type.CustomiseToken"
+	case FlowTypeInternalAuthentication:
+		return "Action.Flow.Type.InternalAuthentication"
 	default:
 		return "Action.Flow.Type.Unspecified"
 	}
