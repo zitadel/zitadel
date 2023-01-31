@@ -357,7 +357,7 @@ We want to deliver a new release every second week. So we plan everything in two
 
 There are a few general labels that don't belong to a specific category.
 
-- **good first issue**: This label shows contibuters, that it is an easy entry point to start developing on ZITADEL.
+- **good first issue**: This label shows contributors, that it is an easy entry point to start developing on ZITADEL.
 - **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
 
 ### Category
