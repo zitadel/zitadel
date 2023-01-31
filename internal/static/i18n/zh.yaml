@@ -90,6 +90,7 @@ Errors:
       Secret:
         NotExisting: 秘密并不存在
         Invalid: 秘密是无效的
+        CouldNotGenerate: 无法生成秘密
     PAT:
       NotFound: 未找到个人访问令牌
     NotHuman: 用户必须是个人
