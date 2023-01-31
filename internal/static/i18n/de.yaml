@@ -87,6 +87,9 @@ Errors:
       Key:
         NotFound: Maschinen Schlüssel nicht gefunden
         AlreadyExisting: Machine Schlüssel exisiert bereits
+      Secret:
+        NotExisting: Secret existiert nicht
+        Invalid: Secret ist ungültig
     PAT:
       NotFound: Persönliches Access Token nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein

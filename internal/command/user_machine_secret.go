@@ -104,7 +104,7 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x7s802", "Errors.User.NotExisting")
 			}
 			if writeModel.ClientSecret == nil {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-coi82n", "Errors.User.Credentials.NotFound")
+				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-coi82n", "Errors.User.Machine.Secret.NotExisting")
 			}
 			return []eventstore.Command{
 				user.NewMachineSecretRemovedEvent(ctx, &a.Aggregate),
@@ -123,8 +123,8 @@ func (c *Commands) VerifyMachineSecret(ctx context.Context, userID string, resou
 	events, err := c.eventstore.Push(ctx, cmds...)
 	for _, cmd := range cmds {
 		if cmd.Type() == user.MachineSecretCheckFailedType {
-			logging.OnError(err).Error("could not push event MachineCredentialsCheckFailed")
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3kjh", "Errors.User.Credentials.ClientSecretInvalid")
+			logging.OnError(err).Error("could not push event MachineSecretCheckFailed")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3kjh", "Errors.User.Machine.Secret.Invalid")
 		}
 	}
 	if err != nil {
@@ -155,7 +155,7 @@ func prepareVerifyMachineSecret(a *user.Aggregate, secret string, algorithm cryp
 				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-569sh2o", "Errors.User.NotExisting")
 			}
 			if writeModel.ClientSecret == nil {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x8910n", "Errors.User.Credentials.NotFound")
+				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x8910n", "Errors.User.Machine.Secret.NotExisting")
 			}
 			err = crypto.CompareHash(writeModel.ClientSecret, []byte(secret), algorithm)
 			if err == nil {

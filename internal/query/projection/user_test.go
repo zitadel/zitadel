@@ -1637,6 +1637,15 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
+							expectedStmt: "UPDATE projections.users7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								"instance-id",
+							},
+						},
+						{
 							expectedStmt: "UPDATE projections.users7_machines SET has_secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
@@ -1664,6 +1673,15 @@ func TestUserProjection_reduces(t *testing.T) {
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users7 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								"instance-id",
+							},
+						},
 						{
 							expectedStmt: "UPDATE projections.users7_machines SET has_secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{

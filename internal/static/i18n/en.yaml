@@ -87,10 +87,11 @@ Errors:
       Key:
         NotFound: Machine key not found
         AlreadyExisting: Machine key already existing
+      Secret:
+        NotExisting: Secret doesn't exist
+        Invalid: Secret is invalid
     PAT:
       NotFound: Personal Access Token not found
-    Credentials:
-      NotFound: Credentials not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
     WrongType: Not allowed for this user type
