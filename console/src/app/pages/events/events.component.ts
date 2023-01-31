@@ -87,7 +87,6 @@ export class EventsComponent implements OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe(({ req, override }) => {
-        console.log('load');
         this._loading.next(true);
         this.adminService
           .listEvents(req)
