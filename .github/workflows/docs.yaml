@@ -12,8 +12,8 @@ env:
   PROJECT_ID: zitadel-com
   GAR_LOCATION: europe
   REPOSITORY: docs
-  SERVICE: hello
-  REGION: europe-west6
+  SERVICE: zitadel-docs
+  REGION: us-central1
 
 permissions:
   contents: 'read'
