@@ -478,8 +478,14 @@ EventTypes:
       added: Technischer Benutzer hinzugefügt
       changed: Technischer Benutzer geändert
       key:
-        added: Key added
-        removed: Key removed
+        added: Key hinzugefügt
+        removed: Key entfernt
+      secret:
+        set: Secret gesetzt
+        removed: Secret entfernt
+        check:
+          succeeded: Secret Überprüfung erfolgreich
+          failed: Secret Überprüfung fehlgeschlagen
     human:
       added: Benutzer hinzugefügt
       selfregistered: Benutzer hat sich selbst registriert

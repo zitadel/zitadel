@@ -478,6 +478,12 @@ EventTypes:
       key:
         added: Chiave aggiunta
         removed: Chiave rimossa
+      secret:
+        set: Secret set
+        removed: Secret rimosso
+        check:
+          succeeded: Controllo della Secret riuscito
+          failed: Controllo della Secret fallito
     human:
       added: Persona aggiunta
       selfregistered: Persona registrata

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	machineSecretPrefix             = machineEventPrefix + "credentials."
+	machineSecretPrefix             = machineEventPrefix + "secret."
 	MachineSecretSetType            = machineSecretPrefix + "set"
 	MachineSecretRemovedType        = machineSecretPrefix + "removed"
 	MachineSecretCheckSucceededType = machineSecretPrefix + "check.succeeded"

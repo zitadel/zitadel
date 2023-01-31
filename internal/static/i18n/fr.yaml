@@ -478,6 +478,12 @@ EventTypes:
       key:
         added: Clé ajoutée
         removed: Clé supprimée
+      secret:
+        set: Secret défini
+        removed: Secret supprimée
+        check:
+          succeeded: La vérification de Secret réussie
+          failed: La vérification de Secret a échoué
     human:
       added: Personne ajoutée
       selfregistered: La personne s'est enregistrée elle-même

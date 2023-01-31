@@ -480,6 +480,12 @@ EventTypes:
       key:
         added: Key added
         removed: Key removed
+      secret:
+        set: Secret set
+        removed: Secret removed
+        check:
+          succeeded: Secret check succeeded
+          failed: Secret check failed
     human:
       added: Person added
       selfregistered: Person registered himself

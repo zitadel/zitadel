@@ -468,6 +468,12 @@ EventTypes:
       key:
         added: 添加服务用户 Key
         removed: 删除服务用户 Key
+      secret:
+        set: 秘密套装
+        removed: 秘密删除
+        check:
+          succeeded: 成功的秘密控制
+          failed: 秘密控制失败
     human:
       added: 添加用户
       selfregistered: 自注册用户
