@@ -334,7 +334,7 @@ The state should reflect the progress of the issue and what is going on right no
 
 ### Priority
 
-Priority shows you the priority the ZITADEL team has given this issue. In general the more customers want a feature the higher the priority gets.
+Priority shows you the priority the ZITADEL team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
 
 - **🌋 Critical**: This is a security issue or something that has to be fixed urgently, because customers can't work anymore.
 - **🏔 High**: These are the issues the ZITADEL Team is currently focusing on and will be implemented as soon as possible.
