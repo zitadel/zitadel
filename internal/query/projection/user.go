@@ -19,7 +19,7 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users6"
+	UserTable        = "projections.users7"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -57,7 +57,7 @@ const (
 	HumanIsPhoneVerifiedCol = "is_phone_verified"
 
 	// machine
-	UserMachineSuffix        = "machines2"
+	UserMachineSuffix        = "machines"
 	MachineUserIDCol         = "user_id"
 	MachineUserInstanceIDCol = "instance_id"
 	MachineNameCol           = "name"
