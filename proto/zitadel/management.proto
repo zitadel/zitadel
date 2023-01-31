@@ -625,7 +625,7 @@ service ManagementService {
         };
     }
 
-    // Generates and sets new machine credentials
+    // Generates and sets a new machine secret
     rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/secret"
@@ -637,7 +637,7 @@ service ManagementService {
         };
     }
 
-    // Removes machine credentials
+    // Removes the machine secret
     rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/secret"

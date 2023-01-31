@@ -586,7 +586,7 @@ Changes a machine user
 > **rpc** GenerateMachineSecret([GenerateMachineSecretRequest](#generatemachinesecretrequest))
 [GenerateMachineSecretResponse](#generatemachinesecretresponse)
 
-Generates and sets new machine credentials
+Generates and sets a new machine secret
 
 
 
@@ -598,7 +598,7 @@ Generates and sets new machine credentials
 > **rpc** RemoveMachineSecret([RemoveMachineSecretRequest](#removemachinesecretrequest))
 [RemoveMachineSecretResponse](#removemachinesecretresponse)
 
-Removes machine credentials
+Removes the machine secret
 
 
 
