@@ -336,7 +336,7 @@ The state should reflect the progress of the issue and what is going on right no
 
 Priority shows you the priority the ZITADEL team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
 
-- **🌋 Critical**: This is a security issue or something that has to be fixed urgently, because customers can't work anymore.
+- **🌋 Critical**: This is a security issue or something that has to be fixed urgently, because the software is not usable or highly vulnerable.
 - **🏔 High**: These are the issues the ZITADEL Team is currently focusing on and will be implemented as soon as possible.
 - **🏕 Medium**: After all the high issues are done these will be next.
 - **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
