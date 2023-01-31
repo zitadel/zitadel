@@ -10,10 +10,17 @@ In ZITADEL, the Client Credentials grant can be used for this non-interactive au
 
 1. Navigate to Service Users
 2. Click on **New**
-3. Enter a user name and a display name
-4. Click on //TODO: add steps
+3. Enter a username and a display name
+4. Click on **Create**
+5. Open **Actions** in the top right corner and click on **Generate Client Secret**
+6. Copy the **ClientID** and **ClientSecret** from the dialog
 
-![Create new service user](/img/console_serviceusers_create.gif) //TODO: exchange image / gif
+:::note
+Be sure to copy in particular the ClientSecret. You won't be able to retrieve it again.
+If you lose it, you will have to generate a new one.
+:::
+
+![Create new service user](/img/console_serviceusers_secret.gif)
 
 ## Grant role for ZITADEL
 
