@@ -759,6 +759,7 @@
       "AGGREGATE": "agrégat",
       "AGGREGATEID": "agrégat ID",
       "AGGREGATETYPE": "type d'agrégat",
+      "RESOURCEOWNER": "Propriétaire",
       "SEQUENCE": "séquence",
       "CREATIONDATE": "Créé à",
       "TYPE": "Type",
@@ -777,6 +778,21 @@
         "TYPE": {
           "TYPELABEL": "Type",
           "CHECKBOX": "Filtrer par type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrer par propriétaire"
+        },
+        "SEQUENCE": {
+          "LABEL": "séquence",
+          "CHECKBOX": "Filtrer par séquence",
+          "SORT": "Triage",
+          "ASC": "Ascendant",
+          "DESC": "Descendant"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Date de création",
+          "CHECKBOX": "Filtrer par date de création"
         },
         "OTHER": "autre",
         "OTHERS": "autres"

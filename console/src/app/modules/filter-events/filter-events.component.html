@@ -149,12 +149,11 @@
           </div>
           <div class="filter-events-sub" *ngIf="sequenceFilterSet?.value">
             <cnsl-form-field class="aggregate-type-select">
-              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.SEQUENCE.ISASC' | translate }}</cnsl-label>
+              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.SEQUENCE.SORT' | translate }}</cnsl-label>
 
               <mat-select id="isAsc" name="isAsc" formControlName="isAsc">
-                <mat-option [value]="false"> false </mat-option>
-
-                <mat-option [value]="true"> true </mat-option>
+                <mat-option [value]="false"> {{ 'IAM.EVENTS.FILTERS.SEQUENCE.DESC' | translate }} </mat-option>
+                <mat-option [value]="true">{{ 'IAM.EVENTS.FILTERS.SEQUENCE.ASC' | translate }} </mat-option>
               </mat-select>
             </cnsl-form-field>
 

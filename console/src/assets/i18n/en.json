@@ -786,7 +786,9 @@
         "SEQUENCE": {
           "LABEL": "Sequence",
           "CHECKBOX": "Filter by Sequence",
-          "ISASC": "is Ascending"
+          "SORT": "Sorting",
+          "ASC": "Ascending",
+          "DESC": "Descending"
         },
         "CREATIONDATE": {
           "LABEL": "Creation Date",

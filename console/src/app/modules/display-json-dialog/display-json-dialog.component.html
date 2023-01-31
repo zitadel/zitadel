@@ -16,6 +16,11 @@
       <span>{{ event.aggregate.id }}</span>
     </div>
 
+    <div class="data-row" *ngIf="event && event.aggregate && event.aggregate.resourceOwner">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.RESOURCEOWNER' | translate }}</span>
+      <span>{{ event.aggregate.resourceOwner }}</span>
+    </div>
+
     <div
       class="data-row"
       *ngIf="

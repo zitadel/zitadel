@@ -74,8 +74,10 @@
 .editor-row {
   display: flex;
   flex-direction: column;
+  padding: 2px 0;
 
-  .name {
+  .name,
+  .id {
     margin-bottom: 0.25rem;
   }
 

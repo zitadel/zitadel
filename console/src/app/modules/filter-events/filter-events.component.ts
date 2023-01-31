@@ -214,7 +214,7 @@ export class FilterEventsComponent implements OnInit {
       constructRequest.setSequence(formValues.sequence);
       filterObject.sequence = formValues.sequence;
     }
-    if (formValues.sequence) {
+    if (formValues.isAsc) {
       constructRequest.setAsc(formValues.isAsc);
       filterObject.isAsc = formValues.isAsc;
     }
