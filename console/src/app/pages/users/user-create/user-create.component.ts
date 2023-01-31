@@ -4,7 +4,6 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Val
 import { Router } from '@angular/router';
 import { parsePhoneNumber, CountryCode } from 'libphonenumber-js';
 import { Subject } from 'rxjs';
-import { getCountryForTimezone } from 'countries-and-timezones';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -220,8 +219,7 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Guess user's country from Intl.DateTimeFormat
-    const defaultCountryCallingCode =
-      (getCountryForTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)?.id as string) ?? 'CH';
+    const defaultCountryCallingCode = 'CH';
 
     // Set default selected country for phone numbers
     this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();

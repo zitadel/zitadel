@@ -4,7 +4,6 @@ import {
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
   MatLegacyDialogRef as MatDialogRef,
 } from '@angular/material/legacy-dialog';
-import { getCountryForTimezone } from 'countries-and-timezones';
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 
@@ -21,8 +20,7 @@ export enum EditDialogType {
 export class EditDialogComponent implements OnInit {
   public isPhone: boolean = false;
   public isVerified: boolean = false;
-  public phoneCountry: string =
-    (getCountryForTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)?.id as string) ?? 'CH';
+  public phoneCountry: string = 'CH';
   public valueControl: UntypedFormControl = new UntypedFormControl(['', [Validators.required]]);
   public EditDialogType: any = EditDialogType;
   public selected: CountryPhoneCode | undefined;
@@ -45,18 +43,15 @@ export class EditDialogComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isPhone) {
-      // Get country phones
+      // Get country phones and set selected flag to default country
       this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
-
-      // Guess user's country from Intl.DateTimeFormat
-      const defaultCountryCallingCode =
-        (getCountryForTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)?.id as CountryCode) ?? 'CH';
+      const defaultCountryCallingCode = this.phoneCountry;
       this.selected = this.countryPhoneCodes.find((code) => code.countryCode === defaultCountryCallingCode);
 
       // Set current calling country code and format phone if possible
       if (this.valueControl?.value) {
         try {
-          const phoneNumber = parsePhoneNumber(this.valueControl?.value ?? '', defaultCountryCallingCode);
+          const phoneNumber = parsePhoneNumber(this.valueControl?.value ?? '', defaultCountryCallingCode as CountryCode);
           if (phoneNumber) {
             const formatted = phoneNumber.formatInternational();
             this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);

@@ -35,7 +35,6 @@
     "buffer": "^6.0.3",
     "codemirror": "^5.65.8",
     "cors": "^2.8.5",
-    "countries-and-timezones": "^3.4.0",
     "file-saver": "^2.0.5",
     "flag-icons": "^6.6.6",
     "google-proto-files": "^3.0.2",

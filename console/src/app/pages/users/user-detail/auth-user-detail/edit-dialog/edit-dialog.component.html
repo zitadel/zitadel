@@ -17,7 +17,12 @@
     </cnsl-form-field>
     <cnsl-form-field>
       <cnsl-label>{{ data.labelKey | translate }}</cnsl-label>
-      <input cnslInput [formControl]="valueControl" />
+      <input
+        cnslInput
+        [formControl]="valueControl"
+        matTooltip="{{ 'USER.PROFILE.PHONE_HINT' | translate }}"
+        [matTooltipDisabled]="!isPhone"
+      />
       <span cnslError *ngIf="valueControl?.invalid && valueControl?.errors?.required">
         {{ 'USER.VALIDATION.REQUIRED' | translate }}
       </span>
