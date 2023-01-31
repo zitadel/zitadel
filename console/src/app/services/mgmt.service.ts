@@ -98,6 +98,8 @@ import {
   DeactivateUserResponse,
   DeleteActionRequest,
   DeleteActionResponse,
+  GenerateMachineSecretRequest,
+  GenerateMachineSecretResponse,
   GenerateOrgDomainValidationRequest,
   GenerateOrgDomainValidationResponse,
   GetActionRequest,
@@ -310,6 +312,8 @@ import {
   RemoveIDPFromLoginPolicyResponse,
   RemoveMachineKeyRequest,
   RemoveMachineKeyResponse,
+  RemoveMachineSecretRequest,
+  RemoveMachineSecretResponse,
   RemoveMultiFactorFromLoginPolicyRequest,
   RemoveMultiFactorFromLoginPolicyResponse,
   RemoveOrgDomainRequest,
@@ -715,6 +719,18 @@ export class ManagementService {
 
   public unlockUser(req: UnlockUserRequest): Promise<UnlockUserResponse.AsObject> {
     return this.grpcService.mgmt.unlockUser(req, null).then((resp) => resp.toObject());
+  }
+
+  public generateMachineSecret(userId: string): Promise<GenerateMachineSecretResponse.AsObject> {
+    const req = new GenerateMachineSecretRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.generateMachineSecret(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeMachineSecret(userId: string): Promise<RemoveMachineSecretResponse.AsObject> {
+    const req = new RemoveMachineSecretRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removeMachineSecret(req, null).then((resp) => resp.toObject());
   }
 
   public getPrivacyPolicy(): Promise<GetPrivacyPolicyResponse.AsObject> {

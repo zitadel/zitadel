@@ -55,6 +55,7 @@ import { PasswordComponent } from './password/password.component';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
+import { MachineSecretDialogComponent } from './user-detail/machine-secret-dialog/machine-secret-dialog.component';
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
 import { QRCodeModule } from 'angularx-qrcode';
 
@@ -75,6 +76,7 @@ import { QRCodeModule } from 'angularx-qrcode';
     DialogU2FComponent,
     DialogPasswordlessComponent,
     AuthFactorDialogComponent,
+    MachineSecretDialogComponent,
   ],
   imports: [
     ChangesModule,

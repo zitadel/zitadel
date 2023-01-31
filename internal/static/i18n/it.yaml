@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: Chiave macchina non trovato
         AlreadyExisting: Chiave macchina già esistente
+      Secret:
+        NotExisting: Secret non esiste
+        Invalid: Secret non è valido
+        CouldNotGenerate: Non è stato possibile generare il Secret
     PAT:
       NotFound: Personal Access Token non trovato
     NotHuman: L'utente deve essere personale
@@ -475,6 +479,12 @@ EventTypes:
       key:
         added: Chiave aggiunta
         removed: Chiave rimossa
+      secret:
+        set: Secret set
+        removed: Secret rimosso
+        check:
+          succeeded: Controllo della Secret riuscito
+          failed: Controllo della Secret fallito
     human:
       added: Persona aggiunta
       selfregistered: Persona registrata

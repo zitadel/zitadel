@@ -240,6 +240,8 @@
       "STATE": "Stato",
       "DELETE": "Elimina utente",
       "UNLOCK": "Sblocca utente",
+      "GENERATESECRET": "Genera Client Secret",
+      "REMOVESECRET": "Elimina Client Secret",
       "LOCKEDDESCRIPTION": "Questo utente \u00e8 stato bloccato a causa del superamento dei tentativi massimi di accesso e deve essere sbloccato per essere utilizzato di nuovo.",
       "DELETEACCOUNT": "Elimina account personale",
       "DELETEACCOUNT_DESC": "Se esegui questa azione, sarai disconnesso e non avrai più accesso al tuo account. Questa azione non può essere invertita.",
@@ -264,6 +266,10 @@
       "TITLE": "Invia una notifica via e-mail",
       "DESCRIPTION": "Clicca il pulsante qui sotto per inviare una notifica all'indirizzo email corrente o cambiare l'indirizzo email nel campo.",
       "NEWEMAIL": "Nuovo indirizzo e-mail"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Salvate il Client Secret in un luogo sicuro, perch\u00e9 non sarà più disponibile dopo aver chiuso la finestra di dialogo"
     },
     "TABLE": {
       "DEACTIVATE": "Disattiva",
@@ -589,7 +595,9 @@
       "MACHINEADDED": "Utente di servizio creato!",
       "DELETED": "Utente cancellato con successo!",
       "UNLOCKED": "Utente sbloccato con successo!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link per la registrazione inviato con successo."
+      "PASSWORDLESSREGISTRATIONSENT": "Link per la registrazione inviato con successo.",
+      "SECRETGENERATED": "Secret generato con successo!",
+      "SECRETREMOVED": "Secret rimosso con successo!"
     },
     "MEMBERSHIPS": {
       "TITLE": "Memberships di ZITADEL",
