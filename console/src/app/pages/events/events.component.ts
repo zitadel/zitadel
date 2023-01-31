@@ -81,9 +81,10 @@ export class EventsComponent implements OnDestroy {
 
     this.currentRequest$
       .pipe(
-        distinctUntilChanged(({ req: prev }, { req: next }) => {
-          return JSON.stringify(prev.toObject()) === JSON.stringify(next.toObject());
-        }),
+        // this would compare the requests if a duplicate and redundant request would be made
+        // distinctUntilChanged(({ req: prev }, { req: next }) => {
+        //   return JSON.stringify(prev.toObject()) === JSON.stringify(next.toObject());
+        // }),
         takeUntil(this.destroy$),
       )
       .subscribe(({ req, override }) => {
