@@ -202,7 +202,6 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 	}
 	return &clientCredentialsRequest{
 		sub:    user.ID,
-		aud:    nil,
 		scopes: scope,
 	}, nil
 }
