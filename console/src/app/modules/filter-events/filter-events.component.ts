@@ -1,6 +1,8 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { MatLegacyOptionSelectionChange } from '@angular/material/legacy-core';
+import { MatLegacySelectChange } from '@angular/material/legacy-select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { take } from 'rxjs';
@@ -90,7 +92,7 @@ export class FilterEventsComponent implements OnInit {
               const date = new Date(milliseconds);
               const ts = dateToTs(date);
               this.request.setCreationDate(ts);
-              this.creationDate?.setValue(filters.creationDate);
+              this.creationDate?.setValue(date);
               this.creationDateFilterSet?.setValue(true);
             }
             if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
@@ -113,6 +115,10 @@ export class FilterEventsComponent implements OnInit {
               this.request.setSequence(filters.sequence);
               this.sequence?.setValue(filters.sequence);
               this.sequenceFilterSet?.setValue(true);
+            }
+            if (filters.isAsc) {
+              this.request.setAsc(filters.isAsc);
+              this.isAsc?.setValue(filters.isAsc);
             }
             if (filters.eventTypesList && filters.eventTypesList.length) {
               const values = this.eventTypes.filter((ev) => filters.eventTypesList.includes(ev.type));
@@ -182,8 +188,6 @@ export class FilterEventsComponent implements OnInit {
     const constructRequest = new ListEventsRequest();
     let filterObject: any = {};
 
-    console.log(formValues);
-
     if (formValues.userFilterSet && formValues.editorUserId) {
       constructRequest.setEditorUserId(formValues.editorUserId);
       filterObject.editorUserId = formValues.editorUserId;
@@ -209,6 +213,10 @@ export class FilterEventsComponent implements OnInit {
     if (formValues.sequenceFilterSet && formValues.sequence) {
       constructRequest.setSequence(formValues.sequence);
       filterObject.sequence = formValues.sequence;
+    }
+    if (formValues.sequence) {
+      constructRequest.setAsc(formValues.isAsc);
+      filterObject.isAsc = formValues.isAsc;
     }
     if (formValues.creationDateFilterSet && formValues.creationDate) {
       const date = new Date(formValues.creationDate);
@@ -252,6 +260,10 @@ export class FilterEventsComponent implements OnInit {
 
   public get sequence(): AbstractControl | null {
     return this.form.get('sequence');
+  }
+
+  public get isAsc(): AbstractControl | null {
+    return this.form.get('isAsc');
   }
 
   public get sequenceFilterSet(): AbstractControl | null {

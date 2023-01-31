@@ -159,8 +159,6 @@ export class EventsComponent implements OnDestroy {
   }
 
   public filterChanged(filterRequest: ListEventsRequest) {
-    console.log('filterchanged');
-
     const req = new ListEventsRequest();
     req.setLimit(this.INITPAGESIZE);
     req.setAsc(this.sortAsc ? true : false);
@@ -172,8 +170,10 @@ export class EventsComponent implements OnDestroy {
     req.setResourceOwner(filterRequest.getResourceOwner());
     req.setSequence(filterRequest.getSequence());
     req.setCreationDate(filterRequest.getCreationDate());
+    const isAsc: boolean = filterRequest.getAsc();
+    req.setAsc(isAsc);
+    this.sort.sort({ id: 'sequence', start: isAsc ? 'asc' : 'desc', disableClear: true });
 
-    console.log(req.toObject());
     this.loadEvents(req, true);
   }
 
