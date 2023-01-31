@@ -1,18 +1,8 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import {
-  AfterContentChecked,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-} from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { MatLegacyCheckboxChange as MatCheckboxChange } from '@angular/material/legacy-checkbox';
-import { MatLegacySelectChange } from '@angular/material/legacy-select';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { take } from 'rxjs';
 import { ListAggregateTypesRequest, ListEventsRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AggregateType, EventType } from 'src/app/proto/generated/zitadel/event_pb';
@@ -23,6 +13,16 @@ import { ActionKeysType } from '../action-keys/action-keys.component';
 export enum UserTarget {
   SELF = 'self',
   EXTERNAL = 'external',
+}
+
+function dateToTs(date: Date): Timestamp {
+  const ts = new Timestamp();
+  const milliseconds = date.getTime();
+  const seconds = Math.abs(milliseconds / 1000);
+  const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;
+  ts.setSeconds(seconds);
+  ts.setNanos(nanos);
+  return ts;
 }
 
 @Component({
@@ -48,6 +48,13 @@ export class FilterEventsComponent implements OnInit {
 
   @Output() public requestChanged: EventEmitter<ListEventsRequest> = new EventEmitter();
   public form: FormGroup = new FormGroup({
+    resourceOwnerFilterSet: new FormControl(false),
+    resourceOwner: new FormControl(''),
+    sequenceFilterSet: new FormControl(false),
+    sequence: new FormControl(''),
+    isAsc: new FormControl<boolean>(false),
+    creationDateFilterSet: new FormControl(false),
+    creationDate: new FormControl<Date>(new Date()),
     userFilterSet: new FormControl(false),
     editorUserId: new FormControl(''),
     aggregateFilterSet: new FormControl(false),
@@ -71,12 +78,20 @@ export class FilterEventsComponent implements OnInit {
           const { filter } = params;
           if (filter) {
             const stringifiedFilters = filter as string;
-            const filters: ListEventsRequest.AsObject = JSON.parse(stringifiedFilters);
+            const filters = JSON.parse(stringifiedFilters);
 
             if (filters.aggregateId) {
               this.request.setAggregateId(filters.aggregateId);
               this.aggregateId?.setValue(filters.aggregateId);
               this.aggregateFilterSet?.setValue(true);
+            }
+            if (filters.creationDate) {
+              const milliseconds = filters.creationDate;
+              const date = new Date(milliseconds);
+              const ts = dateToTs(date);
+              this.request.setCreationDate(ts);
+              this.creationDate?.setValue(filters.creationDate);
+              this.creationDateFilterSet?.setValue(true);
             }
             if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
               const values = this.aggregateTypes.filter((agg) => filters.aggregateTypesList.includes(agg.type));
@@ -88,6 +103,16 @@ export class FilterEventsComponent implements OnInit {
               this.request.setEditorUserId(filters.editorUserId);
               this.editorUserId?.setValue(filters.editorUserId);
               this.userFilterSet?.setValue(true);
+            }
+            if (filters.resourceOwner) {
+              this.request.setResourceOwner(filters.resourceOwner);
+              this.resourceOwner?.setValue(filters.resourceOwner);
+              this.resourceOwnerFilterSet?.setValue(true);
+            }
+            if (filters.sequence) {
+              this.request.setSequence(filters.sequence);
+              this.sequence?.setValue(filters.sequence);
+              this.sequenceFilterSet?.setValue(true);
             }
             if (filters.eventTypesList && filters.eventTypesList.length) {
               const values = this.eventTypes.filter((ev) => filters.eventTypesList.includes(ev.type));
@@ -155,7 +180,9 @@ export class FilterEventsComponent implements OnInit {
     const formValues = this.form.value;
 
     const constructRequest = new ListEventsRequest();
-    let filterObject: Partial<ListEventsRequest.AsObject> = {};
+    let filterObject: any = {};
+
+    console.log(formValues);
 
     if (formValues.userFilterSet && formValues.editorUserId) {
       constructRequest.setEditorUserId(formValues.editorUserId);
@@ -174,6 +201,20 @@ export class FilterEventsComponent implements OnInit {
     if (formValues.eventTypesFilterSet && formValues.eventTypesList && formValues.eventTypesList.length) {
       constructRequest.setEventTypesList(formValues.eventTypesList.map((eventType: EventType.AsObject) => eventType.type));
       filterObject.eventTypesList = formValues.eventTypesList.map((eventType: EventType.AsObject) => eventType.type);
+    }
+    if (formValues.resourceOwnerFilterSet && formValues.resourceOwner) {
+      constructRequest.setResourceOwner(formValues.resourceOwner);
+      filterObject.resourceOwner = formValues.resourceOwner;
+    }
+    if (formValues.sequenceFilterSet && formValues.sequence) {
+      constructRequest.setSequence(formValues.sequence);
+      filterObject.sequence = formValues.sequence;
+    }
+    if (formValues.creationDateFilterSet && formValues.creationDate) {
+      const date = new Date(formValues.creationDate);
+      const ts = dateToTs(date);
+      constructRequest.setCreationDate(ts);
+      filterObject.creationDate = date.getTime();
     }
 
     this.requestChanged.emit(constructRequest);
@@ -209,6 +250,30 @@ export class FilterEventsComponent implements OnInit {
     return this.form.get('eventTypesFilterSet');
   }
 
+  public get sequence(): AbstractControl | null {
+    return this.form.get('sequence');
+  }
+
+  public get sequenceFilterSet(): AbstractControl | null {
+    return this.form.get('sequenceFilterSet');
+  }
+
+  public get creationDate(): AbstractControl | null {
+    return this.form.get('creationDate');
+  }
+
+  public get creationDateFilterSet(): AbstractControl | null {
+    return this.form.get('creationDateFilterSet');
+  }
+
+  public get resourceOwnerFilterSet(): AbstractControl | null {
+    return this.form.get('resourceOwnerFilterSet');
+  }
+
+  public get resourceOwner(): AbstractControl | null {
+    return this.form.get('resourceOwner');
+  }
+
   public get editorUserId(): AbstractControl | null {
     return this.form.get('editorUserId');
   }
@@ -230,7 +295,16 @@ export class FilterEventsComponent implements OnInit {
     if (this.userFilterSet?.value && this.editorUserId?.value) {
       ++count;
     }
+    if (this.creationDateFilterSet?.value && this.creationDate?.value) {
+      ++count;
+    }
     if (this.aggregateFilterSet?.value && this.aggregateId?.value) {
+      ++count;
+    }
+    if (this.sequenceFilterSet?.value && this.sequence?.value) {
+      ++count;
+    }
+    if (this.resourceOwnerFilterSet?.value && this.resourceOwner?.value) {
       ++count;
     }
     if (this.aggregateFilterSet?.value && this.aggregateTypesList?.value && this.aggregateTypesList.value.length) {

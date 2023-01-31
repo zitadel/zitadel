@@ -15,6 +15,7 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 enum EventFieldName {
   EDITOR = 'editor',
   AGGREGATE = 'aggregate',
+  RESOURCEOWNER = 'resourceOwner',
   SEQUENCE = 'sequence',
   CREATIONDATE = 'creationDate',
   TYPE = 'type',
@@ -39,6 +40,7 @@ export class EventsComponent implements OnDestroy {
   public displayedColumns: string[] = [
     EventFieldName.TYPE,
     EventFieldName.AGGREGATE,
+    EventFieldName.RESOURCEOWNER,
     EventFieldName.EDITOR,
     EventFieldName.SEQUENCE,
     EventFieldName.CREATIONDATE,
@@ -167,7 +169,11 @@ export class EventsComponent implements OnDestroy {
     req.setAggregateId(filterRequest.getAggregateId());
     req.setEventTypesList(filterRequest.getEventTypesList());
     req.setEditorUserId(filterRequest.getEditorUserId());
+    req.setResourceOwner(filterRequest.getResourceOwner());
+    req.setSequence(filterRequest.getSequence());
+    req.setCreationDate(filterRequest.getCreationDate());
 
+    console.log(req.toObject());
     this.loadEvents(req, true);
   }
 

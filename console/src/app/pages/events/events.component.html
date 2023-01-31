@@ -39,7 +39,7 @@
                 <i class="las la-robot"></i>
               </cnsl-avatar> </ng-template
             > -->
-
+              <span class="id" *ngIf="editor.id">{{ editor.id }}</span>
               <span class="name" *ngIf="editor.displayName">{{ editor.displayName }}</span>
               <span class="state" *ngIf="editor.service">{{ editor.service }}</span>
             </div>
@@ -52,11 +52,20 @@
         <td mat-cell *matCellDef="let event">
           <ng-container *ngIf="event | toobject as event">
             <div class="aggregate-row">
-              <span class="id">{{ event.aggregate.resourceOwner }}</span
+              <span class="id">{{ event.aggregate.id }}</span
               ><span class="state" *ngIf="event.aggregate?.type?.localized?.localizedMessage">{{
                 event.aggregate.type.localized.localizedMessage
               }}</span>
             </div>
+          </ng-container>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="resourceOwner">
+        <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.RESOURCEOWNER' | translate }}</th>
+        <td mat-cell *matCellDef="let event">
+          <ng-container *ngIf="event | toobject as event">
+            <span *ngIf="event.aggregate.resourceOwner">{{ event.aggregate.resourceOwner }}</span>
           </ng-container>
         </td>
       </ng-container>

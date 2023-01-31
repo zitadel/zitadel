@@ -759,6 +759,7 @@
       "AGGREGATE": "Aggregate",
       "AGGREGATEID": "Aggregate ID",
       "AGGREGATETYPE": "Aggregate Type",
+      "RESOURCEOWNER": "Resource Owner",
       "SEQUENCE": "Sequence",
       "CREATIONDATE": "Created At",
       "TYPE": "Type",
@@ -777,6 +778,18 @@
         "TYPE": {
           "TYPELABEL": "Type",
           "CHECKBOX": "Filter by Type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filter by Resource Owner"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequence",
+          "CHECKBOX": "Filter by Sequence"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Creation Date",
+          "CHECKBOX": "Filter by Creation Date"
         },
         "OTHER": "other",
         "OTHERS": "others"

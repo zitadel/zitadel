@@ -11,6 +11,7 @@ import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progres
 import { MatLegacyCheckboxModule } from '@angular/material/legacy-checkbox';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [FilterEventsComponent],
@@ -21,6 +22,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
     InputModule,
     ReactiveFormsModule,
     OverlayModule,
+    MatDatepickerModule,
     MatLegacyProgressSpinnerModule,
     TranslateModule,
     MatLegacyCheckboxModule,
