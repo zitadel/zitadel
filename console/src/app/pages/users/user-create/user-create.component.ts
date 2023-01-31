@@ -218,10 +218,8 @@ export class UserCreateComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Guess user's country from Intl.DateTimeFormat
-    const defaultCountryCallingCode = 'CH';
-
     // Set default selected country for phone numbers
+    const defaultCountryCallingCode = 'CH';
     this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
     this.selected = this.countryPhoneCodes.find((code) => code.countryCode === defaultCountryCallingCode);
   }
