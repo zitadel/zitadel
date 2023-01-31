@@ -267,7 +267,7 @@
       "DESCRIPTION": "单击下面的按钮可向当前电子邮件地址发送通知或更改电子邮件地址。",
       "NEWEMAIL": "新的电子邮件地址"
     },
-    "SECRETDIALOG":  {
+    "SECRETDIALOG": {
       "CLIENTSECRET": "客户端秘钥",
       "CLIENTSECRET_DESCRIPTION": "将您的客户保密在一个安全的地方，因为一旦对话框关闭，便无法再次查看。"
     },

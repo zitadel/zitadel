@@ -267,7 +267,7 @@
       "DESCRIPTION": "Click the button below to send a notification to the current email address or change the email address in the field.",
       "NEWEMAIL": "New email address"
     },
-    "SECRETDIALOG":  {
+    "SECRETDIALOG": {
       "CLIENTSECRET": "Client Secret",
       "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed."
     },

@@ -267,7 +267,7 @@
       "DESCRIPTION": "Clicca il pulsante qui sotto per inviare una notifica all'indirizzo email corrente o cambiare l'indirizzo email nel campo.",
       "NEWEMAIL": "Nuovo indirizzo e-mail"
     },
-    "SECRETDIALOG":  {
+    "SECRETDIALOG": {
       "CLIENTSECRET": "Client Secret",
       "CLIENTSECRET_DESCRIPTION": "Salvate il Client Secret in un luogo sicuro, perch\u00e9 non sarà più disponibile dopo aver chiuso la finestra di dialogo"
     },

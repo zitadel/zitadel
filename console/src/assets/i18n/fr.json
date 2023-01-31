@@ -267,7 +267,7 @@
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour envoyer une notification à l'adresse e-mail actuelle ou modifier l'adresse e-mail dans le champ.",
       "NEWEMAIL": "Nouvelle adresse e-mail"
     },
-    "SECRETDIALOG":  {
+    "SECRETDIALOG": {
       "CLIENTSECRET": "Client Secret",
       "CLIENTSECRET_DESCRIPTION": "Conservez votre secret client dans un endroit sûr car il disparaîtra une fois la boîte de dialogue fermée."
     },
