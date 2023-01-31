@@ -759,6 +759,7 @@
       "AGGREGATE": "总数",
       "AGGREGATEID": "汇总的ID",
       "AGGREGATETYPE": "骨料类型",
+      "RESOURCEOWNER": "所有者",
       "SEQUENCE": "序列",
       "CREATIONDATE": "创建日期",
       "TYPE": "类型",
@@ -777,6 +778,21 @@
         "TYPE": {
           "TYPELABEL": "类型",
           "CHECKBOX": "按类型过滤"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "按资源所有者过滤"
+        },
+        "SEQUENCE": {
+          "LABEL": "序列",
+          "CHECKBOX": "按顺序过滤",
+          "SORT": "分拣",
+          "ASC": "上升中",
+          "DESC": "下降"
+        },
+        "CREATIONDATE": {
+          "LABEL": "创建日期",
+          "CHECKBOX": "按创建日期过滤"
         },
         "OTHER": "其他",
         "OTHERS": "其他"
