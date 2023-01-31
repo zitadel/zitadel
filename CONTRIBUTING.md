@@ -310,15 +310,20 @@ You can find an installation guide for all the different environments here:
 The ZITADEL Team works with an agile product management methodology.
 You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/2/views/1).
 
-Every two weeks the team goes through new issues and decides on the priority, effort and if the issue is ready to start or goes in the backlog.
-If it is something critical or urgent we will have a look at it earlier.
+### Sprint
+
+We want to deliver a new release every second week. So we plan everything in two-week sprints.
+Each Tuesday we estimate new issues and on Wednesday the last sprint will be reviewed and the next one will be planned.
+After a sprint ends a new version of ZITADEL will be released, and publish to [ZITADEL Cloud](https://zitadel.cloud) the following Monday.
+
+If there are some critical or urgent issues we will have a look at it earlier, than the two weeks.
 To show the community the needed information, each issue gets attributes and labels.
 
-## About the attributes
+### About the attributes
 
 You can find the attributes on the project "Product Management".
 
-### State
+#### State
 
 The state should reflect the progress of the issue and what is going on right now.
 
@@ -328,11 +333,11 @@ The state should reflect the progress of the issue and what is going on right no
 - **📝 Prioritized Product Backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
 - **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
 - **📋 Sprint Backlog**: The issue is scheduled for the current sprint.
-- **🏗 In progress**: Someone is working on this issue right now.
-- **👀 In review**: The issue is in review.
+- **🏗 In progress**: Someone is working on this issue right now. The issue will get an assignee as soon as it is in progress.
+- **👀 In review**: The issue is in review. Please add someone to review your issue or let us know that it is ready to review with a comment on your pull request.
 - **✅ Done**: The issue is implemented and merged to main.
 
-### Priority
+#### Priority
 
 Priority shows you the priority the ZITADEL team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
 
@@ -342,25 +347,21 @@ Priority shows you the priority the ZITADEL team has given this issue. In genera
 - **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
 
 
-### Complexity
+#### Complexity
 
 This should give you an indication how complex the issue is. It's not about the hours or effort it takes.
 Everything that is higher than 8 should be split in smaller parts.
 
 **1**, **2**, **3**, **5**, **8**, **13**
 
-### Sprint
-
-We want to deliver a new release every second week. So we plan everything in two week sprint.
-
-## About the Labels
+### About the Labels
 
 There are a few general labels that don't belong to a specific category.
 
 - **good first issue**: This label shows contributors, that it is an easy entry point to start developing on ZITADEL.
 - **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
 
-### Category
+#### Category
 
 The category shows which part of ZITADEL is affected.
 
@@ -372,7 +373,7 @@ The category shows which part of ZITADEL is affected.
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages
 
-### Language
+#### Language
 
 The language shows you in which programming language the affected part is written
 
