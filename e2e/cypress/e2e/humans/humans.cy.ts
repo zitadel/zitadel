@@ -22,23 +22,29 @@ describe('humans', () => {
         cy.visit(humansPath);
       });
 
-      it('should add a user', () => {
-        cy.get('[data-e2e="create-user-button"]').click();
-        cy.url().should('contain', 'users/create');
-        cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
-        //force needed due to the prefilled username prefix
-        cy.get('[formcontrolname="userName"]').type(user.addName);
-        cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
-        cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
-        cy.get('[formcontrolname="phone"]').type('+41 123456789');
-        cy.get('[data-e2e="create-button"]').click();
-        cy.shouldConfirmSuccess();
-        let loginName = user.addName;
-        if (user.mustBeDomain) {
-          loginName = loginname(user.addName, Cypress.env('ORGANIZATION'));
-        }
-        cy.contains('[data-e2e="copy-loginname"]', loginName).click();
-        cy.clipboardMatches(loginName);
+      [false, true].forEach((shouldSetFirstAndLastName) => {
+        it(`should add a user ${
+          shouldSetFirstAndLastName ? 'with first and last name set' : 'without first and last name set'
+        }`, () => {
+          cy.get('[data-e2e="create-user-button"]').click();
+          cy.url().should('contain', 'users/create');
+          cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
+          //force needed due to the prefilled username prefix
+          cy.get('[formcontrolname="userName"]').type(user.addName);
+          if (shouldSetFirstAndLastName) {
+            cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
+            cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
+          }
+          cy.get('[formcontrolname="phone"]').type('+41 123456789');
+          cy.get('[data-e2e="create-button"]').click();
+          cy.shouldConfirmSuccess();
+          let loginName = user.addName;
+          if (user.mustBeDomain) {
+            loginName = loginname(user.addName, Cypress.env('ORGANIZATION'));
+          }
+          cy.contains('[data-e2e="copy-loginname"]', loginName).click();
+          cy.clipboardMatches(loginName);
+        });
       });
     });
 

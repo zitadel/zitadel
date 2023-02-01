@@ -21,10 +21,10 @@ type Profile struct {
 
 func (p *Profile) Changes(changed *Profile) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
-	if changed.FirstName != "" && p.FirstName != changed.FirstName {
+	if p.FirstName != changed.FirstName {
 		changes["firstName"] = changed.FirstName
 	}
-	if changed.LastName != "" && p.LastName != changed.LastName {
+	if p.LastName != changed.LastName {
 		changes["lastName"] = changed.LastName
 	}
 	if changed.NickName != p.NickName {

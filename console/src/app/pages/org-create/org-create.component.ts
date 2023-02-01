@@ -136,8 +136,8 @@ export class OrgCreateComponent {
   private initForm(): void {
     this.userForm = this.fb.group({
       userName: ['', [Validators.required]],
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
+      firstName: [''],
+      lastName: [''],
       email: ['', [Validators.required]],
       isVerified: [false, []],
       gender: [''],

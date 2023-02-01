@@ -92,13 +92,7 @@
             [checked]="selection.isSelected(user)"
           >
             <cnsl-avatar
-              *ngIf="
-                user.human &&
-                  user.human.profile.displayName &&
-                  user.human?.profile.firstName &&
-                  user.human?.profile.lastName;
-                else cog
-              "
+              *ngIf="user.human && user.human.profile.displayName; else cog"
               class="avatar"
               [name]="user.human.profile.displayName"
               [avatarUrl]="user.human?.profile?.avatarUrl || ''"

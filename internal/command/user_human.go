@@ -29,9 +29,9 @@ func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (
 type AddHuman struct {
 	// Username is required
 	Username string
-	// FirstName is required
+	// FirstName is optional
 	FirstName string
-	// LastName is required
+	// LastName is optional
 	LastName string
 	// NickName is required
 	NickName string
@@ -117,12 +117,8 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			return nil, errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
 		}
 
-		if human.FirstName = strings.TrimSpace(human.FirstName); human.FirstName == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument")
-		}
-		if human.LastName = strings.TrimSpace(human.LastName); human.LastName == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.Invalid.Argument")
-		}
+		human.FirstName = strings.TrimSpace(human.FirstName)
+		human.LastName = strings.TrimSpace(human.LastName)
 		human.ensureDisplayName()
 
 		if human.Phone.Number, err = FormatPhoneNumber(human.Phone.Number); err != nil {
@@ -270,7 +266,11 @@ func (h *AddHuman) ensureDisplayName() {
 	if strings.TrimSpace(h.DisplayName) != "" {
 		return
 	}
-	h.DisplayName = h.FirstName + " " + h.LastName
+	if h.FirstName != "" && h.LastName != "" {
+		h.DisplayName = h.FirstName + " " + h.LastName
+	} else {
+		h.DisplayName = h.Username
+	}
 }
 
 // shouldAddInitCode returns true for all added Humans which:
@@ -463,7 +463,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 		human.AggregateID = userID
 	}
 
-	human.SetNamesAsDisplayname()
+	human.SetNamesOrUsernameAsDisplayName()
 	if human.Password != nil {
 		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordAlg, human.Password.ChangeRequired); err != nil {
 			return nil, nil, err

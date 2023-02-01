@@ -198,7 +198,12 @@
     </div>
 
     <ng-container
-      *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
+      *ngIf="
+        user &&
+        (user.human?.profile?.displayName ||
+          (user.human?.profile?.firstName && user.human?.profile?.lastName) ||
+          user.userName)
+      "
     >
       <div class="account-card-wrapper">
         <button
@@ -217,7 +222,9 @@
             [name]="
               user.human?.profile?.displayName
                 ? user.human?.profile?.displayName ?? ''
-                : user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
+                : user.human?.profile?.firstName && user.human?.profile?.lastName
+                ? user.human?.profile?.firstName + ' ' + user.human?.profile?.lastName
+                : user.userName
             "
             [size]="38"
           >

@@ -39,7 +39,7 @@ services:
     user: '$UID'
     volumes:
       - .:/e2e
-    command: 'sh -c "npm ci --omit=dev && npm run lint && npx wait-on http://localhost:8080/debug/ready"'
+    command: 'sh -c "npm ci --omit=dev && npm run lint && npx wait-on -v -l http://host.docker.internal:8080/debug/ready"'
     network_mode: host
 
   e2e:

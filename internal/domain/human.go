@@ -74,9 +74,13 @@ func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
 	return nil
 }
 
-func (u *Human) SetNamesAsDisplayname() {
-	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {
-		u.DisplayName = u.FirstName + " " + u.LastName
+func (u *Human) SetNamesOrUsernameAsDisplayName() {
+	if u.Profile != nil && u.DisplayName == "" {
+		if u.FirstName != "" && u.LastName != "" {
+			u.DisplayName = u.FirstName + " " + u.LastName
+		} else {
+			u.DisplayName = u.Username
+		}
 	}
 }
 

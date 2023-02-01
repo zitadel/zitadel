@@ -42,14 +42,14 @@
 
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}*</cnsl-label>
-            <input cnslInput formControlName="firstName" required />
+            <input cnslInput formControlName="firstName" />
             <span cnslError *ngIf="firstName?.invalid && firstName?.errors?.required">
               {{ 'USER.VALIDATION.REQUIRED' | translate }}
             </span>
           </cnsl-form-field>
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}*</cnsl-label>
-            <input cnslInput formControlName="lastName" required />
+            <input cnslInput formControlName="lastName" />
             <span cnslError *ngIf="lastName?.invalid && lastName?.errors?.required">
               {{ 'USER.VALIDATION.REQUIRED' | translate }}
             </span>

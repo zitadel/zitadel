@@ -47,6 +47,16 @@ func TestProfileChanges(t *testing.T) {
 				newProfile:      &Profile{FirstName: "", LastName: "", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: LanguageTag(language.German), Gender: int32(user_model.GenderFemale)},
 			},
 			res: res{
+				changesLen: 2,
+			},
+		},
+		{
+			name: "empty names, no changes",
+			args: args{
+				existingProfile: &Profile{FirstName: "", LastName: "", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: LanguageTag(language.German), Gender: int32(user_model.GenderFemale)},
+				newProfile:      &Profile{FirstName: "", LastName: "", NickName: "NickName", DisplayName: "DisplayName", PreferredLanguage: LanguageTag(language.German), Gender: int32(user_model.GenderFemale)},
+			},
+			res: res{
 				changesLen: 0,
 			},
 		},
