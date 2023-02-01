@@ -36,7 +36,7 @@ describe('permissions', () => {
         it('should add a manager', () => {
           cy.get('[data-e2e="add-member-button"]').click();
           cy.get('[data-e2e="add-member-input"]').type(testManagerLoginname);
-          cy.get('[data-e2e="user-option"]').click();
+          cy.get('[data-e2e="user-option"]').click().first();
           cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
           cy.get('[data-e2e="confirm-add-member-button"]').click();
           cy.shouldConfirmSuccess();
