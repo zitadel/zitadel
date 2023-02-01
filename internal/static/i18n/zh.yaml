@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: 未找到机器密钥
         AlreadyExisting: 已有的机器钥匙
+      Secret:
+        NotExisting: 秘密并不存在
+        Invalid: 秘密是无效的
+        CouldNotGenerate: 无法生成秘密
     PAT:
       NotFound: 未找到个人访问令牌
     NotHuman: 用户必须是个人
@@ -465,6 +469,12 @@ EventTypes:
       key:
         added: 添加服务用户 Key
         removed: 删除服务用户 Key
+      secret:
+        set: 秘密套装
+        removed: 秘密删除
+        check:
+          succeeded: 成功的秘密控制
+          failed: 秘密控制失败
     human:
       added: 添加用户
       selfregistered: 自注册用户

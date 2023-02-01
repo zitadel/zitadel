@@ -242,6 +242,8 @@
       "STATE": "Status",
       "DELETE": "Delete User",
       "UNLOCK": "Unlock User",
+      "GENERATESECRET": "Generate Client Secret",
+      "REMOVESECRET": "Remove Client Secret",
       "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again.",
       "DELETEACCOUNT": "Delete Account",
       "DELETEACCOUNT_DESC": "If you perform this action, you will be logged out and will no longer have access to your account. This action is not reversible, so please continue with caution.",
@@ -266,6 +268,10 @@
       "TITLE": "Send Email Notification",
       "DESCRIPTION": "Click the button below to send a notification to the current email address or change the email address in the field.",
       "NEWEMAIL": "New email address"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed."
     },
     "TABLE": {
       "DEACTIVATE": "Deactivate",
@@ -591,7 +597,9 @@
       "MACHINEADDED": "Service User created!",
       "DELETED": "User deleted successfully!",
       "UNLOCKED": "User unlocked successfully!",
-      "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully."
+      "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully.",
+      "SECRETGENERATED": "Secret generated successfully!",
+      "SECRETREMOVED": "Secret removed successfully!"
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",

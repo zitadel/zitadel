@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: Maschinen Schlüssel nicht gefunden
         AlreadyExisting: Machine Schlüssel exisiert bereits
+      Secret:
+        NotExisting: Secret existiert nicht
+        Invalid: Secret ist ungültig
+        CouldNotGenerate: Secret konnte nicht generiert werden
     PAT:
       NotFound: Persönliches Access Token nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
@@ -475,8 +479,14 @@ EventTypes:
       added: Technischer Benutzer hinzugefügt
       changed: Technischer Benutzer geändert
       key:
-        added: Key added
-        removed: Key removed
+        added: Key hinzugefügt
+        removed: Key entfernt
+      secret:
+        set: Secret gesetzt
+        removed: Secret entfernt
+        check:
+          succeeded: Secret Überprüfung erfolgreich
+          failed: Secret Überprüfung fehlgeschlagen
     human:
       added: Benutzer hinzugefügt
       selfregistered: Benutzer hat sich selbst registriert

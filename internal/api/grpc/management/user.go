@@ -756,6 +756,34 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 	}, nil
 }
 
+func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.GenerateMachineSecretRequest) (*mgmt_pb.GenerateMachineSecretResponse, error) {
+	// use SecretGeneratorTypeAppSecret as the secrets will be used in the client_credentials grant like a client secret
+	secretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	set := new(command.GenerateMachineSecret)
+	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, secretGenerator, set)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GenerateMachineSecretResponse{
+		ClientId:     set.ClientID,
+		ClientSecret: set.ClientSecret,
+		Details:      obj_grpc.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) RemoveMachineSecret(ctx context.Context, req *mgmt_pb.RemoveMachineSecretRequest) (*mgmt_pb.RemoveMachineSecretResponse, error) {
+	objectDetails, err := s.command.RemoveMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveMachineSecretResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
 func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.GetPersonalAccessTokenByIDsRequest) (*mgmt_pb.GetPersonalAccessTokenByIDsResponse, error) {
 	resourceOwner, err := query.NewPersonalAccessTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {

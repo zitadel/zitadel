@@ -242,6 +242,8 @@
       "STATE": "Status",
       "DELETE": "Benutzer löschen",
       "UNLOCK": "Benutzer entsperren",
+      "GENERATESECRET": "Client Secret generieren",
+      "REMOVESECRET": "Client Secret löschen",
       "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden.",
       "DELETEACCOUNT": "Account löschen",
       "DELETEACCOUNT_DESC": "Wenn du diese Aktion ausführst, wirst du abgemeldet und danach keinen Zugriff mehr auf dein Konto haben. Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -266,6 +268,10 @@
       "TITLE": "Email Benachrichtigung senden",
       "DESCRIPTION": "Klicken Sie den untenstehenden Button um ein Verifizierung-E-Mail an die aktuelle Adresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
       "NEWEMAIL": "Neue Email"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Verwahre das Client Secret an einem sicheren Ort, da es nicht mehr angezeigt werden kann, sobald der Dialog geschlossen wird."
     },
     "TABLE": {
       "DEACTIVATE": "Deaktivieren",
@@ -591,7 +597,9 @@
       "MACHINEADDED": "Service User erstellt!",
       "DELETED": "Benutzer erfolgreich gelöscht!",
       "UNLOCKED": "Benutzer erfolgreich freigeschaltet!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link via email versendet."
+      "PASSWORDLESSREGISTRATIONSENT": "Link via email versendet.",
+      "SECRETGENERATED": "Secret erfolgreich generiert!",
+      "SECRETREMOVED": "Secret erfolgreich gelöscht!"
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",

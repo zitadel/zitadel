@@ -72,6 +72,7 @@ func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
 		Name:        view.Name,
 		Description: view.Description,
+		HasSecret:   view.HasSecret,
 	}
 }
 

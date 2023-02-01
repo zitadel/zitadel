@@ -242,6 +242,8 @@
       "STATE": "Statut",
       "DELETE": "Supprimer l'utilisateur",
       "UNLOCK": "Déverrouiller l'utilisateur",
+      "GENERATESECRET": "Générer Client Secret",
+      "REMOVESECRET": "Supprimer Client Secret",
       "LOCKEDDESCRIPTION": "Cet utilisateur a été verrouillé pour avoir dépassé le nombre maximum de tentatives de connexion et doit être déverrouillé pour être à nouveau utilisé.",
       "DELETEACCOUNT": "Supprimer le compte",
       "DELETEACCOUNT_DESC": "Si vous effectuez cette action, vous serez déconnecté et n'aurez plus accès à votre compte. Cette action n'est pas réversible, veuillez donc continuer avec prudence.",
@@ -266,6 +268,10 @@
       "TITLE": "Envoyer une notification par e-mail",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour envoyer une notification à l'adresse e-mail actuelle ou modifier l'adresse e-mail dans le champ.",
       "NEWEMAIL": "Nouvelle adresse e-mail"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Conservez votre secret client dans un endroit sûr car il disparaîtra une fois la boîte de dialogue fermée."
     },
     "TABLE": {
       "DEACTIVATE": "Désactiver",
@@ -591,7 +597,9 @@
       "MACHINEADDED": "Utilisateur de service créé !",
       "DELETED": "Utilisateur supprimé avec succès !",
       "UNLOCKED": "Utilisateur déverrouillé avec succès !",
-      "PASSWORDLESSREGISTRATIONSENT": "Lien d'enregistrement envoyé avec succès."
+      "PASSWORDLESSREGISTRATIONSENT": "Lien d'enregistrement envoyé avec succès.",
+      "SECRETGENERATED": "Secret généré avec succès !",
+      "SECRETREMOVED": "Secret supprimé avec succès !"
     },
     "MEMBERSHIPS": {
       "TITLE": "Rôles du gestionnaire ZITADEL",
