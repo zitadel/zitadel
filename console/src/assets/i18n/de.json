@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
-    "COUNT": "Ergebnisse"
+    "COUNT": "Ergebnisse",
+    "MORE": "mehr"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Instanz",
     "ORGS": "Organisationen",
     "VIEWS": "Views",
+    "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organisation",
     "DOMAINS": "Domains",
@@ -240,6 +242,8 @@
       "STATE": "Status",
       "DELETE": "Benutzer löschen",
       "UNLOCK": "Benutzer entsperren",
+      "GENERATESECRET": "Client Secret generieren",
+      "REMOVESECRET": "Client Secret löschen",
       "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden.",
       "DELETEACCOUNT": "Account löschen",
       "DELETEACCOUNT_DESC": "Wenn du diese Aktion ausführst, wirst du abgemeldet und danach keinen Zugriff mehr auf dein Konto haben. Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -264,6 +268,10 @@
       "TITLE": "Email Benachrichtigung senden",
       "DESCRIPTION": "Klicken Sie den untenstehenden Button um ein Verifizierung-E-Mail an die aktuelle Adresse zu versenden oder ändern Sie die Emailadresse in dem Feld.",
       "NEWEMAIL": "Neue Email"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Verwahre das Client Secret an einem sicheren Ort, da es nicht mehr angezeigt werden kann, sobald der Dialog geschlossen wird."
     },
     "TABLE": {
       "DEACTIVATE": "Deaktivieren",
@@ -589,7 +597,9 @@
       "MACHINEADDED": "Service User erstellt!",
       "DELETED": "Benutzer erfolgreich gelöscht!",
       "UNLOCKED": "Benutzer erfolgreich freigeschaltet!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link via email versendet."
+      "PASSWORDLESSREGISTRATIONSENT": "Link via email versendet.",
+      "SECRETGENERATED": "Secret erfolgreich generiert!",
+      "SECRETREMOVED": "Secret erfolgreich gelöscht!"
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",
@@ -749,6 +759,56 @@
       "ACTIONS": "Aktionen",
       "DELETE": "Entfernen",
       "DELETESUCCESS": "Gescheiterte Events entfernt."
+    },
+    "EVENTS": {
+      "TITLE": "Events",
+      "DESCRIPTION": "Diese Ansicht zeigt alle vorhandenen Events.",
+      "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "Aggregate",
+      "AGGREGATEID": "Aggregate ID",
+      "AGGREGATETYPE": "Aggregate Typ",
+      "RESOURCEOWNER": "Resource Owner",
+      "SEQUENCE": "Sequenz",
+      "CREATIONDATE": "Erstelldatum",
+      "TYPE": "Typ",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Nach Editor filtern"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Typ",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Nach Aggregate filtern"
+        },
+        "TYPE": {
+          "TYPELABEL": "Typ",
+          "CHECKBOX": "Nach Typ filtern"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Nach Resource Owner filtern"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequenz",
+          "CHECKBOX": "Nach Sequenz filtern",
+          "SORT": "Sortierung",
+          "ASC": "aufsteigend",
+          "DESC": "absteigend"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Erstelldatum",
+          "CHECKBOX": "Nach Erstelldatum filtern"
+        },
+        "OTHER": "weiterer",
+        "OTHERS": "weitere"
+      },
+      "DIALOG": {
+        "TITLE": "Event Detail"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Manager entfernt.",

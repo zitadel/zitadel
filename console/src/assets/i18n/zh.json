@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "上一页",
     "NEXT": "下一页",
-    "COUNT": "总数"
+    "COUNT": "总数",
+    "MORE": "显示更多"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "实例",
     "ORGS": "组织",
     "VIEWS": "数据表",
+    "EVENTS": "活动",
     "FAILEDEVENTS": "失败事件",
     "ORGANIZATION": "组织",
     "DOMAINS": "域名",
@@ -240,6 +242,8 @@
       "STATE": "状态",
       "DELETE": "删除用户",
       "UNLOCK": "解锁用户",
+      "GENERATESECRET": "生成客户密匙",
+      "REMOVESECRET": "删除客户密匙",
       "LOCKEDDESCRIPTION": "此用户因超过最大登录尝试次数而被锁定，必须解锁才能再次使用。",
       "DELETEACCOUNT": "删除账户",
       "DELETEACCOUNT_DESC": "如果您执行此操作，您将被注销并且无法再访问您的帐户。此操作不可逆，因此请谨慎操作。",
@@ -264,6 +268,10 @@
       "TITLE": "发送电子邮件通知",
       "DESCRIPTION": "单击下面的按钮可向当前电子邮件地址发送通知或更改电子邮件地址。",
       "NEWEMAIL": "新的电子邮件地址"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "客户端秘钥",
+      "CLIENTSECRET_DESCRIPTION": "将您的客户保密在一个安全的地方，因为一旦对话框关闭，便无法再次查看。"
     },
     "TABLE": {
       "DEACTIVATE": "停用",
@@ -589,7 +597,9 @@
       "MACHINEADDED": "服务用户已创建成功!",
       "DELETED": "用户删除成功!",
       "UNLOCKED": "用户解锁成功!",
-      "PASSWORDLESSREGISTRATIONSENT": "注册链接发送成功。"
+      "PASSWORDLESSREGISTRATIONSENT": "注册链接发送成功。",
+      "SECRETGENERATED": "秘密成功生成!",
+      "SECRETREMOVED": "秘密被成功删除!"
     },
     "MEMBERSHIPS": {
       "TITLE": "CITADEL 管理角色",
@@ -749,6 +759,56 @@
       "ACTIONS": "操作",
       "DELETE": "删除",
       "DELETESUCCESS": "失败的事件被移除。"
+    },
+    "EVENTS": {
+      "TITLE": "活动",
+      "DESCRIPTION": "该视图显示所有传入的事件",
+      "EDITOR": "编辑",
+      "EDITORID": "编者号",
+      "AGGREGATE": "总数",
+      "AGGREGATEID": "汇总的ID",
+      "AGGREGATETYPE": "骨料类型",
+      "RESOURCEOWNER": "所有者",
+      "SEQUENCE": "序列",
+      "CREATIONDATE": "创建日期",
+      "TYPE": "类型",
+      "PAYLOAD": "有效载荷",
+      "FILTERS": {
+        "BTN": "过滤器",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "按用户过滤"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "骨料类型",
+          "IDLABEL": "ID",
+          "CHECKBOX": "按总量过滤"
+        },
+        "TYPE": {
+          "TYPELABEL": "类型",
+          "CHECKBOX": "按类型过滤"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "按资源所有者过滤"
+        },
+        "SEQUENCE": {
+          "LABEL": "序列",
+          "CHECKBOX": "按顺序过滤",
+          "SORT": "分拣",
+          "ASC": "上升中",
+          "DESC": "下降"
+        },
+        "CREATIONDATE": {
+          "LABEL": "创建日期",
+          "CHECKBOX": "按创建日期过滤"
+        },
+        "OTHER": "其他",
+        "OTHERS": "其他"
+      },
+      "DIALOG": {
+        "TITLE": "事件的细节"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "管理者已删除。",

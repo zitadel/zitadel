@@ -90,6 +90,7 @@ type Phone struct {
 type Machine struct {
 	Name        string
 	Description string
+	HasSecret   bool
 }
 
 type NotifyUser struct {
@@ -275,6 +276,10 @@ var (
 	}
 	MachineDescriptionCol = Column{
 		name:  projection.MachineDescriptionCol,
+		table: machineTable,
+	}
+	MachineHasSecretCol = Column{
+		name:  projection.MachineHasSecretCol,
 		table: machineTable,
 	}
 )
@@ -747,6 +752,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
+			MachineHasSecretCol.identifier(),
 			countColumn.identifier(),
 		).
 			From(userTable.identifier()).
@@ -782,6 +788,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			machineID := sql.NullString{}
 			name := sql.NullString{}
 			description := sql.NullString{}
+			hasSecret := sql.NullBool{}
 
 			err := row.Scan(
 				&u.ID,
@@ -809,6 +816,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				&machineID,
 				&name,
 				&description,
+				&hasSecret,
 				&count,
 			)
 
@@ -839,6 +847,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				u.Machine = &Machine{
 					Name:        name.String,
 					Description: description.String,
+					HasSecret:   hasSecret.Bool,
 				}
 			}
 			return u, nil
@@ -1209,6 +1218,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
+			MachineHasSecretCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
@@ -1246,6 +1256,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				machineID := sql.NullString{}
 				name := sql.NullString{}
 				description := sql.NullString{}
+				hasSecret := sql.NullBool{}
 
 				err := rows.Scan(
 					&u.ID,
@@ -1273,6 +1284,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&machineID,
 					&name,
 					&description,
+					&hasSecret,
 					&count,
 				)
 				if err != nil {
@@ -1302,6 +1314,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					u.Machine = &Machine{
 						Name:        name.String,
 						Description: description.String,
+						HasSecret:   hasSecret.Bool,
 					}
 				}
 

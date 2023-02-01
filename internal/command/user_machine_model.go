@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -17,6 +18,8 @@ type MachineWriteModel struct {
 	Name        string
 	Description string
 	UserState   domain.UserState
+
+	ClientSecret *crypto.CryptoValue
 }
 
 func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
@@ -63,6 +66,10 @@ func (wm *MachineWriteModel) Reduce() error {
 			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
+		case *user.MachineSecretSetEvent:
+			wm.ClientSecret = e.ClientSecret
+		case *user.MachineSecretRemovedEvent:
+			wm.ClientSecret = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -81,7 +88,9 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserUnlockedType,
 			user.UserDeactivatedType,
 			user.UserReactivatedType,
-			user.UserRemovedType).
+			user.UserRemovedType,
+			user.MachineSecretSetType,
+			user.MachineSecretRemovedType).
 		Builder()
 }
 

@@ -26,4 +26,10 @@
       {{ 'PAGINATOR.NEXT' | translate }}
     </button>
   </div>
+
+  <div class="row" *ngIf="showMoreButton">
+    <button (click)="moreRequested.emit()" mat-stroked-button [disabled]="disableShowMore">
+      {{ 'PAGINATOR.MORE' | translate }}
+    </button>
+  </div>
 </div>

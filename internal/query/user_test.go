@@ -23,41 +23,42 @@ var (
 	preferredLoginNameQuery = `SELECT preferred_login_name.user_id, preferred_login_name.login_name, preferred_login_name.instance_id, preferred_login_name.user_owner_removed, preferred_login_name.policy_owner_removed, preferred_login_name.domain_owner_removed` +
 		` FROM projections.login_names2 AS preferred_login_name` +
 		` WHERE  preferred_login_name.is_primary = $1`
-	userQuery = `SELECT projections.users6.id,` +
-		` projections.users6.creation_date,` +
-		` projections.users6.change_date,` +
-		` projections.users6.resource_owner,` +
-		` projections.users6.sequence,` +
-		` projections.users6.state,` +
-		` projections.users6.type,` +
-		` projections.users6.username,` +
+	userQuery = `SELECT projections.users7.id,` +
+		` projections.users7.creation_date,` +
+		` projections.users7.change_date,` +
+		` projections.users7.resource_owner,` +
+		` projections.users7.sequence,` +
+		` projections.users7.state,` +
+		` projections.users7.type,` +
+		` projections.users7.username,` +
 		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
-		` projections.users6_humans.user_id,` +
-		` projections.users6_humans.first_name,` +
-		` projections.users6_humans.last_name,` +
-		` projections.users6_humans.nick_name,` +
-		` projections.users6_humans.display_name,` +
-		` projections.users6_humans.preferred_language,` +
-		` projections.users6_humans.gender,` +
-		` projections.users6_humans.avatar_key,` +
-		` projections.users6_humans.email,` +
-		` projections.users6_humans.is_email_verified,` +
-		` projections.users6_humans.phone,` +
-		` projections.users6_humans.is_phone_verified,` +
-		` projections.users6_machines.user_id,` +
-		` projections.users6_machines.name,` +
-		` projections.users6_machines.description,` +
+		` projections.users7_humans.user_id,` +
+		` projections.users7_humans.first_name,` +
+		` projections.users7_humans.last_name,` +
+		` projections.users7_humans.nick_name,` +
+		` projections.users7_humans.display_name,` +
+		` projections.users7_humans.preferred_language,` +
+		` projections.users7_humans.gender,` +
+		` projections.users7_humans.avatar_key,` +
+		` projections.users7_humans.email,` +
+		` projections.users7_humans.is_email_verified,` +
+		` projections.users7_humans.phone,` +
+		` projections.users7_humans.is_phone_verified,` +
+		` projections.users7_machines.user_id,` +
+		` projections.users7_machines.name,` +
+		` projections.users7_machines.description,` +
+		` projections.users7_machines.has_secret,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.users6` +
-		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id` +
-		` LEFT JOIN projections.users6_machines ON projections.users6.id = projections.users6_machines.user_id AND projections.users6.instance_id = projections.users6_machines.instance_id` +
+		` FROM projections.users7` +
+		` LEFT JOIN projections.users7_humans ON projections.users7.id = projections.users7_humans.user_id AND projections.users7.instance_id = projections.users7_humans.instance_id` +
+		` LEFT JOIN projections.users7_machines ON projections.users7.id = projections.users7_machines.user_id AND projections.users7.instance_id = projections.users7_machines.instance_id` +
 		` LEFT JOIN` +
 		` (` + loginNamesQuery + `) AS login_names` +
-		` ON login_names.user_id = projections.users6.id AND login_names.instance_id = projections.users6.instance_id` +
+		` ON login_names.user_id = projections.users7.id AND login_names.instance_id = projections.users7.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users6.id AND preferred_login_name.instance_id = projections.users6.instance_id`
+		` ON preferred_login_name.user_id = projections.users7.id AND preferred_login_name.instance_id = projections.users7.instance_id`
 	userCols = []string{
 		"id",
 		"creation_date",
@@ -86,23 +87,24 @@ var (
 		"user_id",
 		"name",
 		"description",
+		"has_secret",
 		"count",
 	}
-	profileQuery = `SELECT projections.users6.id,` +
-		` projections.users6.creation_date,` +
-		` projections.users6.change_date,` +
-		` projections.users6.resource_owner,` +
-		` projections.users6.sequence,` +
-		` projections.users6_humans.user_id,` +
-		` projections.users6_humans.first_name,` +
-		` projections.users6_humans.last_name,` +
-		` projections.users6_humans.nick_name,` +
-		` projections.users6_humans.display_name,` +
-		` projections.users6_humans.preferred_language,` +
-		` projections.users6_humans.gender,` +
-		` projections.users6_humans.avatar_key` +
-		` FROM projections.users6` +
-		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id`
+	profileQuery = `SELECT projections.users7.id,` +
+		` projections.users7.creation_date,` +
+		` projections.users7.change_date,` +
+		` projections.users7.resource_owner,` +
+		` projections.users7.sequence,` +
+		` projections.users7_humans.user_id,` +
+		` projections.users7_humans.first_name,` +
+		` projections.users7_humans.last_name,` +
+		` projections.users7_humans.nick_name,` +
+		` projections.users7_humans.display_name,` +
+		` projections.users7_humans.preferred_language,` +
+		` projections.users7_humans.gender,` +
+		` projections.users7_humans.avatar_key` +
+		` FROM projections.users7` +
+		` LEFT JOIN projections.users7_humans ON projections.users7.id = projections.users7_humans.user_id AND projections.users7.instance_id = projections.users7_humans.instance_id`
 	profileCols = []string{
 		"id",
 		"creation_date",
@@ -118,16 +120,16 @@ var (
 		"gender",
 		"avatar_key",
 	}
-	emailQuery = `SELECT projections.users6.id,` +
-		` projections.users6.creation_date,` +
-		` projections.users6.change_date,` +
-		` projections.users6.resource_owner,` +
-		` projections.users6.sequence,` +
-		` projections.users6_humans.user_id,` +
-		` projections.users6_humans.email,` +
-		` projections.users6_humans.is_email_verified` +
-		` FROM projections.users6` +
-		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id`
+	emailQuery = `SELECT projections.users7.id,` +
+		` projections.users7.creation_date,` +
+		` projections.users7.change_date,` +
+		` projections.users7.resource_owner,` +
+		` projections.users7.sequence,` +
+		` projections.users7_humans.user_id,` +
+		` projections.users7_humans.email,` +
+		` projections.users7_humans.is_email_verified` +
+		` FROM projections.users7` +
+		` LEFT JOIN projections.users7_humans ON projections.users7.id = projections.users7_humans.user_id AND projections.users7.instance_id = projections.users7_humans.instance_id`
 	emailCols = []string{
 		"id",
 		"creation_date",
@@ -138,16 +140,16 @@ var (
 		"email",
 		"is_email_verified",
 	}
-	phoneQuery = `SELECT projections.users6.id,` +
-		` projections.users6.creation_date,` +
-		` projections.users6.change_date,` +
-		` projections.users6.resource_owner,` +
-		` projections.users6.sequence,` +
-		` projections.users6_humans.user_id,` +
-		` projections.users6_humans.phone,` +
-		` projections.users6_humans.is_phone_verified` +
-		` FROM projections.users6` +
-		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id`
+	phoneQuery = `SELECT projections.users7.id,` +
+		` projections.users7.creation_date,` +
+		` projections.users7.change_date,` +
+		` projections.users7.resource_owner,` +
+		` projections.users7.sequence,` +
+		` projections.users7_humans.user_id,` +
+		` projections.users7_humans.phone,` +
+		` projections.users7_humans.is_phone_verified` +
+		` FROM projections.users7` +
+		` LEFT JOIN projections.users7_humans ON projections.users7.id = projections.users7_humans.user_id AND projections.users7.instance_id = projections.users7_humans.instance_id`
 	phoneCols = []string{
 		"id",
 		"creation_date",
@@ -158,14 +160,14 @@ var (
 		"phone",
 		"is_phone_verified",
 	}
-	userUniqueQuery = `SELECT projections.users6.id,` +
-		` projections.users6.state,` +
-		` projections.users6.username,` +
-		` projections.users6_humans.user_id,` +
-		` projections.users6_humans.email,` +
-		` projections.users6_humans.is_email_verified` +
-		` FROM projections.users6` +
-		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id`
+	userUniqueQuery = `SELECT projections.users7.id,` +
+		` projections.users7.state,` +
+		` projections.users7.username,` +
+		` projections.users7_humans.user_id,` +
+		` projections.users7_humans.email,` +
+		` projections.users7_humans.is_email_verified` +
+		` FROM projections.users7` +
+		` LEFT JOIN projections.users7_humans ON projections.users7.id = projections.users7_humans.user_id AND projections.users7.instance_id = projections.users7_humans.instance_id`
 	userUniqueCols = []string{
 		"id",
 		"state",
@@ -174,40 +176,40 @@ var (
 		"email",
 		"is_email_verified",
 	}
-	notifyUserQuery = `SELECT projections.users6.id,` +
-		` projections.users6.creation_date,` +
-		` projections.users6.change_date,` +
-		` projections.users6.resource_owner,` +
-		` projections.users6.sequence,` +
-		` projections.users6.state,` +
-		` projections.users6.type,` +
-		` projections.users6.username,` +
+	notifyUserQuery = `SELECT projections.users7.id,` +
+		` projections.users7.creation_date,` +
+		` projections.users7.change_date,` +
+		` projections.users7.resource_owner,` +
+		` projections.users7.sequence,` +
+		` projections.users7.state,` +
+		` projections.users7.type,` +
+		` projections.users7.username,` +
 		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
-		` projections.users6_humans.user_id,` +
-		` projections.users6_humans.first_name,` +
-		` projections.users6_humans.last_name,` +
-		` projections.users6_humans.nick_name,` +
-		` projections.users6_humans.display_name,` +
-		` projections.users6_humans.preferred_language,` +
-		` projections.users6_humans.gender,` +
-		` projections.users6_humans.avatar_key,` +
-		` projections.users6_notifications.user_id,` +
-		` projections.users6_notifications.last_email,` +
-		` projections.users6_notifications.verified_email,` +
-		` projections.users6_notifications.last_phone,` +
-		` projections.users6_notifications.verified_phone,` +
-		` projections.users6_notifications.password_set,` +
+		` projections.users7_humans.user_id,` +
+		` projections.users7_humans.first_name,` +
+		` projections.users7_humans.last_name,` +
+		` projections.users7_humans.nick_name,` +
+		` projections.users7_humans.display_name,` +
+		` projections.users7_humans.preferred_language,` +
+		` projections.users7_humans.gender,` +
+		` projections.users7_humans.avatar_key,` +
+		` projections.users7_notifications.user_id,` +
+		` projections.users7_notifications.last_email,` +
+		` projections.users7_notifications.verified_email,` +
+		` projections.users7_notifications.last_phone,` +
+		` projections.users7_notifications.verified_phone,` +
+		` projections.users7_notifications.password_set,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.users6` +
-		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id` +
-		` LEFT JOIN projections.users6_notifications ON projections.users6.id = projections.users6_notifications.user_id AND projections.users6.instance_id = projections.users6_notifications.instance_id` +
+		` FROM projections.users7` +
+		` LEFT JOIN projections.users7_humans ON projections.users7.id = projections.users7_humans.user_id AND projections.users7.instance_id = projections.users7_humans.instance_id` +
+		` LEFT JOIN projections.users7_notifications ON projections.users7.id = projections.users7_notifications.user_id AND projections.users7.instance_id = projections.users7_notifications.instance_id` +
 		` LEFT JOIN` +
 		` (` + loginNamesQuery + `) AS login_names` +
-		` ON login_names.user_id = projections.users6.id AND login_names.instance_id = projections.users6.instance_id` +
+		` ON login_names.user_id = projections.users7.id AND login_names.instance_id = projections.users7.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users6.id AND preferred_login_name.instance_id = projections.users6.instance_id`
+		` ON preferred_login_name.user_id = projections.users7.id AND preferred_login_name.instance_id = projections.users7.instance_id`
 	notifyUserCols = []string{
 		"id",
 		"creation_date",
@@ -237,41 +239,42 @@ var (
 		"password_set",
 		"count",
 	}
-	usersQuery = `SELECT projections.users6.id,` +
-		` projections.users6.creation_date,` +
-		` projections.users6.change_date,` +
-		` projections.users6.resource_owner,` +
-		` projections.users6.sequence,` +
-		` projections.users6.state,` +
-		` projections.users6.type,` +
-		` projections.users6.username,` +
+	usersQuery = `SELECT projections.users7.id,` +
+		` projections.users7.creation_date,` +
+		` projections.users7.change_date,` +
+		` projections.users7.resource_owner,` +
+		` projections.users7.sequence,` +
+		` projections.users7.state,` +
+		` projections.users7.type,` +
+		` projections.users7.username,` +
 		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
-		` projections.users6_humans.user_id,` +
-		` projections.users6_humans.first_name,` +
-		` projections.users6_humans.last_name,` +
-		` projections.users6_humans.nick_name,` +
-		` projections.users6_humans.display_name,` +
-		` projections.users6_humans.preferred_language,` +
-		` projections.users6_humans.gender,` +
-		` projections.users6_humans.avatar_key,` +
-		` projections.users6_humans.email,` +
-		` projections.users6_humans.is_email_verified,` +
-		` projections.users6_humans.phone,` +
-		` projections.users6_humans.is_phone_verified,` +
-		` projections.users6_machines.user_id,` +
-		` projections.users6_machines.name,` +
-		` projections.users6_machines.description,` +
+		` projections.users7_humans.user_id,` +
+		` projections.users7_humans.first_name,` +
+		` projections.users7_humans.last_name,` +
+		` projections.users7_humans.nick_name,` +
+		` projections.users7_humans.display_name,` +
+		` projections.users7_humans.preferred_language,` +
+		` projections.users7_humans.gender,` +
+		` projections.users7_humans.avatar_key,` +
+		` projections.users7_humans.email,` +
+		` projections.users7_humans.is_email_verified,` +
+		` projections.users7_humans.phone,` +
+		` projections.users7_humans.is_phone_verified,` +
+		` projections.users7_machines.user_id,` +
+		` projections.users7_machines.name,` +
+		` projections.users7_machines.description,` +
+		` projections.users7_machines.has_secret,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.users6` +
-		` LEFT JOIN projections.users6_humans ON projections.users6.id = projections.users6_humans.user_id AND projections.users6.instance_id = projections.users6_humans.instance_id` +
-		` LEFT JOIN projections.users6_machines ON projections.users6.id = projections.users6_machines.user_id AND projections.users6.instance_id = projections.users6_machines.instance_id` +
+		` FROM projections.users7` +
+		` LEFT JOIN projections.users7_humans ON projections.users7.id = projections.users7_humans.user_id AND projections.users7.instance_id = projections.users7_humans.instance_id` +
+		` LEFT JOIN projections.users7_machines ON projections.users7.id = projections.users7_machines.user_id AND projections.users7.instance_id = projections.users7_machines.instance_id` +
 		` LEFT JOIN` +
 		` (` + loginNamesQuery + `) AS login_names` +
-		` ON login_names.user_id = projections.users6.id AND login_names.instance_id = projections.users6.instance_id` +
+		` ON login_names.user_id = projections.users7.id AND login_names.instance_id = projections.users7.instance_id` +
 		` LEFT JOIN` +
 		` (` + preferredLoginNameQuery + `) AS preferred_login_name` +
-		` ON preferred_login_name.user_id = projections.users6.id AND preferred_login_name.instance_id = projections.users6.instance_id`
+		` ON preferred_login_name.user_id = projections.users7.id AND preferred_login_name.instance_id = projections.users7.instance_id`
 	usersCols = []string{
 		"id",
 		"creation_date",
@@ -300,6 +303,7 @@ var (
 		"user_id",
 		"name",
 		"description",
+		"has_secret",
 		"count",
 	}
 )
@@ -372,6 +376,7 @@ func Test_UserPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						1,
 					},
 				),
@@ -439,6 +444,7 @@ func Test_UserPrepares(t *testing.T) {
 						"id",
 						"name",
 						"description",
+						true,
 						1,
 					},
 				),
@@ -457,6 +463,7 @@ func Test_UserPrepares(t *testing.T) {
 				Machine: &Machine{
 					Name:        "name",
 					Description: "description",
+					HasSecret:   true,
 				},
 			},
 		},
@@ -1036,6 +1043,7 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 						},
 					},
 				),
@@ -1111,6 +1119,7 @@ func Test_UserPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 						},
 						{
 							"id",
@@ -1140,6 +1149,7 @@ func Test_UserPrepares(t *testing.T) {
 							"id",
 							"name",
 							"description",
+							true,
 						},
 					},
 				),
@@ -1188,6 +1198,7 @@ func Test_UserPrepares(t *testing.T) {
 						Machine: &Machine{
 							Name:        "name",
 							Description: "description",
+							HasSecret:   true,
 						},
 					},
 				},
