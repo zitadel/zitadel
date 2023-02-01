@@ -6,6 +6,7 @@ import {
 } from '@angular/material/legacy-dialog';
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
+import { formatPhone } from 'src/app/utils/formatPhone';
 
 export enum EditDialogType {
   PHONE = 1,
@@ -43,26 +44,11 @@ export class EditDialogComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isPhone) {
-      // Get country phones and set selected flag to default country
+      // Get country phone codes and set selected flag to guessed country or default country
       this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
-      const defaultCountryCallingCode = this.phoneCountry;
-      this.selected = this.countryPhoneCodes.find((code) => code.countryCode === defaultCountryCallingCode);
-
-      // Set current calling country code and format phone if possible
-      if (this.valueControl?.value) {
-        try {
-          const phoneNumber = parsePhoneNumber(this.valueControl?.value ?? '', defaultCountryCallingCode as CountryCode);
-          if (phoneNumber) {
-            const formatted = phoneNumber.formatInternational();
-            this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
-            if (formatted !== this.valueControl.value) {
-              this.valueControl.setValue(formatted);
-            }
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }
+      const phoneNumber = formatPhone(this.valueControl?.value);
+      this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
+      this.valueControl.setValue(phoneNumber.phone);
     }
   }
 

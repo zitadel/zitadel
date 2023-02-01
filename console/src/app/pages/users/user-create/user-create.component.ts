@@ -14,6 +14,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../validators';
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
+import { formatPhone } from 'src/app/utils/formatPhone';
 
 function passwordConfirmValidator(c: AbstractControl): any {
   if (!c.parent || !c) {
@@ -183,20 +184,9 @@ export class UserCreateComponent implements OnInit, OnDestroy {
 
     if (this.phone && this.phone.value) {
       // Try to parse number and format it according to country
-      try {
-        const phoneNumber = parsePhoneNumber(this.phone.value ?? '', (this.selected?.countryCode as CountryCode) || 'CH');
-        if (phoneNumber) {
-          const formatted = phoneNumber.formatInternational();
-          const country = phoneNumber.country;
-          if (country && this.phone.value && this.phone.value !== formatted) {
-            this.phone.setValue(formatted);
-            this.selected = this.countryPhoneCodes.find((code) => code.countryCode === country);
-          }
-          humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(formatted));
-        }
-      } catch (error) {
-        humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(this.phone.value));
-      }
+      const phoneNumber = formatPhone(this.phone.value);
+      this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
+      humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(phoneNumber.phone));
     }
 
     this.mgmtService

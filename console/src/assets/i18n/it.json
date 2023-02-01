@@ -405,7 +405,7 @@
       "TITLE": "Profilo",
       "EMAIL": "E-mail",
       "PHONE": "Numero di telefono",
-      "PHONE_HINT": "Utilizzare 00 o il simbolo + seguito dal prefisso del paese del chiamante, oppure selezionare il paese dall'elenco a discesa e infine inserire il numero di telefono",
+      "PHONE_HINT": "Utilizza 00 o il simbolo + seguito dal prefisso del paese, o seleziona il paese ed inserisci il numero di telefono",
       "USERNAME": "Nome utente",
       "CHANGEUSERNAME": "cambia",
       "CHANGEUSERNAME_TITLE": "Cambia nome utente",
@@ -426,7 +426,7 @@
         "DELETESUCCESS": "Rimosso con successo!",
         "CROPPERERROR": "È successo un errore durante il caricamento del tuo file. Prova un formato e una dimensione diversi, se necessario."
       },
-      "COUNTRY": "Nazione"
+      "COUNTRY": "Paese"
     },
     "MACHINE": {
       "TITLE": "Dettagli dell'utente del servizio",

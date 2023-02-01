@@ -1,15 +1,19 @@
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 
 export function formatPhone(phone: string): { phone: string; country: CountryCode } {
-  // Format phone before save (add +)
-  try {
-    const phoneNumber = parsePhoneNumber(phone ?? '', 'CH');
-    const country = phoneNumber.country ?? 'CH';
-    if (phoneNumber) {
-      return { phone: phoneNumber.formatInternational(), country };
+  const defaultCountry = 'CH';
+
+  if (phone) {
+    try {
+      const phoneNumber = parsePhoneNumber(phone, defaultCountry);
+      const country = phoneNumber.country ?? defaultCountry;
+      if (phoneNumber) {
+        return { phone: phoneNumber.formatInternational(), country };
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
   }
-  return { phone, country: 'CH' };
+
+  return { phone, country: defaultCountry };
 }
