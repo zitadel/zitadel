@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Precedente",
     "NEXT": "Avanti",
-    "COUNT": "Risultati totali"
+    "COUNT": "Risultati totali",
+    "MORE": "avanti"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Istanza",
     "ORGS": "Organizzazioni",
     "VIEWS": "Views",
+    "EVENTS": "Eventi",
     "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
     "DOMAINS": "Domini",
@@ -757,6 +759,56 @@
       "ACTIONS": "Azioni",
       "DELETE": "Rimuovi",
       "DELETESUCCESS": "Eventi falliti rimossi."
+    },
+    "EVENTS": {
+      "TITLE": "Eventi",
+      "DESCRIPTION": "Questa vista mostra tutti gli eventi in arrivo",
+      "EDITOR": "Editore",
+      "EDITORID": "ID Editore",
+      "AGGREGATE": "Aggregato",
+      "AGGREGATEID": "ID aggregato",
+      "AGGREGATETYPE": "Tipo aggregato",
+      "RESOURCEOWNER": "Resouce owner",
+      "SEQUENCE": "Sequenza",
+      "CREATIONDATE": "Creato",
+      "TYPE": "Tipo",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtra",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "filtra per editore"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "filtra per aggregato"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtra per tipo"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filter per Resource Owner"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequence",
+          "CHECKBOX": "Filter per sequenza",
+          "SORT": "",
+          "ASC": "Ascending",
+          "DESC": "Descending"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Creation Date",
+          "CHECKBOX": "Filter by Creation Date"
+        },
+        "OTHER": "altro",
+        "OTHERS": "altri"
+      },
+      "DIALOG": {
+        "TITLE": "Dettaglio dell'evento"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Manager rimosso.",

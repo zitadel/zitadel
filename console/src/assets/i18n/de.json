@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
-    "COUNT": "Ergebnisse"
+    "COUNT": "Ergebnisse",
+    "MORE": "mehr"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Instanz",
     "ORGS": "Organisationen",
     "VIEWS": "Views",
+    "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organisation",
     "DOMAINS": "Domains",
@@ -757,6 +759,56 @@
       "ACTIONS": "Aktionen",
       "DELETE": "Entfernen",
       "DELETESUCCESS": "Gescheiterte Events entfernt."
+    },
+    "EVENTS": {
+      "TITLE": "Events",
+      "DESCRIPTION": "Diese Ansicht zeigt alle vorhandenen Events.",
+      "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "Aggregate",
+      "AGGREGATEID": "Aggregate ID",
+      "AGGREGATETYPE": "Aggregate Typ",
+      "RESOURCEOWNER": "Resource Owner",
+      "SEQUENCE": "Sequenz",
+      "CREATIONDATE": "Erstelldatum",
+      "TYPE": "Typ",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Nach Editor filtern"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Typ",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Nach Aggregate filtern"
+        },
+        "TYPE": {
+          "TYPELABEL": "Typ",
+          "CHECKBOX": "Nach Typ filtern"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Nach Resource Owner filtern"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequenz",
+          "CHECKBOX": "Nach Sequenz filtern",
+          "SORT": "Sortierung",
+          "ASC": "aufsteigend",
+          "DESC": "absteigend"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Erstelldatum",
+          "CHECKBOX": "Nach Erstelldatum filtern"
+        },
+        "OTHER": "weiterer",
+        "OTHERS": "weitere"
+      },
+      "DIALOG": {
+        "TITLE": "Event Detail"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Manager entfernt.",

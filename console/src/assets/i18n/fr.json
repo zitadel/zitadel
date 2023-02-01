@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Précédent",
     "NEXT": "Suivant",
-    "COUNT": "Résultats totaux"
+    "COUNT": "Résultats totaux",
+    "MORE": "plus"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Instance",
     "ORGS": "Organisations",
     "VIEWS": "Vues",
+    "EVENTS": "Événements",
     "FAILEDEVENTS": "Événements échoués",
     "ORGANIZATION": "Organisation",
     "DOMAINS": "Domaines",
@@ -757,6 +759,56 @@
       "ACTIONS": "Actions",
       "DELETE": "Supprimer",
       "DELETESUCCESS": "Événements échoués supprimés."
+    },
+    "EVENTS": {
+      "TITLE": "Événements",
+      "DESCRIPTION": "Cette vue montre les événements de ZITADEL.",
+      "EDITOR": "Éditeur",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "agrégat",
+      "AGGREGATEID": "agrégat ID",
+      "AGGREGATETYPE": "type d'agrégat",
+      "RESOURCEOWNER": "Propriétaire",
+      "SEQUENCE": "séquence",
+      "CREATIONDATE": "Créé à",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtre",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer par éditeur"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer par agrégat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtrer par type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrer par propriétaire"
+        },
+        "SEQUENCE": {
+          "LABEL": "séquence",
+          "CHECKBOX": "Filtrer par séquence",
+          "SORT": "Triage",
+          "ASC": "Ascendant",
+          "DESC": "Descendant"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Date de création",
+          "CHECKBOX": "Filtrer par date de création"
+        },
+        "OTHER": "autre",
+        "OTHERS": "autres"
+      },
+      "DIALOG": {
+        "TITLE": "Détail de l'événement"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Gestionnaire supprimé.",
