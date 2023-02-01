@@ -764,6 +764,7 @@
       "TITLE": "Events",
       "DESCRIPTION": "This view shows all occured events.",
       "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
       "AGGREGATE": "Aggregate",
       "AGGREGATEID": "Aggregate ID",
       "AGGREGATETYPE": "Aggregate Type",
@@ -776,7 +777,7 @@
         "BTN": "Filter",
         "USER": {
           "IDLABEL": "ID",
-          "CHECKBOX": "Filter by User"
+          "CHECKBOX": "Filter by Editor"
         },
         "AGGREGATE": {
           "TYPELABEL": "Aggregate Type",

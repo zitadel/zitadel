@@ -764,6 +764,7 @@
       "TITLE": "Événements",
       "DESCRIPTION": "Cette vue montre les événements de ZITADEL.",
       "EDITOR": "Éditeur",
+      "EDITORID": "Editor ID",
       "AGGREGATE": "agrégat",
       "AGGREGATEID": "agrégat ID",
       "AGGREGATETYPE": "type d'agrégat",

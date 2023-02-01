@@ -762,8 +762,9 @@
     },
     "EVENTS": {
       "TITLE": "Events",
-      "DESCRIPTION": "Diese Ansicht zeigt alle eingetroffenen Events.",
+      "DESCRIPTION": "Diese Ansicht zeigt alle vorhandenen Events.",
       "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
       "AGGREGATE": "Aggregate",
       "AGGREGATEID": "Aggregate ID",
       "AGGREGATETYPE": "Aggregate Typ",

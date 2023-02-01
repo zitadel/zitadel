@@ -764,6 +764,7 @@
       "TITLE": "活动",
       "DESCRIPTION": "该视图显示所有传入的事件",
       "EDITOR": "编辑",
+      "EDITORID": "编者号",
       "AGGREGATE": "总数",
       "AGGREGATEID": "汇总的ID",
       "AGGREGATETYPE": "骨料类型",

@@ -35,6 +35,11 @@
       <span class="state aggregate-type">{{ event.aggregate.type.localized.localizedMessage }}</span>
     </div>
 
+    <div class="data-row" *ngIf="event && event.editor?.userId">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.EDITORID' | translate }}</span>
+      <span>{{ event.editor?.userId }}</span>
+    </div>
+
     <div class="data-row" *ngIf="event && event.editor?.displayName">
       <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.EDITOR' | translate }}</span>
       <span>{{ event.editor?.displayName }}</span>

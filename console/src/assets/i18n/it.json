@@ -764,6 +764,7 @@
       "TITLE": "Eventi",
       "DESCRIPTION": "Questa vista mostra tutti gli eventi in arrivo",
       "EDITOR": "Editore",
+      "EDITORID": "ID Editore",
       "AGGREGATE": "Aggregato",
       "AGGREGATEID": "ID aggregato",
       "AGGREGATETYPE": "Tipo aggregato",

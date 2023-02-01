@@ -13,6 +13,7 @@
   .data-row {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 
     .label {
       font-size: 12px;
@@ -21,6 +22,11 @@
 
     .aggregate-type {
       align-self: flex-start;
+    }
+
+    span {
+      text-overflow: ellipsis;
+      text-overflow: ellipsis;
     }
   }
 }

@@ -39,10 +39,7 @@
                 <i class="las la-robot"></i>
               </cnsl-avatar> </ng-template
             > -->
-              <span class="id" *ngIf="editor.userId">{{ editor.userId }}</span>
-              <span class="name" *ngIf="editor.displayName && editor.userId !== editor.displayName">{{
-                editor.displayName
-              }}</span>
+              <span class="name" *ngIf="editor.displayName">{{ editor.displayName }}</span>
               <span class="state" *ngIf="editor.service">{{ editor.service }}</span>
             </div>
           </ng-container>
