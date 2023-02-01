@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Previous",
     "NEXT": "Next",
-    "COUNT": "Total Results"
+    "COUNT": "Total Results",
+    "MORE": "More"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Instance",
     "ORGS": "Organizations",
     "VIEWS": "Views",
+    "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
     "DOMAINS": "Domains",
@@ -757,6 +759,56 @@
       "ACTIONS": "Actions",
       "DELETE": "Remove",
       "DELETESUCCESS": "Failed events removed."
+    },
+    "EVENTS": {
+      "TITLE": "Events",
+      "DESCRIPTION": "This view shows all occured events.",
+      "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "Aggregate",
+      "AGGREGATEID": "Aggregate ID",
+      "AGGREGATETYPE": "Aggregate Type",
+      "RESOURCEOWNER": "Resource Owner",
+      "SEQUENCE": "Sequence",
+      "CREATIONDATE": "Created At",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by Editor"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by Aggregate"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filter by Type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filter by Resource Owner"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequence",
+          "CHECKBOX": "Filter by Sequence",
+          "SORT": "Sorting",
+          "ASC": "Ascending",
+          "DESC": "Descending"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Creation Date",
+          "CHECKBOX": "Filter by Creation Date"
+        },
+        "OTHER": "other",
+        "OTHERS": "others"
+      },
+      "DIALOG": {
+        "TITLE": "Event Detail"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Manager removed.",
