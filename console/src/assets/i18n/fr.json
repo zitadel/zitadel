@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Précédent",
     "NEXT": "Suivant",
-    "COUNT": "Résultats totaux"
+    "COUNT": "Résultats totaux",
+    "MORE": "plus"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Instance",
     "ORGS": "Organisations",
     "VIEWS": "Vues",
+    "EVENTS": "Événements",
     "FAILEDEVENTS": "Événements échoués",
     "ORGANIZATION": "Organisation",
     "DOMAINS": "Domaines",
@@ -240,6 +242,8 @@
       "STATE": "Statut",
       "DELETE": "Supprimer l'utilisateur",
       "UNLOCK": "Déverrouiller l'utilisateur",
+      "GENERATESECRET": "Générer Client Secret",
+      "REMOVESECRET": "Supprimer Client Secret",
       "LOCKEDDESCRIPTION": "Cet utilisateur a été verrouillé pour avoir dépassé le nombre maximum de tentatives de connexion et doit être déverrouillé pour être à nouveau utilisé.",
       "DELETEACCOUNT": "Supprimer le compte",
       "DELETEACCOUNT_DESC": "Si vous effectuez cette action, vous serez déconnecté et n'aurez plus accès à votre compte. Cette action n'est pas réversible, veuillez donc continuer avec prudence.",
@@ -264,6 +268,10 @@
       "TITLE": "Envoyer une notification par e-mail",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour envoyer une notification à l'adresse e-mail actuelle ou modifier l'adresse e-mail dans le champ.",
       "NEWEMAIL": "Nouvelle adresse e-mail"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Conservez votre secret client dans un endroit sûr car il disparaîtra une fois la boîte de dialogue fermée."
     },
     "TABLE": {
       "DEACTIVATE": "Désactiver",
@@ -591,7 +599,9 @@
       "MACHINEADDED": "Utilisateur de service créé !",
       "DELETED": "Utilisateur supprimé avec succès !",
       "UNLOCKED": "Utilisateur déverrouillé avec succès !",
-      "PASSWORDLESSREGISTRATIONSENT": "Lien d'enregistrement envoyé avec succès."
+      "PASSWORDLESSREGISTRATIONSENT": "Lien d'enregistrement envoyé avec succès.",
+      "SECRETGENERATED": "Secret généré avec succès !",
+      "SECRETREMOVED": "Secret supprimé avec succès !"
     },
     "MEMBERSHIPS": {
       "TITLE": "Rôles du gestionnaire ZITADEL",
@@ -751,6 +761,56 @@
       "ACTIONS": "Actions",
       "DELETE": "Supprimer",
       "DELETESUCCESS": "Événements échoués supprimés."
+    },
+    "EVENTS": {
+      "TITLE": "Événements",
+      "DESCRIPTION": "Cette vue montre les événements de ZITADEL.",
+      "EDITOR": "Éditeur",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "agrégat",
+      "AGGREGATEID": "agrégat ID",
+      "AGGREGATETYPE": "type d'agrégat",
+      "RESOURCEOWNER": "Propriétaire",
+      "SEQUENCE": "séquence",
+      "CREATIONDATE": "Créé à",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtre",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer par éditeur"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer par agrégat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtrer par type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrer par propriétaire"
+        },
+        "SEQUENCE": {
+          "LABEL": "séquence",
+          "CHECKBOX": "Filtrer par séquence",
+          "SORT": "Triage",
+          "ASC": "Ascendant",
+          "DESC": "Descendant"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Date de création",
+          "CHECKBOX": "Filtrer par date de création"
+        },
+        "OTHER": "autre",
+        "OTHERS": "autres"
+      },
+      "DIALOG": {
+        "TITLE": "Détail de l'événement"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Gestionnaire supprimé.",

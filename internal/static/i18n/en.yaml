@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: Machine key not found
         AlreadyExisting: Machine key already existing
+      Secret:
+        NotExisting: Secret doesn't exist
+        Invalid: Secret is invalid
+        CouldNotGenerate: Secret could not be generated
     PAT:
       NotFound: Personal Access Token not found
     NotHuman: The User must be personal
@@ -477,6 +481,12 @@ EventTypes:
       key:
         added: Key added
         removed: Key removed
+      secret:
+        set: Secret set
+        removed: Secret removed
+        check:
+          succeeded: Secret check succeeded
+          failed: Secret check failed
     human:
       added: Person added
       selfregistered: Person registered himself
