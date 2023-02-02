@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress';
 import { Client } from "pg";
 import { createServer } from 'http'
+import { ZITADELWebhookEvent } from 'cypress/support/types';
 
 const jwt = require('jsonwebtoken');
 
@@ -34,6 +35,8 @@ YkTaa1AFLstnf348ZjuvBN3USUYZo3X3mxnS+uluVuRSGwIKsN0a
 
 let tokensCache = new Map<string,string>()
 
+let webhookEvents = new Array<ZITADELWebhookEvent>()
+
 export default defineConfig({
   reporter: 'mochawesome',
 
@@ -50,12 +53,16 @@ export default defineConfig({
   env: {
     ORGANIZATION: process.env.CYPRESS_ORGANIZATION || 'zitadel',
     BACKEND_URL: backendUrl(),
+    WEBHOOK_HANDLER_PORT: webhookHandlerPort(),
+    WEBHOOK_HANDLER_HOST: process.env.CYPRESS_WEBHOOK_HANDLER_HOST || 'localhost',
   },
 
   e2e: {
     baseUrl: baseUrl(),
     experimentalRunAllSpecs: true,
     setupNodeEvents(on, config) {
+
+      startWebhookEventHandler()
 
       on('task', {
         safetoken({key, token}) {
@@ -76,7 +83,7 @@ export default defineConfig({
             "exp": exp
           }, Buffer.from(privateKey, 'ascii').toString('ascii'), { algorithm: 'RS256' })
         },
-        runSQL(statement: string){
+        async runSQL(statement: string) {
           const client = new Client({
             connectionString: process.env.CYPRESS_DATABASE_CONNECTION_URL || 'postgresql://root@localhost:26257/zitadel'
           });
@@ -89,37 +96,12 @@ export default defineConfig({
             })
           })
         },
-        receive(){
-          return new Promise<any>((resolve) => {
-            const port = 8900
-            const server = createServer(requestListener);
-              server.listen(port, () => {
-                console.log(`Server is running on http://:${port}`);
-            });
-
-            function requestListener (req, res) {
-
-              const ret = {
-                url: req.url,
-                data: "",
-              }
-
-              const chunks = [];
-              let data: Buffer = null;
-              req.on("data", (chunk) => {
-                chunks.push(chunk);
-              });
-              req.on("end", () => {
-                ret.data = Buffer.concat(chunks).toString();
-              });
-
-              res.writeHead(200);
-              res.end()
-              server.close()
-              console.log(`Server is closed`);
-              resolve(ret);
-            }
-          });
+        resetWebhookEvents() {
+          webhookEvents = []
+          return null
+        },
+        handledWebhookEvents(){
+          return webhookEvents
         }
       })
     },
@@ -134,3 +116,26 @@ function backendUrl(){
   return process.env.CYPRESS_BACKEND_URL || baseUrl().replace("/ui/console", "")
 }
 
+function webhookHandlerPort() {
+  return process.env.CYPRESS_WEBHOOK_HANDLER_PORT || '8900'
+}
+
+function startWebhookEventHandler() {
+  const port = webhookHandlerPort()
+  const server = createServer((req, res) => {
+    const chunks = [];
+    req.on("data", (chunk) => {
+      chunks.push(chunk);
+    });
+    req.on("end", () => {
+      webhookEvents.push(JSON.parse(Buffer.concat(chunks).toString()));
+    });
+
+    res.writeHead(200);
+    res.end()
+  });
+
+  server.listen(port, () => {
+    console.log(`Server is running on http://:${port}`);
+  });
+}

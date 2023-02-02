@@ -1,5 +1,4 @@
 import { Context } from 'support/commands';
-import { SystemAPI } from './types';
 
 export enum Unit {
   Unimplemented,
@@ -8,19 +7,26 @@ export enum Unit {
 }
 
 interface notification {
-  percent: 100;
+  percent: number;
   repeat?: boolean;
   callUrl: string;
 }
 
 export function addQuota(
   ctx: Context,
-  failOnStatusCode = true,
   unit: Unit = Unit.AuthenticatedRequests,
-  amount: number = 25000,
-  intervalSeconds: string = `${30 * 24 * 60 * 60}s`,
-  limit: boolean = true,
+  limit: boolean,
+  amount: number,
   notifications?: Array<notification>,
+  from: Date = (() => {
+    const date = new Date()
+    date.setMonth(0, 1)
+    date.setMinutes(0,0,0)
+    // default to start of current year
+    return date
+  })(),
+  intervalSeconds: string = `${315_576_000_000}s`, // proto max duration is 1000 years
+  failOnStatusCode = true,
 ): Cypress.Chainable<Cypress.Response<any>> {
   return cy.request({
     method: 'POST',
@@ -33,6 +39,7 @@ export function addQuota(
       amount: amount,
       interval: intervalSeconds,
       limit: limit,
+      from: from,
       notifications: notifications,
     },
     failOnStatusCode: failOnStatusCode,
@@ -41,13 +48,14 @@ export function addQuota(
 
 export function ensureQuotaIsAdded(
   ctx: Context,
-  unit?: Unit,
+  unit: Unit,
+  limit: boolean,
   amount?: number,
-  intervalSeconds?: string,
-  limit?: boolean,
   notifications?: Array<notification>,
+  from?: Date,
+  intervalSeconds?: string,
 ): Cypress.Chainable<null> {
-  return addQuota(ctx, false, unit, amount, intervalSeconds, limit, notifications).then((res) => {
+  return addQuota(ctx, unit, limit, amount, notifications, from, intervalSeconds, false).then((res) => {
     if (!res.isOkStatusCode) {
       expect(res.status).to.equal(409);
     }
@@ -57,8 +65,8 @@ export function ensureQuotaIsAdded(
 
 export function removeQuota(
   ctx: Context,
+  unit: Unit,
   failOnStatusCode = true,
-  unit: Unit = Unit.AuthenticatedRequests,
 ): Cypress.Chainable<Cypress.Response<any>> {
   return cy.request({
     method: 'DELETE',
@@ -71,7 +79,7 @@ export function removeQuota(
 }
 
 export function ensureQuotaIsRemoved(ctx: Context, unit?: Unit): Cypress.Chainable<null> {
-  return removeQuota(ctx, false, unit).then((res) => {
+  return removeQuota(ctx, unit, false).then((res) => {
     if (!res.isOkStatusCode) {
       expect(res.status).to.equal(404);
     }
