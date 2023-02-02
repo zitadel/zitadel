@@ -413,6 +413,7 @@
       "TITLE": "信息",
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
+      "PHONE_HINT": "使用 00 或 + 符号后跟呼叫者的国家代码，或从下拉列表中选择国家，最后输入电话号码",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",
@@ -432,7 +433,8 @@
         "PREVIEW": "预览",
         "DELETESUCCESS": "删除成功！",
         "CROPPERERROR": "上传文件时出错。如有必要，请尝试不同的格式和大小。"
-      }
+      },
+      "COUNTRY": "国家"
     },
     "MACHINE": {
       "TITLE": "服务用户详情",
