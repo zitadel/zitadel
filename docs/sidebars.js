@@ -140,6 +140,7 @@ module.exports = {
           ],
         },
         "guides/integrate/logout",
+        "guides/integrate/event-api",
       ],
     },
     {
