@@ -14,9 +14,11 @@ import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from '..
 
 describe('permissions', () => {
   beforeEach(() => {
-    cy.context().as('ctx').then(ctx => {
-      ensureDomainPolicy(ctx.api, false, true, false);
-    });
+    cy.context()
+      .as('ctx')
+      .then((ctx) => {
+        ensureDomainPolicy(ctx.api, false, true, false);
+      });
   });
 
   describe('management', () => {
@@ -27,7 +29,7 @@ describe('permissions', () => {
       beforeMutate: (ctx: Context) => void,
       navigate: () => void,
     ) {
-      beforeEach(()=> {
+      beforeEach(() => {
         cy.get<Context>('@ctx').then((ctx) => {
           ensureUserDoesntExist(ctx.api, testManagerUsername);
           ensureHumanUserExists(ctx.api, testManagerUsername);
@@ -35,7 +37,7 @@ describe('permissions', () => {
       });
 
       describe('create authorization', () => {
-        beforeEach(()=> {
+        beforeEach(() => {
           cy.get<Context>('@ctx').then((ctx) => {
             beforeCreate(ctx);
             navigate();
@@ -124,7 +126,7 @@ describe('permissions', () => {
           });
         });
 
-        const visitOwnedProject = ()=> {
+        const visitOwnedProject = () => {
           cy.get<number>('@projectId').then((projectId) => {
             cy.visit(`/projects/${projectId}`);
           });
@@ -161,7 +163,7 @@ describe('permissions', () => {
         describe('roles', () => {
           const testRoleName = 'e2eroleundertestname';
 
-          beforeEach(()=> {
+          beforeEach(() => {
             cy.get<Context>('@ctx').then((ctx) => {
               cy.get<number>('@projectId').then((projectId) => {
                 ensureProjectResourceDoesntExist(ctx.api, projectId, Roles, testRoleName);
@@ -185,7 +187,7 @@ describe('permissions', () => {
       });
 
       describe('granted projects', () => {
-        beforeEach(()=> {
+        beforeEach(() => {
           cy.get<Context>('@ctx').then((ctx) => {
             ensureOrgExists(ctx.api, 'e2eforeignorg').then((foreignOrgId) => {
               ensureProjectExists(ctx.api, 'e2eprojectgrants', foreignOrgId)

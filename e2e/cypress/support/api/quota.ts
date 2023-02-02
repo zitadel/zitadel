@@ -19,11 +19,11 @@ export function addQuota(
   amount: number,
   notifications?: Array<notification>,
   from: Date = (() => {
-    const date = new Date()
-    date.setMonth(0, 1)
-    date.setMinutes(0,0,0)
+    const date = new Date();
+    date.setMonth(0, 1);
+    date.setMinutes(0, 0, 0);
     // default to start of current year
-    return date
+    return date;
   })(),
   intervalSeconds: string = `${315_576_000_000}s`, // proto max duration is 1000 years
   failOnStatusCode = true,
@@ -63,11 +63,7 @@ export function ensureQuotaIsAdded(
   });
 }
 
-export function removeQuota(
-  ctx: Context,
-  unit: Unit,
-  failOnStatusCode = true,
-): Cypress.Chainable<Cypress.Response<any>> {
+export function removeQuota(ctx: Context, unit: Unit, failOnStatusCode = true): Cypress.Chainable<Cypress.Response<any>> {
   return cy.request({
     method: 'DELETE',
     url: `${ctx.system.baseURL}/instances/${ctx.instanceId}/quotas/${unit}`,

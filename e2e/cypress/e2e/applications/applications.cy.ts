@@ -14,8 +14,8 @@ describe('applications', () => {
       });
   });
 
-  describe('add app', ()=> {
-    beforeEach(`ensure it doesn't exist already`, ()=> {
+  describe('add app', () => {
+    beforeEach(`ensure it doesn't exist already`, () => {
       cy.get<Context>('@ctx').then((ctx) => {
         cy.get<number>('@projectId').then((projectId) => {
           ensureProjectResourceDoesntExist(ctx.api, projectId, Apps, testAppName);

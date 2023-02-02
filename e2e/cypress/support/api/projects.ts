@@ -41,7 +41,8 @@ export function ensureProjectResourceDoesntExist(
     api,
     `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/_search`,
     (resource: Entity) => resource[resourceType.compareProperty] === resourceName,
-    (resource: Entity) => `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`,
+    (resource: Entity) =>
+      `${api.mgmtBaseURL}/projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`,
     orgId,
   );
 }
