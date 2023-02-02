@@ -46,7 +46,7 @@ services:
     image: cypress/included:12.2.0
     environment:
       CYPRESS_DATABASE_CONNECION_URL: postgresql://root@db:26257/zitadel
-      CYPRESS_DATABASE_CONNECION_URL: postgresql://root@db:26257/zitadel
+      CYPRESS_WEBHOOK_HANDLER_HOST: e2e
     depends_on:
       zitadel:
         condition: 'service_started'
