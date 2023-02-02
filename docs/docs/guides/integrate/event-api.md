@@ -103,16 +103,17 @@ curl --request POST \
   --data '{
 	"asc": false,
 	"limit": 1000,
-	"creation_date": "2022-02-01T10:00:00.000000Z",
+	"creation_date": "2023-02-01T10:00:00.000000Z",
 	"aggregate_types": [
 		"user"
 	]
 }'
 ```
 
-## Example: Get successful logins
+## Example: Find out when user have been authenticated
 
-The following example shows you how you could use the events search to get the successful login attempts.
+The following example shows you how you could use the events search to get all events where a token has been created.
+Also we include the refresh tokens in this example to know when the user has become a new token.
 
 ```bash
 curl --request POST \
@@ -123,7 +124,8 @@ curl --request POST \
 	"asc": true,
 	"limit": 1000,
 	"event_types": [
-		"user.human.login.succeeded"
+		"user.token.added",
+		"user.refresh.token.added
 	]
 }'
 ```
