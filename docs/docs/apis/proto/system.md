@@ -612,6 +612,17 @@ This is an empty response
 
 
 
+### GetUsageRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
 ### HealthzRequest
 This is an empty request
 

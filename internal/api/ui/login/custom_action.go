@@ -175,7 +175,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 			apiFields,
 			a.Script,
 			a.Name,
-			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
+			append(actions.ActionToOptions(a), actions.WithHTTP(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
