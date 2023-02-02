@@ -6,6 +6,7 @@ ZITADEL leverages the power of eventsourcing, meaning every action and change wi
 To provide you with greater flexibility and access to these events, ZITADEL has introduced an Event API. 
 This API allows you to easily retrieve and utilize the events generated within the system, enabling you to integrate them into your own system and respond to specific events as they occur.
 
+If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](../../concepts/eventstore/overview).
 ## Request Events
 
 Call the [ListEvents](../../apis/proto/admin#listevents) enpoint in the Administration API to get all the events you need.
