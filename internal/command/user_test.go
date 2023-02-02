@@ -1786,6 +1786,7 @@ func TestExistsUser(t *testing.T) {
 							"name",
 							"description",
 							true,
+							domain.AccessTokenTypeBearer,
 						),
 					}, nil
 				},
@@ -1807,6 +1808,7 @@ func TestExistsUser(t *testing.T) {
 							"name",
 							"description",
 							true,
+							domain.AccessTokenTypeBearer,
 						),
 						user.NewUserRemovedEvent(
 							context.Background(),

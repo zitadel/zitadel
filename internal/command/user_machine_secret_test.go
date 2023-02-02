@@ -104,6 +104,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.AccessTokenTypeBearer,
 							),
 						),
 					),
@@ -244,6 +245,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.AccessTokenTypeBearer,
 							),
 						),
 					),
@@ -271,6 +273,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.AccessTokenTypeBearer,
 							),
 						),
 						eventFromEventPusher(
@@ -409,6 +412,7 @@ func TestCommandSide_VerifyMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.AccessTokenTypeBearer,
 							),
 						),
 					),
@@ -436,6 +440,7 @@ func TestCommandSide_VerifyMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.AccessTokenTypeBearer,
 							),
 						),
 						eventFromEventPusher(
@@ -486,6 +491,7 @@ func TestCommandSide_VerifyMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.AccessTokenTypeBearer,
 							),
 						),
 						eventFromEventPusher(

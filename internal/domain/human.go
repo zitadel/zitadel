@@ -60,6 +60,13 @@ func (f Gender) Specified() bool {
 	return f > GenderUnspecified && f < genderCount
 }
 
+type AccessTokenType int32
+
+const (
+	AccessTokenTypeBearer AccessTokenType = iota
+	AccessTokenTypeJWT
+)
+
 func (u *Human) IsValid() bool {
 	return u.Username != "" && u.Profile != nil && u.Profile.IsValid() && u.Email != nil && u.Email.IsValid() && u.Phone == nil || (u.Phone != nil && u.Phone.PhoneNumber != "" && u.Phone.IsValid())
 }
