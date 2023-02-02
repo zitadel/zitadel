@@ -396,7 +396,13 @@ func NewHumanSignedOutEvent(
 }
 
 func HumanSignedOutEventMapper(event *repository.Event) (eventstore.Event, error) {
-	return &HumanSignedOutEvent{
+	signedOut := &HumanSignedOutEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+	err := json.Unmarshal(event.Data, signedOut)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-WFS3g", "unable to unmarshal human signed out")
+	}
+
+	return signedOut, nil
 }

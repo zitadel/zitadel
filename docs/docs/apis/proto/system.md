@@ -96,6 +96,19 @@ This might take some time
     DELETE: /instances/{instance_id}
 
 
+### ListIAMMembers
+
+> **rpc** ListIAMMembers([ListIAMMembersRequest](#listiammembersrequest))
+[ListIAMMembersResponse](#listiammembersresponse)
+
+Returns all instance members matching the request
+all queries need to match (ANDed)
+
+
+
+    POST: /instances/{instance_id}/members/_search
+
+
 ### ExistsDomain
 
 > **rpc** ExistsDomain([ExistsDomainRequest](#existsdomainrequest))
@@ -651,6 +664,31 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | result | repeated FailedEvent | TODO: list details |  |
+
+
+
+
+### ListIAMMembersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| instance_id |  string | - |  |
+| queries | repeated zitadel.member.v1.SearchQuery | - |  |
+
+
+
+
+### ListIAMMembersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.member.v1.Member | - |  |
 
 
 

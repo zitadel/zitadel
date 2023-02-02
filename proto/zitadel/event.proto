@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+import "zitadel/message.proto";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.event.v1;
+
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/event";
+
+message Event {
+    Editor editor = 1;
+    Aggregate aggregate = 2;
+    uint64 sequence = 3;
+    // The timestamp the event occurred
+    google.protobuf.Timestamp creation_date = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2019-04-01T08:45:00.000000Z\"";
+        }
+    ];
+    google.protobuf.Struct payload = 5;
+    EventType type = 6;
+}
+
+message Editor {
+    string user_id = 1;
+    string display_name = 2;
+    string service = 3;
+}
+
+message Aggregate {
+    string id = 1;
+    AggregateType type = 2;
+    string resource_owner = 3;
+}
+
+message EventType {
+    string type = 1;
+    zitadel.v1.LocalizedMessage localized = 2;
+}
+
+message AggregateType {
+    string type = 1;
+    zitadel.v1.LocalizedMessage localized = 2;
+}

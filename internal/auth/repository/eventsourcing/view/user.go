@@ -53,7 +53,7 @@ func (v *View) UserByLoginNameAndResourceOwner(loginName, resourceOwner, instanc
 }
 
 func (v *View) UserByEmail(email, instanceID string) (*model.UserView, error) {
-	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEquals)
+	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEqualsIgnoreCase)
 	if err != nil {
 		return nil, err
 	}

@@ -32,7 +32,7 @@
           position: absolute;
           display: flex;
           flex-wrap: wrap;
-          opacity: 0;
+          visibility: hidden;
           margin: 0 -0.25rem;
           transition: all 0.2s ease;
 
@@ -84,7 +84,7 @@
 
         &.cnsl-focused {
           .edit-text-chips {
-            opacity: 1;
+            visibility: visible;
             cursor: copy;
           }
         }

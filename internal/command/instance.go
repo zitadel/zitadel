@@ -82,6 +82,9 @@ type InstanceSetup struct {
 		SecondFactorCheckLifetime  time.Duration
 		MultiFactorCheckLifetime   time.Duration
 	}
+	NotificationPolicy struct {
+		PasswordChange bool
+	}
 	PrivacyPolicy struct {
 		TOSLink     string
 		PrivacyLink string
@@ -240,6 +243,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
 		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(

@@ -36,7 +36,7 @@
   <div class="contact-method-row">
     <div class="left">
       <span class="label cnsl-secondary-text">{{ 'USER.PHONE' | translate }}</span>
-      <span class="name">{{ human.phone?.phone ? human.phone?.phone : ('USER.PHONEEMPTY' | translate) }}</span>
+      <cnsl-phone-detail [phone]="human.phone?.phone"></cnsl-phone-detail>
       <span *ngIf="human.phone?.isPhoneVerified" class="contact-state verified">{{ 'USER.PHONEVERIFIED' | translate }}</span>
       <div *ngIf="human.phone?.phone && !human.phone?.isPhoneVerified" class="block">
         <span class="contact-state notverified">{{ 'USER.NOTVERIFIED' | translate }}</span>

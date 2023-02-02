@@ -44,7 +44,6 @@ export default defineConfig({
     json: true,
   },
 
-  chromeWebSecurity: false,
   trashAssetsBeforeRuns: false,
   defaultCommandTimeout: 10000,
 

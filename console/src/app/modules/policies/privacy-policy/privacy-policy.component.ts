@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {

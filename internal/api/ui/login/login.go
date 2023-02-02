@@ -74,7 +74,6 @@ func CreateLogin(config Config,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
 ) (*Login, error) {
-
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
 		samlAuthCallbackURL: samlAuthCallbackURL,
