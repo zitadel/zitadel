@@ -413,6 +413,7 @@
       "TITLE": "Profil",
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
+      "PHONE_HINT": "Verwenden Sie 00 oder das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wählen Sie das Land aus der Dropdown-Liste aus und geben anschließend die Telefonnummer ein",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -432,7 +433,8 @@
         "PREVIEW": "Vorschau",
         "DELETESUCCESS": "Erfolgreich gelöscht!",
         "CROPPERERROR": "Ein Fehler beim hochladen Ihrer Datei ist fehlgeschlagen. Versuchen Sie es mit ggf mit einem anderen Format und Grösse."
-      }
+      },
+      "COUNTRY": "Land"
     },
     "MACHINE": {
       "TITLE": "Details Service-Benutzer",
