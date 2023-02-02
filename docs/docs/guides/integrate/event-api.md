@@ -88,7 +88,7 @@ The following example shows you the aggregate type for the user.
 ...
 ```
 
-## Example: Get Username changes for the last day
+## Example: Get user changes since a specific date
 
 Assuming you use ZITADEL as your single source of truth for your user data.
 Now you like to react to changes on the users to update data in other your other systems.
