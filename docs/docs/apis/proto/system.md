@@ -357,10 +357,10 @@ Removes a quota
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| unit |  Unit | - |  |
-| from |  google.protobuf.Timestamp | - |  |
-| interval |  google.protobuf.Duration | - |  |
-| amount |  uint64 | - |  |
+| unit |  Unit | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| from |  google.protobuf.Timestamp | - | timestamp.required: true<br />  |
+| interval |  google.protobuf.Duration | - | duration.required: true<br />  |
+| amount |  uint64 | - | uint64.gt: 0<br />  |
 | limit |  bool | - |  |
 | notifications | repeated AddQuotaRequest.Notification | - |  |
 
@@ -373,9 +373,9 @@ Removes a quota
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| percent |  uint32 | - |  |
+| percent |  uint32 | - | uint32.gt: 0<br />  |
 | repeat |  bool | - |  |
-| call_url |  string | - |  |
+| call_url |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 

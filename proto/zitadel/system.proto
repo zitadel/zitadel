@@ -552,29 +552,33 @@ message GetUsageRequest {
 
 message AddQuotaRequest {
   message Notification {
-      uint32 percent = 1;
+      uint32 percent = 1 [(validate.rules).uint32.gt = 0];
       bool repeat = 2;
-      string call_url = 3;
+      string call_url = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
   }
 
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   Unit unit = 2 [
+    (validate.rules).enum = {defined_only: true, not_in: [0]},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "the unit ZITADEL should measure";
     }
   ];
   google.protobuf.Timestamp from = 3 [
+      (validate.rules).timestamp.required = true,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
           example: "\"2019-04-01T08:45:00.000000Z\"";
           description: "the first intervals start timestamp";
       }
   ];
   google.protobuf.Duration interval = 4 [
+    (validate.rules).duration.required = true,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
           description: "the quotas repeated time window after which ZITADEL resets the measurement";
       }
   ];
   uint64 amount = 5 [
+    (validate.rules).uint64.gt = 0,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
           description: "the count limit after which ZITADEL enforces the quotas actions";
     }
