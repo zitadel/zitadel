@@ -222,6 +222,8 @@ import {
   GetCustomPasswordChangeMessageTextRequest,
   AddNotificationPolicyRequest,
   AddNotificationPolicyResponse,
+  SetDefaultOrgRequest,
+  SetDefaultOrgResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -232,6 +234,13 @@ import { GrpcService } from './grpc.service';
 })
 export class AdminService {
   constructor(private readonly grpcService: GrpcService) {}
+
+  public setDefaultOrg(orgId: string): Promise<SetDefaultOrgResponse.AsObject> {
+    const req = new SetDefaultOrgRequest();
+    req.setOrgId(orgId);
+
+    return this.grpcService.admin.setDefaultOrg(req, null).then((resp) => resp.toObject());
+  }
 
   public listEvents(req: ListEventsRequest): Promise<ListEventsResponse> {
     return this.grpcService.admin.listEvents(req, null).then((resp) => resp);

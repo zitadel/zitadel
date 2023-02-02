@@ -11,6 +11,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PaginatorComponent } from '../paginator/paginator.component';
+import { AdminService } from 'src/app/services/admin.service';
 
 enum OrgListSearchKey {
   NAME = 'NAME',
@@ -30,7 +31,7 @@ export class OrgTableComponent {
   @ViewChild('input') public filter!: Input;
 
   public dataSource: MatTableDataSource<Org.AsObject> = new MatTableDataSource<Org.AsObject>([]);
-  public displayedColumns: string[] = ['name', 'state', 'primaryDomain', 'creationDate', 'changeDate'];
+  public displayedColumns: string[] = ['name', 'state', 'primaryDomain', 'creationDate', 'changeDate', 'actions'];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public activeOrg!: Org.AsObject;
@@ -54,6 +55,7 @@ export class OrgTableComponent {
 
   constructor(
     private authService: GrpcAuthService,
+    private adminService: AdminService,
     private router: Router,
     private toast: ToastService,
     private _liveAnnouncer: LiveAnnouncer,
@@ -109,6 +111,17 @@ export class OrgTableComponent {
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
+  }
+
+  public setDefaultOrg(org: Org.AsObject) {
+    this.adminService
+      .setDefaultOrg(org.id)
+      .then(() => {
+        this.toast.showInfo('ORG.PAGES.DEFAULTORGSET', true);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public applySearchQuery(searchQueries: OrgQuery[]): void {

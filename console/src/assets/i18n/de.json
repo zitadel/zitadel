@@ -843,6 +843,8 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Geben Sie den Namen der neuen Organisation ein.",
       "ORGDETAILUSER_TITLE": "Organisationsbesitzer hinzufügen",
       "DELETE": "Organisation löschen",
+      "SETASDEFAULT": "Als Standardorganisation festlegen",
+      "DEFAULTORGSET": "Standardorganisation erfolgreich geändert",
       "RENAME": {
         "ACTION": "Umbenennen",
         "TITLE": "Organisation umbenennen",

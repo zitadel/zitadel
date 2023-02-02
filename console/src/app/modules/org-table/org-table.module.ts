@@ -20,6 +20,7 @@ import { InputModule } from '../input/input.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { OrgTableComponent } from './org-table.component';
+import { TableActionsModule } from '../table-actions/table-actions.module';
 
 @NgModule({
   declarations: [OrgTableComponent],
@@ -33,6 +34,7 @@ import { OrgTableComponent } from './org-table.component';
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
     MatSortModule,
+    TableActionsModule,
     MatIconModule,
     PaginatorModule,
     HasRoleModule,
