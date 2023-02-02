@@ -843,6 +843,7 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Saisissez le nom de votre nouvelle organisation.",
       "ORGDETAILUSER_TITLE": "Configurer le propriétaire de l'organisation",
       "DELETE": "Supprimer l'organisation",
+      "DEFAULTLABEL": "Défaut",
       "SETASDEFAULT": "Définir comme organisation par défaut",
       "DEFAULTORGSET": "L'organisation par défaut a été modifiée avec succès",
       "RENAME": {

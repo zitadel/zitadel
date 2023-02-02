@@ -843,6 +843,7 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
       "DELETE": "删除组织",
+      "DEFAULTLABEL": "默认情况下",
       "SETASDEFAULT": "设置为默认组织",
       "DEFAULTORGSET": "默认的组织已经改变",
       "RENAME": {

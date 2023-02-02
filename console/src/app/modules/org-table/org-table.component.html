@@ -52,7 +52,10 @@
       <th mat-header-cell *matHeaderCellDef>
         {{ 'ORG.PAGES.NAME' | translate }}
       </th>
-      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">{{ org.name }}</td>
+      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
+        <span>{{ org.name }}</span
+        ><span *ngIf="globalOrgId === org.id" class="state orgdefaultlabel">{{ 'ORG.PAGES.DEFAULTLABEL' | translate }}</span>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="state">

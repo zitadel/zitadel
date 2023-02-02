@@ -12,6 +12,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { PaginatorComponent } from '../paginator/paginator.component';
 import { AdminService } from 'src/app/services/admin.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 enum OrgListSearchKey {
   NAME = 'NAME',
@@ -51,10 +52,12 @@ export class OrgTableComponent {
     offset: 0,
     queries: [],
   });
+  public globalOrgId: string = '';
   private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
 
   constructor(
     private authService: GrpcAuthService,
+    private mgmtService: ManagementService,
     private adminService: AdminService,
     private router: Router,
     private toast: ToastService,
@@ -66,6 +69,10 @@ export class OrgTableComponent {
 
     this.requestOrgsObservable$.pipe(switchMap((req) => this.loadOrgs(req))).subscribe((orgs) => {
       this.dataSource = new MatTableDataSource<Org.AsObject>(orgs);
+    });
+
+    this.mgmtService.getIAM().then((iam) => {
+      this.globalOrgId = iam.globalOrgId;
     });
   }
 
@@ -118,6 +125,7 @@ export class OrgTableComponent {
       .setDefaultOrg(org.id)
       .then(() => {
         this.toast.showInfo('ORG.PAGES.DEFAULTORGSET', true);
+        this.globalOrgId = org.id;
       })
       .catch((error) => {
         this.toast.showError(error);
