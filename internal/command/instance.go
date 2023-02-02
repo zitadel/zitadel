@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/repository/quota"
+
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -118,7 +120,7 @@ type InstanceSetup struct {
 	}
 	Quotas *struct {
 		DetailsPath string
-		Items       []*Quota
+		Items       []*AddQuota
 	}
 }
 
@@ -266,8 +268,16 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	}
 
 	if setup.Quotas != nil {
-		for _, quota := range setup.Quotas.Items {
-			validations = append(validations, c.AddInstanceQuotaCommand(instanceAgg, quota))
+		for _, q := range setup.Quotas.Items {
+
+			quotaId, err := c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+
+			quotaAggregate := quota.NewAggregate(quotaId, instanceID, instanceID)
+
+			validations = append(validations, c.AddQuotaCommand(quotaAggregate, q))
 		}
 	}
 

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/repository/quota"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -110,6 +112,7 @@ func StartCommands(es *eventstore.Eventstore,
 	proj_repo.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
+	quota.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)

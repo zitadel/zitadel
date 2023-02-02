@@ -5,8 +5,8 @@ import (
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
-func instanceQuotaPbToQuota(req *system_pb.AddQuotaRequest) *command.Quota {
-	return &command.Quota{
+func instanceQuotaPbToQuota(req *system_pb.AddQuotaRequest) *command.AddQuota {
+	return &command.AddQuota{
 		Unit:          instanceQuotaUnitPbToQuotaUnit(req.Unit),
 		From:          req.From.AsTime(),
 		Interval:      req.Interval.AsDuration(),

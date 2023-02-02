@@ -1,6 +1,7 @@
 package quota
 
 import (
+	"context"
 	"encoding/json"
 	"strconv"
 	"time"
@@ -69,7 +70,8 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 }
 
 func NewAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	unit Unit,
 	from time.Time,
 	interval time.Duration,
@@ -78,7 +80,11 @@ func NewAddedEvent(
 	notifications []*AddedEventNotification, // todo: redefine struct to receive here and convert to AddedEventNotification slice?
 ) *AddedEvent {
 	return &AddedEvent{
-		BaseEvent:     *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			AddedEventType,
+		),
 		Unit:          unit,
 		From:          from,
 		Interval:      interval,
@@ -120,7 +126,8 @@ func (e *NotifiedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint 
 }
 
 func NewNotifiedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	unit Unit,
 	id string,
 	callURL string,
@@ -129,7 +136,11 @@ func NewNotifiedEvent(
 	usage uint64,
 ) *NotifiedEvent {
 	return &NotifiedEvent{
-		BaseEvent:   *base,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			NotifiedEventType,
+		),
 		Unit:        unit,
 		ID:          id,
 		CallURL:     callURL,
@@ -166,12 +177,15 @@ func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 }
 
 func NewRemovedEvent(
-	base *eventstore.BaseEvent,
-	unit Unit,
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 ) *RemovedEvent {
 	return &RemovedEvent{
-		BaseEvent: *base,
-		Unit:      unit,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			RemovedEventType,
+		),
 	}
 }
 

@@ -5,8 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/pkg/errors"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -23,13 +21,13 @@ func NewQuerier(dbClient *sql.DB) *projectionQuerier {
 }
 
 func (p *projectionQuerier) GetQuota(ctx context.Context, instanceID string, unit quota.Unit) (*query.Quota, error) {
-	quota, err := query.GetInstanceQuota(ctx, p.dbClient, instanceID, unit)
+	quota, err := query.GetQuota(ctx, p.dbClient, instanceID, unit)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 	}
 	return quota, err
 }
 
-func (p *projectionQuerier) GetDueQuotaNotifications(ctx context.Context, q *query.Quota, used uint64) ([]*instance.QuotaNotifiedEvent, error) {
-	return query.GetDueInstanceQuotaNotifications(ctx, p.dbClient, q, used)
+func (p *projectionQuerier) GetDueQuotaNotifications(ctx context.Context, q *query.Quota, used uint64) ([]*quota.NotifiedEvent, error) {
+	return query.GetDueQuotaNotifications(ctx, p.dbClient, q, used)
 }

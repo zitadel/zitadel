@@ -14,7 +14,7 @@ import (
 func (s *Server) AddQuota(ctx context.Context, req *system.AddQuotaRequest) (*system.AddQuotaResponse, error) {
 	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 
-	details, err := s.command.AddInstanceQuota(
+	details, err := s.command.AddQuota(
 		ctx,
 		instanceQuotaPbToQuota(req),
 	)
@@ -28,7 +28,7 @@ func (s *Server) AddQuota(ctx context.Context, req *system.AddQuotaRequest) (*sy
 
 func (s *Server) RemoveQuota(ctx context.Context, req *system.RemoveQuotaRequest) (*system.RemoveQuotaResponse, error) {
 	ctx = authz.WithInstanceID(ctx, req.InstanceId)
-	details, err := s.command.RemoveInstanceQuota(ctx, instanceQuotaUnitPbToQuotaUnit(req.Unit))
+	details, err := s.command.RemoveQuota(ctx, instanceQuotaUnitPbToQuotaUnit(req.Unit))
 	if err != nil {
 		return nil, err
 	}

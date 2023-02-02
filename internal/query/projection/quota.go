@@ -15,6 +15,7 @@ const (
 	QuotaTable                    = "projections.instance_quotas"
 	QuotaNotificationsTableSuffix = "notifications"
 
+	QuotaIDCol            = "id"
 	QuotaCreationDateCol  = "creation_date"
 	QuotaChangeDateCol    = "change_date"
 	QuotaResourceOwnerCol = "resource_owner"
@@ -27,8 +28,7 @@ const (
 	QuotaLimitCol         = "do_limit"
 
 	QuotaNotificationIdCol                = "id"
-	QuotaNotificationInstanceIDCol        = "instance_id"
-	QuotaNotificationUnitCol              = "quota_unit"
+	QuotaNotificationQuotaIDCol           = "quota_id"
 	QuotaNotificationCallURLCol           = "call_url"
 	QuotaNotificationPercentCol           = "percent"
 	QuotaNotificationRepeatCol            = "repeat"
@@ -50,6 +50,7 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 				crdb.NewColumn(QuotaCreationDateCol, crdb.ColumnTypeTimestamp),
 				crdb.NewColumn(QuotaChangeDateCol, crdb.ColumnTypeTimestamp),
 				crdb.NewColumn(QuotaResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(QuotaIDCol, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaInstanceIDCol, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaSequenceCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaUnitCol, crdb.ColumnTypeEnum),
@@ -58,27 +59,26 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 				crdb.NewColumn(QuotaAmountCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaLimitCol, crdb.ColumnTypeBool),
 			},
-			crdb.NewPrimaryKey(QuotaInstanceIDCol, QuotaUnitCol),
+			crdb.NewPrimaryKey(QuotaIDCol, QuotaUnitCol),
 			crdb.WithIndex(crdb.NewIndex("quotas_ro_idx", []string{QuotaResourceOwnerCol})),
 		),
 		crdb.NewSuffixedTable(
 			[]*crdb.Column{
 				crdb.NewColumn(QuotaNotificationIdCol, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaNotificationInstanceIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(QuotaNotificationUnitCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(QuotaNotificationQuotaIDCol, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaNotificationCallURLCol, crdb.ColumnTypeText),
 				crdb.NewColumn(QuotaNotificationPercentCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaNotificationRepeatCol, crdb.ColumnTypeBool),
 				crdb.NewColumn(QuotaNotificationLastCallDateCol, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 				crdb.NewColumn(QuotaNotificationLastCallThresholdCol, crdb.ColumnTypeInt64, crdb.Nullable()),
 			},
-			crdb.NewPrimaryKey(QuotaNotificationInstanceIDCol, QuotaNotificationUnitCol, QuotaNotificationIdCol),
+			crdb.NewPrimaryKey(QuotaNotificationIdCol),
 			QuotaNotificationsTableSuffix,
 			crdb.WithForeignKey(
 				crdb.NewForeignKey(
 					"fk_instance_quotas_notifications_ref_instance_quotas",
-					[]string{QuotaNotificationInstanceIDCol, QuotaNotificationUnitCol},
-					[]string{QuotaInstanceIDCol, QuotaUnitCol},
+					[]string{QuotaNotificationQuotaIDCol},
+					[]string{QuotaIDCol},
 				),
 			),
 		),
@@ -90,10 +90,10 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 func esReducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: instance.AggregateType,
+			Aggregate: quota.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  instance.QuotaAddedEventType,
+					Event:  quota.AddedEventType,
 					Reduce: reduceQuotaAdded,
 				},
 			},
@@ -103,7 +103,7 @@ func esReducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
-					Reduce: reduceInstanceRemovedHelper(QuotaInstanceIDCol),
+					Reduce: reduceInstanceRemoved,
 				},
 			},
 		},
@@ -111,7 +111,7 @@ func esReducers() []handler.AggregateReducer {
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  instance.QuotaNotifiedEventType,
+					Event:  quota.NotifiedEventType,
 					Reduce: reduceQuotaNotified,
 				},
 			},
@@ -120,7 +120,7 @@ func esReducers() []handler.AggregateReducer {
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  instance.QuotaRemovedEventType,
+					Event:  quota.RemovedEventType,
 					Reduce: reduceQuotaRemoved,
 				},
 			},
@@ -129,7 +129,7 @@ func esReducers() []handler.AggregateReducer {
 }
 
 func reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.QuotaAddedEvent)
+	e, ok := event.(*quota.AddedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff21", "reduce.wrong.event.type% s", quota.AddedEventType)
 	}
@@ -153,8 +153,6 @@ func reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
 
 		execFuncs = append(execFuncs, crdb.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(QuotaNotificationInstanceIDCol, e.Aggregate().InstanceID),
-				handler.NewCol(QuotaNotificationUnitCol, e.Unit),
 				handler.NewCol(QuotaNotificationIdCol, notification.ID),
 				handler.NewCol(QuotaNotificationPercentCol, notification.Percent),
 				handler.NewCol(QuotaNotificationRepeatCol, notification.Repeat),
@@ -170,7 +168,7 @@ func reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
 }
 
 func reduceQuotaNotified(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.QuotaNotifiedEvent)
+	e, ok := event.(*quota.NotifiedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-wmQPo", "reduce.wrong.event.type% s", quota.NotifiedEventType)
 	}
@@ -179,27 +177,38 @@ func reduceQuotaNotified(event eventstore.Event) (*handler.Statement, error) {
 		handler.NewCol(QuotaNotificationLastCallDateCol, e.CreationDate()),
 		handler.NewCol(QuotaNotificationLastCallThresholdCol, e.Threshold),
 	}, []handler.Condition{
-		handler.NewCond(QuotaNotificationInstanceIDCol, e.Aggregate().InstanceID),
-		handler.NewCond(QuotaNotificationUnitCol, e.Unit),
 		handler.NewCond(QuotaNotificationIdCol, e.ID),
 	}, crdb.WithTableSuffix(QuotaNotificationsTableSuffix)), nil
 }
 
 func reduceQuotaRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.QuotaRemovedEvent)
+	e, ok := event.(*quota.RemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DlFsg", "reduce.wrong.event.type% s", quota.NotifiedEventType)
 	}
-
 	return crdb.NewMultiStatement(
 		e,
+		removeQuotaExecs(e.Aggregate().InstanceID, e.Unit)...,
+	), nil
+}
+
+func reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	return crdb.NewMultiStatement(
+		event,
+		append(
+			removeQuotaExecs(event.Aggregate().InstanceID, quota.RequestsAllAuthenticated),
+			removeQuotaExecs(event.Aggregate().InstanceID, quota.ActionsAllRunsSeconds)...,
+		)...,
+	), nil
+}
+
+func removeQuotaExecs(quotaId string) []func(eventstore.Event) crdb.Exec {
+	return []func(eventstore.Event) crdb.Exec{
 		crdb.AddDeleteStatement([]handler.Condition{
-			handler.NewCond(QuotaNotificationInstanceIDCol, e.Aggregate().InstanceID),
-			handler.NewCond(QuotaNotificationUnitCol, e.Unit),
+			handler.NewCond(QuotaNotificationQuotaIDCol, quotaId),
 		}, crdb.WithTableSuffix(QuotaNotificationsTableSuffix)),
 		crdb.AddDeleteStatement([]handler.Condition{
-			handler.NewCond(QuotaInstanceIDCol, e.Aggregate().InstanceID),
-			handler.NewCond(QuotaUnitCol, e.Unit),
+			handler.NewCond(QuotaIDCol, quotaId),
 		}),
-	), nil
+	}
 }

@@ -1,5 +1,6 @@
 package instance
 
+/*
 import (
 	"context"
 	"time"
@@ -126,3 +127,4 @@ func QuotaRemovedEventMapper(event *repository.Event) (eventstore.Event, error) 
 
 	return &QuotaRemovedEvent{RemovedEvent: *e.(*quota.RemovedEvent)}, nil
 }
+*/

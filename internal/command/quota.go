@@ -18,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -41,12 +40,17 @@ func (q *QuotaUnit) Enum() quota.Unit {
 	}
 }
 
-func (c *Commands) AddInstanceQuota(
+func (c *Commands) AddQuota(
 	ctx context.Context,
-	quota *Quota,
+	q *AddQuota,
 ) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddInstanceQuotaCommand(instanceAgg, quota))
+	instanceId := authz.GetInstance(ctx).InstanceID()
+	aggregateId, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
+	aggregate := quota.NewAggregate(aggregateId, instanceId, instanceId)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddQuotaCommand(aggregate, q))
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +59,7 @@ func (c *Commands) AddInstanceQuota(
 		return nil, err
 	}
 	wm := &eventstore.WriteModel{
-		AggregateID:   authz.GetInstance(ctx).InstanceID(),
+		AggregateID:   aggregateId,
 		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 	}
 	err = AppendAndReduce(wm, events...)
@@ -65,43 +69,38 @@ func (c *Commands) AddInstanceQuota(
 	return writeModelToObjectDetails(wm), nil
 }
 
-func (c *Commands) RemoveInstanceQuota(ctx context.Context, unit QuotaUnit) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	if instanceAgg.InstanceID == "" {
+func (c *Commands) RemoveQuota(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	instanceId := authz.GetInstance(ctx).InstanceID()
+	aggregate := quota.NewAggregate(id, instanceId, instanceId)
+	if aggregate.InstanceID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.IDMissing")
 	}
 
-	domainQuotaUnit := unit.Enum()
-
-	if domainQuotaUnit == quota.Unimplemented {
-		return nil, errors.ThrowInvalidArgument(nil, "INSTA-SDSfs", "Errors.Invalid.Argument") // TODO: Better error message?
-	}
-
-	quota, err := c.getQuotaWriteModel(ctx, domainQuotaUnit)
+	q, err := c.getQuotaWriteModel(ctx, id, instanceId, instanceId)
 	if err != nil {
 		return nil, err
 	}
 
-	if !quota.exists {
+	if !q.exists {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
 	}
 
 	events := []eventstore.Command{
-		instance.NewQuotaRemovedEvent(ctx, &instanceAgg.Aggregate, unit.Enum()),
+		quota.NewRemovedEvent(ctx, &aggregate.Aggregate),
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(quota, pushedEvents...)
+	err = AppendAndReduce(q, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&quota.WriteModel), nil
+	return writeModelToObjectDetails(&q.WriteModel), nil
 }
 
-func (c *Commands) getQuotaWriteModel(ctx context.Context, unit quota.Unit) (*quotaWriteModel, error) {
-	wm := newQuotaWriteModel(ctx, unit)
+func (c *Commands) getQuotaWriteModel(ctx context.Context, aggregateId, instanceId, resourceOwner string) (*quotaWriteModel, error) {
+	wm := newQuotaWriteModel(aggregateId, instanceId, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err
@@ -136,7 +135,7 @@ func (q *QuotaNotifications) toAddedEventNotifications(genID func() string) []*q
 	return notifications
 }
 
-type Quota struct {
+type AddQuota struct {
 	Unit          QuotaUnit
 	From          time.Time
 	Interval      time.Duration
@@ -145,7 +144,7 @@ type Quota struct {
 	Notifications QuotaNotifications
 }
 
-func (q *Quota) isValid() bool {
+func (q *AddQuota) isValid() bool {
 	for _, notification := range q.Notifications {
 		if err := isUrl(notification.CallURL); err != nil || notification.Percent < 1 {
 			return false
@@ -159,18 +158,15 @@ func (q *Quota) isValid() bool {
 		(q.Limit || len(q.Notifications) > 0)
 }
 
-func (c *Commands) AddInstanceQuotaCommand(
-	a *instance.Aggregate,
-	q *Quota,
-) preparation.Validation {
+func (c *Commands) AddQuotaCommand(a *quota.Aggregate, q *AddQuota) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 
 		if !q.isValid() {
-			return nil, errors.ThrowInvalidArgument(nil, "INSTA-pBfjq", "Errors.Invalid.Argument") // TODO: Better error message?
+			return nil, errors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", "Errors.Invalid.Argument") // TODO: Better error message?
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
-				// TODO: Validations with side effects
+
 				genID := func() string {
 					id, genErr := c.idGenerator.Next()
 					if genErr != nil {
@@ -179,7 +175,7 @@ func (c *Commands) AddInstanceQuotaCommand(
 					return id
 				}
 
-				return []eventstore.Command{instance.NewQuotaAddedEvent(
+				return []eventstore.Command{quota.NewAddedEvent(
 					ctx,
 					&a.Aggregate,
 					q.Unit.Enum(),
@@ -208,7 +204,7 @@ func isUrl(str string) error {
 }
 
 // ReportUsage calls notification hooks if necessary and returns if usage should be limited
-func (c *Commands) ReportUsage(ctx context.Context, dueNotifications []*instance.QuotaNotifiedEvent) error {
+func (c *Commands) ReportUsage(ctx context.Context, dueNotifications []*quota.NotifiedEvent) error {
 
 	for _, notification := range dueNotifications {
 		alreadyNotified, err := isAlreadNotified(ctx, c.eventstore, notification)
@@ -220,8 +216,8 @@ func (c *Commands) ReportUsage(ctx context.Context, dueNotifications []*instance
 			// TODO: Debugf
 			logging.Infof(
 				"quota notification with ID %s and threshold %d was already notified in this period",
-				notification.NotifiedEvent.ID,
-				notification.NotifiedEvent.Threshold,
+				notification.ID,
+				notification.Threshold,
 			)
 			continue
 		}
@@ -240,14 +236,14 @@ func (c *Commands) ReportUsage(ctx context.Context, dueNotifications []*instance
 	return nil
 }
 
-func isAlreadNotified(ctx context.Context, es *eventstore.Eventstore, notification *instance.QuotaNotifiedEvent) (bool, error) {
+func isAlreadNotified(ctx context.Context, es *eventstore.Eventstore, notification *quota.NotifiedEvent) (bool, error) {
 
 	events, err := es.Filter(
 		ctx,
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 			InstanceID(notification.Aggregate().InstanceID).
 			AddQuery().
-			AggregateTypes(instance.AggregateType).
+			AggregateTypes(quota.AggregateType).
 			AggregateIDs(notification.Aggregate().ID).
 			SequenceGreater(notification.Sequence()).
 			EventTypes(quota.NotifiedEventType).
@@ -261,7 +257,7 @@ func isAlreadNotified(ctx context.Context, es *eventstore.Eventstore, notificati
 	return len(events) > 0, err
 }
 
-func notify(ctx context.Context, notification *instance.QuotaNotifiedEvent) error {
+func notify(ctx context.Context, notification *quota.NotifiedEvent) error {
 
 	payload, err := json.Marshal(notification)
 	if err != nil {

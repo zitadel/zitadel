@@ -5,8 +5,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/instance"
-
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
@@ -19,16 +17,16 @@ type UsageQuerier interface {
 
 type QuotaQuerier interface {
 	GetQuota(ctx context.Context, instanceID string, unit quota.Unit) (*query.Quota, error)
-	GetDueQuotaNotifications(ctx context.Context, q *query.Quota, used uint64) ([]*instance.QuotaNotifiedEvent, error)
+	GetDueQuotaNotifications(ctx context.Context, q *query.Quota, used uint64) ([]*quota.NotifiedEvent, error)
 }
 
 type UsageReporter interface {
-	Report(ctx context.Context, notifications []*instance.QuotaNotifiedEvent) (err error)
+	Report(ctx context.Context, notifications []*quota.NotifiedEvent) (err error)
 }
 
-type UsageReporterFunc func(context.Context, []*instance.QuotaNotifiedEvent) (err error)
+type UsageReporterFunc func(context.Context, []*quota.NotifiedEvent) (err error)
 
-func (u UsageReporterFunc) Report(ctx context.Context, notifications []*instance.QuotaNotifiedEvent) (err error) {
+func (u UsageReporterFunc) Report(ctx context.Context, notifications []*quota.NotifiedEvent) (err error) {
 	return u(ctx, notifications)
 }
 

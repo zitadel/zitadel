@@ -7,8 +7,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/instance"
-
 	"github.com/zitadel/zitadel/internal/query/projection"
 
 	"github.com/Masterminds/squirrel"
@@ -16,9 +14,9 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit) (*Quota, error) {
+func GetQuota(ctx context.Context, client *sql.DB, instanceID string, unit quota.Unit) (*Quota, error) {
 
-	stmt, args, err := squirrel.Select(projection.QuotaAmountCol, projection.QuotaLimitCol, projection.QuotaFromCol, projection.QuotaIntervalCol).
+	stmt, args, err := squirrel.Select(projection.QuotaIDCol, projection.QuotaAmountCol, projection.QuotaLimitCol, projection.QuotaFromCol, projection.QuotaIntervalCol).
 		From(projection.QuotaTable /* + " AS OF SYSTEM TIME '-20s'"*/). // TODO: Incomment
 		Where(squirrel.Eq{
 			projection.QuotaInstanceIDCol: instanceID,
@@ -37,7 +35,7 @@ func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, un
 	}
 	if err = client.
 		QueryRowContext(ctx, stmt, args...).
-		Scan(&quota.Amount, &quota.Limit, &quota.from, &quota.Interval); err != nil {
+		Scan(&quota.ID, &quota.Amount, &quota.Limit, &quota.from, &quota.Interval); err != nil {
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
 	}
 	quota.refreshPeriod()
@@ -45,6 +43,7 @@ func GetInstanceQuota(ctx context.Context, client *sql.DB, instanceID string, un
 }
 
 type Quota struct {
+	ID          string
 	Amount      int64
 	Limit       bool
 	InstanceId  string
@@ -68,9 +67,9 @@ func pushFrom(from time.Time, interval time.Duration, now time.Time) time.Time {
 	return pushFrom(next, interval, now)
 }
 
-func GetDueInstanceQuotaNotifications(ctx context.Context, dbClient *sql.DB, quota *Quota, usedAbs uint64) ([]*instance.QuotaNotifiedEvent, error) {
+func GetDueQuotaNotifications(ctx context.Context, dbClient *sql.DB, q *Quota, usedAbs uint64) ([]*quota.NotifiedEvent, error) {
 
-	usedRel := int64(math.Floor(float64(usedAbs*100) / float64(quota.Amount)))
+	usedRel := int64(math.Floor(float64(usedAbs*100) / float64(q.Amount)))
 
 	thresholdExpr := fmt.Sprintf("%d - %d %% %s", usedRel, usedRel, projection.QuotaNotificationPercentCol)
 	// TODO: Is it possible to reuse the scalar expression in the where clause somehow?
@@ -78,8 +77,8 @@ func GetDueInstanceQuotaNotifications(ctx context.Context, dbClient *sql.DB, quo
 		From(fmt.Sprintf("%s_%s  AS OF SYSTEM TIME '-10s'", projection.QuotaTable, projection.QuotaNotificationsTableSuffix)).
 		Where(squirrel.And{
 			squirrel.Eq{
-				projection.QuotaNotificationInstanceIDCol: quota.InstanceId,
-				projection.QuotaNotificationUnitCol:       quota.Unit,
+				projection.QuotaNotificationInstanceIDCol: q.InstanceId,
+				projection.QuotaNotificationUnitCol:       q.Unit,
 			},
 			squirrel.Lt{
 				projection.QuotaNotificationPercentCol: usedRel,
@@ -89,7 +88,7 @@ func GetDueInstanceQuotaNotifications(ctx context.Context, dbClient *sql.DB, quo
 					projection.QuotaNotificationLastCallDateCol: nil,
 				},
 				squirrel.Lt{
-					projection.QuotaNotificationLastCallDateCol: quota.PeriodStart,
+					projection.QuotaNotificationLastCallDateCol: q.PeriodStart,
 				},
 				squirrel.Or{
 					squirrel.And{
@@ -113,7 +112,7 @@ func GetDueInstanceQuotaNotifications(ctx context.Context, dbClient *sql.DB, quo
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-V9Sde", "Errors.Internal")
 	}
 
-	var notifications []*instance.QuotaNotifiedEvent
+	var notifications []*quota.NotifiedEvent
 	rows, err := dbClient.QueryContext(ctx, stmt, args...)
 	if err != nil {
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-SV9LW", "Errors.Quota.QueryFailed")
@@ -127,13 +126,13 @@ func GetDueInstanceQuotaNotifications(ctx context.Context, dbClient *sql.DB, quo
 		if rows.Scan(&row.id, &row.callUrl, &row.threshold); err != nil {
 			return nil, caos_errors.ThrowInternal(err, "QUOTA-pBPrM", "Errors.Quota.ScanFailed")
 		}
-		notifications = append(notifications, instance.NewQuotaNotifiedEvent(
+		notifications = append(notifications, quota.NewNotifiedEvent(
 			ctx,
-			&instance.NewAggregate(quota.InstanceId).Aggregate,
-			quota.Unit,
+			&quota.NewAggregate(q.InstanceId, q.InstanceId).Aggregate,
+			q.Unit,
 			row.id,
 			row.callUrl,
-			quota.PeriodStart,
+			q.PeriodStart,
 			row.threshold,
 			usedAbs,
 		))
