@@ -235,7 +235,7 @@ module.exports = {
           },
           {
             id: 'admin',
-            spec: ../.artifacts/gen/docs/zitadel/admin.swagger.json',
+            spec: '../.artifacts/gen/docs/zitadel/admin.swagger.json',
           },
           {
             id: 'system',
