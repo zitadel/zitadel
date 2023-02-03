@@ -54,7 +54,9 @@
       </th>
       <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
         <span>{{ org.name }}</span
-        ><span *ngIf="globalOrgId === org.id" class="state orgdefaultlabel">{{ 'ORG.PAGES.DEFAULTLABEL' | translate }}</span>
+        ><span *ngIf="defaultOrgId === org.id" class="state orgdefaultlabel">{{
+          'ORG.PAGES.DEFAULTLABEL' | translate
+        }}</span>
       </td>
     </ng-container>
 

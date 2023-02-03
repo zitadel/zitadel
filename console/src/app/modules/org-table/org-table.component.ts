@@ -52,7 +52,7 @@ export class OrgTableComponent {
     offset: 0,
     queries: [],
   });
-  public globalOrgId: string = '';
+  public defaultOrgId: string = '';
   private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
 
   constructor(
@@ -72,7 +72,7 @@ export class OrgTableComponent {
     });
 
     this.mgmtService.getIAM().then((iam) => {
-      this.globalOrgId = iam.globalOrgId;
+      this.defaultOrgId = iam.defaultOrgId;
     });
   }
 
@@ -125,7 +125,7 @@ export class OrgTableComponent {
       .setDefaultOrg(org.id)
       .then(() => {
         this.toast.showInfo('ORG.PAGES.DEFAULTORGSET', true);
-        this.globalOrgId = org.id;
+        this.defaultOrgId = org.id;
       })
       .catch((error) => {
         this.toast.showError(error);
