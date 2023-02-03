@@ -121,7 +121,7 @@ Also we include the refresh tokens in this example to know when the user has bec
 ```bash
 curl --request POST \
   --url $YOUR-DOMAIN/admin/v1/events/_search \
-  --header 'Authorization: Bearer $TOKEN' \
+  --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{
 	"asc": true,
