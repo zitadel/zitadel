@@ -36,7 +36,7 @@ func TestService(t *testing.T) {
 	type args struct {
 		mainSink      *logstore.EmitterConfig
 		secondarySink *logstore.EmitterConfig
-		quota         query.Quota
+		quota         query.CurrentQuotaPeriod
 	}
 	type wantSink struct {
 		bulks []int

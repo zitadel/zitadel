@@ -5,19 +5,18 @@ import (
 	"math"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
+
+type QuotaQuerier interface {
+	GetCurrentQuotaPeriod(ctx context.Context, instanceID string, unit quota.Unit) (config *quota.AddedEvent, periodStart time.Time, err error)
+	GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, used uint64) ([]*quota.NotifiedEvent, error)
+}
 
 type UsageQuerier interface {
 	LogEmitter
 	QuotaUnit() quota.Unit
-	QueryUsage(ctx context.Context, instanceId string, start, end time.Time) (uint64, error)
-}
-
-type QuotaQuerier interface {
-	GetQuota(ctx context.Context, instanceID string, unit quota.Unit) (*query.Quota, error)
-	GetDueQuotaNotifications(ctx context.Context, q *query.Quota, used uint64) ([]*quota.NotifiedEvent, error)
+	QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error)
 }
 
 type UsageReporter interface {
@@ -83,12 +82,12 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error)
 		return nil, nil
 	}
 
-	quota, err := s.quotaQuerier.GetQuota(ctx, instanceID, s.usageQuerier.QuotaUnit())
+	quota, periodStart, err := s.quotaQuerier.GetCurrentQuotaPeriod(ctx, instanceID, s.usageQuerier.QuotaUnit())
 	if err != nil || quota == nil {
 		return nil, err
 	}
 
-	usage, err := s.usageQuerier.QueryUsage(ctx, instanceID, quota.PeriodStart, quota.PeriodEnd)
+	usage, err := s.usageQuerier.QueryUsage(ctx, instanceID, periodStart)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +98,7 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error)
 		remaining = &r
 	}
 
-	notifications, err := s.quotaQuerier.GetDueQuotaNotifications(ctx, quota, usage)
+	notifications, err := s.quotaQuerier.GetDueQuotaNotifications(ctx, quota, periodStart, usage)
 	if err != nil {
 		return remaining, err
 	}

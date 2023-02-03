@@ -96,7 +96,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 	return nil
 }
 
-func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start, end time.Time) (uint64, error) {
+func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error) {
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("COALESCE(SUM(%s),0)", executionTookCol),
 	).
@@ -104,7 +104,6 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 		Where(squirrel.And{
 			squirrel.Eq{executionInstanceIdCol: instanceId},
 			squirrel.GtOrEq{executionTimestampCol: start},
-			squirrel.Lt{executionTimestampCol: end},
 			squirrel.NotEq{executionTookCol: nil},
 		}).
 		PlaceholderFormat(squirrel.Dollar).

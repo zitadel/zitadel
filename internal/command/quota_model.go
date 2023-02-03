@@ -10,6 +10,7 @@ type quotaWriteModel struct {
 	eventstore.WriteModel
 	unit   quota.Unit
 	active bool
+	config *quota.AddedEvent
 }
 
 // newQuotaWriteModel aggregateId is filled by reducing unit matching events
@@ -19,13 +20,8 @@ func newQuotaWriteModel(instanceId, resourceOwner string, unit quota.Unit) *quot
 			InstanceID:    instanceId,
 			ResourceOwner: resourceOwner,
 		},
-		unit:   unit,
-		active: false,
+		unit: unit,
 	}
-}
-
-func newQuotaAggregate(wm *eventstore.WriteModel) *eventstore.Aggregate {
-	return eventstore.AggregateFromWriteModel(wm, quota.AggregateType, quota.AggregateVersion)
 }
 
 func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -37,7 +33,6 @@ func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			quota.AddedEventType,
 			quota.RemovedEventType,
-			quota.NotifiedEventType,
 		).EventData(map[string]interface{}{"unit": wm.unit})
 
 	return query.Builder()
@@ -47,13 +42,13 @@ func (wm *quotaWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *quota.AddedEvent:
+			wm.AggregateID = e.Aggregate().ID
 			wm.active = true
-			wm.AggregateID = e.Aggregate().ID
+			wm.config = e
 		case *quota.RemovedEvent:
+			wm.AggregateID = e.Aggregate().ID
 			wm.active = false
-			wm.AggregateID = e.Aggregate().ID
-		case *quota.NotifiedEvent:
-			wm.AggregateID = e.Aggregate().ID
+			wm.config = nil
 		}
 	}
 	return wm.WriteModel.Reduce()

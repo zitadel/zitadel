@@ -45,10 +45,10 @@ func withCleanupping(keep, interval time.Duration) emitterOption {
 	}
 }
 
-type quotaOption func(config *query.Quota)
+type quotaOption func(config *query.CurrentQuotaPeriod)
 
-func quotaConfig(quotaOptions ...quotaOption) query.Quota {
-	q := &query.Quota{
+func quotaConfig(quotaOptions ...quotaOption) query.CurrentQuotaPeriod {
+	q := &query.CurrentQuotaPeriod{
 		Amount:   90,
 		Limit:    false,
 		Interval: 90 * time.Second,
@@ -60,14 +60,14 @@ func quotaConfig(quotaOptions ...quotaOption) query.Quota {
 }
 
 func withAmountAndInterval(n int64) quotaOption {
-	return func(c *query.Quota) {
+	return func(c *query.CurrentQuotaPeriod) {
 		c.Amount = n
 		c.Interval = time.Duration(n) * time.Second
 	}
 }
 
 func withLimiting() quotaOption {
-	return func(c *query.Quota) {
+	return func(c *query.CurrentQuotaPeriod) {
 		c.Limit = true
 	}
 }

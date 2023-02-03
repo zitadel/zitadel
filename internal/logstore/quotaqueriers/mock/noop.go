@@ -13,18 +13,18 @@ import (
 var _ logstore.QuotaQuerier = (*inmemReporter)(nil)
 
 type inmemReporter struct {
-	quota     *query.Quota
+	quota     *query.CurrentQuotaPeriod
 	lastUsage uint64
 }
 
-func NewNoopQuerier(quota *query.Quota) *inmemReporter {
+func NewNoopQuerier(quota *query.CurrentQuotaPeriod) *inmemReporter {
 	return &inmemReporter{quota: quota}
 }
 
-func (i *inmemReporter) GetQuota(context.Context, string, quota.Unit) (*query.Quota, error) {
+func (i *inmemReporter) GetQuota(context.Context, string, quota.Unit) (*query.CurrentQuotaPeriod, error) {
 	return i.quota, nil
 }
 
-func (*inmemReporter) GetDueQuotaNotifications(context.Context, *query.Quota, uint64) ([]*instance.QuotaNotifiedEvent, error) {
+func (*inmemReporter) GetDueQuotaNotifications(context.Context, *query.CurrentQuotaPeriod, uint64) ([]*instance.QuotaNotifiedEvent, error) {
 	return nil, nil
 }

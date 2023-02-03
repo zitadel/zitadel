@@ -101,7 +101,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 	return nil
 }
 
-func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start, end time.Time) (uint64, error) {
+func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error) {
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("count(%s)", accessInstanceIdCol),
 	).
@@ -109,7 +109,6 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 		Where(squirrel.And{
 			squirrel.Eq{accessInstanceIdCol: instanceId},
 			squirrel.GtOrEq{accessTimestampCol: start},
-			squirrel.Lt{accessTimestampCol: end},
 			squirrel.Expr(fmt.Sprintf(`%s #>> '{%s,0}' = '[REDACTED]'`, accessRequestHeadersCol, strings.ToLower(zitadel_http.Authorization))),
 			squirrel.NotLike{accessRequestURLCol: "%/zitadel.system.v1.SystemService/%"},
 			squirrel.NotLike{accessRequestURLCol: "%/system/v1/%"},

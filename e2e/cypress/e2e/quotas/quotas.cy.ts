@@ -1,7 +1,4 @@
-import { apiAuth, systemAuth } from 'support/api/apiauth';
-import { instanceUnderTest } from 'support/api/instances';
-import { addQuota, ensureQuotaIsAdded, ensureQuotaIsRemoved, removeQuota, Unit } from 'support/api/quota';
-import { API, SystemAPI } from 'support/api/types';
+import { addQuota, ensureQuotaIsAdded, removeQuota, Unit } from 'support/api/quota';
 import { Context } from 'support/commands';
 import { ZITADELWebhookEvent } from 'support/types';
 
@@ -126,48 +123,51 @@ describe('quotas', () => {
 
       beforeEach(() => cy.task('resetWebhookEvents'));
 
+      const amount = 100
+      const percent = 10
+      const usage = 25
+
       describe('without repetition', () => {
         beforeEach(() => {
-          cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
-            cy.get<Context>('@ctx').then((ctx) => {
-              ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, false, urls.length, [
-                {
-                  callUrl: callURL,
-                  percent: 25,
-                  repeat: false,
-                },
-              ]);
-              cy.task('runSQL', `TRUNCATE logstore.access;`);
-            });
+          cy.get<Context>('@ctx').then((ctx) => {
+            ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, false, amount, [
+              {
+                callUrl: callURL,
+                percent: percent,
+                repeat: false,
+              },
+            ]);
+            cy.task('runSQL', `TRUNCATE logstore.access;`);
           });
         });
 
         it('fires once with the expected payload', () => {
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
             cy.get<Context>('@ctx').then((ctx) => {
-              urls.forEach((url) => {
+              for (let i = 0; i < usage; i++) {
                 cy.request({
-                  url: url,
+                  url: urls[0],
                   method: 'GET',
                   auth: {
                     bearer: ctx.api.token,
                   },
                 });
-              });
-            });
-          });
-          cy.waitUntil(() =>
-            cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
-              if (events.length != 1) {
-                return false;
               }
-              return Cypress._.matches(<ZITADELWebhookEvent>{
-                callURL: callURL,
-                threshold: 25,
-                unit: 1,
-              })(events[0]);
-            }),
-          );
+            });
+            cy.waitUntil(() =>
+              cy.task<Array<ZITADELWebhookEvent>>('handledWebhookEvents').then((events) => {
+                if (events.length != 1) {
+                  return false;
+                }
+                return Cypress._.matches(<ZITADELWebhookEvent>{
+                  callURL: callURL,
+                  threshold: percent,
+                  unit: 1,
+                  usage: percent,
+                })(events[0]);
+              }),
+            );
+          });
         });
       });
 
@@ -175,10 +175,10 @@ describe('quotas', () => {
         beforeEach(() => {
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
             cy.get<Context>('@ctx').then((ctx) => {
-              ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, false, urls.length, [
+              ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, false, amount, [
                 {
                   callUrl: callURL,
-                  percent: 25,
+                  percent: percent,
                   repeat: true,
                 },
               ]);
@@ -190,15 +190,15 @@ describe('quotas', () => {
         it('fires repeatedly with the expected payloads', () => {
           cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
             cy.get<Context>('@ctx').then((ctx) => {
-              urls.forEach((url) => {
+              for (let i = 0; i < usage; i++) {
                 cy.request({
-                  url: url,
+                  url: urls[0],
                   method: 'GET',
                   auth: {
                     bearer: ctx.api.token,
                   },
                 });
-              });
+              }
             });
           });
           cy.waitUntil(() =>
@@ -207,11 +207,13 @@ describe('quotas', () => {
                 return false;
               }
               for (let i = 0; i < events.length; i++) {
+                const threshold = percent * (i + 1)
                 if (
                   !Cypress._.matches(<ZITADELWebhookEvent>{
                     callURL: callURL,
-                    threshold: 25 * (i + 1),
+                    threshold: threshold,
                     unit: 1,
+                    usage: threshold,
                   })(events[i])
                 ) {
                   return false;

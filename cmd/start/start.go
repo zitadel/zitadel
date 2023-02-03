@@ -13,8 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	quota_projection "github.com/zitadel/zitadel/internal/logstore/quotaqueriers/projection"
-
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -162,9 +160,8 @@ func startZitadel(config *Config, masterKey string) error {
 		return err
 	}
 
-	quotaQuerier := quota_projection.NewQuerier(dbClient)
 	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
-	actions.SetLogstoreService(logstore.New(quotaQuerier, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter))
+	actions.SetLogstoreService(logstore.New(commands, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter))
 
 	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
@@ -173,7 +170,7 @@ func startZitadel(config *Config, masterKey string) error {
 	if err != nil {
 		return err
 	}
-	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, quotaQuerier, usageReporter)
+	err = startAPIs(ctx, clock, router, commands, queries, eventstoreClient, dbClient, config, storage, authZRepo, keys, commands, usageReporter)
 	if err != nil {
 		return err
 	}
