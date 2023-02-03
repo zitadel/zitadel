@@ -14,7 +14,7 @@ describe('quotas', () => {
     describe('add one quota', () => {
       it('should add a quota only once per unit', () => {
         cy.get<Context>('@ctx').then((ctx) => {
-          addQuota(ctx, Unit.AuthenticatedRequests, true, 1, undefined, undefined, undefined, false);
+          addQuota(ctx, Unit.AuthenticatedRequests, true, 1);
           addQuota(ctx, Unit.AuthenticatedRequests, true, 1, undefined, undefined, undefined, false).then((res) => {
             expect(res.status).to.equal(409);
           });
@@ -22,16 +22,10 @@ describe('quotas', () => {
       });
 
       describe('add two quotas', () => {
-        beforeEach(() => {
-          cy.get<Context>('@ctx').then((ctx) => {
-            ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
-            ensureQuotaIsRemoved(ctx, Unit.ExecutionSeconds);
-          });
-        });
         it('should add a quota for each unit', () => {
           cy.get<Context>('@ctx').then((ctx) => {
-            addQuota(ctx, Unit.AuthenticatedRequests, true, 1, undefined, undefined, undefined, true);
-            addQuota(ctx, Unit.ExecutionSeconds, true, 1, undefined, undefined, undefined, true);
+            addQuota(ctx, Unit.AuthenticatedRequests, true, 1);
+            addQuota(ctx, Unit.ExecutionSeconds, true, 1);
           });
         });
       });
@@ -64,8 +58,8 @@ describe('quotas', () => {
           });
           it('should remove a quota for each unit', () => {
             cy.get<Context>('@ctx').then((ctx) => {
-              removeQuota(ctx, Unit.AuthenticatedRequests, true);
-              removeQuota(ctx, Unit.ExecutionSeconds, true);
+              removeQuota(ctx, Unit.AuthenticatedRequests);
+              removeQuota(ctx, Unit.ExecutionSeconds);
             });
           });
         });

@@ -49,6 +49,16 @@ func (c *Commands) AddQuota(
 	if err != nil {
 		return nil, err
 	}
+
+	wm, err := c.getQuotaWriteModel(ctx, instanceId, instanceId, q.Unit.Enum())
+	if err != nil {
+		return nil, err
+	}
+
+	if wm.active {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-WDfFf", "Errors.Quota.AlreadyExists")
+	}
+
 	aggregate := quota.NewAggregate(aggregateId, instanceId, instanceId)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddQuotaCommand(aggregate, q))
 	if err != nil {
@@ -58,35 +68,29 @@ func (c *Commands) AddQuota(
 	if err != nil {
 		return nil, err
 	}
-	wm := &eventstore.WriteModel{
-		AggregateID:   aggregateId,
-		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
-	}
 	err = AppendAndReduce(wm, events...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(wm), nil
+	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) RemoveQuota(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.ObjectDetails, error) {
 	instanceId := authz.GetInstance(ctx).InstanceID()
-	aggregate := quota.NewAggregate(id, instanceId, instanceId)
-	if aggregate.InstanceID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.IDMissing")
-	}
 
-	q, err := c.getQuotaWriteModel(ctx, id, instanceId, instanceId)
+	q, err := c.getQuotaWriteModel(ctx, instanceId, instanceId, unit.Enum())
 	if err != nil {
 		return nil, err
 	}
 
-	if !q.exists {
+	if !q.active {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
 	}
 
+	aggregate := quota.NewAggregate(q.AggregateID, instanceId, instanceId)
+
 	events := []eventstore.Command{
-		quota.NewRemovedEvent(ctx, &aggregate.Aggregate),
+		quota.NewRemovedEvent(ctx, &aggregate.Aggregate, unit.Enum()),
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
@@ -99,8 +103,8 @@ func (c *Commands) RemoveQuota(ctx context.Context, id string) (*domain.ObjectDe
 	return writeModelToObjectDetails(&q.WriteModel), nil
 }
 
-func (c *Commands) getQuotaWriteModel(ctx context.Context, aggregateId, instanceId, resourceOwner string) (*quotaWriteModel, error) {
-	wm := newQuotaWriteModel(aggregateId, instanceId, resourceOwner)
+func (c *Commands) getQuotaWriteModel(ctx context.Context, instanceId, resourceOwner string, unit quota.Unit) (*quotaWriteModel, error) {
+	wm := newQuotaWriteModel(instanceId, resourceOwner, unit)
 	err := c.eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err

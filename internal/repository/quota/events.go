@@ -165,7 +165,7 @@ func NotifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 
 type RemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	Unit                 Unit
+	Unit                 Unit `json:"unit"`
 }
 
 func (e *RemovedEvent) Data() interface{} {
@@ -179,6 +179,7 @@ func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 func NewRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	unit Unit,
 ) *RemovedEvent {
 	return &RemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -186,6 +187,7 @@ func NewRemovedEvent(
 			aggregate,
 			RemovedEventType,
 		),
+		Unit: unit,
 	}
 }
 

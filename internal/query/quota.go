@@ -73,7 +73,7 @@ func GetDueQuotaNotifications(ctx context.Context, dbClient *sql.DB, q *Quota, u
 
 	thresholdExpr := fmt.Sprintf("%d - %d %% %s", usedRel, usedRel, projection.QuotaNotificationPercentCol)
 	// TODO: Is it possible to reuse the scalar expression in the where clause somehow?
-	stmt, args, err := squirrel.Select(projection.QuotaNotificationIdCol, projection.QuotaNotificationCallURLCol, fmt.Sprintf("%s as threshold", thresholdExpr)).
+	stmt, args, err := squirrel.Select(projection.QuotaNotificationIDCol, projection.QuotaNotificationCallURLCol, fmt.Sprintf("%s as threshold", thresholdExpr)).
 		From(fmt.Sprintf("%s_%s  AS OF SYSTEM TIME '-10s'", projection.QuotaTable, projection.QuotaNotificationsTableSuffix)).
 		Where(squirrel.And{
 			squirrel.Eq{
@@ -112,6 +112,8 @@ func GetDueQuotaNotifications(ctx context.Context, dbClient *sql.DB, q *Quota, u
 		return nil, caos_errors.ThrowInternal(err, "QUOTA-V9Sde", "Errors.Internal")
 	}
 
+	quotaAggregate := &quota.NewAggregate(q.ID, q.InstanceId, q.InstanceId).Aggregate
+
 	var notifications []*quota.NotifiedEvent
 	rows, err := dbClient.QueryContext(ctx, stmt, args...)
 	if err != nil {
@@ -128,7 +130,7 @@ func GetDueQuotaNotifications(ctx context.Context, dbClient *sql.DB, q *Quota, u
 		}
 		notifications = append(notifications, quota.NewNotifiedEvent(
 			ctx,
-			&quota.NewAggregate(q.InstanceId, q.InstanceId).Aggregate,
+			quotaAggregate,
 			q.Unit,
 			row.id,
 			row.callUrl,
