@@ -101,7 +101,7 @@ This example shows you how to get all events from users, filtered with the creat
 ```bash
 curl --request POST \
   --url $YOUR-DOMAIN/admin/v1/events/_search \
-  --header 'Authorization: Bearer $TOKEN' \
+  --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json' \
   --data '{
 	"asc": false,
