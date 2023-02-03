@@ -34,7 +34,7 @@ To be able to filter for the different event types ZITADEL knows, you can reques
 ```bash
 curl --request POST \
 --url $YOUR-DOMAIN/admin/v1/events/types/_search \
---header 'Authorization: Bearer $TOKEN' \
+--header "Authorization: Bearer $TOKEN" \
 --header 'Content-Type: application/json' \
 '
 ```
