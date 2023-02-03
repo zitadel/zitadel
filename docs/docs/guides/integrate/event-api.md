@@ -70,7 +70,7 @@ To be able to filter for the different aggregate types (resources) ZITADEL knows
 ```bash
 curl --request POST \
   --url $YOUR-DOMAIN/admin/v1/aggregates/types/_search \
-  --header 'Authorization: Bearer $TOKEN' \
+  --header "Authorization: Bearer $TOKEN" \
   --header 'Content-Type: application/json'
 ```
 
