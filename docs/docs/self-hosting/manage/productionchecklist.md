@@ -7,7 +7,7 @@ To apply best practices to your production setup we created a step by step check
 
 ### Infrastructure Configuration
 
-- [ ] Make use of config management such as Terraform to provision all of the below
+- [ ] Make use of configuration management such as Terraform to provision all of the below
 - [ ] Use version control to store the provisioning
 - [ ] Use a secrets manager to store your sensible informations
 - [ ] Reduce the manual interaction with your platform to an absolute minimum 
