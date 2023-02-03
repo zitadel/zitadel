@@ -24,7 +24,7 @@ To further restrict your result you can add the following filters:
 ```bash
 curl --request POST \
   --url $YOUR-DOMAIN/admin/v1/events/_search \
-  --header 'Authorization: Bearer $TOKEN' 
+  --header "Authorization: Bearer $TOKEN"
 ```
 
 ## Get event types
