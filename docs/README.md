@@ -26,18 +26,12 @@ As an alternative you can use this docker compose command:
 docker compose up
 ```
 
-These commands start a local development server.
-Most changes are reflected live without having to restart the server.
+## API docs
 
-## Build
-
-```console
-yarn build
 ```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-## Deployment
-
-Each PR will be automatically built with a preview link from cloudflare pages.
-Visit the checks / comments on the PR for the link.
+$ go install \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
+    google.golang.org/protobuf/cmd/protoc-gen-go \
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc
+```

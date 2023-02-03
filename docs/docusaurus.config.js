@@ -227,19 +227,19 @@ module.exports = {
         specs: [
           {
             id: 'auth',
-            spec: 'https://zitadel.cloud/openapi/v2/swagger/auth.swagger.json',
+            spec: '../.artifacts/gen/docs/zitadel/auth.swagger.json',
           },
           {
             id: 'mgmt',
-            spec: 'https://zitadel.cloud/openapi/v2/swagger/management.swagger.json',
+            spec: '../.artifacts/gen/docs/zitadel/management.swagger.json',
           },
           {
             id: 'admin',
-            spec: 'https://zitadel.cloud/openapi/v2/swagger/admin.swagger.json',
+            spec: ../.artifacts/gen/docs/zitadel/admin.swagger.json',
           },
           {
             id: 'system',
-            spec: 'https://zitadel.cloud/openapi/v2/swagger/system.swagger.json',
+            spec: '../.artifacts/gen/docs/zitadel/system.swagger.json',
           }
         ],
         theme: {

@@ -11,7 +11,9 @@
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids"
+    "write-heading-ids": "docusaurus write-heading-ids",
+    "generate": "npm run generate:grpc",
+    "generate:grpc": "docker run --volume $(pwd)/..:/workspace --workdir /workspace bufbuild/buf generate"
   },
   "dependencies": {
     "@algolia/autocomplete-core": "1.5.2",
@@ -88,6 +90,8 @@
     "dns-packet": "5.3.1",
     "docusaurus-plugin-image-zoom": "^0.1.1",
     "docusaurus-plugin-plausible": "^0.0.5",
+    "docusaurus-protobuffet": "^0.3.2",
+    "docusaurus2-dotenv": "^1.4.0",
     "eastasianwidth": "0.2.0",
     "enhanced-resolve": "5.9.3",
     "eval": "0.1.8",

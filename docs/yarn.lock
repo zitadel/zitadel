@@ -1605,6 +1605,14 @@
     chalk "^4.1.2"
     tslib "^2.4.0"
 
+"@docusaurus/logger@2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@docusaurus/logger/-/logger-2.3.1.tgz#d76aefb452e3734b4e0e645efc6cbfc0aae52869"
+  integrity sha512-2lAV/olKKVr9qJhfHFCaqBIl8FgYjbUFwgUnX76+cULwQYss+42ZQ3grHGFvI0ocN2X55WcYe64ellQXz7suqg==
+  dependencies:
+    chalk "^4.1.2"
+    tslib "^2.4.0"
+
 "@docusaurus/mdx-loader@2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@docusaurus/mdx-loader/-/mdx-loader-2.2.0.tgz#fd558f429e5d9403d284bd4214e54d9768b041a0"
@@ -1893,6 +1901,28 @@
   dependencies:
     "@docusaurus/logger" "2.2.0"
     "@svgr/webpack" "^6.2.1"
+    file-loader "^6.2.0"
+    fs-extra "^10.1.0"
+    github-slugger "^1.4.0"
+    globby "^11.1.0"
+    gray-matter "^4.0.3"
+    js-yaml "^4.1.0"
+    lodash "^4.17.21"
+    micromatch "^4.0.5"
+    resolve-pathname "^3.0.0"
+    shelljs "^0.8.5"
+    tslib "^2.4.0"
+    url-loader "^4.1.1"
+    webpack "^5.73.0"
+
+"@docusaurus/utils@^2.0.0-alpha.72":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@docusaurus/utils/-/utils-2.3.1.tgz#24b9cae3a23b1e6dc88f95c45722c7e82727b032"
+  integrity sha512-9WcQROCV0MmrpOQDXDGhtGMd52DHpSFbKLfkyaYumzbTstrbA5pPOtiGtxK1nqUHkiIv8UwexS54p0Vod2I1lg==
+  dependencies:
+    "@docusaurus/logger" "2.3.1"
+    "@svgr/webpack" "^6.2.1"
+    escape-string-regexp "^4.0.0"
     file-loader "^6.2.0"
     fs-extra "^10.1.0"
     github-slugger "^1.4.0"
@@ -4751,6 +4781,20 @@ docusaurus-plugin-redoc@1.4.0:
     joi "^17.5.0"
     redoc "2.0.0"
 
+docusaurus-protobuffet-plugin@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/docusaurus-protobuffet-plugin/-/docusaurus-protobuffet-plugin-0.3.2.tgz#09ede681475c881bff804fb652f7497b63347dad"
+  integrity sha512-LPu+ah2uy53//q6QN8IYSYH6DHUOz2MxvOzk8JRMsUDUF2sTxIvobFqj3/BctlLM15kBWbWnI2zHaAZQlZodqA==
+  dependencies:
+    "@docusaurus/utils" "^2.0.0-alpha.72"
+
+docusaurus-protobuffet@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/docusaurus-protobuffet/-/docusaurus-protobuffet-0.3.2.tgz#55cda95e4da413bbf7f680b7eac616760bed2aac"
+  integrity sha512-RsTPoyUDW6efG8PyRa9bg1L0W7fvEQLYI/W6Mk96DVr01DnUagiHFmAHkAKCpVAZi7KggCbiDHmCJSRykm63+g==
+  dependencies:
+    docusaurus-protobuffet-plugin "^0.3.2"
+
 docusaurus-theme-redoc@1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/docusaurus-theme-redoc/-/docusaurus-theme-redoc-1.4.0.tgz#d5fe9df72b3284dbc5b289169adc1bd17097da18"
@@ -4762,6 +4806,13 @@ docusaurus-theme-redoc@1.4.0:
     mobx "^6.5.0"
     redoc "2.0.0"
     styled-components "^5.3.5"
+
+docusaurus2-dotenv@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/docusaurus2-dotenv/-/docusaurus2-dotenv-1.4.0.tgz#9ab900e29de9081f9f1f28f7224ff63760385641"
+  integrity sha512-iWqem5fnBAyeBBtX75Fxp71uUAnwFaXzOmade8zAhN4vL3RG9m27sLSRwjJGVVgIkEo3esjGyCcTGTiCjfi+sg==
+  dependencies:
+    dotenv-webpack "1.7.0"
 
 dom-converter@^0.2.0:
   version "0.2.0"
@@ -4893,6 +4944,25 @@ dot-prop@^5.2.0:
   integrity sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==
   dependencies:
     is-obj "^2.0.0"
+
+dotenv-defaults@^1.0.2:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/dotenv-defaults/-/dotenv-defaults-1.1.1.tgz#032c024f4b5906d9990eb06d722dc74cc60ec1bd"
+  integrity sha512-6fPRo9o/3MxKvmRZBD3oNFdxODdhJtIy1zcJeUSCs6HCy4tarUpd+G67UTU9tF6OWXeSPqsm4fPAB+2eY9Rt9Q==
+  dependencies:
+    dotenv "^6.2.0"
+
+dotenv-webpack@1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/dotenv-webpack/-/dotenv-webpack-1.7.0.tgz#4384d8c57ee6f405c296278c14a9f9167856d3a1"
+  integrity sha512-wwNtOBW/6gLQSkb8p43y0Wts970A3xtNiG/mpwj9MLUhtPCQG6i+/DSXXoNN7fbPCU/vQ7JjwGmgOeGZSSZnsw==
+  dependencies:
+    dotenv-defaults "^1.0.2"
+
+dotenv@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-6.2.0.tgz#941c0410535d942c8becf28d3f357dbd9d476064"
+  integrity sha512-HygQCKUBSFl8wKQZBSemMywRWcEDNidvNbjGVyZu3nbZ8qq9ubiPoGLMdRDpfSrpkkm9BXYFkpKxxFX38o/76w==
 
 duplexer3@^0.1.4:
   version "0.1.5"
