@@ -18,6 +18,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { from, Observable } from 'rxjs';
+import * as i18nIsoCountries from 'i18n-iso-countries';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { RoleGuard } from 'src/app/guards/role.guard';
 import { UserGuard } from 'src/app/guards/user.guard';
@@ -58,10 +59,15 @@ import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 
 registerLocaleData(localeDe);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
 registerLocaleData(localeZh);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/zh.json'));
 registerLocaleData(localeFr);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/fr.json'));
 registerLocaleData(localeIt);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/it.json'));
 registerLocaleData(localeEn);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
