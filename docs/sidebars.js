@@ -176,6 +176,17 @@ module.exports = {
         "apis/statuscodes",
         {
           type: "category",
+          label: "API References",
+          collapsed: true,
+          items: [
+            "apis/reference/auth",
+            "apis/reference/mgmt",
+            "apis/reference/admin",
+            "apis/reference/system"
+          ],
+        },
+        {
+          type: "category",
           label: "Proto",
           collapsed: true,
           items: [

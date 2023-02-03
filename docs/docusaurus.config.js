@@ -221,6 +221,40 @@ module.exports = {
         },
       },
     ],
+    [
+      'redocusaurus',
+      {
+        specs: [
+          {
+            id: 'auth',
+            spec: 'https://zitadel.cloud/openapi/v2/swagger/auth.swagger.json',
+          },
+          {
+            id: 'mgmt',
+            spec: 'https://zitadel.cloud/openapi/v2/swagger/management.swagger.json',
+          },
+          {
+            id: 'admin',
+            spec: 'https://zitadel.cloud/openapi/v2/swagger/admin.swagger.json',
+          },
+          {
+            id: 'system',
+            spec: 'https://zitadel.cloud/openapi/v2/swagger/system.swagger.json',
+          }
+        ],
+        theme: {
+          /**
+           * Highlight color for docs
+           */
+          primaryColor: '#1890ff',
+          /**
+           * Options to pass to redoc
+           * @see https://github.com/redocly/redoc#redoc-options-object
+           */
+          options: { disableSearch: true },
+        },
+      },
+    ],
   ],
   plugins: [
     require.resolve("docusaurus-plugin-image-zoom"),
