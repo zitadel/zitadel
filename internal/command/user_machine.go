@@ -23,7 +23,7 @@ type Machine struct {
 	Username        string
 	Name            string
 	Description     string
-	AccessTokenType domain.AccessTokenType
+	AccessTokenType domain.OIDCTokenType
 }
 
 func (m *Machine) IsZero() bool {

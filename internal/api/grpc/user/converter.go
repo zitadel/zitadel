@@ -130,12 +130,12 @@ func GenderToDomain(gender user_pb.Gender) domain.Gender {
 	}
 }
 
-func AccessTokenTypeToDomain(accessTokenType user_pb.AccessTokenType) domain.AccessTokenType {
+func AccessTokenTypeToDomain(accessTokenType user_pb.AccessTokenType) domain.OIDCTokenType {
 	switch accessTokenType {
 	case user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER:
-		return domain.AccessTokenTypeBearer
+		return domain.OIDCTokenTypeBearer
 	case user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_JWT:
-		return domain.AccessTokenTypeJWT
+		return domain.OIDCTokenTypeJWT
 	default:
 		return -1
 	}
@@ -173,11 +173,11 @@ func GenderToPb(gender domain.Gender) user_pb.Gender {
 	}
 }
 
-func AccessTokenTypeToPb(accessTokenType domain.AccessTokenType) user_pb.AccessTokenType {
+func AccessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user_pb.AccessTokenType {
 	switch accessTokenType {
-	case domain.AccessTokenTypeBearer:
+	case domain.OIDCTokenTypeBearer:
 		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER
-	case domain.AccessTokenTypeJWT:
+	case domain.OIDCTokenTypeJWT:
 		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_JWT
 	default:
 		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER

@@ -18,7 +18,7 @@ type MachineWriteModel struct {
 	Name            string
 	Description     string
 	UserState       domain.UserState
-	AccessTokenType domain.AccessTokenType
+	AccessTokenType domain.OIDCTokenType
 
 	ClientSecret *crypto.CryptoValue
 }
@@ -104,7 +104,7 @@ func (wm *MachineWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	name,
 	description string,
-	accessTokenType domain.AccessTokenType,
+	accessTokenType domain.OIDCTokenType,
 ) (*user.MachineChangedEvent, bool, error) {
 	changes := make([]user.MachineChanges, 0)
 	var err error
@@ -116,7 +116,7 @@ func (wm *MachineWriteModel) NewChangedEvent(
 		changes = append(changes, user.ChangeDescription(description))
 	}
 	if wm.AccessTokenType != accessTokenType {
-		changes = append(changes, user.ChangeDAccessTokenType(accessTokenType))
+		changes = append(changes, user.ChangeAccessTokenType(accessTokenType))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

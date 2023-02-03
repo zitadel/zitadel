@@ -91,7 +91,7 @@ type Machine struct {
 	Name            string
 	Description     string
 	HasSecret       bool
-	AccessTokenType domain.AccessTokenType
+	AccessTokenType domain.OIDCTokenType
 }
 
 type NotifyUser struct {
@@ -856,7 +856,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 					Name:            name.String,
 					Description:     description.String,
 					HasSecret:       hasSecret.Bool,
-					AccessTokenType: domain.AccessTokenType(accessTokenType.Int32),
+					AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 				}
 			}
 			return u, nil
@@ -1327,7 +1327,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 						Name:            name.String,
 						Description:     description.String,
 						HasSecret:       hasSecret.Bool,
-						AccessTokenType: domain.AccessTokenType(accessTokenType.Int32),
+						AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 					}
 				}
 

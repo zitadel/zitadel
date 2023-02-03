@@ -21,11 +21,11 @@ type MachineAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	userLoginMustBeDomain bool   `json:"-"`
+	userLoginMustBeDomain bool
 
-	Name            string                 `json:"name,omitempty"`
-	Description     string                 `json:"description,omitempty"`
-	AccessTokenType domain.AccessTokenType `json:"access_token_type,omitempty"`
+	Name            string               `json:"name,omitempty"`
+	Description     string               `json:"description,omitempty"`
+	AccessTokenType domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
 func (e *MachineAddedEvent) Data() interface{} {
@@ -43,7 +43,7 @@ func NewMachineAddedEvent(
 	name,
 	description string,
 	userLoginMustBeDomain bool,
-	accessTokenType domain.AccessTokenType,
+	accessTokenType domain.OIDCTokenType,
 ) *MachineAddedEvent {
 	return &MachineAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -74,9 +74,9 @@ func MachineAddedEventMapper(event *repository.Event) (eventstore.Event, error) 
 type MachineChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name            *string                 `json:"name,omitempty"`
-	Description     *string                 `json:"description,omitempty"`
-	AccessTokenType *domain.AccessTokenType `json:"access_token_type,omitempty"`
+	Name            *string               `json:"name,omitempty"`
+	Description     *string               `json:"description,omitempty"`
+	AccessTokenType *domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
 func (e *MachineChangedEvent) Data() interface{} {
@@ -122,7 +122,7 @@ func ChangeDescription(description string) func(event *MachineChangedEvent) {
 	}
 }
 
-func ChangeDAccessTokenType(accessTokenType domain.AccessTokenType) func(event *MachineChangedEvent) {
+func ChangeAccessTokenType(accessTokenType domain.OIDCTokenType) func(event *MachineChangedEvent) {
 	return func(e *MachineChangedEvent) {
 		e.AccessTokenType = &accessTokenType
 	}
