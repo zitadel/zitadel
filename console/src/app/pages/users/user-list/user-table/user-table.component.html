@@ -174,7 +174,7 @@
       </ng-container>
 
       <ng-container matColumnDef="creationDate">
-        <th mat-header-cell *matHeaderCellDef>{{ 'USER.TABLE.CREATIONDATE' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'USER.TABLE.CREATIONDATE' | translate }}</th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id] : null">
           <span class="no-break">{{ user.details.creationDate | timestampToDate | localizedDate : 'fromNow' }}</span>
         </td>
