@@ -15,8 +15,6 @@ RUN NODE_OPTIONS=--max-old-space-size=4096
 RUN yarn prodbuild
 
 ## Final image for production serving
-FROM node:18-alpine as final
-RUN yarn add global http-server
-COPY --from=builder /console/dist/console /app
-EXPOSE  8080
-CMD ["http-server", "--cors", "-p8080", "/app"]
+FROM nginx:1.23.3 as final
+COPY console/nginx.conf /etc/nginx/nginx.conf 
+COPY --from=builder /console/dist/console /usr/share/nginx/html 
