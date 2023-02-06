@@ -10,6 +10,3 @@ breaking:
 lint:
   use:
     - MINIMAL
-build:
-  excludes:
-  - internal
