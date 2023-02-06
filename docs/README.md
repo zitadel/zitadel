@@ -28,10 +28,11 @@ docker compose up
 
 ## API docs
 
+To generate the openapi files locally please use this command in the root of the repository
+
 ```
-$ go install \
-    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
-    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
-    google.golang.org/protobuf/cmd/protoc-gen-go \
-    google.golang.org/grpc/cmd/protoc-gen-go-grpc
+docker run \
+  --volume "$(pwd):/workspace" \
+  --workdir /workspace \
+  bufbuild/buf generate
 ```
