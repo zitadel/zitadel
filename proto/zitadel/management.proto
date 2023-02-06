@@ -274,7 +274,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deactivate user";
-            description: "The state of the user will be changed to 'deactivated'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'deactivated'."
+            description: "The state of the user will be changed to 'deactivated'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need the access the user data."
             tags: "User";
             responses: {
                 key: "200"
@@ -320,7 +320,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Lock user";
-            description: "The state of the user will be changed to 'locked'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'locked'."
+            description: "The state of the user will be changed to 'locked'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to login temporarly because of an event that happened (wrong password, etc.)"
             tags: "User";
             responses: {
                 key: "200"
