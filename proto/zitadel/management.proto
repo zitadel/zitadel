@@ -377,7 +377,6 @@ service ManagementService {
         };
     }
 
-    // Changes the username
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
@@ -386,6 +385,18 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Change user name";
+            description: "Change the username of the user. Be aware that the user has to login with the newly added username afterwards."
+            tags: "User";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
         };
     }
 
