@@ -21,5 +21,5 @@ type record struct {
 
 func (r record) Normalize() logstore.LogRecord {
 	r.redacted = true
-	return r
+	return &r
 }

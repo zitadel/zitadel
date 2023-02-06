@@ -52,7 +52,7 @@ func (l *InmemLogStorage) QueryUsage(_ context.Context, _ string, start time.Tim
 
 	var count uint64
 	for _, r := range l.emitted {
-		if r.ts.After(start.Add(-1)) {
+		if r.ts.After(start) {
 			count++
 		}
 	}

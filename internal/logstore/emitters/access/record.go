@@ -38,7 +38,7 @@ const (
 func (a Record) Normalize() logstore.LogRecord {
 	normalizeHeaders(a.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "grpcgateway-authorization", "cookie", "grpcgateway-cookie")
 	normalizeHeaders(a.ResponseHeaders, "set-cookie")
-	return a
+	return &a
 }
 
 // normalizeHeaders lowers all header keys and redacts secrets

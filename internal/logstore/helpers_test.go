@@ -51,6 +51,7 @@ func quotaConfig(quotaOptions ...quotaOption) quota.AddedEvent {
 		Amount:   90,
 		Limit:    false,
 		Interval: 90 * time.Second,
+		From:     time.Unix(0, 0),
 	}
 	for _, opt := range quotaOptions {
 		opt(q)

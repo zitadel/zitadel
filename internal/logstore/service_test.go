@@ -227,7 +227,7 @@ func runTest(t *testing.T, name string, args args, want want) bool {
 		tt.Run(name, func(t *testing.T) {
 			ctx, clock, mainStorage, secondaryStorage, svc := given(t, args, want)
 			remaining := when(t, svc, ctx, clock)
-			then(t, mainStorage, want, secondaryStorage, remaining)
+			then(t, mainStorage, secondaryStorage, remaining, want)
 		})
 	})
 }
@@ -236,7 +236,7 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 	ctx := context.Background()
 	clock := clock.NewMock()
 
-	periodStart := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	periodStart := time.Time{}
 	clock.Set(args.config.From)
 
 	mainStorage := emittermock.NewInMemoryStorage(clock)
@@ -247,7 +247,7 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 	secondaryStorage := emittermock.NewInMemoryStorage(clock)
 	secondaryEmitter, err := logstore.NewEmitter(ctx, clock, args.secondarySink, secondaryStorage)
 	if err != nil {
-		t.Fatalf("expected no error but got %v", err)
+		t.Errorf("expected no error but got %v", err)
 	}
 
 	svc := logstore.New(
@@ -267,13 +267,13 @@ func when(t *testing.T, svc *logstore.Service, ctx context.Context, clock *clock
 	for i := 0; i < ticks; i++ {
 		err := svc.Handle(ctx, emittermock.NewRecord(clock))
 		if err != nil {
-			t.Fatalf("expected no error but got %v", err)
+			t.Errorf("expected no error but got %v", err)
 		}
 
 		runtime.Gosched()
 		remaining, err = svc.Limit(ctx, "non-empty-instance-id")
 		if err != nil {
-			t.Fatalf("expected no error but got %v", err)
+			t.Errorf("expected no error but got %v", err)
 		}
 		clock.Add(tick)
 	}
@@ -282,7 +282,7 @@ func when(t *testing.T, svc *logstore.Service, ctx context.Context, clock *clock
 	return remaining
 }
 
-func then(t *testing.T, mainStorage *emittermock.InmemLogStorage, want want, secondaryStorage *emittermock.InmemLogStorage, remaining *uint64) {
+func then(t *testing.T, mainStorage, secondaryStorage *emittermock.InmemLogStorage, remaining *uint64, want want) {
 	mainBulks := mainStorage.Bulks()
 	if !reflect.DeepEqual(want.mainSink.bulks, mainBulks) {
 		t.Errorf("wanted main storage to have bulks %v, but got %v", want.mainSink.bulks, mainBulks)
