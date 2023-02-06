@@ -11,15 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 
-	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/logstore"
 
 	"github.com/benbjohnson/clock"
 
 	emittermock "github.com/zitadel/zitadel/internal/logstore/emitters/mock"
 	quotaqueriermock "github.com/zitadel/zitadel/internal/logstore/quotaqueriers/mock"
-	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
@@ -36,7 +35,7 @@ func TestService(t *testing.T) {
 	type args struct {
 		mainSink      *logstore.EmitterConfig
 		secondarySink *logstore.EmitterConfig
-		quota         query.CurrentQuotaPeriod
+		config        quota.AddedEvent
 	}
 	type wantSink struct {
 		bulks []int
@@ -60,7 +59,7 @@ func TestService(t *testing.T) {
 				MaxBulkSize:  60,
 			})),
 			secondarySink: emitterConfig(),
-			quota:         quotaConfig(),
+			config:        quotaConfig(),
 		},
 		want: want{
 			enabled:   true,
@@ -85,7 +84,7 @@ func TestService(t *testing.T) {
 				MinFrequency: 10 * time.Second,
 				MaxBulkSize:  0,
 			})),
-			quota: quotaConfig(),
+			config: quotaConfig(),
 		},
 		want: want{
 			enabled:   true,
@@ -104,7 +103,7 @@ func TestService(t *testing.T) {
 		args: args{
 			mainSink:      emitterConfig(withDisabled()),
 			secondarySink: emitterConfig(),
-			quota:         quotaConfig(),
+			config:        quotaConfig(),
 		},
 		want: want{
 			enabled:   true,
@@ -123,7 +122,7 @@ func TestService(t *testing.T) {
 		args: args{
 			mainSink:      emitterConfig(withDisabled()),
 			secondarySink: emitterConfig(withDisabled()),
-			quota:         quotaConfig(),
+			config:        quotaConfig(),
 		},
 		want: want{
 			enabled:   false,
@@ -145,7 +144,7 @@ func TestService(t *testing.T) {
 				MinFrequency: 0,
 				MaxBulkSize:  15,
 			}), withCleanupping(5*time.Second, 47*time.Second)),
-			quota: quotaConfig(),
+			config: quotaConfig(),
 		},
 		want: want{
 			enabled:   true,
@@ -164,7 +163,7 @@ func TestService(t *testing.T) {
 		args: args{
 			mainSink:      emitterConfig(),
 			secondarySink: emitterConfig(),
-			quota:         quotaConfig(withLimiting()),
+			config:        quotaConfig(withLimiting()),
 		},
 		want: want{
 			enabled:   true,
@@ -183,7 +182,7 @@ func TestService(t *testing.T) {
 		args: args{
 			mainSink:      emitterConfig(),
 			secondarySink: emitterConfig(),
-			quota:         quotaConfig(withLimiting(), withAmountAndInterval(30)),
+			config:        quotaConfig(withLimiting(), withAmountAndInterval(30)),
 		},
 		want: want{
 			enabled:   true,
@@ -202,7 +201,7 @@ func TestService(t *testing.T) {
 		args: args{
 			mainSink:      emitterConfig(),
 			secondarySink: emitterConfig(),
-			quota:         quotaConfig(withAmountAndInterval(30)),
+			config:        quotaConfig(withAmountAndInterval(30)),
 		},
 		want: want{
 			enabled:   true,
@@ -223,9 +222,8 @@ func TestService(t *testing.T) {
 				ctx := context.Background()
 				clock := clock.NewMock()
 
-				ttt.args.quota.PeriodStart = time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
-				ttt.args.quota.PeriodEnd = ttt.args.quota.PeriodStart.Add(ttt.args.quota.Interval)
-				clock.Set(ttt.args.quota.PeriodStart)
+				periodStart := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+				clock.Set(ttt.args.config.From)
 
 				mainStorage := emittermock.NewInMemoryStorage(clock)
 				mainEmitter, err := logstore.NewEmitter(ctx, clock, ttt.args.mainSink, mainStorage)
@@ -241,8 +239,8 @@ func TestService(t *testing.T) {
 				}
 
 				svc := logstore.New(
-					quotaqueriermock.NewNoopQuerier(&ttt.args.quota),
-					logstore.UsageReporterFunc(func(context.Context, []*instance.QuotaNotifiedEvent) error { return nil }),
+					quotaqueriermock.NewNoopQuerier(&ttt.args.config, periodStart),
+					logstore.UsageReporterFunc(func(context.Context, []*quota.NotifiedEvent) error { return nil }),
 					mainEmitter,
 					secondaryEmitter)
 

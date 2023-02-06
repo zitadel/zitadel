@@ -3,9 +3,9 @@ package logstore_test
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/logstore"
 )
 
 type emitterOption func(config *logstore.EmitterConfig)
@@ -45,10 +45,10 @@ func withCleanupping(keep, interval time.Duration) emitterOption {
 	}
 }
 
-type quotaOption func(config *query.CurrentQuotaPeriod)
+type quotaOption func(config *quota.AddedEvent)
 
-func quotaConfig(quotaOptions ...quotaOption) query.CurrentQuotaPeriod {
-	q := &query.CurrentQuotaPeriod{
+func quotaConfig(quotaOptions ...quotaOption) quota.AddedEvent {
+	q := &quota.AddedEvent{
 		Amount:   90,
 		Limit:    false,
 		Interval: 90 * time.Second,
@@ -59,15 +59,15 @@ func quotaConfig(quotaOptions ...quotaOption) query.CurrentQuotaPeriod {
 	return *q
 }
 
-func withAmountAndInterval(n int64) quotaOption {
-	return func(c *query.CurrentQuotaPeriod) {
+func withAmountAndInterval(n uint64) quotaOption {
+	return func(c *quota.AddedEvent) {
 		c.Amount = n
 		c.Interval = time.Duration(n) * time.Second
 	}
 }
 
 func withLimiting() quotaOption {
-	return func(c *query.CurrentQuotaPeriod) {
+	return func(c *quota.AddedEvent) {
 		c.Limit = true
 	}
 }

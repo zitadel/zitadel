@@ -46,13 +46,13 @@ func (l *inmemLogStorage) Emit(_ context.Context, bulk []logstore.LogRecord) err
 	return nil
 }
 
-func (l *inmemLogStorage) QueryUsage(_ context.Context, _ string, start, end time.Time) (uint64, error) {
+func (l *inmemLogStorage) QueryUsage(_ context.Context, _ string, start time.Time) (uint64, error) {
 	l.mux.Lock()
 	defer l.mux.Unlock()
 
 	var count uint64
 	for _, r := range l.emitted {
-		if r.ts.After(start.Add(-1)) && r.ts.Before(end) {
+		if r.ts.After(start.Add(-1)) {
 			count++
 		}
 	}
