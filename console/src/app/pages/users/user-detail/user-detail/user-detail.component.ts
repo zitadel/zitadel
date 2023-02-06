@@ -20,6 +20,9 @@ import { ToastService } from 'src/app/services/toast.service';
 import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { formatPhone } from 'src/app/utils/formatPhone';
+import { MachineSecretDialogComponent } from './machine-secret-dialog/machine-secret-dialog.component';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
@@ -58,6 +61,7 @@ export class UserDetailComponent implements OnInit {
 
   public settingsList: SidenavSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
   public currentSetting: string | undefined = 'general';
+  public loginPolicy?: LoginPolicy.AsObject;
 
   constructor(
     public translate: TranslateService,
@@ -137,6 +141,12 @@ export class UserDetailComponent implements OnInit {
 
   public ngOnInit(): void {
     this.refreshUser();
+
+    this.mgmtUserService.getLoginPolicy().then((policy) => {
+      if (policy.policy) {
+        this.loginPolicy = policy.policy;
+      }
+    });
   }
 
   public changeUsername(): void {
@@ -174,6 +184,38 @@ export class UserDetailComponent implements OnInit {
       .unlockUser(req)
       .then(() => {
         this.toast.showInfo('USER.TOAST.UNLOCKED', true);
+        this.refreshUser();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public generateMachineSecret(): void {
+    this.mgmtUserService
+      .generateMachineSecret(this.user.id)
+      .then((resp) => {
+        this.toast.showInfo('USER.TOAST.SECRETGENERATED', true);
+        console.log(resp.clientSecret);
+        this.dialog.open(MachineSecretDialogComponent, {
+          data: {
+            clientId: resp.clientId,
+            clientSecret: resp.clientSecret,
+          },
+          width: '400px',
+        });
+        this.refreshUser();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public removeMachineSecret(): void {
+    this.mgmtUserService
+      .removeMachineSecret(this.user.id)
+      .then((resp) => {
+        this.toast.showInfo('USER.TOAST.SECRETREMOVED', true);
         this.refreshUser();
       })
       .catch((error) => {
@@ -314,6 +356,9 @@ export class UserDetailComponent implements OnInit {
 
   public savePhone(phone: string): void {
     if (this.user.id && phone) {
+      // Format phone before save (add +)
+      phone = formatPhone(phone).phone;
+
       this.mgmtUserService
         .updateHumanPhone(this.user.id, phone)
         .then(() => {
@@ -363,8 +408,9 @@ export class UserDetailComponent implements OnInit {
           .then(() => {
             const params: Params = {
               deferredReload: true,
+              type: this.user.human ? 'humans' : 'machines',
             };
-            this.router.navigate(['/users/list', this.user.human ? 'humans' : 'machines'], { queryParams: params });
+            this.router.navigate(['/users'], { queryParams: params });
             this.toast.showInfo('USER.TOAST.DELETED', true);
           })
           .catch((error) => {

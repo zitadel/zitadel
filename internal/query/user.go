@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -89,6 +90,7 @@ type Phone struct {
 type Machine struct {
 	Name        string
 	Description string
+	HasSecret   bool
 }
 
 type NotifyUser struct {
@@ -177,6 +179,10 @@ var (
 	userLoginNamesOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userLoginNamesTable)
 	userLoginNamesListCol               = Column{
 		name:  "loginnames",
+		table: userLoginNamesTable,
+	}
+	userLoginNamesLowerListCol = Column{
+		name:  "loginnames_lower",
 		table: userLoginNamesTable,
 	}
 	userPreferredLoginNameTable                 = loginNameTable.setAlias("preferred_login_name")
@@ -270,6 +276,10 @@ var (
 	}
 	MachineDescriptionCol = Column{
 		name:  projection.MachineDescriptionCol,
+		table: machineTable,
+	}
+	MachineHasSecretCol = Column{
+		name:  projection.MachineHasSecretCol,
 		table: machineTable,
 	}
 )
@@ -642,7 +652,7 @@ func NewUserPreferredLoginNameSearchQuery(value string, comparison TextCompariso
 }
 
 func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(userLoginNamesListCol, value, TextListContains)
+	return NewTextQuery(userLoginNamesLowerListCol, strings.ToLower(value), TextListContains)
 }
 
 func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (SearchQuery, error) {
@@ -677,6 +687,7 @@ func prepareLoginNamesQuery() (string, []interface{}, error) {
 	return sq.Select(
 		userLoginNamesUserIDCol.identifier(),
 		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name,
+		"ARRAY_AGG(LOWER("+userLoginNamesNameCol.identifier()+"))::TEXT[] AS "+userLoginNamesLowerListCol.name,
 		userLoginNamesInstanceIDCol.identifier(),
 		userLoginNamesOwnerRemovedUserCol.identifier(),
 		userLoginNamesOwnerRemovedPolicyCol.identifier(),
@@ -741,6 +752,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
+			MachineHasSecretCol.identifier(),
 			countColumn.identifier(),
 		).
 			From(userTable.identifier()).
@@ -776,6 +788,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			machineID := sql.NullString{}
 			name := sql.NullString{}
 			description := sql.NullString{}
+			hasSecret := sql.NullBool{}
 
 			err := row.Scan(
 				&u.ID,
@@ -803,6 +816,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				&machineID,
 				&name,
 				&description,
+				&hasSecret,
 				&count,
 			)
 
@@ -833,6 +847,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				u.Machine = &Machine{
 					Name:        name.String,
 					Description: description.String,
+					HasSecret:   hasSecret.Bool,
 				}
 			}
 			return u, nil
@@ -1203,6 +1218,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
+			MachineHasSecretCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
@@ -1240,6 +1256,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				machineID := sql.NullString{}
 				name := sql.NullString{}
 				description := sql.NullString{}
+				hasSecret := sql.NullBool{}
 
 				err := rows.Scan(
 					&u.ID,
@@ -1267,6 +1284,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&machineID,
 					&name,
 					&description,
+					&hasSecret,
 					&count,
 				)
 				if err != nil {
@@ -1296,6 +1314,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					u.Machine = &Machine{
 						Name:        name.String,
 						Description: description.String,
+						HasSecret:   hasSecret.Bool,
 					}
 				}
 

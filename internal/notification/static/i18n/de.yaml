@@ -40,3 +40,10 @@ PasswordlessRegistration:
   Greeting: Hallo {{.FirstName}} {{.LastName}},
   Text: Wir haben eine Anfrage für das Hinzufügen eines Token für den passwortlosen Login erhalten. Du kannst den untenstehenden Button verwenden, um dein Token oder Gerät hinzuzufügen.
   ButtonText: Passwortlosen Login hinzufügen
+PasswordChange:
+  Title: ZITADEL - Passwort von Benutzer wurde geändert
+  PreHeader: Passwort Änderung
+  Subject: Passwort von Benutzer wurde geändert
+  Greeting: Hallo {{.FirstName}} {{.LastName}},
+  Text: Das Password vom Benutzer wurde geändert, wenn diese Änderung von jemand anderem gemacht wurde, empfehlen wir die sofortige Zurücksetzung ihres Passworts.
+  ButtonText: Login

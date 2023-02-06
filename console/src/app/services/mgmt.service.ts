@@ -24,6 +24,8 @@ import {
   AddCustomLockoutPolicyResponse,
   AddCustomLoginPolicyRequest,
   AddCustomLoginPolicyResponse,
+  AddCustomNotificationPolicyRequest,
+  AddCustomNotificationPolicyResponse,
   AddCustomPasswordAgePolicyRequest,
   AddCustomPasswordAgePolicyResponse,
   AddCustomPasswordComplexityPolicyRequest,
@@ -96,6 +98,8 @@ import {
   DeactivateUserResponse,
   DeleteActionRequest,
   DeleteActionResponse,
+  GenerateMachineSecretRequest,
+  GenerateMachineSecretResponse,
   GenerateOrgDomainValidationRequest,
   GenerateOrgDomainValidationResponse,
   GetActionRequest,
@@ -108,6 +112,8 @@ import {
   GetCustomInitMessageTextResponse,
   GetCustomLoginTextsRequest,
   GetCustomLoginTextsResponse,
+  GetCustomPasswordChangeMessageTextRequest,
+  GetCustomPasswordChangeMessageTextResponse,
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
@@ -124,6 +130,8 @@ import {
   GetDefaultLabelPolicyResponse,
   GetDefaultLoginTextsRequest,
   GetDefaultLoginTextsResponse,
+  GetDefaultPasswordChangeMessageTextRequest,
+  GetDefaultPasswordChangeMessageTextResponse,
   GetDefaultPasswordComplexityPolicyRequest,
   GetDefaultPasswordComplexityPolicyResponse,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
@@ -156,6 +164,8 @@ import {
   GetLoginPolicyResponse,
   GetMyOrgRequest,
   GetMyOrgResponse,
+  GetNotificationPolicyRequest,
+  GetNotificationPolicyResponse,
   GetOIDCInformationRequest,
   GetOIDCInformationResponse,
   GetOrgByDomainGlobalRequest,
@@ -302,6 +312,8 @@ import {
   RemoveIDPFromLoginPolicyResponse,
   RemoveMachineKeyRequest,
   RemoveMachineKeyResponse,
+  RemoveMachineSecretRequest,
+  RemoveMachineSecretResponse,
   RemoveMultiFactorFromLoginPolicyRequest,
   RemoveMultiFactorFromLoginPolicyResponse,
   RemoveOrgDomainRequest,
@@ -343,6 +355,8 @@ import {
   ResetCustomInitMessageTextToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
   ResetCustomLoginTextsToDefaultResponse,
+  ResetCustomPasswordChangeMessageTextToDefaultRequest,
+  ResetCustomPasswordChangeMessageTextToDefaultResponse,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse,
   ResetCustomPasswordResetMessageTextToDefaultRequest,
@@ -357,6 +371,8 @@ import {
   ResetLockoutPolicyToDefaultResponse,
   ResetLoginPolicyToDefaultRequest,
   ResetLoginPolicyToDefaultResponse,
+  ResetNotificationPolicyToDefaultRequest,
+  ResetNotificationPolicyToDefaultResponse,
   ResetPasswordAgePolicyToDefaultRequest,
   ResetPasswordAgePolicyToDefaultResponse,
   ResetPasswordComplexityPolicyToDefaultRequest,
@@ -403,6 +419,8 @@ import {
   UpdateCustomLockoutPolicyResponse,
   UpdateCustomLoginPolicyRequest,
   UpdateCustomLoginPolicyResponse,
+  UpdateCustomNotificationPolicyRequest,
+  UpdateCustomNotificationPolicyResponse,
   UpdateCustomPasswordAgePolicyRequest,
   UpdateCustomPasswordAgePolicyResponse,
   UpdateCustomPasswordComplexityPolicyRequest,
@@ -631,6 +649,26 @@ export class ManagementService {
     return this.grpcService.mgmt.getDefaultPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
   }
 
+  public getDefaultPasswordChangeMessageText(
+    req: GetDefaultPasswordChangeMessageTextRequest,
+  ): Promise<GetDefaultPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomPasswordChangeMessageText(
+    req: GetCustomPasswordChangeMessageTextRequest,
+  ): Promise<GetCustomPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomPasswordChangeMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomPasswordChangeMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordChangeMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomPasswordChangeMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
   public getCustomPasswordlessRegistrationMessageText(
     req: GetCustomPasswordlessRegistrationMessageTextRequest,
   ): Promise<GetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
@@ -681,6 +719,18 @@ export class ManagementService {
 
   public unlockUser(req: UnlockUserRequest): Promise<UnlockUserResponse.AsObject> {
     return this.grpcService.mgmt.unlockUser(req, null).then((resp) => resp.toObject());
+  }
+
+  public generateMachineSecret(userId: string): Promise<GenerateMachineSecretResponse.AsObject> {
+    const req = new GenerateMachineSecretRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.generateMachineSecret(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeMachineSecret(userId: string): Promise<RemoveMachineSecretResponse.AsObject> {
+    const req = new RemoveMachineSecretRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removeMachineSecret(req, null).then((resp) => resp.toObject());
   }
 
   public getPrivacyPolicy(): Promise<GetPrivacyPolicyResponse.AsObject> {
@@ -1369,6 +1419,30 @@ export class ManagementService {
     } else {
       return 'POLICY.PWD_COMPLEXITY.PATTERNERROR';
     }
+  }
+
+  /* notification policy */
+
+  public getNotificationPolicy(): Promise<GetNotificationPolicyResponse.AsObject> {
+    const req = new GetNotificationPolicyRequest();
+    return this.grpcService.mgmt.getNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetNotificationPolicyToDefault(): Promise<ResetNotificationPolicyToDefaultResponse.AsObject> {
+    const req = new ResetNotificationPolicyToDefaultRequest();
+    return this.grpcService.mgmt.resetNotificationPolicyToDefault(req, null).then((resp) => resp.toObject());
+  }
+
+  public addCustomNotificationPolicy(
+    req: AddCustomNotificationPolicyRequest,
+  ): Promise<AddCustomNotificationPolicyResponse.AsObject> {
+    return this.grpcService.mgmt.addCustomNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateCustomNotificationPolicy(
+    req: UpdateCustomNotificationPolicyRequest,
+  ): Promise<UpdateCustomNotificationPolicyResponse.AsObject> {
+    return this.grpcService.mgmt.updateCustomNotificationPolicy(req, null).then((resp) => resp.toObject());
   }
 
   public getUserByID(id: string): Promise<GetUserByIDResponse.AsObject> {

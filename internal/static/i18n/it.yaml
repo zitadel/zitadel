@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: Chiave macchina non trovato
         AlreadyExisting: Chiave macchina già esistente
+      Secret:
+        NotExisting: Secret non esiste
+        Invalid: Secret non è valido
+        CouldNotGenerate: Non è stato possibile generare il Secret
     PAT:
       NotFound: Personal Access Token non trovato
     NotHuman: L'utente deve essere personale
@@ -225,6 +229,10 @@ Errors:
       Empty: Mancano le impostazioni Org IAM
       NotExisting: Impostazioni Org IAM non esistenti
       AlreadyExists: Impostazioni Org IAM già esistenti
+    NotificationPolicy:
+      NotFound: Impostazioni di notifica non trovate
+      NotChanged: Impostazioni di notifica non è stato cambiato
+      AlreadyExists: Impostazioni di notifica già esistente
   Project:
     ProjectIDMissing: ID del progetto mancante
     AlreadyExists: Il progetto è già stato creato nell'organizzazione
@@ -351,6 +359,10 @@ Errors:
       NotExisting: Impostazioni Org IAM non esistenti
       AlreadyExists: Impostazioni Org IAM già esistenti
       NotChanged: Impostazioni Org IAM non sono state cambiate
+    NotificationPolicy:
+      NotFound: Impostazioni di notifica predefinite non trovate
+      NotChanged: Impostazioni di notifica predefinite non è stato cambiato
+      AlreadyExists: Impostazioni di notifica predefinite già esistente
   Policy:
     AlreadyExists: Impostazioni già esistenti
     Label:
@@ -425,6 +437,16 @@ Errors:
     CloseRows: Lo statement SQL non può essere terminato
     SQLStatement: Lo statement SQL non può essere creato
     InvalidRequest: La richiesta non è valida
+
+AggregateTypes:
+  action: Azione
+  instance: Istanza
+  key_pair: Coppia di chiavi
+  org: Organizzazione
+  project: Progetto
+  user: Utente
+  usergrant: Sovvenzione utente
+
 EventTypes:
   user:
     added: Utente aggiunto
@@ -457,6 +479,12 @@ EventTypes:
       key:
         added: Chiave aggiunta
         removed: Chiave rimossa
+      secret:
+        set: Secret set
+        removed: Secret rimosso
+        check:
+          succeeded: Controllo della Secret riuscito
+          failed: Controllo della Secret fallito
     human:
       added: Persona aggiunta
       selfregistered: Persona registrata
@@ -636,7 +664,7 @@ EventTypes:
       changed: Membro dell'organizzazione cambiato
       removed: Membro dell'organizzazione rimosso
       cascade:
-        removeD: Cascata di membri dell'organizzazione rimossa
+        removed: Cascata di membri dell'organizzazione rimossa
     iam:
       policy:
         added: Impostazioni IAM aggiunti
@@ -715,6 +743,10 @@ EventTypes:
         added: Informativa sulla privacy e termini e condizioni aggiunti
         changed: Informativa sulla privacy e termini e condizioni cambiati
         removed: Informativa sulla privacy e termini e condizioni rimossi
+      notification:
+        added: Impostazione di notifica creata
+        changed: Impostazione di notifica cambiata
+        removed: Impostazione di notifica rimossa
     flow:
       trigger_actions:
         set: azioni salvate
@@ -732,7 +764,7 @@ EventTypes:
       changed: Membro del progetto cambiato
       removed: Membro del progetto rimosso
       cascade:
-        removeD: Cascata di membri del progetto rimossa
+        removed: Cascata di membri del progetto rimossa
     role:
       added: Ruolo del progetto aggiunto
       changed: Il ruolo del progetto è cambiato
@@ -924,6 +956,7 @@ Action:
       Unspecified: Non specificato
       ExternalAuthentication: Autenticazione esterna
       CustomiseToken: Completare Token
+      InternalAuthentication: Autenticazione interna
   TriggerType:
     Unspecified: Non specificato
     PostAuthentication: Post-autenticazione

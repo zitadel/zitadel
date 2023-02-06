@@ -109,9 +109,11 @@ module.exports = {
           items: [
             "guides/integrate/serviceusers",
             "guides/integrate/access-zitadel-apis",
+            "guides/integrate/client-credentials",
             "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/export-and-import",
+            "guides/integrate/event-api",
           ],
         },
         {
@@ -232,8 +234,9 @@ module.exports = {
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
-        "apis/actions/login-flow",
-        "apis/actions/register-flow",
+        "apis/actions/internal-authentication",
+        "apis/actions/external-authentication",
+        "apis/actions/complement-token",
         "apis/actions/objects",
       ]
     },
@@ -271,6 +274,7 @@ module.exports = {
       collapsed: false,
       items: [
         "self-hosting/manage/production",
+        "self-hosting/manage/productionchecklist",
         "self-hosting/manage/configure/configure",
         "self-hosting/manage/reverseproxy/reverse_proxy",
         "self-hosting/manage/custom-domain",

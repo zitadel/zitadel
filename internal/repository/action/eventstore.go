@@ -3,9 +3,9 @@ package action
 import "github.com/zitadel/zitadel/internal/eventstore"
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(AddedEventType, AddedEventMapper).
-		RegisterFilterEventMapper(ChangedEventType, ChangedEventMapper).
-		RegisterFilterEventMapper(DeactivatedEventType, DeactivatedEventMapper).
-		RegisterFilterEventMapper(ReactivatedEventType, ReactivatedEventMapper).
-		RegisterFilterEventMapper(RemovedEventType, RemovedEventMapper)
+	es.RegisterFilterEventMapper(AggregateType, AddedEventType, AddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, ChangedEventType, ChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, DeactivatedEventType, DeactivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, ReactivatedEventType, ReactivatedEventMapper).
+		RegisterFilterEventMapper(AggregateType, RemovedEventType, RemovedEventMapper)
 }
