@@ -11,29 +11,29 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
-var _ logstore.UsageQuerier = (*inmemLogStorage)(nil)
-var _ logstore.LogCleanupper = (*inmemLogStorage)(nil)
+var _ logstore.UsageQuerier = (*InmemLogStorage)(nil)
+var _ logstore.LogCleanupper = (*InmemLogStorage)(nil)
 
-type inmemLogStorage struct {
+type InmemLogStorage struct {
 	mux     sync.Mutex
 	clock   clock.Clock
 	emitted []*record
 	bulks   []int
 }
 
-func NewInMemoryStorage(clock clock.Clock) *inmemLogStorage {
-	return &inmemLogStorage{
+func NewInMemoryStorage(clock clock.Clock) *InmemLogStorage {
+	return &InmemLogStorage{
 		clock:   clock,
 		emitted: make([]*record, 0),
 		bulks:   make([]int, 0),
 	}
 }
 
-func (l *inmemLogStorage) QuotaUnit() quota.Unit {
+func (l *InmemLogStorage) QuotaUnit() quota.Unit {
 	return quota.Unimplemented
 }
 
-func (l *inmemLogStorage) Emit(_ context.Context, bulk []logstore.LogRecord) error {
+func (l *InmemLogStorage) Emit(_ context.Context, bulk []logstore.LogRecord) error {
 	if len(bulk) == 0 {
 		return nil
 	}
@@ -46,7 +46,7 @@ func (l *inmemLogStorage) Emit(_ context.Context, bulk []logstore.LogRecord) err
 	return nil
 }
 
-func (l *inmemLogStorage) QueryUsage(_ context.Context, _ string, start time.Time) (uint64, error) {
+func (l *InmemLogStorage) QueryUsage(_ context.Context, _ string, start time.Time) (uint64, error) {
 	l.mux.Lock()
 	defer l.mux.Unlock()
 
@@ -59,7 +59,7 @@ func (l *inmemLogStorage) QueryUsage(_ context.Context, _ string, start time.Tim
 	return count, nil
 }
 
-func (l *inmemLogStorage) Cleanup(_ context.Context, keep time.Duration) error {
+func (l *InmemLogStorage) Cleanup(_ context.Context, keep time.Duration) error {
 	l.mux.Lock()
 	defer l.mux.Unlock()
 
@@ -74,14 +74,14 @@ func (l *inmemLogStorage) Cleanup(_ context.Context, keep time.Duration) error {
 	return nil
 }
 
-func (l *inmemLogStorage) Bulks() []int {
+func (l *InmemLogStorage) Bulks() []int {
 	l.mux.Lock()
 	defer l.mux.Unlock()
 
 	return l.bulks
 }
 
-func (l *inmemLogStorage) Len() int {
+func (l *InmemLogStorage) Len() int {
 	l.mux.Lock()
 	defer l.mux.Unlock()
 

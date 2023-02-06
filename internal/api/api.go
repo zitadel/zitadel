@@ -14,23 +14,22 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type API struct {
-	port              uint16
-	grpcServer        *grpc.Server
-	verifier          *internal_authz.TokenVerifier
-	health            health
-	router            *mux.Router
-	externalSecure    bool
-	http1HostName     string
-	accessInterceptor *middleware.AccessInterceptor
+	port           uint16
+	grpcServer     *grpc.Server
+	verifier       *internal_authz.TokenVerifier
+	health         health
+	router         *mux.Router
+	externalSecure bool
+	http1HostName  string
 }
 
 type health interface {

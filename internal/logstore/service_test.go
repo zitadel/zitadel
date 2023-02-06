@@ -24,27 +24,30 @@ const (
 	ticks = 60
 )
 
+type args struct {
+	mainSink      *logstore.EmitterConfig
+	secondarySink *logstore.EmitterConfig
+	config        quota.AddedEvent
+}
+
+type want struct {
+	enabled       bool
+	remaining     *uint64
+	mainSink      wantSink
+	secondarySink wantSink
+}
+
+type wantSink struct {
+	bulks []int
+	len   int
+}
+
 func TestService(t *testing.T) {
 	// tests should run on a single thread
 	// important for deterministic results
 	beforeProcs := runtime.GOMAXPROCS(1)
 	defer runtime.GOMAXPROCS(beforeProcs)
 
-	type args struct {
-		mainSink      *logstore.EmitterConfig
-		secondarySink *logstore.EmitterConfig
-		config        quota.AddedEvent
-	}
-	type wantSink struct {
-		bulks []int
-		len   int
-	}
-	type want struct {
-		enabled       bool
-		remaining     *uint64
-		mainSink      wantSink
-		secondarySink wantSink
-	}
 	tests := []struct {
 		name string
 		args args
@@ -214,89 +217,103 @@ func TestService(t *testing.T) {
 			},
 		},
 	}}
-	for _, ttt := range tests {
-		t.Run("Given over a minute, each second a log record is emitted", func(tt *testing.T) {
-			tt.Run(ttt.name, func(t *testing.T) {
-				ctx := context.Background()
-				clock := clock.NewMock()
+	for _, tt := range tests {
+		runTest(t, tt.name, tt.args, tt.want)
+	}
+}
 
-				periodStart := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
-				clock.Set(ttt.args.config.From)
-
-				mainStorage := emittermock.NewInMemoryStorage(clock)
-				mainEmitter, err := logstore.NewEmitter(ctx, clock, ttt.args.mainSink, mainStorage)
-				if err != nil {
-					t.Errorf("expected no error but got %v", err)
-					return
-				}
-				secondaryStorage := emittermock.NewInMemoryStorage(clock)
-				secondaryEmitter, err := logstore.NewEmitter(ctx, clock, ttt.args.secondarySink, secondaryStorage)
-				if err != nil {
-					t.Fatalf("expected no error but got %v", err)
-					return
-				}
-
-				svc := logstore.New(
-					quotaqueriermock.NewNoopQuerier(&ttt.args.config, periodStart),
-					logstore.UsageReporterFunc(func(context.Context, []*quota.NotifiedEvent) error { return nil }),
-					mainEmitter,
-					secondaryEmitter)
-
-				if svc.Enabled() != ttt.want.enabled {
-					t.Errorf("wantet service enabled to be %t but is %t", ttt.want.enabled, svc.Enabled())
-					return
-				}
-
-				var (
-					remaining *uint64
-				)
-				for i := 0; i < ticks; i++ {
-					err = svc.Handle(ctx, emittermock.NewRecord(clock))
-					runtime.Gosched()
-					remaining, err = svc.Limit(ctx, "non-empty-instance-id")
-					if err != nil {
-						t.Fatalf("expected no error but got %v", err)
-						return
-					}
-					clock.Add(tick)
-				}
-				time.Sleep(time.Millisecond)
-				runtime.Gosched()
-
-				mainBulks := mainStorage.Bulks()
-				if !reflect.DeepEqual(ttt.want.mainSink.bulks, mainBulks) {
-					t.Errorf("wanted main storage to have bulks %v, but got %v", ttt.want.mainSink.bulks, mainBulks)
-				}
-
-				mainLen := mainStorage.Len()
-				if !reflect.DeepEqual(ttt.want.mainSink.len, mainLen) {
-					t.Errorf("wanted main storage to have len %d, but got %d", ttt.want.mainSink.len, mainLen)
-				}
-
-				secondaryBulks := secondaryStorage.Bulks()
-				if !reflect.DeepEqual(ttt.want.secondarySink.bulks, secondaryBulks) {
-					t.Errorf("wanted secondary storage to have bulks %v, but got %v", ttt.want.secondarySink.bulks, secondaryBulks)
-				}
-
-				secondaryLen := secondaryStorage.Len()
-				if !reflect.DeepEqual(ttt.want.secondarySink.len, secondaryLen) {
-					t.Errorf("wanted secondary storage to have len %d, but got %d", ttt.want.secondarySink.len, secondaryLen)
-				}
-
-				if remaining == nil && ttt.want.remaining == nil {
-					return
-				}
-
-				if remaining == nil && ttt.want.remaining != nil ||
-					remaining != nil && ttt.want.remaining == nil {
-					t.Errorf("wantet remaining nil %t but got %t", ttt.want.remaining == nil, remaining == nil)
-					return
-				}
-				if *remaining != *ttt.want.remaining {
-					t.Errorf("wantet remaining %d but got %d", *ttt.want.remaining, *remaining)
-					return
-				}
-			})
+func runTest(t *testing.T, name string, args args, want want) bool {
+	return t.Run("Given over a minute, each second a log record is emitted", func(tt *testing.T) {
+		tt.Run(name, func(t *testing.T) {
+			ctx, clock, mainStorage, secondaryStorage, svc := given(t, args, want)
+			remaining := when(t, svc, ctx, clock)
+			then(t, mainStorage, want, secondaryStorage, remaining)
 		})
+	})
+}
+
+func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *emittermock.InmemLogStorage, *emittermock.InmemLogStorage, *logstore.Service) {
+	ctx := context.Background()
+	clock := clock.NewMock()
+
+	periodStart := time.Date(2023, time.January, 1, 0, 0, 0, 0, time.UTC)
+	clock.Set(args.config.From)
+
+	mainStorage := emittermock.NewInMemoryStorage(clock)
+	mainEmitter, err := logstore.NewEmitter(ctx, clock, args.mainSink, mainStorage)
+	if err != nil {
+		t.Errorf("expected no error but got %v", err)
+	}
+	secondaryStorage := emittermock.NewInMemoryStorage(clock)
+	secondaryEmitter, err := logstore.NewEmitter(ctx, clock, args.secondarySink, secondaryStorage)
+	if err != nil {
+		t.Fatalf("expected no error but got %v", err)
+	}
+
+	svc := logstore.New(
+		quotaqueriermock.NewNoopQuerier(&args.config, periodStart),
+		logstore.UsageReporterFunc(func(context.Context, []*quota.NotifiedEvent) error { return nil }),
+		mainEmitter,
+		secondaryEmitter)
+
+	if svc.Enabled() != want.enabled {
+		t.Errorf("wantet service enabled to be %t but is %t", want.enabled, svc.Enabled())
+	}
+	return ctx, clock, mainStorage, secondaryStorage, svc
+}
+
+func when(t *testing.T, svc *logstore.Service, ctx context.Context, clock *clock.Mock) *uint64 {
+	var remaining *uint64
+	for i := 0; i < ticks; i++ {
+		err := svc.Handle(ctx, emittermock.NewRecord(clock))
+		if err != nil {
+			t.Fatalf("expected no error but got %v", err)
+		}
+
+		runtime.Gosched()
+		remaining, err = svc.Limit(ctx, "non-empty-instance-id")
+		if err != nil {
+			t.Fatalf("expected no error but got %v", err)
+		}
+		clock.Add(tick)
+	}
+	time.Sleep(time.Millisecond)
+	runtime.Gosched()
+	return remaining
+}
+
+func then(t *testing.T, mainStorage *emittermock.InmemLogStorage, want want, secondaryStorage *emittermock.InmemLogStorage, remaining *uint64) {
+	mainBulks := mainStorage.Bulks()
+	if !reflect.DeepEqual(want.mainSink.bulks, mainBulks) {
+		t.Errorf("wanted main storage to have bulks %v, but got %v", want.mainSink.bulks, mainBulks)
+	}
+
+	mainLen := mainStorage.Len()
+	if !reflect.DeepEqual(want.mainSink.len, mainLen) {
+		t.Errorf("wanted main storage to have len %d, but got %d", want.mainSink.len, mainLen)
+	}
+
+	secondaryBulks := secondaryStorage.Bulks()
+	if !reflect.DeepEqual(want.secondarySink.bulks, secondaryBulks) {
+		t.Errorf("wanted secondary storage to have bulks %v, but got %v", want.secondarySink.bulks, secondaryBulks)
+	}
+
+	secondaryLen := secondaryStorage.Len()
+	if !reflect.DeepEqual(want.secondarySink.len, secondaryLen) {
+		t.Errorf("wanted secondary storage to have len %d, but got %d", want.secondarySink.len, secondaryLen)
+	}
+
+	if remaining == nil && want.remaining == nil {
+		return
+	}
+
+	if remaining == nil && want.remaining != nil ||
+		remaining != nil && want.remaining == nil {
+		t.Errorf("wantet remaining nil %t but got %t", want.remaining == nil, remaining == nil)
+		return
+	}
+	if *remaining != *want.remaining {
+		t.Errorf("wantet remaining %d but got %d", *want.remaining, *remaining)
+		return
 	}
 }

@@ -19,7 +19,7 @@ type QuotaUnit string
 
 const (
 	QuotaRequestsAllAuthenticated QuotaUnit = "requests.all.authenticated"
-	QuotaActionsAllRunsSeconds              = "actions.all.runs.seconds"
+	QuotaActionsAllRunsSeconds    QuotaUnit = "actions.all.runs.seconds"
 )
 
 func (q *QuotaUnit) Enum() quota.Unit {

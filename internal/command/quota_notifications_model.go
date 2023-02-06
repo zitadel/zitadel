@@ -38,10 +38,8 @@ func (wm *quotaNotificationsWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *quotaNotificationsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *quota.NotifiedEvent:
-			wm.latestNotifiedThresholds[e.ID] = e.Threshold
-		}
+		e := event.(*quota.NotifiedEvent)
+		wm.latestNotifiedThresholds[e.ID] = e.Threshold
 	}
 	return wm.WriteModel.Reduce()
 }

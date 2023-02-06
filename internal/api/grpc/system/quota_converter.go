@@ -22,6 +22,8 @@ func instanceQuotaUnitPbToQuotaUnit(unit system_pb.Unit) command.QuotaUnit {
 		return command.QuotaRequestsAllAuthenticated
 	case system_pb.Unit_UNIT_ACTIONS_ALL_RUNS_SECONDS:
 		return command.QuotaActionsAllRunsSeconds
+	case system_pb.Unit_UNIT_UNIMPLEMENTED:
+		fallthrough
 	default:
 		return command.QuotaUnit(unit.String())
 	}

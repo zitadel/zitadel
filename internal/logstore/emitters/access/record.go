@@ -35,11 +35,10 @@ const (
 	redacted = "[REDACTED]"
 )
 
-func (a *Record) Normalize() logstore.LogRecord {
-	clone := &(*a)
-	normalizeHeaders(clone.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "grpcgateway-authorization", "cookie", "grpcgateway-cookie")
-	normalizeHeaders(clone.ResponseHeaders, "set-cookie")
-	return clone
+func (a Record) Normalize() logstore.LogRecord {
+	normalizeHeaders(a.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "grpcgateway-authorization", "cookie", "grpcgateway-cookie")
+	normalizeHeaders(a.ResponseHeaders, "set-cookie")
+	return a
 }
 
 // normalizeHeaders lowers all header keys and redacts secrets

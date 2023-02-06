@@ -77,7 +77,7 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 		record.TookMS = ts.Sub(l.started).Milliseconds()
 	}
 
-	if err := logstoreService.Handle(context.TODO() /* TODO: context */, record); err != nil {
+	if err := logstoreService.Handle(l.ctx, record); err != nil {
 		logging.WithError(err).WithField("record", record).Errorf("handling execution log failed")
 	}
 }

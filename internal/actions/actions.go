@@ -5,8 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	z_errs "github.com/zitadel/zitadel/internal/errors"
-
+	"github.com/dop251/goja_nodejs/require"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
 

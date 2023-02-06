@@ -13,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/zitadel/saml/pkg/provider"
+
 	clockpkg "github.com/benbjohnson/clock"
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
