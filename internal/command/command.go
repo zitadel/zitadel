@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"

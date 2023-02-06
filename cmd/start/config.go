@@ -3,8 +3,6 @@ package start
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"

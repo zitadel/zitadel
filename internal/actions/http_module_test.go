@@ -9,8 +9,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-
 	"github.com/dop251/goja"
 	"github.com/zitadel/zitadel/internal/errors"
 )

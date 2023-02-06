@@ -6,8 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-
 	"github.com/dop251/goja"
 )
 

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-
 	"github.com/zitadel/logging"
 )
 

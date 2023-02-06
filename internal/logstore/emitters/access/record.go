@@ -5,9 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/logstore"
 )
 
 var _ logstore.LogRecord = (*Record)(nil)

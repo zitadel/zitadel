@@ -8,10 +8,9 @@ import (
 	z_errs "github.com/zitadel/zitadel/internal/errors"
 
 	"github.com/sirupsen/logrus"
-
 	"github.com/zitadel/logging"
 
-	"github.com/dop251/goja_nodejs/require"
+	z_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
@@ -137,7 +136,7 @@ func executeFn(config *runConfig, fn jsAction) (err error) {
 			}
 			return
 		}
-		err = fmt.Errorf("unknown error occured: %v", r)
+		err = fmt.Errorf("unknown error occurred: %v", r)
 		config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
 		if config.allowedToFail {
 			err = nil

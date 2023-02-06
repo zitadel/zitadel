@@ -1,9 +1,8 @@
 package command
 
 import (
-	"github.com/zitadel/zitadel/internal/repository/quota"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 type quotaWriteModel struct {

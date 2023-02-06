@@ -22,7 +22,6 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	"github.com/zitadel/saml/pkg/provider"
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
 	"github.com/zitadel/zitadel/internal/actions"

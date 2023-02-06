@@ -8,16 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-
-	"github.com/zitadel/zitadel/internal/repository/quota"
-
 	"github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 
-	"github.com/zitadel/logging"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 const (

@@ -6,13 +6,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
-
-	"github.com/zitadel/zitadel/internal/logstore"
-
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 )
 
 const (

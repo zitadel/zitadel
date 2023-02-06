@@ -3,8 +3,6 @@ package server
 import (
 	"crypto/tls"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"

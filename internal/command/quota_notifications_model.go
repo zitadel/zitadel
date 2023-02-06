@@ -3,9 +3,8 @@ package command
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 type quotaNotificationsWriteModel struct {

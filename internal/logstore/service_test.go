@@ -11,14 +11,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
-
-	"github.com/zitadel/zitadel/internal/logstore"
-
 	"github.com/benbjohnson/clock"
 
+	"github.com/zitadel/zitadel/internal/logstore"
 	emittermock "github.com/zitadel/zitadel/internal/logstore/emitters/mock"
 	quotaqueriermock "github.com/zitadel/zitadel/internal/logstore/quotaqueriers/mock"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 const (

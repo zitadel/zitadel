@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-
 	"github.com/gorilla/mux"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/zitadel/logging"

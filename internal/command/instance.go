@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
-
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"

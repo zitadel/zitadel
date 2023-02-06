@@ -9,10 +9,9 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
+
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/logstore"
-
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
