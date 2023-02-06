@@ -25,14 +25,3 @@ As an alternative you can use this docker compose command:
 ```console
 docker compose up
 ```
-
-## API docs
-
-To generate the openapi files locally please use this command in the root of the repository
-
-```
-docker run \
-  --volume "$(pwd):/workspace" \
-  --workdir /workspace \
-  bufbuild/buf generate
-```
