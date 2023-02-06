@@ -1,31 +1,28 @@
-FROM node:18 as npm-base
-
-WORKDIR /console
-
-COPY third_party /third_party
+## Generate the gRPC clients for Angular
+FROM bufbuild/buf as generator
+COPY buf.*.yaml .
 COPY proto /proto
+RUN buf generate --include-imports
 
-COPY console/package.json console/package-lock.json ./
-RUN npm ci
+## Cache step for dependencies
+FROM node:18 as npm-base
+WORKDIR /console
+COPY console/package.json console/yarn.lock ./
+RUN yarn install --frozen-lockfile
 
-COPY console .
-
-#######################
-## angular lint workspace and prod build
-#######################
+## Angular lint workspace and production build
 FROM npm-base as angular-build
+COPY --from=generator console/src/app/proto/generated src/app/proto/generated
+COPY console .
+RUN yarn prodbuild
 
-RUN npm run build
-
-#######################
-## Only Copy Assets
-#######################
+## Extra step which allows to output the build artifacts during CI
 FROM scratch as angular-export
 COPY --from=angular-build /console/dist/console .
 
-##
+## Final image for production serving
 FROM node:18-alpine as final
-RUN npm install -g http-server
-COPY --from=angular-build /console/dist/console /site
+RUN yarn add global http-server
+COPY --from=angular-build /console/dist/console /app
 EXPOSE  8080
-CMD ["http-server", "--cors", "-p8080", "/site"]
+CMD ["http-server", "--cors", "-p8080", "/app"]

@@ -12,7 +12,7 @@ import { enterAnimations } from 'src/app/animations';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { SearchQuery, Type, TypeQuery, User, UserFieldName, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';

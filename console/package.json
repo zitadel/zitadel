@@ -1,17 +1,17 @@
 {
-  "name": "ZITADEL-Console",
+  "name": "zitadel-console",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "prebuild": "yarn generate && yarn lint",
-    "build": "ng build --configuration production",
+    "build": "ng build",
+    "prodbuild": "ng build --configuration production",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
     "generate": "yarn generate:grpc",
     "pregenerate:grpc": "del-cli src/app/proto/generated && make-dir src/app/proto/generated",
-    "generate:grpc": "docker run --volume $(pwd)/..:/workspace --workdir /workspace bufbuild/buf generate"
-    },
+    "generate:grpc": "docker run --volume $(pwd)/..:/workspace --workdir /workspace bufbuild/buf generate --include-imports"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^15.0.2",
@@ -38,6 +38,8 @@
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "flag-icons": "^6.6.6",
+    "google-protobuf": "^3.21.2",
+    "grpc-web": "^1.4.2",
     "i18n-iso-countries": "^7.5.0",
     "libphonenumber-js": "^1.10.19",
     "material-design-icons-iconfont": "^6.1.1",
@@ -59,6 +61,7 @@
     "@angular/cli": "^15.0.2",
     "@angular/compiler-cli": "^15.0.2",
     "@angular/language-service": "^15.0.4",
+    "@types/google-protobuf": "^3.15.6",
     "@types/jasmine": "~4.3.0",
     "@types/jasminewd2": "~2.0.10",
     "@types/jsonwebtoken": "^9.0.0",
@@ -69,6 +72,7 @@
     "codelyzer": "^6.0.0",
     "del-cli": "5.0.0",
     "eslint": "^8.31.0",
+    "google-protobuf": "^3.21.2",
     "jasmine-core": "~4.5.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "~6.4.1",
