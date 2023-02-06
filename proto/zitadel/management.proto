@@ -129,9 +129,9 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Search a user within all organisations by it's loginname";
-            description: "The request only returns data if the login name matches exactly."
-            tags: "user";
+            summary: "Get user by login name (globally)";
+            description: "Get a user by login name over all organizations. The request only returns data if the login name matches exactly."
+            tags: "User";
             tags: "global";
             responses: {
                 key: "200"
@@ -142,8 +142,6 @@ service ManagementService {
         };
     }
 
-    // Return the users matching the query
-    // Limit should always be set, there is a default limit set by the service
     rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
         option (google.api.http) = {
             post: "/users/_search"
@@ -152,6 +150,29 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            summary: "Search users";
+            description: "Search for users within an organization. By default we will return users of your own organization. Set the 'x-zitadel-orgid' header to search users from another organization. Make sure to include a limit and sorting for pagination."
+            responses: {
+                key: "200";
+                value: {
+                    description: "A list of all users matching the query";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid list query";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
         };
     }
 
@@ -179,9 +200,7 @@ service ManagementService {
         };
     }
 
-    // Create a user of the type human
-    // A email will be sent to the user if email is not verified or no password is set
-    // If a password is given, the user has to change on the next login
+    // deprecated: use ImportHumanUser
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -193,9 +212,6 @@ service ManagementService {
         };
     }
 
-    // Create a user of the type human
-    // A email will be sent to the user if email is not verified or no password is set
-    // If a password is given, the user doesn't have to change on the next login
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -204,6 +220,18 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create User (Human)";
+            description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
+            tags: "User";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
         };
     }
 
@@ -216,6 +244,18 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create User (Machine)";
+            description: "Create a new user with the type machine for your API, service or device. This users are used for non interactive authentication flows."
+            tags: "User";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
         };
     }
 
@@ -231,10 +271,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Deactivate user";
+            description: "The state of the user will be changed to 'deactivated'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'deactivated'."
+            tags: "User";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
     }
 
-    // Changes the user state to active
-    // returns an error if user state is not deactivated
     rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_reactivate"
@@ -244,11 +294,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Reactivate user";
+            description: "Reactivate a user with the state 'deactivated'. The user will be able to login again afterwards. The endpoint returns an error if the user is not in the state 'deactivated'."
+            tags: "User";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
     }
 
-    // Changes the user state to deactivated
-    // The user will not be able to login
-    // returns an error if user state is already locked
     rpc LockUser(LockUserRequest) returns (LockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_lock"
@@ -258,10 +317,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Deactivate user";
+            description: "The state of the user will be changed to 'locked'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'locked'."
+            tags: "User";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
     }
 
-    // Changes the user state to active
-    // returns an error if user state is not locked
     rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_unlock"
@@ -270,6 +339,18 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Unlock user";
+            description: "Unlock a user with the state 'locked'. The user will be able to login again afterwards. The endpoint returns an error if the user is not in the state 'locked'."
+            tags: "User";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
         };
     }
 
@@ -281,6 +362,18 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete user";
+            description: "The state of the user will be changed to 'deleted'. The user will not be able to login anymore. Endpoints requesting this user will return an error 'User not found'"
+            tags: "User";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
         };
     }
 
