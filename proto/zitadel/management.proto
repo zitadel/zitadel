@@ -155,7 +155,15 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User";
             summary: "Search users";
-            description: "Search for users within an organization. By default we will return users of your own organization. Set the 'x-zitadel-orgid' header to search users from another organization. Make sure to include a limit and sorting for pagination."
+            description: "Search for users within an organization. By default we will return users of your own organization. Make sure to include a limit and sorting for pagination."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
             responses: {
                 key: "200";
                 value: {
@@ -231,6 +239,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to add users to another organization include the header. Make sure the user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
