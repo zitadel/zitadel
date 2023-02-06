@@ -1,18 +1,17 @@
 {
-  "name": "console",
+  "name": "ZITADEL-Console",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "prebuild": "npm run generate && npm run lint",
+    "prebuild": "yarn generate && yarn lint",
     "build": "ng build --configuration production",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
-    "pregenerate": "del-cli src/app/proto/generated && make-dir src/app/proto/generated",
-    "generate": "npm run generate:grpc",
+    "generate": "yarn generate:grpc",
     "pregenerate:grpc": "del-cli src/app/proto/generated && make-dir src/app/proto/generated",
-    "generate:grpc": "grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./src/app/proto/generated --grpc-web_out=import_style=typescript,mode=grpcweb:./src/app/proto/generated -I=third_party/googleapis/ -I=third_party/grpc-gateway/ -I=third_party/protoc-gen-validate/ -I=proto/ proto/zitadel/*.proto third_party/protoc-gen-validate/validate/*.proto third_party/grpc-gateway/protoc-gen-openapiv2/options/*.proto third_party/googleapis/google/api/*.proto third_party/googleapis/google/protobuf/*.proto"
-  },
+    "generate:grpc": "docker run --volume $(pwd)/..:/workspace --workdir /workspace bufbuild/buf generate"
+    },
   "private": true,
   "dependencies": {
     "@angular/animations": "^15.0.2",
@@ -39,17 +38,11 @@
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "flag-icons": "^6.6.6",
-    "google-proto-files": "^3.0.2",
-    "google-protobuf": "^3.21.2",
-    "grpc-web": "^1.4.1",
     "i18n-iso-countries": "^7.5.0",
     "libphonenumber-js": "^1.10.19",
     "material-design-icons-iconfont": "^6.1.1",
     "moment": "^2.29.4",
     "ngx-color": "^8.0.3",
-    "nice-grpc-web": "^2.0.1",
-    "protobufjs": "^7.1.2",
-    "protoc-gen-grpc-web": "^1.4.1",
     "rxjs": "~7.8.0",
     "tinycolor2": "^1.5.2",
     "tslib": "^2.4.1",
@@ -66,7 +59,6 @@
     "@angular/cli": "^15.0.2",
     "@angular/compiler-cli": "^15.0.2",
     "@angular/language-service": "^15.0.4",
-    "@types/google-protobuf": "^3.15.6",
     "@types/jasmine": "~4.3.0",
     "@types/jasminewd2": "~2.0.10",
     "@types/jsonwebtoken": "^9.0.0",
@@ -77,7 +69,6 @@
     "codelyzer": "^6.0.0",
     "del-cli": "5.0.0",
     "eslint": "^8.31.0",
-    "grpc-tools": "1.11.3",
     "jasmine-core": "~4.5.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma": "~6.4.1",
@@ -88,8 +79,6 @@
     "make-dir-cli": "3.0.0",
     "prettier": "2.8.3",
     "protractor": "~7.0.0",
-    "ts-proto": "1.130.0",
-    "ts-protoc-gen": "^0.15.0",
     "typescript": "^4.8.4"
   }
 }
