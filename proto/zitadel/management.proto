@@ -319,7 +319,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deactivate user";
+            summary: "Lock user";
             description: "The state of the user will be changed to 'locked'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'locked'."
             tags: "User";
             responses: {
