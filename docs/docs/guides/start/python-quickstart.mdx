@@ -46,7 +46,7 @@ cd example-api-python3-flask
 2. The [server.py](https://github.com/zitadel/example-api-python3-flask/blob/main/server.py) file contains a Flask-based API that provides authentication for routes using the OpenID Connect protocol as shown below.
  
 
-```
+```python
 from flask import Flask, jsonify, Response
 from authlib.integrations.flask_oauth2 import ResourceProtector
 from validator import ZitadelIntrospectTokenValidator, ValidatorError
@@ -97,17 +97,90 @@ if __name__ == "__main__":
 
 The API has three routes:
 
-"/api/public" - No access token required
-"/api/private" - A valid access token is required.
-"/api/private-scoped" - A valid access token and a "read:messages" scope are required.
+<ul>
+<li> "/api/public" - No access token is required.</li>
+<li>"/api/private" - A valid access token is required.</li>
+<li>"/api/private-scoped" - A valid access token and a "read:messages" scope are required.</li>
+</ul>
 
-The [validator.py](https://github.com/zitadel/example-api-python3-flask/blob/main/validator.py) file implements the ZitadelIntrospectTokenValidator class, which is a custom class that inherits from the IntrospectTokenValidator class provided by the authlib library. The ZitadelIntrospectTokenValidator class implements the introspection of an access token, which is used to validate the token. The introspection process retrieves the token details from an authorization server using the introspection endpoint.
+The [validator.py](https://github.com/zitadel/example-api-python3-flask/blob/main/validator.py) file implements the ZitadelIntrospectTokenValidator class, which is a custom class that inherits from the IntrospectTokenValidator class provided by the authlib library. The introspection process retrieves the token details from ZITADEL using ZITADEL's introspection endpoint.
 
-The [test_validator.py](https://github.com/zitadel/example-api-python3-flask/blob/main/test_validator.py) file contains a series of tests for the ZitadelIntrospectTokenValidator class to ensure that it is working as expected.
+```python
+from os import environ as env
+import os
+import time
+from typing import Dict
 
+from authlib.oauth2.rfc7662 import IntrospectTokenValidator
+import requests
+from dotenv import load_dotenv, find_dotenv
+from requests.auth import HTTPBasicAuth
+
+load_dotenv()
+
+ZITADEL_DOMAIN = os.getenv("ZITADEL_DOMAIN")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
+
+class ValidatorError(Exception):
+
+    def __init__(self, error: Dict[str, str], status_code: int):
+        super().__init__()
+        self.error = error
+        self.status_code = status_code
+
+# Use Introspection in Resource Server
+# https://docs.authlib.org/en/latest/specs/rfc7662.html#require-oauth-introspection
+
+class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
+    def introspect_token(self, token_string):
+        url = f'{ZITADEL_DOMAIN}/oauth/v2/introspect'
+        data = {'token': token_string, 'token_type_hint': 'access_token', 'scope': 'openid'}
+        auth = HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
+        resp = requests.post(url, data=data, auth=auth)
+        resp.raise_for_status()
+        return resp.json()
+    
+    def match_token_scopes(self, token, or_scopes):
+        if or_scopes is None: 
+            return True
+        roles = token["urn:zitadel:iam:org:project:roles"].keys()
+        for and_scopes in or_scopes:
+            scopes = and_scopes.split()
+            """print(f"Check if all {scopes} are in {roles}")"""
+            if all(key in roles for key in scopes):
+                return True
+        return False
+
+    def validate_token(self, token, scopes, request):
+        print (f"Token: {token}\n")
+        now = int( time.time() )
+        if not token:
+            raise ValidatorError({
+                "code": "invalid_token_revoked", 
+                "description": "Token was revoked." }, 401)
+        """Expired"""
+        if token["exp"] < now: 
+            raise ValidatorError({
+                "code": "invalid_token_expired", 
+                "description": "Token has expired." }, 401)
+        """Revoked"""
+        if not token["active"]: 
+            raise InvalidTokenError()
+        """Insufficient Scope"""
+        if not self.match_token_scopes(token, scopes):
+            raise ValidatorError({
+                "code": "insufficient_scope", 
+                "description": f"Token has insufficient scope. Route requires: {scopes}" }, 401)
+
+    def __call__(self, *args, **kwargs):
+        res = self.introspect_token(*args, **kwargs)
+        return res
+```
 3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Instance Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](https://zitadel.com/docs/guides/start/quickstart#referred1).
 
-```
+```python
 ZITADEL_DOMAIN = "https://your-domain-abcdef.zitadel.cloud"
 CLIENT_ID = "197....@projectname"
 CLIENT_SECRET = "NVAp70IqiGmJldbS...."
@@ -117,17 +190,15 @@ CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 
 ![Create a service user](/img/guides/python-quickstart/3.png)
 
-1. Create a service user by following [this guide](https://zitadel.com/docs/guides/manage/console/users#create-user) to create a service user.
-
-2. Now create a Personal Access Token (PAT) by following [this guide](https://zitadel.com/docs/guides/integrate/pat#create-a-service-user-with-a-pat). No need to add the the user as manager.
-
-3. To enable authorization, follow [this guide](https://zitadel.com/docs/guides/manage/console/roles) to create a role `read:messages` on your project. Authorize the service user you created by adding the role `read:messages` to the user.
+1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](https://zitadel.com/docs/guides/integrate/pat#create-a-service-user-with-a-pat). 
+2. To enable authorization, follow [this guide](https://zitadel.com/docs/guides/manage/console/roles) to create a role `read:messages` on your project. 
+3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](https://zitadel.com/docs/guides/manage/console/roles#authorizations) for more information on creating an authorization. 
 
 
 ### Run the API
 
-1. Install required dependencies by running `pip3 install -r requirements.txt`.
-2. Run the API with `python3 server.py`.
+1. Install required dependencies by running `pip3 install -r requirements.txt` on your terminal.
+2. Run the API with the `python3 server.py` command.
 3. Open another terminal and follow the next step to test the API.
 
 ## Test the API
@@ -186,4 +257,4 @@ You should get a response with Status Code 200 and the following message.
 
 `{"message":"Private, scoped route - You need to be authenticated and have the role read:messages to see this."}`
 
-You can remove the role from the service user in ZITADEL and try again. You should then get Status Code 401, unauthorized.
+You can remove the role from the service user in ZITADEL and try again. You should then get a Status Code 403, Forbidden error.
