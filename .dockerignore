@@ -19,3 +19,5 @@ pkg/grpc/*/*.pb.*
 pkg/grpc/*/*.swagger.json
 .goreleaser.yaml
 .artifacts/
+node_modules/
+/console/dist/

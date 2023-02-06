@@ -13,7 +13,7 @@ If you have `buf` installed locally you can invoke `buf generate --include-impor
 
 ### Create a local env file
 
---- max can you insert quickly somehting here
+--- max can you insert quickly something here
 
 ## Development server
 
