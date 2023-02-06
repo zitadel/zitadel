@@ -43,6 +43,7 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/start/quickstart",
+        "guides/start/python-quickstart",
       ],
     },
     {
