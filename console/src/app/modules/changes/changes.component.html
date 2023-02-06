@@ -5,7 +5,7 @@
 <div class="scroll-container">
   <li class="item" *ngFor="let hist of data | async; index as histindex">
     <span *ngIf="hist.values[0].dates[0]" class="date">
-      {{ hist.values[0].dates[0] | timestampToDate | localizedDate : 'dd. MMM YYYY' }}
+      {{ hist.values[0].dates[0] | timestampToDate | localizedDate: 'dd. MMM YYYY' }}
     </span>
     <div class="item" *ngFor="let dayelement of hist.values; index as i">
       <div class="row">
@@ -28,8 +28,8 @@
               <span class="msg">{{ action.localizedMessage }}</span>
               <span
                 class="block"
-                matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate : 'dd. MM YYYY, HH:mm' }}"
-                >{{ dayelement.dates[j] | timestampToDate | localizedDate : 'HH:mm' }}</span
+                matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MM YYYY, HH:mm' }}"
+                >{{ dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm' }}</span
               >
             </div>
           </div>

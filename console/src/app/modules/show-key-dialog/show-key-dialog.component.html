@@ -13,7 +13,7 @@
     <div class="row">
       <p class="left cnsl-secondary-text">{{ 'USER.MACHINE.CREATIONDATE' | translate }}</p>
       <p *ngIf="keyResponse.details && keyResponse.details.creationDate" class="right">
-        {{ keyResponse.details.creationDate | timestampToDate | localizedDate : 'EEE dd. MMM YYYY, HH:mm' }}
+        {{ keyResponse.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
       </p>
     </div>
 

@@ -14,7 +14,7 @@
       <div class="text-part">
         <span *ngIf="item.details && item.details.changeDate" class="top cnsl-secondary-text"
           >{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}
-          {{ item.details.changeDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm' }}</span
+          {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span
         >
         <div class="name-row">
           <span class="name" *ngIf="$any(item).name">{{ $any(item).name }}</span>
@@ -31,7 +31,7 @@
 
         <span *ngIf="item.details && item.details.creationDate" class="created"
           >{{ 'PROJECT.PAGES.CREATEDON' | translate }}
-          {{ item.details.creationDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm' }}</span
+          {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span
         >
         <span class="fill-space"></span>
       </div>
@@ -52,7 +52,7 @@
       <div class="text-part">
         <span *ngIf="item.details && item.details.changeDate" class="top cnsl-secondary-text"
           >{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}
-          {{ item.details.changeDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm' }}</span
+          {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span
         >
         <div class="name-row">
           <span class="name" *ngIf="$any(item).name">{{ $any(item).name }}</span>
@@ -70,7 +70,7 @@
         <span class="owning-org" *ngIf="$any(item).projectOwnerName">{{ $any(item).projectOwnerName }}</span>
         <span *ngIf="item.details && item.details.creationDate" class="created cnsl-secondary-text"
           >{{ 'PROJECT.PAGES.CREATEDON' | translate }}
-          {{ item.details.creationDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm' }}</span
+          {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span
         >
         <span class="fill-space"></span>
       </div>

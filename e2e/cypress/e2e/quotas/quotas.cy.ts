@@ -123,9 +123,9 @@ describe('quotas', () => {
 
       beforeEach(() => cy.task('resetWebhookEvents'));
 
-      const amount = 100
-      const percent = 10
-      const usage = 25
+      const amount = 100;
+      const percent = 10;
+      const usage = 25;
 
       describe('without repetition', () => {
         beforeEach(() => {
@@ -207,7 +207,7 @@ describe('quotas', () => {
                 return false;
               }
               for (let i = 0; i < events.length; i++) {
-                const threshold = percent * (i + 1)
+                const threshold = percent * (i + 1);
                 if (
                   !Cypress._.matches(<ZITADELWebhookEvent>{
                     callURL: callURL,

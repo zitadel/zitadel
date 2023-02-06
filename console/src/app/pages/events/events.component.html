@@ -84,7 +84,7 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.CREATIONDATE' | translate }}</th>
         <td mat-cell *matCellDef="let event">
           <ng-container *ngIf="event | toobject as event">
-            <span>{{ event?.creationDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm' }}</span>
+            <span>{{ event?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
           </ng-container>
         </td>
       </ng-container>
