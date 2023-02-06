@@ -33,6 +33,32 @@ describe('organizations', () => {
     });
   });
 
+  const orgOverviewPath = `/orgs`;
+  const orgNameForNewDefault = 'e2eorgnewdefault';
+
+  describe('set default org', () => {
+    beforeEach(() => {
+      apiAuth()
+        .as('api')
+        .then((api) => {
+          ensureOrgExists(api, orgNameForNewDefault)
+            .as('newDefaultOrgId')
+            .then(() => {
+              cy.visit(`${orgOverviewPath}`).as('orgsite');
+            });
+        });
+    });
+
+    it('should rename the organization', () => {
+      const rowSelector = `tr:contains(${orgNameForNewDefault})`;
+      cy.get(rowSelector).trigger('mouseover').find('[data-e2e="table-actions-button"]').click();
+      cy.get('[data-e2e="set-default-button"]', { timeout: 1000 }).should('be.visible').click();
+      cy.shouldConfirmSuccess();
+      cy.visit(orgOverviewPath);
+      //   cy.get('[data-e2e="top-view-title"').should('contain', testOrgNameChange);
+    });
+  });
+
   it('should add an organization with the personal account as org owner');
   describe('changing the current organization', () => {
     it('should update displayed organization details');
