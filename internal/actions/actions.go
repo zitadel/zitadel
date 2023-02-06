@@ -77,7 +77,6 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 	return executeFn(config, fn)
 }
 
-// TODO: Why does this return non nil errors even though config.allowedToFail is true?
 func executeScript(config *runConfig, ctxParam contextFields, apiParam apiFields, script string) (err error) {
 
 	t := config.StartScript()

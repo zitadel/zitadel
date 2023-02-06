@@ -118,8 +118,7 @@ type InstanceSetup struct {
 		RefreshTokenExpiration     time.Duration
 	}
 	Quotas *struct {
-		DetailsPath string
-		Items       []*AddQuota
+		Items []*AddQuota
 	}
 }
 

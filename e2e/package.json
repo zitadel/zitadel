@@ -12,7 +12,6 @@
   "private": true,
   "dependencies": {
     "@types/pg": "^8.6.6",
-    "@zitadel/node": "^1.1.8",
     "cypress-wait-until": "^1.7.2",
     "jsonwebtoken": "^8.5.1",
     "mochawesome": "^7.1.3",

@@ -17,8 +17,7 @@ import (
 )
 
 const (
-	mgmtName          = "Management-API"
-	GatewayPathPrefix = "/management/v1"
+	mgmtName = "Management-API"
 )
 
 var _ management.ManagementServiceServer = (*Server)(nil)
@@ -76,5 +75,5 @@ func (s *Server) RegisterGateway() server.GatewayFunc {
 }
 
 func (s *Server) GatewayPathPrefix() string {
-	return GatewayPathPrefix
+	return "/management/v1"
 }

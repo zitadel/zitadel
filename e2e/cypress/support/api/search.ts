@@ -1,7 +1,6 @@
 import { requestHeaders } from './apiauth';
 import { API, Entity, SearchResult, Token } from './types';
 
-// Deprecated (see ensureSomething)
 export function searchSomething(
   token: Token,
   searchPath: string,
@@ -21,7 +20,6 @@ export function searchSomething(
     });
 }
 
-// Deprecated (see ensureSomething)
 export function findFromList(find: (entity: Entity) => boolean, idField: string = 'id'): (body: any) => SearchResult {
   return (b) => {
     const entity = b.result?.find(find);

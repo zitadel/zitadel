@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	systemAPI         = "System-API"
-	GatewayPathPrefix = "/system/v1"
+	systemAPI = "System-API"
 )
 
 var _ system.SystemServiceServer = (*Server)(nil)
@@ -73,5 +72,5 @@ func (s *Server) RegisterGateway() server.GatewayFunc {
 }
 
 func (s *Server) GatewayPathPrefix() string {
-	return GatewayPathPrefix
+	return "/system/v1"
 }

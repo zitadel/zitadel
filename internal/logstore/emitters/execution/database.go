@@ -99,7 +99,7 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("COALESCE(SUM(%s),0)", executionTookCol),
 	).
-		From(executionLogsTable + " AS OF SYSTEM TIME '-20s'").
+		From(executionLogsTable).
 		Where(squirrel.And{
 			squirrel.Eq{executionInstanceIdCol: instanceId},
 			squirrel.GtOrEq{executionTimestampCol: start},
@@ -125,7 +125,6 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 func (l *databaseLogStorage) Cleanup(ctx context.Context, keep time.Duration) error {
 	stmt, args, err := squirrel.Delete(executionLogsTable).
 		Where(squirrel.LtOrEq{executionTimestampCol: time.Now().Add(-keep)}).
-		// TODO: Window by Action ID
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 

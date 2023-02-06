@@ -103,7 +103,7 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("count(%s)", accessInstanceIdCol),
 	).
-		From(accessLogsTable /* + " AS OF SYSTEM TIME '-20s'"*/). // TODO: Incomment
+		From(accessLogsTable).
 		Where(squirrel.And{
 			squirrel.Eq{accessInstanceIdCol: instanceId},
 			squirrel.GtOrEq{accessTimestampCol: start},

@@ -77,7 +77,7 @@ func NewAddedEvent(
 	interval time.Duration,
 	amount uint64,
 	limit bool,
-	notifications []*AddedEventNotification, // todo: redefine struct to receive here and convert to AddedEventNotification slice?
+	notifications []*AddedEventNotification,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

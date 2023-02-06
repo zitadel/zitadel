@@ -76,7 +76,6 @@ func (s *Service) Handle(ctx context.Context, record LogRecord) error {
 	return nil
 }
 
-// Limit TODO: Cache things in-memory here?
 func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error) {
 	if !s.reportingEnabled || instanceID == "" {
 		return nil, nil

@@ -3,31 +3,6 @@ import { apiAuth, systemAuth } from './api/apiauth';
 import { API, SystemAPI } from './api/types';
 import { ensureQuotaIsRemoved, Unit } from './api/quota';
 import { instanceUnderTest } from './api/instances';
-//
-//namespace Cypress {
-//    interface Chainable {
-//        /**
-//         * Custom command that authenticates a user.
-//         *
-//         * @example cy.consolelogin('hodor', 'hodor1234')
-//         */
-//        consolelogin(username: string, password: string): void
-//    }
-//}
-//
-//Cypress.Commands.add('consolelogin', { prevSubject: false }, (username: string, password: string) => {
-//
-//    window.sessionStorage.removeItem("zitadel:access_token")
-//    cy.visit(Cypress.config('baseUrl')/ui/console).then(() => {
-//        // fill the fields and push button
-//        cy.get('#loginName').type(username, { log: false })
-//        cy.get('#submit-button').click()
-//        cy.get('#password').type(password, { log: false })
-//        cy.get('#submit-button').click()
-//        cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
-//    })
-//})
-//
 
 interface ShouldNotExistOptions {
   selector: string;
@@ -57,10 +32,6 @@ declare global {
        */
       context(): Cypress.Chainable<Context>;
 
-      /**
-       * Custom command that has to be called before each test
-       */
-      resetContext(): Cypress.Chainable<null>;
       /**
        * Custom command that asserts success is printed after a change.
        */
@@ -126,17 +97,6 @@ Cypress.Commands.add('shouldConfirmSuccess', { prevSubject: false }, () => {
   cy.shouldNotExist({ selector: '.data-e2e-failure' });
   cy.get('.data-e2e-success');
 });
-/*
-Cypress.Commands.add('authenticate', {prevSubject:false}, ()=>{
-  return systemAuth().then((system) => {
-    return apiAuth().then((api) => {
-      return {
-        api: api,
-        system: system,
-      }
-    });
-})
-})*/
 
 Cypress.Commands.add('context', { prevSubject: false }, () => {
   return systemAuth().then((system) => {

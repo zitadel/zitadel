@@ -16,19 +16,17 @@ import (
 
 var (
 	logstoreService *logstore.Service
+	_               console.Printer = (*logger)(nil)
 )
 
 func SetLogstoreService(svc *logstore.Service) {
 	logstoreService = svc
 }
 
-var _ console.Printer = (*logger)(nil)
-
 type logger struct {
-	ctx                             context.Context
-	started                         time.Time
-	instanceID, projectID, actionID string
-	metadata                        map[string]interface{}
+	ctx                   context.Context
+	started               time.Time
+	instanceID, projectID string
 }
 
 // newLogger returns a *logger instance that should only be used for a single action run.
@@ -39,8 +37,6 @@ func newLogger(ctx context.Context, instanceID, projectID string) *logger {
 		started:    time.Time{},
 		instanceID: instanceID,
 		projectID:  projectID,
-		actionID:   "",  // TODO: fill
-		metadata:   nil, // TODO: fill
 	}
 }
 
@@ -67,10 +63,8 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 		Timestamp:  ts,
 		InstanceID: l.instanceID,
 		ProjectID:  l.projectID,
-		ActionID:   l.actionID,
 		Message:    msg,
 		LogLevel:   level,
-		Metadata:   l.metadata,
 	}
 
 	if last {

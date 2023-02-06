@@ -21,8 +21,7 @@ import (
 var _ auth.AuthServiceServer = (*Server)(nil)
 
 const (
-	authName          = "Auth-API"
-	GatewayPathPrefix = "/auth/v1"
+	authName = "Auth-API"
 )
 
 type Server struct {
@@ -82,5 +81,5 @@ func (s *Server) RegisterGateway() server.GatewayFunc {
 }
 
 func (s *Server) GatewayPathPrefix() string {
-	return GatewayPathPrefix
+	return "/auth/v1"
 }
