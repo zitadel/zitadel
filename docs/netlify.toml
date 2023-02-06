@@ -21,6 +21,6 @@
 	  preload'''
 
 [build]
-  base = "/docs"
-  publish = "/docs/build"
+  base = "docs/"
+  publish = "build/"
   command = "yarn prodbuild"
