@@ -289,7 +289,7 @@ module.exports = {
     ],
     [
       'redocusaurus',
-      process.env.NODE_ENV === "development" ? devConfig : prodConfig,
+      process.env.NODE_ENV === "production" : prodConfig : devConfig,
     ],
   ],
   plugins: [
