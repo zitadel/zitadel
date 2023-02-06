@@ -5,7 +5,8 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "yarn generate:grpc && docusaurus start",
-    "build": "yarn generate:grpc && docusaurus",
+    "build": "yarn generate:grpc && docusaurus build",
+    "prodbuild": "NODE_ENV=production && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
