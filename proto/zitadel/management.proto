@@ -40,9 +40,45 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         license: {
             name: "Apache License 2.0",
             url: "https://github.com/zitadel/zitadel/blob/main/LICENSE"
-        };
+        }
     };
-
+    tags: [
+        {
+            name: "Applications",
+            description: "..."
+        },
+        {
+            name: "Authorization",
+            description: "..."
+        },
+        {
+            name: "General",
+            description: "..."
+        },
+        {
+            name: "Global",
+            description: "..."
+        },
+        {
+            name: "Organizations",
+            description: "..."
+        },
+        {
+            name: "Project"
+        },
+        {
+            name: "Settings",
+            description: "..."
+        },
+        {
+            name: "Users",
+            description: "..."
+        },
+        {
+            name: "Roles",
+            description: "..."
+        }
+    ];
     schemes: HTTPS;
 
     consumes: "application/json";
@@ -62,6 +98,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         url: "https://zitadel.com/docs"
     }
 
+
     extensions: {
 		key: "x-zitadel-orgid";
 		value: {
@@ -70,11 +107,22 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 	}
 };
 
-
 service ManagementService {
     rpc Healthz(HealthzRequest) returns (HealthzResponse) {
         option (google.api.http) = {
             get: "/healthz"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Healthz";
+            description: "The health endpoint allows an external system to probe if ZITADEL management API is alive"
+            tags: "General";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
         };
     }
 
@@ -82,9 +130,20 @@ service ManagementService {
         option (google.api.http) = {
             get: "/zitadel/docs"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "ZITADEL documentation";
+            description: "This endpoint returns some general needed (OIDC) information about ZITADEL like the issuer or discovery endpoint."
+            tags: "General";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
     }
 
-    // Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project ID)
     rpc GetIAM(GetIAMRequest) returns (GetIAMResponse) {
         option (google.api.http) = {
             get: "/iam"
@@ -93,9 +152,20 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Instance information";
+            description: "Some needed settings made in ZITADEL like the global organisation id or ZITADEL project ID "
+            tags: "General";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
     }
 
-    // Returns the default languages
     rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
         option (google.api.http) = {
             get: "/languages";
@@ -103,6 +173,18 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "authenticated";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Supported Languages";
+            description: "The supported/default languages of the system will be returned by the language abbreviation."
+            tags: "General";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
         };
     }
 
@@ -118,8 +200,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "User by ID";
-            description: "Get a user by the ID."
-            tags: "User";
+            description: "Returns the full blown user object (human or machine) including the profile, email, etc."
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -137,8 +219,6 @@ service ManagementService {
         };
     }
 
-    // Searches a user over all organisations
-    // the login name has to match exactly
     rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (GetUserByLoginNameGlobalResponse) {
         option (google.api.http) = {
             get: "/global/users/_by_login_name"
@@ -149,10 +229,10 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Get user by login name (globally)";
-            description: "Get a user by login name over all organizations. The request only returns data if the login name matches exactly."
-            tags: "User";
-            tags: "global";
+            summary: "Get User by login name (globally)";
+            description: "Get a user by login name searched over all organizations. The request only returns data if the login name matches exactly."
+            tags: "Users";
+            tags: "Global";
             responses: {
                 key: "200"
                 value: {
@@ -173,8 +253,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User";
-            summary: "Search users";
+            tags: "Users";
+            summary: "Search Users";
             description: "Search for users within an organization. By default we will return users of your own organization. Make sure to include a limit and sorting for pagination."
             parameters: {
                 headers: {
@@ -253,7 +333,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create User (Human)";
             description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
-            tags: "User";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -271,7 +351,6 @@ service ManagementService {
         };
     }
 
-    // Create a user of the type machine
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
         option (google.api.http) = {
             post: "/users/machine"
@@ -285,7 +364,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create User (Machine)";
             description: "Create a new user with the type machine for your API, service or device. This users are used for non interactive authentication flows."
-            tags: "User";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -295,9 +374,6 @@ service ManagementService {
         };
     }
 
-    // Changes the user state to deactivated
-    // The user will not be able to login
-    // returns an error if user state is already deactivated
     rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_deactivate"
@@ -311,7 +387,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deactivate user";
             description: "The state of the user will be changed to 'deactivated'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need the access the user data."
-            tags: "User";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -334,7 +410,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Reactivate user";
             description: "Reactivate a user with the state 'deactivated'. The user will be able to login again afterwards. The endpoint returns an error if the user is not in the state 'deactivated'."
-            tags: "User";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -357,7 +433,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Lock user";
             description: "The state of the user will be changed to 'locked'. The user will not be able to login anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to login temporarly because of an event that happened (wrong password, etc.)"
-            tags: "User";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -380,7 +456,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Unlock user";
             description: "Unlock a user with the state 'locked'. The user will be able to login again afterwards. The endpoint returns an error if the user is not in the state 'locked'."
-            tags: "User";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -390,7 +466,6 @@ service ManagementService {
         };
     }
 
-    // Changes the user state to deleted
     rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
         option (google.api.http) = {
             delete: "/users/{id}"
@@ -403,7 +478,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete user";
             description: "The state of the user will be changed to 'deleted'. The user will not be able to login anymore. Endpoints requesting this user will return an error 'User not found'"
-            tags: "User";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -426,7 +501,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Change user name";
             description: "Change the username of the user. Be aware that the user has to login with the newly added username afterwards."
-            tags: "User";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -531,8 +606,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Profile (Human)";
             description: "Update the profile information from a user."
-            tags: "User";
-            tags: "User Profile";
+            tags: "Users";
             responses: {
                 key: "200"
                 value: {
@@ -3445,8 +3519,8 @@ message ImportHumanUserRequest {
 
     string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    Profile profile = 2 [(validate.rules).message.required = true];
-    Email email = 3 [(validate.rules).message.required = true];
+    Profile profile = 2 [(validate.rules).message.required = true, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "Basic user information.", required: "profile.first_name, profile.last_name"}];
+    Email email = 3 [(validate.rules).message.required = true, (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {description: "Email address of the user including if it is verified or not.", required: "email.email"}];
     Phone phone = 4;
     string password = 5;
     HashedPassword hashed_password = 6;
