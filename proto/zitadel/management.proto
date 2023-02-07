@@ -3576,7 +3576,13 @@ message ImportHumanUserRequest {
     message Phone {
         // has to be a global number
         string phone = 1 [
-            (validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}
+            (validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"},
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "mobile phone number of the user. (use global pattern of spec https://tools.ietf.org/html/rfc3966)";
+                min_length: 1;
+                max_length: 50;
+                example: "\"+41 71 000 00 00\"";
+            }
         ];
         bool is_phone_verified = 2;
     }
@@ -3612,8 +3618,18 @@ message ImportHumanUserRequest {
     Phone phone = 4;
     string password = 5;
     HashedPassword hashed_password = 6;
-    bool password_change_required = 7;
-    bool request_passwordless_registration = 8;
+    bool password_change_required = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If this is set to true, the user has to change the password on the next login."
+            example: "true";
+        }
+    ];
+    bool request_passwordless_registration = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "If this is set to true, you will get a link for the passwordless/passkey registration in the response."
+            example: "true";
+        }
+    ];
     string otp_code = 9;
     repeated IDP idps = 10;
 }
