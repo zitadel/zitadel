@@ -1,4 +1,4 @@
-import { ensureOrgExists } from 'support/api/orgs';
+import { ensureOrgExists, ensureOrgIsDefault, isDefaultOrg } from 'support/api/orgs';
 import { apiAuth } from '../../support/api/apiauth';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -34,6 +34,7 @@ describe('organizations', () => {
   });
 
   const orgOverviewPath = `/orgs`;
+  const initialDefaultOrg = 'e2eorgolddefault';
   const orgNameForNewDefault = 'e2eorgnewdefault';
 
   describe('set default org', () => {
@@ -44,18 +45,25 @@ describe('organizations', () => {
           ensureOrgExists(api, orgNameForNewDefault)
             .as('newDefaultOrgId')
             .then(() => {
-              cy.visit(`${orgOverviewPath}`).as('orgsite');
+              ensureOrgExists(api, initialDefaultOrg)
+                .as('defaultOrg')
+                .then((id) => {
+                  ensureOrgIsDefault(api, id)
+                    .as('orgWasDefault')
+                    .then(() => {
+                      cy.visit(`${orgOverviewPath}`).as('orgsite');
+                    });
+                });
             });
         });
     });
 
-    it('should rename the organization', () => {
+    it('should rename the organization', function () {
       const rowSelector = `tr:contains(${orgNameForNewDefault})`;
-      cy.get(rowSelector).trigger('mouseover').find('[data-e2e="table-actions-button"]').click();
+      cy.get(rowSelector).find('[data-e2e="table-actions-button"]').click({ force: true });
       cy.get('[data-e2e="set-default-button"]', { timeout: 1000 }).should('be.visible').click();
       cy.shouldConfirmSuccess();
-      cy.visit(orgOverviewPath);
-      //   cy.get('[data-e2e="top-view-title"').should('contain', testOrgNameChange);
+      isDefaultOrg(this.api, this.newDefaultOrgId);
     });
   });
 
