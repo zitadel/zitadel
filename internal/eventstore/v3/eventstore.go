@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
+	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
 type EventStore struct {
@@ -83,10 +84,11 @@ func (e *EventStore) Push(ctx context.Context, commands ...Cmd) (events []*Event
 		}
 
 		args = append(args,
-			events[i].Aggregate.ID,
+			// TODO: replaced instance id with aggregate id to simulate multiple aggregates in a single instance
+			authz.GetInstance(ctx).InstanceID(),
 			events[i].Aggregate.Type,
 			events[i].Aggregate.Owner,
-			events[i].Aggregate.InstanceID,
+			events[i].Aggregate.ID,
 			events[i].Editor.UserID,
 			events[i].Editor.Service,
 			events[i].Type,
@@ -95,20 +97,16 @@ func (e *EventStore) Push(ctx context.Context, commands ...Cmd) (events []*Event
 		)
 
 		placeholders[i] = "(" +
-			strings.Join(
-				[]string{
-					"$" + strconv.Itoa(i*argsPerRow+1),
-					"$" + strconv.Itoa(i*argsPerRow+2),
-					"$" + strconv.Itoa(i*argsPerRow+3),
-					"$" + strconv.Itoa(i*argsPerRow+4),
-					"$" + strconv.Itoa(i*argsPerRow+5),
-					"$" + strconv.Itoa(i*argsPerRow+6),
-					"$" + strconv.Itoa(i*argsPerRow+7),
-					"$" + strconv.Itoa(i*argsPerRow+8),
-					"$" + strconv.Itoa(i*argsPerRow+9),
-					"now() + '" + fmt.Sprintf("%f", time.Duration(time.Microsecond*time.Duration(i)).Seconds()) + "s'",
-				},
-				", ") +
+			"$" + strconv.Itoa(i*argsPerRow+1) +
+			", $" + strconv.Itoa(i*argsPerRow+2) +
+			", $" + strconv.Itoa(i*argsPerRow+3) +
+			", $" + strconv.Itoa(i*argsPerRow+4) +
+			", $" + strconv.Itoa(i*argsPerRow+5) +
+			", $" + strconv.Itoa(i*argsPerRow+6) +
+			", $" + strconv.Itoa(i*argsPerRow+7) +
+			", $" + strconv.Itoa(i*argsPerRow+8) +
+			", $" + strconv.Itoa(i*argsPerRow+9) +
+			", now() + '" + fmt.Sprintf("%f", time.Duration(time.Microsecond*time.Duration(i)).Seconds()) + "s'" +
 			")"
 	}
 

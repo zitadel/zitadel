@@ -1,0 +1,1 @@
+SELECT aggregate_id, instance_id, sequence FROM zitadel.eventstore_v4.sequences WHERE %s FOR UPDATE

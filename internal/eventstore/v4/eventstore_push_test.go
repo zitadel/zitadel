@@ -11,7 +11,7 @@ import (
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/eventstore/v4"
 )
 
 type benchmarkTest struct {
@@ -146,7 +146,10 @@ func execTest(b *testing.B, client *sql.DB, workers int, name string, commands [
 	if err != nil {
 		b.Fatal("unable to init eventstore: ", err)
 	}
-	if _, err = localClient.Exec("TRUNCATE zitadel.eventstore_v3.events;"); err != nil {
+	if _, err = localClient.Exec("TRUNCATE zitadel.eventstore_v4.events;"); err != nil {
+		b.Fatal("unable to truncate table: ", err)
+	}
+	if _, err = localClient.Exec("TRUNCATE zitadel.eventstore_v4.sequences;"); err != nil {
 		b.Fatal("unable to truncate table: ", err)
 	}
 
