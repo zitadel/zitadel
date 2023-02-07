@@ -75,6 +75,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "..."
         },
         {
+            name: "User Metadata",
+            description: "The metadata is an unstructured key value list that can be added to the user. The data is not interpreted by ZITADEL."
+        },
+        {
             name: "Roles",
             description: "..."
         }
@@ -511,7 +515,6 @@ service ManagementService {
         };
     }
 
-    // Sets a user metadata by key
     rpc SetUserMetadata(SetUserMetadataRequest) returns (SetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/{key}"
@@ -520,6 +523,21 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users";
+            tags: "User Metadata";
+            summary: "Set User Metadata";
+            description: "Metadata is a key/value list to enrich the user object with any data needed. This endpoints either adds/updates a metadata value for the requested key. Make sure the value is "
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -3625,9 +3643,30 @@ message GetUserMetadataResponse {
 }
 
 message SetUserMetadataRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    bytes value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"my-user-id\"";
+            min_length: 1,
+            max_length: 200;
+        }
+    ];
+    string key = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"my-key\"";
+            min_length: 1,
+            max_length: 200;
+        }
+    ];
+    bytes value = 3 [
+        (validate.rules).bytes = {min_len: 1, max_len: 500000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"VGhpcyBpcyBteSB0ZXN0IHZhbHVl\"";
+            min_length: 1,
+            max_length: 500000;
+        }
+    ];
 }
 
 message SetUserMetadataResponse {
