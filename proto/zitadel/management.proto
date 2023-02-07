@@ -76,7 +76,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "User Metadata",
-            description: "The metadata is an unstructured key value list that can be added to the user. The data is not interpreted by ZITADEL."
+            description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by ZITADEL itself."
         },
         {
             name: "Roles",
@@ -529,7 +529,7 @@ service ManagementService {
             tags: "Users";
             tags: "User Metadata";
             summary: "Set User Metadata";
-            description: "Metadata is a key/value list to enrich the user object with any data needed. This endpoints either adds/updates a metadata value for the requested key. Make sure the value is "
+            description: "This endpoints either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -541,7 +541,6 @@ service ManagementService {
         };
     }
 
-    // Set a list of user metadata
     rpc BulkSetUserMetadata(BulkSetUserMetadataRequest) returns (BulkSetUserMetadataResponse) {
         option (google.api.http) = {
             post: "/users/{id}/metadata/_bulk"
@@ -550,6 +549,21 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users";
+            tags: "User Metadata";
+            summary: "Bulk Set User Metadata";
+            description: "Add or update multiple metadata values for a user. Make sure the values are base64 encoded."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -3680,7 +3694,11 @@ message BulkSetUserMetadataRequest {
         string key = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
         bytes value = 2 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
     }
-    repeated Metadata metadata = 2;
+    repeated Metadata metadata = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[{\"test1\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"test2\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
+        }
+    ];
 }
 
 message BulkSetUserMetadataResponse {
