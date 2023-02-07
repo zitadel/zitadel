@@ -15,7 +15,6 @@ import (
 )
 
 const (
-	// TODO: Make configurable?
 	limitExceededCookiename   = "zitadel.quota.exceeded"
 	limitExceededCookieMaxAge = 60 * 5 // 5 minutes
 )
