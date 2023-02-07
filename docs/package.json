@@ -4,15 +4,15 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
+    "start": "yarn generate:grpc && docusaurus start",
+    "build": "yarn generate:grpc && docusaurus build",
+    "prodbuild": "NODE_ENV=production && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "generate": "npm run generate:grpc",
     "generate:grpc": "docker run --volume $(pwd)/..:/workspace --workdir /workspace bufbuild/buf generate"
   },
   "dependencies": {
