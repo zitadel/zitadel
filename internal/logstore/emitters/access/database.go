@@ -136,7 +136,7 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 	if err = l.dbClient.
 		QueryRowContext(ctx, stmt, args...).
 		Scan(&count); err != nil {
-		return 0, caos_errors.ThrowInternal(err, "ACCESS-pBPrM", "Errors.Access.ScanFailed")
+		return 0, caos_errors.ThrowInternal(err, "ACCESS-pBPrM", "Errors.Logstore.Access.ScanFailed")
 	}
 
 	return count, nil

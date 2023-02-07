@@ -437,6 +437,24 @@ Errors:
     CloseRows: SQL Statement could not be finished
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
+  Quota:
+    AlreadyExists: Quota already exists for this unit
+    NotFound: Quota not found for this unit
+    Invalid:
+      CallURL: Quota call URL is invalid
+      Percent: Quota percent is lower than 1
+      Unimplemented: Quotas are not implemented for this unit
+      Amount: Quota amount is lower than 1
+      Interval: Quota interval is shorter than a minute
+      Noop: An unlimited quota without notifications has no effect
+  LogStore:
+    Access:
+      StorageFailed: Storing access log to database failed
+      ScanFailed: Querying usage for authenticated requests failed
+    Execution:
+      StorageFailed: Storing action execution log to database failed
+      ScanFailed: Querying usage for action execution seconds failed
+
 
 AggregateTypes:
   action: Action
@@ -446,6 +464,7 @@ AggregateTypes:
   project: Project
   user: User
   usergrant: User grant
+  quota: Quota
 
 EventTypes:
   user:

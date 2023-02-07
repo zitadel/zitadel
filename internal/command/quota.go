@@ -138,7 +138,7 @@ type AddQuota struct {
 	Notifications QuotaNotifications
 }
 
-func (q *AddQuota) isValid() bool {
+func (q *AddQuota) validate() error {
 
 	isUrl := func(str string) error {
 		u, err := url.Parse(str)
@@ -154,23 +154,38 @@ func (q *AddQuota) isValid() bool {
 	}
 
 	for _, notification := range q.Notifications {
-		if err := isUrl(notification.CallURL); err != nil || notification.Percent < 1 {
-			return false
+		if err := isUrl(notification.CallURL); err != nil {
+			return errors.ThrowInvalidArgument(err, "QUOTA-HAYmN", "Errors.Quota.Invalid.CallURL")
+		}
+		if notification.Percent < 1 {
+			return errors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", "Errors.Quota.Invalid.Percent")
 		}
 	}
 
-	return q.Unit.Enum() != quota.Unimplemented &&
-		!q.From.IsZero() &&
-		q.Amount > 0 &&
-		q.Interval > time.Minute &&
-		(q.Limit || len(q.Notifications) > 0)
+	if q.Unit.Enum() == quota.Unimplemented {
+		return errors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", "Errors.Quota.Invalid.Unimplemented")
+	}
+
+	if q.Amount < 1 {
+		return errors.ThrowInvalidArgument(nil, "QUOTA-hOKSJ", "Errors.Quota.Invalid.Amount")
+	}
+
+	if q.Interval < time.Minute {
+		return errors.ThrowInvalidArgument(nil, "QUOTA-R5otd", "Errors.Quota.Invalid.Interval")
+	}
+
+	if !q.Limit && len(q.Notifications) == 0 {
+		return errors.ThrowInvalidArgument(nil, "QUOTA-4Nv68", "Errors.Quota.Invalid.Noop")
+	}
+
+	return nil
 }
 
 func (c *Commands) AddQuotaCommand(a *quota.Aggregate, q *AddQuota) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 
-		if !q.isValid() {
-			return nil, errors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", "Errors.Invalid.Argument") // TODO: Better error message?
+		if err := q.validate(); err != nil {
+			return nil, err
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {

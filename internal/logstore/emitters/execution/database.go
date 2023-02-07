@@ -116,7 +116,7 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 	if err = l.dbClient.
 		QueryRowContext(ctx, stmt, args...).
 		Scan(&milliSeconds); err != nil {
-		return 0, caos_errors.ThrowInternal(err, "EXEC-Ad8nP", "Errors.Access.ScanFailed")
+		return 0, caos_errors.ThrowInternal(err, "EXEC-Ad8nP", "Errors.Logstore.Execution.ScanFailed")
 	}
 
 	return uint64(math.Ceil(float64(milliSeconds) / 1000)), nil
