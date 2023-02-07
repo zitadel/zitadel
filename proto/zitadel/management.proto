@@ -3521,20 +3521,63 @@ message AddHumanUserResponse {
 
 message ImportHumanUserRequest {
     message Profile {
-        string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
-        string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}, (google.api.field_behavior) = REQUIRED];
-        string nick_name = 3 [(validate.rules).string = {max_len: 200}];
-        string display_name = 4 [(validate.rules).string = {max_len: 200}];
-        string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
-        zitadel.user.v1.Gender gender = 6;
+        string first_name = 1 [
+            (validate.rules).string = {min_len: 1, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                min_length: 1;
+                max_length: 200;
+                example: "\"Minnie\"";
+            }
+        ];
+        string last_name = 2 [
+            (validate.rules).string = {min_len: 1, max_len: 200},
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                min_length: 1;
+                max_length: 200;
+                example: "\"Mouse\"";
+            }
+        ];
+        string nick_name = 3 [
+            (validate.rules).string = {max_len: 200},
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                max_length: 200;
+                example: "\"Mini\"";
+            }
+        ];
+        string display_name = 4 [
+            (validate.rules).string = {max_len: 200},
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                max_length: 200;
+                example: "\"Minnie Mouse\"";
+            }
+        ];
+        string preferred_language = 5 [
+            (validate.rules).string = {max_len: 10},
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                max_length: 10;
+                example: "\"en\"";
+            }
+        ];
+        zitadel.user.v1.Gender gender = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GENDER_FEMALE\"";
+        }];
     }
     message Email {
-        string email = 1 [(validate.rules).string.email = true, (google.api.field_behavior) = REQUIRED];
+        string email = 1 [
+            (validate.rules).string.email = true,
+            (google.api.field_behavior) = REQUIRED,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"minnie@mouse.com\"";
+            }];
         bool is_email_verified = 2;
     }
     message Phone {
         // has to be a global number
-        string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
+        string phone = 1 [
+            (validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}
+        ];
         bool is_phone_verified = 2;
     }
     message HashedPassword{
@@ -3550,10 +3593,22 @@ message ImportHumanUserRequest {
         string display_name = 3 [(validate.rules).string = {max_len: 200}];
     }
 
-    string user_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"minnie-mouse\"";
+        }
+    ];
 
-    Profile profile = 2 [(validate.rules).message.required = true, (google.api.field_behavior) = REQUIRED];
-    Email email = 3 [(validate.rules).message.required = true, (google.api.field_behavior) = REQUIRED];
+    Profile profile = 2 [
+        (validate.rules).message.required = true,
+        (google.api.field_behavior) = REQUIRED
+    ];
+    Email email = 3 [
+        (validate.rules).message.required = true,
+        (google.api.field_behavior) = REQUIRED
+    ];
     Phone phone = 4;
     string password = 5;
     HashedPassword hashed_password = 6;
