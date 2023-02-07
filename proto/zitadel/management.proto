@@ -3732,6 +3732,7 @@ message SetUserMetadataRequest {
     bytes value = 3 [
         (validate.rules).bytes = {min_len: 1, max_len: 500000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The value has to be base64 encoded.";
             example: "\"VGhpcyBpcyBteSB0ZXN0IHZhbHVl\"";
             min_length: 1,
             max_length: 500000;
@@ -3752,6 +3753,7 @@ message BulkSetUserMetadataRequest {
     }
     repeated Metadata metadata = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The values have to be base64 encoded.";
             example: "[{\"test1\": \"VGhpcyBpcyBteSBmaXJzdCB2YWx1ZQ==\"}, {\"test2\": \"VGhpcyBpcyBteSBzZWNvbmQgdmFsdWU=\"}]"
         }
     ];
