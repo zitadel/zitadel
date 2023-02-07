@@ -233,3 +233,10 @@ enum IDPFieldName {
     IDP_FIELD_NAME_UNSPECIFIED = 0;
     IDP_FIELD_NAME_NAME = 1;
 }
+
+message Options {
+    bool is_linking_allowed = 1;
+    bool is_creation_allowed = 2;
+    bool is_auto_creation = 3;
+    bool is_auto_update = 4;
+}
