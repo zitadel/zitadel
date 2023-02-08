@@ -16,7 +16,7 @@ module.exports = {
     {
       type: "category",
       label: "Secure your API",
-      items: ["examples/secure-api/go", "examples/secure-api/dot-net"],
+      items: ["examples/secure-api/go", "examples/secure-api/python-flask", "examples/secure-api/dot-net"],
       collapsed: false,
     },
     {
@@ -43,7 +43,6 @@ module.exports = {
       collapsed: false,
       items: [
         "guides/start/quickstart",
-        "guides/start/python-quickstart",
       ],
     },
     {
