@@ -88,9 +88,10 @@ type Phone struct {
 }
 
 type Machine struct {
-	Name        string
-	Description string
-	HasSecret   bool
+	Name            string
+	Description     string
+	HasSecret       bool
+	AccessTokenType domain.OIDCTokenType
 }
 
 type NotifyUser struct {
@@ -280,6 +281,10 @@ var (
 	}
 	MachineHasSecretCol = Column{
 		name:  projection.MachineHasSecretCol,
+		table: machineTable,
+	}
+	MachineAccessTokenTypeCol = Column{
+		name:  projection.MachineAccessTokenTypeCol,
 		table: machineTable,
 	}
 )
@@ -753,6 +758,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
 			MachineHasSecretCol.identifier(),
+			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier(),
 		).
 			From(userTable.identifier()).
@@ -789,6 +795,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 			name := sql.NullString{}
 			description := sql.NullString{}
 			hasSecret := sql.NullBool{}
+			accessTokenType := sql.NullInt32{}
 
 			err := row.Scan(
 				&u.ID,
@@ -817,6 +824,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				&name,
 				&description,
 				&hasSecret,
+				&accessTokenType,
 				&count,
 			)
 
@@ -845,9 +853,10 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 				}
 			} else if machineID.Valid {
 				u.Machine = &Machine{
-					Name:        name.String,
-					Description: description.String,
-					HasSecret:   hasSecret.Bool,
+					Name:            name.String,
+					Description:     description.String,
+					HasSecret:       hasSecret.Bool,
+					AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 				}
 			}
 			return u, nil
@@ -1219,6 +1228,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
 			MachineHasSecretCol.identifier(),
+			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
@@ -1257,6 +1267,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 				name := sql.NullString{}
 				description := sql.NullString{}
 				hasSecret := sql.NullBool{}
+				accessTokenType := sql.NullInt32{}
 
 				err := rows.Scan(
 					&u.ID,
@@ -1285,6 +1296,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&name,
 					&description,
 					&hasSecret,
+					&accessTokenType,
 					&count,
 				)
 				if err != nil {
@@ -1312,9 +1324,10 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					}
 				} else if machineID.Valid {
 					u.Machine = &Machine{
-						Name:        name.String,
-						Description: description.String,
-						HasSecret:   hasSecret.Bool,
+						Name:            name.String,
+						Description:     description.String,
+						HasSecret:       hasSecret.Bool,
+						AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 					}
 				}
 

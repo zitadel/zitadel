@@ -3313,6 +3313,7 @@ message AddMachineUserRequest {
 
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string description = 3 [(validate.rules).string = {max_len: 500}];
+    zitadel.user.v1.AccessTokenType access_token_type = 4 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddMachineUserResponse {
@@ -3633,6 +3634,7 @@ message UpdateMachineRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string description = 2 [(validate.rules).string.max_len = 500];
     string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.user.v1.AccessTokenType access_token_type = 4 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateMachineResponse {
