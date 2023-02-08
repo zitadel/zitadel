@@ -23,6 +23,10 @@ type Server interface {
 	AuthMethods() authz.MethodMapping
 }
 
+const (
+	SystemGatewayPrefix = "/system/v1"
+)
+
 func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, queries *query.Queries, hostHeaderName string, tlsConfig *tls.Config) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{
@@ -32,7 +36,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, querie
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
-				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_MethodPrefix),
+				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_MethodPrefix, SystemGatewayPrefix),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(),
 				middleware.ValidationHandler(),

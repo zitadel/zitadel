@@ -72,5 +72,5 @@ func (s *Server) RegisterGateway() server.GatewayFunc {
 }
 
 func (s *Server) GatewayPathPrefix() string {
-	return "/system/v1"
+	return server.SystemGatewayPrefix
 }
