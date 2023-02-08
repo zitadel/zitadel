@@ -9,12 +9,9 @@ services:
     depends_on:
       db:
         condition: 'service_healthy'
-    ports:
-      - '8080:8080'
-    networks:
-      - zitadel
     volumes:
       - ./docker-compose-zitadel.yaml:/zitadel.yaml
+    network_mode: host
 
   db:
     restart: 'always'
@@ -26,11 +23,7 @@ services:
       timeout: '30s'
       retries: 5
       start_period: '20s'
-    ports:
-      - '9090:9090'
-      - '26257:26257'
-    networks:
-      - zitadel
+    network_mode: host
 
   prepare:
     image: node:18-alpine3.15
@@ -43,9 +36,6 @@ services:
 
   e2e:
     image: cypress/included:12.2.0
-    environment:
-      CYPRESS_DATABASE_CONNECION_URL: postgresql://root@db:26257/zitadel
-      CYPRESS_WEBHOOK_HANDLER_HOST: e2e
     depends_on:
       zitadel:
         condition: 'service_started'

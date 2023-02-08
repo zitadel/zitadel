@@ -1,7 +1,3 @@
-Database:
-  cockroach:
-    Host: db
-
 FirstInstance:
   Org:
     Human:
