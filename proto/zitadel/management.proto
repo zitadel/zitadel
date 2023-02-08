@@ -296,8 +296,6 @@ service ManagementService {
         };
     }
 
-    // Returns the history of the user (each event)
-    // Limit should always be set, there is a default limit set by the service
     rpc ListUserChanges(ListUserChangesRequest) returns (ListUserChangesResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/changes/_search"
@@ -307,9 +305,22 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users";
+            summary: "Get User History";
+            description: "Returns a list of changes/events that have happend on the user. It's basically the history of the user. Make sure to send a limit."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns if a user with the searched email or username is unique
     rpc IsUserUnique(IsUserUniqueRequest) returns (IsUserUniqueResponse) {
         option (google.api.http) = {
             get: "/users/_is_unique"
@@ -317,6 +328,20 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users";
+            summary: "Check for existing user";
+            description: "Returns if a user with the requested email or username is unique. So you are able to create the user."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get users of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
