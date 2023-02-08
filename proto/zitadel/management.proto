@@ -3081,7 +3081,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateAzureADProvider(AddAzureADProviderRequest) returns (AddAzureADProviderResponse) {
+    rpc UpdateAzureADProvider(UpdateAzureADProviderRequest) returns (UpdateAzureADProviderResponse) {
         option (google.api.http) = {
             post: "/idps/azure/{id}"
             body: "*"
@@ -3103,7 +3103,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateGitHubProvider(AddGitHubProviderRequest) returns (AddGitHubProviderResponse) {
+    rpc UpdateGitHubProvider(UpdateGitHubProviderRequest) returns (UpdateGitHubProviderResponse) {
         option (google.api.http) = {
             post: "/idps/github/{id}"
             body: "*"
@@ -3125,7 +3125,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateGitHubEnterpriseProvider(AddGitHubEnterpriseProviderRequest) returns (AddGitHubEnterpriseProviderResponse) {
+    rpc UpdateGitHubEnterpriseProvider(UpdateGitHubEnterpriseProviderRequest) returns (UpdateGitHubEnterpriseProviderResponse) {
         option (google.api.http) = {
             post: "/idps/github_ee/{id}"
             body: "*"
@@ -3147,7 +3147,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateGitLabProvider(AddGitLabProviderRequest) returns (AddGitLabProviderResponse) {
+    rpc UpdateGitLabProvider(UpdateGitLabProviderRequest) returns (UpdateGitLabProviderResponse) {
         option (google.api.http) = {
             post: "/idps/gitlab/{id}"
             body: "*"
@@ -3169,7 +3169,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateGitLabSelfHostedProvider(AddGitLabSelfHostedProviderRequest) returns (AddGitLabSelfHostedProviderResponse) {
+    rpc UpdateGitLabSelfHostedProvider(UpdateGitLabSelfHostedProviderRequest) returns (UpdateGitLabSelfHostedProviderResponse) {
         option (google.api.http) = {
             post: "/idps/gitlab_self_hosted/{id}"
             body: "*"
@@ -3191,7 +3191,7 @@ service ManagementService {
         };
     }
 
-    rpc UpdateGoogleProvider(AddGoogleProviderRequest) returns (AddGoogleProviderResponse) {
+    rpc UpdateGoogleProvider(UpdateGoogleProviderRequest) returns (UpdateGoogleProviderResponse) {
         option (google.api.http) = {
             post: "/idps/google/{id}"
             body: "*"

@@ -120,6 +120,20 @@ title: zitadel/idp.proto
 
 
 
+### Options
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| is_linking_allowed |  bool | - |  |
+| is_creation_allowed |  bool | - |  |
+| is_auto_creation |  bool | - |  |
+| is_auto_update |  bool | - |  |
+
+
+
+
 
 
 ## Enums
