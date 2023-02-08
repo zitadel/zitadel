@@ -200,9 +200,11 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 	if err != nil {
 		return nil, err
 	}
+	audience := domain.AddAudScopeToAudience(ctx, nil, scope)
 	return &clientCredentialsRequest{
-		sub:    user.ID,
-		scopes: scope,
+		sub:      user.ID,
+		scopes:   scope,
+		audience: audience,
 	}, nil
 }
 
@@ -219,7 +221,8 @@ func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecre
 		return nil, err
 	}
 	return &clientCredentialsClient{
-		id: clientID,
+		id:        clientID,
+		tokenType: accessTokenTypeToOIDC(user.Machine.AccessTokenType),
 	}, nil
 }
 
