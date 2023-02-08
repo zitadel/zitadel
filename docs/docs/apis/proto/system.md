@@ -357,12 +357,12 @@ Removes a quota
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| unit |  Unit | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
-| from |  google.protobuf.Timestamp | - | timestamp.required: true<br />  |
-| interval |  google.protobuf.Duration | - | duration.required: true<br />  |
-| amount |  uint64 | - | uint64.gt: 0<br />  |
-| limit |  bool | - |  |
-| notifications | repeated AddQuotaRequest.Notification | - |  |
+| unit |  Unit | the unit a quota should be imposed on | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| from |  google.protobuf.Timestamp | the starting time from which the current quota period is calculated from. This is relevant for querying the current usage. | timestamp.required: true<br />  |
+| interval |  google.protobuf.Duration | the quota periods duration | duration.required: true<br />  |
+| amount |  uint64 | the count limit after which ZITADEL enforces the quotas actions | uint64.gt: 0<br />  |
+| limit |  bool | whether ZITADEL should block further usage when the configured amount is used |  |
+| notifications | repeated AddQuotaRequest.Notification | the handlers, ZITADEL executes when certain quota percentages are reached |  |
 
 
 
@@ -373,9 +373,9 @@ Removes a quota
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| percent |  uint32 | - | uint32.gt: 0<br />  |
-| repeat |  bool | - |  |
-| call_url |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| percent |  uint32 | The percentage relative to the quotas amount on which the call_url should be called. | uint32.gt: 0<br />  |
+| repeat |  bool | If true, the call_url is called each time a factor of percentage is reached. |  |
+| call_url |  string | The URL, which is called with HTTP method POST and a JSON payload with the properties "unit", "id" (notification id), "callURL", "periodStart", "threshold" and "usage". | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -908,8 +908,8 @@ This is an empty response
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | UNIT_UNIMPLEMENTED | 0 | - |
-| UNIT_REQUESTS_ALL_AUTHENTICATED | 1 | - |
-| UNIT_ACTIONS_ALL_RUNS_SECONDS | 2 | - |
+| UNIT_REQUESTS_ALL_AUTHENTICATED | 1 | The sum of all requests to the ZITADEL API with an authorization header, excluding the following exceptions - Calls to the System API - Calls that cause internal server errors - Failed authorizations - Requests after the quota already exceeded |
+| UNIT_ACTIONS_ALL_RUN_SECONDS | 2 | The sum of all actions run durations in seconds |
 
 
 
