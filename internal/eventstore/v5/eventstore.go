@@ -42,8 +42,6 @@ var (
 	create string
 	//go:embed query_sequences.sql
 	sequenceQuery string
-	//go:embed upsert_sequences.sql
-	sequenceUpsert string
 )
 
 // Cmd is an abstraction of [Command]
@@ -129,25 +127,6 @@ func (e *EventStore) Push(ctx context.Context, commands ...Cmd) (events []*Event
 
 		eventsStmt := fmt.Sprintf(insertStmt, strings.Join(eventPlaceholders, ", "))
 		_, err = tx.Exec(eventsStmt, eventArgs...)
-		if err != nil {
-			return err
-		}
-
-		aggregateArgs := make([]interface{}, 0, len(aggregates)*eventArgsPerRow)
-		aggregatePlaceholders := make([]string, len(aggregates))
-		for i, aggregate := range aggregates {
-			aggregateArgs = append(aggregateArgs, aggregate.ID, aggregate.InstanceID, aggregate.sequence)
-			aggregatePlaceholders[i] = "(" +
-				"$" + strconv.Itoa(i*aggregateArgsPerRow+1) +
-				", $" + strconv.Itoa(i*aggregateArgsPerRow+2) +
-				", $" + strconv.Itoa(i*aggregateArgsPerRow+3) +
-				")"
-		}
-		aggregateStmt := fmt.Sprintf(sequenceUpsert, strings.Join(aggregatePlaceholders, ", "))
-		_, err = tx.Exec(aggregateStmt, aggregateArgs...)
-		if err != nil {
-			return err
-		}
 
 		return err
 	})

@@ -112,6 +112,7 @@ func (e *EventStore) Push(ctx context.Context, commands ...Cmd) (events []*Event
 
 	query := fmt.Sprintf(insertStmt, strings.Join(placeholders, ", "))
 	err = crdb.ExecuteTx(ctx, e.db, nil, func(tx *sql.Tx) error {
+		begin := time.Now()
 		rows, err := tx.Query(query, args...)
 		if err != nil {
 			return err
@@ -123,6 +124,10 @@ func (e *EventStore) Push(ctx context.Context, commands ...Cmd) (events []*Event
 			if err != nil {
 				return err
 			}
+		}
+
+		if remaining := begin.Sub(time.Now()).Microseconds() - int64(len(commands)); remaining > 0 {
+			time.Sleep(time.Duration(remaining) * time.Microsecond)
 		}
 		return nil
 	})

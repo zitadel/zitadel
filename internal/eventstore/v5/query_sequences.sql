@@ -1,0 +1,1 @@
+SELECT aggregate_id, instance_id, MAX(sequence) FROM zitadel.eventstore_v5.events@agg_seq_uniq WHERE %s GROUP BY instance_id, aggregate_id
