@@ -83,6 +83,16 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by ZITADEL itself."
         },
         {
+            name: "User Multi-Factors (MFA)",
+            description: "Multi-Factors are different authentication methods like an Authenticator App, FingerPrint, WindowsHello, that add additional security to a user account."
+        },
+        {
+            name: "User Password"
+        },
+        {
+            name: "User Phone"
+        },
+        {
             name: "User Profile",
             description: "Profile data includes the basic information of a user like first name, last name, etc."
         },
@@ -200,7 +210,6 @@ service ManagementService {
         };
     }
 
-    // Returns the requested full blown user (human or machine)
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -802,7 +811,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Email (Human)";
-            description: "Change the email address of a user. If the state is sent verified: false, the user will get a verification email."
+            description: "Change the email address of a user. If the state is set to not verified, the user will get a verification email."
             tags: "Users";
             tags: "User Email";
             responses: {
@@ -886,7 +895,6 @@ service ManagementService {
         };
     }
 
-    // Returns the phone and verified state of the human phone
     rpc GetHumanPhone(GetHumanPhoneRequest) returns (GetHumanPhoneResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/phone"
@@ -895,10 +903,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get User Phone (Human)";
+            description: "Get the phone number and the verification state of the number. The phone number is only for informational purpose and to send messages, not for Authentication (2FA)."
+            tags: "Users";
+            tags: "User Phone";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Changes the phone number
-    // If verified is not set, the user will get an sms to verify the number
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/phone"
@@ -908,9 +935,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update User Phone (Human)";
+            description: "Change the phone number of a user. If the state is set to not verified, the user will get an ams to verify (if a notification provider is configured). The phone number is only for informational purpose and to send messages, not for Authentication (2FA)."
+            tags: "Users";
+            tags: "User Phone";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the phone number of the human
     rpc RemoveHumanPhone(RemoveHumanPhoneRequest) returns (RemoveHumanPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/phone"
@@ -919,9 +966,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Remove User Phone (Human)";
+            description: "Remove the configured phone number of a user."
+            tags: "Users";
+            tags: "User Phone";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // An sms will be sent to the given phone number to finish the phone verification process of the user
     rpc ResendHumanPhoneVerification(ResendHumanPhoneVerificationRequest) returns (ResendHumanPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/phone/_resend_verification"
@@ -931,8 +998,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Resend User Phone Verification";
+            description: "Resend the notification for the verification of the phone number, to the number stored on the user."
+            tags: "Users";
+            tags: "User Phone";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
-    // Removes the avatar number of the human
+
     rpc RemoveHumanAvatar(RemoveHumanAvatarRequest) returns (RemoveHumanAvatarResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/avatar"
@@ -940,6 +1028,26 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete User Avatar (Human)";
+            description: "Removes the avatar that is currently set on the user."
+            tags: "Users";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -955,8 +1063,6 @@ service ManagementService {
         };
     }
 
-    // Set a new password for a user, on default the user has to change the password on the next login
-    // Set no_change_required to true if the user does not have to change the password on the next login
     rpc SetHumanPassword(SetHumanPasswordRequest) returns (SetHumanPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password"
@@ -966,9 +1072,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Set User Password";
+            description: "Set a new password for a user. Per default the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login."
+            tags: "Users";
+            tags: "User Password";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // An email will be sent to the given address to reset the password of the user
     rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_reset"
@@ -978,9 +1104,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Send Reset Password Notification";
+            description: "The user will receive an email with a link to change the password."
+            tags: "Users";
+            tags: "User Password";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns a list of all factors (second and multi) which are configured on the user
     rpc ListHumanAuthFactors(ListHumanAuthFactorsRequest) returns (ListHumanAuthFactorsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/auth_factors/_search"
@@ -989,10 +1135,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get User Authentication Factors (2FA/MFA)";
+            description: "Get a list of authentication factors the user has set. Including Second-Factors (2FA) and Multi-Factors (MFA)."
+            tags: "Users";
+            tags: "User Multi-Factors (MFA)";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // The otp second factor will be removed from the user
-    // Because only one otp can be configured per user, the configured one will be removed
     rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp"
@@ -1001,9 +1166,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Remove Multi-Factor OTP";
+            description: "Remove the configured One-Time-Password (OTP) as factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.."
+            tags: "Users";
+            tags: "User Multi-Factors (MFA)";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // The u2f (universial second factor) will be removed from the user
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/u2f/{token_id}"
@@ -1011,6 +1196,27 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Remove Multi-Factor U2F";
+            description: "Remove the configured Universal-Second-Factor (U2F) as factor from the user. U2F is a device dependent factor like FingerPrint, Windows-Hello, etc."
+            tags: "Users";
+            tags: "User Multi-Factors (MFA)";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -1023,11 +1229,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Search Passwordless/Passkey authentication";
+            description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device dependent authentication like FingerScan, WindowsHello or a Hardware Token."
+            tags: "Users";
+            tags: "User Multi-Factors (MFA)";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Adds a new passwordless authenticator link to the user and returns it directly
-    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
-    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_link"
@@ -1035,11 +1259,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.credential.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Add Passwordless/Passkey Registration Link";
+            description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device, if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
+            tags: "Users";
+            tags: "User Multi-Factors (MFA)";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Adds a new passwordless authenticator link to the user and sends it to the registered email address
-    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
-    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
     rpc SendPasswordlessRegistration(SendPasswordlessRegistrationRequest) returns (SendPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_send_link"
@@ -1047,6 +1289,27 @@ service ManagementService {
         };
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Send Passwordless/Passkey Registration Link";
+            description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device, if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
+            tags: "Users";
+            tags: "User Multi-Factors (MFA)";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -1058,6 +1321,27 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete Passwordless/Passkey";
+            description: "Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.)"
+            tags: "Users";
+            tags: "User Multi-Factors (MFA)";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -4247,9 +4531,16 @@ message GetHumanPhoneResponse {
 
 message UpdateHumanPhoneRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-
-
-    string phone = 2 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
+    string phone = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "mobile phone number of the user. (use global pattern of spec https://tools.ietf.org/html/rfc3966)";
+            min_length: 1;
+            max_length: 50;
+            example: "\"+41 71 000 00 00\"";
+        }
+    ];
     bool is_phone_verified = 3;
 }
 
@@ -4292,7 +4583,15 @@ message SetHumanInitialPasswordResponse {
 
 message SetHumanPasswordRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
-    string password = 2 [(validate.rules).string = {min_len: 1, max_len: 72}];
+    string password = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 72},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 72;
+            example: "\"MyNewPassword1234!\"";
+        }
+    ];
     bool no_change_required = 3;
 }
 
