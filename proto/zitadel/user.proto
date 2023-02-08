@@ -24,7 +24,7 @@ message User {
     ];
     string user_name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"mr_long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     repeated string login_names = 5 [
@@ -98,7 +98,7 @@ message Profile {
     ];
     string nick_name = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     string display_name = 4 [
@@ -182,7 +182,7 @@ message UserNameQuery {
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             max_length: 200;
-            example: "\"mr_long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -522,7 +522,7 @@ message Session {
     ];
     string user_name = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"mr_long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     string login_name = 7 [
@@ -640,7 +640,7 @@ message UserGrant {
     ];
     string user_name = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"mr_long_neck\"";
+            example: "\"gigi-giraffe\"";
         }
     ];
     string first_name = 7 [
@@ -700,7 +700,7 @@ message UserGrant {
     string avatar_url = 17 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "avatar url of the user"
-            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+            example: "\"{your-domain}/assets/v1/avatar-32432jkh4kj32\"";
         }
     ];
     string preferred_login_name = 18 [
@@ -787,7 +787,7 @@ message UserGrantUserNameQuery {
     string user_name = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"mr_long_neck\""
+            example: "\"gigi-giraffe\""
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [

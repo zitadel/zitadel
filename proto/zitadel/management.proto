@@ -76,8 +76,15 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "ZITADEL knows two different types of users: Users (Human) and Service Users (Machine Accounts)"
         },
         {
+            name: "User Email"
+        },
+        {
             name: "User Metadata",
             description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by ZITADEL itself."
+        },
+        {
+            name: "User Profile",
+            description: "Profile data includes the basic information of a user like first name, last name, etc."
         },
         {
             name: "Roles",
@@ -664,7 +671,6 @@ service ManagementService {
         };
     }
 
-    // Returns the profile of the human
     rpc GetHumanProfile(GetHumanProfileRequest) returns (GetHumanProfileResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/profile"
@@ -673,23 +679,12 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
-    }
-
-    // Changes the profile of the human
-    rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
-        option (google.api.http) = {
-            put: "/users/{user_id}/profile"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "user.write"
-        };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Update User Profile (Human)";
-            description: "Update the profile information from a user."
+            summary: "Get User Profile (Human)";
+            description: "Get basic information like first_name and last_name of a user."
             tags: "Users";
+            tags: "User Profile";
             responses: {
                 key: "200"
                 value: {
@@ -707,7 +702,38 @@ service ManagementService {
         };
     }
 
-    // GetHumanEmail returns the email and verified state of the human
+    rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/profile"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update User Profile (Human)";
+            description: "Update the profile information from a user. Profile includes basic information like first_name and last_name."
+            tags: "Users";
+            tags: "User Profile";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
     rpc GetHumanEmail(GetHumanEmailRequest) returns (GetHumanEmailResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/email"
@@ -716,10 +742,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get User Email (Human)";
+            description: "Get the email address and the verification state of the address."
+            tags: "Users";
+            tags: "User Email";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Changes the email of the human
-    // If state is not verified, the user will get a verification email
     rpc UpdateHumanEmail(UpdateHumanEmailRequest) returns (UpdateHumanEmailResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/email"
@@ -729,10 +774,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update User Email (Human)";
+            description: "Change the email address of a user. If the state is sent verified: false, the user will get a verification email."
+            tags: "Users";
+            tags: "User Email";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Resends an email to the given email address to finish the initialization process of the user
-    // Changes the email address of the user if it is provided
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/_resend_initialization"
@@ -742,9 +806,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Resend User Initialization Email";
+            description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the users email address, or a newly added addres."
+            tags: "Users";
+            tags: "User Email";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Resends an email to the given email address to finish the email verification process of the user
     rpc ResendHumanEmailVerification(ResendHumanEmailVerificationRequest) returns (ResendHumanEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/email/_resend_verification"
@@ -753,6 +837,27 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Resend User Email Verification";
+            description: "Resend the email verification notification to the given email address of the user."
+            tags: "Users";
+            tags: "User Email";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -4011,11 +4116,46 @@ message GetHumanProfileResponse {
 message UpdateHumanProfileRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    string first_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string last_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string nick_name = 4 [(validate.rules).string = {max_len: 200}];
-    string display_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string preferred_language = 6 [(validate.rules).string = {max_len: 10}];
+    string first_name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Gigi\"";
+        }
+    ];
+    string last_name = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Giraffe\"";
+        }
+    ];
+    string nick_name = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"Gigi\"";
+        }
+    ];
+    string display_name = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Gigi\"";
+        }
+    ];
+    string preferred_language = 6 [
+        (validate.rules).string = {max_len: 10},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 10;
+            example: "\"en\"";
+        }
+    ];
     zitadel.user.v1.Gender gender = 7;
 }
 
@@ -4035,7 +4175,12 @@ message GetHumanEmailResponse {
 message UpdateHumanEmailRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 
-    string email = 2 [(validate.rules).string.email = true];
+    string email = 2 [
+        (validate.rules).string.email = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi@zitadel.com\"";
+        }
+    ];
     bool is_email_verified = 3;
 }
 
@@ -4045,7 +4190,13 @@ message UpdateHumanEmailResponse {
 
 message ResendHumanInitializationRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string email = 2 [(validate.rules).string = {ignore_empty: true, email: true}];
+    string email = 2 [
+        (validate.rules).string = {ignore_empty: true, email: true},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"updated-email@test.com\"";
+            description: "Send a new email address if the one set on the user is wrong or has a typo."
+        }
+    ];
 }
 
 message ResendHumanInitializationResponse {

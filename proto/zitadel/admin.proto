@@ -3130,7 +3130,7 @@ message SetUpOrgRequest {
                 (validate.rules).string = {max_len: 200},
                 (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                     max_length: 200;
-                    example: "\"long_neck\"";
+                    example: "\"gigi-giraffe\"";
                 }
             ];
             string display_name = 4 [
@@ -3192,7 +3192,7 @@ message SetUpOrgRequest {
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 min_length: 1;
                 max_length: 200;
-                example: "\"mr_long_neck\"";
+                example: "\"gigi-giraffe\"";
             }
         ];
 
