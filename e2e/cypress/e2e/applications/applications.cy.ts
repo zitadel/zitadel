@@ -1,5 +1,4 @@
 import { Apps, ensureProjectExists, ensureProjectResourceDoesntExist } from '../../support/api/projects';
-import { apiAuth } from '../../support/api/apiauth';
 import { Context } from 'support/commands';
 
 const testProjectName = 'e2eprojectapplication';

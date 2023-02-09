@@ -1,4 +1,3 @@
-import { apiAuth } from '../../support/api/apiauth';
 import { ensureHumanUserExists, ensureUserDoesntExist } from '../../support/api/users';
 import { loginname } from '../../support/login/users';
 import { ensureDomainPolicy } from '../../support/api/policies';

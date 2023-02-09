@@ -73,7 +73,6 @@ describe('quotas', () => {
             `${ctx.api.authBaseURL}/users/me`,
             `${ctx.api.mgmtBaseURL}/iam`,
             `${ctx.api.adminBaseURL}/instances/me`,
-            // `${api.assetsBaseURL}/instance/policy/label/icon`,
             `${ctx.api.oauthBaseURL}/keys`,
             `${ctx.api.samlBaseURL}/certificate`,
           ];

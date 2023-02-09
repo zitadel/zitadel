@@ -9,7 +9,6 @@ import { ensureOrgExists } from 'support/api/orgs';
 import { ensureDomainPolicy } from 'support/api/policies';
 import { ensureHumanUserExists, ensureUserDoesntExist } from 'support/api/users';
 import { Context } from 'support/commands';
-import { loginname } from 'support/login/users';
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from '../../support/api/projects';
 
 describe('permissions', () => {

@@ -1,5 +1,4 @@
 import { Context } from 'support/commands';
-import { apiAuth } from '../../support/api/apiauth';
 import { ensureProjectDoesntExist, ensureProjectExists } from '../../support/api/projects';
 
 describe('projects', () => {
