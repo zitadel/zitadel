@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Poprzedni",
     "NEXT": "Następny",
-    "COUNT": "Całkowita liczba wyników"
+    "COUNT": "Całkowita liczba wyników",
+    "MORE": "Więcej"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Instancja",
     "ORGS": "Organizacje",
     "VIEWS": "Widoki",
+    "EVENTS": "Zdarzenia",
     "FAILEDEVENTS": "Nieudane Zdarzenia",
     "ORGANIZATION": "Organizacja",
     "DOMAINS": "Domeny",
@@ -240,6 +242,8 @@
       "STATE": "Status",
       "DELETE": "Usuń Użytkownika",
       "UNLOCK": "Odblokuj Użytkownika",
+      "GENERATESECRET": "Generuj sekret klienta",
+      "REMOVESECRET": "Usuń sekret klienta",
       "LOCKEDDESCRIPTION": "Ten użytkownik został zablokowany z powodu przekroczenia maksymalnej liczby prób logowania i musi zostać odblokowany, aby mógł być używany ponownie.",
       "DELETEACCOUNT": "Usuń Konto",
       "DELETEACCOUNT_DESC": "Jeśli wykonasz tę akcję, zostaniesz wylogowany i już nie będziesz mieć dostępu do swojego konta. Ta akcja nie jest odwracalna, więc proszę kontynuować ostrożnie.",
@@ -264,6 +268,10 @@
       "TITLE": "Wyślij powiadomienie e-mailem",
       "DESCRIPTION": "Kliknij poniższy przycisk, aby wysłać powiadomienie na bieżący adres e-mail lub zmienić adres e-mail w polu.",
       "NEWEMAIL": "Nowy adres e-mail"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Sekret klienta",
+      "CLIENTSECRET_DESCRIPTION": "Zachowaj sekret klienta w bezpiecznym miejscu, ponieważ zniknie ona po zamknięciu okna dialogowego."
     },
     "TABLE": {
       "DEACTIVATE": "Dezaktywuj",
@@ -405,6 +413,7 @@
       "TITLE": "Profil",
       "EMAIL": "E-mail",
       "PHONE": "Numer telefonu",
+      "PHONE_HINT": "Użyj 00 lub symbolu +, a następnie kodu kraju, z którego dzwonisz, lub wybierz kraj z listy rozwijanej i wprowadź numer telefonu.",
       "USERNAME": "Nazwa użytkownika",
       "CHANGEUSERNAME": "modyfikuj",
       "CHANGEUSERNAME_TITLE": "Zmień nazwę użytkownika",
@@ -424,7 +433,8 @@
         "PREVIEW": "Podgląd",
         "DELETESUCCESS": "Usunięto pomyślnie!",
         "CROPPERERROR": "Wystąpił błąd podczas przesyłania pliku. Spróbuj innego formatu i rozmiaru, jeśli to konieczne."
-      }
+      },
+      "COUNTRY": "Kraj"
     },
     "MACHINE": {
       "TITLE": "Szczegóły użytkownika usługi",
@@ -589,7 +599,9 @@
       "MACHINEADDED": "Utworzono użytkownika serwisu!",
       "DELETED": "Użytkownik został usunięty pomyślnie!",
       "UNLOCKED": "Użytkownik został odblokowany pomyślnie!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link rejestracyjny został wysłany pomyślnie."
+      "PASSWORDLESSREGISTRATIONSENT": "Link rejestracyjny został wysłany pomyślnie.",
+      "SECRETGENERATED": "Sekret wygenerowany pomyślnie!",
+      "SECRETREMOVED": "Sekret usunięty pomyślnie!"
     },
     "MEMBERSHIPS": {
       "TITLE": "Role menedżera ZITADEL",
@@ -749,6 +761,56 @@
       "ACTIONS": "Akcje",
       "DELETE": "Usuń",
       "DELETESUCCESS": "Usunięto zdarzenia nieudane."
+    },
+    "EVENTS": {
+      "TITLE": "Zdarzenia",
+      "DESCRIPTION": "Ten widok pokazuje wszystkie zaistniałe zdarzenia.",
+      "EDITOR": "Edytor",
+      "EDITORID": "Identyfikator edytora",
+      "AGGREGATE": "Agregat",
+      "AGGREGATEID": "Identyfikator agregatu",
+      "AGGREGATETYPE": "Typ agregatu",
+      "RESOURCEOWNER": "Właściciel zasobów",
+      "SEQUENCE": "Sekwencja",
+      "CREATIONDATE": "Data utworzenia",
+      "TYPE": "Typ",
+      "PAYLOAD": "Obciążenie użytkowe",
+      "FILTERS": {
+        "BTN": "Filtr",
+        "USER": {
+          "IDLABEL": "Identyfikator",
+          "CHECKBOX": "Filtruj według edytora"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Typ agregatu",
+          "IDLABEL": "Identyfikator",
+          "CHECKBOX": "Filtrowanie według agregatu"
+        },
+        "TYPE": {
+          "TYPELABEL": "Typ",
+          "CHECKBOX": "Filtrowanie według typu"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "Identyfikator",
+          "CHECKBOX": "Filtrowanie według właściciela zasobu"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sekwencja",
+          "CHECKBOX": "Filtrowanie według sekwencji",
+          "SORT": "Sortowanie",
+          "ASC": "Wstępująca",
+          "DESC": "Zjeżdżający"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Data utworzenia",
+          "CHECKBOX": "Filtrowanie według daty utworzenia"
+        },
+        "OTHER": "inne",
+        "OTHERS": "inni"
+      },
+      "DIALOG": {
+        "TITLE": "Szczegóły wydarzenia"
+      }
     },
     "TOAST": {
       "MEMBERREMOVED": "Menedżer usunięty.",
@@ -1136,7 +1198,7 @@
         "usernameChangeText": "Zmiana nazwy użytkownika",
         "verifyMfaOtpText": "Zweryfikuj OTP",
         "verifyMfaU2fText": "Zweryfikuj Universal Second Factor",
-        "passwordlessPromptText": "Passwordless Prompt",
+        "passwordlessPromptText": "Prompt bez hasła",
         "passwordlessRegistrationDoneText": "Rejestracja bez hasła zakończona",
         "passwordlessRegistrationText": "Rejestracja bez hasła",
         "passwordlessText": "Bez hasła",
