@@ -79,7 +79,6 @@ If you decide to use the _StatehandlerService_, provide it in the `app.module`. 
 https://github.com/zitadel/zitadel-angular/blob/main/src/app/app.module.ts#L26-L30
 ```
 
-<!-- TODO: Is is safe over time to use reference with line numbers? -->
 ```ts reference
 https://github.com/zitadel/zitadel-angular/blob/main/src/app/app.module.ts#L55-L78
 ```
