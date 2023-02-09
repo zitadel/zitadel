@@ -200,9 +200,11 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 	if err != nil {
 		return nil, err
 	}
+	audience := domain.AddAudScopeToAudience(ctx, nil, scope)
 	return &clientCredentialsRequest{
-		sub:    user.ID,
-		scopes: scope,
+		sub:      user.ID,
+		scopes:   scope,
+		audience: audience,
 	}, nil
 }
 
@@ -219,7 +221,8 @@ func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecre
 		return nil, err
 	}
 	return &clientCredentialsClient{
-		id: clientID,
+		id:        clientID,
+		tokenType: accessTokenTypeToOIDC(user.Machine.AccessTokenType),
 	}, nil
 }
 
@@ -538,7 +541,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
 						if _, ok := claims[key]; !ok {
-							claims[key] = value
+							claims = appendClaim(claims, key, value)
 							return
 						}
 						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/errors"
@@ -20,10 +21,11 @@ type MachineAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserName              string `json:"userName"`
-	userLoginMustBeDomain bool   `json:"-"`
+	userLoginMustBeDomain bool
 
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	Name            string               `json:"name,omitempty"`
+	Description     string               `json:"description,omitempty"`
+	AccessTokenType domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
 func (e *MachineAddedEvent) Data() interface{} {
@@ -41,6 +43,7 @@ func NewMachineAddedEvent(
 	name,
 	description string,
 	userLoginMustBeDomain bool,
+	accessTokenType domain.OIDCTokenType,
 ) *MachineAddedEvent {
 	return &MachineAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -52,6 +55,7 @@ func NewMachineAddedEvent(
 		Name:                  name,
 		Description:           description,
 		userLoginMustBeDomain: userLoginMustBeDomain,
+		AccessTokenType:       accessTokenType,
 	}
 }
 
@@ -70,8 +74,9 @@ func MachineAddedEventMapper(event *repository.Event) (eventstore.Event, error) 
 type MachineChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Name        *string `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
+	Name            *string               `json:"name,omitempty"`
+	Description     *string               `json:"description,omitempty"`
+	AccessTokenType *domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
 func (e *MachineChangedEvent) Data() interface{} {
@@ -114,6 +119,12 @@ func ChangeName(name string) func(event *MachineChangedEvent) {
 func ChangeDescription(description string) func(event *MachineChangedEvent) {
 	return func(e *MachineChangedEvent) {
 		e.Description = &description
+	}
+}
+
+func ChangeAccessTokenType(accessTokenType domain.OIDCTokenType) func(event *MachineChangedEvent) {
+	return func(e *MachineChangedEvent) {
+		e.AccessTokenType = &accessTokenType
 	}
 }
 

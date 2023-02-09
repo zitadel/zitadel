@@ -104,6 +104,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),
@@ -244,6 +245,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),
@@ -271,6 +273,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 						eventFromEventPusher(
@@ -409,6 +412,7 @@ func TestCommandSide_VerifyMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),
@@ -436,6 +440,7 @@ func TestCommandSide_VerifyMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 						eventFromEventPusher(
@@ -486,6 +491,7 @@ func TestCommandSide_VerifyMachineSecret(t *testing.T) {
 								"username",
 								"user",
 								false,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 						eventFromEventPusher(
