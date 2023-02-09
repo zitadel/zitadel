@@ -20,7 +20,7 @@ func instanceQuotaUnitPbToQuotaUnit(unit system_pb.Unit) command.QuotaUnit {
 	switch unit {
 	case system_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED:
 		return command.QuotaRequestsAllAuthenticated
-	case system_pb.Unit_UNIT_ACTIONS_ALL_RUNS_SECONDS:
+	case system_pb.Unit_UNIT_ACTIONS_ALL_RUN_SECONDS:
 		return command.QuotaActionsAllRunsSeconds
 	case system_pb.Unit_UNIT_UNIMPLEMENTED:
 		fallthrough
