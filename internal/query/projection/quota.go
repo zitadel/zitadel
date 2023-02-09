@@ -148,7 +148,7 @@ func reduceQuotaAdded(event eventstore.Event) (*handler.Statement, error) {
 			handler.NewCol(QuotaSequenceCol, e.Sequence()),
 			handler.NewCol(QuotaUnitCol, e.Unit),
 			handler.NewCol(QuotaFromCol, e.From),
-			handler.NewCol(QuotaIntervalCol, e.Interval),
+			handler.NewCol(QuotaIntervalCol, e.ResetInterval),
 			handler.NewCol(QuotaAmountCol, e.Amount),
 			handler.NewCol(QuotaLimitCol, e.Limit),
 		}),
@@ -197,9 +197,11 @@ func reduceQuotaRemoved(event eventstore.Event) (*handler.Statement, error) {
 	return crdb.NewMultiStatement(
 		e,
 		crdb.AddDeleteStatement([]handler.Condition{
+			handler.NewCond(QuotaNotificationInstanceIDCol, event.Aggregate().InstanceID),
 			handler.NewCond(QuotaNotificationQuotaIDCol, e.Aggregate().ID),
 		}, crdb.WithTableSuffix(QuotaNotificationsTableSuffix)),
 		crdb.AddDeleteStatement([]handler.Condition{
+			handler.NewCond(QuotaInstanceIDCol, event.Aggregate().InstanceID),
 			handler.NewCond(QuotaIDCol, e.Aggregate().ID),
 		}),
 	), nil

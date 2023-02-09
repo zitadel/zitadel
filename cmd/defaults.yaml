@@ -622,7 +622,7 @@ DefaultInstance:
 #      - Unit: "requests.all.authenticated"
 #        # Start Time for the quota periods
 #        From: "2023-01-01T00:00:00Z01:00"
-#        Interval: 720h # 30 days
+#        ResetInterval: 720h # 30 days
 #        Amount: 25000
 #        Limit: false
 #        Notifications:
@@ -636,7 +636,7 @@ DefaultInstance:
 #      - Unit: "actions.all.runs.seconds"
 #        # Start Time for the quota periods
 #        From: "2023-01-01T00:00:00Z01:00"
-#        Interval: 720h # 30 days
+#        ResetInterval: 720h # 30 days
 #        Amount: 3600 # 1 hour
 #        Limit: false
 #        Notifications:

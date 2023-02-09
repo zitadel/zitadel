@@ -59,7 +59,7 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 	}
 
 	record := &execution.Record{
-		Timestamp:  ts,
+		LogDate:    ts,
 		InstanceID: l.instanceID,
 		ProjectID:  l.projectID,
 		Message:    msg,
@@ -67,7 +67,7 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 	}
 
 	if last {
-		record.TookMS = ts.Sub(l.started).Milliseconds()
+		record.Took = ts.Sub(l.started)
 	}
 
 	if err := logstoreService.Handle(l.ctx, record); err != nil {

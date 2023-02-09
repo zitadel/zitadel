@@ -445,7 +445,7 @@ Errors:
       Percent: Quota percent is lower than 1
       Unimplemented: Quotas are not implemented for this unit
       Amount: Quota amount is lower than 1
-      Interval: Quota interval is shorter than a minute
+      ResetInterval: Quota reset interval is shorter than a minute
       Noop: An unlimited quota without notifications has no effect
   LogStore:
     Access:

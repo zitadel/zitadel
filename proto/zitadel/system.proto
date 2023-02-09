@@ -4,6 +4,7 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/instance.proto";
 import "zitadel/member.proto";
+import "zitadel/quota.proto";
 import "zitadel/auth_n_key.proto";
 
 import "google/api/annotations.proto";
@@ -529,20 +530,6 @@ message RemoveInstanceResponse {
   zitadel.v1.ObjectDetails details = 1;
 }
 
-enum Unit {
-  UNIT_UNIMPLEMENTED = 0;
-  /* The sum of all requests to the ZITADEL API with an authorization header,
-  excluding the following exceptions
-  - Calls to the System API
-  - Calls that cause internal server errors
-  - Failed authorizations
-  - Requests after the quota already exceeded
-  */
-  UNIT_REQUESTS_ALL_AUTHENTICATED = 1;
-  // The sum of all actions run durations in seconds
-  UNIT_ACTIONS_ALL_RUN_SECONDS = 2;
-}
-
 message ListIAMMembersRequest {
   zitadel.v1.ListQuery query = 1;
   string instance_id = 2;
@@ -559,30 +546,9 @@ message GetUsageRequest {
 }
 
 message AddQuotaRequest {
-  message Notification {
-      // The percentage relative to the quotas amount on which the call_url should be called.
-      uint32 percent = 1 [
-        (validate.rules).uint32.gt = 0,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          description: "The percentage relative to the quotas amount on which the call_url should be called.";
-        }
-      ];
-      // If true, the call_url is called each time a factor of percentage is reached.
-      bool repeat = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          description: "If true, the call_url is called each time a factor of percentage is reached.";
-      }];
-      // The URL, which is called with HTTP method POST and a JSON payload with the properties "unit", "id" (notification id), "callURL", "periodStart", "threshold" and "usage".
-      string call_url = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-          description: "The URL, which is called with HTTP method POST and a JSON payload with the properties \"unit\", \"id\" (notification id), \"callURL\", \"periodStart\", \"threshold\" and \"usage\".";
-        }
-      ];
-  }
-
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   // the unit a quota should be imposed on
-  Unit unit = 2 [
+  zitadel.quota.v1.Unit unit = 2 [
     (validate.rules).enum = {defined_only: true, not_in: [0]},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         description: "the unit a quota should be imposed on";
@@ -597,7 +563,7 @@ message AddQuotaRequest {
       }
   ];
   // the quota periods duration
-  google.protobuf.Duration interval = 4 [
+  google.protobuf.Duration reset_interval = 4 [
     (validate.rules).duration.required = true,
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
           description: "the quota periods duration";
@@ -617,7 +583,7 @@ message AddQuotaRequest {
     }
   ];
   // the handlers, ZITADEL executes when certain quota percentages are reached
-  repeated Notification notifications = 7 [
+  repeated zitadel.quota.v1.Notification notifications = 7 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
           description: "the handlers, ZITADEL executes when certain quota percentages are reached";
     }
@@ -630,7 +596,7 @@ message AddQuotaResponse {
 
 message RemoveQuotaRequest {
   string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  Unit unit = 2;
+  zitadel.quota.v1.Unit unit = 2;
 }
 
 message RemoveQuotaResponse {

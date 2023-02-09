@@ -11,8 +11,8 @@ import (
 var _ logstore.LogRecord = (*Record)(nil)
 
 type Record struct {
-	Timestamp  time.Time
-	TookMS     int64
+	LogDate    time.Time
+	Took       time.Duration
 	Message    string
 	LogLevel   logrus.Level
 	InstanceID string

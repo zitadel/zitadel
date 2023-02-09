@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -17,8 +16,8 @@ import (
 
 const (
 	executionLogsTable     = "logstore.execution"
-	executionTimestampCol  = "ts"
-	executionTookCol       = "took_ms"
+	executionTimestampCol  = "log_date"
+	executionTookCol       = "took"
 	executionMessageCol    = "message"
 	executionLogLevelCol   = "loglevel"
 	executionInstanceIdCol = "instance_id"
@@ -60,12 +59,12 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 		item := bulk[idx].(*Record)
 
 		var took interface{}
-		if item.TookMS > 0 {
-			took = item.TookMS
+		if item.Took > 0 {
+			took = item.Took
 		}
 
 		builder = builder.Values(
-			item.Timestamp,
+			item.LogDate,
 			took,
 			item.Message,
 			item.LogLevel,
@@ -97,7 +96,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 
 func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error) {
 	stmt, args, err := squirrel.Select(
-		fmt.Sprintf("COALESCE(SUM(%s),0)", executionTookCol),
+		fmt.Sprintf("COALESCE(SUM(%s)::INT,0)", executionTookCol),
 	).
 		From(executionLogsTable).
 		Where(squirrel.And{
@@ -112,14 +111,13 @@ func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, 
 		return 0, caos_errors.ThrowInternal(err, "EXEC-DXtzg", "Errors.Internal")
 	}
 
-	var milliSeconds uint64
+	var durationSeconds uint64
 	if err = l.dbClient.
 		QueryRowContext(ctx, stmt, args...).
-		Scan(&milliSeconds); err != nil {
+		Scan(&durationSeconds); err != nil {
 		return 0, caos_errors.ThrowInternal(err, "EXEC-Ad8nP", "Errors.Logstore.Execution.ScanFailed")
 	}
-
-	return uint64(math.Ceil(float64(milliSeconds) / 1000)), nil
+	return durationSeconds, nil
 }
 
 func (l *databaseLogStorage) Cleanup(ctx context.Context, keep time.Duration) error {

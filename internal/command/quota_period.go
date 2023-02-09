@@ -13,7 +13,7 @@ func (c *Commands) GetCurrentQuotaPeriod(ctx context.Context, instanceID string,
 		return nil, time.Time{}, err
 	}
 
-	return wm.config, pushPeriodStart(wm.config.From, wm.config.Interval, time.Now()), nil
+	return wm.config, pushPeriodStart(wm.config.From, wm.config.ResetInterval, time.Now()), nil
 }
 
 func pushPeriodStart(from time.Time, interval time.Duration, now time.Time) time.Time {

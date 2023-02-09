@@ -445,7 +445,7 @@ Errors:
       Percent: La percentuale contingente è inferiore all'1
       Unimplemented: La quota non è implementata per questa unità
       Amount: L'importo contingente è inferiore all'1
-      Interval: L'intervallo contingente è inferiore a un minuto
+      ResetInterval: L'intervallo di reset contingente è inferiore a un minuto
       Noop: Una quota illimitata senza notifiche non ha alcun effetto
   LogStore:
     Access:

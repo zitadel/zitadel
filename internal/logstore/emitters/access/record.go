@@ -12,16 +12,16 @@ import (
 var _ logstore.LogRecord = (*Record)(nil)
 
 type Record struct {
-	Timestamp       time.Time   `json:"ts"`
-	Protocol        Protocol    `json:"protocol"`
-	RequestURL      string      `json:"requestURL"`
-	ResponseStatus  uint32      `json:"responseStatus"`
-	RequestHeaders  http.Header `json:"requestHeaders"`
-	ResponseHeaders http.Header `json:"responseHeaders"`
-	InstanceID      string      `json:"instanceID"`
-	ProjectID       string      `json:"projectID"`
-	RequestedDomain string      `json:"requestedDomain"`
-	RequestedHost   string      `json:"requestedHost"`
+	LogDate         time.Time
+	Protocol        Protocol
+	RequestURL      string
+	ResponseStatus  uint32
+	RequestHeaders  http.Header
+	ResponseHeaders http.Header
+	InstanceID      string
+	ProjectID       string
+	RequestedDomain string
+	RequestedHost   string
 }
 
 type Protocol uint8
@@ -29,8 +29,6 @@ type Protocol uint8
 const (
 	GRPC Protocol = iota
 	HTTP
-	// TODO: GRPC-Web?
-	// TODO: HTTPS?
 
 	redacted = "[REDACTED]"
 )

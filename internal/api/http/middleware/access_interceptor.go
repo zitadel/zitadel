@@ -65,7 +65,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			logging.Warningf("failed to unescape request url %s", requestURL)
 		}
 		err = a.svc.Handle(ctx, &access.Record{
-			Timestamp:       time.Now(),
+			LogDate:         time.Now(),
 			Protocol:        access.HTTP,
 			RequestURL:      unescapedURL,
 			ResponseStatus:  uint32(wrappedWriter.status),

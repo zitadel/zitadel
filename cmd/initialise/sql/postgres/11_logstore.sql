@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS logstore;
 GRANT ALL ON ALL TABLES IN SCHEMA logstore TO %[1]s;
 
 CREATE TABLE IF NOT EXISTS logstore.access (
-    ts TIMESTAMPTZ NOT NULL,
+    log_date TIMESTAMPTZ NOT NULL,
     protocol INT NOT NULL,
     request_url TEXT NOT NULL,
     response_status INT NOT NULL,
@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS logstore.access (
 );
 
 CREATE TABLE IF NOT EXISTS logstore.execution (
-    ts TIMESTAMPTZ NOT NULL,
-    took_ms INT,
+    log_date TIMESTAMPTZ NOT NULL,
+    took INTERVAL,
     message TEXT NOT NULL,
     loglevel INT NOT NULL,
     instance_id TEXT NOT NULL,

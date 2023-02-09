@@ -48,7 +48,7 @@ type AddedEvent struct {
 
 	Unit          Unit                      `json:"unit"`
 	From          time.Time                 `json:"from"`
-	Interval      time.Duration             `json:"interval,omitempty"`
+	ResetInterval time.Duration             `json:"interval,omitempty"`
 	Amount        uint64                    `json:"amount"`
 	Limit         bool                      `json:"limit"`
 	Notifications []*AddedEventNotification `json:"notifications,omitempty"`
@@ -74,7 +74,7 @@ func NewAddedEvent(
 	aggregate *eventstore.Aggregate,
 	unit Unit,
 	from time.Time,
-	interval time.Duration,
+	resetInterval time.Duration,
 	amount uint64,
 	limit bool,
 	notifications []*AddedEventNotification,
@@ -87,7 +87,7 @@ func NewAddedEvent(
 		),
 		Unit:          unit,
 		From:          from,
-		Interval:      interval,
+		ResetInterval: resetInterval,
 		Amount:        amount,
 		Limit:         limit,
 		Notifications: notifications,

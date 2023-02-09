@@ -37,7 +37,7 @@ export function addQuota(
     body: {
       unit: unit,
       amount: amount,
-      interval: intervalSeconds,
+      resetInterval: intervalSeconds,
       limit: limit,
       from: from,
       notifications: notifications,

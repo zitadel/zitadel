@@ -20,7 +20,7 @@ import (
 
 const (
 	accessLogsTable          = "logstore.access"
-	accessTimestampCol       = "ts"
+	accessTimestampCol       = "log_date"
 	accessProtocolCol        = "protocol"
 	accessRequestURLCol      = "request_url"
 	accessResponseStatusCol  = "response_status"
@@ -66,7 +66,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 	for idx := range bulk {
 		item := bulk[idx].(*Record)
 		builder = builder.Values(
-			item.Timestamp,
+			item.LogDate,
 			item.Protocol,
 			item.RequestURL,
 			item.ResponseStatus,

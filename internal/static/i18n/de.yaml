@@ -445,7 +445,7 @@ Errors:
       Percent: Kontingent Prozent is unter 1
       Unimplemented: Kontingente sind für diese Einheit nicht implementiert
       Amount: Kontingent Menge ist kleiner als 1
-      Interval: Kontingent Interval ist kürzer als eine Minute
+      ResetInterval: Das Rücksetzungsintervall für das Kontingent ist kürzer als eine Minute
       Noop: Ein unlimitiertes Kontingent ohne Benachrichtigungen hat keinen Effekt
   LogStore:
     Access:

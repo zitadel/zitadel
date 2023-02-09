@@ -48,10 +48,10 @@ type quotaOption func(config *quota.AddedEvent)
 
 func quotaConfig(quotaOptions ...quotaOption) quota.AddedEvent {
 	q := &quota.AddedEvent{
-		Amount:   90,
-		Limit:    false,
-		Interval: 90 * time.Second,
-		From:     time.Unix(0, 0),
+		Amount:        90,
+		Limit:         false,
+		ResetInterval: 90 * time.Second,
+		From:          time.Unix(0, 0),
 	}
 	for _, opt := range quotaOptions {
 		opt(q)
@@ -62,7 +62,7 @@ func quotaConfig(quotaOptions ...quotaOption) quota.AddedEvent {
 func withAmountAndInterval(n uint64) quotaOption {
 	return func(c *quota.AddedEvent) {
 		c.Amount = n
-		c.Interval = time.Duration(n) * time.Second
+		c.ResetInterval = time.Duration(n) * time.Second
 	}
 }
 

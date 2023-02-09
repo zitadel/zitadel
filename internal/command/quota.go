@@ -10,8 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -45,7 +45,7 @@ func (c *Commands) AddQuota(
 	}
 
 	if wm.active {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-WDfFf", "Errors.Quota.AlreadyExists")
+		return nil, errors.ThrowAlreadyExists(nil, "COMMAND-WDfFf", "Errors.Quota.AlreadyExists")
 	}
 
 	aggregateId, err := c.idGenerator.Next()
@@ -78,7 +78,7 @@ func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.Obj
 	}
 
 	if !wm.active {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
+		return nil, errors.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
 	}
 
 	aggregate := quota.NewAggregate(wm.AggregateID, instanceId, instanceId)
@@ -110,29 +110,34 @@ type QuotaNotification struct {
 
 type QuotaNotifications []*QuotaNotification
 
-func (q *QuotaNotifications) toAddedEventNotifications(genID func() string) []*quota.AddedEventNotification {
+func (q *QuotaNotifications) toAddedEventNotifications(idGenerator id.Generator) ([]*quota.AddedEventNotification, error) {
 	if q == nil {
-		return nil
+		return nil, nil
 	}
 
 	notifications := make([]*quota.AddedEventNotification, len(*q))
 	for idx, notification := range *q {
 
+		id, err := idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+
 		notifications[idx] = &quota.AddedEventNotification{
-			ID:      genID(),
+			ID:      id,
 			Percent: notification.Percent,
 			Repeat:  notification.Repeat,
 			CallURL: notification.CallURL,
 		}
 	}
 
-	return notifications
+	return notifications, nil
 }
 
 type AddQuota struct {
 	Unit          QuotaUnit
 	From          time.Time
-	Interval      time.Duration
+	ResetInterval time.Duration
 	Amount        uint64
 	Limit         bool
 	Notifications QuotaNotifications
@@ -169,8 +174,8 @@ func (q *AddQuota) validate() error {
 		return errors.ThrowInvalidArgument(nil, "QUOTA-hOKSJ", "Errors.Quota.Invalid.Amount")
 	}
 
-	if q.Interval < time.Minute {
-		return errors.ThrowInvalidArgument(nil, "QUOTA-R5otd", "Errors.Quota.Invalid.Interval")
+	if q.ResetInterval < time.Minute {
+		return errors.ThrowInvalidArgument(nil, "QUOTA-R5otd", "Errors.Quota.Invalid.ResetInterval")
 	}
 
 	if !q.Limit && len(q.Notifications) == 0 {
@@ -189,12 +194,9 @@ func (c *Commands) AddQuotaCommand(a *quota.Aggregate, q *AddQuota) preparation.
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
 
-				genID := func() string {
-					id, genErr := c.idGenerator.Next()
-					if genErr != nil {
-						err = genErr
-					}
-					return id
+				notifications, err := q.Notifications.toAddedEventNotifications(c.idGenerator)
+				if err != nil {
+					return nil, err
 				}
 
 				return []eventstore.Command{quota.NewAddedEvent(
@@ -202,10 +204,10 @@ func (c *Commands) AddQuotaCommand(a *quota.Aggregate, q *AddQuota) preparation.
 					&a.Aggregate,
 					q.Unit.Enum(),
 					q.From,
-					q.Interval,
+					q.ResetInterval,
 					q.Amount,
 					q.Limit,
-					q.Notifications.toAddedEventNotifications(genID),
+					notifications,
 				)}, err
 			},
 			nil

@@ -445,7 +445,7 @@ Errors:
       Percent: Pourcent du contingent est inférieure à 1
       Unimplemented: Les contingents ne sont pas implémentés pour cette unité
       Amount: Quantité contingentée est inférieure à 1
-      Interval: L'intervalle entre les contingents est inférieur à une minute
+      ResetInterval: L'intervalle de réinitialisation entre les contingents est inférieur à une minute
       Noop: Un contingent illimité sans notifications n'a aucun effet
   LogStore:
     Access:
