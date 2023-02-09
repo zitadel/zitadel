@@ -83,6 +83,11 @@ message Machine {
             example: "\"true\"";
         }
     ];
+    AccessTokenType access_token_typ = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Type of access token to receive";
+        }
+    ];
 }
 
 message Profile {
@@ -159,6 +164,11 @@ enum Gender {
     GENDER_FEMALE = 1;
     GENDER_MALE = 2;
     GENDER_DIVERSE = 3;
+}
+
+enum AccessTokenType {
+    ACCESS_TOKEN_TYPE_BEARER = 0;
+    ACCESS_TOKEN_TYPE_JWT = 1;
 }
 
 message SearchQuery {
