@@ -61,17 +61,8 @@ type Config struct {
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
-	LogStore          *struct {
-		Access *struct {
-			Database *logstore.EmitterConfig
-			Stdout   *logstore.EmitterConfig
-		}
-		Execution *struct {
-			Database *logstore.EmitterConfig
-			Stdout   *logstore.EmitterConfig
-		}
-	}
-	Eventstore *eventstore.Config
+	Eventstore        *eventstore.Config
+	LogStore          *logstore.Configs
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
