@@ -78,7 +78,6 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 }
 
 func executeScript(config *runConfig, ctxParam contextFields, apiParam apiFields, script string) (err error) {
-
 	t := config.StartScript()
 	defer func() {
 		t.Stop()

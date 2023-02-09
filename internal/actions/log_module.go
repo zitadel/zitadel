@@ -53,7 +53,6 @@ func (l *logger) Error(msg string) {
 }
 
 func (l *logger) log(msg string, level logrus.Level, last bool) {
-
 	ts := time.Now()
 	if l.started.IsZero() {
 		l.started = ts

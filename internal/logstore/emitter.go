@@ -50,7 +50,6 @@ type LogCleanupper interface {
 }
 
 func NewEmitter(ctx context.Context, clock clock.Clock, cfg *EmitterConfig, logger LogEmitter) (*emitter, error) {
-
 	svc := &emitter{
 		enabled: cfg != nil && cfg.Enabled,
 		ctx:     ctx,

@@ -139,7 +139,6 @@ type AddQuota struct {
 }
 
 func (q *AddQuota) validate() error {
-
 	isUrl := func(str string) error {
 		u, err := url.Parse(str)
 		if err != nil {

@@ -12,7 +12,6 @@ import (
 
 // ReportUsage calls notification hooks and emits the notified events
 func (c *Commands) ReportUsage(ctx context.Context, dueNotifications []*quota.NotifiedEvent) error {
-
 	for _, notification := range dueNotifications {
 
 		if err := notify(ctx, notification); err != nil {
@@ -30,7 +29,6 @@ func (c *Commands) ReportUsage(ctx context.Context, dueNotifications []*quota.No
 }
 
 func notify(ctx context.Context, notification *quota.NotifiedEvent) error {
-
 	payload, err := json.Marshal(notification)
 	if err != nil {
 		return err

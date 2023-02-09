@@ -39,7 +39,6 @@ type Service struct {
 }
 
 func New(quotaQuerier QuotaQuerier, usageReporter UsageReporter, usageQuerierSink *emitter, additionalSink ...*emitter) *Service {
-
 	var usageQuerier UsageQuerier
 	if usageQuerierSink != nil {
 		usageQuerier = usageQuerierSink.emitter.(UsageQuerier)

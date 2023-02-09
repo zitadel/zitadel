@@ -10,7 +10,6 @@ import (
 )
 
 func (c *Commands) GetDueQuotaNotifications(ctx context.Context, config *quota.AddedEvent, periodStart time.Time, usedAbs uint64) ([]*quota.NotifiedEvent, error) {
-
 	if len(config.Notifications) == 0 {
 		return nil, nil
 	}
