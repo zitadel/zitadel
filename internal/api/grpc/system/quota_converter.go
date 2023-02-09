@@ -5,18 +5,18 @@ import (
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
-func instanceQuotaPbToQuota(req *system_pb.AddQuotaRequest) *command.AddQuota {
+func instanceQuotaPbToCommand(req *system_pb.AddQuotaRequest) *command.AddQuota {
 	return &command.AddQuota{
-		Unit:          instanceQuotaUnitPbToQuotaUnit(req.Unit),
+		Unit:          instanceQuotaUnitPbToCommand(req.Unit),
 		From:          req.From.AsTime(),
 		Interval:      req.Interval.AsDuration(),
 		Amount:        req.Amount,
 		Limit:         req.Limit,
-		Notifications: instanceQuotaNotificationsPbToQuotaNotifications(req.Notifications),
+		Notifications: instanceQuotaNotificationsPbToCommand(req.Notifications),
 	}
 }
 
-func instanceQuotaUnitPbToQuotaUnit(unit system_pb.Unit) command.QuotaUnit {
+func instanceQuotaUnitPbToCommand(unit system_pb.Unit) command.QuotaUnit {
 	switch unit {
 	case system_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED:
 		return command.QuotaRequestsAllAuthenticated
@@ -29,7 +29,7 @@ func instanceQuotaUnitPbToQuotaUnit(unit system_pb.Unit) command.QuotaUnit {
 	}
 }
 
-func instanceQuotaNotificationsPbToQuotaNotifications(req []*system_pb.AddQuotaRequest_Notification) command.QuotaNotifications {
+func instanceQuotaNotificationsPbToCommand(req []*system_pb.AddQuotaRequest_Notification) command.QuotaNotifications {
 	notifications := make([]*command.QuotaNotification, len(req))
 	for idx := range req {
 		item := req[idx]
