@@ -3,12 +3,31 @@
 </h1>
 <p class="desc cnsl-secondary-text">{{ data.descriptionKey | translate }}</p>
 <div mat-dialog-content>
-  <cnsl-form-field class="formfield">
-    <cnsl-label
-      >{{ data.labelKey | translate }} <span *ngIf="isPhone && phoneCountry">({{ phoneCountry }})</span>
-    </cnsl-label>
-    <input [formControl]="valueControl" cnslInput (keydown.enter)="valueControl.valid ? closeDialogWithValue() : null" />
-  </cnsl-form-field>
+  <div class="phone-grid">
+    <cnsl-form-field *ngIf="isPhone">
+      <cnsl-label>{{ 'USER.PROFILE.COUNTRY' | translate }}</cnsl-label>
+      <mat-select [(value)]="selected" (selectionChange)="setCountryCallingCode()">
+        <mat-select-trigger> <span class="fi fi-{{ selected?.countryCode | lowercase }}"></span></mat-select-trigger>
+        <mat-option *ngFor="let country of countryPhoneCodes" [value]="country">
+          <span class="fi fi-{{ country.countryCode | lowercase }}"></span>
+          <span class="phone-country-name">{{ country.countryName }}</span>
+          <span class="phone-country-code">+{{ country.countryCallingCode }}</span>
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+    <cnsl-form-field>
+      <cnsl-label>{{ data.labelKey | translate }}</cnsl-label>
+      <input
+        cnslInput
+        [formControl]="valueControl"
+        matTooltip="{{ 'USER.PROFILE.PHONE_HINT' | translate }}"
+        [matTooltipDisabled]="!isPhone"
+      />
+      <span cnslError *ngIf="valueControl?.invalid && valueControl?.errors?.required">
+        {{ 'USER.VALIDATION.REQUIRED' | translate }}
+      </span>
+    </cnsl-form-field>
+  </div>
 
   <ng-container *ngIf="data.type === EditDialogType.EMAIL && data.isVerifiedTextKey">
     <mat-checkbox class="verified-checkbox" [(ngModel)]="isVerified">

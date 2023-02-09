@@ -19,7 +19,7 @@ type userProjection struct {
 }
 
 const (
-	UserTable        = "projections.users6"
+	UserTable        = "projections.users8"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -57,11 +57,13 @@ const (
 	HumanIsPhoneVerifiedCol = "is_phone_verified"
 
 	// machine
-	UserMachineSuffix        = "machines"
-	MachineUserIDCol         = "user_id"
-	MachineUserInstanceIDCol = "instance_id"
-	MachineNameCol           = "name"
-	MachineDescriptionCol    = "description"
+	UserMachineSuffix         = "machines"
+	MachineUserIDCol          = "user_id"
+	MachineUserInstanceIDCol  = "instance_id"
+	MachineNameCol            = "name"
+	MachineDescriptionCol     = "description"
+	MachineHasSecretCol       = "has_secret"
+	MachineAccessTokenTypeCol = "access_token_type"
 
 	// notify
 	UserNotifySuffix       = "notifications"
@@ -120,6 +122,8 @@ func newUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(MachineUserInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineDescriptionCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(MachineHasSecretCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(MachineAccessTokenTypeCol, crdb.ColumnTypeEnum, crdb.Default(0)),
 		},
 			crdb.NewPrimaryKey(MachineUserInstanceIDCol, MachineUserIDCol),
 			UserMachineSuffix,
@@ -275,6 +279,14 @@ func (p *userProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanPasswordChangedType,
 					Reduce: p.reduceHumanPasswordChanged,
+				},
+				{
+					Event:  user.MachineSecretSetType,
+					Reduce: p.reduceMachineSecretSet,
+				},
+				{
+					Event:  user.MachineSecretRemovedType,
+					Reduce: p.reduceMachineSecretRemoved,
 				},
 			},
 		},
@@ -907,6 +919,67 @@ func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*ha
 	), nil
 }
 
+func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineSecretSetEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x0p1n1i", "reduce.wrong.event.type %s", user.MachineSecretSetType)
+	}
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(UserChangeDateCol, e.CreationDate()),
+				handler.NewCol(UserSequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MachineHasSecretCol, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserMachineSuffix),
+		),
+	), nil
+}
+
+func (p *userProjection) reduceMachineSecretRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineSecretRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x0p6n1i", "reduce.wrong.event.type %s", user.MachineSecretRemovedType)
+	}
+
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(UserChangeDateCol, e.CreationDate()),
+				handler.NewCol(UserSequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MachineHasSecretCol, false),
+			},
+			[]handler.Condition{
+				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(UserMachineSuffix),
+		),
+	), nil
+}
+
 func (p *userProjection) reduceMachineAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineAddedEvent)
 	if !ok {
@@ -934,6 +1007,7 @@ func (p *userProjection) reduceMachineAdded(event eventstore.Event) (*handler.St
 				handler.NewCol(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(MachineNameCol, e.Name),
 				handler.NewCol(MachineDescriptionCol, &sql.NullString{String: e.Description, Valid: e.Description != ""}),
+				handler.NewCol(MachineAccessTokenTypeCol, e.AccessTokenType),
 			},
 			crdb.WithTableSuffix(UserMachineSuffix),
 		),
@@ -952,6 +1026,9 @@ func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 	}
 	if e.Description != nil {
 		cols = append(cols, handler.NewCol(MachineDescriptionCol, *e.Description))
+	}
+	if e.AccessTokenType != nil {
+		cols = append(cols, handler.NewCol(MachineAccessTokenTypeCol, e.AccessTokenType))
 	}
 	if len(cols) == 0 {
 		return crdb.NewNoOpStatement(e), nil

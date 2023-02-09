@@ -204,6 +204,12 @@ import {
   GetSecurityPolicyResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
+  ListEventsResponse,
+  ListEventsRequest,
+  ListEventTypesRequest,
+  ListEventTypesResponse,
+  ListAggregateTypesRequest,
+  ListAggregateTypesResponse,
   GetNotificationPolicyRequest,
   GetNotificationPolicyResponse,
   UpdateNotificationPolicyRequest,
@@ -226,6 +232,18 @@ import { GrpcService } from './grpc.service';
 })
 export class AdminService {
   constructor(private readonly grpcService: GrpcService) {}
+
+  public listEvents(req: ListEventsRequest): Promise<ListEventsResponse> {
+    return this.grpcService.admin.listEvents(req, null).then((resp) => resp);
+  }
+
+  public listEventTypes(req: ListEventTypesRequest): Promise<ListEventTypesResponse.AsObject> {
+    return this.grpcService.admin.listEventTypes(req, null).then((resp) => resp.toObject());
+  }
+
+  public listAggregateTypes(req: ListAggregateTypesRequest): Promise<ListAggregateTypesResponse.AsObject> {
+    return this.grpcService.admin.listAggregateTypes(req, null).then((resp) => resp.toObject());
+  }
 
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();

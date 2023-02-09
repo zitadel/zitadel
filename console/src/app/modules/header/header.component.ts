@@ -80,6 +80,7 @@ export class HeaderComponent implements OnDestroy {
       '/instance',
       '/settings',
       '/views',
+      '/events',
       '/orgs',
       '/settings',
       '/failed-events',

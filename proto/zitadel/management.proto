@@ -625,6 +625,29 @@ service ManagementService {
         };
     }
 
+    // Generates and sets a new machine secret
+    rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/secret"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Removes the machine secret
+    rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/secret"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
     // Returns a machine key of a (machine) user
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
@@ -3290,6 +3313,7 @@ message AddMachineUserRequest {
 
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string description = 3 [(validate.rules).string = {max_len: 500}];
+    zitadel.user.v1.AccessTokenType access_token_type = 4 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddMachineUserResponse {
@@ -3610,9 +3634,28 @@ message UpdateMachineRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string description = 2 [(validate.rules).string.max_len = 500];
     string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.user.v1.AccessTokenType access_token_type = 4 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateMachineResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GenerateMachineSecretRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GenerateMachineSecretResponse {
+    string client_id = 1;
+    string client_secret = 2;
+    zitadel.v1.ObjectDetails details = 3;
+}
+
+message RemoveMachineSecretRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMachineSecretResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

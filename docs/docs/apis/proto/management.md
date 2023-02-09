@@ -581,6 +581,30 @@ Changes a machine user
     PUT: /users/{user_id}/machine
 
 
+### GenerateMachineSecret
+
+> **rpc** GenerateMachineSecret([GenerateMachineSecretRequest](#generatemachinesecretrequest))
+[GenerateMachineSecretResponse](#generatemachinesecretresponse)
+
+Generates and sets a new machine secret
+
+
+
+    PUT: /users/{user_id}/secret
+
+
+### RemoveMachineSecret
+
+> **rpc** RemoveMachineSecret([RemoveMachineSecretRequest](#removemachinesecretrequest))
+[RemoveMachineSecretResponse](#removemachinesecretresponse)
+
+Removes the machine secret
+
+
+
+    DELETE: /users/{user_id}/secret
+
+
 ### GetMachineKeyByIDs
 
 > **rpc** GetMachineKeyByIDs([GetMachineKeyByIDsRequest](#getmachinekeybyidsrequest))
@@ -3562,6 +3586,7 @@ This is an empty request
 | user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | description |  string | - | string.max_len: 500<br />  |
+| access_token_type |  zitadel.user.v1.AccessTokenType | - | enum.defined_only: true<br />  |
 
 
 
@@ -4421,6 +4446,30 @@ This is an empty request
 
 ### DeleteActionResponse
 
+
+
+
+
+### GenerateMachineSecretRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+
+
+
+
+### GenerateMachineSecretResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| client_secret |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -7175,6 +7224,28 @@ This is an empty request
 
 
 
+### RemoveMachineSecretRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveMachineSecretResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveMultiFactorFromLoginPolicyRequest
 
 
@@ -8698,6 +8769,7 @@ This is an empty request
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | description |  string | - | string.max_len: 500<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| access_token_type |  zitadel.user.v1.AccessTokenType | - | enum.defined_only: true<br />  |
 
 
 

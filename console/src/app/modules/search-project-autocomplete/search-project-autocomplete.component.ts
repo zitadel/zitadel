@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, OnDestroy, Output, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import {
   MatLegacyAutocomplete as MatAutocomplete,
@@ -25,7 +25,7 @@ export enum ProjectAutocompleteType {
   templateUrl: './search-project-autocomplete.component.html',
   styleUrls: ['./search-project-autocomplete.component.scss'],
 })
-export class SearchProjectAutocompleteComponent implements OnDestroy {
+export class SearchProjectAutocompleteComponent implements OnInit, OnDestroy {
   public selectable: boolean = true;
   public removable: boolean = true;
   public addOnBlur: boolean = true;
@@ -89,6 +89,35 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
             break;
         }
       });
+  }
+
+  public ngOnInit(): void {
+    // feat-3916 show projects as soon as I am in the input field of the project
+    const query = new ProjectQuery();
+    const nameQuery = new ProjectNameQuery();
+    nameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+    query.setNameQuery(nameQuery);
+
+    switch (this.autocompleteType) {
+      case ProjectAutocompleteType.PROJECT_GRANTED:
+        this.mgmtService.listGrantedProjects(10, 0, [query]).then((projects) => {
+          this.filteredProjects = projects.resultList;
+        });
+        break;
+      case ProjectAutocompleteType.PROJECT_OWNED:
+        this.mgmtService.listProjects(10, 0, [query]).then((projects) => {
+          this.filteredProjects = projects.resultList;
+        });
+        break;
+      default:
+        Promise.all([
+          this.mgmtService.listGrantedProjects(10, 0, [query]),
+          this.mgmtService.listProjects(10, 0, [query]),
+        ]).then((values) => {
+          this.filteredProjects = values[0].resultList;
+          this.filteredProjects = this.filteredProjects.concat(values[1].resultList);
+        });
+    }
   }
 
   public ngOnDestroy(): void {

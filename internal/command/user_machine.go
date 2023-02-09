@@ -20,9 +20,10 @@ type AddMachine struct {
 type Machine struct {
 	models.ObjectRoot
 
-	Username    string
-	Name        string
-	Description string
+	Username        string
+	Name            string
+	Description     string
+	AccessTokenType domain.OIDCTokenType
 }
 
 func (m *Machine) IsZero() bool {
@@ -56,7 +57,7 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 				return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotFound")
 			}
 			return []eventstore.Command{
-				user.NewMachineAddedEvent(ctx, &a.Aggregate, machine.Username, machine.Name, machine.Description, domainPolicy.UserLoginMustBeDomain),
+				user.NewMachineAddedEvent(ctx, &a.Aggregate, machine.Username, machine.Name, machine.Description, domainPolicy.UserLoginMustBeDomain, machine.AccessTokenType),
 			}, nil
 		}, nil
 	}
@@ -124,7 +125,7 @@ func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Valid
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5M0od", "Errors.User.NotFound")
 			}
-			changedEvent, hasChanged, err := writeModel.NewChangedEvent(ctx, &a.Aggregate, machine.Name, machine.Description)
+			changedEvent, hasChanged, err := writeModel.NewChangedEvent(ctx, &a.Aggregate, machine.Name, machine.Description, machine.AccessTokenType)
 			if err != nil {
 				return nil, err
 			}

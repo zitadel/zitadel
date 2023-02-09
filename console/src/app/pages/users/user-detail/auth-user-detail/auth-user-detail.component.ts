@@ -21,6 +21,7 @@ import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { formatPhone } from 'src/app/utils/formatPhone';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -271,6 +272,9 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public savePhone(phone: string): void {
     if (this.user?.human) {
+      // Format phone before save (add +)
+      phone = formatPhone(phone).phone;
+
       this.userService
         .setMyPhone(phone)
         .then(() => {
