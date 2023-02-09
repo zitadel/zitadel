@@ -1,5 +1,5 @@
 <div class="max-width-container">
-  <div class="enlarged-container">
+  <div class="enlarged-container actions-enlarged-container">
     <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
     <p class="desc cnsl-secondary-text">{{ 'FLOWS.DESCRIPTION' | translate }}</p>
 
@@ -21,7 +21,7 @@
     <p class="desc cnsl-secondary-text">{{ 'FLOWS.FLOWSDESCRIPTION' | translate }}</p>
 
     <ng-template cnslHasRole [hasRole]="['org.flow.read']">
-      <div class="flow">
+      <div class="actions-flow">
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'FLOWS.FLOWTYPE' | translate }}</cnsl-label>
           <mat-select [formControl]="typeControl">
@@ -32,7 +32,7 @@
         </cnsl-form-field>
 
         <div *ngIf="flow" class="trigger-wrapper">
-          <div class="topbottomline"></div>
+          <div class="actions-topbottomline"></div>
 
           <div class="flow-type">
             <i class="type-icon las la-dot-circle"></i>

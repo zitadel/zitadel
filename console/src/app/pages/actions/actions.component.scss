@@ -1,156 +1,168 @@
-h1 {
-  margin: 0;
-}
+@use '@angular/material' as mat;
 
-.desc {
-  margin-bottom: 2rem;
-  font-size: 14px;
-}
+@mixin actions-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $primary: map-get($theme, primary);
+  $primary-color: map-get($primary, 500);
 
-.title-section {
-  display: flex;
-  align-items: center;
-  margin-top: 3rem;
-  margin-bottom: 1rem;
-
-  h2 {
-    margin: 0;
-  }
-
-  i {
-    margin-left: 0.5rem;
-  }
-}
-
-.flow {
-  display: flex;
-  flex-direction: column;
-  max-width: 1000px;
-  position: relative;
-
-  .formfield {
-    max-width: 300px;
-  }
-
-  .flow-type {
-    margin: 0.5rem 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0 1.5rem;
-
-    .type-icon {
-      color: var(--color-main);
+  .actions-enlarged-container {
+    h1 {
+      margin: 0;
     }
 
-    .type-button-icon,
-    .type-icon,
-    span {
-      margin-right: 1rem;
+    .desc {
+      margin-bottom: 2rem;
+      font-size: 14px;
     }
 
-    .type-icon,
-    .type-button-icon {
-      position: relative;
-    }
-  }
-
-  .trigger-wrapper {
-    position: relative;
-
-    .trigger {
+    .title-section {
       display: flex;
       align-items: center;
+      margin-top: 3rem;
+      margin-bottom: 1rem;
+
+      h2 {
+        margin: 0;
+      }
+
+      i {
+        margin-left: 0.5rem;
+      }
+    }
+
+    .actions-flow {
+      display: flex;
+      flex-direction: column;
+      max-width: 1000px;
       position: relative;
 
-      .trigger-top {
+      .formfield {
+        max-width: 300px;
+      }
+
+      .flow-type {
+        margin: 0.5rem 0;
         display: flex;
         align-items: center;
-        margin-bottom: 0.5rem;
-        padding-left: 7px;
+        justify-content: flex-start;
+        padding: 0 1.5rem;
 
-        .fill-space {
-          flex: 1;
+        .type-icon {
+          color: $primary-color;
+        }
+
+        .type-button-icon,
+        .type-icon,
+        span {
+          margin-right: 1rem;
+        }
+
+        .type-icon,
+        .type-button-icon {
+          position: relative;
         }
       }
 
-      .icon {
-        margin-right: 1rem;
-        color: var(--color-main);
-      }
+      .trigger-wrapper {
+        position: relative;
 
-      .fill-space {
-        flex: 1;
-      }
-
-      .flow-action-wrapper {
-        padding: 0 0.5rem;
-        margin: 0;
-
-        .flow-action {
+        .trigger {
           display: flex;
           align-items: center;
-          font-size: 14px;
-          padding: 0.5rem 0;
-          cursor: move;
+          position: relative;
 
-          .flow-action-name {
+          .trigger-top {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-left: 7px;
+
+            .fill-space {
+              flex: 1;
+            }
+          }
+
+          .icon {
             margin-right: 1rem;
+            color: $primary-color;
           }
 
           .fill-space {
             flex: 1;
           }
 
-          i {
-            margin-right: 0.5rem;
+          .flow-action-wrapper {
+            padding: 0 0.5rem;
+            margin: 0;
+
+            .flow-action {
+              display: flex;
+              align-items: center;
+              font-size: 14px;
+              padding: 0.5rem 0;
+              cursor: move;
+
+              .flow-action-name {
+                margin-right: 1rem;
+              }
+
+              .fill-space {
+                flex: 1;
+              }
+
+              i {
+                margin-right: 0.5rem;
+              }
+            }
+
+            .state {
+              margin-left: 1rem;
+            }
           }
         }
+      }
 
-        .state {
-          margin-left: 1rem;
-        }
+      .actions-topbottomline {
+        position: absolute;
+        top: 26px;
+        bottom: 1.5rem;
+        left: 35px;
+        width: 2px;
+        z-index: 0;
+        background-color: $primary-color;
+      }
+
+      .add-btn {
+        display: flex;
+        align-items: center;
+        align-self: flex-start;
+        margin: 1rem 0;
       }
     }
+
+    .cdk-drag-preview {
+      color: white;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      border-radius: 0.5rem;
+      padding: 0 0.5rem;
+      background-color: $primary-color;
+      box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+
+      i {
+        margin-right: 0.5rem;
+      }
+    }
+
+    .cdk-drag-placeholder {
+      opacity: 0;
+    }
+
+    .cdk-drag-animating {
+      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
   }
-
-  .topbottomline {
-    position: absolute;
-    top: 26px;
-    bottom: 1.5rem;
-    left: 35px;
-    width: 2px;
-    z-index: 0;
-    background-color: var(--color-main);
-  }
-
-  .add-btn {
-    display: flex;
-    align-items: center;
-    align-self: flex-start;
-    margin: 1rem 0;
-  }
-}
-
-.cdk-drag-preview {
-  color: white;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  border-radius: 0.5rem;
-  padding: 0 0.5rem;
-  background-color: var(--color-main);
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
-
-  i {
-    margin-right: 0.5rem;
-  }
-}
-
-.cdk-drag-placeholder {
-  opacity: 0;
-}
-
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
