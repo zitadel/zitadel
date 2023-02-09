@@ -774,7 +774,7 @@
       "SEQUENCE": "Sekwencja",
       "CREATIONDATE": "Data utworzenia",
       "TYPE": "Typ",
-      "PAYLOAD": "Obciążenie użytkowe",
+      "PAYLOAD": "Zawartość",
       "FILTERS": {
         "BTN": "Filtr",
         "USER": {
@@ -784,32 +784,32 @@
         "AGGREGATE": {
           "TYPELABEL": "Typ agregatu",
           "IDLABEL": "Identyfikator",
-          "CHECKBOX": "Filtrowanie według agregatu"
+          "CHECKBOX": "Filtruj według agregatu"
         },
         "TYPE": {
           "TYPELABEL": "Typ",
-          "CHECKBOX": "Filtrowanie według typu"
+          "CHECKBOX": "Filtruj według typu"
         },
         "RESOURCEOWNER": {
           "LABEL": "Identyfikator",
-          "CHECKBOX": "Filtrowanie według właściciela zasobu"
+          "CHECKBOX": "Filtruj według właściciela zasobu"
         },
         "SEQUENCE": {
           "LABEL": "Sekwencja",
-          "CHECKBOX": "Filtrowanie według sekwencji",
+          "CHECKBOX": "Filtruj według sekwencji",
           "SORT": "Sortowanie",
-          "ASC": "Wstępująca",
-          "DESC": "Zjeżdżający"
+          "ASC": "Rosnące",
+          "DESC": "Malejące"
         },
         "CREATIONDATE": {
           "LABEL": "Data utworzenia",
-          "CHECKBOX": "Filtrowanie według daty utworzenia"
+          "CHECKBOX": "Filtruj według daty utworzenia"
         },
         "OTHER": "inne",
         "OTHERS": "inni"
       },
       "DIALOG": {
-        "TITLE": "Szczegóły wydarzenia"
+        "TITLE": "Szczegóły zdarzenia"
       }
     },
     "TOAST": {

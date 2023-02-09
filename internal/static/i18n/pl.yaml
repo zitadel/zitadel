@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: Klucz maszyny nie znaleziony
         AlreadyExisting: Klucz maszyny już istnieje
+      Secret:
+        NotExisting: Sekret nie istnieje
+        Invalid: Sekret jest nieprawidłowy
+        CouldNotGenerate: Sekret nie mógł zostać wygenerowany
     PAT:
       NotFound: Osobisty token dostępu nie znaleziony
     NotHuman: Użytkownik musi być osobą
@@ -434,22 +438,22 @@ Errors:
     SQLStatement: Instrukcja SQL nie mogła zostać utworzona
     InvalidRequest: Żądanie jest nieprawidłowe
   Quota:
-    AlreadyExists: Kwota już istnieje dla tej jednostki
-    NotFound: Nie znaleziono kontyngentu dla tej jednostki
+    AlreadyExists: Limit już istnieje dla tej jednostki
+    NotFound: Nie znaleziono limitu dla tej jednostki
     Invalid:
-      CallURL: Adres URL połączenia z kwotą jest nieprawidłowy
-      Percent: Wartość procentowa kwoty jest niższa niż 1
-      Unimplemented: Dla tej jednostki nie wprowadza się kwot
-      Amount: Wysokość kwoty jest mniejsza niż 1
-      Interval: Interwał kwotowy jest krótszy niż minuta
-      Noop: Nieograniczona kwota bez powiadomień nie ma żadnego wpływu
+      CallURL: Adres URL połączenia z limitem jest nieprawidłowy
+      Percent: Wartość procentowa limitu jest niższa niż 1
+      Unimplemented: Limit nie jest zaimplementowany dla tej jednostki
+      Amount: Wysokość limitu jest mniejsza niż 1
+      Interval: Interwał limitu jest krótszy niż minuta
+      Noop: Nieograniczony limit bez powiadomień nie ma żadnego wpływu
   LogStore:
     Access:
       StorageFailed: Zapisywanie dziennika dostępu do bazy danych nie powiodło się
       ScanFailed: Zapytanie o użycie dla uwierzytelnionych żądań nie powiodło się
     Execution:
       StorageFailed: Zapisywanie dziennika wykonania akcji do bazy danych nie powiodło się
-      ScanFailed: Zapytanie o wykorzystanie sekund wykonania akcji nie powiodło się
+      ScanFailed: Zapytanie o użycie dla sekund wykonania akcji nie powiodło się
 
 AggregateTypes:
   action: Działanie
@@ -459,6 +463,7 @@ AggregateTypes:
   project: Projekt
   user: Użytkownik
   usergrant: Uprawnienie użytkownika
+  quota: Limit
 
 EventTypes:
   user:
@@ -495,11 +500,11 @@ EventTypes:
         added: Dodano klucz
         removed: Usunięto klucz
       secret:
-        set: Tajny zestaw
-        removed: Tajemnica usunięta
+        set: Sekret ustawiony
+        removed: Sekret usunięty
         check:
-          succeeded: Tajne sprawdzenie powiodło się
-          failed: Tajne sprawdzenie nie powiodło się
+          succeeded: Sprawdzenie sekretu powiodło się
+          failed: Sprawdzenie sekretu nie powiodło się
     human:
       added: Dodano osobę
       selfregistered: Osoba zarejestrowała się sama
