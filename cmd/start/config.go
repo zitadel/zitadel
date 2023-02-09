@@ -5,6 +5,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+
 	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
