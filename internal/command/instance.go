@@ -267,7 +267,6 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	if setup.Quotas != nil {
 		for _, q := range setup.Quotas.Items {
-
 			quotaId, err := c.idGenerator.Next()
 			if err != nil {
 				return "", "", nil, nil, err
