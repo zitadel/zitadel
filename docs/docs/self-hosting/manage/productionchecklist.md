@@ -15,7 +15,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] High Availability for ZITADEL containers
   - [ ] Use a container orchestrator such as Kubernetes
   - [ ] Use serverless platform such as Knative or a hyperscaler equivalent (e.g. CloudRun from Google)
-  - [ ] Separate `zitadel init` and `zitadel setup` for fast startup times when [scaling](/docs/self-hosting/manage/updating_scaling) ZITADEL
+  - [ ] Split `zitadel init` and `zitadel setup` for fast start-up times when [scaling](/docs/self-hosting/manage/updating_scaling) ZITADEL
 - [ ] High Availability for database 
   - [ ] Follow the [Production Checklist](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html) for CockroachDB if you selfhost the database or use [CockroachDB cloud](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
   - [ ] Configure backups on a regular basis for the database
