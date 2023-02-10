@@ -31,10 +31,10 @@ func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, exp
 	}
 }
 
-func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string, translator *i18n.Translator, ignoredServices ...string) (_ interface{}, err error) {
+func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	for _, service := range ignoredServices {
+	for _, service := range idFromRequestsServices {
 		if !strings.HasPrefix(service, "/") {
 			service = "/" + service
 		}

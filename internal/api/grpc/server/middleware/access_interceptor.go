@@ -11,31 +11,10 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 )
 
-func AccessLimitInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		if !svc.Enabled() {
-			return handler(ctx, req)
-		}
-		instance := authz.GetInstance(ctx)
-		remaining, err := svc.Limit(ctx, instance.InstanceID())
-		if err != nil {
-			logging.WithError(err).Warn("failed to check whether requests should be limited")
-			//nolint:ineffassign
-			err = nil
-		}
-
-		resp, err := handler(ctx, req)
-		if remaining != nil && *remaining == 0 {
-			err = errors.ThrowResourceExhausted(nil, "QUOTA-vjAy8", "Quota.Access.Exhausted")
-		}
-		return resp, err
-	}
-}
 func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		if !svc.Enabled() {
@@ -46,9 +25,9 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 
 		resp, handlerErr := handler(ctx, req)
 		var respStatus uint32
-		grpcErr, ok := status.FromError(handlerErr)
+		grpcStatus, ok := status.FromError(handlerErr)
 		if ok {
-			respStatus = uint32(grpcErr.Code())
+			respStatus = uint32(grpcStatus.Code())
 		}
 
 		resMd, _ := metadata.FromOutgoingContext(ctx)
