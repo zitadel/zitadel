@@ -44,7 +44,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] Use a FQDN and a trusted valid certificate for external [TLS](/docs/self-hosting/manage/tls_modes#http2) connections
 - [ ] Create service accounts for applications that interact with ZITADEL's APIs
 - [ ] Make use of a CDN service to decrease the load for static assets served by ZITADEL
-- [ ] Make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and cluster
+- [ ] Make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and deployment environment
 
 ### Monitoring
 Use an appropriate monitoring solution to have an overview about your ZITADEL instance. In particular you may want to watch out for things like:
