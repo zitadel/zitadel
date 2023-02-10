@@ -13,7 +13,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] Reduce the manual interaction with your platform to an absolute minimum 
 #### HA Setup
 - [ ] High Availability for ZITADEL containers
-  - [ ] Use container orchestrator such as Kubernetes or
+  - [ ] Use a container orchestrator such as Kubernetes
   - [ ] Use serverless architecture such as Knative or a hyperscaler equivalent (e.g. CloudRun from Google)
   - [ ] Separate `zitadel init` and `zitadel setup` for fast startup times when [scaling](/docs/self-hosting/manage/updating_scaling) ZITADEL
 - [ ] High Availability for database 
