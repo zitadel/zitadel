@@ -38,7 +38,8 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 
 	remaining, err := logstoreService.Limit(ctx, config.instanceID)
 	if err != nil {
-		logging.WithError(err).Warnf("failed to check whether action executions should be limited")
+		logging.WithError(err).Warn("failed to check whether action executions should be limited")
+		//nolint:ineffassign
 		err = nil
 	}
 
