@@ -61,7 +61,7 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 				crdb.NewColumn(QuotaAmountCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaLimitCol, crdb.ColumnTypeBool),
 			},
-			crdb.NewPrimaryKey(QuotaIDCol),
+			crdb.NewPrimaryKey(QuotaInstanceIDCol, QuotaIDCol),
 			crdb.WithIndex(crdb.NewIndex("quotas_ro_idx", []string{QuotaResourceOwnerCol})),
 		),
 		crdb.NewSuffixedTable(
@@ -76,7 +76,7 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 				crdb.NewColumn(QuotaNotificationLastCallDateCol, crdb.ColumnTypeTimestamp, crdb.Nullable()),
 				crdb.NewColumn(QuotaNotificationLastCallThresholdCol, crdb.ColumnTypeInt64, crdb.Nullable()),
 			},
-			crdb.NewPrimaryKey(QuotaNotificationIDCol),
+			crdb.NewPrimaryKey(QuotaNotificationInstanceIDCol, QuotaNotificationIDCol),
 			QuotaNotificationsTableSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
