@@ -5,6 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 )
 
@@ -260,6 +261,15 @@ func IDPProviderTypeModelFromPb(typ idp_pb.IDPOwnerType) iam_model.IDPProviderTy
 		return iam_model.IDPProviderTypeSystem
 	default:
 		return iam_model.IDPProviderTypeOrg
+	}
+}
+
+func OptionsToCommand(options *idp_pb.Options) idp.Options {
+	return idp.Options{
+		IsCreationAllowed: options.IsCreationAllowed,
+		IsLinkingAllowed:  options.IsLinkingAllowed,
+		IsAutoCreation:    options.IsAutoCreation,
+		IsAutoUpdate:      options.IsAutoUpdate,
 	}
 }
 

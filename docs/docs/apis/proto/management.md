@@ -9309,7 +9309,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
 | provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
 
 
@@ -9385,7 +9385,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
 | provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
 
 

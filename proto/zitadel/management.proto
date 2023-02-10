@@ -6268,7 +6268,7 @@ message AddGitHubProviderResponse {
 message UpdateGitHubProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {max_len: 200}];
     zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
 }
 
@@ -6364,7 +6364,7 @@ message AddGoogleProviderResponse {
 message UpdateGoogleProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {max_len: 200}];
     zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
 }
 

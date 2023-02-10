@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -169,4 +170,30 @@ func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 		}
 	}
 	return links
+}
+
+func addGenericOAuthProviderToCommand(req *mgmt_pb.AddGenericOAuthProviderRequest) command.GenericOAuthProvider {
+	return command.GenericOAuthProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProviderRequest) command.GenericOAuthProvider {
+	return command.GenericOAuthProvider{
+		Name:                  req.Name,
+		ClientID:              req.ClientId,
+		ClientSecret:          req.ClientSecret,
+		AuthorizationEndpoint: req.AuthorizationEndpoint,
+		TokenEndpoint:         req.TokenEndpoint,
+		UserEndpoint:          req.UserEndpoint,
+		Scopes:                req.Scopes,
+		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
 }
