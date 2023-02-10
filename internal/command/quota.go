@@ -103,7 +103,7 @@ func (c *Commands) getQuotaWriteModel(ctx context.Context, instanceId, resourceO
 }
 
 type QuotaNotification struct {
-	Percent uint64
+	Percent uint16
 	Repeat  bool
 	CallURL string
 }

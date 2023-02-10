@@ -20,7 +20,7 @@ func (c *Commands) GetDueQuotaNotifications(ctx context.Context, config *quota.A
 		return nil, err
 	}
 
-	usedRel := uint64(math.Floor(float64(usedAbs*100) / float64(config.Amount)))
+	usedRel := uint16(math.Floor(float64(usedAbs*100) / float64(config.Amount)))
 
 	var dueNotifications []*quota.NotifiedEvent
 	for _, notification := range config.Notifications {
@@ -30,7 +30,7 @@ func (c *Commands) GetDueQuotaNotifications(ctx context.Context, config *quota.A
 
 		threshold := notification.Percent
 		if notification.Repeat {
-			threshold = uint64(math.Min(1, math.Floor(float64(usedRel)/float64(notification.Percent)))) * notification.Percent
+			threshold = uint16(math.Min(1, math.Floor(float64(usedRel)/float64(notification.Percent)))) * notification.Percent
 		}
 
 		if wm.latestNotifiedThresholds[notification.ID] < threshold {

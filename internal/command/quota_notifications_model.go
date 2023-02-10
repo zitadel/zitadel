@@ -10,7 +10,7 @@ import (
 type quotaNotificationsWriteModel struct {
 	eventstore.WriteModel
 	periodStart              time.Time
-	latestNotifiedThresholds map[string]uint64
+	latestNotifiedThresholds map[string]uint16
 }
 
 func newQuotaNotificationsWriteModel(aggregateId, instanceId, resourceOwner string, periodStart time.Time) *quotaNotificationsWriteModel {
@@ -21,7 +21,7 @@ func newQuotaNotificationsWriteModel(aggregateId, instanceId, resourceOwner stri
 			ResourceOwner: resourceOwner,
 		},
 		periodStart:              periodStart,
-		latestNotifiedThresholds: make(map[string]uint64),
+		latestNotifiedThresholds: make(map[string]uint16),
 	}
 }
 

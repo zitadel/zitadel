@@ -56,7 +56,7 @@ type AddedEvent struct {
 
 type AddedEventNotification struct {
 	ID      string `json:"id"`
-	Percent uint64 `json:"percent"`
+	Percent uint16 `json:"percent"`
 	Repeat  bool   `json:"repeat,omitempty"`
 	CallURL string `json:"callUrl"`
 }
@@ -113,7 +113,7 @@ type NotifiedEvent struct {
 	ID                   string    `json:"id"`
 	CallURL              string    `json:"callURL"`
 	PeriodStart          time.Time `json:"periodStart"`
-	Threshold            uint64    `json:"threshold"`
+	Threshold            uint16    `json:"threshold"`
 	Usage                uint64    `json:"usage"`
 }
 
@@ -132,7 +132,7 @@ func NewNotifiedEvent(
 	id string,
 	callURL string,
 	periodStart time.Time,
-	threshold uint64,
+	threshold uint16,
 	usage uint64,
 ) *NotifiedEvent {
 	return &NotifiedEvent{

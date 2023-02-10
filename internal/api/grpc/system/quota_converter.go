@@ -34,7 +34,7 @@ func instanceQuotaNotificationsPbToCommand(req []*quota.Notification) command.Qu
 	notifications := make([]*command.QuotaNotification, len(req))
 	for idx, item := range req {
 		notifications[idx] = &command.QuotaNotification{
-			Percent: uint64(item.Percent),
+			Percent: uint16(item.Percent),
 			Repeat:  item.Repeat,
 			CallURL: item.CallUrl,
 		}

@@ -78,9 +78,7 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 			},
 			crdb.NewPrimaryKey(QuotaNotificationIDCol),
 			QuotaNotificationsTableSuffix,
-			crdb.WithForeignKey(
-				crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
-			),
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, esHandlerConfig)
