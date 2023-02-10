@@ -447,6 +447,8 @@ Errors:
       Amount: L'importo contingente è inferiore all'1
       ResetInterval: L'intervallo di reset contingente è inferiore a un minuto
       Noop: Una quota illimitata senza notifiche non ha alcun effetto
+    Access:
+      Exhausted: La quota per le richieste autenticate è esaurita
   LogStore:
     Access:
       StorageFailed: Il salvataggio del registro degli accessi nel database non è riuscito

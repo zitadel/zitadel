@@ -7,11 +7,11 @@ import (
 
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 )
@@ -30,7 +30,7 @@ func AccessLimitInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
 
 		resp, err := handler(ctx, req)
 		if remaining != nil && *remaining == 0 {
-			err = status.Error(codes.ResourceExhausted, "quota for authenticated requests exceeded")
+			err = errors.ThrowResourceExhausted(nil, "QUOTA-vjAy8", "Quota.Access.Exhausted")
 		}
 		return resp, err
 	}

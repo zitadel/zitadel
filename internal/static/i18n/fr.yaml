@@ -447,6 +447,8 @@ Errors:
       Amount: Quantité contingentée est inférieure à 1
       ResetInterval: L'intervalle de réinitialisation entre les contingents est inférieur à une minute
       Noop: Un contingent illimité sans notifications n'a aucun effet
+    Access:
+      Exhausted: Le quota de requêtes authentifiées est épuisé
   LogStore:
     Access:
       StorageFailed: L'enregistrement du journal d'accès dans la base de données a échoué

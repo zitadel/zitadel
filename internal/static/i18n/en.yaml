@@ -447,6 +447,8 @@ Errors:
       Amount: Quota amount is lower than 1
       ResetInterval: Quota reset interval is shorter than a minute
       Noop: An unlimited quota without notifications has no effect
+    Access:
+      Exhausted: The quota for authenticated requests is exhausted
   LogStore:
     Access:
       StorageFailed: Storing access log to database failed

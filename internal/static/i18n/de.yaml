@@ -447,6 +447,8 @@ Errors:
       Amount: Kontingent Menge ist kleiner als 1
       ResetInterval: Das Rücksetzungsintervall für das Kontingent ist kürzer als eine Minute
       Noop: Ein unlimitiertes Kontingent ohne Benachrichtigungen hat keinen Effekt
+    Access:
+      Exhausted: Das Kontingent für authentifizierte Requests ist aufgebraucht
   LogStore:
     Access:
       StorageFailed: Das Speichern des Access Logs in der Datenbank ist fehlgeschlagen
