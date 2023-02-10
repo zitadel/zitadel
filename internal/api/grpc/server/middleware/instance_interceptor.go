@@ -42,6 +42,9 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 		if !strings.HasPrefix(service, "/") {
 			service = "/" + service
 		}
+		if withInstanceIDProperty, ok := req.(interface{ GetInstanceId() string }); ok {
+			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
+		}
 		if strings.HasPrefix(info.FullMethod, service) {
 			return handler(ctx, req)
 		}

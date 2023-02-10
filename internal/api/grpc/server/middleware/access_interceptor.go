@@ -25,6 +25,7 @@ func AccessLimitInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
 		remaining, err := svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
 			logging.WithError(err).Warn("failed to check whether requests should be limited")
+			//nolint:ineffassign
 			err = nil
 		}
 
@@ -68,6 +69,7 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 
 		if err := svc.Handle(ctx, record); err != nil {
 			logging.WithError(err).Warn("failed to handle access log")
+			//nolint:ineffassign
 			err = nil
 		}
 
