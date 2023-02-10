@@ -447,6 +447,8 @@ Errors:
       Amount: Wysokość limitu jest mniejsza niż 1
       Interval: Interwał limitu jest krótszy niż minuta
       Noop: Nieograniczony limit bez powiadomień nie ma żadnego wpływu
+    Access:
+      Exhausted: Limit dla wniosków uwierzytelnionych został wykorzystany.
   LogStore:
     Access:
       StorageFailed: Zapisywanie dziennika dostępu do bazy danych nie powiodło się
