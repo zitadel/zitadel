@@ -22,7 +22,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Authentication API aka Auth";
         version: "1.0";
-        description: "The authentication API is used for all operations on the currently logged in user.";
+        description: "The authentication API is used for all operations on the currently authenticated in user.";
         contact:{
             name: "ZITADEL"
             url: "https://zitadel.com"
@@ -33,7 +33,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             url: "https://github.com/zitadel/zitadel/blob/main/LICENSE"
         };
     };
-
+    tags: [
+        {
+            name: "General",
+            description: "..."
+        }
+    ];
     schemes: HTTPS;
 
     consumes: "application/json";
@@ -59,9 +64,14 @@ service AuthService {
         option (google.api.http) = {
             get: "/healthz"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Healthz";
+            description: "The health endpoint allows an external system to probe if ZITADEL authentication API is alive"
+            tags: "General";
+        };
     }
 
-    // Returns the default languages
     rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
         option (google.api.http) = {
             get: "/languages";
@@ -70,9 +80,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Supported Languages";
+            description: "The supported/default languages of the system will be returned by the language abbreviation."
+            tags: "General";
+        };
+
     }
 
-    // Returns my full blown user
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
         option (google.api.http) = {
             get: "/users/me"
@@ -81,9 +97,14 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get my user";
+            description: "Returns the full blown user object of the authenticated user including the profile, email, phone, etc "
+            tags: "User";
+        };
     }
 
-    // Changes the user state to deleted
     rpc RemoveMyUser(RemoveMyUserRequest) returns (RemoveMyUserResponse) {
         option (google.api.http) = {
             delete: "/users/me"
@@ -91,6 +112,12 @@ service AuthService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.self.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete my user";
+            description: "Deletes the currently authenticated user. All authentication tokens will be removed and the user will not be able to make any request."
+            tags: "User";
         };
     }
 

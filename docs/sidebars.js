@@ -170,21 +170,14 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "API Definition",
+      label: "Resources",
       collapsed: false,
       items: [
+        "apis/reference/auth",
+        "apis/reference/mgmt",
+        "apis/reference/admin",
+        "apis/reference/system",
         "apis/statuscodes",
-        {
-          type: "category",
-          label: "API References",
-          collapsed: true,
-          items: [
-            "apis/reference/auth",
-            "apis/reference/mgmt",
-            "apis/reference/admin",
-            "apis/reference/system"
-          ],
-        },
         {
           type: "category",
           label: "Assets API",
