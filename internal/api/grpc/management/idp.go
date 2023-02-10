@@ -168,6 +168,27 @@ func (s *Server) UpdateGenericOAuthProvider(ctx context.Context, req *mgmt_pb.Up
 	}, nil
 }
 
+func (s *Server) AddGitHubProvider(ctx context.Context, req *mgmt_pb.AddGitHubProviderRequest) (*mgmt_pb.AddGitHubProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddGitHubProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitHubProvider(ctx context.Context, req *mgmt_pb.UpdateGitHubProviderRequest) (*mgmt_pb.UpdateGitHubProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateGitHubProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) AddGoogleProvider(ctx context.Context, req *mgmt_pb.AddGoogleProviderRequest) (*mgmt_pb.AddGoogleProviderResponse, error) {
 	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
 	if err != nil {

@@ -73,6 +73,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, GoogleIDPChangedEventType, GoogleIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, OAuthIDPAddedEventType, OAuthIDPAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, OAuthIDPChangedEventType, OAuthIDPChangedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubIDPAddedEventType, GitHubIDPAddedEventMapper).
+		RegisterFilterEventMapper(AggregateType, GitHubIDPChangedEventType, GitHubIDPChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, IDPConfigAddedEventType, IDPConfigAddedEventMapper).
 		RegisterFilterEventMapper(AggregateType, IDPConfigChangedEventType, IDPConfigChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, IDPConfigRemovedEventType, IDPConfigRemovedEventMapper).

@@ -14,13 +14,13 @@ type OAuthIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID                    string              `json:"id"`
-	Name                  string              `json:"name"`
-	ClientID              string              `json:"client_id"`
-	ClientSecret          *crypto.CryptoValue `json:"client_secret"`
-	AuthorizationEndpoint string              `json:"authorizationEndpoint"`
-	TokenEndpoint         string              `json:"tokenEndpoint"`
-	UserEndpoint          string              `json:"userEndpoint"`
-	Scopes                []string            `json:"scopes"`
+	Name                  string              `json:"name,omitempty"`
+	ClientID              string              `json:"client_id,omitempty"`
+	ClientSecret          *crypto.CryptoValue `json:"client_secret,omitempty"`
+	AuthorizationEndpoint string              `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint         string              `json:"tokenEndpoint,omitempty"`
+	UserEndpoint          string              `json:"userEndpoint,omitempty"`
+	Scopes                []string            `json:"scopes,omitempty"`
 	Options
 }
 
@@ -30,15 +30,23 @@ func NewOAuthIDPAddedEvent(
 	name,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
 	options Options,
 ) *OAuthIDPAddedEvent {
 	return &OAuthIDPAddedEvent{
-		BaseEvent:    *base,
-		ID:           id,
-		Name:         name,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		Options:      options,
+		BaseEvent:             *base,
+		ID:                    id,
+		Name:                  name,
+		ClientID:              clientID,
+		ClientSecret:          clientSecret,
+		AuthorizationEndpoint: authorizationEndpoint,
+		TokenEndpoint:         tokenEndpoint,
+		UserEndpoint:          userEndpoint,
+		Scopes:                scopes,
+		Options:               options,
 	}
 }
 

@@ -3,24 +3,24 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
-	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddInstanceGenericOAuthProvider(ctx context.Context, resourceOwner string, provider GenericOAuthProvider) (string, *domain.ObjectDetails, error) {
-	orgAgg := org.NewAggregate(resourceOwner)
+func (c *Commands) AddInstanceGenericOAuthProvider(ctx context.Context, provider GenericOAuthProvider) (string, *domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceOAuthProvider(
-		orgAgg,
-		resourceOwner,
+		instanceAgg,
 		id,
 		provider,
 	))
@@ -34,9 +34,9 @@ func (c *Commands) AddInstanceGenericOAuthProvider(ctx context.Context, resource
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, resourceOwner, id string, provider GenericOAuthProvider) (*domain.ObjectDetails, error) {
-	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceOAuthProvider(orgAgg, resourceOwner, id, provider))
+func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, id string, provider GenericOAuthProvider) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceOAuthProvider(instanceAgg, id, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -51,15 +51,14 @@ func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, resou
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, resourceOwner, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
-	orgAgg := org.NewAggregate(resourceOwner)
+func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGoogleProvider(
-		orgAgg,
-		resourceOwner,
+		instanceAgg,
 		id,
 		clientID,
 		clientSecret,
@@ -75,9 +74,9 @@ func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, resourceOwner,
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, resourceOwner, id, clientID, clientSecret string, options idp.Options) (*domain.ObjectDetails, error) {
-	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGoogleProvider(orgAgg, resourceOwner, id, clientID, clientSecret, options))
+func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, id, clientID, clientSecret string, options idp.Options) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGoogleProvider(instanceAgg, id, clientID, clientSecret, options))
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +91,10 @@ func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, resourceOwn
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) prepareAddInstanceOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
+func (c *Commands) prepareAddInstanceOAuthProvider(a *instance.Aggregate, id string, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
+			writeModel := NewOAuthInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -109,21 +108,32 @@ func (c *Commands) prepareAddInstanceOAuthProvider(a *org.Aggregate, resourceOwn
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewOAuthIDPAddedEvent(ctx, &a.Aggregate, id, provider.Name, provider.ClientID, secret, provider.IDPOptions),
+				instance.NewOAuthIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					id,
+					provider.Name,
+					provider.ClientID,
+					secret,
+					provider.AuthorizationEndpoint,
+					provider.TokenEndpoint,
+					provider.UserEndpoint,
+					provider.Scopes,
+					provider.IDPOptions,
+				),
 			}, nil
 		}, nil
 	}
 }
 
 func (c *Commands) prepareUpdateInstanceOAuthProvider(
-	a *org.Aggregate,
-	resourceOwner,
+	a *instance.Aggregate,
 	id string,
 	provider GenericOAuthProvider,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
+			writeModel := NewOAuthInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -133,7 +143,7 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-D3r1s", "Errors.Org.IDPConfig.NotExisting")
+				return nil, caos_errs.ThrowNotFound(nil, "INST-D3r1s", "Errors.Instance.IDPConfig.NotExisting")
 			}
 			event, err := writeModel.NewChangedEvent(
 				ctx,
@@ -161,10 +171,10 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(
 	}
 }
 
-func (c *Commands) prepareAddInstanceGoogleProvider(a *org.Aggregate, resourceOwner, id, clientID, clientSecret string, options idp.Options) preparation.Validation {
+func (c *Commands) prepareAddInstanceGoogleProvider(a *instance.Aggregate, id, clientID, clientSecret string, options idp.Options) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
+			writeModel := NewGoogleInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -178,15 +188,14 @@ func (c *Commands) prepareAddInstanceGoogleProvider(a *org.Aggregate, resourceOw
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, clientID, secret, idp.Options{IsAutoUpdate: options.IsAutoUpdate}),
+				instance.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, clientID, secret, idp.Options{IsAutoUpdate: options.IsAutoUpdate}),
 			}, nil
 		}, nil
 	}
 }
 
 func (c *Commands) prepareUpdateInstanceGoogleProvider(
-	a *org.Aggregate,
-	resourceOwner,
+	a *instance.Aggregate,
 	id,
 	clientID,
 	clientSecret string,
@@ -194,7 +203,7 @@ func (c *Commands) prepareUpdateInstanceGoogleProvider(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
+			writeModel := NewGoogleInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -204,7 +213,7 @@ func (c *Commands) prepareUpdateInstanceGoogleProvider(
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-D3r1s", "Errors.Org.IDPConfig.NotExisting")
+				return nil, caos_errs.ThrowNotFound(nil, "INST-D3r1s", "Errors.Instance.IDPConfig.NotExisting")
 			}
 			event, err := writeModel.NewChangedEvent(
 				ctx,

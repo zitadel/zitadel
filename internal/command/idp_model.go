@@ -179,3 +179,69 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 	}
 	return changes, nil
 }
+
+type GitHubIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	idp.Options
+
+	State domain.IDPConfigState //TODO: ?
+}
+
+func (wm *GitHubIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GitHubIDPAddedEvent:
+			wm.ID = e.ID
+			wm.ClientID = e.ClientID
+			wm.ClientSecret = e.ClientSecret
+			wm.State = domain.IDPConfigStateActive
+		case *idp.GitHubIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GitHubIDPWriteModel) reduceChangedEvent(e *idp.GitHubIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GitHubIDPWriteModel) NewChanges(
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	options idp.Options,
+) ([]idp.OAuthIDPChanges, error) {
+	changes := make([]idp.OAuthIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeOAuthClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeOAuthClientID(clientID))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeOAuthOptions(opts))
+	}
+	return changes, nil
+}
