@@ -49,6 +49,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		remaining, err := a.svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
 			logging.WithError(err).Warn("failed to check whether requests should be limited")
+			//nolint:ineffassign
 			err = nil
 		}
 		limit := remaining != nil && *remaining == 0
@@ -66,6 +67,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		unescapedURL, err := url.QueryUnescape(requestURL)
 		if err != nil {
 			logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
+			//nolint:ineffassign
 			err = nil
 		}
 		err = a.svc.Handle(ctx, &access.Record{
@@ -83,6 +85,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 
 		if err != nil {
 			logging.WithError(err).Warn("failed to handle access log")
+			//nolint:ineffassign
 			err = nil
 		}
 	})

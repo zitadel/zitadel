@@ -2,12 +2,14 @@ package middleware
 
 import (
 	"context"
+	"strings"
+
 	"github.com/zitadel/logging"
+	"google.golang.org/grpc"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
-	"google.golang.org/grpc"
-	"strings"
 )
 
 func QuotaExhaustedInterceptor(svc *logstore.Service, ignoreService ...string) grpc.UnaryServerInterceptor {

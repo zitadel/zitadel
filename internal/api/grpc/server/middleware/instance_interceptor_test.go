@@ -153,12 +153,14 @@ type mockInstanceVerifier struct {
 	host string
 }
 
-func (m *mockInstanceVerifier) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
+func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, host string) (authz.Instance, error) {
 	if host != m.host {
 		return nil, fmt.Errorf("invalid host")
 	}
 	return &mockInstance{}, nil
 }
+
+func (m *mockInstanceVerifier) InstanceByID(context.Context) (authz.Instance, error) { return nil, nil }
 
 type mockInstance struct{}
 
