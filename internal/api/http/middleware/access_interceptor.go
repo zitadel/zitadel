@@ -48,7 +48,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		instance := authz.GetInstance(ctx)
 		remaining, err := a.svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
-			logging.Warnf("failed to check whether requests should be limited: %s", err.Error())
+			logging.WithError(err).Warn("failed to check whether requests should be limited")
 			err = nil
 		}
 		limit := remaining != nil && *remaining == 0
@@ -65,7 +65,8 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		requestURL := request.RequestURI
 		unescapedURL, err := url.QueryUnescape(requestURL)
 		if err != nil {
-			logging.Warningf("failed to unescape request url %s", requestURL)
+			logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
+			err = nil
 		}
 		err = a.svc.Handle(ctx, &access.Record{
 			LogDate:         time.Now(),
@@ -81,7 +82,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		})
 
 		if err != nil {
-			logging.Warnf("failed to handle access log: %s", err.Error())
+			logging.WithError(err).Warn("failed to handle access log")
 			err = nil
 		}
 	})

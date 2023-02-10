@@ -71,7 +71,7 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 	}
 
 	if err := logstoreService.Handle(l.ctx, record); err != nil {
-		logging.WithError(err).WithField("record", record).Errorf("handling execution log failed")
+		logging.WithError(err).WithField("record", record).Error("handling execution log failed")
 	}
 }
 

@@ -94,7 +94,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 		return caos_errors.ThrowInternal(err, "ACCESS-7KIpL", "Errors.Internal")
 	}
 
-	logging.Debugf("successfully stored %d acccess logs", rows)
+	logging.WithFields("rows", rows).Debug("successfully stored access logs")
 	return nil
 }
 

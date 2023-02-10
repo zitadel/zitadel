@@ -24,7 +24,7 @@ func AccessLimitInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
 		instance := authz.GetInstance(ctx)
 		remaining, err := svc.Limit(ctx, instance.InstanceID())
 		if err != nil {
-			logging.Warnf("failed to check whether requests should be limited: %s", err.Error())
+			logging.WithError(err).Warn("failed to check whether requests should be limited")
 			err = nil
 		}
 
@@ -67,7 +67,7 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 		}
 
 		if err := svc.Handle(ctx, record); err != nil {
-			logging.Warnf("failed to handle access log: %s", err.Error())
+			logging.WithError(err).Warn("failed to handle access log")
 			err = nil
 		}
 

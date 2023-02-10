@@ -71,7 +71,8 @@ func (d *debouncer) ship() {
 	d.mux.Lock()
 	defer d.mux.Unlock()
 	if err := d.storage.sendBulk(d.ctx, d.cache); err != nil {
-		logging.WithError(err).Warnf("storing bulk of size %d failed", len(d.cache))
+		logging.WithError(err).WithField("size", len(d.cache)).Error("storing bulk failed")
+		err = nil
 	}
 	d.cache = nil
 	d.cacheLen = 0

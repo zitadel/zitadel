@@ -90,7 +90,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 		return caos_errors.ThrowInternal(err, "EXEC-MGchJ", "Errors.Internal")
 	}
 
-	logging.Debugf("successfully stored %d execution logs", rows)
+	logging.WithFields("rows", rows).Debug("successfully stored execution logs")
 	return nil
 }
 
