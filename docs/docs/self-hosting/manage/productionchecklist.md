@@ -30,7 +30,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] Use a Layer 7 Web Application Firewall to secure ZITADEL that supports **[HTTP/2](/docs/self-hosting/manage/http2)**
   - [ ] Limit the access by IP addresses if needed
   - [ ] Secure the access by rate limits for specific endpoints (e.g. API vs frontend) to secure availability on high load. See the [ZITADEL Cloud rate limits](https://zitadel.com/docs/apis/ratelimits) for reference.
-  - [ ] Doublecheck your firewall for IPv6 connectivity and change accordingly
+  - [ ] Check that your firewall also filters IPv6 traffic```
 
 ### ZITADEL configuration
 - [ ] Configure a valid [SMTP Server](/docs/guides/manage/console/instance-settings#smtp) and test the email delivery
