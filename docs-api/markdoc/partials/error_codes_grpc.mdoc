@@ -1,5 +1,3 @@
-{% card title="Status Codes" hasProtocolToggle="true" %}
-{% if equals($protocol, "grpc") %}
 | Code              | Number | Description                                                                                                                              |
 | :---------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------- |
 | OK                | 0      | Not an error, return on success {% .text-xs %}                                                                                           |
@@ -10,17 +8,3 @@
 | NOT_FOUND         | 5      | Some requested object was not found {% .text-xs %}                                                                                       |
 | ALREADY_EXISTS    | 6      | Object already exists {% .text-xs %}                                                                                                     |
 | PERMISSION_DENIED | 7      | Your unauthorized because you are missing an [auth header](#authentication) or your user does not have enough permission. {% .text-xs %} |
-{% /if %}
-{% if equals($protocol, "rest") %}
-| Code              | Number | Description                                                    |
-| :---------------- | :----- | :------------------------------------------------------------- |
-| OK                | 200    | The request succeeded {% .text-xs %}                           |
-| Bad Request       | 400    | Not an error, return on success {% .text-xs %}                 |
-| Unauthorized      | 401    | You must send an [auth header](#authentication) {% .text-xs %} |
-| Request Failed    | 402    | Not an error, return on success {% .text-xs %}                 |
-| Forbidden         | 403    | Not an error, return on success {% .text-xs %}                 |
-| Not found         | 404    | Not an error, return on success {% .text-xs %}                 |
-| Conflict          | 409    | Not an error, return on success {% .text-xs %}                 |
-| PERMISSION_DENIED | 429    | Not an error, return on success {% .text-xs %}                 |
-{% /if %}
-{% /card %}

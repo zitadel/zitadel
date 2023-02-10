@@ -16,7 +16,7 @@ export default {
     language: {
       type: String,
     },
-    protocol: {
+    defaultProtocol: {
       type: String,
     },
   },

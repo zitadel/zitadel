@@ -17,7 +17,13 @@ export const upper = {
 
 export const instanceDomain = {
   transform(parameters) {
-    const instance = parameters[0];
+    let instance = parameters[0];
+    // setInterval(() => {
+    //   console.log("i");
+    //   instance = instance + "a";
+    // }, 1000);
+
+    // const instance = parameters[0];
     const servicePath = parameters[1];
     const serviceVersion = parameters[2];
 

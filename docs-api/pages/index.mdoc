@@ -100,7 +100,14 @@ If your getting a 401 error code you may consider reading the [Authentication Ch
 
 {% /column %}
 {% column %}
-{% partial file="error_codes.mdoc" /%}
+{% card title="Status Codes" hasProtocolToggle="true" %}
+{% protocol showOnProtocol="rest" showDefault=true %}
+{% partial file="error_codes_rest.mdoc" /%}
+{% /protocol %}
+{% protocol showOnProtocol="grpc" %}
+{% partial file="error_codes_grpc.mdoc" /%}
+{% /protocol %}
+{% /card %}
 
 {% /column %}
 {% /section %}

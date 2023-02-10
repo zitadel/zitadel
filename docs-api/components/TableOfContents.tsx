@@ -52,12 +52,12 @@ export function TableOfContents({ toc }) {
                 <Disclosure key={`menu_${i}`}>
                   {({ open }) => (
                     <>
-                      <Disclosure.Button className="pl-4 flex w-full justify-between rounded-lg py-2 pt-6 text-left text-sm font-medium text-gray-500 dark:text-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                      <Disclosure.Button className="pl-4 flex w-full justify-between rounded-lg py-2 pt-6 text-left text-sm font-medium text-gray-800 dark:text-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
                         <span className="uppercase text-xs">{item.title}</span>
                         <ChevronDownIcon
                           className={`${
                             open ? "rotate-180 transform" : ""
-                          } h-4 w-4 text-gray-500 dark:text-gray-200`}
+                          } h-4 w-4 text-gray-400 dark:text-gray-200`}
                         />
                       </Disclosure.Button>
                       <Disclosure.Panel className="pt-1 text-sm text-gray-500">

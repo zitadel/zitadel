@@ -6,5 +6,6 @@ export { default as card } from "./card.markdoc";
 export { default as endpoint } from "./endpoint.markdoc";
 export { default as code } from "./code.markdoc";
 export { default as codeblock } from "./codeblock.markdoc";
+export { default as protocol } from "./protocol.markdoc";
 
 export * as default from "./";

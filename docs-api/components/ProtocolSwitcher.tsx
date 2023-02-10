@@ -1,6 +1,7 @@
-import { Fragment, useState } from "react";
+import { Fragment, useReducer, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { useRouter } from "next/router";
 
 const protocols = [
   { name: "REST", code: "rest" },
@@ -8,17 +9,35 @@ const protocols = [
 ];
 
 type Props = {
-  initial: string;
+  defaultProtocol: string;
 };
 
-export default function ProtocolSwitcher({ initial }: Props) {
-  const [selected, setSelected] = useState(
-    (initial && protocols.find((p) => p.code === initial)) ?? protocols[0]
-  );
+export default function ProtocolSwitcher({ defaultProtocol }: Props) {
+  const router = useRouter();
+
+  const { protocol } = router.query;
+
+  console.log(protocol);
+  const initial = protocol
+    ? protocols.find((p) => p.code === protocol) ?? protocols[0]
+    : defaultProtocol
+    ? protocols.find((p) => p.code === defaultProtocol) ?? protocols[0]
+    : protocols[0];
+
+  console.log(initial);
+  const [selected, setSelected] = useState(initial);
+
+  function select(value) {
+    setSelected(value);
+    console.log(value.code);
+    router.push({
+      query: { protocol: value.code },
+    });
+  }
 
   return (
     <div className="w-28">
-      <Listbox value={selected} onChange={setSelected}>
+      <Listbox value={selected} onChange={select}>
         <div className="relative">
           <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white dark:bg-background-dark-400 py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
             <span className="block truncate text-xs">{selected.name}</span>

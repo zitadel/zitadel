@@ -1,6 +1,5 @@
 import React from "react";
 import Head from "next/head";
-import { Lato } from "@next/font/google";
 
 import "prismjs";
 import "prismjs/components/prism-bash.min";
@@ -90,7 +89,7 @@ export default function MyApp({ Component, pageProps }: AppProps<MyAppProps>) {
         storageKey="cp-theme"
       >
         <div
-          className={`bg-white dark:bg-background-dark-500 text-gray-800 dark:text-gray-100 `}
+          className={`bg-white dark:bg-background-dark-500 text-gray-700 dark:text-gray-100 `}
         >
           <div className="flex flex-grow max-w-8xl mx-auto relative">
             <TableOfContents toc={toc} />
