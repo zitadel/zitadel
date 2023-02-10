@@ -449,6 +449,8 @@ Errors:
       Noop: Un contingent illimité sans notifications n'a aucun effet
     Access:
       Exhausted: Le quota de requêtes authentifiées est épuisé
+    Execution:
+      Exhausted: Le quota de secondes d'action est épuisé
   LogStore:
     Access:
       StorageFailed: L'enregistrement du journal d'accès dans la base de données a échoué

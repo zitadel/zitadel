@@ -449,6 +449,8 @@ Errors:
       Noop: An unlimited quota without notifications has no effect
     Access:
       Exhausted: The quota for authenticated requests is exhausted
+    Execution:
+      Exhausted: The quota for execution seconds is exhausted
   LogStore:
     Access:
       StorageFailed: Storing access log to database failed

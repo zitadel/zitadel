@@ -45,6 +45,7 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 	config.cutTimeouts(remaining)
 
 	if remaining != nil && *remaining == 0 {
+		z_errs.ThrowResourceExhausted(nil, "ACTIO-f19Ii", "")
 		err = errors.New("action execution seconds exhausted")
 		if config.allowedToFail {
 			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)

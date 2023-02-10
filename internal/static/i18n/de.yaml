@@ -449,6 +449,8 @@ Errors:
       Noop: Ein unlimitiertes Kontingent ohne Benachrichtigungen hat keinen Effekt
     Access:
       Exhausted: Das Kontingent für authentifizierte Requests ist aufgebraucht
+    Execution:
+      Exhausted: Das Kontingent für Action Sekunden ist aufgebraucht
   LogStore:
     Access:
       StorageFailed: Das Speichern des Access Logs in der Datenbank ist fehlgeschlagen
