@@ -33,7 +33,7 @@ To apply best practices to your production setup we created a step by step check
   - [ ] Doublecheck your firewall for IPv6 connectivity and change accordingly
 
 ### ZITADEL configuration
-- [ ] Configure a valid [SMTP Server](/docs/guides/manage/console/instance-settings#smtp) and test emails
+- [ ] Configure a valid [SMTP Server](/docs/guides/manage/console/instance-settings#smtp) and test the email delivery
 - [ ] Add [Custom Branding](/docs/guides/manage/customize/branding) if required
 - [ ] Configure a valid [SMS Service](/docs/guides/manage/console/instance-settings#sms) such as Twilio if needed
 - [ ] Configure your privacy policy, terms of service and a help Link if needed
