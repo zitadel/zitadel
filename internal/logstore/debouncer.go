@@ -22,14 +22,20 @@ func (s bulkSinkFunc) sendBulk(ctx context.Context, items []LogRecord) error {
 }
 
 type debouncer struct {
-	ctx      context.Context
-	clock    clock.Clock
-	ticker   *clock.Ticker
-	mux      sync.Mutex
-	cfg      DebouncerConfig
-	storage  bulkSink
-	cache    []LogRecord
-	cacheLen uint
+	// Storing context.Context in a struct is generally bad practice
+	// https://go.dev/blog/context-and-structs
+	// However, debouncer starts a go routine that triggers side effects itself.
+	// So, there is no incoming context.Context available when these events trigger.
+	// The only context we can use for the side effects is the app context.
+	// Because this can be cancelled by os signals, it's the better solution than creating new background contexts.
+	binarySignaledCtx context.Context
+	clock             clock.Clock
+	ticker            *clock.Ticker
+	mux               sync.Mutex
+	cfg               DebouncerConfig
+	storage           bulkSink
+	cache             []LogRecord
+	cacheLen          uint
 }
 
 type DebouncerConfig struct {
@@ -37,12 +43,12 @@ type DebouncerConfig struct {
 	MaxBulkSize  uint
 }
 
-func newDebouncer(ctx context.Context, cfg DebouncerConfig, clock clock.Clock, ship bulkSink) *debouncer {
+func newDebouncer(binarySignaledCtx context.Context, cfg DebouncerConfig, clock clock.Clock, ship bulkSink) *debouncer {
 	a := &debouncer{
-		ctx:     ctx,
-		clock:   clock,
-		cfg:     cfg,
-		storage: ship,
+		binarySignaledCtx: binarySignaledCtx,
+		clock:             clock,
+		cfg:               cfg,
+		storage:           ship,
 	}
 
 	if cfg.MinFrequency > 0 {
@@ -69,7 +75,7 @@ func (d *debouncer) ship() {
 	}
 	d.mux.Lock()
 	defer d.mux.Unlock()
-	if err := d.storage.sendBulk(d.ctx, d.cache); err != nil {
+	if err := d.storage.sendBulk(d.binarySignaledCtx, d.cache); err != nil {
 		logging.WithError(err).WithField("size", len(d.cache)).Error("storing bulk failed")
 		//nolint:ineffassign
 		err = nil
