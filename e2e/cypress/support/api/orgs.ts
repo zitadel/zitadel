@@ -3,7 +3,7 @@ import { searchSomething } from './search';
 import { API } from './types';
 import { host } from '../login/users';
 
-export function ensureOrgExists(api: API, name: string): Cypress.Chainable<number> {
+export function ensureOrgExists(api: API, name: string){
   return ensureSomething(
     api,
     () =>

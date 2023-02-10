@@ -4,9 +4,9 @@ import { API } from './types';
 
 export function ensureProjectGrantExists(
   api: API,
-  foreignOrgId: number,
-  foreignProjectId: number,
-): Cypress.Chainable<number> {
+  foreignOrgId: string,
+  foreignProjectId: string,
+) {
   return getOrgUnderTest(api).then((orgUnderTest) => {
     return ensureItemExists(
       api,

@@ -6,7 +6,7 @@ export function searchSomething(
   searchPath: string,
   method: string,
   mapResult: (body: any) => SearchResult,
-  orgId?: number,
+  orgId?: string,
 ): Cypress.Chainable<SearchResult> {
   return cy
     .request({

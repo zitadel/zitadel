@@ -29,7 +29,7 @@ export function systemAuth(): Cypress.Chainable<SystemAPI> {
   });
 }
 
-export function requestHeaders(token: Token, orgId?: number): object {
+export function requestHeaders(token: Token, orgId?: string): object {
   const headers = { [authHeaderKey]: `Bearer ${token.token}` };
   if (orgId) {
     headers[orgIdHeaderKey] = orgId;

@@ -1,6 +1,6 @@
 import { SystemAPI } from './types';
 
-export function instanceUnderTest(api: SystemAPI): Cypress.Chainable<number> {
+export function instanceUnderTest(api: SystemAPI): Cypress.Chainable<string> {
   return cy
     .request({
       method: 'POST',

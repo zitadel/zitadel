@@ -8,10 +8,10 @@ export function ensureItemExists(
   findInList: (entity: Entity) => boolean,
   createPath: string,
   body: Entity,
-  orgId?: number,
+  orgId?: string,
   newItemIdField: string = 'id',
   searchItemIdField?: string,
-): Cypress.Chainable<number> {
+) {
   return ensureSomething(
     token,
     () => searchSomething(token, searchPath, 'POST', mapFromList(findInList, searchItemIdField), orgId),
@@ -29,7 +29,7 @@ export function ensureItemDoesntExist(
   searchPath: string,
   findInList: (entity: Entity) => boolean,
   deletePath: (entity: Entity) => string,
-  orgId?: number,
+  orgId?: string,
 ): Cypress.Chainable<null> {
   return ensureSomething(
     token,
@@ -47,8 +47,8 @@ export function ensureSetting(
   mapResult: (entity: any) => SearchResult,
   createPath: string,
   body: any,
-  orgId?: number,
-): Cypress.Chainable<number> {
+  orgId?: string,
+): Cypress.Chainable<string> {
   return ensureSomething(
     api,
     () => searchSomething(api, path, 'GET', mapResult, orgId),
@@ -79,7 +79,7 @@ function awaitDesired(
 }
 
 interface EnsuredResult {
-  id: number;
+  id: string;
   sequence: number;
 }
 
@@ -90,17 +90,13 @@ export function ensureSomething(
   ensureMethod: string,
   body: Entity,
   expectEntity: (entity: Entity) => boolean,
-  mapId?: (body: any) => number,
-  orgId?: number,
-): Cypress.Chainable<number> {
+  mapId?: (body: any) => string,
+  orgId?: string,
+): Cypress.Chainable<string> {
   return search()
-    .then<EnsuredResult>((sRes) => {
+    .then((sRes) => {
       if (expectEntity(sRes.entity)) {
-        return cy.wrap({ id: sRes.id, sequence: sRes.sequence });
-      }
-
-      if (apiPath(sRes.entity).indexOf('/admin/v1/policies/domain') > -1) {
-        debugger;
+        return cy.wrap(<EnsuredResult>{ id: sRes.id, sequence: sRes.sequence });
       }
 
       return cy
@@ -114,7 +110,7 @@ export function ensureSomething(
         })
         .then((cRes) => {
           expect(cRes.status).to.equal(200);
-          return {
+          return <EnsuredResult>{
             id: mapId ? mapId(cRes.body) : undefined,
             sequence: sRes.sequence,
           };
@@ -122,7 +118,7 @@ export function ensureSomething(
     })
     .then((data) => {
       return awaitDesired(90, expectEntity, search, data.sequence).then(() => {
-        return cy.wrap<number>(data.id);
+        return cy.wrap(data.id);
       });
     });
 }

@@ -1,7 +1,7 @@
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
 
-export function ensureHumanUserExists(api: API, username: string): Cypress.Chainable<number> {
+export function ensureHumanUserExists(api: API, username: string){
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/users/_search`,
@@ -25,7 +25,7 @@ export function ensureHumanUserExists(api: API, username: string): Cypress.Chain
   );
 }
 
-export function ensureMachineUserExists(api: API, username: string): Cypress.Chainable<number> {
+export function ensureMachineUserExists(api: API, username: string) {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/users/_search`,
@@ -41,7 +41,7 @@ export function ensureMachineUserExists(api: API, username: string): Cypress.Cha
   );
 }
 
-export function ensureUserDoesntExist(api: API, username: string): Cypress.Chainable<null> {
+export function ensureUserDoesntExist(api: API, username: string) {
   return ensureItemDoesntExist(
     api,
     `${api.mgmtBaseURL}/users/_search`,

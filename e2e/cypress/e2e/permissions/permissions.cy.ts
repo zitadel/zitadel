@@ -140,12 +140,12 @@ describe('permissions', () => {
           testAuthorizations(
             roles.map((role) => role.display),
             function (ctx) {
-              cy.get<number>('@projectId').then((projectId) => {
+              cy.get<string>('@projectId').then((projectId) => {
                 ensureHumanIsNotProjectMember(ctx.api, projectId, testManagerUsername);
               });
             },
             function (ctx) {
-              cy.get<number>('@projectId').then((projectId) => {
+              cy.get<string>('@projectId').then((projectId) => {
                 ensureHumanIsNotProjectMember(ctx.api, projectId, testManagerUsername);
                 ensureHumanIsProjectMember(
                   ctx.api,
@@ -164,7 +164,7 @@ describe('permissions', () => {
 
           beforeEach(() => {
             cy.get<Context>('@ctx').then((ctx) => {
-              cy.get<number>('@projectId').then((projectId) => {
+              cy.get<string>('@projectId').then((projectId) => {
                 ensureProjectResourceDoesntExist(ctx.api, projectId, Roles, testRoleName);
                 visitOwnedProject();
               });
@@ -199,8 +199,8 @@ describe('permissions', () => {
         });
 
         function visitGrantedProject() {
-          cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
-            cy.get<number>('@grantId').then((grantId) => {
+          cy.get<string>('@foreignProjectId').then((foreignProjectId) => {
+            cy.get<string>('@grantId').then((grantId) => {
               cy.visit(`/granted-projects/${foreignProjectId}/grant/${grantId}`);
             });
           });
@@ -215,15 +215,15 @@ describe('permissions', () => {
           testAuthorizations(
             roles.map((role) => role.display),
             function (ctx: Context) {
-              cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
-                cy.get<number>('@grantId').then((grantId) => {
+              cy.get<string>('@foreignProjectId').then((foreignProjectId) => {
+                cy.get<string>('@grantId').then((grantId) => {
                   ensureHumanIsNotProjectMember(ctx.api, foreignProjectId, testManagerUsername, grantId);
                 });
               });
             },
             function (ctx: Context) {
-              cy.get<number>('@foreignProjectId').then((foreignProjectId) => {
-                cy.get<number>('@grantId').then((grantId) => {
+              cy.get<string>('@foreignProjectId').then((foreignProjectId) => {
+                cy.get<string>('@grantId').then((grantId) => {
                   ensureHumanIsNotProjectMember(ctx.api, foreignProjectId, testManagerUsername, grantId);
                   ensureHumanIsProjectMember(
                     ctx.api,
