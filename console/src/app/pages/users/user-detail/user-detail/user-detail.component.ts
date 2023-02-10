@@ -274,9 +274,10 @@ export class UserDetailComponent implements OnInit {
     if (this.user.machine) {
       this.user.machine.name = machineData.name;
       this.user.machine.description = machineData.description;
+      this.user.machine.accessTokenTyp = machineData.accessTokenTyp;
 
       this.mgmtUserService
-        .updateMachine(this.user.id, this.user.machine.name, this.user.machine.description)
+        .updateMachine(this.user.id, this.user.machine.name, this.user.machine.description, this.user.machine.accessTokenTyp)
         .then(() => {
           this.toast.showInfo('USER.TOAST.SAVED', true);
           this.refreshChanges$.emit();
