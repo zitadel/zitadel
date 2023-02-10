@@ -37,7 +37,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] Add [Custom Branding](/docs/guides/manage/customize/branding) if required
 - [ ] Configure a valid [SMS Service](/docs/guides/manage/console/instance-settings#sms) such as Twilio if needed
 - [ ] Configure your privacy policy, terms of service and a help Link if needed
-- [ ] Secure your [masterkey](https://zitadel.com/docs/self-hosting/manage/configure)
+- [ ] Keep your [masterkey](https://zitadel.com/docs/self-hosting/manage/configure) in a secure storage
 - [ ] Declare and apply zitadel configuration using the zitadel terraform [provider](https://github.com/zitadel/terraform-provider-zitadel) 
 
 ### Security
