@@ -12,13 +12,13 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
-func (c *Commands) AddOrgGenericOAuthProvider(ctx context.Context, resourceOwner string, provider GenericOAuthProvider) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddInstanceGenericOAuthProvider(ctx context.Context, resourceOwner string, provider GenericOAuthProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgOAuthProvider(
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceOAuthProvider(
 		orgAgg,
 		resourceOwner,
 		id,
@@ -34,9 +34,9 @@ func (c *Commands) AddOrgGenericOAuthProvider(ctx context.Context, resourceOwner
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateOrgGenericOAuthProvider(ctx context.Context, resourceOwner, id string, provider GenericOAuthProvider) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, resourceOwner, id string, provider GenericOAuthProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgOAuthProvider(orgAgg, resourceOwner, id, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceOAuthProvider(orgAgg, resourceOwner, id, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -51,13 +51,13 @@ func (c *Commands) UpdateOrgGenericOAuthProvider(ctx context.Context, resourceOw
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddOrgGoogleProvider(ctx context.Context, resourceOwner, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, resourceOwner, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGoogleProvider(
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGoogleProvider(
 		orgAgg,
 		resourceOwner,
 		id,
@@ -75,9 +75,9 @@ func (c *Commands) AddOrgGoogleProvider(ctx context.Context, resourceOwner, clie
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateOrgGoogleProvider(ctx context.Context, resourceOwner, id, clientID, clientSecret string, options idp.Options) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, resourceOwner, id, clientID, clientSecret string, options idp.Options) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGoogleProvider(orgAgg, resourceOwner, id, clientID, clientSecret, options))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGoogleProvider(orgAgg, resourceOwner, id, clientID, clientSecret, options))
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (c *Commands) UpdateOrgGoogleProvider(ctx context.Context, resourceOwner, i
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
+func (c *Commands) prepareAddInstanceOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
@@ -115,7 +115,7 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, i
 	}
 }
 
-func (c *Commands) prepareUpdateOrgOAuthProvider(
+func (c *Commands) prepareUpdateInstanceOAuthProvider(
 	a *org.Aggregate,
 	resourceOwner,
 	id string,
@@ -161,7 +161,7 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(
 	}
 }
 
-func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, id, clientID, clientSecret string, options idp.Options) preparation.Validation {
+func (c *Commands) prepareAddInstanceGoogleProvider(a *org.Aggregate, resourceOwner, id, clientID, clientSecret string, options idp.Options) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
@@ -184,7 +184,7 @@ func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, 
 	}
 }
 
-func (c *Commands) prepareUpdateOrgGoogleProvider(
+func (c *Commands) prepareUpdateInstanceGoogleProvider(
 	a *org.Aggregate,
 	resourceOwner,
 	id,
