@@ -1,4 +1,5 @@
-import { addQuota, ensureQuotaIsAdded, removeQuota, Unit } from 'support/api/quota';
+import { addQuota, ensureQuotaIsAdded, ensureQuotaIsRemoved, removeQuota, Unit } from 'support/api/quota';
+import { createHumanUser, ensureUserDoesntExist } from 'support/api/users';
 import { Context } from 'support/commands';
 import { ZITADELWebhookEvent } from 'support/types';
 
@@ -81,9 +82,11 @@ describe('quotas', () => {
     });
 
     describe('authenticated requests', () => {
+      const testUserName = "shouldNotBeCreated"
       beforeEach(() => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
+            ensureUserDoesntExist(ctx.api, testUserName)
             ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, true, urls.length);
             cy.task('runSQL', `TRUNCATE logstore.access;`);
           });
@@ -117,13 +120,18 @@ describe('quotas', () => {
               auth: {
                 bearer: ctx.api.token,
               },
-              failOnStatusCode: false,
-            }).then((res) => {
+              failOnStatusCode: false
+            }).then(res => {
               expect(res.status).to.equal(429);
             });
             cy.getCookie("zitadel.quota.limiting").then(cookie => {
               expect(cookie.value).to.equal("true")
             })
+            createHumanUser(ctx.api, testUserName, false).then(res => {
+              expect(res.status).to.equal(429);
+            })
+            ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests)
+            createHumanUser(ctx.api, testUserName)
           });
         });
       });

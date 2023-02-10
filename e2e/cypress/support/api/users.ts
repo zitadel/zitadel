@@ -1,3 +1,4 @@
+import { requestHeaders } from './apiauth';
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
 
@@ -8,17 +9,8 @@ export function ensureHumanUserExists(api: API, username: string){
     (user: any) => user.userName === username,
     `${api.mgmtBaseURL}/users/human`,
     {
+      ...defaultHuman,
       user_name: username,
-      profile: {
-        first_name: 'e2efirstName',
-        last_name: 'e2elastName',
-      },
-      email: {
-        email: 'e2e@email.ch',
-      },
-      phone: {
-        phone: '+41 123456789',
-      },
     },
     undefined,
     'userId',
@@ -48,4 +40,32 @@ export function ensureUserDoesntExist(api: API, username: string) {
     (user: any) => user.userName === username,
     (user) => `${api.mgmtBaseURL}/users/${user.id}`,
   );
+}
+
+export function createHumanUser(api: API, username: string, failOnStatusCode = true) {
+  return cy.request({
+    method: 'POST',
+    url: `${api.mgmtBaseURL}/users/human`,
+    body: {
+      ...defaultHuman,
+      user_name: username,
+    },
+    auth: {
+      bearer: api.token
+    },
+    failOnStatusCode: failOnStatusCode,
+  })
+}
+
+const defaultHuman = {
+    profile: {
+      first_name: 'e2efirstName',
+      last_name: 'e2elastName',
+    },
+    email: {
+      email: 'e2e@email.ch',
+    },
+    phone: {
+      phone: '+41 123456789',
+    },
 }

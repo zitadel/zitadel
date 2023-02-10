@@ -23,15 +23,11 @@ const (
 	HTTP1Host = "x-zitadel-http1-host"
 )
 
-type InstanceVerifier interface {
-	GetInstance(ctx context.Context)
-}
-
-func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, ignoredServices ...string) grpc.UnaryServerInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
 	translator, err := newZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return setInstance(ctx, req, info, handler, verifier, headerName, translator, ignoredServices...)
+		return setInstance(ctx, req, info, handler, verifier, headerName, translator, explicitInstanceIdServices...)
 	}
 }
 
@@ -42,10 +38,19 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 		if !strings.HasPrefix(service, "/") {
 			service = "/" + service
 		}
-		if withInstanceIDProperty, ok := req.(interface{ GetInstanceId() string }); ok {
-			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
-		}
 		if strings.HasPrefix(info.FullMethod, service) {
+			if withInstanceIDProperty, ok := req.(interface{ GetInstanceId() string }); ok {
+				ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
+				instance, err := verifier.InstanceByID(ctx)
+				if err != nil {
+					caosErr := new(caos_errors.NotFoundError)
+					if errors.As(err, &caosErr) {
+						caosErr.Message = translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil)
+					}
+					return nil, status.Error(codes.NotFound, err.Error())
+				}
+				ctx = authz.WithInstance(ctx, instance)
+			}
 			return handler(ctx, req)
 		}
 	}
