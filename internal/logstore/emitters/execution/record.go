@@ -11,14 +11,14 @@ import (
 var _ logstore.LogRecord = (*Record)(nil)
 
 type Record struct {
-	LogDate    time.Time
-	Took       time.Duration
-	Message    string
-	LogLevel   logrus.Level
-	InstanceID string
-	ProjectID  string
-	ActionID   string
-	Metadata   map[string]interface{}
+	LogDate    time.Time              `json:"logDate"`
+	Took       time.Duration          `json:"took"`
+	Message    string                 `json:"message"`
+	LogLevel   logrus.Level           `json:"logLevel"`
+	InstanceID string                 `json:"instanceId"`
+	ProjectID  string                 `json:"projectId"`
+	ActionID   string                 `json:"actionId,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
 func (e Record) Normalize() logstore.LogRecord {

@@ -12,16 +12,16 @@ import (
 var _ logstore.LogRecord = (*Record)(nil)
 
 type Record struct {
-	LogDate         time.Time
-	Protocol        Protocol
-	RequestURL      string
-	ResponseStatus  uint32
-	RequestHeaders  http.Header
-	ResponseHeaders http.Header
-	InstanceID      string
-	ProjectID       string
-	RequestedDomain string
-	RequestedHost   string
+	LogDate         time.Time   `json:"logDate"`
+	Protocol        Protocol    `json:"protocol"`
+	RequestURL      string      `json:"requestUrl"`
+	ResponseStatus  uint32      `json:"responseStatus"`
+	RequestHeaders  http.Header `json:"requestHeaders"`
+	ResponseHeaders http.Header `json:"responseHeaders"`
+	InstanceID      string      `json:"instanceId"`
+	ProjectID       string      `json:"projectId"`
+	RequestedDomain string      `json:"requestedDomain"`
+	RequestedHost   string      `json:"requestedHost"`
 }
 
 type Protocol uint8
