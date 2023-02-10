@@ -76,25 +76,14 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "ZITADEL knows two different types of users: Users (Human) and Service Users (Machine Accounts)"
         },
         {
-            name: "User Email"
+            name: "User Human"
+        },
+        {
+            name: "User Machine"
         },
         {
             name: "User Metadata",
             description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by ZITADEL itself."
-        },
-        {
-            name: "User Multi-Factors (MFA)",
-            description: "Multi-Factors are different authentication methods like an Authenticator App, FingerPrint, WindowsHello, that add additional security to a user account."
-        },
-        {
-            name: "User Password"
-        },
-        {
-            name: "User Phone"
-        },
-        {
-            name: "User Profile",
-            description: "Profile data includes the basic information of a user like first name, last name, etc."
         },
         {
             name: "Roles",
@@ -405,6 +394,7 @@ service ManagementService {
             summary: "Create User (Machine)";
             description: "Create a new user with the type machine for your API, service or device. This users are used for non interactive authentication flows."
             tags: "Users";
+            tags: "Machine User";
             responses: {
                 key: "200"
                 value: {
@@ -718,7 +708,7 @@ service ManagementService {
             summary: "Get User Profile (Human)";
             description: "Get basic information like first_name and last_name of a user."
             tags: "Users";
-            tags: "User Profile";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -750,7 +740,7 @@ service ManagementService {
             summary: "Update User Profile (Human)";
             description: "Update the profile information from a user. Profile includes basic information like first_name and last_name."
             tags: "Users";
-            tags: "User Profile";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -781,7 +771,7 @@ service ManagementService {
             summary: "Get User Email (Human)";
             description: "Get the email address and the verification state of the address."
             tags: "Users";
-            tags: "User Email";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -813,7 +803,7 @@ service ManagementService {
             summary: "Update User Email (Human)";
             description: "Change the email address of a user. If the state is set to not verified, the user will get a verification email."
             tags: "Users";
-            tags: "User Email";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -845,7 +835,7 @@ service ManagementService {
             summary: "Resend User Initialization Email";
             description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the users email address, or a newly added addres."
             tags: "Users";
-            tags: "User Email";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -877,7 +867,7 @@ service ManagementService {
             summary: "Resend User Email Verification";
             description: "Resend the email verification notification to the given email address of the user."
             tags: "Users";
-            tags: "User Email";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -908,7 +898,7 @@ service ManagementService {
             summary: "Get User Phone (Human)";
             description: "Get the phone number and the verification state of the number. The phone number is only for informational purpose and to send messages, not for Authentication (2FA)."
             tags: "Users";
-            tags: "User Phone";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -940,7 +930,7 @@ service ManagementService {
             summary: "Update User Phone (Human)";
             description: "Change the phone number of a user. If the state is set to not verified, the user will get an ams to verify (if a notification provider is configured). The phone number is only for informational purpose and to send messages, not for Authentication (2FA)."
             tags: "Users";
-            tags: "User Phone";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -971,7 +961,7 @@ service ManagementService {
             summary: "Remove User Phone (Human)";
             description: "Remove the configured phone number of a user."
             tags: "Users";
-            tags: "User Phone";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1003,7 +993,7 @@ service ManagementService {
             summary: "Resend User Phone Verification";
             description: "Resend the notification for the verification of the phone number, to the number stored on the user."
             tags: "Users";
-            tags: "User Phone";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1034,6 +1024,7 @@ service ManagementService {
             summary: "Delete User Avatar (Human)";
             description: "Removes the avatar that is currently set on the user."
             tags: "Users";
+            tags: "User Human"
             responses: {
                 key: "200"
                 value: {
@@ -1077,7 +1068,7 @@ service ManagementService {
             summary: "Set User Password";
             description: "Set a new password for a user. Per default the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login."
             tags: "Users";
-            tags: "User Password";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1109,7 +1100,7 @@ service ManagementService {
             summary: "Send Reset Password Notification";
             description: "The user will receive an email with a link to change the password."
             tags: "Users";
-            tags: "User Password";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1140,7 +1131,7 @@ service ManagementService {
             summary: "Get User Authentication Factors (2FA/MFA)";
             description: "Get a list of authentication factors the user has set. Including Second-Factors (2FA) and Multi-Factors (MFA)."
             tags: "Users";
-            tags: "User Multi-Factors (MFA)";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1171,7 +1162,7 @@ service ManagementService {
             summary: "Remove Multi-Factor OTP";
             description: "Remove the configured One-Time-Password (OTP) as factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.."
             tags: "Users";
-            tags: "User Multi-Factors (MFA)";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1202,7 +1193,7 @@ service ManagementService {
             summary: "Remove Multi-Factor U2F";
             description: "Remove the configured Universal-Second-Factor (U2F) as factor from the user. U2F is a device dependent factor like FingerPrint, Windows-Hello, etc."
             tags: "Users";
-            tags: "User Multi-Factors (MFA)";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1220,7 +1211,6 @@ service ManagementService {
         };
     }
 
-    // Returns all configured passwordless authenticators
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_search"
@@ -1234,7 +1224,7 @@ service ManagementService {
             summary: "Search Passwordless/Passkey authentication";
             description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device dependent authentication like FingerScan, WindowsHello or a Hardware Token."
             tags: "Users";
-            tags: "User Multi-Factors (MFA)";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1264,7 +1254,7 @@ service ManagementService {
             summary: "Add Passwordless/Passkey Registration Link";
             description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device, if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
             tags: "Users";
-            tags: "User Multi-Factors (MFA)";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1295,7 +1285,7 @@ service ManagementService {
             summary: "Send Passwordless/Passkey Registration Link";
             description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device, if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
             tags: "Users";
-            tags: "User Multi-Factors (MFA)";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1313,7 +1303,6 @@ service ManagementService {
         };
     }
 
-    // Removed a configured passwordless authenticator
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/passwordless/{token_id}"
@@ -1327,7 +1316,7 @@ service ManagementService {
             summary: "Delete Passwordless/Passkey";
             description: "Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.)"
             tags: "Users";
-            tags: "User Multi-Factors (MFA)";
+            tags: "User Human";
             responses: {
                 key: "200"
                 value: {
@@ -1345,7 +1334,6 @@ service ManagementService {
         };
     }
 
-    // Changes a machine user
     rpc UpdateMachine(UpdateMachineRequest) returns (UpdateMachineResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/machine"
@@ -1355,9 +1343,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Update Machine User";
+            description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilites."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Generates and sets a new machine secret
     rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/secret"
@@ -1367,9 +1375,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create Secret for Machine User";
+            description: "Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant)."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes the machine secret
     rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/secret"
@@ -1378,9 +1406,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete Secret of Machine User";
+            description: "Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterwards."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns a machine key of a (machine) user
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/keys/{key_id}"
@@ -1389,10 +1437,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Machine user Key By ID";
+            description: "Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all machine keys of a (machine) user which match the query
-    // Limit should always be set, there is a default limit set by the service
     rpc ListMachineKeys(ListMachineKeysRequest) returns (ListMachineKeysResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/keys/_search"
@@ -1402,9 +1469,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get Machine user Key By ID";
+            description: "Get the list of key of a machine user. Machine keys are used to authenticate with jwt profile authentication."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Generates a new machine key, details should be stored after return
     rpc AddMachineKey(AddMachineKeyRequest) returns (AddMachineKeyResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/keys"
@@ -1414,9 +1501,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create Key for machine user";
+            description: "A new key is generated and will be returned in the response. Make sure to store the returned key. Machine keys are used to authenticate with jwt profile."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes a machine key
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/keys/{key_id}"
@@ -1425,9 +1532,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create Key for machine user";
+            description: "Delete a specific key from a user. The user will not be able to authenticate with that key afterwards.."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns a personal access token of a (machine) user
     rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/pats/{token_id}"
@@ -1436,10 +1563,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get a Personal-Access-Token (PAT) by ID";
+            description: "Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready to use tokens and can be sent directly in the authentication header."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Returns all personal access tokens of a (machine) user which match the query
-    // Limit should always be set, there is a default limit set by the service
     rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/pats/_search"
@@ -1449,9 +1595,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get a Personal-Access-Token (PAT) by ID";
+            description: "Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready to use tokens and can be sent directly in the authentication header."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Generates a new personal access token for a machine user, details should be stored after return
     rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/pats"
@@ -1461,9 +1627,29 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create a Personal-Access-Token (PAT)";
+            description: "Generates a new PAT for the user. Currently only available for machine users. Token will be returned in the response, make sure to store it. PATs are ready to use tokens and can be sent directly in the authentication header."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to update a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
     }
 
-    // Removes a personal access token
     rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/pats/{token_id}"
@@ -1471,6 +1657,27 @@ service ManagementService {
 
         option (zitadel.v1.auth_option) = {
             permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Get a Personal-Access-Token (PAT) by ID";
+            description: "Delete a PAT from a user. Afterwards the user will not be able to authenticate with that token anymore."
+            tags: "Users";
+            tags: "User Machine";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested orgnization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -4722,7 +4929,13 @@ message ListMachineKeysResponse {
 
 message AddMachineKeyRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
-    zitadel.authn.v1.KeyType type = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+    zitadel.authn.v1.KeyType type = 2 [
+        (validate.rules).enum = {defined_only: true, not_in: [0]},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"KEY_TYPE_JSON\"";
+            description: "The date the key will expire and no logins will be possible";
+        }
+    ];
     google.protobuf.Timestamp expiration_date = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2519-04-01T08:45:00.000000Z\"";
