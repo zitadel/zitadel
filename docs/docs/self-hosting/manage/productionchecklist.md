@@ -9,7 +9,7 @@ To apply best practices to your production setup we created a step by step check
 
 - [ ] Make use of configuration management tools such as Terraform to provision all of the below
 - [ ] Use version control to store the provisioning
-- [ ] Use a secrets manager to store your sensible informations
+- [ ] Use a secrets manager to store your confidential information
 - [ ] Reduce the manual interaction with your platform to an absolute minimum 
 #### HA Setup
 - [ ] High Availability for ZITADEL containers
