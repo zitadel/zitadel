@@ -19,7 +19,7 @@ To apply best practices to your production setup we created a step by step check
 - [ ] High Availability for database 
   - [ ] Follow the [Production Checklist](https://www.cockroachlabs.com/docs/stable/recommended-production-settings.html) for CockroachDB if you selfhost the database or use [CockroachDB cloud](https://www.cockroachlabs.com/docs/cockroachcloud/create-an-account.html)
   - [ ] Configure backups on a regular basis for the database
-  - [ ] Test a restore scenario before going live
+  - [ ] Test the restore scenarios before going live
   - [ ] Secure database connections from outside your network and/or use an internal subnet for database connectivity
 - [ ] High Availability for critical infrastructure components (depending on your setup)
   - [ ] Loadbalancer
