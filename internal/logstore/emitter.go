@@ -49,6 +49,7 @@ type LogCleanupper interface {
 	Cleanup(ctx context.Context, keep time.Duration) error
 }
 
+// NewEmitter accepts Clock from github.com/benbjohnson/clock so we can control timers and tickers in the unit tests
 func NewEmitter(ctx context.Context, clock clock.Clock, cfg *EmitterConfig, logger LogEmitter) (*emitter, error) {
 	svc := &emitter{
 		enabled: cfg != nil && cfg.Enabled,

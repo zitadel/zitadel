@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	// Using this time.Time replacement enables us to control timers and tickers in the unit tests
 	"github.com/benbjohnson/clock"
 	"github.com/zitadel/logging"
 )
