@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"math"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -14,23 +15,25 @@ import (
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 )
 
-const (
-	limitExceededCookiename   = "zitadel.quota.exceeded"
-	limitExceededCookieMaxAge = 60 * 5 // 5 minutes
-)
-
 type AccessInterceptor struct {
 	svc           *logstore.Service
 	cookieHandler *http_utils.CookieHandler
+	limitConfig   *AccessConfig
 }
 
-func NewAccessInterceptor(svc *logstore.Service) *AccessInterceptor {
+type AccessConfig struct {
+	ExhaustedCookieKey    string
+	ExhaustedCookieMaxAge time.Duration
+}
+
+func NewAccessInterceptor(svc *logstore.Service, cookieConfig *AccessConfig) *AccessInterceptor {
 	return &AccessInterceptor{
 		svc: svc,
 		cookieHandler: http_utils.NewCookieHandler(
 			http_utils.WithUnsecure(),
-			http_utils.WithMaxAge(limitExceededCookieMaxAge),
+			http_utils.WithMaxAge(int(math.Floor(cookieConfig.ExhaustedCookieMaxAge.Seconds()))),
 		),
+		limitConfig: cookieConfig,
 	}
 }
 
@@ -50,7 +53,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		}
 		limit := remaining != nil && *remaining == 0
 
-		a.cookieHandler.SetCookie(wrappedWriter, limitExceededCookiename, request.Host, strconv.FormatBool(limit))
+		a.cookieHandler.SetCookie(wrappedWriter, a.limitConfig.ExhaustedCookieKey, request.Host, strconv.FormatBool(limit))
 
 		if limit {
 			wrappedWriter.WriteHeader(http.StatusTooManyRequests)

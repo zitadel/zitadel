@@ -10,14 +10,15 @@ import (
 )
 
 func TestResourceExhaustedError(t *testing.T) {
-	var err interface{}
-	err = new(caos_errs.ResourceExhaustedError)
+	var err interface{} = new(caos_errs.ResourceExhaustedError)
 	_, ok := err.(caos_errs.ResourceExhausted)
 	assert.True(t, ok)
 }
 
 func TestThrowResourceExhaustedf(t *testing.T) {
 	err := caos_errs.ThrowResourceExhaustedf(nil, "id", "msg")
+	// TODO: refactor errors package
+	//nolint:errorlint
 	_, ok := err.(*caos_errs.ResourceExhaustedError)
 	assert.True(t, ok)
 }

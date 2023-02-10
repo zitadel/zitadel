@@ -216,7 +216,7 @@ func startAPIs(
 	}
 
 	accessSvc := logstore.New(quotaQuerier, usageReporter, accessDBEmitter, accessStdoutEmitter)
-	accessInterceptor := middleware.NewAccessInterceptor(accessSvc)
+	accessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access)
 	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {

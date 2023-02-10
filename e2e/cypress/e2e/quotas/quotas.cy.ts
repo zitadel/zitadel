@@ -93,6 +93,7 @@ describe('quotas', () => {
       it('authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
+            const start = new Date()
             urls.forEach((url) => {
               cy.request({
                 url: url,
@@ -102,6 +103,14 @@ describe('quotas', () => {
                 },
               });
             });
+            const expiresMax = new Date()
+            expiresMax.setMinutes ( expiresMax.getMinutes() + 2 )
+            cy.getCookie("zitadel.quota.limiting").then(cookie => {
+              expect(cookie.value).to.equal("false")
+              const cookieExpiry = new Date()
+              cookieExpiry.setTime(cookie.expiry*1000)
+              expect(cookieExpiry).to.be.within(start, expiresMax)
+            })
             cy.request({
               url: urls[0],
               method: 'GET',
@@ -112,6 +121,9 @@ describe('quotas', () => {
             }).then((res) => {
               expect(res.status).to.equal(429);
             });
+            cy.getCookie("zitadel.quota.limiting").then(cookie => {
+              expect(cookie.value).to.equal("true")
+            })
           });
         });
       });

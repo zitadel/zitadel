@@ -5,8 +5,8 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -64,6 +64,11 @@ type Config struct {
 	Actions           *actions.Config
 	Eventstore        *eventstore.Config
 	LogStore          *logstore.Configs
+	Quotas            *QuotasConfig
+}
+
+type QuotasConfig struct {
+	Access *middleware.AccessConfig
 }
 
 func MustNewConfig(v *viper.Viper) *Config {

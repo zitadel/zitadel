@@ -23,6 +23,8 @@ func instanceQuotaUnitPbToCommand(unit quota.Unit) command.QuotaUnit {
 		return command.QuotaRequestsAllAuthenticated
 	case quota.Unit_UNIT_ACTIONS_ALL_RUN_SECONDS:
 		return command.QuotaActionsAllRunsSeconds
+	case quota.Unit_UNIT_UNIMPLEMENTED:
+		fallthrough
 	default:
 		return command.QuotaUnit(unit.String())
 	}

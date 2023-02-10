@@ -29,11 +29,13 @@ func ThrowResourceExhaustedf(parent error, id, format string, a ...interface{}) 
 func (err *ResourceExhaustedError) IsResourceExhausted() {}
 
 func IsResourceExhausted(err error) bool {
+	//nolint:errorlint
 	_, ok := err.(ResourceExhausted)
 	return ok
 }
 
 func (err *ResourceExhaustedError) Is(target error) bool {
+	//nolint:errorlint
 	t, ok := target.(*ResourceExhaustedError)
 	if !ok {
 		return false

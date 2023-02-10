@@ -364,6 +364,11 @@ LogStore:
         MinFrequency: 0s
         MaxBulkSize: 0
 
+Quotas:
+  Access:
+    ExhaustedCookieKey: "zitadel.quota.exhausted"
+    ExhaustedCookieMaxAge: "300s"
+
 Eventstore:
   PushTimeout: 15s
 
