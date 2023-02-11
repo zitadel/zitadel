@@ -7,7 +7,7 @@ export function ensureOIDCSettingsSet(
   idTokenLifetime: number,
   refreshTokenExpiration: number,
   refreshTokenIdleExpiration: number,
-){
+) {
   return ensureSetting(
     api,
     `${api.adminBaseURL}/settings/oidc`,

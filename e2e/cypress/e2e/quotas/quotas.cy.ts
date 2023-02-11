@@ -82,11 +82,11 @@ describe('quotas', () => {
     });
 
     describe('authenticated requests', () => {
-      const testUserName = "shouldNotBeCreated"
+      const testUserName = 'shouldNotBeCreated';
       beforeEach(() => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
-            ensureUserDoesntExist(ctx.api, testUserName)
+            ensureUserDoesntExist(ctx.api, testUserName);
             ensureQuotaIsAdded(ctx, Unit.AuthenticatedRequests, true, urls.length);
             cy.task('runSQL', `TRUNCATE logstore.access;`);
           });
@@ -96,7 +96,7 @@ describe('quotas', () => {
       it('authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
-            const start = new Date()
+            const start = new Date();
             urls.forEach((url) => {
               cy.request({
                 url: url,
@@ -106,32 +106,32 @@ describe('quotas', () => {
                 },
               });
             });
-            const expiresMax = new Date()
-            expiresMax.setMinutes ( expiresMax.getMinutes() + 2 )
-            cy.getCookie("zitadel.quota.limiting").then(cookie => {
-              expect(cookie.value).to.equal("false")
-              const cookieExpiry = new Date()
-              cookieExpiry.setTime(cookie.expiry*1000)
-              expect(cookieExpiry).to.be.within(start, expiresMax)
-            })
+            const expiresMax = new Date();
+            expiresMax.setMinutes(expiresMax.getMinutes() + 2);
+            cy.getCookie('zitadel.quota.limiting').then((cookie) => {
+              expect(cookie.value).to.equal('false');
+              const cookieExpiry = new Date();
+              cookieExpiry.setTime(cookie.expiry * 1000);
+              expect(cookieExpiry).to.be.within(start, expiresMax);
+            });
             cy.request({
               url: urls[0],
               method: 'GET',
               auth: {
                 bearer: ctx.api.token,
               },
-              failOnStatusCode: false
-            }).then(res => {
+              failOnStatusCode: false,
+            }).then((res) => {
               expect(res.status).to.equal(429);
             });
-            cy.getCookie("zitadel.quota.limiting").then(cookie => {
-              expect(cookie.value).to.equal("true")
-            })
-            createHumanUser(ctx.api, testUserName, false).then(res => {
+            cy.getCookie('zitadel.quota.limiting').then((cookie) => {
+              expect(cookie.value).to.equal('true');
+            });
+            createHumanUser(ctx.api, testUserName, false).then((res) => {
               expect(res.status).to.equal(429);
-            })
-            ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests)
-            createHumanUser(ctx.api, testUserName)
+            });
+            ensureQuotaIsRemoved(ctx, Unit.AuthenticatedRequests);
+            createHumanUser(ctx.api, testUserName);
           });
         });
       });

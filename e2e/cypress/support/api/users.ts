@@ -2,7 +2,7 @@ import { requestHeaders } from './apiauth';
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
 
-export function ensureHumanUserExists(api: API, username: string){
+export function ensureHumanUserExists(api: API, username: string) {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/users/_search`,
@@ -51,21 +51,21 @@ export function createHumanUser(api: API, username: string, failOnStatusCode = t
       user_name: username,
     },
     auth: {
-      bearer: api.token
+      bearer: api.token,
     },
     failOnStatusCode: failOnStatusCode,
-  })
+  });
 }
 
 const defaultHuman = {
-    profile: {
-      first_name: 'e2efirstName',
-      last_name: 'e2elastName',
-    },
-    email: {
-      email: 'e2e@email.ch',
-    },
-    phone: {
-      phone: '+41 123456789',
-    },
-}
+  profile: {
+    first_name: 'e2efirstName',
+    last_name: 'e2elastName',
+  },
+  email: {
+    email: 'e2e@email.ch',
+  },
+  phone: {
+    phone: '+41 123456789',
+  },
+};

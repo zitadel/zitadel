@@ -20,13 +20,12 @@ export function instanceUnderTest(api: SystemAPI): Cypress.Chainable<string> {
 }
 
 export function getInstance(api: SystemAPI, instanceId: string, failOnStatusCode = true) {
-  return cy
-  .request({
+  return cy.request({
     method: 'GET',
     url: `${api.baseURL}/instances/${instanceId}`,
     auth: {
       bearer: api.token,
     },
-    failOnStatusCode: failOnStatusCode
-  })
+    failOnStatusCode: failOnStatusCode,
+  });
 }

@@ -2,11 +2,7 @@ import { ensureItemExists } from './ensure';
 import { getOrgUnderTest } from './orgs';
 import { API } from './types';
 
-export function ensureProjectGrantExists(
-  api: API,
-  foreignOrgId: string,
-  foreignProjectId: string,
-) {
+export function ensureProjectGrantExists(api: API, foreignOrgId: string, foreignProjectId: string) {
   return getOrgUnderTest(api).then((orgUnderTest) => {
     return ensureItemExists(
       api,

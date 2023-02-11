@@ -1,7 +1,7 @@
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API, Entity } from './types';
 
-export function ensureProjectExists(api: API, projectName: string, orgId?: string){
+export function ensureProjectExists(api: API, projectName: string, orgId?: string) {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/projects/_search`,
