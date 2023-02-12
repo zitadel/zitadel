@@ -448,9 +448,9 @@ Errors:
       Interval: Interwał limitu jest krótszy niż minuta
       Noop: Nieograniczony limit bez powiadomień nie ma żadnego wpływu
     Access:
-      Exhausted: Limit dla wniosków uwierzytelnionych został wykorzystany.
+      Exhausted: Limit dla uwierzytelnionych żądań został wykorzystany
     Execution:
-      Exhausted: Limit dla wniosków sekund wykonania akcji został wykorzystany.
+      Exhausted: Limit dla sekund wykonywania akcji został wykorzystany
   LogStore:
     Access:
       StorageFailed: Zapisywanie dziennika dostępu do bazy danych nie powiodło się
@@ -583,7 +583,7 @@ EventTypes:
             signcount:
               changed: Zmieniono sumę kontrolną tokenu wielofaktorowego U2F
         init:
-          skipped: Pominieto inicjalizację wielofaktorową
+          skipped: Pominięto inicjalizację wielofaktorową
       passwordless:
         token:
           added: Dodano token dla logowania bez hasła
@@ -604,13 +604,13 @@ EventTypes:
             check:
               succeeded: Pomyślnie sprawdzono kod inicjalizacji bez hasła
               failed: Sprawdzenie kodu inicjalizacji bez hasła nie powiodło się
-        signed:
-          out: Użytkownik wylogowany
-        refresh:
-          token:
-            added: Utworzono token odświeżania
-            renewed: Odnowiono token odświeżania
-            removed: Usunięto token odświeżania
+      signed:
+        out: Użytkownik wylogowany
+      refresh:
+        token:
+          added: Utworzono token odświeżania
+          renewed: Odnowiono token odświeżania
+          removed: Usunięto token odświeżania
     locked: Zablokowano użytkownika
     unlocked: Odblokowano użytkownika
     deactivated: Dezaktywowano użytkownika
@@ -646,9 +646,9 @@ EventTypes:
           succeeded: Sprawdzenie wielofaktorowego OTP zakończone powodzeniem
           failed: Sprawdzenie wielofaktorowego OTP nie powiodło się
         init:
-          skipped: Pominieto inicjalizację wielofaktorowego OTP
+          skipped: Pominięto inicjalizację wielofaktorowego OTP
       init:
-        skipped: Pominieto inicjalizację wielofaktorową
+        skipped: Pominięto inicjalizację wielofaktorową
     signed:
       out: Użytkownik wylogowany
     grant:
@@ -798,7 +798,7 @@ EventTypes:
       trigger_actions:
         set: Ustawiono działanie
         cascade:
-          removed: Usunięto kaskadę działani
+          removed: Usunięto kaskadę działań
         removed: Usunięto działania
       cleared: Czyszczenie przepływu
     mail:
@@ -872,17 +872,17 @@ EventTypes:
           changed: Zmieniono konfigurację API
           secret:
             changed: Zmieniono sekret API
-    policy:
-      password:
-        complexity:
-          added: Dodano politykę złożoności hasła
-          changed: Zmieniono politykę złożoności hasła
-        age:
-          added: Dodano politykę wieku hasła
-          changed: Zmieniono politykę wieku hasła
-        lockout:
-          added: Dodano politykę blokowania hasła
-          changed: Zmieniono politykę blokowania hasła
+  policy:
+    password:
+      complexity:
+        added: Dodano politykę złożoności hasła
+        changed: Zmieniono politykę złożoności hasła
+      age:
+        added: Dodano politykę wieku hasła
+        changed: Zmieniono politykę wieku hasła
+      lockout:
+        added: Dodano politykę blokowania hasła
+        changed: Zmieniono politykę blokowania hasła
   iam:
     setup:
       started: rozpoczęta konfiguracja ZITADEL
@@ -1117,28 +1117,28 @@ EventTypes:
 
 Application:
   OIDC:
-    UnsupportedVersion: Wersja OIDC nie jest obsługiwana
+    UnsupportedVersion: Twoja wersja OIDC nie jest obsługiwana
     V1:
       NotCompliant: Twoja konfiguracja nie jest zgodna i różni się od standardu OIDC 1.0.
-      NoRedirectUris: Musi być zarejestrowana co najmniej jedna URI przekierowania.
+      NoRedirectUris: Musi być zarejestrowany co najmniej jednen adres przekierowania URI.
       NotAllCombinationsAreAllowed: Konfiguracja jest zgodna, ale nie wszystkie możliwe kombinacje są dozwolone.
       Code:
         RedirectUris:
-          HttpOnlyForWeb: Typ grantu code tylko pozwala na URI przekierowania http dla typu aplikacji web.
-          CustomOnlyForNative: Typ grantu code tylko pozwala na niestandardowe URI przekierowania dla typu aplikacji natywnej (np. appname://).
+          HttpOnlyForWeb: Typ kodu grantu pozwala tylko na adres http przekierowania URI dla aplikacji typu web.
+          CustomOnlyForNative: Typ kodu grantu tylko pozwala na niestandardowe adresy przekierowania URI dla aplikacji typu natywna (np. appname://).
       Implicit:
         RedirectUris:
-          CustomNotAllowed: Typ udzielania pozwolenia implicit nie pozwala na redirect uris niestandardowe
-          HttpNotAllowed: Typ udzielania pozwolenia implicit nie pozwala na redirect uris http
-          HttpLocalhostOnlyForNative: Tylko aplikacje natywne mogą używać redirect uri http://localhost
+          CustomNotAllowed: Typ grantu implicit nie pozwala na niestandardowe adresy przekierowania URI
+          HttpNotAllowed: Typ grantu implicit nie pozwala na adresy http przekierowania URI
+          HttpLocalhostOnlyForNative: Tylko aplikacje natywne mogą używać adresu przekierowania URI http://localhost
       Native:
         AuthMethodType:
-          NotNone: Aplikacje natywne powinny mieć authmethodtype none.
+          NotNone: Aplikacje natywne powinny nie mieć metody uwierzytelniania.
         RedirectUris:
-          MustBeHttpLocalhost: Redirect URIs muszą zaczynać się od własnego protokołu, http://127.0.0.1, http://[::1] lub http://localhost.
+          MustBeHttpLocalhost: Adresy przekierowań URI muszą zaczynać się od własnego protokołu, http://127.0.0.1, http://[::1] lub http://localhost.
       UserAgent:
         AuthMethodType:
-          NotNone: Aplikacja User Agent powinna mieć authmethodtype none.
+          NotNone: Aplikacja User Agent powinna nie mieć metody uwierzytelniania.
       GrantType:
         Refresh:
           NoAuthCode: Token odświeżania jest dozwolony tylko w połączeniu z Authorization Code.

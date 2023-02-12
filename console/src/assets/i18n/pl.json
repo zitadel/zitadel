@@ -113,7 +113,7 @@
     "REFRESH": "Odśwież",
     "LOGIN": "Zaloguj się",
     "EDIT": "Edytuj",
-    "PIN": "Przypnij / Odpin",
+    "PIN": "Przypnij / Odepnij",
     "CONFIGURE": "Konfiguruj",
     "SEND": "Wyślij",
     "NEWVALUE": "Nowa wartość",
@@ -372,7 +372,7 @@
       }
     },
     "EXTERNALIDP": {
-      "TITLE": "Zewnętrznni Dostawcy Tożsamości ",
+      "TITLE": "Zewnętrzni Dostawcy Tożsamości ",
       "DESC": "",
       "IDPCONFIGID": "Identyfikator konfiguracji IDP",
       "IDPNAME": "Nazwa IDP",
@@ -452,7 +452,7 @@
       "CHOOSEEXPIRY": "Wybierz datę ważności",
       "CREATIONDATE": "Data utworzenia",
       "KEYDETAILS": "Szczegóły klucza",
-      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPE": "Rodzaj tokenu dostępu",
       "ACCESSTOKENTYPES": {
         "0": "Bearer",
         "1": "JWT"
@@ -745,7 +745,7 @@
       "DATABASE": "Baza danych",
       "SEQUENCE": "Sekwencja",
       "EVENTTIMESTAMP": "Sygnatura czasowa",
-      "LASTSPOOL": "Ostatni spool",
+      "LASTSPOOL": "Udane uruchomienie",
       "ACTIONS": "Akcje",
       "CLEAR": "Wyczyść",
       "CLEARED": "Widok został pomyślnie wyczyszczony!",
@@ -848,9 +848,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Wprowadź nazwę swojej nowej organizacji.",
       "ORGDETAILUSER_TITLE": "Skonfiguruj właściciela organizacji",
       "DELETE": "Usuń organizację",
-      "DEFAULTLABEL": "Default",
-      "SETASDEFAULT": "Set as default organization",
-      "DEFAULTORGSET": "Default organization changed successfully",
+      "DEFAULTLABEL": "Domyślna",
+      "SETASDEFAULT": "Ustaw jako domyślną organizację",
+      "DEFAULTORGSET": "Domyślna organizacja została zmieniona pomyślnie",
       "RENAME": {
         "ACTION": "Zmień nazwę",
         "TITLE": "Zmiana nazwy organizacji",
@@ -1086,7 +1086,7 @@
     "PRIVATELABELING": {
       "TITLE": "Branding",
       "DESCRIPTION": "Nadaj logowaniu swój indywidualny styl i modyfikuj jego zachowanie.",
-      "PREVIEW_DESCRIPTION": "Zmiany polityki zostaną automatycznie zdeployowane do środowiska podglądu.",
+      "PREVIEW_DESCRIPTION": "Zmiany polityki zostaną automatycznie wdrożone do środowiska podglądu.",
       "BTN": "Wybierz plik",
       "ACTIVATEPREVIEW": "Zastosuj konfigurację",
       "DARK": "Tryb ciemny",
@@ -1844,9 +1844,9 @@
       "OVERVIEWSECTION": "Przegląd",
       "OVERVIEWTITLE": "Konfiguracja zakończona. Przejrzyj ją.",
       "ACCESSTOKENROLEASSERTION": "Dodaj role użytkownika do tokenu dostępu",
-      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Jeśli zaznaczone, żądane role zauthentykowanego użytkownika zostaną dodane do tokenu dostępu.",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Jeśli zaznaczone, żądane role uwierzytelnionego użytkownika zostaną dodane do tokenu dostępu.",
       "IDTOKENROLEASSERTION": "Role użytkownika w tokenie ID",
-      "IDTOKENROLEASSERTION_DESCRIPTION": "Jeśli zaznaczone, żądane role zauthentykowanego użytkownika zostaną dodane do tokenu ID.",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Jeśli zaznaczone, żądane role uwierzytelnionego użytkownika zostaną dodane do tokenu ID.",
       "IDTOKENUSERINFOASSERTION": "Informacje o użytkowniku w tokenie ID",
       "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umożliwia klientom pobieranie twierdzeń profilu, e-mail, telefonu i adresu z tokenu ID.",
       "CLOCKSKEW": "Umożliwia klientom obsługę opóźnienia zegara OP i klienta. Czas trwania (0-5s) zostanie dodany do twierdzenia exp i odjęty od iats, auth_time i nbf.",
@@ -1917,7 +1917,7 @@
         "DESCRIPTION": "Uwierzytelnianie za pomocą nazwy użytkownika i hasła"
       },
       "IMPLICIT": {
-        "TITLE": "Domyślny",
+        "TITLE": "Implicit",
         "DESCRIPTION": "Pobierz tokeny bezpośrednio z punktu autoryzacyjnego"
       },
       "CUSTOM": {
