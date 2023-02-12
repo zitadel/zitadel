@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Wybierz datę ważności",
       "CREATIONDATE": "Data utworzenia",
       "KEYDETAILS": "Szczegóły klucza",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Dodaj klucz",
         "DESCRIPTION": "Wybierz typ swojego klucza i wybierz opcjonalną datę ważności."
@@ -843,6 +848,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Wprowadź nazwę swojej nowej organizacji.",
       "ORGDETAILUSER_TITLE": "Skonfiguruj właściciela organizacji",
       "DELETE": "Usuń organizację",
+      "DEFAULTLABEL": "Default",
+      "SETASDEFAULT": "Set as default organization",
+      "DEFAULTORGSET": "Default organization changed successfully",
       "RENAME": {
         "ACTION": "Zmień nazwę",
         "TITLE": "Zmiana nazwy organizacji",

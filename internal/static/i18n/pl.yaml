@@ -449,6 +449,8 @@ Errors:
       Noop: Nieograniczony limit bez powiadomień nie ma żadnego wpływu
     Access:
       Exhausted: Limit dla wniosków uwierzytelnionych został wykorzystany.
+    Execution:
+      Exhausted: Limit dla wniosków sekund wykonania akcji został wykorzystany.
   LogStore:
     Access:
       StorageFailed: Zapisywanie dziennika dostępu do bazy danych nie powiodło się
