@@ -14,6 +14,8 @@ const (
 	OAuthIDPChangedEventType  eventstore.EventType = "org.idp.oauth.changed"
 	OIDCIDPAddedEventType     eventstore.EventType = "org.idp.oidc.added"
 	OIDCIDPChangedEventType   eventstore.EventType = "org.idp.oidc.changed"
+	JWTIDPAddedEventType      eventstore.EventType = "org.idp.jwt.added"
+	JWTIDPChangedEventType    eventstore.EventType = "org.idp.jwt.changed"
 	GoogleIDPAddedEventType   eventstore.EventType = "org.idp.google.added"
 	GoogleIDPChangedEventType eventstore.EventType = "org.idp.google.changed"
 	GitHubIDPAddedEventType   eventstore.EventType = "org.idp.github.added"
@@ -182,6 +184,86 @@ func OIDCIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error
 	}
 
 	return &OIDCIDPChangedEvent{OIDCIDPChangedEvent: *e.(*idp.OIDCIDPChangedEvent)}, nil
+}
+
+type JWTIDPAddedEvent struct {
+	idp.JWTIDPAddedEvent
+}
+
+func NewJWTIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	issuer,
+	jwtEndpoint,
+	keysEndpoint,
+	headerName string,
+	options idp.Options,
+) *JWTIDPAddedEvent {
+
+	return &JWTIDPAddedEvent{
+		JWTIDPAddedEvent: *idp.NewJWTIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				JWTIDPAddedEventType,
+			),
+			id,
+			name,
+			issuer,
+			jwtEndpoint,
+			keysEndpoint,
+			headerName,
+			options,
+		),
+	}
+}
+
+func JWTIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.JWTIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &JWTIDPAddedEvent{JWTIDPAddedEvent: *e.(*idp.JWTIDPAddedEvent)}, nil
+}
+
+type JWTIDPChangedEvent struct {
+	idp.JWTIDPChangedEvent
+}
+
+func NewJWTIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	oldName string,
+	changes []idp.JWTIDPChanges,
+) (*JWTIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewJWTIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			JWTIDPChangedEventType,
+		),
+		id,
+		oldName,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &JWTIDPChangedEvent{JWTIDPChangedEvent: *changedEvent}, nil
+}
+
+func JWTIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.JWTIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &JWTIDPChangedEvent{JWTIDPChangedEvent: *e.(*idp.JWTIDPChangedEvent)}, nil
 }
 
 type GoogleIDPAddedEvent struct {

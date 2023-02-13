@@ -219,3 +219,25 @@ func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRe
 		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
+
+func addJWTProviderToCommand(req *mgmt_pb.AddJWTProviderRequest) command.JWTProvider {
+	return command.JWTProvider{
+		Name:        req.Name,
+		Issuer:      req.Issuer,
+		JWTEndpoint: req.JwtEndpoint,
+		KeyEndpoint: req.KeysEndpoint,
+		HeaderName:  req.HeaderName,
+		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateJWTProviderToCommand(req *mgmt_pb.UpdateJWTProviderRequest) command.JWTProvider {
+	return command.JWTProvider{
+		Name:        req.Name,
+		Issuer:      req.Issuer,
+		JWTEndpoint: req.JwtEndpoint,
+		KeyEndpoint: req.KeysEndpoint,
+		HeaderName:  req.HeaderName,
+		IDPOptions:  idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}

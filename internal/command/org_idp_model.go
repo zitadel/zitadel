@@ -185,6 +185,90 @@ func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
 	return changeEvent, nil
 }
 
+type OrgJWTIDPWriteModel struct {
+	JWTIDPWriteModel
+}
+
+func NewJWTOrgIDPWriteModel(orgID, id string) *OrgJWTIDPWriteModel {
+	return &OrgJWTIDPWriteModel{
+		JWTIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgJWTIDPWriteModel) Reduce() error {
+	return wm.JWTIDPWriteModel.Reduce()
+}
+
+func (wm *OrgJWTIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.JWTIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.JWTIDPWriteModel.AppendEvents(&e.JWTIDPAddedEvent)
+		case *org.JWTIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.JWTIDPWriteModel.AppendEvents(&e.JWTIDPChangedEvent)
+		}
+	}
+}
+
+func (wm *OrgJWTIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.JWTIDPAddedEventType,
+			org.JWTIDPChangedEventType,
+		).
+		Builder()
+}
+
+func (wm *OrgJWTIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	oldName,
+	name,
+	issuer,
+	jwtEndpoint,
+	keysEndpoint,
+	headerName string,
+	options idp.Options,
+) (*org.JWTIDPChangedEvent, error) {
+
+	changes, err := wm.JWTIDPWriteModel.NewChanges(
+		name,
+		issuer,
+		jwtEndpoint,
+		keysEndpoint,
+		headerName,
+		options,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(changes) == 0 {
+		return nil, nil
+	}
+	changeEvent, err := org.NewJWTIDPChangedEvent(ctx, aggregate, id, oldName, changes)
+	if err != nil {
+		return nil, err
+	}
+	return changeEvent, nil
+}
+
 type OrgGoogleIDPWriteModel struct {
 	GoogleIDPWriteModel
 }

@@ -21,3 +21,12 @@ type GenericOIDCProvider struct {
 	Scopes       []string
 	IDPOptions   idp.Options
 }
+
+type JWTProvider struct {
+	Name        string
+	Issuer      string
+	JWTEndpoint string
+	KeyEndpoint string
+	HeaderName  string
+	IDPOptions  idp.Options
+}

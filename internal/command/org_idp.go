@@ -90,6 +90,45 @@ func (c *Commands) UpdateOrgGenericOIDCProvider(ctx context.Context, resourceOwn
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func (c *Commands) AddOrgJWTProvider(ctx context.Context, resourceOwner string, provider JWTProvider) (string, *domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgJWTProvider(
+		orgAgg,
+		resourceOwner,
+		id,
+		provider,
+	))
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) UpdateOrgJWTProvider(ctx context.Context, resourceOwner, id string, provider JWTProvider) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgJWTProvider(orgAgg, resourceOwner, id, provider))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
 func (c *Commands) AddOrgGitHubProvider(ctx context.Context, resourceOwner, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err := c.idGenerator.Next()
@@ -317,6 +356,78 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(
 				provider.ClientSecret,
 				c.idpConfigEncryption,
 				provider.Scopes,
+				provider.IDPOptions,
+			)
+			if err != nil {
+				return nil, err
+			}
+			if event == nil {
+				return nil, nil
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, resourceOwner, id string, provider JWTProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				org.NewJWTIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					id,
+					provider.Name,
+					provider.Issuer,
+					provider.JWTEndpoint,
+					provider.KeyEndpoint,
+					provider.HeaderName,
+					provider.IDPOptions,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareUpdateOrgJWTProvider(
+	a *org.Aggregate,
+	resourceOwner,
+	id string,
+	provider JWTProvider,
+) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "ORG-D3r1s", "Errors.Org.IDPConfig.NotExisting")
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				id,
+				writeModel.Name,
+				provider.Name,
+				provider.Issuer,
+				provider.JWTEndpoint,
+				provider.KeyEndpoint,
+				provider.HeaderName,
 				provider.IDPOptions,
 			)
 			if err != nil {

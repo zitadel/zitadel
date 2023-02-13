@@ -29,9 +29,15 @@ func (wm *OAuthIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *idp.OAuthIDPAddedEvent:
-			wm.ID = e.ID
+			if wm.ID != e.ID {
+				continue
+			}
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
+			wm.AuthorizationEndpoint = e.AuthorizationEndpoint
+			wm.TokenEndpoint = e.TokenEndpoint
+			wm.UserEndpoint = e.UserEndpoint
+			wm.Scopes = e.Scopes
 			wm.State = domain.IDPConfigStateActive
 		case *idp.OAuthIDPChangedEvent:
 			if wm.ID != e.ID {
@@ -118,8 +124,8 @@ type OIDCIDPWriteModel struct {
 	eventstore.WriteModel
 
 	Name         string
-	Issuer       string
 	ID           string
+	Issuer       string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
 	Scopes       []string
@@ -133,8 +139,10 @@ func (wm *OIDCIDPWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *idp.OIDCIDPAddedEvent:
 			wm.ID = e.ID
+			wm.Issuer = e.Issuer
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
+			wm.Scopes = e.Scopes
 			wm.State = domain.IDPConfigStateActive
 		case *idp.OIDCIDPChangedEvent:
 			if wm.ID != e.ID {
@@ -199,6 +207,92 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
 		changes = append(changes, idp.ChangeOIDCOptions(opts))
+	}
+	return changes, nil
+}
+
+type JWTIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	Name         string
+	Issuer       string
+	JWTEndpoint  string
+	KeysEndpoint string
+	HeaderName   string
+	idp.Options
+
+	State domain.IDPConfigState //TODO: ?
+}
+
+func (wm *JWTIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.JWTIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.Issuer = e.Issuer
+			wm.JWTEndpoint = e.JWTEndpoint
+			wm.KeysEndpoint = e.KeysEndpoint
+			wm.HeaderName = e.HeaderName
+			wm.State = domain.IDPConfigStateActive
+		case *idp.JWTIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *JWTIDPWriteModel) reduceChangedEvent(e *idp.JWTIDPChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.JWTEndpoint != nil {
+		wm.JWTEndpoint = *e.JWTEndpoint
+	}
+	if e.KeysEndpoint != nil {
+		wm.KeysEndpoint = *e.KeysEndpoint
+	}
+	if e.HeaderName != nil {
+		wm.HeaderName = *e.HeaderName
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *JWTIDPWriteModel) NewChanges(
+	name,
+	issuer,
+	jwtEndpoint,
+	keysEndpoint,
+	headerName string,
+	options idp.Options,
+) ([]idp.JWTIDPChanges, error) {
+	changes := make([]idp.JWTIDPChanges, 0)
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeJWTName(name))
+	}
+	if wm.Issuer != issuer {
+		changes = append(changes, idp.ChangeJWTIssuer(issuer))
+	}
+	if wm.JWTEndpoint != jwtEndpoint {
+		changes = append(changes, idp.ChangeJWTEndpoint(jwtEndpoint))
+	}
+	if wm.KeysEndpoint != keysEndpoint {
+		changes = append(changes, idp.ChangeJWTKeysEndpoint(keysEndpoint))
+	}
+	if wm.HeaderName != headerName {
+		changes = append(changes, idp.ChangeJWTHeaderName(headerName))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeJWTOptions(opts))
 	}
 	return changes, nil
 }
