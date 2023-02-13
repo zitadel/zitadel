@@ -4,6 +4,7 @@ import localeDe from '@angular/common/locales/de';
 import localeZh from '@angular/common/locales/zh';
 import localeFr from '@angular/common/locales/fr';
 import localeIt from '@angular/common/locales/it';
+import localePl from '@angular/common/locales/pl';
 import localeEn from '@angular/common/locales/en';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -66,6 +67,8 @@ registerLocaleData(localeFr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/fr.json'));
 registerLocaleData(localeIt);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/it.json'));
+registerLocaleData(localePl);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/pl.json'));
 registerLocaleData(localeEn);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/en.json'));
 
