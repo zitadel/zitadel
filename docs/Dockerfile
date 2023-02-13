@@ -4,10 +4,10 @@ WORKDIR /docs
 COPY docs/package.json docs/yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY docs .
-RUN yarn prodbuild
+COPY proto /proto
+RUN yarn build
 
-## Final image for production serving
-FROM nginx:1.23.3 as final
+## Final image for serving
+FROM nginx as final
 COPY docs/nginx.conf /etc/nginx/nginx.conf 
-#COPY --from=builder /docs/build /usr/share/nginx/html
-COPY docs/build /usr/share/nginx/html/docs
+COPY --from=builder /docs/build /usr/share/nginx/html
