@@ -42,6 +42,11 @@ func (wm *OrgOAuthIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.OAuthIDPWriteModel.AppendEvents(&e.OAuthIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.OAuthIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.OAuthIDPWriteModel.AppendEvents(e)
 		}
@@ -57,6 +62,7 @@ func (wm *OrgOAuthIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.OAuthIDPAddedEventType,
 			org.OAuthIDPChangedEventType,
+			org.IDPRemovedEventType,
 		).
 		Builder()
 }
@@ -134,6 +140,16 @@ func (wm *OrgOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.OIDCIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		case *org.IDPConfigAddedEvent:
+			if wm.ID != e.ConfigID {
+				continue
+			}
+			wm.OIDCIDPWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
 		case *org.IDPOIDCConfigAddedEvent:
 			if wm.ID != e.IDPConfigID {
 				continue
@@ -164,6 +180,11 @@ func (wm *OrgOIDCIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.OIDCIDPAddedEventType,
 			org.OIDCIDPChangedEventType,
+			org.IDPRemovedEventType,
+			org.IDPConfigAddedEventType,
+			org.IDPOIDCConfigAddedEventType,
+			org.IDPOIDCConfigChangedEventType,
+			org.IDPConfigRemovedEventType,
 		).
 		Builder()
 }
@@ -237,6 +258,16 @@ func (wm *OrgJWTIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.JWTIDPWriteModel.AppendEvents(&e.JWTIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.JWTIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		case *org.IDPConfigAddedEvent:
+			if wm.ID != e.ConfigID {
+				continue
+			}
+			wm.JWTIDPWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
 		case *org.IDPJWTConfigAddedEvent:
 			if wm.ID != e.IDPConfigID {
 				continue
@@ -267,6 +298,11 @@ func (wm *OrgJWTIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.JWTIDPAddedEventType,
 			org.JWTIDPChangedEventType,
+			org.IDPRemovedEventType,
+			org.IDPConfigAddedEventType,
+			org.IDPJWTConfigAddedEventType,
+			org.IDPJWTConfigChangedEventType,
+			org.IDPConfigRemovedEventType,
 		).
 		Builder()
 }
@@ -338,6 +374,11 @@ func (wm *OrgAzureADIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.AzureADIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.AzureADIDPWriteModel.AppendEvents(e)
 		}
@@ -353,6 +394,7 @@ func (wm *OrgAzureADIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.AzureADIDPAddedEventType,
 			org.AzureADIDPChangedEventType,
+			org.IDPRemovedEventType,
 		).
 		Builder()
 }
@@ -428,6 +470,11 @@ func (wm *OrgGitHubIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.GitHubIDPWriteModel.AppendEvents(&e.GitHubIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.GitHubIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.GitHubIDPWriteModel.AppendEvents(e)
 		}
@@ -443,6 +490,7 @@ func (wm *OrgGitHubIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.GitHubIDPAddedEventType,
 			org.GitHubIDPChangedEventType,
+			org.IDPRemovedEventType,
 		).
 		Builder()
 }
@@ -505,6 +553,11 @@ func (wm *OrgGitHubEnterpriseIDPWriteModel) AppendEvents(events ...eventstore.Ev
 				continue
 			}
 			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.GitHubEnterpriseIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(e)
 		}
@@ -520,6 +573,7 @@ func (wm *OrgGitHubEnterpriseIDPWriteModel) Query() *eventstore.SearchQueryBuild
 		EventTypes(
 			org.GitHubEnterpriseIDPAddedEventType,
 			org.GitHubEnterpriseIDPChangedEventType,
+			org.IDPRemovedEventType,
 		).
 		Builder()
 }
@@ -596,6 +650,11 @@ func (wm *OrgGitLabIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.GitLabIDPWriteModel.AppendEvents(&e.GitLabIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.GitLabIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.GitLabIDPWriteModel.AppendEvents(e)
 		}
@@ -611,6 +670,7 @@ func (wm *OrgGitLabIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.GitLabIDPAddedEventType,
 			org.GitLabIDPChangedEventType,
+			org.IDPRemovedEventType,
 		).
 		Builder()
 }
@@ -673,6 +733,11 @@ func (wm *OrgGitLabSelfHostedIDPWriteModel) AppendEvents(events ...eventstore.Ev
 				continue
 			}
 			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(&e.GitLabSelfHostedIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(e)
 		}
@@ -688,6 +753,7 @@ func (wm *OrgGitLabSelfHostedIDPWriteModel) Query() *eventstore.SearchQueryBuild
 		EventTypes(
 			org.GitLabSelfHostedIDPAddedEventType,
 			org.GitLabSelfHostedIDPChangedEventType,
+			org.IDPRemovedEventType,
 		).
 		Builder()
 }
@@ -752,6 +818,11 @@ func (wm *OrgGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.GoogleIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.GoogleIDPWriteModel.AppendEvents(e)
 		}
@@ -767,6 +838,7 @@ func (wm *OrgGoogleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.GoogleIDPAddedEventType,
 			org.GoogleIDPChangedEventType,
+			org.IDPRemovedEventType,
 		).
 		Builder()
 }
@@ -794,4 +866,78 @@ func (wm *OrgGoogleIDPWriteModel) NewChangedEvent(
 		return nil, err
 	}
 	return changeEvent, nil
+}
+
+type OrgIDPRemoveWriteModel struct {
+	IDPRemoveWriteModel
+}
+
+func NewOrgIDPRemoveWriteModel(orgID, id string) *OrgIDPRemoveWriteModel {
+	return &OrgIDPRemoveWriteModel{
+		IDPRemoveWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgIDPRemoveWriteModel) Reduce() error {
+	return wm.IDPRemoveWriteModel.Reduce()
+}
+
+func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.OAuthIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.OAuthIDPAddedEvent)
+		case *org.OIDCIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.OIDCIDPAddedEvent)
+		case *org.JWTIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.JWTIDPAddedEvent)
+		case *org.AzureADIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.AzureADIDPAddedEvent)
+		case *org.GitHubIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubIDPAddedEvent)
+		case *org.GitHubEnterpriseIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitHubEnterpriseIDPAddedEvent)
+		case *org.GitLabIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitLabIDPAddedEvent)
+		case *org.GitLabSelfHostedIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GitLabSelfHostedIDPAddedEvent)
+		case *org.GoogleIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
+		case *org.IDPRemovedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
+		case *org.IDPConfigAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigAddedEvent)
+		case *org.IDPConfigRemovedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
+		default:
+			wm.IDPRemoveWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.OAuthIDPAddedEventType,
+			org.OIDCIDPAddedEventType,
+			org.JWTIDPAddedEventType,
+			org.AzureADIDPAddedEventType,
+			org.GitHubIDPAddedEventType,
+			org.GitHubEnterpriseIDPAddedEventType,
+			org.GitLabIDPAddedEventType,
+			org.GitLabSelfHostedIDPAddedEventType,
+			org.GoogleIDPAddedEventType,
+			org.IDPConfigAddedEventType,
+		).
+		Builder()
 }

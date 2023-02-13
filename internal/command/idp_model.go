@@ -875,3 +875,58 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 	}
 	return changes, nil
 }
+
+type IDPRemoveWriteModel struct {
+	eventstore.WriteModel
+
+	ID    string
+	State domain.IDPState
+	name  string
+}
+
+func (wm *IDPRemoveWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.OAuthIDPAddedEvent:
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.OIDCIDPAddedEvent:
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.JWTIDPAddedEvent:
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.AzureADIDPAddedEvent:
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.GitHubIDPAddedEvent:
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.GitHubEnterpriseIDPAddedEvent:
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.GitLabIDPAddedEvent:
+			wm.reduceAdded(e.ID, "")
+		case *idp.GitLabSelfHostedIDPAddedEvent:
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.GoogleIDPAddedEvent:
+			wm.reduceAdded(e.ID, "")
+		case *idp.RemovedEvent:
+			wm.reduceRemoved(e.ID)
+		case *idpconfig.IDPConfigAddedEvent:
+			wm.reduceAdded(e.ConfigID, "")
+		case *idpconfig.IDPConfigRemovedEvent:
+			wm.reduceRemoved(e.ConfigID)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *IDPRemoveWriteModel) reduceAdded(id string, name string) {
+	if wm.ID != id {
+		return
+	}
+	wm.State = domain.IDPStateActive
+	wm.name = name
+}
+
+func (wm *IDPRemoveWriteModel) reduceRemoved(id string) {
+	if wm.ID != id {
+		return
+	}
+	wm.State = domain.IDPStateRemoved
+}

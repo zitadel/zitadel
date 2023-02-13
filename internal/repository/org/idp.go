@@ -28,6 +28,7 @@ const (
 	GitLabSelfHostedIDPChangedEventType eventstore.EventType = "org.idp.gitlab_self_hosted.changed"
 	GoogleIDPAddedEventType             eventstore.EventType = "org.idp.google.added"
 	GoogleIDPChangedEventType           eventstore.EventType = "org.idp.google.changed"
+	IDPRemovedEventType                 eventstore.EventType = "instance.idp.removed"
 )
 
 type OAuthIDPAddedEvent struct {
@@ -736,4 +737,40 @@ func GoogleIDPChangedEventMapper(event *repository.Event) (eventstore.Event, err
 	}
 
 	return &GoogleIDPChangedEvent{GoogleIDPChangedEvent: *e.(*idp.GoogleIDPChangedEvent)}, nil
+}
+
+type IDPRemovedEvent struct {
+	idp.RemovedEvent
+}
+
+func NewIDPRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	name string,
+) *IDPRemovedEvent {
+	return &IDPRemovedEvent{
+		RemovedEvent: *idp.NewRemovedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				IDPRemovedEventType,
+			),
+			id,
+			name,
+		),
+	}
+}
+
+func (e *IDPRemovedEvent) Data() interface{} {
+	return e
+}
+
+func IDPRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.RemovedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &IDPRemovedEvent{RemovedEvent: *e.(*idp.RemovedEvent)}, nil
 }

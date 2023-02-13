@@ -1,5 +1,14 @@
 package idp
 
+import (
+	"encoding/json"
+
+	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
+)
+
 type Options struct {
 	IsCreationAllowed bool `json:"isCreationAllowed,omitempty"`
 	IsLinkingAllowed  bool `json:"isLinkingAllowed,omitempty"`
@@ -48,4 +57,48 @@ func (o *Options) ReduceChanges(changes OptionChanges) {
 
 func (o *OptionChanges) IsZero() bool {
 	return o.IsCreationAllowed == nil && o.IsLinkingAllowed == nil && o.IsAutoCreation == nil && o.IsAutoUpdate == nil
+}
+
+type RemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	ID string `json:"id"`
+
+	name string
+}
+
+func NewRemovedEvent(
+	base *eventstore.BaseEvent,
+	id string,
+	name string,
+) *RemovedEvent {
+	return &RemovedEvent{
+		BaseEvent: *base,
+		ID:        id,
+		name:      name,
+	}
+}
+
+func (e *RemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *RemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	if e.name == "" {
+		return nil
+	}
+	return []*eventstore.EventUniqueConstraint{idpconfig.NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
+}
+
+func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &RemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IDP-plSD2", "unable to unmarshal event")
+	}
+
+	return e, nil
 }

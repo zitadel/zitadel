@@ -317,6 +317,19 @@ func (c *Commands) UpdateOrgGoogleProvider(ctx context.Context, resourceOwner, i
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func (c *Commands) DeleteProvider(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+	orgAgg := org.NewAggregate(resourceOwner)
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareDeleteOrgProvider(orgAgg, resourceOwner, id))
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
 func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -925,6 +938,26 @@ func (c *Commands) prepareUpdateOrgGoogleProvider(a *org.Aggregate, resourceOwne
 				return nil, nil
 			}
 			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareDeleteOrgProvider(a *org.Aggregate, resourceOwner, id string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewOrgIDPRemoveWriteModel(resourceOwner, id)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "ORG-Se3tg", "Errors.Org.IDPConfig.NotExisting")
+			}
+			return []eventstore.Command{org.NewIDPRemovedEvent(ctx, &a.Aggregate, id, writeModel.name)}, nil
 		}, nil
 	}
 }

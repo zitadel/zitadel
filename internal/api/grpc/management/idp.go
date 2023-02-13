@@ -343,3 +343,13 @@ func (s *Server) UpdateGoogleProvider(ctx context.Context, req *mgmt_pb.UpdateGo
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
+
+func (s *Server) DeleteProvider(ctx context.Context, req *mgmt_pb.DeleteProviderRequest) (*mgmt_pb.DeleteProviderResponse, error) {
+	details, err := s.command.DeleteProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.DeleteProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
