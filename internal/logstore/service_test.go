@@ -271,10 +271,7 @@ func when(t *testing.T, svc *logstore.Service, ctx context.Context, clock *clock
 		}
 
 		runtime.Gosched()
-		remaining, err = svc.Limit(ctx, "non-empty-instance-id")
-		if err != nil {
-			t.Errorf("expected no error but got %v", err)
-		}
+		remaining = svc.Limit(ctx, "non-empty-instance-id")
 		clock.Add(tick)
 	}
 	time.Sleep(time.Millisecond)

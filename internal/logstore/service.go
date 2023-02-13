@@ -5,6 +5,8 @@ import (
 	"math"
 	"time"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
@@ -75,19 +77,26 @@ func (s *Service) Handle(ctx context.Context, record LogRecord) error {
 	return nil
 }
 
-func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error) {
+func (s *Service) Limit(ctx context.Context, instanceID string) *uint64 {
+	var err error
+	defer func() {
+		if err != nil {
+			logging.WithError(err).Warn("failed to check is usage should be limited")
+		}
+	}()
+
 	if !s.reportingEnabled || instanceID == "" {
-		return nil, nil
+		return nil
 	}
 
 	quota, periodStart, err := s.quotaQuerier.GetCurrentQuotaPeriod(ctx, instanceID, s.usageQuerier.QuotaUnit())
 	if err != nil || quota == nil {
-		return nil, err
+		return nil
 	}
 
 	usage, err := s.usageQuerier.QueryUsage(ctx, instanceID, periodStart)
 	if err != nil {
-		return nil, err
+		return nil
 	}
 
 	var remaining *uint64
@@ -98,8 +107,9 @@ func (s *Service) Limit(ctx context.Context, instanceID string) (*uint64, error)
 
 	notifications, err := s.quotaQuerier.GetDueQuotaNotifications(ctx, quota, periodStart, usage)
 	if err != nil {
-		return remaining, err
+		return remaining
 	}
 
-	return remaining, s.usageReporter.Report(ctx, notifications)
+	err = s.usageReporter.Report(ctx, notifications)
+	return remaining
 }

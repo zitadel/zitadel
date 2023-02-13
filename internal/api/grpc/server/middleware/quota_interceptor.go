@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -27,13 +26,7 @@ func QuotaExhaustedInterceptor(svc *logstore.Service, ignoreService ...string) g
 		}
 
 		instance := authz.GetInstance(ctx)
-		remaining, err := svc.Limit(ctx, instance.InstanceID())
-		if err != nil {
-			logging.WithError(err).Warn("failed to check whether requests should be limited")
-			//nolint:ineffassign
-			err = nil
-		}
-
+		remaining := svc.Limit(ctx, instance.InstanceID())
 		if remaining != nil && *remaining == 0 {
 			return nil, errors.ThrowResourceExhausted(nil, "QUOTA-vjAy8", "Quota.Access.Exhausted")
 		}

@@ -40,6 +40,7 @@ func (a Record) Normalize() logstore.LogRecord {
 }
 
 // normalizeHeaders lowers all header keys and redacts secrets
+// TODO: Limit message size
 func normalizeHeaders(header http.Header, redactKeysLower ...string) {
 	for k, v := range header {
 		lowerKey := strings.ToLower(k)

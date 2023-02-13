@@ -7,7 +7,6 @@ import (
 
 	"github.com/dop251/goja_nodejs/require"
 	"github.com/sirupsen/logrus"
-	"github.com/zitadel/logging"
 
 	z_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
@@ -36,17 +35,11 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 		return z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
 	}
 
-	remaining, err := logstoreService.Limit(ctx, config.instanceID)
-	if err != nil {
-		logging.WithError(err).Warn("failed to check whether action executions should be limited")
-		//nolint:ineffassign
-		err = nil
-	}
-
+	remaining := logstoreService.Limit(ctx, config.instanceID)
 	config.cutTimeouts(remaining)
 
 	if remaining != nil && *remaining == 0 {
-		err = z_errs.ThrowResourceExhausted(nil, "ACTIO-f19Ii", "Errors.Quota.Execution.Exhausted")
+		err := z_errs.ThrowResourceExhausted(nil, "ACTIO-f19Ii", "Errors.Quota.Execution.Exhausted")
 		if config.allowedToFail {
 			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
 			return nil
@@ -56,7 +49,7 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 
 	config.logger.Log(actionStartedMessage)
 
-	if err = executeScript(config, ctxParam, apiParam, script); err != nil {
+	if err := executeScript(config, ctxParam, apiParam, script); err != nil {
 		return err
 	}
 
@@ -65,8 +58,7 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 	if jsFn == nil {
 		return errors.New("function not found")
 	}
-	err = config.vm.ExportTo(jsFn, &fn)
-	if err != nil {
+	if err := config.vm.ExportTo(jsFn, &fn); err != nil {
 		return err
 	}
 
@@ -107,6 +99,7 @@ func executeScript(config *runConfig, ctxParam contextFields, apiParam apiFields
 	}()
 
 	_, err = config.vm.RunString(script)
+	config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
 	return err
 }
 
@@ -118,6 +111,7 @@ func executeFn(config *runConfig, fn jsAction) (err error) {
 		}
 		var ok bool
 		if err, ok = r.(error); ok {
+			// TODO: Move to defer function as soon as logger an config are available
 			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
 			if config.allowedToFail {
 				err = nil
