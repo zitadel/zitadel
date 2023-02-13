@@ -257,12 +257,12 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			id, got, err := r.AddOrgGenericOAuthProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			id, got, err := c.AddOrgGenericOAuthProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -551,11 +551,463 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			got, err := r.UpdateOrgGenericOAuthProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
+			got, err := c.UpdateOrgGenericOAuthProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		idGenerator  id.Generator
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx           context.Context
+		resourceOwner string
+		provider      GenericOIDCProvider
+	}
+	type res struct {
+		id   string
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid name",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider:      GenericOIDCProvider{},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"invalid issuer",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"invalid clientID",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:   "name",
+					Issuer: "issuer",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"invalid clientSecret",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						eventPusherToEvents(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								idp.Options{},
+							)),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "org1")),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+		{
+			name: "ok all set",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						eventPusherToEvents(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"user"},
+								idp.Options{
+									IsCreationAllowed: true,
+									IsLinkingAllowed:  true,
+									IsAutoCreation:    true,
+									IsAutoUpdate:      true,
+								},
+							)),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "org1")),
+					),
+				),
+				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: GenericOIDCProvider{
+					Name:         "name",
+					Issuer:       "issuer",
+					ClientID:     "clientID",
+					ClientSecret: "clientSecret",
+					Scopes:       []string{"user"},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idGenerator:         tt.fields.idGenerator,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			id, got, err := c.AddOrgGenericOIDCProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.id, id)
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx           context.Context
+		resourceOwner string
+		id            string
+		provider      GenericOIDCProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider:      GenericOIDCProvider{},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"invalid name",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider:      GenericOIDCProvider{},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"invalid issuer",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOIDCProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"invalid clientID",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOIDCProvider{
+					Name:   "name",
+					Issuer: "issuer",
+				},
+			},
+			res{
+				err: caos_errors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOIDCProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
+				},
+			},
+			res: res{
+				err: caos_errors.IsNotFound,
+			},
+		},
+		{
+			name: "no changes",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								idp.Options{},
+							)),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOIDCProvider{
+					Name:     "name",
+					Issuer:   "issuer",
+					ClientID: "clientID",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{},
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+								"id1",
+								"name",
+								"issuer",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						eventPusherToEvents(
+							func() eventstore.Command {
+								t := true
+								event, _ := org.NewOIDCIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+									"id1",
+									"name",
+									[]idp.OIDCIDPChanges{
+										idp.ChangeOIDCName("new name"),
+										idp.ChangeOIDCIssuer("new issuer"),
+										idp.ChangeOIDCClientID("clientID2"),
+										idp.ChangeOIDCClientSecret(&crypto.CryptoValue{
+											CryptoType: crypto.TypeEncryption,
+											Algorithm:  "enc",
+											KeyID:      "id",
+											Crypted:    []byte("newSecret"),
+										}),
+										idp.ChangeOIDCScopes([]string{"openid", "profile"}),
+										idp.ChangeOIDCOptions(idp.OptionChanges{
+											IsCreationAllowed: &t,
+											IsLinkingAllowed:  &t,
+											IsAutoCreation:    &t,
+											IsAutoUpdate:      &t,
+										}),
+									},
+								)
+								return event
+							}(),
+						),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name", "org1")),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("new name", "org1")),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: GenericOIDCProvider{
+					Name:         "new name",
+					Issuer:       "new issuer",
+					ClientID:     "clientID2",
+					ClientSecret: "newSecret",
+					Scopes:       []string{"openid", "profile"},
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.UpdateOrgGenericOIDCProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -712,12 +1164,12 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:          tt.fields.eventstore,
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			id, got, err := r.AddOrgGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			id, got, err := c.AddOrgGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -906,11 +1358,11 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:          tt.fields.eventstore,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			got, err := r.UpdateOrgGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
+			got, err := c.UpdateOrgGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

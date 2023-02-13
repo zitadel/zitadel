@@ -442,6 +442,18 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, resourceOwner
 
 func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOIDCProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sgtj5", "Errors.Invalid.Argument")
+		}
+		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Hz6zj", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-fb5jm", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sfdf4", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -475,6 +487,18 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, resourceOwner, id
 
 func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOIDCProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAfd3", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dvf4f", "Errors.Invalid.Argument")
+		}
+		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-BDfr3", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Db3bs", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
