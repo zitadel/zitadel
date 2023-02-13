@@ -12,3 +12,12 @@ type GenericOAuthProvider struct {
 	Scopes                []string
 	IDPOptions            idp.Options
 }
+
+type GenericOIDCProvider struct {
+	Name         string
+	Issuer       string
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}

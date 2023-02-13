@@ -114,6 +114,95 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
+type OIDCIDPWriteModel struct {
+	eventstore.WriteModel
+
+	Name         string
+	Issuer       string
+	ID           string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPConfigState //TODO: ?
+}
+
+func (wm *OIDCIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.OIDCIDPAddedEvent:
+			wm.ID = e.ID
+			wm.ClientID = e.ClientID
+			wm.ClientSecret = e.ClientSecret
+			wm.State = domain.IDPConfigStateActive
+		case *idp.OIDCIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *OIDCIDPWriteModel) reduceChangedEvent(e *idp.OIDCIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *OIDCIDPWriteModel) NewChanges(
+	name,
+	issuer,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.OIDCIDPChanges, error) {
+	changes := make([]idp.OIDCIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeOIDCClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeOIDCClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeOIDCName(name))
+	}
+	if wm.Issuer != issuer {
+		changes = append(changes, idp.ChangeOIDCIssuer(issuer))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeOIDCScopes(scopes))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeOIDCOptions(opts))
+	}
+	return changes, nil
+}
+
 type GoogleIDPWriteModel struct {
 	eventstore.WriteModel
 

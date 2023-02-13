@@ -197,3 +197,25 @@ func updateGenericOAuthProviderToCommand(req *mgmt_pb.UpdateGenericOAuthProvider
 		IDPOptions:            idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
+
+func addGenericOIDCProviderToCommand(req *mgmt_pb.AddGenericOIDCProviderRequest) command.GenericOIDCProvider {
+	return command.GenericOIDCProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGenericOIDCProviderToCommand(req *mgmt_pb.UpdateGenericOIDCProviderRequest) command.GenericOIDCProvider {
+	return command.GenericOIDCProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}

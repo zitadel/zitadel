@@ -99,6 +99,92 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 	return changeEvent, nil
 }
 
+type OrgOIDCIDPWriteModel struct {
+	OIDCIDPWriteModel
+}
+
+func NewOIDCOrgIDPWriteModel(orgID, id string) *OrgOIDCIDPWriteModel {
+	return &OrgOIDCIDPWriteModel{
+		OIDCIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgOIDCIDPWriteModel) Reduce() error {
+	return wm.OIDCIDPWriteModel.Reduce()
+}
+
+func (wm *OrgOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.OIDCIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPAddedEvent)
+		case *org.OIDCIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPChangedEvent)
+		}
+	}
+}
+
+func (wm *OrgOIDCIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.OIDCIDPAddedEventType,
+			org.OIDCIDPChangedEventType,
+		).
+		Builder()
+}
+
+func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	oldName,
+	name,
+	issuer,
+	clientID,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) (*org.OIDCIDPChangedEvent, error) {
+
+	changes, err := wm.OIDCIDPWriteModel.NewChanges(
+		name,
+		issuer,
+		clientID,
+		clientSecretString,
+		secretCrypto,
+		scopes,
+		options,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if len(changes) == 0 {
+		return nil, nil
+	}
+	changeEvent, err := org.NewOIDCIDPChangedEvent(ctx, aggregate, id, oldName, changes)
+	if err != nil {
+		return nil, err
+	}
+	return changeEvent, nil
+}
+
 type OrgGoogleIDPWriteModel struct {
 	GoogleIDPWriteModel
 }
