@@ -11,6 +11,7 @@ import { IdpSettingsModule } from '../policies/idp-settings/idp-settings.module'
 import { LoginPolicyModule } from '../policies/login-policy/login-policy.module';
 import { LoginTextsPolicyModule } from '../policies/login-texts/login-texts.module';
 import { MessageTextsPolicyModule } from '../policies/message-texts/message-texts.module';
+import { NotificationPolicyModule } from '../policies/notification-policy/notification-policy.module';
 import { NotificationSettingsModule } from '../policies/notification-settings/notification-settings.module';
 import { OIDCConfigurationModule } from '../policies/oidc-configuration/oidc-configuration.module';
 import { PasswordComplexityPolicyModule } from '../policies/password-complexity-policy/password-complexity-policy.module';
@@ -18,6 +19,7 @@ import { PasswordLockoutPolicyModule } from '../policies/password-lockout-policy
 import { PrivacyPolicyModule } from '../policies/privacy-policy/privacy-policy.module';
 import { PrivateLabelingPolicyModule } from '../policies/private-labeling-policy/private-labeling-policy.module';
 import { SecretGeneratorModule } from '../policies/secret-generator/secret-generator.module';
+import { SecurityPolicyModule } from '../policies/security-policy/security-policy.module';
 import { SidenavModule } from '../sidenav/sidenav.module';
 import { SettingsListComponent } from './settings-list.component';
 
@@ -33,9 +35,11 @@ import { SettingsListComponent } from './settings-list.component';
     PasswordLockoutPolicyModule,
     PrivateLabelingPolicyModule,
     GeneralSettingsModule,
+    NotificationPolicyModule,
     IdpSettingsModule,
     PrivacyPolicyModule,
     MessageTextsPolicyModule,
+    SecurityPolicyModule,
     LoginTextsPolicyModule,
     DomainPolicyModule,
     TranslateModule,

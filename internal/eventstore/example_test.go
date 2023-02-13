@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 )
 
 // ------------------------------------------------------------
@@ -44,8 +43,8 @@ func NewUserAddedEvent(id string, firstName string) *UserAddedEvent {
 	}
 }
 
-func UserAddedEventMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user.added", func(event *repository.Event) (eventstore.Event, error) {
+func UserAddedEventMapper() (eventstore.AggregateType, eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user", "user.added", func(event *repository.Event) (eventstore.Event, error) {
 		e := &UserAddedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
@@ -89,8 +88,8 @@ func NewUserFirstNameChangedEvent(id, firstName string) *UserFirstNameChangedEve
 	}
 }
 
-func UserFirstNameChangedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user.firstName.changed", func(event *repository.Event) (eventstore.Event, error) {
+func UserFirstNameChangedMapper() (eventstore.AggregateType, eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user", "user.firstName.changed", func(event *repository.Event) (eventstore.Event, error) {
 		e := &UserFirstNameChangedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}
@@ -131,8 +130,8 @@ func NewUserPasswordCheckedEvent(id string) *UserPasswordCheckedEvent {
 	}
 }
 
-func UserPasswordCheckedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user.password.checked", func(event *repository.Event) (eventstore.Event, error) {
+func UserPasswordCheckedMapper() (eventstore.AggregateType, eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user", "user.password.checked", func(event *repository.Event) (eventstore.Event, error) {
 		return &UserPasswordCheckedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
@@ -168,8 +167,8 @@ func NewUserDeletedEvent(id string) *UserDeletedEvent {
 	}
 }
 
-func UserDeletedMapper() (eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
-	return "user.deleted", func(event *repository.Event) (eventstore.Event, error) {
+func UserDeletedMapper() (eventstore.AggregateType, eventstore.EventType, func(*repository.Event) (eventstore.Event, error)) {
+	return "user", "user.deleted", func(event *repository.Event) (eventstore.Event, error) {
 		return &UserDeletedEvent{
 			BaseEvent: *eventstore.BaseEventFromRepo(event),
 		}, nil
@@ -287,7 +286,12 @@ func (rm *UserReadModel) Reduce() error {
 // ------------------------------------------------------------
 
 func TestUserReadModel(t *testing.T) {
-	es := eventstore.NewEventstore(sql.NewCRDB(testCRDBClient))
+	es, err := eventstore.Start(&eventstore.Config{Client: testCRDBClient})
+	if err != nil {
+		t.Errorf("unable to start eventstore: %v", err)
+		t.FailNow()
+	}
+	// es := eventstore.NewEventstore(&eventstore.Config{re})
 	es.RegisterFilterEventMapper(UserAddedEventMapper()).
 		RegisterFilterEventMapper(UserFirstNameChangedMapper()).
 		RegisterFilterEventMapper(UserPasswordCheckedMapper()).

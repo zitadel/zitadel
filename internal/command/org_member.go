@@ -109,7 +109,7 @@ func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregat
 	return org.NewMemberAddedEvent(ctx, orgAgg, member.UserID, member.Roles...), nil
 }
 
-//ChangeOrgMember updates an existing member
+// ChangeOrgMember updates an existing member
 func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	if !member.IsValid() {
 		return nil, errors.ThrowInvalidArgument(nil, "Org-LiaZi", "Errors.Org.MemberInvalid")
@@ -128,6 +128,9 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...))
+	if err != nil {
+		return nil, err
+	}
 	err = AppendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -142,7 +145,8 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 		return nil, err
 	}
 	if errors.IsNotFound(err) {
-		return nil, nil
+		// empty response because we have no data that match the request
+		return &domain.ObjectDetails{}, nil
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)

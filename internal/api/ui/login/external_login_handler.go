@@ -8,9 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v2/pkg/client/rp"
 	"github.com/zitadel/oidc/v2/pkg/oidc"
 	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -154,18 +156,35 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	if idpConfig.IsOIDC {
 		provider, err := l.getRPConfig(r.Context(), idpConfig, EndpointExternalLoginCallback)
 		if err != nil {
+			emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
+			if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+				logging.WithError(err).Error("both external user authentication and action post authentication failed")
+			}
+
 			l.renderLogin(w, r, authReq, err)
 			return
 		}
 		tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
 		if err != nil {
+			emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
+			if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+				logging.WithError(err).Error("both external user authentication and action post authentication failed")
+			}
+
 			l.renderLogin(w, r, authReq, err)
 			return
 		}
 		l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
 		return
 	}
-	l.renderError(w, r, authReq, errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+
+	err = errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	emtpyTokens := &oidc.Tokens{Token: &oauth2.Token{}}
+	if _, actionErr := l.runPostExternalAuthenticationActions(&domain.ExternalUser{}, emtpyTokens, authReq, r, idpConfig, err); actionErr != nil {
+		logging.WithError(err).Error("both external user authentication and action post authentication failed")
+	}
+
+	l.renderError(w, r, authReq, err)
 }
 
 func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) (rp.RelyingParty, error) {
@@ -194,7 +213,7 @@ func (l *Login) getRPConfig(ctx context.Context, idpConfig *iam_model.IDPConfigV
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
 	externalUser := l.mapTokenToLoginUser(tokens, idpConfig)
-	externalUser, err := l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
+	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens, authReq, r, idpConfig, nil)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -314,7 +333,12 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		data.ExternalPhone = human.PhoneNumber
 		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
-	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
+	funcs := map[string]interface{}{
+		"selectedLanguage": func(l string) bool {
+			return data.Language == l
+		},
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, funcs)
 }
 
 func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
@@ -377,7 +401,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
 
-	user, metadata, err = l.customExternalUserToLoginUserMapping(r.Context(), user, nil, authReq, idpConfig, metadata, resourceOwner)
+	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIamPolicy, nil, nil, err)
 		return
@@ -392,7 +416,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(r.Context(), authReq.UserID, nil, authReq, idpConfig, resourceOwner)
+	userGrants, err := l.runPostCreationActions(authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -420,6 +444,7 @@ func (l *Login) mapExternalNotFoundOptionFormDataToLoginUser(formData *externalN
 		IsEmailVerified:   isEmailVerified,
 		Phone:             formData.Phone,
 		IsPhoneVerified:   isPhoneVerified,
+		PreferredLanguage: language.Make(formData.Language),
 	}
 }
 
@@ -445,6 +470,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 		NickName:          tokens.IDTokenClaims.GetNickname(),
 		Email:             tokens.IDTokenClaims.GetEmail(),
 		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
+		PreferredLanguage: tokens.IDTokenClaims.GetLocale(),
 	}
 
 	if tokens.IDTokenClaims.GetPhoneNumber() != "" {
@@ -466,9 +492,9 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.DomainPolicy, lin
 	}
 
 	if orgIamPolicy.UserLoginMustBeDomain {
-		splittedUsername := strings.Split(username, "@")
-		if len(splittedUsername) > 1 {
-			username = splittedUsername[0]
+		index := strings.LastIndex(username, "@")
+		if index > 1 {
+			username = username[:index]
 		}
 	}
 

@@ -82,6 +82,9 @@ type InstanceSetup struct {
 		SecondFactorCheckLifetime  time.Duration
 		MultiFactorCheckLifetime   time.Duration
 	}
+	NotificationPolicy struct {
+		PasswordChange bool
+	}
 	PrivacyPolicy struct {
 		TOSLink     string
 		PrivacyLink string
@@ -151,30 +154,30 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return nil
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	if err = c.eventstore.NewInstance(ctx, instanceID); err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	ctx = authz.SetCtxData(authz.WithRequestedDomain(authz.WithInstanceID(ctx, instanceID), c.externalDomain), authz.CtxData{OrgID: instanceID, ResourceOwner: instanceID})
 
 	orgID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	userID, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	if err = setup.generateIDs(c.idGenerator); err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 	ctx = authz.WithConsole(ctx, setup.zitadel.projectID, setup.zitadel.consoleAppID)
 
@@ -236,6 +239,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
 		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(
@@ -285,10 +289,40 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	validations = append(validations,
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
-		AddHumanCommand(userAgg, &setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+	)
+
+	var pat *PersonalAccessToken
+	var machineKey *MachineKey
+	// only a human or a machine user should be created as owner
+	if setup.Org.Machine != nil && setup.Org.Machine.Machine != nil && !setup.Org.Machine.Machine.IsZero() {
+		validations = append(validations,
+			AddMachineCommand(userAgg, setup.Org.Machine.Machine),
+		)
+		if setup.Org.Machine.Pat != nil {
+			pat = NewPersonalAccessToken(orgID, userID, setup.Org.Machine.Pat.ExpirationDate, setup.Org.Machine.Pat.Scopes, domain.UserTypeMachine)
+			pat.TokenID, err = c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareAddPersonalAccessToken(pat, c.keyAlgorithm))
+		}
+		if setup.Org.Machine.MachineKey != nil {
+			machineKey = NewMachineKey(orgID, userID, setup.Org.Machine.MachineKey.ExpirationDate, setup.Org.Machine.MachineKey.Type)
+			machineKey.KeyID, err = c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+			validations = append(validations, prepareAddUserMachineKey(machineKey, c.machineKeySize))
+		}
+	} else if setup.Org.Human != nil {
+		validations = append(validations,
+			AddHumanCommand(userAgg, setup.Org.Human, c.userPasswordAlg, c.userEncryption),
+		)
+	}
+
+	validations = append(validations,
 		c.AddOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 		c.AddInstanceMemberCommand(instanceAgg, userID, domain.RoleIAMOwner),
-
 		AddProjectCommand(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
@@ -334,7 +368,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	addGeneratedDomain, err := c.addGeneratedInstanceDomain(ctx, instanceAgg, setup.InstanceName)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 	validations = append(validations, addGeneratedDomain...)
 	if setup.CustomDomain != "" {
@@ -372,14 +406,20 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
 
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return "", "", nil, nil, err
 	}
-	return instanceID, &domain.ObjectDetails{
+
+	var token string
+	if pat != nil {
+		token = pat.Token
+	}
+
+	return instanceID, token, machineKey, &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreationDate(),
 		ResourceOwner: orgID,
@@ -397,11 +437,7 @@ func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
@@ -415,11 +451,7 @@ func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage langu
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
@@ -433,11 +465,7 @@ func (c *Commands) SetDefaultOrg(ctx context.Context, orgID string) (*domain.Obj
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) ChangeSystemConfig(ctx context.Context, externalDomain string, externalPort uint16, externalSecure bool) error {

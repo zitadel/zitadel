@@ -49,6 +49,7 @@ Returns the detail of an instance
 > **rpc** AddInstance([AddInstanceRequest](#addinstancerequest))
 [AddInstanceResponse](#addinstanceresponse)
 
+Deprecated: Use CreateInstance instead
 Creates a new instance with all needed setup data
 This might take some time
 
@@ -69,6 +70,19 @@ Updates name of an existing instance
     PUT: /instances/{instance_id}
 
 
+### CreateInstance
+
+> **rpc** CreateInstance([CreateInstanceRequest](#createinstancerequest))
+[CreateInstanceResponse](#createinstanceresponse)
+
+Creates a new instance with all needed setup data
+This might take some time
+
+
+
+    POST: /instances/_create
+
+
 ### RemoveInstance
 
 > **rpc** RemoveInstance([RemoveInstanceRequest](#removeinstancerequest))
@@ -80,6 +94,19 @@ This might take some time
 
 
     DELETE: /instances/{instance_id}
+
+
+### ListIAMMembers
+
+> **rpc** ListIAMMembers([ListIAMMembersRequest](#listiammembersrequest))
+[ListIAMMembersResponse](#listiammembersresponse)
+
+Returns all instance members matching the request
+all queries need to match (ANDed)
+
+
+
+    POST: /instances/{instance_id}/members/_search
 
 
 ### ExistsDomain
@@ -342,6 +369,124 @@ This is an empty response
 
 
 
+### CreateInstanceRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| first_org_name |  string | - | string.max_len: 200<br />  |
+| custom_domain |  string | - | string.max_len: 200<br />  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) owner.human |  CreateInstanceRequest.Human | oneof field for the user managing the instance |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) owner.machine |  CreateInstanceRequest.Machine | - |  |
+| default_language |  string | - | string.max_len: 10<br />  |
+
+
+
+
+### CreateInstanceRequest.Email
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| email |  string | - | string.min_len: 1<br /> string.max_len: 200<br /> string.email: true<br />  |
+| is_email_verified |  bool | - |  |
+
+
+
+
+### CreateInstanceRequest.Human
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.max_len: 200<br />  |
+| email |  CreateInstanceRequest.Email | - | message.required: true<br />  |
+| profile |  CreateInstanceRequest.Profile | - | message.required: false<br />  |
+| password |  CreateInstanceRequest.Password | - | message.required: false<br />  |
+
+
+
+
+### CreateInstanceRequest.Machine
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_name |  string | - | string.max_len: 200<br />  |
+| name |  string | - | string.max_len: 200<br />  |
+| personal_access_token |  CreateInstanceRequest.PersonalAccessToken | - |  |
+| machine_key |  CreateInstanceRequest.MachineKey | - |  |
+
+
+
+
+### CreateInstanceRequest.MachineKey
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.authn.v1.KeyType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+
+
+
+
+### CreateInstanceRequest.Password
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password |  string | - | string.max_len: 200<br />  |
+| password_change_required |  bool | - |  |
+
+
+
+
+### CreateInstanceRequest.PersonalAccessToken
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+
+
+
+
+### CreateInstanceRequest.Profile
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| first_name |  string | - | string.max_len: 200<br />  |
+| last_name |  string | - | string.max_len: 200<br />  |
+| preferred_language |  string | - | string.max_len: 10<br />  |
+
+
+
+
+### CreateInstanceResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| pat |  string | - |  |
+| machine_key |  bytes | - |  |
+
+
+
+
 ### ExistsDomainRequest
 
 
@@ -478,6 +623,31 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | result | repeated FailedEvent | TODO: list details |  |
+
+
+
+
+### ListIAMMembersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | - |  |
+| instance_id |  string | - |  |
+| queries | repeated zitadel.member.v1.SearchQuery | - |  |
+
+
+
+
+### ListIAMMembersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.member.v1.Member | - |  |
 
 
 

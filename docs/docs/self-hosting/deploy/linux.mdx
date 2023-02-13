@@ -1,0 +1,56 @@
+---
+title: Linux
+---
+
+import Disclaimer from './_disclaimer.mdx'
+import DefaultUser from './_defaultuser.mdx'
+import Next from './_next.mdx'
+
+## Install CockroachDB
+
+Download a `cockroach` binary as described [in the CockroachDB docs](https://www.cockroachlabs.com/docs/stable/install-cockroachdb).
+ZITADEL is tested against CockroachDB v22.2.2 and Ubuntu 20.04.
+
+## Run CockroachDB
+
+```bash
+cockroach start-single-node --insecure --background --http-addr :9090 --listen-addr=localhost
+```
+
+## Install ZITADEL
+
+Download the ZITADEL release according to your architecture from [Github](https://github.com/zitadel/zitadel/releases/latest) 
+
+## Unpack the archive
+move to your download location and unpack the archive
+
+```bash
+#unpack and copy to /usr/local/bin
+LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); wget -qO-  https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel_Linux_$(uname -m).tar.gz  | tar -xz zitadel && sudo mv zitadel /usr/local/bin
+
+```
+
+## Run ZITADEL
+
+```bash
+ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+```
+
+<DefaultUser components={props.components} />
+
+## VideoGuide
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/YVLua-q7dbs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### Setup ZITADEL with a service account
+
+```bash
+ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+
+# then you can move your machine key
+mv /tmp/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json
+```
+
+This key can be used to provision resources with for example [Terraform](/docs/guides/manage/terraform/basics.md).
+
+<Next components={props.components} />
+<Disclaimer components={props.components} />

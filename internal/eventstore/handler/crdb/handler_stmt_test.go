@@ -269,9 +269,10 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "fetch previous fails",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).
 						ExpectFilterEventsError(errFilter),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -301,8 +302,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "no successful stmts",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -339,8 +341,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "update current sequence fails",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"agg"},
 			},
@@ -381,8 +384,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "commit fails",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"agg"},
 			},
@@ -423,8 +427,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "correct",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -455,8 +460,9 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "fetch previous stmts no additional stmts",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -486,7 +492,7 @@ func TestStatementHandler_Update(t *testing.T) {
 		{
 			name: "fetch previous stmts additional events",
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							AggregateType:             "testAgg",
@@ -495,6 +501,7 @@ func TestStatementHandler_Update(t *testing.T) {
 							InstanceID:                "instanceID",
 						},
 					),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -617,8 +624,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				stmtSeq: 6,
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEventsError(errFilter),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -642,8 +650,9 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				stmtSeq: 6,
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
@@ -666,7 +675,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				stmtSeq: 10,
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							ID:                        "id",
@@ -690,6 +699,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 						},
 					),
 				),
+				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},
 			want: want{
@@ -712,7 +722,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 				stmtSeq: 10,
 			},
 			fields: fields{
-				eventstore: eventstore.NewEventstore(
+				eventstore: eventstore.NewEventstore(eventstore.TestConfig(
 					es_repo_mock.NewRepo(t).ExpectFilterEvents(
 						&repository.Event{
 							ID:                        "id",
@@ -725,6 +735,7 @@ func TestProjectionHandler_fetchPreviousStmts(t *testing.T) {
 							AggregateType:             "testAgg",
 						},
 					),
+				),
 				),
 				aggregates: []eventstore.AggregateType{"testAgg"},
 			},

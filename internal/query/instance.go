@@ -11,8 +11,10 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -80,6 +82,12 @@ type Instance struct {
 	DefaultLang  language.Tag
 	Domains      []*InstanceDomain
 	host         string
+	csp          csp
+}
+
+type csp struct {
+	enabled        bool
+	allowedOrigins database.StringArray
 }
 
 type Instances struct {
@@ -119,6 +127,13 @@ func (i *Instance) DefaultOrganisationID() string {
 	return i.DefaultOrgID
 }
 
+func (i *Instance) SecurityPolicyAllowedOrigins() []string {
+	if !i.csp.enabled {
+		return nil
+	}
+	return i.csp.allowedOrigins
+}
+
 type InstanceSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -141,6 +156,9 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 }
 
 func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	filter, query, scan := prepareInstancesQuery()
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
@@ -158,7 +176,10 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 	return instances, err
 }
 
-func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (*Instance, error) {
+func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Instance, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if shouldTriggerBulk {
 		projection.InstanceProjection.Trigger(ctx)
 	}
@@ -178,8 +199,11 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (*Instan
 	return scan(row)
 }
 
-func (q *Queries) InstanceByHost(ctx context.Context, host string) (authz.Instance, error) {
-	stmt, scan := prepareInstanceDomainQuery(host)
+func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Instance, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	stmt, scan := prepareAuthzInstanceQuery(host)
 	host = strings.Split(host, ":")[0] //remove possible port
 	query, args, err := stmt.Where(sq.Eq{
 		InstanceDomainDomainCol.identifier(): host,
@@ -415,6 +439,95 @@ func prepareInstanceDomainQuery(host string) (sq.SelectBuilder, func(*sql.Rows) 
 					IsGenerated:  isGenerated.Bool,
 					InstanceID:   instance.ID,
 				})
+			}
+			if instance.ID == "" {
+				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+			}
+			instance.DefaultLang = language.Make(lang)
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
+			}
+			return instance, nil
+		}
+}
+
+func prepareAuthzInstanceQuery(host string) (sq.SelectBuilder, func(*sql.Rows) (*Instance, error)) {
+	return sq.Select(
+			InstanceColumnID.identifier(),
+			InstanceColumnCreationDate.identifier(),
+			InstanceColumnChangeDate.identifier(),
+			InstanceColumnSequence.identifier(),
+			InstanceColumnName.identifier(),
+			InstanceColumnDefaultOrgID.identifier(),
+			InstanceColumnProjectID.identifier(),
+			InstanceColumnConsoleID.identifier(),
+			InstanceColumnConsoleAppID.identifier(),
+			InstanceColumnDefaultLanguage.identifier(),
+			InstanceDomainDomainCol.identifier(),
+			InstanceDomainIsPrimaryCol.identifier(),
+			InstanceDomainIsGeneratedCol.identifier(),
+			InstanceDomainCreationDateCol.identifier(),
+			InstanceDomainChangeDateCol.identifier(),
+			InstanceDomainSequenceCol.identifier(),
+			SecurityPolicyColumnEnabled.identifier(),
+			SecurityPolicyColumnAllowedOrigins.identifier(),
+		).
+			From(instanceTable.identifier()).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
+			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID)).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*Instance, error) {
+			instance := &Instance{
+				host:    host,
+				Domains: make([]*InstanceDomain, 0),
+			}
+			lang := ""
+			for rows.Next() {
+				var (
+					domain                sql.NullString
+					isPrimary             sql.NullBool
+					isGenerated           sql.NullBool
+					changeDate            sql.NullTime
+					creationDate          sql.NullTime
+					sequence              sql.NullInt64
+					securityPolicyEnabled sql.NullBool
+				)
+				err := rows.Scan(
+					&instance.ID,
+					&instance.CreationDate,
+					&instance.ChangeDate,
+					&instance.Sequence,
+					&instance.Name,
+					&instance.DefaultOrgID,
+					&instance.IAMProjectID,
+					&instance.ConsoleID,
+					&instance.ConsoleAppID,
+					&lang,
+					&domain,
+					&isPrimary,
+					&isGenerated,
+					&changeDate,
+					&creationDate,
+					&sequence,
+					&securityPolicyEnabled,
+					&instance.csp.allowedOrigins,
+				)
+				if err != nil {
+					return nil, errors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
+				}
+				if !domain.Valid {
+					continue
+				}
+				instance.Domains = append(instance.Domains, &InstanceDomain{
+					CreationDate: creationDate.Time,
+					ChangeDate:   changeDate.Time,
+					Sequence:     uint64(sequence.Int64),
+					Domain:       domain.String,
+					IsPrimary:    isPrimary.Bool,
+					IsGenerated:  isGenerated.Bool,
+					InstanceID:   instance.ID,
+				})
+				instance.csp.enabled = securityPolicyEnabled.Bool
 			}
 			if instance.ID == "" {
 				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")

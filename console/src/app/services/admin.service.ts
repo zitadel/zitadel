@@ -200,6 +200,28 @@ import {
   UpdateSMTPConfigPasswordResponse,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
+  GetSecurityPolicyRequest,
+  GetSecurityPolicyResponse,
+  SetSecurityPolicyRequest,
+  SetSecurityPolicyResponse,
+  ListEventsResponse,
+  ListEventsRequest,
+  ListEventTypesRequest,
+  ListEventTypesResponse,
+  ListAggregateTypesRequest,
+  ListAggregateTypesResponse,
+  GetNotificationPolicyRequest,
+  GetNotificationPolicyResponse,
+  UpdateNotificationPolicyRequest,
+  UpdateNotificationPolicyResponse,
+  GetDefaultPasswordChangeMessageTextResponse,
+  GetDefaultPasswordChangeMessageTextRequest,
+  GetCustomPasswordChangeMessageTextResponse,
+  SetDefaultPasswordChangeMessageTextRequest,
+  SetDefaultPasswordChangeMessageTextResponse,
+  GetCustomPasswordChangeMessageTextRequest,
+  AddNotificationPolicyRequest,
+  AddNotificationPolicyResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
@@ -210,6 +232,18 @@ import { GrpcService } from './grpc.service';
 })
 export class AdminService {
   constructor(private readonly grpcService: GrpcService) {}
+
+  public listEvents(req: ListEventsRequest): Promise<ListEventsResponse> {
+    return this.grpcService.admin.listEvents(req, null).then((resp) => resp);
+  }
+
+  public listEventTypes(req: ListEventTypesRequest): Promise<ListEventTypesResponse.AsObject> {
+    return this.grpcService.admin.listEventTypes(req, null).then((resp) => resp.toObject());
+  }
+
+  public listAggregateTypes(req: ListAggregateTypesRequest): Promise<ListAggregateTypesResponse.AsObject> {
+    return this.grpcService.admin.listAggregateTypes(req, null).then((resp) => resp.toObject());
+  }
 
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
@@ -340,6 +374,24 @@ export class AdminService {
     req: SetDefaultPasswordlessRegistrationMessageTextRequest,
   ): Promise<SetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultPasswordChangeMessageText(
+    req: GetDefaultPasswordChangeMessageTextRequest,
+  ): Promise<GetDefaultPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomPasswordChangeMessageText(
+    req: GetCustomPasswordChangeMessageTextRequest,
+  ): Promise<GetCustomPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultPasswordChangeMessageText(
+    req: SetDefaultPasswordChangeMessageTextRequest,
+  ): Promise<SetDefaultPasswordChangeMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
   }
 
   public SetUpOrg(org: SetUpOrgRequest.Org, human: SetUpOrgRequest.Human): Promise<SetUpOrgResponse.AsObject> {
@@ -478,6 +530,32 @@ export class AdminService {
     req.setLanguage(language);
 
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  /* notification policy */
+
+  public getNotificationPolicy(): Promise<GetNotificationPolicyResponse.AsObject> {
+    const req = new GetNotificationPolicyRequest();
+    return this.grpcService.admin.getNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateNotificationPolicy(req: UpdateNotificationPolicyRequest): Promise<UpdateNotificationPolicyResponse.AsObject> {
+    return this.grpcService.admin.updateNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public addNotificationPolicy(req: AddNotificationPolicyRequest): Promise<AddNotificationPolicyResponse.AsObject> {
+    return this.grpcService.admin.addNotificationPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  /* security policy */
+
+  public getSecurityPolicy(): Promise<GetSecurityPolicyResponse.AsObject> {
+    const req = new GetSecurityPolicyRequest();
+    return this.grpcService.admin.getSecurityPolicy(req, null).then((resp) => resp.toObject());
+  }
+
+  public setSecurityPolicy(req: SetSecurityPolicyRequest): Promise<SetSecurityPolicyResponse.AsObject> {
+    return this.grpcService.admin.setSecurityPolicy(req, null).then((resp) => resp.toObject());
   }
 
   /* notification settings */

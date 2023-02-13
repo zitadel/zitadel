@@ -332,6 +332,30 @@ Get log notification provider
     GET: /notification/provider/log
 
 
+### GetSecurityPolicy
+
+> **rpc** GetSecurityPolicy([GetSecurityPolicyRequest](#getsecuritypolicyrequest))
+[GetSecurityPolicyResponse](#getsecuritypolicyresponse)
+
+Get the security policy
+
+
+
+    GET: /policies/security
+
+
+### SetSecurityPolicy
+
+> **rpc** SetSecurityPolicy([SetSecurityPolicyRequest](#setsecuritypolicyrequest))
+[SetSecurityPolicyResponse](#setsecuritypolicyresponse)
+
+set the security policy
+
+
+
+    PUT: /policies/security
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -404,6 +428,19 @@ and adds the user to the orgs members as ORG_OWNER
 
 
     POST: /orgs/_setup
+
+
+### RemoveOrg
+
+> **rpc** RemoveOrg([RemoveOrgRequest](#removeorgrequest))
+[RemoveOrgResponse](#removeorgresponse)
+
+Sets the state of the organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+Users of this organisation will not be able login
+
+
+
+    DELETE: /orgs/{org_id}
 
 
 ### GetIDPByID
@@ -1035,6 +1072,44 @@ Variable {{.Lang}} can be set to have different links based on the language
     PUT: /policies/privacy
 
 
+### AddNotificationPolicy
+
+> **rpc** AddNotificationPolicy([AddNotificationPolicyRequest](#addnotificationpolicyrequest))
+[AddNotificationPolicyResponse](#addnotificationpolicyresponse)
+
+Add a default notification policy for ZITADEL
+it impacts all organisations without a customised policy
+
+
+
+    POST: /policies/notification
+
+
+### GetNotificationPolicy
+
+> **rpc** GetNotificationPolicy([GetNotificationPolicyRequest](#getnotificationpolicyrequest))
+[GetNotificationPolicyResponse](#getnotificationpolicyresponse)
+
+Returns the notification policy defined by the administrators of ZITADEL
+
+
+
+    GET: /policies/notification
+
+
+### UpdateNotificationPolicy
+
+> **rpc** UpdateNotificationPolicy([UpdateNotificationPolicyRequest](#updatenotificationpolicyrequest))
+[UpdateNotificationPolicyResponse](#updatenotificationpolicyresponse)
+
+Updates the default notification policy of ZITADEL
+it impacts all organisations without a customised policy
+
+
+
+    PUT: /policies/notification
+
+
 ### GetDefaultInitMessageText
 
 > **rpc** GetDefaultInitMessageText([GetDefaultInitMessageTextRequest](#getdefaultinitmessagetextrequest))
@@ -1067,7 +1142,7 @@ Returns the custom text for initial message (overwritten in eventstore)
 Sets the default custom text for initial message
 it impacts all organisations without customized initial message text
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -1119,7 +1194,7 @@ Returns the custom text for password reset message (overwritten in eventstore)
 Sets the default custom text for password reset message
 it impacts all organisations without customized password reset message text
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -1171,7 +1246,7 @@ Returns the custom text for verify email message (overwritten in eventstore)
 Sets the default custom text for verify email message
 it impacts all organisations without customized verify email message text
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -1223,7 +1298,7 @@ Returns the custom text for verify phone message
 Sets the default custom text for verify phone message
 it impacts all organisations without customized verify phone message text
 The Following Variables can be used:
-{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -1272,10 +1347,10 @@ Returns the custom text for domain claimed message (overwritten in eventstore)
 > **rpc** SetDefaultDomainClaimedMessageText([SetDefaultDomainClaimedMessageTextRequest](#setdefaultdomainclaimedmessagetextrequest))
 [SetDefaultDomainClaimedMessageTextResponse](#setdefaultdomainclaimedmessagetextresponse)
 
-Sets the default custom text for domain claimed phone message
+Sets the default custom text for domain claimed message
 it impacts all organisations without customized domain claimed message text
 The Following Variables can be used:
-{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -1327,7 +1402,7 @@ Returns the custom text for passwordless registration message (overwritten in ev
 Sets the default custom text for passwordless registration message
 it impacts all organisations without customized passwordless registration message text
 The Following Variables can be used:
-{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
 
 
 
@@ -1345,6 +1420,58 @@ The default text from the translation file will trigger after
 
 
     DELETE: /text/message/passwordless_registration/{language}
+
+
+### GetDefaultPasswordChangeMessageText
+
+> **rpc** GetDefaultPasswordChangeMessageText([GetDefaultPasswordChangeMessageTextRequest](#getdefaultpasswordchangemessagetextrequest))
+[GetDefaultPasswordChangeMessageTextResponse](#getdefaultpasswordchangemessagetextresponse)
+
+Returns the default text for password change message (translation file)
+
+
+
+    GET: /text/default/message/password_change/{language}
+
+
+### GetCustomPasswordChangeMessageText
+
+> **rpc** GetCustomPasswordChangeMessageText([GetCustomPasswordChangeMessageTextRequest](#getcustompasswordchangemessagetextrequest))
+[GetCustomPasswordChangeMessageTextResponse](#getcustompasswordchangemessagetextresponse)
+
+Returns the custom text for password change message (overwritten in eventstore)
+
+
+
+    GET: /text/message/password_change/{language}
+
+
+### SetDefaultPasswordChangeMessageText
+
+> **rpc** SetDefaultPasswordChangeMessageText([SetDefaultPasswordChangeMessageTextRequest](#setdefaultpasswordchangemessagetextrequest))
+[SetDefaultPasswordChangeMessageTextResponse](#setdefaultpasswordchangemessagetextresponse)
+
+Sets the default custom text for password change message
+it impacts all organisations without customized password change message text
+The Following Variables can be used:
+{{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
+
+
+
+    PUT: /text/message/password_change/{language}
+
+
+### ResetCustomPasswordChangeMessageTextToDefault
+
+> **rpc** ResetCustomPasswordChangeMessageTextToDefault([ResetCustomPasswordChangeMessageTextToDefaultRequest](#resetcustompasswordchangemessagetexttodefaultrequest))
+[ResetCustomPasswordChangeMessageTextToDefaultResponse](#resetcustompasswordchangemessagetexttodefaultresponse)
+
+Removes the custom password change message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/password_change/{language}
 
 
 ### GetDefaultLoginTexts
@@ -1529,6 +1656,42 @@ Exports data from instance
     POST: /export
 
 
+### ListEventTypes
+
+> **rpc** ListEventTypes([ListEventTypesRequest](#listeventtypesrequest))
+[ListEventTypesResponse](#listeventtypesresponse)
+
+
+
+
+
+    POST: /events/types/_search
+
+
+### ListEvents
+
+> **rpc** ListEvents([ListEventsRequest](#listeventsrequest))
+[ListEventsResponse](#listeventsresponse)
+
+
+
+
+
+    POST: /events/_search
+
+
+### ListAggregateTypes
+
+> **rpc** ListAggregateTypes([ListAggregateTypesRequest](#listaggregatetypesrequest))
+[ListAggregateTypesResponse](#listaggregatetypesresponse)
+
+
+
+
+
+    POST: /aggregates/types/_search
+
+
 
 
 
@@ -1710,6 +1873,28 @@ This is an empty request
 
 
 ### AddMultiFactorToLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddNotificationPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password_change |  bool | - |  |
+
+
+
+
+### AddNotificationPolicyResponse
 
 
 
@@ -2137,6 +2322,28 @@ This is an empty request
 
 
 
+### GetCustomPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
 ### GetCustomPasswordResetMessageTextRequest
 
 
@@ -2321,6 +2528,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org |  zitadel.org.v1.Org | - |  |
+
+
+
+
+### GetDefaultPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetDefaultPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| custom_text |  zitadel.text.v1.MessageCustomText | - |  |
 
 
 
@@ -2554,6 +2783,23 @@ This is an empty request
 
 
 
+### GetNotificationPolicyRequest
+This is an empty request
+
+
+
+
+### GetNotificationPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.NotificationPolicy | - |  |
+
+
+
+
 ### GetOIDCSettingsRequest
 This is an empty request
 
@@ -2735,6 +2981,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | secret_generator |  zitadel.settings.v1.SecretGenerator | - |  |
+
+
+
+
+### GetSecurityPolicyRequest
+This is an empty request
+
+
+
+
+### GetSecurityPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.settings.v1.SecurityPolicy | - |  |
 
 
 
@@ -3014,6 +3277,70 @@ at least one argument has to be provided
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | is_unique |  bool | - |  |
+
+
+
+
+### ListAggregateTypesRequest
+
+
+
+
+
+### ListAggregateTypesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| aggregate_types | repeated zitadel.event.v1.AggregateType | - |  |
+
+
+
+
+### ListEventTypesRequest
+
+
+
+
+
+### ListEventTypesResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| event_types | repeated zitadel.event.v1.EventType | - |  |
+
+
+
+
+### ListEventsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sequence |  uint64 | sequence represents the order of events. It's always upcounting if asc is false sequence is used as less than filter if asc is true sequence is used as greater than filter if sequence is 0 the field is ignored |  |
+| limit |  uint32 | - |  |
+| asc |  bool | - |  |
+| editor_user_id |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
+| event_types | repeated string | the types are or filtered and must match the type exatly | repeated.max_items: 30<br />  |
+| aggregate_id |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
+| aggregate_types | repeated string | - | repeated.max_items: 10<br />  |
+| resource_owner |  string | - | string.min_len: 0<br /> string.max_len: 200<br />  |
+| creation_date |  google.protobuf.Timestamp | if asc is false creation_date is used as less than filter if asc is true creation_date is used as greater than filter if creation_date is not set the field is ignored |  |
+
+
+
+
+### ListEventsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| events | repeated zitadel.event.v1.Event | - |  |
 
 
 
@@ -3492,6 +3819,28 @@ This is an empty request
 
 
 
+### RemoveOrgRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveOrgResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveSMSProviderRequest
 
 
@@ -3653,6 +4002,28 @@ this is en empty request
 
 
 ### ResetCustomOrgIAMPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomPasswordChangeMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordChangeMessageTextToDefaultResponse
 
 
 
@@ -3909,6 +4280,35 @@ this is en empty request
 
 
 
+### SetDefaultPasswordChangeMessageTextRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| title |  string | - | string.max_len: 200<br />  |
+| pre_header |  string | - | string.max_len: 200<br />  |
+| subject |  string | - | string.max_len: 200<br />  |
+| greeting |  string | - | string.max_len: 200<br />  |
+| text |  string | - | string.max_len: 800<br />  |
+| button_text |  string | - | string.max_len: 200<br />  |
+| footer_text |  string | - | string.max_len: 200<br />  |
+
+
+
+
+### SetDefaultPasswordChangeMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetDefaultPasswordResetMessageTextRequest
 
 
@@ -4015,6 +4415,29 @@ this is en empty request
 
 
 ### SetDefaultVerifyPhoneMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetSecurityPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| enable_iframe_embedding |  bool | states if iframe embedding is enabled or disabled |  |
+| allowed_origins | repeated string | origins allowed to load ZITADEL in an iframe if enable_iframe_embedding is true |  |
+
+
+
+
+### SetSecurityPolicyResponse
 
 
 
@@ -4372,6 +4795,28 @@ this is en empty request
 
 
 ### UpdateLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateNotificationPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password_change |  bool | - |  |
+
+
+
+
+### UpdateNotificationPolicyResponse
 
 
 

@@ -137,6 +137,10 @@ func (p *notificationsProjection) reducers() []handler.AggregateReducer {
 					Event:  user.HumanPhoneCodeAddedType,
 					Reduce: p.reducePhoneCodeAdded,
 				},
+				{
+					Event:  user.HumanPasswordChangedType,
+					Reduce: p.reducePasswordChanged,
+				},
 			},
 		},
 	}
@@ -161,17 +165,17 @@ func (p *notificationsProjection) reduceInitCodeAdded(event eventstore.Event) (*
 	if err != nil {
 		return nil, err
 	}
-	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner)
+	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner)
+	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -224,17 +228,17 @@ func (p *notificationsProjection) reduceEmailCodeAdded(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner)
+	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner)
+	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -287,17 +291,17 @@ func (p *notificationsProjection) reducePasswordCodeAdded(event eventstore.Event
 	if err != nil {
 		return nil, err
 	}
-	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner)
+	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner)
+	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -358,17 +362,17 @@ func (p *notificationsProjection) reduceDomainClaimed(event eventstore.Event) (*
 	if alreadyHandled {
 		return crdb.NewNoOpStatement(e), nil
 	}
-	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner)
+	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner)
+	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -419,17 +423,17 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 	if err != nil {
 		return nil, err
 	}
-	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner)
+	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner)
+	template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -463,6 +467,74 @@ func (p *notificationsProjection) reducePasswordlessCodeRequested(event eventsto
 	return crdb.NewNoOpStatement(e), nil
 }
 
+func (p *notificationsProjection) reducePasswordChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanPasswordChangedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Yko2z8", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
+	}
+	ctx := setNotificationContext(event.Aggregate())
+	alreadyHandled, err := p.checkIfAlreadyHandled(ctx, event, nil, user.HumanPasswordChangeSentType)
+	if err != nil {
+		return nil, err
+	}
+	if alreadyHandled {
+		return crdb.NewNoOpStatement(e), nil
+	}
+
+	notificationPolicy, err := p.queries.NotificationPolicyByOrg(ctx, true, e.Aggregate().ResourceOwner, false)
+	if errors.IsNotFound(err) {
+		return crdb.NewNoOpStatement(e), nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if notificationPolicy.PasswordChange {
+		colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return nil, err
+		}
+
+		template, err := p.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return nil, err
+		}
+
+		notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+		if err != nil {
+			return nil, err
+		}
+		translator, err := p.getTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.PasswordChangeMessageType)
+		if err != nil {
+			return nil, err
+		}
+
+		ctx, origin, err := p.origin(ctx)
+		if err != nil {
+			return nil, err
+		}
+		err = types.SendEmail(
+			ctx,
+			string(template.Template),
+			translator,
+			notifyUser,
+			p.getSMTPConfig,
+			p.getFileSystemProvider,
+			p.getLogProvider,
+			colors,
+			p.assetsPrefix(ctx),
+		).SendPasswordChange(notifyUser, origin)
+		if err != nil {
+			return nil, err
+		}
+		err = p.commands.PasswordChangeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return crdb.NewNoOpStatement(e), nil
+}
+
 func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPhoneCodeAddedEvent)
 	if !ok {
@@ -482,12 +554,12 @@ func (p *notificationsProjection) reducePhoneCodeAdded(event eventstore.Event) (
 	if err != nil {
 		return nil, err
 	}
-	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner)
+	colors, err := p.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 	if err != nil {
 		return nil, err
 	}
 
-	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+	notifyUser, err := p.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
 	if err != nil {
 		return nil, err
 	}
@@ -619,11 +691,11 @@ func (p *notificationsProjection) getTranslatorWithOrgTexts(ctx context.Context,
 		return nil, err
 	}
 
-	allCustomTexts, err := p.queries.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), textType)
+	allCustomTexts, err := p.queries.CustomTextListByTemplate(ctx, authz.GetInstance(ctx).InstanceID(), textType, false)
 	if err != nil {
 		return translator, nil
 	}
-	customTexts, err := p.queries.CustomTextListByTemplate(ctx, orgID, textType)
+	customTexts, err := p.queries.CustomTextListByTemplate(ctx, orgID, textType, false)
 	if err != nil {
 		return translator, nil
 	}

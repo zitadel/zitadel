@@ -156,6 +156,8 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 		return u.view.DeleteUserSessions(event.AggregateID, event.InstanceID, event)
 	case instance.InstanceRemovedEventType:
 		return u.view.DeleteInstanceUserSessions(event)
+	case org.OrgRemovedEventType:
+		return u.view.DeleteOrgUserSessions(event)
 	default:
 		return u.view.ProcessedUserSessionSequence(event)
 	}
@@ -218,14 +220,14 @@ func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, in
 	if err != nil {
 		return false, "", err
 	}
-	if org.DomainPolicy == nil {
-		policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
-		if err != nil {
-			return false, "", err
-		}
-		userLoginMustBeDomain = policy.UserLoginMustBeDomain
+	if org.DomainPolicy != nil {
+		return org.DomainPolicy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, nil
 	}
-	return userLoginMustBeDomain, org.GetPrimaryDomain().Domain, nil
+	policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
+	if err != nil {
+		return false, "", err
+	}
+	return policy.UserLoginMustBeDomain, org.GetPrimaryDomain().Domain, nil
 }
 
 func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {

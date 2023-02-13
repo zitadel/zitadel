@@ -57,6 +57,8 @@ func (key LabelPolicySearchKey) ToColumnName() string {
 		return LabelPolicyKeyState
 	case iam_model.LabelPolicySearchKeyInstanceID:
 		return LabelPolicyKeyInstanceID
+	case iam_model.LabelPolicySearchKeyOwnerRemoved:
+		return LabelPolicyKeyOwnerRemoved
 
 	default:
 		return ""

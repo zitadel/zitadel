@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	externalIDPTable = "auth.user_external_idps"
+	externalIDPTable = "auth.user_external_idps2"
 )
 
 type ExternalIDP struct {
@@ -153,6 +153,8 @@ func (i *ExternalIDP) processIdpConfig(event *es_models.Event) (err error) {
 		return i.view.PutExternalIDPs(event, exterinalIDPs...)
 	case instance.InstanceRemovedEventType:
 		return i.view.DeleteInstanceExternalIDPs(event)
+	case org.OrgRemovedEventType:
+		return i.view.UpdateOrgOwnerRemovedExternalIDPs(event)
 	default:
 		return i.view.ProcessedExternalIDPSequence(event)
 	}
@@ -184,9 +186,9 @@ func (i *ExternalIDP) OnSuccess(instanceIDs []string) error {
 }
 
 func (i *ExternalIDP) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, aggregateID, false)
 }
 
 func (i *ExternalIDP) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID)
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), false, idpConfigID, instanceID, false)
 }

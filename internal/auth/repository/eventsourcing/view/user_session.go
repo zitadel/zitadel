@@ -64,6 +64,14 @@ func (v *View) DeleteInstanceUserSessions(event *models.Event) error {
 	return v.ProcessedUserSessionSequence(event)
 }
 
+func (v *View) DeleteOrgUserSessions(event *models.Event) error {
+	err := view.DeleteOrgUserSessions(v.Db, userSessionTable, event.InstanceID, event.ResourceOwner)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedUserSessionSequence(event)
+}
+
 func (v *View) GetLatestUserSessionSequence(instanceID string) (*repository.CurrentSequence, error) {
 	return v.latestSequence(userSessionTable, instanceID)
 }

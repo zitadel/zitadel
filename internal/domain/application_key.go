@@ -20,19 +20,19 @@ type ApplicationKey struct {
 	PublicKey      []byte
 }
 
-func (k *ApplicationKey) setPublicKey(publicKey []byte) {
+func (k *ApplicationKey) SetPublicKey(publicKey []byte) {
 	k.PublicKey = publicKey
 }
 
-func (k *ApplicationKey) setPrivateKey(privateKey []byte) {
+func (k *ApplicationKey) SetPrivateKey(privateKey []byte) {
 	k.PrivateKey = privateKey
 }
 
-func (k *ApplicationKey) expirationDate() time.Time {
+func (k *ApplicationKey) GetExpirationDate() time.Time {
 	return k.ExpirationDate
 }
 
-func (k *ApplicationKey) setExpirationDate(expiration time.Time) {
+func (k *ApplicationKey) SetExpirationDate(expiration time.Time) {
 	k.ExpirationDate = expiration
 }
 

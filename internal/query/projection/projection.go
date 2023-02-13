@@ -59,6 +59,8 @@ var (
 	OIDCSettingsProjection              *oidcSettingsProjection
 	DebugNotificationProviderProjection *debugNotificationProviderProjection
 	KeyProjection                       *keyProjection
+	SecurityPolicyProjection            *securityPolicyProjection
+	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
 )
 
@@ -131,6 +133,8 @@ func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, c
 	OIDCSettingsProjection = newOIDCSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["oidc_settings"]))
 	DebugNotificationProviderProjection = newDebugNotificationProviderProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_notification_provider"]))
 	KeyProjection = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, certEncryptionAlgorithm)
+	SecurityPolicyProjection = newSecurityPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["security_policies"]))
+	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
 	newProjectionsList()
 	return nil
 }
@@ -221,5 +225,7 @@ func newProjectionsList() {
 		OIDCSettingsProjection,
 		DebugNotificationProviderProjection,
 		KeyProjection,
+		SecurityPolicyProjection,
+		NotificationPolicyProjection,
 	}
 }

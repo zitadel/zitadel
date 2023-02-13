@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"golang.org/x/text/language"
 )
 
 const (
@@ -396,7 +396,13 @@ func NewHumanSignedOutEvent(
 }
 
 func HumanSignedOutEventMapper(event *repository.Event) (eventstore.Event, error) {
-	return &HumanSignedOutEvent{
+	signedOut := &HumanSignedOutEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+	err := json.Unmarshal(event.Data, signedOut)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-WFS3g", "unable to unmarshal human signed out")
+	}
+
+	return signedOut, nil
 }

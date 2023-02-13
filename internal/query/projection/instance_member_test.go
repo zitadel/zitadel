@@ -1,14 +1,19 @@
 package projection
 
 import (
+	"context"
 	"testing"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -34,7 +39,21 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				}`),
 				), instance.MemberAddedEventMapper),
 			},
-			reduce: (&instanceMemberProjection{}).reduceAdded,
+			reduce: (&instanceMemberProjection{
+				StatementHandler: getStatementHandlerWithFilters(
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
+				)(t)}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
@@ -42,15 +61,18 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.instance_members2 (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.instance_members3 (user_id, user_resource_owner, user_owner_removed, roles, creation_date, change_date, sequence, resource_owner, instance_id, owner_removed, id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"user-id",
+								"org1",
+								false,
 								database.StringArray{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
 								"instance-id",
+								false,
 								"agg-id",
 							},
 						},
@@ -78,7 +100,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.instance_members2 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5)",
+							expectedStmt: "UPDATE projections.instance_members3 SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_id = $5)",
 							expectedArgs: []interface{}{
 								database.StringArray{"role", "changed"},
 								anyArg{},
@@ -110,7 +132,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_members2 WHERE (instance_id = $1) AND (user_id = $2)",
+							expectedStmt: "DELETE FROM projections.instance_members3 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"user-id",
@@ -139,7 +161,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_members2 WHERE (instance_id = $1) AND (user_id = $2)",
+							expectedStmt: "DELETE FROM projections.instance_members3 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"user-id",
@@ -166,8 +188,38 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_members2 WHERE (instance_id = $1) AND (user_id = $2)",
+							expectedStmt: "DELETE FROM projections.instance_members3 WHERE (instance_id = $1) AND (user_id = $2)",
 							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org.OrgRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					nil,
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&instanceMemberProjection{}).reduceUserOwnerRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.instance_members3 SET (change_date, sequence, user_owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (user_resource_owner = $5)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								true,
 								"instance-id",
 								"agg-id",
 							},
@@ -193,7 +245,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_members2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_members3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

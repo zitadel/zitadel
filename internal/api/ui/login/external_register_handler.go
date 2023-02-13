@@ -121,7 +121,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		resourceOwner = authReq.RequestedOrgID
 	}
 	externalUser, externalIDP := l.mapTokenToLoginHumanAndExternalIDP(tokens, idpConfig)
-	externalUser, err := l.customExternalUserMapping(r.Context(), externalUser, tokens, authReq, idpConfig)
+	externalUser, err := l.runPostExternalAuthenticationActions(externalUser, tokens, authReq, r, idpConfig, nil)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -161,7 +161,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		return
 	}
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, externalUser, idpConfig)
-	user, metadata, err = l.customExternalUserToLoginUserMapping(r.Context(), user, nil, authReq, idpConfig, metadata, resourceOwner)
+	user, metadata, err = l.runPreCreationActions(authReq, r, user, metadata, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -177,7 +177,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userGrants, err := l.customGrants(r.Context(), authReq.UserID, nil, authReq, idpConfig, resourceOwner)
+	userGrants, err := l.runPostCreationActions(authReq.UserID, authReq, r, resourceOwner, domain.FlowTypeExternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -219,7 +219,13 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 	data.Phone = externalUser.Phone
 	data.ExternalPhone = externalUser.Phone
 	data.ExternalPhoneVerified = externalUser.IsPhoneVerified
-	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, nil)
+
+	funcs := map[string]interface{}{
+		"selectedLanguage": func(l string) bool {
+			return data.Language == l
+		},
+	}
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalRegisterOverview], data, funcs)
 }
 
 func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Request) {
@@ -262,6 +268,7 @@ func (l *Login) mapTokenToLoginHumanAndExternalIDP(tokens *oidc.Tokens, idpConfi
 		NickName:          tokens.IDTokenClaims.GetNickname(),
 		Email:             tokens.IDTokenClaims.GetEmail(),
 		IsEmailVerified:   tokens.IDTokenClaims.IsEmailVerified(),
+		PreferredLanguage: tokens.IDTokenClaims.GetLocale(),
 	}
 
 	if tokens.IDTokenClaims.GetPhoneNumber() != "" {

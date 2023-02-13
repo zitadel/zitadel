@@ -41,20 +41,8 @@ module.exports = {
       type: "category",
       label: "Get started",
       collapsed: false,
-      items: ["guides/start/quickstart"],
-    },
-    {
-      type: "category",
-      label: "Deploy",
-      collapsed: false,
       items: [
-        "guides/deploy/overview",
-        "guides/deploy/linux",
-        "guides/deploy/macos",
-        "guides/deploy/compose",
-        "guides/deploy/knative",
-        "guides/deploy/kubernetes",
-        "guides/deploy/loadbalancing-example/loadbalancing-example",
+        "guides/start/quickstart",
       ],
     },
     {
@@ -72,19 +60,6 @@ module.exports = {
             "guides/manage/cloud/billing",
             "guides/manage/cloud/users",
             "guides/manage/cloud/support",
-          ],
-        },
-        {
-          type: "category",
-          label: "Self-Hosted",
-          items: [
-            "guides/manage/self-hosted/production",
-            "guides/manage/self-hosted/configure/configure",
-            "guides/manage/self-hosted/reverseproxy/reverse_proxy",
-            "guides/manage/self-hosted/custom-domain",
-            "guides/manage/self-hosted/http2",
-            "guides/manage/self-hosted/tls_modes",
-            "guides/manage/self-hosted/database/database",
           ],
         },
         {
@@ -117,6 +92,7 @@ module.exports = {
           label: "Terraform",
           items: ["guides/manage/terraform/basics"],
         },
+        "guides/manage/user/reg-create-user",
       ],
     },
     {
@@ -133,9 +109,11 @@ module.exports = {
           items: [
             "guides/integrate/serviceusers",
             "guides/integrate/access-zitadel-apis",
+            "guides/integrate/client-credentials",
             "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/export-and-import",
+            "guides/integrate/event-api",
           ],
         },
         {
@@ -162,6 +140,7 @@ module.exports = {
             "guides/integrate/gitlab-saml",
           ],
         },
+        "guides/integrate/logout",
       ],
     },
     {
@@ -227,7 +206,6 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
-        "apis/actions",
       ],
     },
     {
@@ -236,6 +214,7 @@ module.exports = {
       collapsed: false,
       items: [
         "apis/openidoauth/endpoints",
+        "apis/openidoauth/authrequest",
         "apis/openidoauth/scopes",
         "apis/openidoauth/claims",
         "apis/openidoauth/authn-methods",
@@ -250,6 +229,19 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Actions",
+      collapsed: false,
+      items: [
+        "apis/actions/introduction",
+        "apis/actions/modules",
+        "apis/actions/internal-authentication",
+        "apis/actions/external-authentication",
+        "apis/actions/complement-token",
+        "apis/actions/objects",
+      ]
+    },
+    {
+      type: "category",
       label: "Observability",
       collapsed: false,
       items: ["apis/observability/metrics", "apis/observability/health"],
@@ -259,6 +251,38 @@ module.exports = {
       label: "Rate Limits",
       collapsed: false,
       items: ["apis/ratelimits/ratelimits", "legal/rate-limit-policy"],
+    },
+  ],
+  selfHosting: [
+    {
+      type: "category",
+      label: "Deploy",
+      collapsed: false,
+      items: [
+        "self-hosting/deploy/overview",
+        "self-hosting/deploy/linux",
+        "self-hosting/deploy/macos",
+        "self-hosting/deploy/compose",
+        "self-hosting/deploy/knative",
+        "self-hosting/deploy/kubernetes",
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+      ],
+    },
+    {
+      type: "category",
+      label: "Manage",
+      collapsed: false,
+      items: [
+        "self-hosting/manage/production",
+        "self-hosting/manage/productionchecklist",
+        "self-hosting/manage/configure/configure",
+        "self-hosting/manage/reverseproxy/reverse_proxy",
+        "self-hosting/manage/custom-domain",
+        "self-hosting/manage/http2",
+        "self-hosting/manage/tls_modes",
+        "self-hosting/manage/database/database",
+        "self-hosting/manage/updating_scaling",
+      ],
     },
   ],
   concepts: [

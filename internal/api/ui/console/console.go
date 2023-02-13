@@ -52,6 +52,10 @@ var (
 	}
 )
 
+func LoginHintLink(origin, username string) string {
+	return origin + HandlerPrefix + "?login_hint=" + username
+}
+
 func (i *spaHandler) Open(name string) (http.File, error) {
 	ret, err := i.fileSystem.Open(name)
 	if !os.IsNotExist(err) || path.Ext(name) != "" {
@@ -99,7 +103,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, inst
 
 	handler := mux.NewRouter()
 
-	handler.Use(security, instanceHandler)
+	handler.Use(instanceHandler, security)
 	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
 		environmentJSON, err := createEnvironmentJSON(url, issuer(r), authz.GetInstance(r.Context()).ConsoleClientID(), customerPortal)

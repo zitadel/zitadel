@@ -73,7 +73,6 @@ func CreateLogin(config Config,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
 ) (*Login, error) {
-
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
 		samlAuthCallbackURL: samlAuthCallbackURL,
@@ -152,7 +151,7 @@ func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string
 	if err != nil {
 		return nil, err
 	}
-	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
+	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}}, false)
 	if err != nil {
 		return nil, err
 	}

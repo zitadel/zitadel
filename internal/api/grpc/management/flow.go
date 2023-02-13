@@ -17,6 +17,7 @@ func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequ
 		Result: []*action_pb.FlowType{
 			action_grpc.FlowTypeToPb(domain.FlowTypeExternalAuthentication),
 			action_grpc.FlowTypeToPb(domain.FlowTypeCustomiseToken),
+			action_grpc.FlowTypeToPb(domain.FlowTypeInternalAuthentication),
 		},
 	}, nil
 }
@@ -32,7 +33,7 @@ func (s *Server) ListFlowTriggerTypes(ctx context.Context, req *mgmt_pb.ListFlow
 }
 
 func (s *Server) GetFlow(ctx context.Context, req *mgmt_pb.GetFlowRequest) (*mgmt_pb.GetFlowResponse, error) {
-	flow, err := s.query.GetFlow(ctx, action_grpc.FlowTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID)
+	flow, err := s.query.GetFlow(ctx, action_grpc.FlowTypeToDomain(req.Type), authz.GetCtxData(ctx).OrgID, false)
 	if err != nil {
 		return nil, err
 	}
