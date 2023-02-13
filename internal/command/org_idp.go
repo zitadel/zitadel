@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -332,6 +333,24 @@ func (c *Commands) DeleteProvider(ctx context.Context, resourceOwner, id string)
 
 func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D32ef", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dbgzf", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-DF4ga", "Errors.Invalid.Argument")
+		}
+		if provider.AuthorizationEndpoint = strings.TrimSpace(provider.AuthorizationEndpoint); provider.AuthorizationEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-B23bs", "Errors.Invalid.Argument")
+		}
+		if provider.TokenEndpoint = strings.TrimSpace(provider.TokenEndpoint); provider.TokenEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D2gj8", "Errors.Invalid.Argument")
+		}
+		if provider.UserEndpoint = strings.TrimSpace(provider.UserEndpoint); provider.UserEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Fb8jk", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -367,6 +386,21 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, i
 
 func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D32ef", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dbgzf", "Errors.Invalid.Argument")
+		}
+		if provider.AuthorizationEndpoint = strings.TrimSpace(provider.AuthorizationEndpoint); provider.AuthorizationEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-B23bs", "Errors.Invalid.Argument")
+		}
+		if provider.TokenEndpoint = strings.TrimSpace(provider.TokenEndpoint); provider.TokenEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D2gj8", "Errors.Invalid.Argument")
+		}
+		if provider.UserEndpoint = strings.TrimSpace(provider.UserEndpoint); provider.UserEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Fb8jk", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -885,6 +919,12 @@ func (c *Commands) prepareUpdateOrgGitLabSelfHostedProvider(a *org.Aggregate, re
 
 func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, id string, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-D3fvs", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-W2vqs", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -908,6 +948,12 @@ func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, 
 
 func (c *Commands) prepareUpdateOrgGoogleProvider(a *org.Aggregate, resourceOwner, id string, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-S32t1", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-ds432", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
