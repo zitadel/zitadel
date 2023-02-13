@@ -46,7 +46,7 @@
     "moment": "^2.29.4",
     "ngx-color": "^8.0.3",
     "rxjs": "~7.8.0",
-    "tinycolor2": "^1.5.2",
+    "tinycolor2": "^1.6.0",
     "tslib": "^2.4.1",
     "uuid": "^9.0.0",
     "zone.js": "~0.11.4"
