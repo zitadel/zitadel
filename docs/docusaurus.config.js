@@ -288,8 +288,37 @@ module.exports = {
       },
     ],
     [
-      'redocusaurus',
-      process.env.NODE_ENV === "production" ? prodConfig : devConfig,
+      'redocusaurus',{
+      specs: [
+        {
+          id: 'auth',
+          spec: '.artifacts/openapi/zitadel/auth.swagger.json',
+        },
+        {
+          id: 'mgmt',
+          spec: '.artifacts/openapi/zitadel/management.swagger.json',
+        },
+        {
+          id: 'admin',
+          spec: '.artifacts/openapi/zitadel/admin.swagger.json',
+        },
+        {
+          id: 'system',
+          spec: '.artifacts/openapi/zitadel/system.swagger.json',
+        }
+      ],
+      theme: {
+        /**
+         * Highlight color for docs
+         */
+        primaryColor: '#1890ff',
+        /**
+         * Options to pass to redoc
+         * @see https://github.com/redocly/redoc#redoc-options-object
+         */
+        options: { disableSearch: true },
+      },
+    },
     ],
   ],
   plugins: [

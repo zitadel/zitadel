@@ -1,13 +1,6 @@
-# Generate the gRPC clients for Angular
-FROM bufbuild/buf as generator
-COPY buf.*.yaml .
-COPY proto /proto
-RUN buf generate
-
 ## Angular lint workspace and production build
 FROM node:18 as builder
 WORKDIR /docs
-COPY --from=generator .artifacts/gen/ .artifacts/gen/
 COPY docs/package.json docs/yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY docs .

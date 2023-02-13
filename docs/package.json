@@ -6,14 +6,13 @@
     "docusaurus": "docusaurus",
     "start": "yarn generate:grpc && docusaurus start",
     "build": "yarn generate:grpc && docusaurus build",
-    "prodbuild": "NODE_ENV=production && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "generate:grpc": "docker run --volume $(pwd)/..:/workspace --workdir /workspace bufbuild/buf generate"
+    "generate:grpc": "buf generate ../proto"
   },
   "dependencies": {
     "@algolia/autocomplete-core": "1.5.2",
@@ -35,6 +34,7 @@
     "@babel/preset-react": "7.16.7",
     "@babel/preset-typescript": "7.16.7",
     "@babel/runtime-corejs3": "7.17.9",
+    "@bufbuild/buf": "^1.14.0",
     "@colors/colors": "1.5.0",
     "@docsearch/css": "3.0.0",
     "@docsearch/react": "3.0.0",
@@ -155,7 +155,7 @@
     "react-dom": "^17.0.2",
     "react-error-overlay": "6.0.11",
     "react-fast-compare": "3.2.0",
-    "redocusaurus": "^1.4.0",
+    "redocusaurus": "^1.6.0",
     "regenerator-transform": "0.15.0",
     "remark-emoji": "2.2.0",
     "rtlcss": "3.5.0",
