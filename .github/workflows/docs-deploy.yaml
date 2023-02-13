@@ -1,0 +1,93 @@
+on:
+  workflow_call:
+    secrets:
+      SERVICE_ACCOUNT:
+        description: 'A token passed from the caller workflow'
+        required: true
+    inputs:
+      BRANCH:
+        required: true
+        description: 'Evaluates if we should run production or preview deployments'
+        type: string
+      PROJECT_ID:
+        description: 'The google cloud project id'
+        required: true
+        type: string
+      GAR_LOCATION:
+        description: 'The google cloud artifact registry domain'
+        required: true
+        type: string
+      REPOSITORY:
+        description: 'The google cloud artifact registry repository'
+        required: true
+        type: string
+      SERVICE:
+        description: 'The google cloud run service name'
+        required: true
+        type: string
+      REGION:
+        description: 'The google cloud run service location'
+        required: true
+        type: string
+
+jobs:
+  Preview:
+    if: ${{ inputs.BRANCH != 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: Docs Preview
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.SERVICE_ACCOUNT }}'
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ inputs.SERVICE }}
+          region: ${{ inputs.REGION }}
+          image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
+          tag: pr-${{ github.event.number }}
+          no_traffic: true
+      - name: Comment Preview URL in PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            🍿 Successfully deployed preview revision at ${{ steps.deploy.outputs.url }}
+          allow-repeats: false
+  Production:
+    if: ${{ inputs.BRANCH == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: Docs Production
+      url: https://zitadel.com/docs
+    steps:
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.SERVICE_ACCOUNT }}'
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ inputs.SERVICE }}
+          region: ${{ inputs.REGION }}
+          image: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
+          tag: main
+      - name: Switch Traffic to new Revision
+        id: traffic
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ inputs.SERVICE }}
+          region: ${{ inputs.REGION }}
+          tag_traffic: 'main=100'
+      - name: Comment in PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            🍿 Successfully deployed new version https://zitadel.com/docs
+          allow-repeats: false

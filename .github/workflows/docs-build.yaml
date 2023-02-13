@@ -1,0 +1,55 @@
+on:
+  workflow_call:
+    secrets:
+      SERVICE_ACCOUNT:
+        description: 'A token passed from the caller workflow'
+        required: true
+    inputs:
+      PROJECT_ID:
+        description: 'The google cloud project id'
+        required: true
+        type: string
+      GAR_LOCATION:
+        description: 'The google cloud artifact registry domain'
+        required: true
+        type: string
+      REPOSITORY:
+        description: 'The google cloud artifact registry repository'
+        required: true
+        type: string
+      SERVICE:
+        description: 'The google cloud run service name'
+        required: true
+        type: string
+      REGION:
+        description: 'The google cloud run service location'
+        required: true
+        type: string
+
+jobs:
+  Container:
+    runs-on: ubuntu-latest
+    steps:
+      ## TODO Setup non env specific account to push images
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.SERVICE_ACCOUNT }}'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2 
+      - name: Docker Auth
+        id: docker-auth
+        uses: 'docker/login-action@v2'
+        with:
+          registry: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.SERVICE_ACCOUNT }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: "{{defaultContext}}:docs"
+          push: true
+          tags: ${{ inputs.GAR_LOCATION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.REPOSITORY }}/${{ inputs.SERVICE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
