@@ -5,6 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
 type GitHubIDPAddedEvent struct {
@@ -16,6 +17,7 @@ func NewGitHubIDPAddedEvent(
 	id,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
+	scopes []string,
 	options Options,
 ) *GitHubIDPAddedEvent {
 	return &GitHubIDPAddedEvent{
@@ -24,6 +26,7 @@ func NewGitHubIDPAddedEvent(
 			ID:           id,
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
+			Scopes:       scopes,
 			Options:      options,
 		},
 	}
@@ -158,3 +161,99 @@ func GitHubIDPChangedEventMapper(event *repository.Event) (eventstore.Event, err
 //
 //	return e, nil
 //}
+
+type GitHubEnterpriseIDPAddedEvent struct {
+	OAuthIDPAddedEvent
+}
+
+func NewGitHubEnterpriseIDPAddedEvent(
+	base *eventstore.BaseEvent,
+	id,
+	name,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
+	options Options,
+) *GitHubEnterpriseIDPAddedEvent {
+	return &GitHubEnterpriseIDPAddedEvent{
+		OAuthIDPAddedEvent: *NewOAuthIDPAddedEvent(
+			base,
+			id,
+			name,
+			clientID,
+			clientSecret,
+			authorizationEndpoint,
+			tokenEndpoint,
+			userEndpoint,
+			scopes,
+			options,
+		),
+	}
+}
+
+func (e *GitHubEnterpriseIDPAddedEvent) Data() interface{} {
+	return e
+}
+
+func (e *GitHubEnterpriseIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+}
+
+func GitHubEnterpriseIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := OAuthIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitHubEnterpriseIDPAddedEvent{OAuthIDPAddedEvent: *e.(*OAuthIDPAddedEvent)}, nil
+}
+
+type GitHubEnterpriseIDPChangedEvent struct {
+	OAuthIDPChangedEvent
+}
+
+func NewGitHubEnterpriseIDPChangedEvent(
+	base *eventstore.BaseEvent,
+	id string,
+	changes []OAuthIDPChanges,
+) (*GitHubEnterpriseIDPChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, errors.ThrowPreconditionFailed(nil, "IDP-JHKs9", "Errors.NoChangesFound")
+	}
+	changedEvent := &GitHubEnterpriseIDPChangedEvent{
+		OAuthIDPChangedEvent: OAuthIDPChangedEvent{
+			BaseEvent: *base,
+			ID:        id,
+		},
+	}
+	for _, change := range changes {
+		change(&changedEvent.OAuthIDPChangedEvent)
+	}
+	return changedEvent, nil
+}
+
+func (e *GitHubEnterpriseIDPChangedEvent) Data() interface{} {
+	return e
+}
+
+func (e *GitHubEnterpriseIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	if e.Name == nil || e.oldName == *e.Name { // TODO: nil check should be enough
+		return nil
+	}
+	return []*eventstore.EventUniqueConstraint{
+		idpconfig.NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
+		idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
+	}
+}
+
+func GitHubEnterpriseIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := OAuthIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitHubEnterpriseIDPChangedEvent{OAuthIDPChangedEvent: *e.(*OAuthIDPChangedEvent)}, nil
+}

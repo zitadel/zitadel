@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
 type OAuthIDPWriteModel struct {
@@ -22,7 +23,7 @@ type OAuthIDPWriteModel struct {
 	Scopes                []string
 	idp.Options
 
-	State domain.IDPConfigState //TODO: ?
+	State domain.IDPState
 }
 
 func (wm *OAuthIDPWriteModel) Reduce() error {
@@ -38,7 +39,7 @@ func (wm *OAuthIDPWriteModel) Reduce() error {
 			wm.TokenEndpoint = e.TokenEndpoint
 			wm.UserEndpoint = e.UserEndpoint
 			wm.Scopes = e.Scopes
-			wm.State = domain.IDPConfigStateActive
+			wm.State = domain.IDPStateActive
 		case *idp.OAuthIDPChangedEvent:
 			if wm.ID != e.ID {
 				continue
@@ -131,24 +132,42 @@ type OIDCIDPWriteModel struct {
 	Scopes       []string
 	idp.Options
 
-	State domain.IDPConfigState //TODO: ?
+	State domain.IDPState
 }
 
 func (wm *OIDCIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+
 		case *idp.OIDCIDPAddedEvent:
-			wm.ID = e.ID
+			if wm.ID != e.ID {
+				continue
+			}
 			wm.Issuer = e.Issuer
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
 			wm.Scopes = e.Scopes
-			wm.State = domain.IDPConfigStateActive
+			wm.State = domain.IDPStateActive
 		case *idp.OIDCIDPChangedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
 			wm.reduceChangedEvent(e)
+		case *idpconfig.IDPConfigAddedEvent:
+			if wm.ID != e.ConfigID {
+				continue
+			}
+			wm.reduceConfigAddedEvent(e)
+		case *idpconfig.IDPConfigChangedEvent:
+			if wm.ID != e.ConfigID {
+				continue
+			}
+			wm.reduceConfigChangedEvent(e)
+		case *idpconfig.IDPConfigRemovedEvent:
+			if wm.ID != e.ConfigID {
+				continue
+			}
+			wm.State = domain.IDPStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -211,6 +230,25 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
+func (wm *OIDCIDPWriteModel) reduceConfigAddedEvent(e *idpconfig.IDPConfigAddedEvent) {
+	wm.Name = e.Name
+	//rm.StylingType = e.StylingType //TODO: ?
+	wm.Options.IsAutoCreation = e.AutoRegister
+	wm.State = domain.IDPStateActive
+}
+
+func (wm *OIDCIDPWriteModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigChangedEvent) {
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	//if e.StylingType != nil && e.StylingType.Valid() { //TODO: ?
+	//	rm.StylingType = *e.StylingType
+	//}
+	if e.AutoRegister != nil {
+		wm.Options.IsAutoCreation = *e.AutoRegister
+	}
+}
+
 type JWTIDPWriteModel struct {
 	eventstore.WriteModel
 
@@ -222,7 +260,7 @@ type JWTIDPWriteModel struct {
 	HeaderName   string
 	idp.Options
 
-	State domain.IDPConfigState //TODO: ?
+	State domain.IDPState //TODO: ?
 }
 
 func (wm *JWTIDPWriteModel) Reduce() error {
@@ -236,7 +274,7 @@ func (wm *JWTIDPWriteModel) Reduce() error {
 			wm.JWTEndpoint = e.JWTEndpoint
 			wm.KeysEndpoint = e.KeysEndpoint
 			wm.HeaderName = e.HeaderName
-			wm.State = domain.IDPConfigStateActive
+			wm.State = domain.IDPStateActive
 		case *idp.JWTIDPChangedEvent:
 			if wm.ID != e.ID {
 				continue
@@ -297,26 +335,36 @@ func (wm *JWTIDPWriteModel) NewChanges(
 	return changes, nil
 }
 
-type GoogleIDPWriteModel struct {
+type AzureADIDPWriteModel struct {
 	eventstore.WriteModel
 
-	ID           string
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
+	ID              string
+	Name            string
+	ClientID        string
+	ClientSecret    *crypto.CryptoValue
+	Scopes          []string
+	Tenant          string
+	IsEmailVerified bool
 	idp.Options
 
-	State domain.IDPConfigState //TODO: ?
+	State domain.IDPState //TODO: ?
 }
 
-func (wm *GoogleIDPWriteModel) Reduce() error {
+func (wm *AzureADIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *idp.GoogleIDPAddedEvent:
-			wm.ID = e.ID
+		case *idp.AzureADIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.Name = e.Name
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
-			wm.State = domain.IDPConfigStateActive
-		case *idp.GoogleIDPChangedEvent:
+			wm.Scopes = e.Scopes
+			wm.Tenant = e.Tenant
+			wm.IsEmailVerified = e.IsEmailVerified
+			wm.State = domain.IDPStateActive
+		case *idp.AzureADIDPChangedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
@@ -326,23 +374,39 @@ func (wm *GoogleIDPWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *GoogleIDPWriteModel) reduceChangedEvent(e *idp.GoogleIDPChangedEvent) {
+func (wm *AzureADIDPWriteModel) reduceChangedEvent(e *idp.AzureADIDPChangedEvent) {
 	if e.ClientID != nil {
 		wm.ClientID = *e.ClientID
 	}
 	if e.ClientSecret != nil {
 		wm.ClientSecret = e.ClientSecret
 	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	if e.Tenant != nil {
+		wm.Tenant = *e.Tenant
+	}
+	if e.IsEmailVerified != nil {
+		wm.IsEmailVerified = *e.IsEmailVerified
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
-func (wm *GoogleIDPWriteModel) NewChanges(
+func (wm *AzureADIDPWriteModel) NewChanges(
+	name string,
 	clientID string,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
+	scopes []string,
+	tenant string,
+	isEmailVerified bool,
 	options idp.Options,
-) ([]idp.GoogleIDPChanges, error) {
-	changes := make([]idp.GoogleIDPChanges, 0)
+) ([]idp.AzureADIDPChanges, error) {
+	changes := make([]idp.AzureADIDPChanges, 0)
 	var clientSecret *crypto.CryptoValue
 	var err error
 	if clientSecretString != "" {
@@ -350,15 +414,27 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 		if err != nil {
 			return nil, err
 		}
-		changes = append(changes, idp.ChangeGoogleClientSecret(clientSecret))
+		changes = append(changes, idp.ChangeAzureADClientSecret(clientSecret))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeAzureADName(name))
 	}
 	if wm.ClientID != clientID {
-		changes = append(changes, idp.ChangeGoogleClientID(clientID))
+		changes = append(changes, idp.ChangeAzureADClientID(clientID))
+	}
+	if wm.Tenant != tenant {
+		changes = append(changes, idp.ChangeAzureADTenant(tenant))
+	}
+	if wm.IsEmailVerified != isEmailVerified {
+		changes = append(changes, idp.ChangeAzureADIsEmailVerified(isEmailVerified))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeAzureADScopes(scopes))
 	}
 
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
-		changes = append(changes, idp.ChangeGoogleOptions(opts))
+		changes = append(changes, idp.ChangeAzureADOptions(opts))
 	}
 	return changes, nil
 }
@@ -371,17 +447,19 @@ type GitHubIDPWriteModel struct {
 	ClientSecret *crypto.CryptoValue
 	idp.Options
 
-	State domain.IDPConfigState //TODO: ?
+	State domain.IDPState //TODO: ?
 }
 
 func (wm *GitHubIDPWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *idp.GitHubIDPAddedEvent:
-			wm.ID = e.ID
+			if wm.ID != e.ID {
+				continue
+			}
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
-			wm.State = domain.IDPConfigStateActive
+			wm.State = domain.IDPStateActive
 		case *idp.GitHubIDPChangedEvent:
 			if wm.ID != e.ID {
 				continue
@@ -425,6 +503,356 @@ func (wm *GitHubIDPWriteModel) NewChanges(
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
 		changes = append(changes, idp.ChangeOAuthOptions(opts))
+	}
+	return changes, nil
+}
+
+type GitHubEnterpriseIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID                    string
+	Name                  string
+	ClientID              string
+	ClientSecret          *crypto.CryptoValue
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	UserEndpoint          string
+	Scopes                []string
+	idp.Options
+
+	State domain.IDPState //TODO: ?
+}
+
+func (wm *GitHubEnterpriseIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GitHubEnterpriseIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.Name = e.Name
+			wm.ClientID = e.ClientID
+			wm.ClientSecret = e.ClientSecret
+			wm.AuthorizationEndpoint = e.AuthorizationEndpoint
+			wm.TokenEndpoint = e.TokenEndpoint
+			wm.UserEndpoint = e.UserEndpoint
+			wm.Scopes = e.Scopes
+			wm.State = domain.IDPStateActive
+		case *idp.GitHubEnterpriseIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GitHubEnterpriseIDPWriteModel) reduceChangedEvent(e *idp.GitHubEnterpriseIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.AuthorizationEndpoint != nil {
+		wm.AuthorizationEndpoint = *e.AuthorizationEndpoint
+	}
+	if e.TokenEndpoint != nil {
+		wm.TokenEndpoint = *e.TokenEndpoint
+	}
+	if e.UserEndpoint != nil {
+		wm.UserEndpoint = *e.UserEndpoint
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GitHubEnterpriseIDPWriteModel) NewChanges(
+	name,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	authorizationEndpoint,
+	tokenEndpoint,
+	userEndpoint string,
+	scopes []string,
+	options idp.Options,
+) ([]idp.OAuthIDPChanges, error) {
+	changes := make([]idp.OAuthIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeOAuthClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeOAuthClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeOAuthName(name))
+	}
+	if wm.AuthorizationEndpoint != authorizationEndpoint {
+		changes = append(changes, idp.ChangeOAuthAuthorizationEndpoint(authorizationEndpoint))
+	}
+	if wm.TokenEndpoint != tokenEndpoint {
+		changes = append(changes, idp.ChangeOAuthTokenEndpoint(tokenEndpoint))
+	}
+	if wm.UserEndpoint != userEndpoint {
+		changes = append(changes, idp.ChangeOAuthUserEndpoint(userEndpoint))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeOAuthScopes(scopes))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeOAuthOptions(opts))
+	}
+	return changes, nil
+}
+
+type GitLabIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPState //TODO: ?
+}
+
+func (wm *GitLabIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GitLabIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.ClientID = e.ClientID
+			wm.ClientSecret = e.ClientSecret
+			wm.Scopes = e.Scopes
+			wm.State = domain.IDPStateActive
+		case *idp.GitLabIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GitLabIDPWriteModel) reduceChangedEvent(e *idp.GitLabIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GitLabIDPWriteModel) NewChanges(
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.GitLabIDPChanges, error) {
+	changes := make([]idp.GitLabIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeGitLabClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeGitLabClientID(clientID))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeGitLabScopes(scopes))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeGitLabOptions(opts))
+	}
+	return changes, nil
+}
+
+type GitLabSelfHostedIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	Name         string
+	Issuer       string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPState //TODO: ?
+}
+
+func (wm *GitLabSelfHostedIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GitLabSelfHostedIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.Name = e.Name
+			wm.Issuer = e.Issuer
+			wm.ClientID = e.ClientID
+			wm.ClientSecret = e.ClientSecret
+			wm.State = domain.IDPStateActive
+		case *idp.GitLabSelfHostedIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GitLabSelfHostedIDPWriteModel) reduceChangedEvent(e *idp.GitLabSelfHostedIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	if e.Name != nil {
+		wm.Name = *e.Name
+	}
+	if e.Issuer != nil {
+		wm.Issuer = *e.Issuer
+	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GitLabSelfHostedIDPWriteModel) NewChanges(
+	name string,
+	issuer string,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.GitLabSelfHostedIDPChanges, error) {
+	changes := make([]idp.GitLabSelfHostedIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeGitLabSelfHostedClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeGitLabSelfHostedClientID(clientID))
+	}
+	if wm.Name != name {
+		changes = append(changes, idp.ChangeGitLabSelfHostedName(name))
+	}
+	if wm.Issuer != issuer {
+		changes = append(changes, idp.ChangeGitLabSelfHostedIssuer(issuer))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeGitLabSelfHostedScopes(scopes))
+	}
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeGitLabSelfHostedOptions(opts))
+	}
+	return changes, nil
+}
+
+type GoogleIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	idp.Options
+
+	State domain.IDPState //TODO: ?
+}
+
+func (wm *GoogleIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GoogleIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.ClientID = e.ClientID
+			wm.ClientSecret = e.ClientSecret
+			wm.State = domain.IDPStateActive
+		case *idp.GoogleIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GoogleIDPWriteModel) reduceChangedEvent(e *idp.GoogleIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GoogleIDPWriteModel) NewChanges(
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	options idp.Options,
+) ([]idp.GoogleIDPChanges, error) {
+	changes := make([]idp.GoogleIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeGoogleClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeGoogleClientID(clientID))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeGoogleOptions(opts))
 	}
 	return changes, nil
 }
