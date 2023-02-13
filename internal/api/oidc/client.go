@@ -541,7 +541,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
 						if _, ok := claims[key]; !ok {
-							claims[key] = value
+							claims = appendClaim(claims, key, value)
 							return
 						}
 						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
