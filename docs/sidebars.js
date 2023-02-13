@@ -170,7 +170,7 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "Resources",
+      label: "Manage ZITADEL resources",
       collapsed: false,
       items: [
         "apis/reference/auth",
@@ -180,7 +180,7 @@ module.exports = {
         "apis/statuscodes",
         {
           type: "category",
-          label: "Assets API",
+          label: "Assets",
           collapsed: true,
           items: ["apis/assets/assets"],
         },
@@ -188,22 +188,29 @@ module.exports = {
     },
     {
       type: "category",
-      label: "OpenID Connect & OAuth",
+      label: "Authenticate Users",
       collapsed: false,
       items: [
-        "apis/openidoauth/endpoints",
-        "apis/openidoauth/authrequest",
-        "apis/openidoauth/scopes",
-        "apis/openidoauth/claims",
-        "apis/openidoauth/authn-methods",
-        "apis/openidoauth/grant-types",
+        {
+          type: "category",
+          label: "OpenID Connect & OAuth",
+          collapsed: false,
+          items: [
+            "apis/openidoauth/endpoints",
+            "apis/openidoauth/authrequest",
+            "apis/openidoauth/scopes",
+            "apis/openidoauth/claims",
+            "apis/openidoauth/authn-methods",
+            "apis/openidoauth/grant-types",
+          ],
+        },
+        {
+          type: "category",
+          label: "SAML",
+          collapsed: false,
+          items: ["apis/saml/endpoints"],
+        },
       ],
-    },
-    {
-      type: "category",
-      label: "SAML",
-      collapsed: false,
-      items: ["apis/saml/endpoints"],
     },
     {
       type: "category",
