@@ -66,7 +66,7 @@
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^18.8.1",
     "@types/qrcode": "^1.5.0",
-    "@typescript-eslint/eslint-plugin": "5.48.0",
+    "@typescript-eslint/eslint-plugin": "5.51.0",
     "@typescript-eslint/parser": "5.48.0",
     "codelyzer": "^6.0.0",
     "eslint": "^8.31.0",
