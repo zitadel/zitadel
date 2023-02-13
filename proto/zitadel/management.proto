@@ -45,31 +45,25 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     };
     tags: [
         {
-            name: "Applications",
-            description: "..."
+            name: "Applications"
         },
         {
-            name: "Authorization",
-            description: "..."
+            name: "Authorization"
         },
         {
-            name: "General",
-            description: "..."
+            name: "General"
         },
         {
-            name: "Global",
-            description: "..."
+            name: "Global"
         },
         {
-            name: "Organizations",
-            description: "..."
+            name: "Organizations"
         },
         {
             name: "Project"
         },
         {
-            name: "Settings",
-            description: "..."
+            name: "Settings"
         },
         {
             name: "Users",
@@ -86,8 +80,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by ZITADEL itself."
         },
         {
-            name: "Roles",
-            description: "..."
+            name: "Roles"
         }
     ];
     schemes: HTTPS;

@@ -36,29 +36,26 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     };
     tags: [
         {
-            name: "General",
-            description: "..."
+            name: "General"
         },
         {
             name: "Policies",
             description: "Policies are settings that are made on either an instance or organization level of ZITADEL. The policies will have an impact on what a user is allowed to do or what should be shown to the suer."
         },
         {
-            name: "User",
-            description: "..."
+            name: "User"
         },
         {
-            name: "User Authentication Factor",
+            name: "User Authentication Factor"
         },
         {
             name: "User Email"
         },
         {
-            name: "User Metadata",
-            description: "..."
+            name: "User Metadata"
         },
         {
-            name: "User Phone",
+            name: "User Phone"
         },
         {
             name: "User Profile"
@@ -67,8 +64,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "User Social Login"
         },
         {
-            name: "User Tokens",
-            description: "..."
+            name: "User Tokens"
         }
     ];
     schemes: HTTPS;
