@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -148,22 +147,13 @@ func (c *Commands) UpdateOrgAzureADProvider(ctx context.Context, resourceOwner, 
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddOrgGitHubProvider(ctx context.Context, resourceOwner, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddOrgGitHubProvider(ctx context.Context, resourceOwner string, provider GitHubProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGitHubProvider(
-		orgAgg,
-		resourceOwner,
-		id,
-		clientID,
-		clientSecret,
-		[]string{}, //TODO: ?
-		//scopes,
-		options,
-	))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGitHubProvider(orgAgg, resourceOwner, id, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -174,9 +164,9 @@ func (c *Commands) AddOrgGitHubProvider(ctx context.Context, resourceOwner, clie
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateOrgGitHubProvider(ctx context.Context, resourceOwner, id, clientID, clientSecret string, options idp.Options) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateOrgGitHubProvider(ctx context.Context, resourceOwner, id string, provider GitHubProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGitHubProvider(orgAgg, resourceOwner, id, clientID, clientSecret, options))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGitHubProvider(orgAgg, resourceOwner, id, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -225,22 +215,13 @@ func (c *Commands) UpdateOrgGitHubEnterpriseProvider(ctx context.Context, resour
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddOrgGitLabProvider(ctx context.Context, resourceOwner, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddOrgGitLabProvider(ctx context.Context, resourceOwner string, provider GitLabProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGitLabProvider(
-		orgAgg,
-		resourceOwner,
-		id,
-		clientID,
-		clientSecret,
-		[]string{}, //TODO: ?
-		//scopes,
-		options,
-	))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGitLabProvider(orgAgg, resourceOwner, id, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -251,18 +232,9 @@ func (c *Commands) AddOrgGitLabProvider(ctx context.Context, resourceOwner, clie
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateOrgGitLabProvider(ctx context.Context, resourceOwner, id, clientID, clientSecret string, options idp.Options) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateOrgGitLabProvider(ctx context.Context, resourceOwner, id string, provider GitLabProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGitLabProvider(
-		orgAgg,
-		resourceOwner,
-		id,
-		clientID,
-		clientSecret,
-		[]string{}, //TODO: ?
-		//scopes,
-		options,
-	))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGitLabProvider(orgAgg, resourceOwner, id, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -311,20 +283,13 @@ func (c *Commands) UpdateOrgGitLabSelfHostedProvider(ctx context.Context, resour
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddOrgGoogleProvider(ctx context.Context, resourceOwner, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddOrgGoogleProvider(ctx context.Context, resourceOwner string, provider GoogleProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGoogleProvider(
-		orgAgg,
-		resourceOwner,
-		id,
-		clientID,
-		clientSecret,
-		options,
-	))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgGoogleProvider(orgAgg, resourceOwner, id, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -335,9 +300,9 @@ func (c *Commands) AddOrgGoogleProvider(ctx context.Context, resourceOwner, clie
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateOrgGoogleProvider(ctx context.Context, resourceOwner, id, clientID, clientSecret string, options idp.Options) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateOrgGoogleProvider(ctx context.Context, resourceOwner, id string, provider GoogleProvider) (*domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGoogleProvider(orgAgg, resourceOwner, id, clientID, clientSecret, options))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgGoogleProvider(orgAgg, resourceOwner, id, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -387,12 +352,7 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, resourceOwner, i
 	}
 }
 
-func (c *Commands) prepareUpdateOrgOAuthProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id string,
-	provider GenericOAuthProvider,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOAuthProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewOAuthOrgIDPWriteModel(resourceOwner, id)
@@ -466,12 +426,7 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, resourceOwner, id
 	}
 }
 
-func (c *Commands) prepareUpdateOrgOIDCProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id string,
-	provider GenericOIDCProvider,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, resourceOwner, id string, provider GenericOIDCProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewOIDCOrgIDPWriteModel(resourceOwner, id)
@@ -539,12 +494,7 @@ func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, resourceOwner, id 
 	}
 }
 
-func (c *Commands) prepareUpdateOrgJWTProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id string,
-	provider JWTProvider,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, resourceOwner, id string, provider JWTProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
@@ -616,12 +566,7 @@ func (c *Commands) prepareAddOrgAzureADProvider(a *org.Aggregate, resourceOwner,
 	}
 }
 
-func (c *Commands) prepareUpdateOrgAzureADProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id string,
-	provider AzureADProvider,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgAzureADProvider(a *org.Aggregate, resourceOwner, id string, provider AzureADProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewAzureADOrgIDPWriteModel(resourceOwner, id)
@@ -661,7 +606,7 @@ func (c *Commands) prepareUpdateOrgAzureADProvider(
 	}
 }
 
-func (c *Commands) prepareAddOrgGitHubProvider(a *org.Aggregate, resourceOwner, id, clientID, clientSecret string, scopes []string, options idp.Options) preparation.Validation {
+func (c *Commands) prepareAddOrgGitHubProvider(a *org.Aggregate, resourceOwner, id string, provider GitHubProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitHubOrgIDPWriteModel(resourceOwner, id)
@@ -673,25 +618,18 @@ func (c *Commands) prepareAddOrgGitHubProvider(a *org.Aggregate, resourceOwner, 
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			secret, err := crypto.Encrypt([]byte(clientSecret), c.idpConfigEncryption)
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewGitHubIDPAddedEvent(ctx, &a.Aggregate, id, clientID, secret, scopes, options),
+				org.NewGitHubIDPAddedEvent(ctx, &a.Aggregate, id, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
 			}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) prepareUpdateOrgGitHubProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id,
-	clientID,
-	clientSecret string,
-	options idp.Options,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgGitHubProvider(a *org.Aggregate, resourceOwner, id string, provider GitHubProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitHubOrgIDPWriteModel(resourceOwner, id)
@@ -710,10 +648,11 @@ func (c *Commands) prepareUpdateOrgGitHubProvider(
 				ctx,
 				&a.Aggregate,
 				id,
-				clientID,
-				clientSecret,
+				provider.ClientID,
+				provider.ClientSecret,
 				c.idpConfigEncryption,
-				options,
+				provider.Scopes,
+				provider.IDPOptions,
 			)
 			if err != nil {
 				return nil, err
@@ -761,12 +700,7 @@ func (c *Commands) prepareAddOrgGitHubEnterpriseProvider(a *org.Aggregate, resou
 	}
 }
 
-func (c *Commands) prepareUpdateOrgGitHubEnterpriseProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id string,
-	provider GitHubEnterpriseProvider,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgGitHubEnterpriseProvider(a *org.Aggregate, resourceOwner, id string, provider GitHubEnterpriseProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitHubEnterpriseOrgIDPWriteModel(resourceOwner, id)
@@ -806,7 +740,7 @@ func (c *Commands) prepareUpdateOrgGitHubEnterpriseProvider(
 	}
 }
 
-func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate, resourceOwner, id, clientID, clientSecret string, scopes []string, options idp.Options) preparation.Validation {
+func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate, resourceOwner, id string, provider GitLabProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitLabOrgIDPWriteModel(resourceOwner, id)
@@ -818,26 +752,18 @@ func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate, resourceOwner, 
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			secret, err := crypto.Encrypt([]byte(clientSecret), c.idpConfigEncryption)
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewGitLabIDPAddedEvent(ctx, &a.Aggregate, id, clientID, secret, scopes, options),
+				org.NewGitLabIDPAddedEvent(ctx, &a.Aggregate, id, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
 			}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) prepareUpdateOrgGitLabProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id,
-	clientID,
-	clientSecret string,
-	scopes []string,
-	options idp.Options,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgGitLabProvider(a *org.Aggregate, resourceOwner, id string, provider GitLabProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitLabOrgIDPWriteModel(resourceOwner, id)
@@ -856,11 +782,11 @@ func (c *Commands) prepareUpdateOrgGitLabProvider(
 				ctx,
 				&a.Aggregate,
 				id,
-				clientID,
-				clientSecret,
+				provider.ClientID,
+				provider.ClientSecret,
 				c.idpConfigEncryption,
-				scopes,
-				options,
+				provider.Scopes,
+				provider.IDPOptions,
 			)
 			if err != nil {
 				return nil, err
@@ -906,12 +832,7 @@ func (c *Commands) prepareAddOrgGitLabSelfHostedProvider(a *org.Aggregate, resou
 	}
 }
 
-func (c *Commands) prepareUpdateOrgGitLabSelfHostedProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id string,
-	provider GitLabSelfHostedProvider,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgGitLabSelfHostedProvider(a *org.Aggregate, resourceOwner, id string, provider GitLabSelfHostedProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitLabSelfHostedOrgIDPWriteModel(resourceOwner, id)
@@ -949,7 +870,7 @@ func (c *Commands) prepareUpdateOrgGitLabSelfHostedProvider(
 	}
 }
 
-func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, id, clientID, clientSecret string, options idp.Options) preparation.Validation {
+func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, id string, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
@@ -961,25 +882,18 @@ func (c *Commands) prepareAddOrgGoogleProvider(a *org.Aggregate, resourceOwner, 
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			secret, err := crypto.Encrypt([]byte(clientSecret), c.idpConfigEncryption)
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, clientID, secret, idp.Options{IsAutoUpdate: options.IsAutoUpdate}),
+				org.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
 			}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) prepareUpdateOrgGoogleProvider(
-	a *org.Aggregate,
-	resourceOwner,
-	id,
-	clientID,
-	clientSecret string,
-	options idp.Options,
-) preparation.Validation {
+func (c *Commands) prepareUpdateOrgGoogleProvider(a *org.Aggregate, resourceOwner, id string, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGoogleOrgIDPWriteModel(resourceOwner, id)
@@ -998,10 +912,11 @@ func (c *Commands) prepareUpdateOrgGoogleProvider(
 				ctx,
 				&a.Aggregate,
 				id,
-				clientID,
-				clientSecret,
+				provider.ClientID,
+				provider.ClientSecret,
 				c.idpConfigEncryption,
-				options,
+				provider.Scopes,
+				provider.IDPOptions,
 			)
 			if err != nil {
 				return nil, err

@@ -26,6 +26,7 @@ func NewGoogleIDPAddedEvent(
 	id,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
+	scopes []string,
 	options idp.Options,
 ) *GoogleIDPAddedEvent {
 
@@ -39,6 +40,7 @@ func NewGoogleIDPAddedEvent(
 			id,
 			clientID,
 			clientSecret,
+			scopes,
 			options,
 		),
 	}

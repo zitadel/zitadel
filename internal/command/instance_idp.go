@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -51,19 +50,13 @@ func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, id st
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, clientID, clientSecret string, options idp.Options) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, provider GoogleProvider) (string, *domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGoogleProvider(
-		instanceAgg,
-		id,
-		clientID,
-		clientSecret,
-		options,
-	))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGoogleProvider(instanceAgg, id, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -74,9 +67,9 @@ func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, clientID, clie
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, id, clientID, clientSecret string, options idp.Options) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, id string, provider GoogleProvider) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGoogleProvider(instanceAgg, id, clientID, clientSecret, options))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGoogleProvider(instanceAgg, id, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +164,7 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(
 	}
 }
 
-func (c *Commands) prepareAddInstanceGoogleProvider(a *instance.Aggregate, id, clientID, clientSecret string, options idp.Options) preparation.Validation {
+func (c *Commands) prepareAddInstanceGoogleProvider(a *instance.Aggregate, id string, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGoogleInstanceIDPWriteModel(a.InstanceID, id)
@@ -183,24 +176,18 @@ func (c *Commands) prepareAddInstanceGoogleProvider(a *instance.Aggregate, id, c
 			if err = writeModel.Reduce(); err != nil {
 				return nil, err
 			}
-			secret, err := crypto.Encrypt([]byte(clientSecret), c.idpConfigEncryption)
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
 			if err != nil {
 				return nil, err
 			}
 			return []eventstore.Command{
-				instance.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, clientID, secret, idp.Options{IsAutoUpdate: options.IsAutoUpdate}),
+				instance.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
 			}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) prepareUpdateInstanceGoogleProvider(
-	a *instance.Aggregate,
-	id,
-	clientID,
-	clientSecret string,
-	options idp.Options,
-) preparation.Validation {
+func (c *Commands) prepareUpdateInstanceGoogleProvider(a *instance.Aggregate, id string, provider GoogleProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGoogleInstanceIDPWriteModel(a.InstanceID, id)
@@ -219,10 +206,11 @@ func (c *Commands) prepareUpdateInstanceGoogleProvider(
 				ctx,
 				&a.Aggregate,
 				id,
-				clientID,
-				clientSecret,
+				provider.ClientID,
+				provider.ClientSecret,
 				c.idpConfigEncryption,
-				options,
+				provider.Scopes,
+				provider.IDPOptions,
 			)
 			if err != nil {
 				return nil, err

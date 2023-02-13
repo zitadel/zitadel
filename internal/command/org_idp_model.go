@@ -42,6 +42,8 @@ func (wm *OrgOAuthIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.OAuthIDPWriteModel.AppendEvents(&e.OAuthIDPChangedEvent)
+		default:
+			wm.OAuthIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -132,6 +134,23 @@ func (wm *OrgOIDCIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCIDPChangedEvent)
+		case *org.IDPOIDCConfigAddedEvent:
+			if wm.ID != e.IDPConfigID {
+				continue
+			}
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCConfigAddedEvent)
+		case *org.IDPOIDCConfigChangedEvent:
+			if wm.ID != e.IDPConfigID {
+				continue
+			}
+			wm.OIDCIDPWriteModel.AppendEvents(&e.OIDCConfigChangedEvent)
+		case *org.IDPConfigRemovedEvent:
+			if wm.ID != e.ConfigID {
+				continue
+			}
+			wm.OIDCIDPWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
+		default:
+			wm.OIDCIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -218,6 +237,23 @@ func (wm *OrgJWTIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.JWTIDPWriteModel.AppendEvents(&e.JWTIDPChangedEvent)
+		case *org.IDPJWTConfigAddedEvent:
+			if wm.ID != e.IDPConfigID {
+				continue
+			}
+			wm.JWTIDPWriteModel.AppendEvents(&e.JWTConfigAddedEvent)
+		case *org.IDPJWTConfigChangedEvent:
+			if wm.ID != e.IDPConfigID {
+				continue
+			}
+			wm.JWTIDPWriteModel.AppendEvents(&e.JWTConfigChangedEvent)
+		case *org.IDPConfigRemovedEvent:
+			if wm.ID != e.ConfigID {
+				continue
+			}
+			wm.JWTIDPWriteModel.AppendEvents(&e.IDPConfigRemovedEvent)
+		default:
+			wm.JWTIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -302,6 +338,8 @@ func (wm *OrgAzureADIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.AzureADIDPWriteModel.AppendEvents(&e.AzureADIDPChangedEvent)
+		default:
+			wm.AzureADIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -390,6 +428,8 @@ func (wm *OrgGitHubIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.GitHubIDPWriteModel.AppendEvents(&e.GitHubIDPChangedEvent)
+		default:
+			wm.GitHubIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -414,10 +454,11 @@ func (wm *OrgGitHubIDPWriteModel) NewChangedEvent(
 	clientID string,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
+	scopes []string,
 	options idp.Options,
 ) (*org.GitHubIDPChangedEvent, error) {
 
-	changes, err := wm.GitHubIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, options)
+	changes, err := wm.GitHubIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, scopes, options)
 	if err != nil {
 		return nil, err
 	}
@@ -464,6 +505,8 @@ func (wm *OrgGitHubEnterpriseIDPWriteModel) AppendEvents(events ...eventstore.Ev
 				continue
 			}
 			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(&e.GitHubEnterpriseIDPChangedEvent)
+		default:
+			wm.GitHubEnterpriseIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -553,6 +596,8 @@ func (wm *OrgGitLabIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.GitLabIDPWriteModel.AppendEvents(&e.GitLabIDPChangedEvent)
+		default:
+			wm.GitLabIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -628,6 +673,8 @@ func (wm *OrgGitLabSelfHostedIDPWriteModel) AppendEvents(events ...eventstore.Ev
 				continue
 			}
 			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(&e.GitLabSelfHostedIDPChangedEvent)
+		default:
+			wm.GitLabSelfHostedIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -705,6 +752,8 @@ func (wm *OrgGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
+		default:
+			wm.GoogleIDPWriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -729,10 +778,11 @@ func (wm *OrgGoogleIDPWriteModel) NewChangedEvent(
 	clientID string,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
+	scopes []string,
 	options idp.Options,
 ) (*org.GoogleIDPChangedEvent, error) {
 
-	changes, err := wm.GoogleIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, options)
+	changes, err := wm.GoogleIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, scopes, options)
 	if err != nil {
 		return nil, err
 	}

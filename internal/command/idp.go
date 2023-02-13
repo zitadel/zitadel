@@ -42,6 +42,13 @@ type AzureADProvider struct {
 	IDPOptions    idp.Options
 }
 
+type GitHubProvider struct {
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
 type GitHubEnterpriseProvider struct {
 	Name                  string
 	ClientID              string
@@ -53,9 +60,23 @@ type GitHubEnterpriseProvider struct {
 	IDPOptions            idp.Options
 }
 
+type GitLabProvider struct {
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
 type GitLabSelfHostedProvider struct {
 	Name         string
 	Issuer       string
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
+type GoogleProvider struct {
 	ClientID     string
 	ClientSecret string
 	Scopes       []string

@@ -240,7 +240,7 @@ func (s *Server) UpdateAzureADProvider(ctx context.Context, req *mgmt_pb.UpdateA
 }
 
 func (s *Server) AddGitHubProvider(ctx context.Context, req *mgmt_pb.AddGitHubProviderRequest) (*mgmt_pb.AddGitHubProviderResponse, error) {
-	id, details, err := s.command.AddOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
+	id, details, err := s.command.AddOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitHubProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +251,7 @@ func (s *Server) AddGitHubProvider(ctx context.Context, req *mgmt_pb.AddGitHubPr
 }
 
 func (s *Server) UpdateGitHubProvider(ctx context.Context, req *mgmt_pb.UpdateGitHubProviderRequest) (*mgmt_pb.UpdateGitHubProviderResponse, error) {
-	details, err := s.command.UpdateOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
+	details, err := s.command.UpdateOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitHubProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +282,7 @@ func (s *Server) UpdateGitHubEnterpriseProvider(ctx context.Context, req *mgmt_p
 }
 
 func (s *Server) AddGitLabProvider(ctx context.Context, req *mgmt_pb.AddGitLabProviderRequest) (*mgmt_pb.AddGitLabProviderResponse, error) {
-	id, details, err := s.command.AddOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
+	id, details, err := s.command.AddOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +293,7 @@ func (s *Server) AddGitLabProvider(ctx context.Context, req *mgmt_pb.AddGitLabPr
 }
 
 func (s *Server) UpdateGitLabProvider(ctx context.Context, req *mgmt_pb.UpdateGitLabProviderRequest) (*mgmt_pb.UpdateGitLabProviderResponse, error) {
-	details, err := s.command.UpdateOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
+	details, err := s.command.UpdateOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -324,7 +324,7 @@ func (s *Server) UpdateGitLabSelfHostedProvider(ctx context.Context, req *mgmt_p
 }
 
 func (s *Server) AddGoogleProvider(ctx context.Context, req *mgmt_pb.AddGoogleProviderRequest) (*mgmt_pb.AddGoogleProviderResponse, error) {
-	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
+	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, addGoogleProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -335,7 +335,7 @@ func (s *Server) AddGoogleProvider(ctx context.Context, req *mgmt_pb.AddGooglePr
 }
 
 func (s *Server) UpdateGoogleProvider(ctx context.Context, req *mgmt_pb.UpdateGoogleProviderRequest) (*mgmt_pb.UpdateGoogleProviderResponse, error) {
-	details, err := s.command.UpdateOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, req.ClientId, req.ClientSecret, idp_grpc.OptionsToCommand(req.ProviderOptions))
+	details, err := s.command.UpdateOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGoogleProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}

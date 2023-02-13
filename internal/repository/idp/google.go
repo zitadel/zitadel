@@ -13,8 +13,9 @@ type GoogleIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID           string              `json:"id"`
-	ClientID     string              `json:"client_id"`
-	ClientSecret *crypto.CryptoValue `json:"client_secret"`
+	ClientID     string              `json:"clientID"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
+	Scopes       []string            `json:"scopes,omitempty"`
 	Options
 }
 
@@ -23,6 +24,7 @@ func NewGoogleIDPAddedEvent(
 	id,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
+	scopes []string,
 	options Options,
 ) *GoogleIDPAddedEvent {
 	return &GoogleIDPAddedEvent{
@@ -30,6 +32,7 @@ func NewGoogleIDPAddedEvent(
 		ID:           id,
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
+		Scopes:       scopes,
 		Options:      options,
 	}
 }
@@ -60,8 +63,9 @@ type GoogleIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID           string              `json:"id"`
-	ClientID     *string             `json:"client_id,omitempty"`
-	ClientSecret *crypto.CryptoValue `json:"client_secret,omitempty"`
+	ClientID     *string             `json:"clientID,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	Scopes       []string            `json:"scopes,omitempty"` //TODO: tristate?
 	OptionChanges
 }
 
@@ -94,6 +98,12 @@ func ChangeGoogleClientID(clientID string) func(*GoogleIDPChangedEvent) {
 func ChangeGoogleClientSecret(clientSecret *crypto.CryptoValue) func(*GoogleIDPChangedEvent) {
 	return func(e *GoogleIDPChangedEvent) {
 		e.ClientSecret = clientSecret
+	}
+}
+
+func ChangeGoogleScopes(scopes []string) func(*GoogleIDPChangedEvent) {
+	return func(e *GoogleIDPChangedEvent) {
+		e.Scopes = scopes
 	}
 }
 

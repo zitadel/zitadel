@@ -6219,7 +6219,8 @@ message AddAzureADProviderRequest {
     string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     AzureADTenant tenant = 4; //TODO: validation?
     bool email_verified = 5;
-    zitadel.idp.v1.Options provider_options = 6 [(validate.rules).message = {required: true}];
+    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
 }
 
 message AddAzureADProviderResponse {
@@ -6234,7 +6235,8 @@ message UpdateAzureADProviderRequest {
     string client_secret = 4 [(validate.rules).string = {max_len: 200}];
     AzureADTenant tenant = 5; //TODO: validation?
     bool email_verified = 6;
-    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
+    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 8 [(validate.rules).message = {required: true}];
 }
 
 message UpdateAzureADProviderResponse {
@@ -6257,7 +6259,8 @@ message AzureADTenant {
 message AddGitHubProviderRequest {
     string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 3 [(validate.rules).message = {required: true}];
+    repeated string scopes = 3 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
 }
 
 message AddGitHubProviderResponse {
@@ -6269,7 +6272,8 @@ message UpdateGitHubProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 3 [(validate.rules).string = {max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
+    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 5 [(validate.rules).message = {required: true}];
 }
 
 message UpdateGitHubProviderResponse {
@@ -6278,11 +6282,13 @@ message UpdateGitHubProviderResponse {
 
 message AddGitHubEnterpriseProviderRequest {
     string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string authorization_endpoint = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string token_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 6 [(validate.rules).message = {required: true}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string authorization_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 8 [(validate.rules).message = {required: true}];
 }
 
 message AddGitHubEnterpriseProviderResponse {
@@ -6292,12 +6298,14 @@ message AddGitHubEnterpriseProviderResponse {
 
 message UpdateGitHubEnterpriseProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {max_len: 200}];
-    string authorization_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    string authorization_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_endpoint = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 9 [(validate.rules).message = {required: true}];
 }
 
 message UpdateGitHubEnterpriseProviderResponse {
@@ -6307,7 +6315,8 @@ message UpdateGitHubEnterpriseProviderResponse {
 message AddGitLabProviderRequest {
     string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 3 [(validate.rules).message = {required: true}];
+    repeated string scopes = 3 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
 }
 
 message AddGitLabProviderResponse {
@@ -6319,7 +6328,8 @@ message UpdateGitLabProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 3 [(validate.rules).string = {max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
+    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 5 [(validate.rules).message = {required: true}];
 }
 
 message UpdateGitLabProviderResponse {
@@ -6328,9 +6338,11 @@ message UpdateGitLabProviderResponse {
 
 message AddGitLabSelfHostedProviderRequest {
     string issuer = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 6 [(validate.rules).message = {required: true}];
 }
 
 message AddGitLabSelfHostedProviderResponse {
@@ -6341,9 +6353,11 @@ message AddGitLabSelfHostedProviderResponse {
 message UpdateGitLabSelfHostedProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 5 [(validate.rules).message = {required: true}];
+    string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 5 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
 }
 
 message UpdateGitLabSelfHostedProviderResponse {
@@ -6353,7 +6367,8 @@ message UpdateGitLabSelfHostedProviderResponse {
 message AddGoogleProviderRequest {
     string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 3 [(validate.rules).message = {required: true}];
+    repeated string scopes = 3 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
 }
 
 message AddGoogleProviderResponse {
@@ -6365,7 +6380,8 @@ message UpdateGoogleProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 3 [(validate.rules).string = {max_len: 200}];
-    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
+    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 5 [(validate.rules).message = {required: true}];
 }
 
 message UpdateGoogleProviderResponse {

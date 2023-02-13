@@ -156,10 +156,11 @@ func (wm *InstanceGoogleIDPWriteModel) NewChangedEvent(
 	clientID string,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
+	scopes []string,
 	options idp.Options,
 ) (*instance.GoogleIDPChangedEvent, error) {
 
-	changes, err := wm.GoogleIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, options)
+	changes, err := wm.GoogleIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, scopes, options)
 	if err != nil {
 		return nil, err
 	}

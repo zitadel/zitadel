@@ -33,6 +33,7 @@ func (wm *OAuthIDPWriteModel) Reduce() error {
 			if wm.ID != e.ID {
 				continue
 			}
+			wm.Name = e.Name
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
 			wm.AuthorizationEndpoint = e.AuthorizationEndpoint
@@ -143,6 +144,7 @@ func (wm *OIDCIDPWriteModel) Reduce() error {
 			if wm.ID != e.ID {
 				continue
 			}
+			wm.Name = e.Name
 			wm.Issuer = e.Issuer
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
@@ -232,7 +234,7 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 
 func (wm *OIDCIDPWriteModel) reduceConfigAddedEvent(e *idpconfig.IDPConfigAddedEvent) {
 	wm.Name = e.Name
-	//rm.StylingType = e.StylingType //TODO: ?
+	//rm.StylingType = e.StylingType //TODO: drop?
 	wm.Options.IsAutoCreation = e.AutoRegister
 	wm.State = domain.IDPStateActive
 }
@@ -241,7 +243,7 @@ func (wm *OIDCIDPWriteModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigChan
 	if e.Name != nil {
 		wm.Name = *e.Name
 	}
-	//if e.StylingType != nil && e.StylingType.Valid() { //TODO: ?
+	//if e.StylingType != nil && e.StylingType.Valid() { //TODO: drop?
 	//	rm.StylingType = *e.StylingType
 	//}
 	if e.AutoRegister != nil {
@@ -270,6 +272,7 @@ func (wm *JWTIDPWriteModel) Reduce() error {
 			if wm.ID != e.ID {
 				continue
 			}
+			wm.Name = e.Name
 			wm.Issuer = e.Issuer
 			wm.JWTEndpoint = e.JWTEndpoint
 			wm.KeysEndpoint = e.KeysEndpoint
@@ -445,6 +448,7 @@ type GitHubIDPWriteModel struct {
 	ID           string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
+	Scopes       []string
 	idp.Options
 
 	State domain.IDPState //TODO: ?
@@ -459,6 +463,7 @@ func (wm *GitHubIDPWriteModel) Reduce() error {
 			}
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
+			wm.Scopes = e.Scopes
 			wm.State = domain.IDPStateActive
 		case *idp.GitHubIDPChangedEvent:
 			if wm.ID != e.ID {
@@ -477,6 +482,9 @@ func (wm *GitHubIDPWriteModel) reduceChangedEvent(e *idp.GitHubIDPChangedEvent) 
 	if e.ClientSecret != nil {
 		wm.ClientSecret = e.ClientSecret
 	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -484,6 +492,7 @@ func (wm *GitHubIDPWriteModel) NewChanges(
 	clientID string,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
+	scopes []string,
 	options idp.Options,
 ) ([]idp.OAuthIDPChanges, error) {
 	changes := make([]idp.OAuthIDPChanges, 0)
@@ -498,6 +507,9 @@ func (wm *GitHubIDPWriteModel) NewChanges(
 	}
 	if wm.ClientID != clientID {
 		changes = append(changes, idp.ChangeOAuthClientID(clientID))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeOAuthScopes(scopes))
 	}
 
 	opts := wm.Options.Changes(options)
@@ -721,6 +733,7 @@ func (wm *GitLabSelfHostedIDPWriteModel) Reduce() error {
 			wm.Issuer = e.Issuer
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
+			wm.Scopes = e.Scopes
 			wm.State = domain.IDPStateActive
 		case *idp.GitLabSelfHostedIDPChangedEvent:
 			if wm.ID != e.ID {
@@ -795,9 +808,10 @@ type GoogleIDPWriteModel struct {
 	ID           string
 	ClientID     string
 	ClientSecret *crypto.CryptoValue
+	Scopes       []string
 	idp.Options
 
-	State domain.IDPState //TODO: ?
+	State domain.IDPState
 }
 
 func (wm *GoogleIDPWriteModel) Reduce() error {
@@ -809,6 +823,7 @@ func (wm *GoogleIDPWriteModel) Reduce() error {
 			}
 			wm.ClientID = e.ClientID
 			wm.ClientSecret = e.ClientSecret
+			wm.Scopes = e.Scopes
 			wm.State = domain.IDPStateActive
 		case *idp.GoogleIDPChangedEvent:
 			if wm.ID != e.ID {
@@ -834,6 +849,7 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 	clientID string,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
+	scopes []string,
 	options idp.Options,
 ) ([]idp.GoogleIDPChanges, error) {
 	changes := make([]idp.GoogleIDPChanges, 0)
@@ -848,6 +864,9 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 	}
 	if wm.ClientID != clientID {
 		changes = append(changes, idp.ChangeGoogleClientID(clientID))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeGoogleScopes(scopes))
 	}
 
 	opts := wm.Options.Changes(options)
