@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -144,23 +143,16 @@ type AddQuota struct {
 }
 
 func (q *AddQuota) validate() error {
-	isUrl := func(str string) error {
-		u, err := url.Parse(str)
-		if err != nil {
-			return err
-		}
-
-		if u.Scheme == "" || u.Host == "" {
-			return fmt.Errorf("url %s is invalid", str)
-		}
-
-		return nil
-	}
-
 	for _, notification := range q.Notifications {
-		if err := isUrl(notification.CallURL); err != nil {
-			return errors.ThrowInvalidArgument(err, "QUOTA-HAYmN", "Errors.Quota.Invalid.CallURL")
+		u, err := url.Parse(notification.CallURL)
+		if err != nil {
+			return errors.ThrowInvalidArgument(err, "QUOTA-bZ0Fj", "Errors.Quota.Invalid.CallURL")
 		}
+
+		if !u.IsAbs() || u.Host == "" {
+			return errors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", "Errors.Quota.Invalid.CallURL")
+		}
+
 		if notification.Percent < 1 {
 			return errors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", "Errors.Quota.Invalid.Percent")
 		}

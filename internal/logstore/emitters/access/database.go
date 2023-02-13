@@ -98,6 +98,7 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 	return nil
 }
 
+// TODO: AS OF SYSTEM TIME
 func (l *databaseLogStorage) QueryUsage(ctx context.Context, instanceId string, start time.Time) (uint64, error) {
 	stmt, args, err := squirrel.Select(
 		fmt.Sprintf("count(%s)", accessInstanceIdCol),
