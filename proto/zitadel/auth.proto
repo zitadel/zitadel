@@ -900,7 +900,11 @@ message GetSupportedLanguagesRequest {}
 
 //This is an empty response
 message GetSupportedLanguagesResponse {
-    repeated string languages = 1;
+    repeated string languages = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"en\", \"de\", \"it\"]"
+        }
+    ];
 }
 
 //This is an empty request
