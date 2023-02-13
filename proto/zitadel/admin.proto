@@ -3017,7 +3017,7 @@ message IsOrgUniqueRequest {
     string domain = 2 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
+            example: "\"zitadel.cloud\"";
             max_length: 200;
         }
     ];
@@ -3091,7 +3091,7 @@ message SetUpOrgRequest {
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 description: "ZITADEL generates a domain (<org-name>.zitadel.ch) for an organisation, the field is not required";
                 max_length: 200;
-                example: "\"caos.ch\"";
+                example: "\"zitadel.cloud\"";
             }
         ];
     }
@@ -3163,7 +3163,7 @@ message SetUpOrgRequest {
                 (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                     description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)";
                     min_length: 1;
-                    example: "\"gigi@caos.ch\"";
+                    example: "\"gigi@zitadel.com\"";
                 }
             ];
             bool is_email_verified = 2;

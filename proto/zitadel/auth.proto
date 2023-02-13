@@ -10,6 +10,7 @@ import "zitadel/idp.proto";
 import "zitadel/metadata.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -37,6 +38,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         {
             name: "General",
             description: "..."
+        },
+        {
+            name: "Policies",
+            description: "Policies are settings that are made on either an instance or organization level of ZITADEL. The policies will have an impact on what a user is allowed to do or what should be shown to the suer."
         },
         {
             name: "User",
@@ -775,7 +780,6 @@ service AuthService {
         };
     }
 
-    // Removes the passwordless configuration from the authorized user
     rpc RemoveMyPasswordless(RemoveMyPasswordlessRequest) returns (RemoveMyPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/me/passwordless/{token_id}"
@@ -784,9 +788,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "User Authentication Factor"
+            summary: "Remove passkey";
+            description: "Remove a passkey configuration from the authenticated user. The user will not be able to login with that configuration afterwards. Make sure the user has other possibilities to login."
+        };
     }
 
-    // Returns all user grants (authorizations) of the authorized user
     rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
         option (google.api.http) = {
             post: "/usergrants/me/_search"
@@ -795,9 +805,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "User Authorizations/Grants"
+            summary: "List My Authorizations/Grants";
+            description: "Returns a list of the authorizations/user grants the authenticated user has. User grants consist of an organization, a project and 1-n roles."
+        };
     }
 
-    // Returns a list of organisations where the authorized user has a user grant (authorization) in the context of the requested project
     rpc ListMyProjectOrgs(ListMyProjectOrgsRequest) returns (ListMyProjectOrgsResponse) {
         option (google.api.http) = {
             post: "/global/projectorgs/_search"
@@ -807,9 +823,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "User Authorizations/Grants"
+            summary: "List My Authorizations/Grants";
+            description: "Returns a list of the organizations where the authenticated user has any authorizations/user grants. The request is made in the context of the requested project. This request can be used in multi-tenancy applications to show the user a tenant switcher."
+        };
     }
 
-    // Returns the permissions the authorized user has in ZITADEL based on his manager roles (e.g ORG_OWNER)
     rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
         option (google.api.http) = {
             post: "/permissions/zitadel/me/_search"
@@ -818,9 +840,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "User Authorizations/Grants"
+            summary: "List My ZITADEL Permissions";
+            description: "Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: ORG_OWNER = org.read, org.write, ...)."
+        };
     }
 
-    // Returns a list of roles for the authorized user and project
     rpc ListMyProjectPermissions(ListMyProjectPermissionsRequest) returns (ListMyProjectPermissionsResponse) {
         option (google.api.http) = {
             post: "/permissions/me/_search"
@@ -829,10 +857,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "User Authorizations/Grants"
+            summary: "List My Project Permissions";
+            description: "Returns a list of roles for the authenticated user and for the requesting project (based on the token)."
+        };
     }
 
-    // Show all the permissions my user has in ZITADEL (ZITADEL Manager)
-    // Limit should always be set, there is a default limit set by the service
     rpc ListMyMemberships(ListMyMembershipsRequest) returns (ListMyMembershipsResponse) {
         option (google.api.http) = {
             post: "/memberships/me/_search"
@@ -842,9 +875,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "User Memberships"
+            summary: "List My ZITADEL Permissions";
+            description: "Show all the permissions my user has in ZITADEL (ZITADEL Manager). Limit should always be set, there is a default limit set by the service"
+        };
     }
 
-    // Returns the label policy of the current organisation
     rpc GetMyLabelPolicy(GetMyLabelPolicyRequest) returns (GetMyLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/label"
@@ -853,9 +892,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "Policies";
+            summary: "Get Label Policy";
+            description: "Returns the label settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines the branding, colors, fonts, images, etc."
+        };
     }
 
-    // Returns the privacy policy of the current organisation
     rpc GetMyPrivacyPolicy(GetMyPrivacyPolicyRequest) returns (GetMyPrivacyPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/privacy"
@@ -864,9 +909,15 @@ service AuthService {
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "Policies";
+            summary: "Get Privacy Policy";
+            description: "Returns the privacy settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines the tos and terms of service links."
+        };
     }
 
-    // Returns the login policy of the current organisation
     rpc GetMyLoginPolicy(GetMyLoginPolicyRequest) returns (GetMyLoginPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/login"
@@ -874,6 +925,13 @@ service AuthService {
 
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
+            tags: "Policies";
+            summary: "Get Login Policy";
+            description: "Returns the login settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines what possibilities the user has to authenticate and to use in the login, e.g social logins, mfa, passkey, etc."
         };
     }
 }
@@ -1024,8 +1082,22 @@ message GetMyPasswordComplexityPolicyResponse {
 }
 
 message UpdateMyPasswordRequest {
-    string old_password = 1 [(validate.rules).string = {min_len: 1, max_bytes: 70}];
-    string new_password = 2 [(validate.rules).string = {min_len: 1, max_bytes: 70}];
+    string old_password = 1 [
+        (validate.rules).string = {min_len: 1, max_bytes: 70},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            example: "\"MyOldPassword12!\"";
+        }
+    ];
+    string new_password = 2 [
+        (validate.rules).string = {min_len: 1, max_bytes: 70},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            example: "\"MyNewPassword12!\"";
+        }
+    ];
 }
 
 message UpdateMyPasswordResponse {
@@ -1041,11 +1113,47 @@ message GetMyProfileResponse {
 }
 
 message UpdateMyProfileRequest {
-    string first_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string last_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string nick_name = 3 [(validate.rules).string = {max_len: 200}];
-    string display_name = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string preferred_language = 5 [(validate.rules).string = {max_len: 10}];
+    string first_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Minnie\"";
+        }
+    ];
+    string last_name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Mouse\"";
+        }
+    ];
+    string nick_name = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Minnie\"";
+        }
+    ];
+    string display_name = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},(google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Minnie Mouse\"";
+        }
+    ];
+    string preferred_language = 5 [
+        (validate.rules).string = {max_len: 10},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 10;
+            example: "\"en\"";
+        }
+    ];
     zitadel.user.v1.Gender gender = 6;
 }
 
@@ -1062,7 +1170,13 @@ message GetMyEmailResponse {
 }
 
 message SetMyEmailRequest {
-    string email = 1 [(validate.rules).string.email = true];
+    string email = 1 [
+        (validate.rules).string.email = true,
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi@zitadel.com\"";
+        }
+    ];
 }
 
 message SetMyEmailResponse {
@@ -1070,7 +1184,15 @@ message SetMyEmailResponse {
 }
 
 message VerifyMyEmailRequest {
-    string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string code = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"H83J3\"";
+        }
+    ];
 }
 
 message VerifyMyEmailResponse {
@@ -1093,7 +1215,15 @@ message GetMyPhoneResponse {
 }
 
 message SetMyPhoneRequest {
-    string phone = 1 [(validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"}];
+    string phone = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 50, prefix: "+"},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 50;
+            example: "\"+41 71 000 00 00\"";
+        }
+    ];
 }
 
 message SetMyPhoneResponse {
@@ -1101,7 +1231,15 @@ message SetMyPhoneResponse {
 }
 
 message VerifyMyPhoneRequest {
-    string code = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string code = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"H83J3\"";
+        }
+    ];
 }
 
 message VerifyMyPhoneResponse {
@@ -1263,12 +1401,36 @@ message ListMyUserGrantsResponse {
 }
 
 message UserGrant {
-    string org_id = 1;
-    string project_id = 2;
-    string user_id = 3;
-    repeated string roles = 4;
-    string org_name = 5;
-    string grant_id = 6;
+    string org_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629026806489455\""
+        }
+    ];
+    string project_id = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"98729028932384528\""
+        }
+    ];
+    string user_id = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"28746028909593987\""
+        }
+    ];
+    repeated string roles = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"RoleKey1\", \"RoleKey2\"]"
+        }
+    ];
+    string org_name = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\""
+        }
+    ];
+    string grant_id = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"\""
+        }
+    ];
 }
 
 message ListMyProjectOrgsRequest {
@@ -1287,14 +1449,22 @@ message ListMyProjectOrgsResponse {
 message ListMyZitadelPermissionsRequest {}
 
 message ListMyZitadelPermissionsResponse {
-    repeated string result = 1;
+    repeated string result = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"org.read\", \"org.write\"]"
+        }
+    ];
 }
 
 //This is an empty request
 message ListMyProjectPermissionsRequest {}
 
 message ListMyProjectPermissionsResponse {
-    repeated string result = 1;
+    repeated string result = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"RoleKey1\", \"RoleKey2\"]"
+        }
+    ];
 }
 
 message ListMyMembershipsRequest {

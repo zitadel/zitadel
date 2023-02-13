@@ -29,12 +29,12 @@ message User {
     ];
     repeated string login_names = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"gigi@caos.ch\", \"gigi@caos-ag.zitadel.ch\"]";
+            example: "[\"gigi@zitadel.com\", \"gigi@zitadel.zitadel.ch\"]";
         }
     ];
     string preferred_login_name = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     oneof type {
@@ -130,7 +130,7 @@ message Email {
     string email = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     bool is_email_verified = 2 [
@@ -257,7 +257,7 @@ message EmailQuery {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
             max_length: 200;
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -527,7 +527,7 @@ message Session {
     ];
     string login_name = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     string display_name = 8 [
@@ -566,16 +566,19 @@ message RefreshToken {
     ];
     google.protobuf.Timestamp auth_time = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2023-02-13T08:45:00.000000Z\"";
             description: "\"time when the user authenticated, does not have to be the same time the token was created\""
         }
     ];
     google.protobuf.Timestamp idle_expiration = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2023-02-14T08:45:00.000000Z\"";
             description: "\"time the refresh token will expire if not used, the user will have to reauthenticate\""
         }
     ];
     google.protobuf.Timestamp expiration = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2023-02-14T08:45:00.000000Z\"";
             description: "\"time the refresh token will expire, the user will have to reauthenticate\""
         }
     ];
@@ -657,7 +660,7 @@ message UserGrant {
         (validate.rules).string.email = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
     string display_name = 10 [
@@ -674,12 +677,12 @@ message UserGrant {
     ];
     string org_name = 12 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"CAOS AG\"";
+            example: "\"ZITADEL\"";
         }
     ];
     string org_domain = 13 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
+            example: "\"zitadel.cloud\"";
         }
     ];
     string project_id = 14 [
@@ -705,7 +708,7 @@ message UserGrant {
     ];
     string preferred_login_name = 18 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\"";
+            example: "\"gigi@zitadel.com\"";
         }
     ];
 }
@@ -832,7 +835,7 @@ message UserGrantEmailQuery {
     string email = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"gigi@caos.ch\""
+            example: "\"gigi@zitadel.com\""
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [

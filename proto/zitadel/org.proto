@@ -22,12 +22,12 @@ message Org {
     ];
     string name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"CAOS AG\"";
+            example: "\"ZITADEL\"";
         }
     ];
     string primary_domain = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
+            example: "\"zitadel.cloud\"";
         }
     ];
 }
@@ -103,7 +103,7 @@ message OrgDomainQuery {
     string domain = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"CAOS.C\"";
+            example: "\"zitadel.cloud\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
@@ -140,7 +140,7 @@ message DomainNameQuery {
     string name = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos.ch\"";
+            example: "\"zitadel.cloud\"";
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
