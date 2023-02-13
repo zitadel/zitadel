@@ -287,7 +287,7 @@ Please refer to the [README](./docs/README.md) for more information and local te
 ### Style Guide
 
 - **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
-- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the partent page, but is not accessible individually (eg, by search).
+- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
 
 ### Docs Pull Request
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
