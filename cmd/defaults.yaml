@@ -654,7 +654,7 @@ DefaultInstance:
 #            # Repeat defines, whether a notification should be emitted each time when a multitude of the configured Percent is used.
 #            Repeat: true
 #            # CallURL is called when a relative amount of the quota is used.
-#            CallURL: "https://example.com"
+#            CallURL: "https://httpbin.org/post"
 
 InternalAuthZ:
   RolePermissionMappings:
