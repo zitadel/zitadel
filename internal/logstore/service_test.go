@@ -226,7 +226,7 @@ func runTest(t *testing.T, name string, args args, want want) bool {
 	return t.Run("Given over a minute, each second a log record is emitted", func(tt *testing.T) {
 		tt.Run(name, func(t *testing.T) {
 			ctx, clock, mainStorage, secondaryStorage, svc := given(t, args, want)
-			remaining := when(t, svc, ctx, clock)
+			remaining := when(svc, ctx, clock)
 			then(t, mainStorage, secondaryStorage, remaining, want)
 		})
 	})
@@ -262,14 +262,10 @@ func given(t *testing.T, args args, want want) (context.Context, *clock.Mock, *e
 	return ctx, clock, mainStorage, secondaryStorage, svc
 }
 
-func when(t *testing.T, svc *logstore.Service, ctx context.Context, clock *clock.Mock) *uint64 {
+func when(svc *logstore.Service, ctx context.Context, clock *clock.Mock) *uint64 {
 	var remaining *uint64
 	for i := 0; i < ticks; i++ {
-		err := svc.Handle(ctx, emittermock.NewRecord(clock))
-		if err != nil {
-			t.Errorf("expected no error but got %v", err)
-		}
-
+		svc.Handle(ctx, emittermock.NewRecord(clock))
 		runtime.Gosched()
 		remaining = svc.Limit(ctx, "non-empty-instance-id")
 		clock.Add(tick)

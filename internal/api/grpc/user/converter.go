@@ -76,7 +76,7 @@ func MachineToPb(view *query.Machine) *user_pb.Machine {
 		AccessTokenType: AccessTokenTypeToPb(view.AccessTokenType),
 	}
 }
-
+ 
 func ProfileToPb(profile *query.Profile, assetPrefix string) *user_pb.Profile {
 	return &user_pb.Profile{
 		FirstName:         profile.FirstName,

@@ -360,7 +360,7 @@ Removes a quota
 | unit |  zitadel.quota.v1.Unit | the unit a quota should be imposed on | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 | from |  google.protobuf.Timestamp | the starting time from which the current quota period is calculated from. This is relevant for querying the current usage. | timestamp.required: true<br />  |
 | reset_interval |  google.protobuf.Duration | the quota periods duration | duration.required: true<br />  |
-| amount |  uint64 | the count limit after which ZITADEL enforces the quotas actions | uint64.gt: 0<br />  |
+| amount |  uint64 | the quota amount of units | uint64.gt: 0<br />  |
 | limit |  bool | whether ZITADEL should block further usage when the configured amount is used |  |
 | notifications | repeated zitadel.quota.v1.Notification | the handlers, ZITADEL executes when certain quota percentages are reached |  |
 
