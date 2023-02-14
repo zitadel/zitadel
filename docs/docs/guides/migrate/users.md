@@ -8,17 +8,33 @@ We will also offer more detailed guides how to migrate users from a specific aut
 
 ## Technical Considerations
 
-## Migrating Secrets
+- Explain when to use batch vs. JIT
+- Explain when to have zitadel or legacy as lead
+- Explain when parallel user sessions might be required
+
+### Migrating Secrets
 
 - Hashes
 - Passkeys
 - OTP
 
-## Importing users
+### Importing users
 
-### Local users
+#### Local users
 
 - Batch
 - Individual
 
-### External users
+#### Actions
+
+- Required flows
+- HTTP request to pull / push info
+- Setting metadata
+
+#### External users
+
+## Batch Migration
+
+## Just In Time Migration
+
+## Parallel Sessions
