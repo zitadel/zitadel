@@ -260,8 +260,8 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
 	cols = append(cols,
-		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
 	ldapCols := make([]handler.Column, 0, 4)
@@ -338,8 +338,8 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 			crdb.AddUpdateStatement(
 				cols,
 				[]handler.Condition{
-					handler.NewCond(IDPIDCol, idpEvent.ID),
-					handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 			),
 		)
