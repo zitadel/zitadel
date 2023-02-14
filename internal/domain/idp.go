@@ -18,3 +18,17 @@ func (s IDPState) Valid() bool {
 func (s IDPState) Exists() bool {
 	return s != IDPStateUnspecified && s != IDPStateRemoved
 }
+
+type IDPType int32
+
+const (
+	IDPTypeUnspecified IDPType = iota
+	IDPTypeLDAP
+	IDPTypeOIDC
+	IDPTypeJWT
+	IDPTypeGoogle
+	IDPTypeOAuth
+	IDPTypeGitHub
+	IDPTypeGitLab
+	IDPTypeAzureAD
+)
