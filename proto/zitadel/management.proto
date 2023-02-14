@@ -3007,7 +3007,7 @@ service ManagementService {
         };
     }
 
-    rpc ListIDPs(ListIDPsRequest) returns (ListIDPsResponse) {
+    rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {
         option (google.api.http) = {
             post: "/idps/templates/_search"
             body: "*"
@@ -5974,12 +5974,12 @@ message UpdateOrgIDPJWTConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListIDPsRequest {
+message ListProvidersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
 }
 
-message ListIDPsResponse {
+message ListProvidersResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.idp.v1.Provider result = 2;
 }

@@ -263,6 +263,7 @@ authorization framework of the identity provider
 | PROVIDER_TYPE_GITLAB | 7 | - |
 | PROVIDER_TYPE_GITLAB_SELF_HOSTED | 8 | - |
 | PROVIDER_TYPE_GOOGLE | 9 | - |
+| PROVIDER_TYPE_LDAP | 10 | - |
 
 
 

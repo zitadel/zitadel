@@ -4,21 +4,22 @@ import (
 	"context"
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddOrgLDAPProvider(ctx context.Context, resourceOwner string, provider LDAPProvider) (string, *domain.ObjectDetails, error) {
-	orgAgg := org.NewAggregate(resourceOwner)
+func (c *Commands) AddInstanceLDAPProvider(ctx context.Context, provider LDAPProvider) (string, *domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgLDAPProvider(orgAgg, resourceOwner, id, provider))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceLDAPProvider(instanceAgg, id, provider))
 	if err != nil {
 		return "", nil, err
 	}
@@ -29,9 +30,9 @@ func (c *Commands) AddOrgLDAPProvider(ctx context.Context, resourceOwner string,
 	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateOrgLDAPProvider(ctx context.Context, resourceOwner, id string, provider LDAPProvider) (*domain.ObjectDetails, error) {
-	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgLDAPProvider(orgAgg, resourceOwner, id, provider))
+func (c *Commands) UpdateInstanceLDAPProvider(ctx context.Context, id string, provider LDAPProvider) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceLDAPProvider(instanceAgg, id, provider))
 	if err != nil {
 		return nil, err
 	}
@@ -46,9 +47,9 @@ func (c *Commands) UpdateOrgLDAPProvider(ctx context.Context, resourceOwner, id 
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) DeleteOrgProvider(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
-	orgAgg := org.NewAggregate(resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareDeleteOrgProvider(orgAgg, resourceOwner, id))
+func (c *Commands) DeleteInstanceProvider(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareDeleteInstanceProvider(instanceAgg, id))
 	if err != nil {
 		return nil, err
 	}
@@ -59,31 +60,31 @@ func (c *Commands) DeleteOrgProvider(ctx context.Context, resourceOwner, id stri
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, resourceOwner, id string, provider LDAPProvider) preparation.Validation {
+func (c *Commands) prepareAddInstanceLDAPProvider(a *instance.Aggregate, id string, provider LDAPProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAfdd", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SAfdd", "Errors.Invalid.Argument")
 		}
 		if provider.Host = strings.TrimSpace(provider.Host); provider.Host == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SDVg2", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SDVg2", "Errors.Invalid.Argument")
 		}
 		if provider.BaseDN = strings.TrimSpace(provider.BaseDN); provider.BaseDN == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-sv31s", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sv31s", "Errors.Invalid.Argument")
 		}
 		if provider.UserObjectClass = strings.TrimSpace(provider.UserObjectClass); provider.UserObjectClass == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-sdgf4", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdgf4", "Errors.Invalid.Argument")
 		}
 		if provider.UserUniqueAttribute = strings.TrimSpace(provider.UserUniqueAttribute); provider.UserUniqueAttribute == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-AEG2w", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-AEG2w", "Errors.Invalid.Argument")
 		}
 		if provider.Admin = strings.TrimSpace(provider.Admin); provider.Admin == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAD5n", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-SAD5n", "Errors.Invalid.Argument")
 		}
 		if provider.Password = strings.TrimSpace(provider.Password); provider.Password == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-sdf5h", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdf5h", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewLDAPOrgIDPWriteModel(resourceOwner, id)
+			writeModel := NewLDAPInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -97,7 +98,7 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, resourceOwner, id
 				return nil, err
 			}
 			return []eventstore.Command{
-				org.NewLDAPIDPAddedEvent(
+				instance.NewLDAPIDPAddedEvent(
 					ctx,
 					&a.Aggregate,
 					id,
@@ -118,31 +119,31 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, resourceOwner, id
 	}
 }
 
-func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, resourceOwner, id string, provider LDAPProvider) preparation.Validation {
+func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, id string, provider LDAPProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if id = strings.TrimSpace(id); id == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dgdbs", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Dgdbs", "Errors.Invalid.Argument")
 		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sffgd", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Sffgd", "Errors.Invalid.Argument")
 		}
 		if provider.Host = strings.TrimSpace(provider.Host); provider.Host == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dz62d", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Dz62d", "Errors.Invalid.Argument")
 		}
 		if provider.BaseDN = strings.TrimSpace(provider.BaseDN); provider.BaseDN == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-vb3ss", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-vb3ss", "Errors.Invalid.Argument")
 		}
 		if provider.UserObjectClass = strings.TrimSpace(provider.UserObjectClass); provider.UserObjectClass == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-hbere", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-hbere", "Errors.Invalid.Argument")
 		}
 		if provider.UserUniqueAttribute = strings.TrimSpace(provider.UserUniqueAttribute); provider.UserUniqueAttribute == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-ASFt6", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-ASFt6", "Errors.Invalid.Argument")
 		}
 		if provider.Admin = strings.TrimSpace(provider.Admin); provider.Admin == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-DG45z", "Errors.Invalid.Argument")
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-DG45z", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewLDAPOrgIDPWriteModel(resourceOwner, id)
+			writeModel := NewLDAPInstanceIDPWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -152,7 +153,7 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, resourceOwner,
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-ASF3F", "Errors.Org.IDPConfig.NotExisting")
+				return nil, caos_errs.ThrowNotFound(nil, "INST-ASF3F", "Errors.Instance.IDPConfig.NotExisting")
 			}
 			event, err := writeModel.NewChangedEvent(
 				ctx,
@@ -183,10 +184,10 @@ func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, resourceOwner,
 	}
 }
 
-func (c *Commands) prepareDeleteOrgProvider(a *org.Aggregate, resourceOwner, id string) preparation.Validation {
+func (c *Commands) prepareDeleteInstanceProvider(a *instance.Aggregate, id string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel := NewOrgIDPRemoveWriteModel(resourceOwner, id)
+			writeModel := NewInstanceIDPRemoveWriteModel(a.InstanceID, id)
 			events, err := filter(ctx, writeModel.Query())
 			if err != nil {
 				return nil, err
@@ -196,9 +197,9 @@ func (c *Commands) prepareDeleteOrgProvider(a *org.Aggregate, resourceOwner, id 
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-Se3tg", "Errors.Org.IDPConfig.NotExisting")
+				return nil, caos_errs.ThrowNotFound(nil, "INST-Se3tg", "Errors.Instance.IDPConfig.NotExisting")
 			}
-			return []eventstore.Command{org.NewIDPRemovedEvent(ctx, &a.Aggregate, id, writeModel.name)}, nil
+			return []eventstore.Command{instance.NewIDPRemovedEvent(ctx, &a.Aggregate, id, writeModel.name)}, nil
 		}, nil
 	}
 }
