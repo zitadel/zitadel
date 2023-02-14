@@ -2,6 +2,8 @@
 title: Connect with Auth0 through OIDC
 ---
 
+import CreateApp from "./application/_application.mdx";
+
 This guide shows how to enable login with ZITADEL on Auth0.
 
 It covers how to:
@@ -37,8 +39,6 @@ Next we have to switch to the ZITADEL console.
 ## **ZITADEL**: Create the application
 
 First of all we create the application in your project.
-
-import CreateApp from "./application/application.mdx";
 
 <CreateApp appType="web" authType="code" appName="Auth0" redirectURI="https://<TENANT>.<REGION>.auth0.com/login/callback"/>
 

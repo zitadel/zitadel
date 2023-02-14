@@ -1,4 +1,5 @@
-import { ensureOrgExists } from 'support/api/orgs';
+import { ensureOrgExists, ensureOrgIsDefault, isDefaultOrg } from 'support/api/orgs';
+import { apiAuth } from '../../support/api/apiauth';
 import { v4 as uuidv4 } from 'uuid';
 import { Context } from 'support/commands';
 
@@ -29,6 +30,42 @@ describe('organizations', () => {
       cy.shouldConfirmSuccess();
       cy.visit(orgPath);
       cy.get('[data-e2e="top-view-title"').should('contain', testOrgNameChange);
+    });
+
+    const orgOverviewPath = `/orgs`;
+    const initialDefaultOrg = 'e2eorgolddefault';
+    const orgNameForNewDefault = 'e2eorgnewdefault';
+
+    describe('set default org', () => {
+      beforeEach(() => {
+        cy.get<Context>('@ctx').then((ctx) => {
+          ensureOrgExists(ctx.api, orgNameForNewDefault)
+            .as('newDefaultOrgId')
+            .then(() => {
+              ensureOrgExists(ctx.api, initialDefaultOrg)
+                .as('defaultOrg')
+                .then((id) => {
+                  ensureOrgIsDefault(ctx.api, parseInt(id))
+                    .as('orgWasDefault')
+                    .then(() => {
+                      cy.visit(`${orgOverviewPath}`).as('orgsite');
+                    });
+                });
+            });
+        });
+      });
+
+      it('should rename the organization', () => {
+        cy.get<Context>('@ctx').then((ctx) => {
+          const rowSelector = `tr:contains(${orgNameForNewDefault})`;
+          cy.get(rowSelector).find('[data-e2e="table-actions-button"]').click({ force: true });
+          cy.get('[data-e2e="set-default-button"]', { timeout: 1000 }).should('be.visible').click();
+          cy.shouldConfirmSuccess();
+          cy.get<number>('@newDefaultOrgId').then((newDefaultOrgId) => {
+            isDefaultOrg(ctx.api, newDefaultOrgId);
+          });
+        });
+      });
     });
 
     it('should add an organization with the personal account as org owner');

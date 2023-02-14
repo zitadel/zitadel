@@ -42,7 +42,7 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'it', 'fr'];
+  public languages: string[] = ['de', 'en', 'it', 'fr', 'pl', 'zh'];
 
   public ChangeType: any = ChangeType;
 
@@ -274,9 +274,15 @@ export class UserDetailComponent implements OnInit {
     if (this.user.machine) {
       this.user.machine.name = machineData.name;
       this.user.machine.description = machineData.description;
+      this.user.machine.accessTokenType = machineData.accessTokenType;
 
       this.mgmtUserService
-        .updateMachine(this.user.id, this.user.machine.name, this.user.machine.description)
+        .updateMachine(
+          this.user.id,
+          this.user.machine.name,
+          this.user.machine.description,
+          this.user.machine.accessTokenType,
+        )
         .then(() => {
           this.toast.showInfo('USER.TOAST.SAVED', true);
           this.refreshChanges$.emit();

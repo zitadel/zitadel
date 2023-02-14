@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Sélectionnez une date d'expiration",
       "CREATIONDATE": "Date de création",
       "KEYDETAILS": "Détails de la clé",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Ajouter une clé",
         "DESCRIPTION": "Sélectionnez votre type de clé et choisissez une date d'expiration facultative."
@@ -843,6 +848,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Saisissez le nom de votre nouvelle organisation.",
       "ORGDETAILUSER_TITLE": "Configurer le propriétaire de l'organisation",
       "DELETE": "Supprimer l'organisation",
+      "DEFAULTLABEL": "Défaut",
+      "SETASDEFAULT": "Définir comme organisation par défaut",
+      "DEFAULTORGSET": "L'organisation par défaut a été modifiée avec succès",
       "RENAME": {
         "ACTION": "Renommer",
         "TITLE": "Renommer l'organisation",
@@ -973,7 +981,8 @@
       "en": "English",
       "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1164,7 +1173,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1926,7 +1936,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",
