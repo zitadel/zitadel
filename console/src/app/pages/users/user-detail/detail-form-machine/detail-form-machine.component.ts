@@ -28,7 +28,7 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
       userName: [{ value: '', disabled: true }, [Validators.required]],
       name: [{ value: '', disabled: this.disabled }, Validators.required],
       description: [{ value: '', disabled: this.disabled }],
-      accessTokenTyp: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, [Validators.required]],
+      accessTokenType: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, [Validators.required]],
     });
   }
 
@@ -57,6 +57,6 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
   }
 
   public get accessTokenTyp(): AbstractControl | null {
-    return this.machineForm.get('accessTokenTyp');
+    return this.machineForm.get('accessTokenType');
   }
 }
