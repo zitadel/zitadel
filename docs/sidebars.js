@@ -107,6 +107,17 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Migrate",
+      collapsed: false,
+      items: [
+        "guides/migrate/introduction",
+        "guides/migrate/users",
+        "guides/migrate/export-and-import",
+        "guides/migrate/auth0",
+      ]
+    },
+    {
+      type: "category",
       label: "Integrate",
       collapsed: true,
       link: {
