@@ -23,7 +23,7 @@ type IDPTemplate struct {
 	Sequence          uint64
 	ResourceOwner     string
 	ID                string
-	State             domain.IDPConfigState
+	State             domain.IDPState
 	Name              string
 	Type              domain.IDPType
 	OwnerType         domain.IdentityProviderType
@@ -543,6 +543,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&ldapPreferredLanguageAttribute,
 					&ldapAvatarURLAttribute,
 					&ldapProfileAttribute,
+					&count,
 				)
 
 				if err != nil {

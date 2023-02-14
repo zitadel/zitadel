@@ -191,7 +191,7 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPConfigStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeLDAP),
