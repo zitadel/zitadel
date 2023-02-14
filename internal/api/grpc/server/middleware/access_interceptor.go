@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"net/http"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
@@ -21,12 +21,13 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 			return handler(ctx, req)
 		}
 
-		interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
-		defer func() { span.EndWithError(err) }()
-
 		reqMd, _ := metadata.FromIncomingContext(ctx)
 
 		resp, handlerErr := handler(ctx, req)
+
+		interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
+		defer func() { span.EndWithError(err) }()
+
 		var respStatus uint32
 		grpcStatus, ok := status.FromError(handlerErr)
 		if ok {
@@ -50,7 +51,6 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 		}
 
 		svc.Handle(interceptorCtx, record)
-		span.End() // TODO: Why?
 		return resp, handlerErr
 	}
 }

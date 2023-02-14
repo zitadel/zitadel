@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"math"
 	"net/http"
 	"net/url"
@@ -14,6 +13,7 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type AccessInterceptor struct {
@@ -69,7 +69,8 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		unescapedURL, err := url.QueryUnescape(requestURL)
 		if err != nil {
 			logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
-			//nolint:ineffassign
+			// err = nil is effective because of deferred tracing span end
+
 			err = nil
 		}
 		a.svc.Handle(tracingCtx, &access.Record{
@@ -84,7 +85,6 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			RequestedDomain: instance.RequestedDomain(),
 			RequestedHost:   instance.RequestedHost(),
 		})
-		span.End()
 	})
 }
 
