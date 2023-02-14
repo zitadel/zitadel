@@ -68,13 +68,12 @@ func (s *Service) Enabled() bool {
 	return s.sinkEnabled
 }
 
-func (s *Service) Handle(ctx context.Context, record LogRecord) error {
+func (s *Service) Handle(ctx context.Context, record LogRecord) {
 	for _, sink := range s.enabledSinks {
 		if err := sink.Emit(ctx, record.Normalize()); err != nil {
-			return err
+			logging.WithError(err).WithField("record", record).Warn("failed to emit log record")
 		}
 	}
-	return nil
 }
 
 func (s *Service) Limit(ctx context.Context, instanceID string) *uint64 {

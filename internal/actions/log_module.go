@@ -7,7 +7,6 @@ import (
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/console"
 	"github.com/sirupsen/logrus"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -70,9 +69,7 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 		record.Took = ts.Sub(l.started)
 	}
 
-	if err := logstoreService.Handle(l.ctx, record); err != nil {
-		logging.WithError(err).WithField("record", record).Error("handling execution log failed")
-	}
+	logstoreService.Handle(l.ctx, record)
 }
 
 func withLogger(ctx context.Context) Option {
