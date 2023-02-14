@@ -55,18 +55,16 @@ func normalizeHeaders(header http.Header, redactKeysLower ...string) {
 	// normalize keys to lowercase and ensure limit
 	for key, values := range header {
 		lowerKey := strings.ToLower(key)
-		delete(header, key)
+		header.Del(key)
 
-		vItems := make([]string, 0, maxValuesPerKey)
 		for i, vitem := range values {
 			// Max 10 header values per key
 			if i > maxValuesPerKey {
 				break
 			}
 			// Max 200 value length
-			vItems = append(vItems, cutString(vitem, 200))
+			header.Add(lowerKey, cutString(vitem, 200))
 		}
-		header[lowerKey] = vItems
 	}
 }
 
