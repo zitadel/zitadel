@@ -147,11 +147,6 @@ func ReadStmts(typ string) (err error) {
 		return err
 	}
 
-	createLogstoreStmt, err = readStmt(typ, "11_logstore")
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
