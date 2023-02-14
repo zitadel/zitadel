@@ -48,15 +48,7 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
     return this.machineForm.get('name');
   }
 
-  public get description(): AbstractControl | null {
-    return this.machineForm.get('description');
-  }
-
   public get userName(): AbstractControl | null {
     return this.machineForm.get('userName');
-  }
-
-  public get accessTokenTyp(): AbstractControl | null {
-    return this.machineForm.get('accessTokenType');
   }
 }
