@@ -162,7 +162,11 @@ func startZitadel(config *Config, masterKey string) error {
 	}
 
 	usageReporter := logstore.UsageReporterFunc(commands.ReportUsage)
-	actions.SetLogstoreService(logstore.New(commands, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter))
+	actionsLogstoreSvc := logstore.New(commands, usageReporter, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
+	if actionsLogstoreSvc.Enabled() {
+		logging.Warn("execution logs are currently in beta")
+	}
+	actions.SetLogstoreService(actionsLogstoreSvc)
 
 	notification.Start(ctx, config.Projections.Customizations["notifications"], config.ExternalPort, config.ExternalSecure, commands, queries, eventstoreClient, assets.AssetAPIFromDomain(config.ExternalSecure, config.ExternalPort), config.SystemDefaults.Notifications.FileSystemPath, keys.User, keys.SMTP, keys.SMS)
 
@@ -216,6 +220,9 @@ func startAPIs(
 	}
 
 	accessSvc := logstore.New(quotaQuerier, usageReporter, accessDBEmitter, accessStdoutEmitter)
+	if accessSvc.Enabled() {
+		logging.Warn("access logs are currently in beta")
+	}
 	accessInterceptor := middleware.NewAccessInterceptor(accessSvc, config.Quotas.Access)
 	apis := api.New(config.Port, router, queries, verifier, config.InternalAuthZ, config.ExternalSecure, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, accessSvc)
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
