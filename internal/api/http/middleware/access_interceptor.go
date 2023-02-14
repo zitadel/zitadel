@@ -70,7 +70,6 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		if err != nil {
 			logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
 			// err = nil is effective because of deferred tracing span end
-
 			err = nil
 		}
 		a.svc.Handle(tracingCtx, &access.Record{

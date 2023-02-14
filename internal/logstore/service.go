@@ -70,18 +70,14 @@ func (s *Service) Enabled() bool {
 
 func (s *Service) Handle(ctx context.Context, record LogRecord) {
 	for _, sink := range s.enabledSinks {
-		if err := sink.Emit(ctx, record.Normalize()); err != nil {
-			logging.WithError(err).WithField("record", record).Warn("failed to emit log record")
-		}
+		logging.OnError(sink.Emit(ctx, record.Normalize())).WithField("record", record).Warn("failed to emit log record")
 	}
 }
 
 func (s *Service) Limit(ctx context.Context, instanceID string) *uint64 {
 	var err error
 	defer func() {
-		if err != nil {
-			logging.WithError(err).Warn("failed to check is usage should be limited")
-		}
+		logging.OnError(err).Warn("failed to check is usage should be limited")
 	}()
 
 	if !s.reportingEnabled || instanceID == "" {

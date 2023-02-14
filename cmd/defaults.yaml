@@ -623,33 +623,37 @@ DefaultInstance:
       ButtonText: Login
 
   Quotas:
+    # Items takes a slice of quota configurations, whereas for each unit type and instance, one or zero quotas may exist.
+    # The following unit types are supported
+
+    # "requests.all.authenticated"
+    # The sum of all requests to the ZITADEL API with an authorization header,
+    # excluding the following exceptions
+    # - Calls to the System API
+    # - Calls that cause internal server errors
+    # - Failed authorizations
+    # - Requests after the quota already exceeded
+
+    # "actions.all.runs.seconds"
+    # The sum of all actions run durations in seconds
     Items:
 #      - Unit: "requests.all.authenticated"
-#        # Start Time for the quota periods
+#        # From defines the starting time from which the current quota period is calculated from.
+#        # This is relevant for querying the current usage.
 #        From: "2023-01-01T00:00:00Z01:00"
+#        # ResetInterval defines the quota periods duration
 #        ResetInterval: 720h # 30 days
+#        # Amount defines the number of units for this quota
 #        Amount: 25000
+#        # Limit defines whether ZITADEL should block further usage when the configured amount is used
 #        Limit: false
+#        # Notifications are emitted by ZITADEL when certain quota percentages are reached
 #        Notifications:
+#            # Percent defines the relative amount of used units, after which a notification should be emitted.
 #          - Percent: 100
+#            # Repeat defines, whether a notification should be emitted each time when a multitude of the configured Percent is used.
 #            Repeat: true
-#            CallURL: "https://example.com"
-#          - Percent: 95
-#            CallURL: "https://example.com"
-#          - Percent: 50
-#            CallURL: "https://example.com"
-#      - Unit: "actions.all.runs.seconds"
-#        # Start Time for the quota periods
-#        From: "2023-01-01T00:00:00Z01:00"
-#        ResetInterval: 720h # 30 days
-#        Amount: 3600 # 1 hour
-#        Limit: false
-#        Notifications:
-#          - Percent: 100
-#            CallURL: "https://example.com"
-#          - Percent: 95
-#            CallURL: "https://example.com"
-#          - Percent: 50
+#            # CallURL is called when a relative amount of the quota is used.
 #            CallURL: "https://example.com"
 
 InternalAuthZ:
