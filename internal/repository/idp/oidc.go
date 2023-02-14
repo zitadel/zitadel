@@ -75,7 +75,7 @@ type OIDCIDPChangedEvent struct {
 	Issuer       *string             `json:"issuer,omitempty"`
 	ClientID     *string             `json:"client_id,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"client_secret,omitempty"`
-	Scopes       []string            `json:"scopes,omitempty"` //TODO: tristate?
+	Scopes       []string            `json:"scopes,omitempty"` // TODO: tristate?
 	OptionChanges
 }
 

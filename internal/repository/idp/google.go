@@ -43,7 +43,6 @@ func (e *GoogleIDPAddedEvent) Data() interface{} {
 
 func (e *GoogleIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
-	//return []*eventstore.EventUniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)} //TODO: ?
 }
 
 func GoogleIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
@@ -65,7 +64,7 @@ type GoogleIDPChangedEvent struct {
 	ID           string              `json:"id"`
 	ClientID     *string             `json:"clientID,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	Scopes       []string            `json:"scopes,omitempty"` //TODO: tristate?
+	Scopes       []string            `json:"scopes,omitempty"` // TODO: tristate?
 	OptionChanges
 }
 
@@ -118,7 +117,6 @@ func (e *GoogleIDPChangedEvent) Data() interface{} {
 }
 
 func (e *GoogleIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	//return []*eventstore.EventUniqueConstraint{NewAddGoogleIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)} //TODO: ?
 	return nil
 }
 

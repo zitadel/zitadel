@@ -18,7 +18,7 @@ type AzureADIDPAddedEvent struct {
 	ClientID        string              `json:"client_id,omitempty"`
 	ClientSecret    *crypto.CryptoValue `json:"client_secret,omitempty"`
 	Scopes          []string            `json:"scopes,omitempty"`
-	Tenant          string              `json:"tenant,omitempty"` //TODO: type?
+	Tenant          string              `json:"tenant,omitempty"`
 	IsEmailVerified bool                `json:"isEmailVerified,omitempty"`
 	Options
 }
@@ -77,8 +77,8 @@ type AzureADIDPChangedEvent struct {
 	Name            *string             `json:"name,omitempty"`
 	ClientID        *string             `json:"client_id,omitempty"`
 	ClientSecret    *crypto.CryptoValue `json:"client_secret,omitempty"`
-	Scopes          []string            `json:"scopes,omitempty"` //TODO: tristate?
-	Tenant          *string             `json:"tenant,omitempty"` //TODO: type?
+	Scopes          []string            `json:"scopes,omitempty"` // TODO: tristate?
+	Tenant          *string             `json:"tenant,omitempty"`
 	IsEmailVerified *bool               `json:"isEmailVerified,omitempty"`
 	OptionChanges
 }

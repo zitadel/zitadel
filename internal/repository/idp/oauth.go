@@ -83,7 +83,7 @@ type OAuthIDPChangedEvent struct {
 	AuthorizationEndpoint *string             `json:"authorizationEndpoint,omitempty"`
 	TokenEndpoint         *string             `json:"tokenEndpoint,omitempty"`
 	UserEndpoint          *string             `json:"userEndpoint,omitempty"`
-	Scopes                []string            `json:"scopes,omitempty"` //TODO: tristate?
+	Scopes                []string            `json:"scopes,omitempty"` // TODO: tristate?
 	OptionChanges
 }
 
