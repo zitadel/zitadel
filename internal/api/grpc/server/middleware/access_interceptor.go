@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"net/http"
 	"time"
 
-	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -16,10 +16,13 @@ import (
 )
 
 func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
 		if !svc.Enabled() {
 			return handler(ctx, req)
 		}
+
+		interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
+		defer func() { span.EndWithError(err) }()
 
 		reqMd, _ := metadata.FromIncomingContext(ctx)
 
@@ -46,12 +49,8 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 			RequestedHost:   instance.RequestedHost(),
 		}
 
-		if err := svc.Handle(ctx, record); err != nil {
-			logging.WithError(err).Warn("failed to handle access log")
-			//nolint:ineffassign
-			err = nil
-		}
-
+		svc.Handle(interceptorCtx, record)
+		span.End() // TODO: Why?
 		return resp, handlerErr
 	}
 }

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"math"
 	"net/http"
 	"net/url"
@@ -42,11 +43,17 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 		return next
 	}
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
 
 		ctx := request.Context()
+		var err error
+
+		tracingCtx, span := tracing.NewServerInterceptorSpan(ctx)
+		defer func() { span.EndWithError(err) }()
+
+		wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
+
 		instance := authz.GetInstance(ctx)
-		remaining := a.svc.Limit(ctx, instance.InstanceID())
+		remaining := a.svc.Limit(tracingCtx, instance.InstanceID())
 		limit := remaining != nil && *remaining == 0
 
 		a.cookieHandler.SetCookie(wrappedWriter, a.limitConfig.ExhaustedCookieKey, request.Host, strconv.FormatBool(limit))
@@ -65,7 +72,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			//nolint:ineffassign
 			err = nil
 		}
-		err = a.svc.Handle(ctx, &access.Record{
+		a.svc.Handle(tracingCtx, &access.Record{
 			LogDate:         time.Now(),
 			Protocol:        access.HTTP,
 			RequestURL:      unescapedURL,
@@ -77,12 +84,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 			RequestedDomain: instance.RequestedDomain(),
 			RequestedHost:   instance.RequestedHost(),
 		})
-
-		if err != nil {
-			logging.WithError(err).Warn("failed to handle access log")
-			//nolint:ineffassign
-			err = nil
-		}
+		span.End()
 	})
 }
 
