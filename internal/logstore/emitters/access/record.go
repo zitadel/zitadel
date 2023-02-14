@@ -34,23 +34,40 @@ const (
 )
 
 func (a Record) Normalize() logstore.LogRecord {
+	a.RequestedDomain = cutString(a.RequestedDomain, 200)
+	a.RequestURL = cutString(a.RequestURL, 200)
 	normalizeHeaders(a.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "grpcgateway-authorization", "cookie", "grpcgateway-cookie")
 	normalizeHeaders(a.ResponseHeaders, "set-cookie")
 	return &a
 }
 
 // normalizeHeaders lowers all header keys and redacts secrets
-// TODO: Limit message size
 func normalizeHeaders(header http.Header, redactKeysLower ...string) {
 	for k, v := range header {
 		lowerKey := strings.ToLower(k)
 		delete(header, k)
-		header[lowerKey] = v
 		for _, r := range redactKeysLower {
 			if lowerKey == r {
 				header[lowerKey] = []string{redacted}
 				break
 			}
 		}
+		vItems := make([]string, 0)
+		for i, vitem := range v {
+			// Max 10 header values per key
+			if i > 10 {
+				break
+			}
+			// Max 200 value length
+			vItems = append(vItems, cutString(vitem, 200))
+		}
+		header[lowerKey] = vItems
 	}
+}
+
+func cutString(str string, pos int) string {
+	if len(str) <= pos {
+		return str
+	}
+	return str[:pos]
 }

@@ -21,7 +21,14 @@ type Record struct {
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }
 
-// TODO: Limit message size
 func (e Record) Normalize() logstore.LogRecord {
+	e.Message = cutString(e.Message, 2000)
 	return &e
+}
+
+func cutString(str string, pos int) string {
+	if len(str) <= pos {
+		return str
+	}
+	return str[:pos]
 }
