@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -44,6 +45,10 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
 			instance, err := verifier.InstanceByID(ctx)
 			if err != nil {
+				caosErr := new(caos_errors.NotFoundError)
+				if errors.As(err, &caosErr) {
+					caosErr.Message = translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil)
+				}
 				return nil, status.Error(codes.NotFound, err.Error())
 			}
 			return handler(authz.WithInstance(ctx, instance), req)
@@ -56,6 +61,10 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
+		caosErr := new(caos_errors.NotFoundError)
+		if errors.As(err, &caosErr) {
+			caosErr.Message = translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil)
+		}
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 	span.End()

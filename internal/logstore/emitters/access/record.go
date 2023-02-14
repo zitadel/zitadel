@@ -43,17 +43,11 @@ func (a Record) Normalize() logstore.LogRecord {
 
 // normalizeHeaders lowers all header keys and redacts secrets
 func normalizeHeaders(header http.Header, redactKeysLower ...string) {
-	for k, v := range header {
-		lowerKey := strings.ToLower(k)
-		delete(header, k)
-		for _, r := range redactKeysLower {
-			if lowerKey == r {
-				header[lowerKey] = []string{redacted}
-				break
-			}
-		}
+	for key, values := range header {
+		lowerKey := strings.ToLower(key)
+		delete(header, key)
 		vItems := make([]string, 0)
-		for i, vitem := range v {
+		for i, vitem := range values {
 			// Max 10 header values per key
 			if i > 10 {
 				break
@@ -62,6 +56,12 @@ func normalizeHeaders(header http.Header, redactKeysLower ...string) {
 			vItems = append(vItems, cutString(vitem, 200))
 		}
 		header[lowerKey] = vItems
+		for _, redactKeyLower := range redactKeysLower {
+			if lowerKey == redactKeyLower {
+				header[lowerKey] = []string{redacted}
+				break
+			}
+		}
 	}
 }
 
