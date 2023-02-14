@@ -33,7 +33,6 @@ type JWTProvider struct {
 
 type AzureADProvider struct {
 	Name          string
-	Issuer        string
 	ClientID      string
 	ClientSecret  string
 	Scopes        []string

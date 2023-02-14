@@ -538,6 +538,21 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, resourceOwner,
 
 func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, resourceOwner, id string, provider JWTProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JLKef", "Errors.Invalid.Argument")
+		}
+		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-WNJK3", "Errors.Invalid.Argument")
+		}
+		if provider.JWTEndpoint = strings.TrimSpace(provider.JWTEndpoint); provider.JWTEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-NJKSD", "Errors.Invalid.Argument")
+		}
+		if provider.KeyEndpoint = strings.TrimSpace(provider.KeyEndpoint); provider.KeyEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-NJKE3", "Errors.Invalid.Argument")
+		}
+		if provider.HeaderName = strings.TrimSpace(provider.HeaderName); provider.HeaderName == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2rlks", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -567,6 +582,24 @@ func (c *Commands) prepareAddOrgJWTProvider(a *org.Aggregate, resourceOwner, id 
 
 func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, resourceOwner, id string, provider JWTProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		}
+		if provider.Issuer = strings.TrimSpace(provider.Issuer); provider.Issuer == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKs3f", "Errors.Invalid.Argument")
+		}
+		if provider.JWTEndpoint = strings.TrimSpace(provider.JWTEndpoint); provider.JWTEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-NJKS2", "Errors.Invalid.Argument")
+		}
+		if provider.KeyEndpoint = strings.TrimSpace(provider.KeyEndpoint); provider.KeyEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SJk2d", "Errors.Invalid.Argument")
+		}
+		if provider.HeaderName = strings.TrimSpace(provider.HeaderName); provider.HeaderName == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SJK2f", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewJWTOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -605,6 +638,15 @@ func (c *Commands) prepareUpdateOrgJWTProvider(a *org.Aggregate, resourceOwner, 
 
 func (c *Commands) prepareAddOrgAzureADProvider(a *org.Aggregate, resourceOwner, id string, provider AzureADProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-sdf3g", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Fhbr2", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dzh3g", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewAzureADOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -639,6 +681,15 @@ func (c *Commands) prepareAddOrgAzureADProvider(a *org.Aggregate, resourceOwner,
 
 func (c *Commands) prepareUpdateOrgAzureADProvider(a *org.Aggregate, resourceOwner, id string, provider AzureADProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-SAgh2", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-fh3h1", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-dmitg", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewAzureADOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -679,6 +730,12 @@ func (c *Commands) prepareUpdateOrgAzureADProvider(a *org.Aggregate, resourceOwn
 
 func (c *Commands) prepareAddOrgGitHubProvider(a *org.Aggregate, resourceOwner, id string, provider GitHubProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		//if id = strings.TrimSpace(id); id == "" {
+		//	return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		//}
+		//if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+		//	return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		//}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitHubOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -702,6 +759,12 @@ func (c *Commands) prepareAddOrgGitHubProvider(a *org.Aggregate, resourceOwner, 
 
 func (c *Commands) prepareUpdateOrgGitHubProvider(a *org.Aggregate, resourceOwner, id string, provider GitHubProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		}
+		//if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+		//	return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		//}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitHubOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -738,6 +801,12 @@ func (c *Commands) prepareUpdateOrgGitHubProvider(a *org.Aggregate, resourceOwne
 
 func (c *Commands) prepareAddOrgGitHubEnterpriseProvider(a *org.Aggregate, resourceOwner, id string, provider GitHubEnterpriseProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitHubEnterpriseOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -773,6 +842,12 @@ func (c *Commands) prepareAddOrgGitHubEnterpriseProvider(a *org.Aggregate, resou
 
 func (c *Commands) prepareUpdateOrgGitHubEnterpriseProvider(a *org.Aggregate, resourceOwner, id string, provider GitHubEnterpriseProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitHubEnterpriseOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -813,6 +888,12 @@ func (c *Commands) prepareUpdateOrgGitHubEnterpriseProvider(a *org.Aggregate, re
 
 func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate, resourceOwner, id string, provider GitLabProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		//if id = strings.TrimSpace(id); id == "" {
+		//	return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		//}
+		//if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+		//	return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		//}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitLabOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -836,6 +917,12 @@ func (c *Commands) prepareAddOrgGitLabProvider(a *org.Aggregate, resourceOwner, 
 
 func (c *Commands) prepareUpdateOrgGitLabProvider(a *org.Aggregate, resourceOwner, id string, provider GitLabProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		}
+		//if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+		//	return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		//}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitLabOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -872,6 +959,12 @@ func (c *Commands) prepareUpdateOrgGitLabProvider(a *org.Aggregate, resourceOwne
 
 func (c *Commands) prepareAddOrgGitLabSelfHostedProvider(a *org.Aggregate, resourceOwner, id string, provider GitLabSelfHostedProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitLabSelfHostedOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
@@ -905,6 +998,12 @@ func (c *Commands) prepareAddOrgGitLabSelfHostedProvider(a *org.Aggregate, resou
 
 func (c *Commands) prepareUpdateOrgGitLabSelfHostedProvider(a *org.Aggregate, resourceOwner, id string, provider GitLabSelfHostedProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-HUe3q", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-JKLS2", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewGitLabSelfHostedOrgIDPWriteModel(resourceOwner, id)
 			events, err := filter(ctx, writeModel.Query())
