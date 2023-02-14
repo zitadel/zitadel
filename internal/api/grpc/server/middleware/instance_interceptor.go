@@ -45,7 +45,7 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
 			instance, err := verifier.InstanceByID(ctx)
 			if err != nil {
-				caosErr := new(caos_errors.NotFoundError)
+				caosErr := new(errors.NotFoundError)
 				if errors.As(err, &caosErr) {
 					caosErr.Message = translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil)
 				}
@@ -61,7 +61,7 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
-		caosErr := new(caos_errors.NotFoundError)
+		caosErr := new(errors.NotFoundError)
 		if errors.As(err, &caosErr) {
 			caosErr.Message = translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil)
 		}
