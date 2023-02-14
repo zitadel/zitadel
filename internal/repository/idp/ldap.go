@@ -167,7 +167,7 @@ func (e *LDAPIDPAddedEvent) Data() interface{} {
 }
 
 func (e *LDAPIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
+	return []*eventstore.EventUniqueConstraint{idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
 func LDAPIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {

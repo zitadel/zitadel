@@ -120,6 +120,9 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, resourceOwner, id
 
 func (c *Commands) prepareUpdateOrgLDAPProvider(a *org.Aggregate, resourceOwner, id string, provider LDAPProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Dgdbs", "Errors.Invalid.Argument")
+		}
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-Sffgd", "Errors.Invalid.Argument")
 		}
