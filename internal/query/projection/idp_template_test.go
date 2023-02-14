@@ -22,8 +22,35 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
 	}{
+
 		{
-			name:   "org.reduceOwnerRemoved",
+			name: "instance reduceInstanceRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.InstanceRemovedEventType),
+					instance.AggregateType,
+					nil,
+				), instance.InstanceRemovedEventMapper),
+			},
+			reduce: reduceInstanceRemovedHelper(IDPInstanceIDCol),
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM projections.idp_templates WHERE (instance_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "org reduceOwnerRemoved",
 			reduce: (&idpTemplateProjection{}).reduceOwnerRemoved,
 			args: args{
 				event: getEvent(testEvent(

@@ -23,12 +23,14 @@ type IDPType int32
 
 const (
 	IDPTypeUnspecified IDPType = iota
-	IDPTypeLDAP
 	IDPTypeOIDC
 	IDPTypeJWT
-	IDPTypeGoogle
 	IDPTypeOAuth
-	IDPTypeGitHub
-	IDPTypeGitLab
+	IDPTypeLDAP
 	IDPTypeAzureAD
+	IDPTypeGitHub
+	IDPTypeGitHubEE
+	IDPTypeGitLab
+	IDPTypeGitLabSelfHosted
+	IDPTypeGoogle
 )

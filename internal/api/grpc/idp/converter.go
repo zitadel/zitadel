@@ -352,11 +352,13 @@ func ProviderToPb(provider *query.IDPTemplate) *idp_pb.Provider {
 }
 
 func providerStateToPb(state domain.IDPState) idp_pb.IDPState {
-	switch state {
+	switch state { //nolint:exhaustive
 	case domain.IDPStateActive:
 		return idp_pb.IDPState_IDP_STATE_ACTIVE
 	case domain.IDPStateInactive:
 		return idp_pb.IDPState_IDP_STATE_INACTIVE
+	case domain.IDPStateUnspecified:
+		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
 	default:
 		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
 	}
@@ -364,8 +366,28 @@ func providerStateToPb(state domain.IDPState) idp_pb.IDPState {
 
 func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
 	switch idpType {
+	case domain.IDPTypeOIDC:
+		return idp_pb.ProviderType_PROVIDER_TYPE_OIDC
+	case domain.IDPTypeJWT:
+		return idp_pb.ProviderType_PROVIDER_TYPE_JWT
+	case domain.IDPTypeOAuth:
+		return idp_pb.ProviderType_PROVIDER_TYPE_OAUTH
 	case domain.IDPTypeLDAP:
 		return idp_pb.ProviderType_PROVIDER_TYPE_LDAP
+	case domain.IDPTypeAzureAD:
+		return idp_pb.ProviderType_PROVIDER_TYPE_AZURE_AD
+	case domain.IDPTypeGitHub:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB
+	case domain.IDPTypeGitHubEE:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB_EE
+	case domain.IDPTypeGitLab:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB
+	case domain.IDPTypeGitLabSelfHosted:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB_SELF_HOSTED
+	case domain.IDPTypeGoogle:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GOOGLE
+	case domain.IDPTypeUnspecified:
+		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
 	default:
 		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
 	}

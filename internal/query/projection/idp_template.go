@@ -141,6 +141,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.IDPRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
+				{
+					Event:  instance.InstanceRemovedEventType,
+					Reduce: reduceInstanceRemovedHelper(IDPTemplateInstanceIDCol),
+				},
 			},
 		},
 		{
@@ -243,6 +247,80 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
 	}
 
+	cols := reduceLDAPIDPChangedTemplateColumns(idpEvent)
+	ldapCols := reduceLDAPIDPChangedLDAPColumns(idpEvent)
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			cols,
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+
+	if len(ldapCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				ldapCols,
+				[]handler.Condition{
+					handler.NewCond(LDAPIDCol, idpEvent.ID),
+					handler.NewCond(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateLDAPSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.RemovedEvent
+	switch e := event.(type) {
+	case *org.IDPRemovedEvent:
+		idpEvent = e.RemovedEvent
+	case *instance.IDPRemovedEvent:
+		idpEvent = e.RemovedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
+	}
+
+	return crdb.NewDeleteStatement(
+		&idpEvent,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Jp0D2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+	}
+
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(IDPTemplateChangeDateCol, e.CreationDate()),
+			handler.NewCol(IDPTemplateSequenceCol, e.Sequence()),
+			handler.NewCol(IDPTemplateOwnerRemovedCol, true),
+		},
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(IDPTemplateResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func reduceLDAPIDPChangedTemplateColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
 	cols := make([]handler.Column, 0, 7)
 	if idpEvent.Name != nil {
 		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *idpEvent.Name))
@@ -259,11 +337,13 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	if idpEvent.IsAutoUpdate != nil {
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
-	cols = append(cols,
+	return append(cols,
 		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
+}
 
+func reduceLDAPIDPChangedLDAPColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
 	ldapCols := make([]handler.Column, 0, 4)
 	if idpEvent.Host != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPHostCol, *idpEvent.Host))
@@ -328,77 +408,5 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	if idpEvent.ProfileAttribute != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPProfileAttributeCol, *idpEvent.ProfileAttribute))
 	}
-	if len(cols) == 0 && len(ldapCols) == 0 {
-		return crdb.NewNoOpStatement(&idpEvent), nil
-	}
-
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
-	if len(cols) > 0 {
-		ops = append(ops,
-			crdb.AddUpdateStatement(
-				cols,
-				[]handler.Condition{
-					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				},
-			),
-		)
-	}
-	if len(ldapCols) > 0 {
-		ops = append(ops,
-			crdb.AddUpdateStatement(
-				ldapCols,
-				[]handler.Condition{
-					handler.NewCond(LDAPIDCol, idpEvent.ID),
-					handler.NewCond(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				},
-				crdb.WithTableSuffix(IDPTemplateLDAPSuffix),
-			),
-		)
-	}
-
-	return crdb.NewMultiStatement(
-		&idpEvent,
-		ops...,
-	), nil
-}
-
-func (p *idpTemplateProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
-	var idpEvent idp.RemovedEvent
-	switch e := event.(type) {
-	case *org.IDPRemovedEvent:
-		idpEvent = e.RemovedEvent
-	case *instance.IDPRemovedEvent:
-		idpEvent = e.RemovedEvent
-	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
-	}
-
-	return crdb.NewDeleteStatement(
-		&idpEvent,
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-		},
-	), nil
-}
-
-func (p *idpTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*org.OrgRemovedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Jp0D2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
-	}
-
-	return crdb.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(IDPTemplateChangeDateCol, e.CreationDate()),
-			handler.NewCol(IDPTemplateSequenceCol, e.Sequence()),
-			handler.NewCol(IDPTemplateOwnerRemovedCol, true),
-		},
-		[]handler.Condition{
-			handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
-			handler.NewCond(IDPTemplateResourceOwnerCol, e.Aggregate().ID),
-		},
-	), nil
+	return ldapCols
 }

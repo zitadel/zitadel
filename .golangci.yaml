@@ -1,14 +1,15 @@
 issues:
-  new: true
+  new-from-rev: main
   # Set to 0 to disable.
   max-issues-per-linter: 0
   # Set to 0 to disable.
   max-same-issues: 0
 
 run:
-  concurrency: 2
+  concurrency: 4
   timeout: 10m
   go: '1.19'
+  tests: false
   skip-dirs:
     - .artifacts
     - .backups

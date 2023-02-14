@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -225,7 +226,8 @@ func (q *Queries) IDPTemplateByIDAndResourceOwner(ctx context.Context, shouldTri
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		projection.IDPTemplateProjection.Trigger(ctx)
+		err := projection.IDPTemplateProjection.Trigger(ctx)
+		logging.OnError(err).WithField("projection", idpTemplateTable.identifier()).Warn("could not trigger projection for query")
 	}
 
 	eq := sq.Eq{
