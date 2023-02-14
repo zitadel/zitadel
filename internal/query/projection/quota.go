@@ -57,7 +57,7 @@ func newQuotaProjection(ctx context.Context, esHandlerConfig crdb.StatementHandl
 				crdb.NewColumn(QuotaSequenceCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaUnitCol, crdb.ColumnTypeEnum),
 				crdb.NewColumn(QuotaFromCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(QuotaIntervalCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(QuotaIntervalCol, crdb.ColumnTypeInterval),
 				crdb.NewColumn(QuotaAmountCol, crdb.ColumnTypeInt64),
 				crdb.NewColumn(QuotaLimitCol, crdb.ColumnTypeBool),
 			},
