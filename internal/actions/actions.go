@@ -29,7 +29,7 @@ func actionFailedMessage(err error) string {
 	return fmt.Sprintf("action run failed: %s", err.Error())
 }
 
-func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) error {
+func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) (err error) {
 	config := newRunConfig(ctx, append(opts, withLogger(ctx))...)
 	if config.functionTimeout == 0 {
 		return z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
@@ -38,16 +38,21 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 	remaining := logstoreService.Limit(ctx, config.instanceID)
 	config.cutTimeouts(remaining)
 
+	config.logger.Log(actionStartedMessage)
 	if remaining != nil && *remaining == 0 {
-		err := z_errs.ThrowResourceExhausted(nil, "ACTIO-f19Ii", "Errors.Quota.Execution.Exhausted")
-		if config.allowedToFail {
-			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
-			return nil
-		}
-		return err
+		return z_errs.ThrowResourceExhausted(nil, "ACTIO-f19Ii", "Errors.Quota.Execution.Exhausted")
 	}
 
-	config.logger.Log(actionStartedMessage)
+	defer func() {
+		if err != nil {
+			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
+		} else {
+			config.logger.log(actionSucceededMessage, logrus.InfoLevel, true)
+		}
+		if config.allowedToFail {
+			err = nil
+		}
+	}()
 
 	if err := executeScript(config, ctxParam, apiParam, script); err != nil {
 		return err
@@ -99,7 +104,6 @@ func executeScript(config *runConfig, ctxParam contextFields, apiParam apiFields
 	}()
 
 	_, err = config.vm.RunString(script)
-	config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
 	return err
 }
 
@@ -111,39 +115,20 @@ func executeFn(config *runConfig, fn jsAction) (err error) {
 		}
 		var ok bool
 		if err, ok = r.(error); ok {
-			// TODO: Move to defer function as soon as logger an config are available
-			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
-			if config.allowedToFail {
-				err = nil
-			}
 			return
 		}
 
 		e, ok := r.(string)
 		if ok {
 			err = errors.New(e)
-			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
-			if config.allowedToFail {
-				err = nil
-			}
 			return
 		}
 		err = fmt.Errorf("unknown error occurred: %v", r)
-		config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
-		if config.allowedToFail {
-			err = nil
-		}
 	}()
 
-	err = fn(config.ctxParam.fields, config.apiParam.fields)
-	if err != nil {
-		config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
-		if config.allowedToFail {
-			return nil
-		}
+	if err = fn(config.ctxParam.fields, config.apiParam.fields); err != nil {
 		return err
 	}
-	config.logger.log(actionSucceededMessage, logrus.InfoLevel, true)
 	return nil
 }
 
