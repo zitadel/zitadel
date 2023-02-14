@@ -172,6 +172,52 @@ func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 	return links
 }
 
+func listProvidersToQuery(ctx context.Context, req *mgmt_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := providerQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwnerQuery, err := query.NewIDPTemplateResourceOwnerListSearchQuery(authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, resourceOwnerQuery)
+	return &query.IDPTemplateSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
+}
+
+func providerQueriesToQuery(queries []*mgmt_pb.ProviderQuery) (q []query.SearchQuery, err error) {
+	q = make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = providerQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return q, nil
+}
+
+func providerQueryToQuery(idpQuery *mgmt_pb.ProviderQuery) (query.SearchQuery, error) {
+	switch q := idpQuery.Query.(type) {
+	case *mgmt_pb.ProviderQuery_IdpNameQuery:
+		return query.NewIDPTemplateNameSearchQuery(object.TextMethodToQuery(q.IdpNameQuery.Method), q.IdpNameQuery.Name)
+	case *mgmt_pb.ProviderQuery_IdpIdQuery:
+		return query.NewIDPTemplateIDSearchQuery(q.IdpIdQuery.Id)
+	case *mgmt_pb.ProviderQuery_OwnerTypeQuery:
+		return query.NewIDPTemplateOwnerTypeSearchQuery(idp_grpc.IDPProviderTypeFromPb(q.OwnerTypeQuery.OwnerType))
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "ORG-Dr2aa", "List.Query.Invalid")
+	}
+}
+
 func addLDAPProviderToCommand(req *mgmt_pb.AddLDAPProviderRequest) command.LDAPProvider {
 	return command.LDAPProvider{
 		Name:                req.Name,

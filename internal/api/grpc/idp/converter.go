@@ -299,6 +299,9 @@ func ownerTypeToPB(typ domain.IdentityProviderType) idp_pb.IDPOwnerType {
 }
 
 func OptionsToCommand(options *idp_pb.Options) idp.Options {
+	if options == nil {
+		return idp.Options{}
+	}
 	return idp.Options{
 		IsCreationAllowed: options.IsCreationAllowed,
 		IsLinkingAllowed:  options.IsLinkingAllowed,
@@ -308,6 +311,9 @@ func OptionsToCommand(options *idp_pb.Options) idp.Options {
 }
 
 func LDAPAttributesToCommand(attributes *idp_pb.LDAPAttributes) idp.LDAPAttributes {
+	if attributes == nil {
+		return idp.LDAPAttributes{}
+	}
 	return idp.LDAPAttributes{
 		IDAttribute:                attributes.IdAttribute,
 		FirstNameAttribute:         attributes.FirstNameAttribute,
@@ -321,6 +327,82 @@ func LDAPAttributesToCommand(attributes *idp_pb.LDAPAttributes) idp.LDAPAttribut
 		PhoneVerifiedAttribute:     attributes.PhoneVerifiedAttribute,
 		PreferredLanguageAttribute: attributes.PreferredLanguageAttribute,
 		AvatarURLAttribute:         attributes.AvatarUrlAttribute,
+		ProfileAttribute:           attributes.ProfileAttribute,
+	}
+}
+
+func ProvidersToPb(providers []*query.IDPTemplate) []*idp_pb.Provider {
+	list := make([]*idp_pb.Provider, len(providers))
+	for i, provider := range providers {
+		list[i] = ProviderToPb(provider)
+	}
+	return list
+}
+
+func ProviderToPb(provider *query.IDPTemplate) *idp_pb.Provider {
+	return &idp_pb.Provider{
+		Id:      provider.ID,
+		Details: obj_grpc.ToViewDetailsPb(provider.Sequence, provider.CreationDate, provider.ChangeDate, provider.ResourceOwner),
+		State:   providerStateToPb(provider.State),
+		Name:    provider.Name,
+		Owner:   ownerTypeToPB(provider.OwnerType),
+		Type:    providerTypeToPb(provider.Type),
+		Config:  configToPb(provider),
+	}
+}
+
+func providerStateToPb(state domain.IDPState) idp_pb.IDPState {
+	switch state {
+	case domain.IDPStateActive:
+		return idp_pb.IDPState_IDP_STATE_ACTIVE
+	case domain.IDPStateInactive:
+		return idp_pb.IDPState_IDP_STATE_INACTIVE
+	default:
+		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
+	}
+}
+
+func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
+	switch idpType {
+	case domain.IDPTypeLDAP:
+		return idp_pb.ProviderType_PROVIDER_TYPE_LDAP
+	default:
+		return idp_pb.ProviderType_PROVIDER_TYPE_UNSPECIFIED
+	}
+}
+
+func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
+	if config.LDAPIDPTemplate != nil {
+		return &idp_pb.ProviderConfig{Config: &idp_pb.ProviderConfig_Ldap{
+			Ldap: &idp_pb.LDAPConfig{
+				Host:                config.Host,
+				Port:                config.Port,
+				Tls:                 config.TLS,
+				BaseDn:              config.BaseDN,
+				UserObjectClass:     config.UserObjectClass,
+				UserUniqueAttribute: config.UserUniqueAttribute,
+				Admin:               config.Admin,
+				Attributes:          ldapAttributesToPb(config.LDAPAttributes),
+			},
+		}}
+	}
+	return nil
+}
+
+func ldapAttributesToPb(attributes idp.LDAPAttributes) *idp_pb.LDAPAttributes {
+	return &idp_pb.LDAPAttributes{
+		IdAttribute:                attributes.IDAttribute,
+		FirstNameAttribute:         attributes.FirstNameAttribute,
+		LastNameAttribute:          attributes.LastNameAttribute,
+		DisplayNameAttribute:       attributes.DisplayNameAttribute,
+		NickNameAttribute:          attributes.NickNameAttribute,
+		PreferredUsernameAttribute: attributes.PreferredUsernameAttribute,
+		EmailAttribute:             attributes.EmailAttribute,
+		EmailVerifiedAttribute:     attributes.EmailVerifiedAttribute,
+		PhoneAttribute:             attributes.PhoneAttribute,
+		PhoneVerifiedAttribute:     attributes.PhoneVerifiedAttribute,
+		PreferredLanguageAttribute: attributes.PreferredLanguageAttribute,
+		AvatarUrlAttribute:         attributes.AvatarURLAttribute,
 		ProfileAttribute:           attributes.ProfileAttribute,
 	}
 }

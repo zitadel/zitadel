@@ -202,6 +202,7 @@ func newProjectionsList() {
 		OrgDomainProjection,
 		LoginPolicyProjection,
 		IDPProjection,
+		IDPTemplateProjection,
 		AppProjection,
 		IDPUserLinkProjection,
 		IDPLoginPolicyLinkProjection,

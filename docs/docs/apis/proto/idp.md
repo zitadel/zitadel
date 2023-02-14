@@ -128,6 +128,25 @@ title: zitadel/idp.proto
 
 
 
+### LDAPConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| host |  string | - |  |
+| port |  string | - |  |
+| tls |  bool | - |  |
+| base_dn |  string | - |  |
+| user_object_class |  string | - |  |
+| user_unique_attribute |  string | - |  |
+| admin |  string | - |  |
+| attributes |  LDAPAttributes | - |  |
+| provider_options |  Options | - |  |
+
+
+
+
 ### OIDCConfig
 
 
@@ -169,6 +188,18 @@ title: zitadel/idp.proto
 | name |  string | - |  |
 | owner |  IDPOwnerType | - |  |
 | type |  ProviderType | - |  |
+| config |  ProviderConfig | - |  |
+
+
+
+
+### ProviderConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.ldap |  LDAPConfig | - |  |
 
 
 

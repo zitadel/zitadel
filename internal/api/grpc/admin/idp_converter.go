@@ -157,6 +157,50 @@ func idpUserLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 	return externalIDPs
 }
 
+func listProvidersToQuery(instanceID string, req *admin_pb.ListProvidersRequest) (*query.IDPTemplateSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := providerQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	iamQuery, err := query.NewIDPTemplateResourceOwnerSearchQuery(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, iamQuery)
+	return &query.IDPTemplateSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
+}
+
+func providerQueriesToQuery(queries []*admin_pb.ProviderQuery) (q []query.SearchQuery, err error) {
+	q = make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = providerQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return q, nil
+}
+
+func providerQueryToQuery(idpQuery *admin_pb.ProviderQuery) (query.SearchQuery, error) {
+	switch q := idpQuery.Query.(type) {
+	case *admin_pb.ProviderQuery_IdpNameQuery:
+		return query.NewIDPTemplateNameSearchQuery(object.TextMethodToQuery(q.IdpNameQuery.Method), q.IdpNameQuery.Name)
+	case *admin_pb.ProviderQuery_IdpIdQuery:
+		return query.NewIDPTemplateIDSearchQuery(q.IdpIdQuery.Id)
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-Dr2aa", "List.Query.Invalid")
+	}
+}
+
 func addLDAPProviderToCommand(req *admin_pb.AddLDAPProviderRequest) command.LDAPProvider {
 	return command.LDAPProvider{
 		Name:                req.Name,

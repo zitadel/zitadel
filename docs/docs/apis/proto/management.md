@@ -3619,15 +3619,15 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| port |  string | TODO: int? | string.min_len: 1<br /> string.max_len: 200<br />  |
+| port |  string | TODO: int? | string.max_len: 5<br />  |
 | tls |  bool | - |  |
 | base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_unique_attribute |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | admin |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | password |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| attributes |  zitadel.idp.v1.LDAPAttributes | - | message.required: true<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+| attributes |  zitadel.idp.v1.LDAPAttributes | - |  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
 
 
 
@@ -6688,6 +6688,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated ProviderQuery | criteria the client is looking for |  |
 
 
 
@@ -6845,6 +6846,19 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ProviderQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_id_query |  zitadel.idp.v1.IDPIDQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_name_query |  zitadel.idp.v1.IDPNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.owner_type_query |  zitadel.idp.v1.IDPOwnerTypeQuery | - |  |
 
 
 
@@ -8929,15 +8943,15 @@ This is an empty request
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| port |  string | TODO: int? | string.min_len: 1<br /> string.max_len: 200<br />  |
+| port |  string | TODO: int? | string.max_len: 5<br />  |
 | tls |  bool | - |  |
 | base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_unique_attribute |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | admin |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | password |  string | - | string.max_len: 200<br />  |
-| attributes |  zitadel.idp.v1.LDAPAttributes | - | message.required: true<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+| attributes |  zitadel.idp.v1.LDAPAttributes | - |  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
 
 
 

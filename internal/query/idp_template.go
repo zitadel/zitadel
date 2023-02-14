@@ -245,7 +245,7 @@ func (q *Queries) IDPTemplateByIDAndResourceOwner(ctx context.Context, shouldTri
 	stmt, scan := prepareIDPTemplateByIDQuery()
 	query, args, err := stmt.Where(where).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Sf3rq", "Errors.Query.SQLStatement")
+		return nil, errors.ThrowInternal(err, "QUERY-SFAew", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -266,24 +266,48 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-SFrww", "Errors.Query.InvalidRequest")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-SAF34", "Errors.Query.InvalidRequest")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SFfg3", "Errors.Internal")
+		return nil, errors.ThrowInternal(err, "QUERY-BDFrq", "Errors.Internal")
 	}
 	idps, err = scan(rows)
 	if err != nil {
 		return nil, err
 	}
-	idps.LatestSequence, err = q.latestSequence(ctx, idpTable)
+	idps.LatestSequence, err = q.latestSequence(ctx, idpTemplateTable)
 	return idps, err
 }
 
 type IDPTemplateSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
+}
+
+func NewIDPTemplateIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(IDPTemplateIDCol, id, TextEquals)
+}
+
+func NewIDPTemplateOwnerTypeSearchQuery(ownerType domain.IdentityProviderType) (SearchQuery, error) {
+	return NewNumberQuery(IDPTemplateOwnerTypeCol, ownerType, NumberEquals)
+}
+
+func NewIDPTemplateNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
+	return NewTextQuery(IDPTemplateNameCol, value, method)
+}
+
+func NewIDPTemplateResourceOwnerSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPTemplateResourceOwnerCol, value, TextEquals)
+}
+
+func NewIDPTemplateResourceOwnerListSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(IDPTemplateResourceOwnerCol, list, ListIn)
 }
 
 func (q *IDPTemplateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -399,9 +423,9 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-rhR2o", "Errors.IDPConfig.NotExisting")
+					return nil, errors.ThrowNotFound(err, "QUERY-SAFrt", "Errors.IDPConfig.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-zE3Ro", "Errors.Internal")
+				return nil, errors.ThrowInternal(err, "QUERY-ADG42", "Errors.Internal")
 			}
 
 			if ldapID.Valid {
@@ -582,7 +606,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-Sfer3s", "Errors.Query.CloseRows")
+				return nil, errors.ThrowInternal(err, "QUERY-SAGrt", "Errors.Query.CloseRows")
 			}
 
 			return &IDPTemplates{

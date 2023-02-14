@@ -143,6 +143,29 @@ func (s *Server) UpdateOrgIDPJWTConfig(ctx context.Context, req *mgmt_pb.UpdateO
 	}, nil
 }
 
+func (s *Server) GetProviderByID(ctx context.Context, req *mgmt_pb.GetProviderByIDRequest) (*mgmt_pb.GetProviderByIDResponse, error) {
+	idp, err := s.query.IDPTemplateByIDAndResourceOwner(ctx, true, req.Id, authz.GetCtxData(ctx).OrgID, false)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetProviderByIDResponse{Idp: idp_grpc.ProviderToPb(idp)}, nil
+}
+
+func (s *Server) ListProviders(ctx context.Context, req *mgmt_pb.ListProvidersRequest) (*mgmt_pb.ListProvidersResponse, error) {
+	queries, err := listProvidersToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.query.IDPTemplates(ctx, queries, false)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListProvidersResponse{
+		Result:  idp_grpc.ProvidersToPb(resp.Templates),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
+	}, nil
+}
+
 func (s *Server) AddLDAPProvider(ctx context.Context, req *mgmt_pb.AddLDAPProviderRequest) (*mgmt_pb.AddLDAPProviderResponse, error) {
 	id, details, err := s.command.AddOrgLDAPProvider(ctx, authz.GetCtxData(ctx).OrgID, addLDAPProviderToCommand(req))
 	if err != nil {

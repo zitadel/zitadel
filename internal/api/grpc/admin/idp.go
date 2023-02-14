@@ -151,6 +151,29 @@ func (s *Server) UpdateIDPJWTConfig(ctx context.Context, req *admin_pb.UpdateIDP
 	}, nil
 }
 
+func (s *Server) GetProviderByID(ctx context.Context, req *admin_pb.GetProviderByIDRequest) (*admin_pb.GetProviderByIDResponse, error) {
+	idp, err := s.query.IDPTemplateByIDAndResourceOwner(ctx, true, req.Id, authz.GetInstance(ctx).InstanceID(), false)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetProviderByIDResponse{Idp: idp_grpc.ProviderToPb(idp)}, nil
+}
+
+func (s *Server) ListProviders(ctx context.Context, req *admin_pb.ListProvidersRequest) (*admin_pb.ListProvidersResponse, error) {
+	queries, err := listProvidersToQuery(authz.GetInstance(ctx).InstanceID(), req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.query.IDPTemplates(ctx, queries, false)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ListProvidersResponse{
+		Result:  idp_grpc.ProvidersToPb(resp.Templates),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
+	}, nil
+}
+
 func (s *Server) AddLDAPProvider(ctx context.Context, req *admin_pb.AddLDAPProviderRequest) (*admin_pb.AddLDAPProviderResponse, error) {
 	id, details, err := s.command.AddInstanceLDAPProvider(ctx, addLDAPProviderToCommand(req))
 	if err != nil {

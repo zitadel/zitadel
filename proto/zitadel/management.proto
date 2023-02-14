@@ -5977,6 +5977,16 @@ message UpdateOrgIDPJWTConfigResponse {
 message ListProvidersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+    //criteria the client is looking for
+    repeated ProviderQuery queries = 2;
+}
+
+message ProviderQuery {
+    oneof query {
+        zitadel.idp.v1.IDPIDQuery idp_id_query = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name_query = 2;
+        zitadel.idp.v1.IDPOwnerTypeQuery owner_type_query = 3;
+    }
 }
 
 message ListProvidersResponse {
@@ -5995,15 +6005,15 @@ message GetProviderByIDResponse {
 message AddLDAPProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string host = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string port = 3 [(validate.rules).string = {min_len: 1, max_len: 200}]; // TODO: int?
+    string port = 3 [(validate.rules).string = {max_len: 5}]; // TODO: int?
     bool tls = 4;
     string base_dn = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_object_class = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_unique_attribute = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string admin = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string password = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.idp.v1.LDAPAttributes attributes = 10 [(validate.rules).message = {required: true}];
-    zitadel.idp.v1.Options provider_options = 11 [(validate.rules).message = {required: true}];
+    zitadel.idp.v1.LDAPAttributes attributes = 10;
+    zitadel.idp.v1.Options provider_options = 11;
 }
 
 message AddLDAPProviderResponse {
@@ -6015,15 +6025,15 @@ message UpdateLDAPProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string host = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string port = 4 [(validate.rules).string = {min_len: 1, max_len: 200}]; // TODO: int?
+    string port = 4 [(validate.rules).string = {max_len: 5}]; // TODO: int?
     bool tls = 5;
     string base_dn = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_object_class = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_unique_attribute = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string admin = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string password = 10 [(validate.rules).string = {max_len: 200}];
-    zitadel.idp.v1.LDAPAttributes attributes = 11 [(validate.rules).message = {required: true}];
-    zitadel.idp.v1.Options provider_options = 12 [(validate.rules).message = {required: true}];
+    zitadel.idp.v1.LDAPAttributes attributes = 11;
+    zitadel.idp.v1.Options provider_options = 12;
 }
 
 message UpdateLDAPProviderResponse {
