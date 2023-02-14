@@ -41,27 +41,32 @@ func (a Record) Normalize() logstore.LogRecord {
 	return &a
 }
 
+const maxValuesPerKey = 10
+
 // normalizeHeaders lowers all header keys and redacts secrets
 func normalizeHeaders(header http.Header, redactKeysLower ...string) {
+	// set readacted values where needed
+	for _, key := range redactKeysLower {
+		if len(header.Values(key)) > 0 {
+			header.Set(key, redacted)
+		}
+	}
+
+	// normalize keys to lowercase and ensure limit
 	for key, values := range header {
 		lowerKey := strings.ToLower(key)
 		delete(header, key)
-		vItems := make([]string, 0)
+
+		vItems := make([]string, 0, maxValuesPerKey)
 		for i, vitem := range values {
 			// Max 10 header values per key
-			if i > 10 {
+			if i > maxValuesPerKey {
 				break
 			}
 			// Max 200 value length
 			vItems = append(vItems, cutString(vitem, 200))
 		}
 		header[lowerKey] = vItems
-		for _, redactKeyLower := range redactKeysLower {
-			if lowerKey == redactKeyLower {
-				header[lowerKey] = []string{redacted}
-				break
-			}
-		}
 	}
 }
 
