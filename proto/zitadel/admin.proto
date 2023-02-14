@@ -43,6 +43,23 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         };
     };
 
+    tags: [
+        {
+            name: "General"
+        },
+        {
+            name: "Instance"
+        },
+        {
+            name: "Secrets"
+        },
+        {
+            name: "SMS Provider",
+        },
+        {
+            name: "SMTP"
+        }
+    ];
     schemes: HTTPS;
     schemes: HTTP;
 
@@ -77,15 +94,15 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 				flow: FLOW_ACCESS_CODE;
 				authorization_url: "https://accounts.zitadel.io/oauth/v2/authorize";
 				token_url: "https://api.zitadel.io/oauth/v2/token";
-                scopes: {
+        scopes: {
 					scope: {
 						key: "openid";
 						value: "openid";
 					}
-                    scope: {
-                        key: "urn:zitadel:iam:org:project:id:100992085158584780:aud";
-                        value: "urn:zitadel:iam:org:project:id:100992085158584780:aud";
-                    }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
 				}
 			}
 		}
@@ -131,15 +148,15 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service AdminService {
-    //Indicates if ZITADEL is running.
-    // It respondes as soon as ZITADEL started
     rpc Healthz(HealthzRequest) returns (HealthzResponse) {
         option (google.api.http) = {
             get: "/healthz";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "probes";
+            summary: "Healthz";
+            description: "The health endpoint allows an external system to probe if ZITADEL system API is alive. Response as soon as ZITADLE is running."
+            tags: "General";
             responses: {
                 key: "200";
                 value: {
@@ -155,7 +172,6 @@ service AdminService {
         };
     }
 
-    // Returns the default languages
     rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
         option (google.api.http) = {
             get: "/languages";
@@ -164,9 +180,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "General";
+            summary: "Supported Languages";
+            description: "The supported/default languages of the system will be returned by the language abbreviation."
+        };
     }
 
-    // Set the default language
     rpc SetDefaultLanguage(SetDefaultLanguageRequest) returns (SetDefaultLanguageResponse) {
         option (google.api.http) = {
             put: "/languages/default/{language}";
@@ -175,9 +196,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "General";
+            summary: "Set Default Languages";
+            description: "Set the language that is used as a fallback/default if the user has configured something that is not provided by ZITADEL."
+        };
     }
 
-    // Set the default language
     rpc GetDefaultLanguage(GetDefaultLanguageRequest) returns (GetDefaultLanguageResponse) {
         option (google.api.http) = {
             get: "/languages/default";
@@ -186,9 +212,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "General";
+            summary: "Get Default Languages";
+            description: "Returns the language that is used as a fallback/default if the user has configured something that is not provided by ZITADEL."
+        };
     }
 
-    // Returns the details of the instance
     rpc GetMyInstance(GetMyInstanceRequest) returns (GetMyInstanceResponse) {
         option (google.api.http) = {
             get: "/instances/me";
@@ -197,16 +228,26 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Instance";
+            summary: "Get My Instance";
+            description: "Returns the details about the current instance such as the name, version and the domains, etc."
+        };
     }
 
-    // Returns the domains of the instance
     rpc ListInstanceDomains(ListInstanceDomainsRequest) returns (ListInstanceDomainsResponse) {
         option (google.api.http) = {
             post: "/domains/_search";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Instance";
+            summary: "List Instance Domains";
+            description: "Returns a list of domains that are configured for this ZITADEL instance. This domains are the URLs where ZITADEL is running."
+        };
     }
 
-    // Set the default language
     rpc ListSecretGenerators(ListSecretGeneratorsRequest) returns (ListSecretGeneratorsResponse) {
         option (google.api.http) = {
             post: "/secretgenerators/_search"
@@ -215,6 +256,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Secrets";
+            summary: "List Secret Generators";
+            description: "Lists all the configured secret generators. The generators define how a secret should look like when generating in ZITADEL. E.g Email verification code, phone verification code, etc."
         };
     }
 
@@ -227,9 +274,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Secrets";
+            summary: "Get Secret Generator";
+            description: "Get a specific secret generator by its type (e.g PasswordResetCode). A generator defines how a secret should look like when generating in ZITADEL."
+        };
     }
 
-    // Update secret generator configuration
     rpc UpdateSecretGenerator(UpdateSecretGeneratorRequest) returns (UpdateSecretGeneratorResponse) {
         option (google.api.http) = {
             put: "/secretgenerators/{generator_type}";
@@ -239,9 +291,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Secrets";
+            summary: "Update Secret Generator";
+            description: "Change a specific secret generator configuration by its type (e.g PasswordResetCode). A generator defines how a secret should look like when generating in ZITADEL."
+        };
     }
 
-    // Get system smtp configuration
     rpc GetSMTPConfig(GetSMTPConfigRequest) returns (GetSMTPConfigResponse) {
         option (google.api.http) = {
             get: "/smtp";
@@ -250,9 +307,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP";
+            summary: "Get SMTP Configuration";
+            description: "Returns the SMTP configuration from the system. This is used to send E-Mails to the users."
+        };
     }
 
-    // Add system smtp configuration
     rpc AddSMTPConfig(AddSMTPConfigRequest) returns (AddSMTPConfigResponse) {
         option (google.api.http) = {
             post: "/smtp";
@@ -262,9 +324,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP";
+            summary: "Add SMTP Configuration";
+            description: "Add a new SMTP configuration if nothing is set yet."
+        };
     }
 
-    // Update system smtp configuration
     rpc UpdateSMTPConfig(UpdateSMTPConfigRequest) returns (UpdateSMTPConfigResponse) {
         option (google.api.http) = {
             put: "/smtp";
@@ -274,9 +341,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP";
+            summary: "Update SMTP Configuration";
+            description: "Update the SMTP configuration, be aware that this will be activated as soon as it is saved. So the users will get notifications from the new configured SMTP."
+        };
     }
 
-    // Update system smtp configuration password for host
     rpc UpdateSMTPConfigPassword(UpdateSMTPConfigPasswordRequest) returns (UpdateSMTPConfigPasswordResponse) {
         option (google.api.http) = {
             put: "/smtp/password";
@@ -286,9 +358,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP";
+            summary: "Update SMTP Password";
+            description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the new configured SMTP."
+        };
     }
 
-    // Remove system smtp configuration
     rpc RemoveSMTPConfig(RemoveSMTPConfigRequest) returns (RemoveSMTPConfigResponse) {
         option (google.api.http) = {
             delete: "/smtp";
@@ -297,9 +374,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP";
+            summary: "Remove SMTP Configuration";
+            description: "Remove the SMTP configuration, be aware that the users will not get an E-Mail if no SMTP is set."
+        };
     }
 
-    // list sms provider configurations
     rpc ListSMSProviders(ListSMSProvidersRequest) returns (ListSMSProvidersResponse) {
         option (google.api.http) = {
             post: "/sms/_search"
@@ -309,9 +391,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "List SMS Providers";
+            description: "Returns a list of configured SMS providers."
+        };
     }
 
-    // Get sms provider
     rpc GetSMSProvider(GetSMSProviderRequest) returns (GetSMSProviderResponse) {
         option (google.api.http) = {
             get: "/sms/{id}";
@@ -320,9 +407,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Get SMS Provider";
+            description: "Get a specific SMS provider by its ID."
+        };
     }
 
-    // Add twilio sms provider
     rpc AddSMSProviderTwilio(AddSMSProviderTwilioRequest) returns (AddSMSProviderTwilioResponse) {
         option (google.api.http) = {
             post: "/sms/twilio";
@@ -332,9 +424,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Add Twilio SMS Provider";
+            description: "Configure a new SMS provider of the type Twilio. A provider has to be activated to be able to send notifications."
+        };
     }
 
-    // Update twilio sms provider
     rpc UpdateSMSProviderTwilio(UpdateSMSProviderTwilioRequest) returns (UpdateSMSProviderTwilioResponse) {
         option (google.api.http) = {
             put: "/sms/twilio/{id}";
@@ -344,9 +441,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Update Twilio SMS Provider";
+            description: "Change the configuration of a SMS provider of the type Twilio.  A provider has to be activated to be able to send notifications."
+        };
     }
 
-    // Update twilio sms provider token
     rpc UpdateSMSProviderTwilioToken(UpdateSMSProviderTwilioTokenRequest) returns (UpdateSMSProviderTwilioTokenResponse) {
         option (google.api.http) = {
             put: "/sms/twilio/{id}/token";
@@ -356,9 +458,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Update Twilio SMS Provider Token";
+            description: "Change the token of the SMS provider of the type Twilio."
+        };
     }
 
-    // Activate sms provider
     rpc ActivateSMSProvider(ActivateSMSProviderRequest) returns (ActivateSMSProviderResponse) {
         option (google.api.http) = {
             post: "/sms/{id}/_activate";
@@ -368,9 +475,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Activate SMS Provider";
+            description: "Activate a SMS provider. After activating a provider, the users will be able to receive SMS notifications."
+        };
     }
 
-    // Deactivate sms provider
     rpc DeactivateSMSProvider(DeactivateSMSProviderRequest) returns (DeactivateSMSProviderResponse) {
         option (google.api.http) = {
             post: "/sms/{id}/_deactivate";
@@ -380,9 +492,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Deactivate SMS Provider";
+            description: "Deactivate a SMS provider. After deactivating the provider, the users will not be able to receive SMS notifications from that provider anymore. If it was the last activated they will not get notifications at all"
+        };
     }
 
-    // Remove sms provider token
     rpc RemoveSMSProvider(RemoveSMSProviderRequest) returns (RemoveSMSProviderResponse) {
         option (google.api.http) = {
             delete: "/sms/{id}";
@@ -390,6 +507,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Remove SMS Provider" ;
+            description: "Delete an SMS provider. If the provider was still active the users will not receive notifications from that provider anymore."
         };
     }
 

@@ -31,6 +31,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     };
   };
 
+  tags: [
+    {
+      name: "General"
+    }
+  ];
   schemes: HTTPS;
   schemes: HTTP;
 
@@ -84,7 +89,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "probes";
+      tags: "General";
       responses: {
         key: "200";
         value: {
