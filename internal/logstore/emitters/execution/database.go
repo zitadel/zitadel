@@ -21,7 +21,6 @@ const (
 	executionMessageCol    = "message"
 	executionLogLevelCol   = "loglevel"
 	executionInstanceIdCol = "instance_id"
-	executionProjectIdCol  = "project_id"
 	executionActionIdCol   = "action_id"
 	executionMetadataCol   = "metadata"
 )
@@ -49,7 +48,6 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 			executionMessageCol,
 			executionLogLevelCol,
 			executionInstanceIdCol,
-			executionProjectIdCol,
 			executionActionIdCol,
 			executionMetadataCol,
 		).
@@ -69,7 +67,6 @@ func (l *databaseLogStorage) Emit(ctx context.Context, bulk []logstore.LogRecord
 			item.Message,
 			item.LogLevel,
 			item.InstanceID,
-			item.ProjectID,
 			item.ActionID,
 			item.Metadata,
 		)

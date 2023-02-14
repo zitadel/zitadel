@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"strings"
 )
 
 var (
@@ -17,10 +18,11 @@ var (
 
 type LogstoreTables struct {
 	dbClient *sql.DB
+	username string
 }
 
 func (mig *LogstoreTables) Execute(ctx context.Context) error {
-	stmt := createLogstoreSchema07 + createAccessLogsTable07 + createExecutionLogsTable07
+	stmt := strings.ReplaceAll(createLogstoreSchema07, "%[1]s", mig.username) + createAccessLogsTable07 + createExecutionLogsTable07
 	_, err := mig.dbClient.ExecContext(ctx, stmt)
 	return err
 }

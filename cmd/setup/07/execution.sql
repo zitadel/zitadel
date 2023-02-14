@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS logstore.execution (
     , message TEXT NOT NULL
     , loglevel INT NOT NULL
     , instance_id TEXT NOT NULL
-    , project_id TEXT NOT NULL
     , action_id TEXT NOT NULL
     , metadata JSONB
 

@@ -16,7 +16,6 @@ type Record struct {
 	Message    string                 `json:"message"`
 	LogLevel   logrus.Level           `json:"logLevel"`
 	InstanceID string                 `json:"instanceId"`
-	ProjectID  string                 `json:"projectId"` // TODO: Is this filled and meaningful?
 	ActionID   string                 `json:"actionId,omitempty"`
 	Metadata   map[string]interface{} `json:"metadata,omitempty"`
 }

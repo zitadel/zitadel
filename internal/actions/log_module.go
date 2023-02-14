@@ -23,19 +23,18 @@ func SetLogstoreService(svc *logstore.Service) {
 }
 
 type logger struct {
-	ctx                   context.Context
-	started               time.Time
-	instanceID, projectID string
+	ctx        context.Context
+	started    time.Time
+	instanceID string
 }
 
 // newLogger returns a *logger instance that should only be used for a single action run.
 // The first log call sets the started field for subsequent log calls
-func newLogger(ctx context.Context, instanceID, projectID string) *logger {
+func newLogger(ctx context.Context, instanceID string) *logger {
 	return &logger{
 		ctx:        ctx,
 		started:    time.Time{},
 		instanceID: instanceID,
-		projectID:  projectID,
 	}
 }
 
@@ -60,7 +59,6 @@ func (l *logger) log(msg string, level logrus.Level, last bool) {
 	record := &execution.Record{
 		LogDate:    ts,
 		InstanceID: l.instanceID,
-		ProjectID:  l.projectID,
 		Message:    msg,
 		LogLevel:   level,
 	}
@@ -76,7 +74,7 @@ func withLogger(ctx context.Context) Option {
 	instance := authz.GetInstance(ctx)
 	instanceID := instance.InstanceID()
 	return func(c *runConfig) {
-		c.logger = newLogger(ctx, instanceID, instance.ProjectID())
+		c.logger = newLogger(ctx, instanceID)
 		c.instanceID = instanceID
 		c.modules["zitadel/log"] = func(runtime *goja.Runtime, module *goja.Object) {
 			console.RequireWithPrinter(c.logger)(runtime, module)
