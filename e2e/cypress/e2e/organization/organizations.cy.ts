@@ -1,5 +1,4 @@
 import { ensureOrgExists, ensureOrgIsDefault, isDefaultOrg } from 'support/api/orgs';
-import { apiAuth } from '../../support/api/apiauth';
 import { v4 as uuidv4 } from 'uuid';
 import { Context } from 'support/commands';
 
