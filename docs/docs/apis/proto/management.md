@@ -3025,6 +3025,54 @@ Change JWT identity provider configuration of the organisation
     PUT: /idps/{idp_id}/jwt_config
 
 
+### ListIDPs
+
+> **rpc** ListIDPs([ListIDPsRequest](#listidpsrequest))
+[ListIDPsResponse](#listidpsresponse)
+
+
+
+
+
+    POST: /idps/templates/_search
+
+
+### AddLDAPProvider
+
+> **rpc** AddLDAPProvider([AddLDAPProviderRequest](#addldapproviderrequest))
+[AddLDAPProviderResponse](#addldapproviderresponse)
+
+
+
+
+
+    POST: /idps/ldap
+
+
+### UpdateLDAPProvider
+
+> **rpc** UpdateLDAPProvider([UpdateLDAPProviderRequest](#updateldapproviderrequest))
+[UpdateLDAPProviderResponse](#updateldapproviderresponse)
+
+
+
+
+
+    POST: /idps/ldap/{id}
+
+
+### DeleteProvider
+
+> **rpc** DeleteProvider([DeleteProviderRequest](#deleteproviderrequest))
+[DeleteProviderResponse](#deleteproviderresponse)
+
+
+
+
+
+    POST: /idps/templates/{id}
+
+
 ### ListActions
 
 > **rpc** ListActions([ListActionsRequest](#listactionsrequest))
@@ -3547,6 +3595,39 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddLDAPProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| port |  string | TODO: int? | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_unique_attribute |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| admin |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| password |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| attributes |  zitadel.idp.v1.LDAPAttributes | - | message.required: true<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddLDAPProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
 
 
 
@@ -4446,6 +4527,28 @@ This is an empty request
 
 ### DeleteActionResponse
 
+
+
+
+
+### DeleteProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### DeleteProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -6082,6 +6185,29 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | result | repeated zitadel.user.v1.WebAuthNToken | - |  |
+
+
+
+
+### ListIDPsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListIDPsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.idp.v1.Provider | - |  |
 
 
 
@@ -8750,6 +8876,39 @@ This is an empty request
 
 
 ### UpdateHumanProfileResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateLDAPProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| port |  string | TODO: int? | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_unique_attribute |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| admin |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| password |  string | - | string.max_len: 200<br />  |
+| attributes |  zitadel.idp.v1.LDAPAttributes | - | message.required: true<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateLDAPProviderResponse
 
 
 

@@ -5,6 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 )
 
@@ -294,5 +295,32 @@ func ownerTypeToPB(typ domain.IdentityProviderType) idp_pb.IDPOwnerType {
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM
 	default:
 		return idp_pb.IDPOwnerType_IDP_OWNER_TYPE_UNSPECIFIED
+	}
+}
+
+func OptionsToCommand(options *idp_pb.Options) idp.Options {
+	return idp.Options{
+		IsCreationAllowed: options.IsCreationAllowed,
+		IsLinkingAllowed:  options.IsLinkingAllowed,
+		IsAutoCreation:    options.IsAutoCreation,
+		IsAutoUpdate:      options.IsAutoUpdate,
+	}
+}
+
+func LDAPAttributesToCommand(attributes *idp_pb.LDAPAttributes) idp.LDAPAttributes {
+	return idp.LDAPAttributes{
+		IDAttribute:                attributes.IdAttribute,
+		FirstNameAttribute:         attributes.FirstNameAttribute,
+		LastNameAttribute:          attributes.LastNameAttribute,
+		DisplayNameAttribute:       attributes.DisplayNameAttribute,
+		NickNameAttribute:          attributes.NickNameAttribute,
+		PreferredUsernameAttribute: attributes.PreferredUsernameAttribute,
+		EmailAttribute:             attributes.EmailAttribute,
+		EmailVerifiedAttribute:     attributes.EmailVerifiedAttribute,
+		PhoneAttribute:             attributes.PhoneAttribute,
+		PhoneVerifiedAttribute:     attributes.PhoneVerifiedAttribute,
+		PreferredLanguageAttribute: attributes.PreferredLanguageAttribute,
+		AvatarURLAttribute:         attributes.AvatarUrlAttribute,
+		ProfileAttribute:           attributes.ProfileAttribute,
 	}
 }

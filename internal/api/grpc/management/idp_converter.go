@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -169,4 +170,36 @@ func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 		}
 	}
 	return links
+}
+
+func addLDAPProviderToCommand(req *mgmt_pb.AddLDAPProviderRequest) command.LDAPProvider {
+	return command.LDAPProvider{
+		Name:                req.Name,
+		Host:                req.Host,
+		Port:                req.Port,
+		TLS:                 req.Tls,
+		BaseDN:              req.BaseDn,
+		UserObjectClass:     req.UserObjectClass,
+		UserUniqueAttribute: req.UserUniqueAttribute,
+		Admin:               req.Admin,
+		Password:            req.Password,
+		LDAPAttributes:      idp_grpc.LDAPAttributesToCommand(req.Attributes),
+		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateLDAPProviderToCommand(req *mgmt_pb.UpdateLDAPProviderRequest) command.LDAPProvider {
+	return command.LDAPProvider{
+		Name:                req.Name,
+		Host:                req.Host,
+		Port:                req.Port,
+		TLS:                 req.Tls,
+		BaseDN:              req.BaseDn,
+		UserObjectClass:     req.UserObjectClass,
+		UserUniqueAttribute: req.UserUniqueAttribute,
+		Admin:               req.Admin,
+		Password:            req.Password,
+		LDAPAttributes:      idp_grpc.LDAPAttributesToCommand(req.Attributes),
+		IDPOptions:          idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
 }

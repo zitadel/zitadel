@@ -142,3 +142,24 @@ func (s *Server) UpdateOrgIDPJWTConfig(ctx context.Context, req *mgmt_pb.UpdateO
 		),
 	}, nil
 }
+
+func (s *Server) AddLDAPProvider(ctx context.Context, req *mgmt_pb.AddLDAPProviderRequest) (*mgmt_pb.AddLDAPProviderResponse, error) {
+	id, details, err := s.command.AddOrgLDAPProvider(ctx, authz.GetCtxData(ctx).OrgID, addLDAPProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddLDAPProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateLDAPProvider(ctx context.Context, req *mgmt_pb.UpdateLDAPProviderRequest) (*mgmt_pb.UpdateLDAPProviderResponse, error) {
+	details, err := s.command.UpdateOrgLDAPProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateLDAPProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateLDAPProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}

@@ -105,6 +105,29 @@ title: zitadel/idp.proto
 
 
 
+### LDAPAttributes
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id_attribute |  string | - | string.max_len: 200<br />  |
+| first_name_attribute |  string | - | string.max_len: 200<br />  |
+| last_name_attribute |  string | - | string.max_len: 200<br />  |
+| display_name_attribute |  string | - | string.max_len: 200<br />  |
+| nick_name_attribute |  string | - | string.max_len: 200<br />  |
+| preferred_username_attribute |  string | - | string.max_len: 200<br />  |
+| email_attribute |  string | - | string.max_len: 200<br />  |
+| email_verified_attribute |  string | - | string.max_len: 200<br />  |
+| phone_attribute |  string | - | string.max_len: 200<br />  |
+| phone_verified_attribute |  string | - | string.max_len: 200<br />  |
+| preferred_language_attribute |  string | - | string.max_len: 200<br />  |
+| avatar_url_attribute |  string | - | string.max_len: 200<br />  |
+| profile_attribute |  string | - | string.max_len: 200<br />  |
+
+
+
+
 ### OIDCConfig
 
 
@@ -116,6 +139,36 @@ title: zitadel/idp.proto
 | scopes | repeated string | - |  |
 | display_name_mapping |  OIDCMappingField | - |  |
 | username_mapping |  OIDCMappingField | - |  |
+
+
+
+
+### Options
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| is_linking_allowed |  bool | - |  |
+| is_creation_allowed |  bool | - |  |
+| is_auto_creation |  bool | - |  |
+| is_auto_update |  bool | - |  |
+
+
+
+
+### Provider
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| state |  IDPState | - |  |
+| name |  string | - |  |
+| owner |  IDPOwnerType | - |  |
+| type |  ProviderType | - |  |
 
 
 
@@ -191,6 +244,25 @@ authorization framework of the identity provider
 | OIDC_MAPPING_FIELD_UNSPECIFIED | 0 | - |
 | OIDC_MAPPING_FIELD_PREFERRED_USERNAME | 1 | - |
 | OIDC_MAPPING_FIELD_EMAIL | 2 | - |
+
+
+
+
+### ProviderType {#providertype}
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PROVIDER_TYPE_UNSPECIFIED | 0 | - |
+| PROVIDER_TYPE_OAUTH | 1 | - |
+| PROVIDER_TYPE_OIDC | 2 | - |
+| PROVIDER_TYPE_JWT | 3 | - |
+| PROVIDER_TYPE_AZURE_AD | 4 | - |
+| PROVIDER_TYPE_GITHUB | 5 | - |
+| PROVIDER_TYPE_GITHUB_EE | 6 | - |
+| PROVIDER_TYPE_GITLAB | 7 | - |
+| PROVIDER_TYPE_GITLAB_SELF_HOSTED | 8 | - |
+| PROVIDER_TYPE_GOOGLE | 9 | - |
 
 
 
