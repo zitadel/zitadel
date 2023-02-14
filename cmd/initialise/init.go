@@ -26,7 +26,6 @@ var (
 	createEventsStmt         string
 	createSystemSequenceStmt string
 	createUniqueConstraints  string
-	createLogstoreStmt       string
 
 	roleAlreadyExistsCode = "42710"
 	dbAlreadyExistsCode   = "42P04"
