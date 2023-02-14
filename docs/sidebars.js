@@ -97,6 +97,17 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Migrate",
+      collapsed: false,
+      items: [
+        "guides/migrate/introduction",
+        "guides/migrate/users",
+        "guides/migrate/export-and-import",
+        "guides/migrate/auth0",
+      ]
+    },
+    {
+      type: "category",
       label: "Integrate",
       collapsed: false,
       items: [
@@ -112,7 +123,6 @@ module.exports = {
             "guides/integrate/client-credentials",
             "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
-            "guides/integrate/export-and-import",
             "guides/integrate/event-api",
           ],
         },
