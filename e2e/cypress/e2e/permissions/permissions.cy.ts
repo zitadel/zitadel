@@ -188,7 +188,7 @@ describe('permissions', () => {
       describe('granted projects', () => {
         beforeEach(() => {
           cy.get<Context>('@ctx').then((ctx) => {
-            ensureOrgExists(ctx.api, 'e2eforeignorg').then((foreignOrgId) => {
+            ensureOrgExists(ctx, 'e2eforeignorg').then((foreignOrgId) => {
               ensureProjectExists(ctx.api, 'e2eprojectgrants', foreignOrgId)
                 .as('foreignProjectId')
                 .then((foreignProjectId) => {
