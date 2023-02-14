@@ -164,7 +164,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 								uint64(15),
 								"ro-id",
 								"instance-id",
-								domain.IDPConfigStateActive,
+								domain.IDPStateActive,
 								"custom-zitadel-instance",
 								domain.IdentityProviderTypeSystem,
 								domain.IDPTypeLDAP,
@@ -263,7 +263,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 								uint64(15),
 								"ro-id",
 								"instance-id",
-								domain.IDPConfigStateActive,
+								domain.IDPStateActive,
 								"custom-zitadel-instance",
 								domain.IdentityProviderTypeOrg,
 								domain.IDPTypeLDAP,
@@ -458,7 +458,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idps3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "UPDATE projections.idp_templates SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
