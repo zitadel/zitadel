@@ -199,6 +199,7 @@ title: zitadel/idp.proto
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
+| options |  Options | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.ldap |  LDAPConfig | - |  |
 
 

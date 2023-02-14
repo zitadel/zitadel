@@ -259,8 +259,9 @@ enum ProviderType {
 }
 
 message ProviderConfig {
+    Options options = 1;
     oneof config {
-        LDAPConfig ldap = 1;
+        LDAPConfig ldap = 2;
     }
 }
 

@@ -372,8 +372,16 @@ func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
 }
 
 func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
+	providerConfig := &idp_pb.ProviderConfig{
+		Options: &idp_pb.Options{
+			IsLinkingAllowed:  config.IsLinkingAllowed,
+			IsCreationAllowed: config.IsCreationAllowed,
+			IsAutoCreation:    config.IsAutoCreation,
+			IsAutoUpdate:      config.IsAutoUpdate,
+		},
+	}
 	if config.LDAPIDPTemplate != nil {
-		return &idp_pb.ProviderConfig{Config: &idp_pb.ProviderConfig_Ldap{
+		providerConfig.Config = &idp_pb.ProviderConfig_Ldap{
 			Ldap: &idp_pb.LDAPConfig{
 				Host:                config.Host,
 				Port:                config.Port,
@@ -384,9 +392,9 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 				Admin:               config.Admin,
 				Attributes:          ldapAttributesToPb(config.LDAPAttributes),
 			},
-		}}
+		}
 	}
-	return nil
+	return providerConfig
 }
 
 func ldapAttributesToPb(attributes idp.LDAPAttributes) *idp_pb.LDAPAttributes {
