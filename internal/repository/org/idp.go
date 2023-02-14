@@ -640,6 +640,7 @@ func NewGitLabSelfHostedIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
+	oldName string,
 	changes []idp.GitLabSelfHostedIDPChanges,
 ) (*GitLabSelfHostedIDPChangedEvent, error) {
 
@@ -650,6 +651,7 @@ func NewGitLabSelfHostedIDPChangedEvent(
 			GitLabSelfHostedIDPChangedEventType,
 		),
 		id,
+		oldName,
 		changes,
 	)
 	if err != nil {

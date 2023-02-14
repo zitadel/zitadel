@@ -778,7 +778,7 @@ func (wm *OrgGitLabSelfHostedIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := org.NewGitLabSelfHostedIDPChangedEvent(ctx, aggregate, id, changes)
+	changeEvent, err := org.NewGitLabSelfHostedIDPChangedEvent(ctx, aggregate, id, wm.Name, changes)
 	if err != nil {
 		return nil, err
 	}

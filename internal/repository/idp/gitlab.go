@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
 type GitLabIDPAddedEvent struct {
@@ -174,8 +175,7 @@ func (e *GitLabSelfHostedIDPAddedEvent) Data() interface{} {
 }
 
 func (e *GitLabSelfHostedIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-	//return []*eventstore.EventUniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)} //TODO: ?
+	return []*eventstore.EventUniqueConstraint{idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
 func GitLabSelfHostedIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
@@ -194,6 +194,8 @@ func GitLabSelfHostedIDPAddedEventMapper(event *repository.Event) (eventstore.Ev
 type GitLabSelfHostedIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	oldName string
+
 	ID           string              `json:"id"`
 	Name         *string             `json:"name,omitempty"`
 	Issuer       *string             `json:"issuer,omitempty"`
@@ -206,6 +208,7 @@ type GitLabSelfHostedIDPChangedEvent struct {
 func NewGitLabSelfHostedIDPChangedEvent(
 	base *eventstore.BaseEvent,
 	id string,
+	oldName string,
 	changes []GitLabSelfHostedIDPChanges,
 ) (*GitLabSelfHostedIDPChangedEvent, error) {
 	if len(changes) == 0 {
@@ -214,6 +217,7 @@ func NewGitLabSelfHostedIDPChangedEvent(
 	changedEvent := &GitLabSelfHostedIDPChangedEvent{
 		BaseEvent: *base,
 		ID:        id,
+		oldName:   oldName,
 	}
 	for _, change := range changes {
 		change(changedEvent)
@@ -264,8 +268,13 @@ func (e *GitLabSelfHostedIDPChangedEvent) Data() interface{} {
 }
 
 func (e *GitLabSelfHostedIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	//return []*eventstore.EventUniqueConstraint{NewAddGitLabSelfHostedIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)} //TODO: ?
-	return nil
+	if e.Name == nil || e.oldName == *e.Name { // TODO: nil check should be enough
+		return nil
+	}
+	return []*eventstore.EventUniqueConstraint{
+		idpconfig.NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
+		idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
+	}
 }
 
 func GitLabSelfHostedIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
