@@ -977,7 +977,8 @@
       "en": "English",
       "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1168,7 +1169,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1942,7 +1944,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

@@ -211,6 +211,7 @@ RegistrationUser:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -241,6 +242,7 @@ ExternalRegistrationUserOverview:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -299,6 +301,7 @@ ExternalNotFound:
   Italian: Italiano
   French: Français
   Chinese: 简体中文
+  Polish: Polski
 
 Footer:
   PoweredBy: Promulgué par
