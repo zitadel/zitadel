@@ -62,7 +62,6 @@ var (
 	SecurityPolicyProjection            *securityPolicyProjection
 	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
-	QuotasProjection                    *quotaProjection
 )
 
 type projection interface {
@@ -134,7 +133,6 @@ func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, c
 	OIDCSettingsProjection = newOIDCSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["oidc_settings"]))
 	DebugNotificationProviderProjection = newDebugNotificationProviderProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_notification_provider"]))
 	KeyProjection = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, certEncryptionAlgorithm)
-	QuotasProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
 	SecurityPolicyProjection = newSecurityPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["security_policies"]))
 	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
 	newProjectionsList()
@@ -226,7 +224,6 @@ func newProjectionsList() {
 		OIDCSettingsProjection,
 		DebugNotificationProviderProjection,
 		KeyProjection,
-		QuotasProjection,
 		SecurityPolicyProjection,
 		NotificationPolicyProjection,
 	}
