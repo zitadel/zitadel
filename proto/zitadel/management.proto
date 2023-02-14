@@ -3213,7 +3213,6 @@ service ManagementService {
         };
     }
 
-
     rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
         option (google.api.http) = {
             post: "/actions/_search"
@@ -6217,7 +6216,7 @@ message AddAzureADProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    AzureADTenant tenant = 4; //TODO: validation?
+    zitadel.idp.v1.AzureADTenant tenant = 4;
     bool email_verified = 5;
     repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
     zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
@@ -6233,7 +6232,7 @@ message UpdateAzureADProviderRequest {
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 4 [(validate.rules).string = {max_len: 200}];
-    AzureADTenant tenant = 5; //TODO: validation?
+    zitadel.idp.v1.AzureADTenant tenant = 5;
     bool email_verified = 6;
     repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
     zitadel.idp.v1.Options provider_options = 8 [(validate.rules).message = {required: true}];
@@ -6243,18 +6242,6 @@ message UpdateAzureADProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-enum AzureADTenantType {
-    AZURE_AD_TENANT_TYPE_COMMON = 0;
-    AZURE_AD_TENANT_TYPE_ORGANISATIONS = 1;
-    AZURE_AD_TENANT_TYPE_CONSUMERS = 2;
-}
-
-message AzureADTenant {
-    oneof type {
-        AzureADTenantType tenant_type = 1;
-        string tenant_id = 2;
-    }
-}
 
 message AddGitHubProviderRequest {
     string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];

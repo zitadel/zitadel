@@ -1009,6 +1009,215 @@ service AdminService {
         };
     }
 
+    rpc AddGenericOAuthProvider(AddGenericOAuthProviderRequest) returns (AddGenericOAuthProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/oauth"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateGenericOAuthProvider(UpdateGenericOAuthProviderRequest) returns (UpdateGenericOAuthProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/oauth/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc AddGenericOIDCProvider(AddGenericOIDCProviderRequest) returns (AddGenericOIDCProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/oidc"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateGenericOIDCProvider(UpdateGenericOIDCProviderRequest) returns (UpdateGenericOIDCProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/oidc/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc AddJWTProvider(AddJWTProviderRequest) returns (AddJWTProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/jwt"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateJWTProvider(UpdateJWTProviderRequest) returns (UpdateJWTProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/jwt/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc AddAzureADProvider(AddAzureADProviderRequest) returns (AddAzureADProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/azure"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateAzureADProvider(UpdateAzureADProviderRequest) returns (UpdateAzureADProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/azure/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc AddGitHubProvider(AddGitHubProviderRequest) returns (AddGitHubProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/github"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateGitHubProvider(UpdateGitHubProviderRequest) returns (UpdateGitHubProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/github/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc AddGitHubEnterpriseProvider(AddGitHubEnterpriseProviderRequest) returns (AddGitHubEnterpriseProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/github_ee"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateGitHubEnterpriseProvider(UpdateGitHubEnterpriseProviderRequest) returns (UpdateGitHubEnterpriseProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/github_ee/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc AddGitLabProvider(AddGitLabProviderRequest) returns (AddGitLabProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/gitlab"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateGitLabProvider(UpdateGitLabProviderRequest) returns (UpdateGitLabProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/gitlab/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc AddGitLabSelfHostedProvider(AddGitLabSelfHostedProviderRequest) returns (AddGitLabSelfHostedProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/gitlab_self_hosted"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateGitLabSelfHostedProvider(UpdateGitLabSelfHostedProviderRequest) returns (UpdateGitLabSelfHostedProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/gitlab_self_hosted/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc AddGoogleProvider(AddGoogleProviderRequest) returns (AddGoogleProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/google"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc UpdateGoogleProvider(UpdateGoogleProviderRequest) returns (UpdateGoogleProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/google/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
+    rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+    }
+
     //deprecated: please use DomainPolicy instead
     //Returns the Org IAM policy defined by the administrators of ZITADEL
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
@@ -3620,6 +3829,265 @@ message UpdateIDPJWTConfigRequest {
 }
 
 message UpdateIDPJWTConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddGenericOAuthProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string authorization_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 8 [(validate.rules).message = {required: true}];
+}
+
+message AddGenericOAuthProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGenericOAuthProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    string authorization_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_endpoint = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 9 [(validate.rules).message = {required: true}];
+}
+
+message UpdateGenericOAuthProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddGenericOIDCProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 6 [(validate.rules).message = {required: true}];
+}
+
+message AddGenericOIDCProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGenericOIDCProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 5 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
+}
+
+message UpdateGenericOIDCProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddJWTProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string jwt_endpoint = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string keys_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string header_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.Options provider_options = 6 [(validate.rules).message = {required: true}];
+}
+
+message AddJWTProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateJWTProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string jwt_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string keys_endpoint = 5 [(validate.rules).string = {max_len: 200}];
+    string header_name = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
+}
+
+message UpdateJWTProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddAzureADProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.AzureADTenant tenant = 4;
+    bool email_verified = 5;
+    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
+}
+
+message AddAzureADProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateAzureADProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    zitadel.idp.v1.AzureADTenant tenant = 5;
+    bool email_verified = 6;
+    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 8 [(validate.rules).message = {required: true}];
+}
+
+message UpdateAzureADProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+
+message AddGitHubProviderRequest {
+    string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 3 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
+}
+
+message AddGitHubProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGitHubProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 5 [(validate.rules).message = {required: true}];
+}
+
+message UpdateGitHubProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddGitHubEnterpriseProviderRequest {
+    string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string authorization_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 8 [(validate.rules).message = {required: true}];
+}
+
+message AddGitHubEnterpriseProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGitHubEnterpriseProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    string authorization_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_endpoint = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 9 [(validate.rules).message = {required: true}];
+}
+
+message UpdateGitHubEnterpriseProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddGitLabProviderRequest {
+    string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 3 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
+}
+
+message AddGitLabProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGitLabProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 5 [(validate.rules).message = {required: true}];
+}
+
+message UpdateGitLabProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddGitLabSelfHostedProviderRequest {
+    string issuer = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 6 [(validate.rules).message = {required: true}];
+}
+
+message AddGitLabSelfHostedProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGitLabSelfHostedProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 5 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 7 [(validate.rules).message = {required: true}];
+}
+
+message UpdateGitLabSelfHostedProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddGoogleProviderRequest {
+    string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 3 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 4 [(validate.rules).message = {required: true}];
+}
+
+message AddGoogleProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGoogleProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {max_len: 200}];
+    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 5 [(validate.rules).message = {required: true}];
+}
+
+message UpdateGoogleProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeleteProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

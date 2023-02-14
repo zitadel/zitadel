@@ -3497,7 +3497,7 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| tenant |  AzureADTenant | TODO: validation? |  |
+| tenant |  zitadel.idp.v1.AzureADTenant | - |  |
 | email_verified |  bool | - |  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
 | provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
@@ -4517,18 +4517,6 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | user_grant_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### AzureADTenant
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) type.tenant_type |  AzureADTenantType | - |  |
-| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) type.tenant_id |  string | - |  |
 
 
 
@@ -9020,7 +9008,7 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_secret |  string | - | string.max_len: 200<br />  |
-| tenant |  AzureADTenant | TODO: validation? |  |
+| tenant |  zitadel.idp.v1.AzureADTenant | - |  |
 | email_verified |  bool | - |  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
 | provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
@@ -9923,32 +9911,6 @@ This is an empty request
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
-
-
-
-
-## Enums
-
-
-### AzureADTenantType {#azureadtenanttype}
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| AZURE_AD_TENANT_TYPE_COMMON | 0 | - |
-| AZURE_AD_TENANT_TYPE_ORGANISATIONS | 1 | - |
-| AZURE_AD_TENANT_TYPE_CONSUMERS | 2 | - |
-
-
-
-
-### SendHumanResetPasswordNotificationRequest.Type {#sendhumanresetpasswordnotificationrequesttype}
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| TYPE_EMAIL | 0 | - |
-| TYPE_SMS | 1 | - |
 
 
 

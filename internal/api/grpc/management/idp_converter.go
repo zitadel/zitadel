@@ -247,14 +247,10 @@ func addAzureADProviderToCommand(req *mgmt_pb.AddAzureADProviderRequest) command
 		Name:          req.Name,
 		ClientID:      req.ClientId,
 		ClientSecret:  req.ClientSecret,
-		Tenant:        azureADTenantToCommand(req.Tenant),
+		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
 		EmailVerified: req.EmailVerified,
 		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
-}
-
-func azureADTenantToCommand(tenant *mgmt_pb.AzureADTenant) string {
-	return "" //TODO: ?
 }
 
 func updateAzureADProviderToCommand(req *mgmt_pb.UpdateAzureADProviderRequest) command.AzureADProvider {
@@ -262,7 +258,7 @@ func updateAzureADProviderToCommand(req *mgmt_pb.UpdateAzureADProviderRequest) c
 		Name:          req.Name,
 		ClientID:      req.ClientId,
 		ClientSecret:  req.ClientSecret,
-		Tenant:        azureADTenantToCommand(req.Tenant),
+		Tenant:        idp_grpc.AzureADTenantToCommand(req.Tenant),
 		EmailVerified: req.EmailVerified,
 		IDPOptions:    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}

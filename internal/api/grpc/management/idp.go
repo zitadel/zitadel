@@ -144,11 +144,7 @@ func (s *Server) UpdateOrgIDPJWTConfig(ctx context.Context, req *mgmt_pb.UpdateO
 }
 
 func (s *Server) AddGenericOAuthProvider(ctx context.Context, req *mgmt_pb.AddGenericOAuthProviderRequest) (*mgmt_pb.AddGenericOAuthProviderResponse, error) {
-	id, details, err := s.command.AddOrgGenericOAuthProvider(
-		ctx,
-		authz.GetCtxData(ctx).OrgID,
-		addGenericOAuthProviderToCommand(req),
-	)
+	id, details, err := s.command.AddOrgGenericOAuthProvider(ctx, authz.GetCtxData(ctx).OrgID, addGenericOAuthProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -169,11 +165,7 @@ func (s *Server) UpdateGenericOAuthProvider(ctx context.Context, req *mgmt_pb.Up
 }
 
 func (s *Server) AddGenericOIDCProvider(ctx context.Context, req *mgmt_pb.AddGenericOIDCProviderRequest) (*mgmt_pb.AddGenericOIDCProviderResponse, error) {
-	id, details, err := s.command.AddOrgGenericOIDCProvider(
-		ctx,
-		authz.GetCtxData(ctx).OrgID,
-		addGenericOIDCProviderToCommand(req),
-	)
+	id, details, err := s.command.AddOrgGenericOIDCProvider(ctx, authz.GetCtxData(ctx).OrgID, addGenericOIDCProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
@@ -194,11 +186,7 @@ func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *mgmt_pb.Upd
 }
 
 func (s *Server) AddJWTProvider(ctx context.Context, req *mgmt_pb.AddJWTProviderRequest) (*mgmt_pb.AddJWTProviderResponse, error) {
-	id, details, err := s.command.AddOrgJWTProvider(
-		ctx,
-		authz.GetCtxData(ctx).OrgID,
-		addJWTProviderToCommand(req),
-	)
+	id, details, err := s.command.AddOrgJWTProvider(ctx, authz.GetCtxData(ctx).OrgID, addJWTProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}

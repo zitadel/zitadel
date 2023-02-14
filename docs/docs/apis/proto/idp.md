@@ -9,6 +9,18 @@ title: zitadel/idp.proto
 ## Messages
 
 
+### AzureADTenant
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) type.tenant_type |  AzureADTenantType | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) type.tenant_id |  string | - |  |
+
+
+
+
 ### IDP
 
 
@@ -137,6 +149,18 @@ title: zitadel/idp.proto
 
 
 ## Enums
+
+
+### AzureADTenantType {#azureadtenanttype}
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| AZURE_AD_TENANT_TYPE_COMMON | 0 | - |
+| AZURE_AD_TENANT_TYPE_ORGANISATIONS | 1 | - |
+| AZURE_AD_TENANT_TYPE_CONSUMERS | 2 | - |
+
+
 
 
 ### IDPFieldName {#idpfieldname}

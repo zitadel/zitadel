@@ -273,6 +273,10 @@ func OptionsToCommand(options *idp_pb.Options) idp.Options {
 	}
 }
 
+func AzureADTenantToCommand(tenant *idp_pb.AzureADTenant) string {
+	return "" //TODO: ?
+}
+
 func IDPIDQueryToModel(query *idp_pb.IDPIDQuery) *iam_model.IDPConfigSearchQuery {
 	return &iam_model.IDPConfigSearchQuery{
 		Key:    iam_model.IDPConfigSearchKeyIdpConfigID,

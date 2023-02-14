@@ -150,3 +150,202 @@ func (s *Server) UpdateIDPJWTConfig(ctx context.Context, req *admin_pb.UpdateIDP
 		),
 	}, nil
 }
+
+func (s *Server) AddGenericOAuthProvider(ctx context.Context, req *admin_pb.AddGenericOAuthProviderRequest) (*admin_pb.AddGenericOAuthProviderResponse, error) {
+	id, details, err := s.command.AddOrgGenericOAuthProvider(ctx, authz.GetCtxData(ctx).OrgID, addGenericOAuthProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGenericOAuthProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGenericOAuthProvider(ctx context.Context, req *admin_pb.UpdateGenericOAuthProviderRequest) (*admin_pb.UpdateGenericOAuthProviderResponse, error) {
+	details, err := s.command.UpdateOrgGenericOAuthProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGenericOAuthProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGenericOAuthProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGenericOIDCProvider(ctx context.Context, req *admin_pb.AddGenericOIDCProviderRequest) (*admin_pb.AddGenericOIDCProviderResponse, error) {
+	id, details, err := s.command.AddOrgGenericOIDCProvider(ctx, authz.GetCtxData(ctx).OrgID, addGenericOIDCProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGenericOIDCProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGenericOIDCProvider(ctx context.Context, req *admin_pb.UpdateGenericOIDCProviderRequest) (*admin_pb.UpdateGenericOIDCProviderResponse, error) {
+	details, err := s.command.UpdateOrgGenericOIDCProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGenericOIDCProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGenericOIDCProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddJWTProvider(ctx context.Context, req *admin_pb.AddJWTProviderRequest) (*admin_pb.AddJWTProviderResponse, error) {
+	id, details, err := s.command.AddOrgJWTProvider(ctx, authz.GetCtxData(ctx).OrgID, addJWTProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddJWTProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateJWTProvider(ctx context.Context, req *admin_pb.UpdateJWTProviderRequest) (*admin_pb.UpdateJWTProviderResponse, error) {
+	details, err := s.command.UpdateOrgJWTProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateJWTProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateJWTProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddAzureADProvider(ctx context.Context, req *admin_pb.AddAzureADProviderRequest) (*admin_pb.AddAzureADProviderResponse, error) {
+	id, details, err := s.command.AddOrgAzureADProvider(ctx, authz.GetCtxData(ctx).OrgID, addAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddAzureADProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateAzureADProvider(ctx context.Context, req *admin_pb.UpdateAzureADProviderRequest) (*admin_pb.UpdateAzureADProviderResponse, error) {
+	details, err := s.command.UpdateOrgAzureADProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateAzureADProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateAzureADProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitHubProvider(ctx context.Context, req *admin_pb.AddGitHubProviderRequest) (*admin_pb.AddGitHubProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitHubProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGitHubProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitHubProvider(ctx context.Context, req *admin_pb.UpdateGitHubProviderRequest) (*admin_pb.UpdateGitHubProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitHubProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitHubProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGitHubProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitHubEnterpriseProvider(ctx context.Context, req *admin_pb.AddGitHubEnterpriseProviderRequest) (*admin_pb.AddGitHubEnterpriseProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitHubEnterpriseProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitHubEnterpriseProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGitHubEnterpriseProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitHubEnterpriseProvider(ctx context.Context, req *admin_pb.UpdateGitHubEnterpriseProviderRequest) (*admin_pb.UpdateGitHubEnterpriseProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitHubEnterpriseProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitHubEnterpriseProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGitHubEnterpriseProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitLabProvider(ctx context.Context, req *admin_pb.AddGitLabProviderRequest) (*admin_pb.AddGitLabProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGitLabProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitLabProvider(ctx context.Context, req *admin_pb.UpdateGitLabProviderRequest) (*admin_pb.UpdateGitLabProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitLabProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGitLabProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGitLabSelfHostedProvider(ctx context.Context, req *admin_pb.AddGitLabSelfHostedProviderRequest) (*admin_pb.AddGitLabSelfHostedProviderResponse, error) {
+	id, details, err := s.command.AddOrgGitLabSelfHostedProvider(ctx, authz.GetCtxData(ctx).OrgID, addGitLabSelfHostedProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGitLabSelfHostedProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGitLabSelfHostedProvider(ctx context.Context, req *admin_pb.UpdateGitLabSelfHostedProviderRequest) (*admin_pb.UpdateGitLabSelfHostedProviderResponse, error) {
+	details, err := s.command.UpdateOrgGitLabSelfHostedProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGitLabSelfHostedProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGitLabSelfHostedProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddGoogleProvider(ctx context.Context, req *admin_pb.AddGoogleProviderRequest) (*admin_pb.AddGoogleProviderResponse, error) {
+	id, details, err := s.command.AddOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, addGoogleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddGoogleProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateGoogleProvider(ctx context.Context, req *admin_pb.UpdateGoogleProviderRequest) (*admin_pb.UpdateGoogleProviderResponse, error) {
+	details, err := s.command.UpdateOrgGoogleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateGoogleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateGoogleProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) DeleteProvider(ctx context.Context, req *admin_pb.DeleteProviderRequest) (*admin_pb.DeleteProviderResponse, error) {
+	details, err := s.command.DeleteProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.DeleteProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}

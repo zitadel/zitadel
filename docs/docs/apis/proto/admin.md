@@ -568,6 +568,234 @@ all fields are updated. If no value is provided the field will be empty afterwar
     PUT: /idps/{idp_id}/jwt_config
 
 
+### AddGenericOAuthProvider
+
+> **rpc** AddGenericOAuthProvider([AddGenericOAuthProviderRequest](#addgenericoauthproviderrequest))
+[AddGenericOAuthProviderResponse](#addgenericoauthproviderresponse)
+
+
+
+
+
+    POST: /idps/oauth
+
+
+### UpdateGenericOAuthProvider
+
+> **rpc** UpdateGenericOAuthProvider([UpdateGenericOAuthProviderRequest](#updategenericoauthproviderrequest))
+[UpdateGenericOAuthProviderResponse](#updategenericoauthproviderresponse)
+
+
+
+
+
+    POST: /idps/oauth/{id}
+
+
+### AddGenericOIDCProvider
+
+> **rpc** AddGenericOIDCProvider([AddGenericOIDCProviderRequest](#addgenericoidcproviderrequest))
+[AddGenericOIDCProviderResponse](#addgenericoidcproviderresponse)
+
+
+
+
+
+    POST: /idps/oidc
+
+
+### UpdateGenericOIDCProvider
+
+> **rpc** UpdateGenericOIDCProvider([UpdateGenericOIDCProviderRequest](#updategenericoidcproviderrequest))
+[UpdateGenericOIDCProviderResponse](#updategenericoidcproviderresponse)
+
+
+
+
+
+    POST: /idps/oidc/{id}
+
+
+### AddJWTProvider
+
+> **rpc** AddJWTProvider([AddJWTProviderRequest](#addjwtproviderrequest))
+[AddJWTProviderResponse](#addjwtproviderresponse)
+
+
+
+
+
+    POST: /idps/jwt
+
+
+### UpdateJWTProvider
+
+> **rpc** UpdateJWTProvider([UpdateJWTProviderRequest](#updatejwtproviderrequest))
+[UpdateJWTProviderResponse](#updatejwtproviderresponse)
+
+
+
+
+
+    POST: /idps/jwt/{id}
+
+
+### AddAzureADProvider
+
+> **rpc** AddAzureADProvider([AddAzureADProviderRequest](#addazureadproviderrequest))
+[AddAzureADProviderResponse](#addazureadproviderresponse)
+
+
+
+
+
+    POST: /idps/azure
+
+
+### UpdateAzureADProvider
+
+> **rpc** UpdateAzureADProvider([UpdateAzureADProviderRequest](#updateazureadproviderrequest))
+[UpdateAzureADProviderResponse](#updateazureadproviderresponse)
+
+
+
+
+
+    POST: /idps/azure/{id}
+
+
+### AddGitHubProvider
+
+> **rpc** AddGitHubProvider([AddGitHubProviderRequest](#addgithubproviderrequest))
+[AddGitHubProviderResponse](#addgithubproviderresponse)
+
+
+
+
+
+    POST: /idps/github
+
+
+### UpdateGitHubProvider
+
+> **rpc** UpdateGitHubProvider([UpdateGitHubProviderRequest](#updategithubproviderrequest))
+[UpdateGitHubProviderResponse](#updategithubproviderresponse)
+
+
+
+
+
+    POST: /idps/github/{id}
+
+
+### AddGitHubEnterpriseProvider
+
+> **rpc** AddGitHubEnterpriseProvider([AddGitHubEnterpriseProviderRequest](#addgithubenterpriseproviderrequest))
+[AddGitHubEnterpriseProviderResponse](#addgithubenterpriseproviderresponse)
+
+
+
+
+
+    POST: /idps/github_ee
+
+
+### UpdateGitHubEnterpriseProvider
+
+> **rpc** UpdateGitHubEnterpriseProvider([UpdateGitHubEnterpriseProviderRequest](#updategithubenterpriseproviderrequest))
+[UpdateGitHubEnterpriseProviderResponse](#updategithubenterpriseproviderresponse)
+
+
+
+
+
+    POST: /idps/github_ee/{id}
+
+
+### AddGitLabProvider
+
+> **rpc** AddGitLabProvider([AddGitLabProviderRequest](#addgitlabproviderrequest))
+[AddGitLabProviderResponse](#addgitlabproviderresponse)
+
+
+
+
+
+    POST: /idps/gitlab
+
+
+### UpdateGitLabProvider
+
+> **rpc** UpdateGitLabProvider([UpdateGitLabProviderRequest](#updategitlabproviderrequest))
+[UpdateGitLabProviderResponse](#updategitlabproviderresponse)
+
+
+
+
+
+    POST: /idps/gitlab/{id}
+
+
+### AddGitLabSelfHostedProvider
+
+> **rpc** AddGitLabSelfHostedProvider([AddGitLabSelfHostedProviderRequest](#addgitlabselfhostedproviderrequest))
+[AddGitLabSelfHostedProviderResponse](#addgitlabselfhostedproviderresponse)
+
+
+
+
+
+    POST: /idps/gitlab_self_hosted
+
+
+### UpdateGitLabSelfHostedProvider
+
+> **rpc** UpdateGitLabSelfHostedProvider([UpdateGitLabSelfHostedProviderRequest](#updategitlabselfhostedproviderrequest))
+[UpdateGitLabSelfHostedProviderResponse](#updategitlabselfhostedproviderresponse)
+
+
+
+
+
+    POST: /idps/gitlab_self_hosted/{id}
+
+
+### AddGoogleProvider
+
+> **rpc** AddGoogleProvider([AddGoogleProviderRequest](#addgoogleproviderrequest))
+[AddGoogleProviderResponse](#addgoogleproviderresponse)
+
+
+
+
+
+    POST: /idps/google
+
+
+### UpdateGoogleProvider
+
+> **rpc** UpdateGoogleProvider([UpdateGoogleProviderRequest](#updategoogleproviderrequest))
+[UpdateGoogleProviderResponse](#updategoogleproviderresponse)
+
+
+
+
+
+    POST: /idps/google/{id}
+
+
+### DeleteProvider
+
+> **rpc** DeleteProvider([DeleteProviderRequest](#deleteproviderrequest))
+[DeleteProviderResponse](#deleteproviderresponse)
+
+
+
+
+
+    POST: /idps/{id}
+
+
 ### GetOrgIAMPolicy
 
 > **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
@@ -1739,6 +1967,35 @@ This is an empty request
 
 
 
+### AddAzureADProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tenant |  zitadel.idp.v1.AzureADTenant | - |  |
+| email_verified |  bool | - |  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddAzureADProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
 ### AddCustomDomainPolicyRequest
 
 
@@ -1783,6 +2040,200 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddGenericOAuthProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| authorization_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddGenericOAuthProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### AddGenericOIDCProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddGenericOIDCProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### AddGitHubEnterpriseProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| authorization_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddGitHubEnterpriseProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### AddGitHubProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddGitHubProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### AddGitLabProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddGitLabProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### AddGitLabSelfHostedProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddGitLabSelfHostedProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### AddGoogleProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddGoogleProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
 
 
 
@@ -1857,6 +2308,34 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | idp_id |  string | - |  |
+
+
+
+
+### AddJWTProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddJWTProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
 
 
 
@@ -2114,6 +2593,28 @@ This is an empty request
 
 
 ### DeactivateSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### DeleteProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### DeleteProviderResponse
 
 
 
@@ -4541,6 +5042,35 @@ this is en empty request
 
 
 
+### UpdateAzureADProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| tenant |  zitadel.idp.v1.AzureADTenant | - |  |
+| email_verified |  bool | - |  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateAzureADProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateCustomDomainPolicyRequest
 
 
@@ -4603,6 +5133,200 @@ this is en empty request
 
 
 ### UpdateDomainPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGenericOAuthProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| authorization_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateGenericOAuthProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGenericOIDCProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateGenericOIDCProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGitHubEnterpriseProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| authorization_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateGitHubEnterpriseProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGitHubProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateGitHubProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGitLabProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateGitLabProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGitLabSelfHostedProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateGitLabSelfHostedProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGoogleProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateGoogleProviderResponse
 
 
 
@@ -4705,6 +5429,34 @@ this is en empty request
 
 
 ### UpdateIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateJWTProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateJWTProviderResponse
 
 
 
