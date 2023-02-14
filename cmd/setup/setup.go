@@ -84,6 +84,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s4EventstoreIndexes = &EventstoreIndexes{dbClient: dbClient, dbType: config.Database.Type()}
 	steps.s5LastFailed = &LastFailed{dbClient: dbClient}
 	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient}
+	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
