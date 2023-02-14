@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -14,7 +13,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -43,10 +41,6 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 				ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
 				instance, err := verifier.InstanceByID(ctx)
 				if err != nil {
-					caosErr := new(caos_errors.NotFoundError)
-					if errors.As(err, &caosErr) {
-						caosErr.Message = translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil)
-					}
 					return nil, status.Error(codes.NotFound, err.Error())
 				}
 				ctx = authz.WithInstance(ctx, instance)
@@ -61,10 +55,6 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
-		caosErr := new(caos_errors.NotFoundError)
-		if errors.As(err, &caosErr) {
-			caosErr.Message = translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil)
-		}
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 	span.End()
