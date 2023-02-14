@@ -640,7 +640,7 @@ DefaultInstance:
 #      - Unit: "requests.all.authenticated"
 #        # From defines the starting time from which the current quota period is calculated from.
 #        # This is relevant for querying the current usage.
-#        From: "2023-01-01T00:00:00Z01:00"
+#        From: "2023-01-01T00:00:00Z"
 #        # ResetInterval defines the quota periods duration
 #        ResetInterval: 720h # 30 days
 #        # Amount defines the number of units for this quota
