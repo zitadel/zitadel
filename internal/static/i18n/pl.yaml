@@ -1,0 +1,1159 @@
+Errors:
+  Internal: Wystąpił błąd wewnętrzny
+  NoChangesFound: Brak zmian
+  OriginNotAllowed: Ten "Origin" nie jest dozwolony
+  IDMissing: ID brakuje
+  ResourceOwnerMissing: Brakuje organizacji właściciela zasobu
+  RemoveFailed: Nie można usunąć
+  ProjectionName:
+    Invalid: Nieprawidłowa nazwa projekcji
+  Assets:
+    EmptyKey: Klucz zasobu jest pusty
+    Store:
+      NotInitialized: Przechowywanie zasobów nie zostało zainicjowane
+      NotConfigured: Przechowywanie zasobów nie jest skonfigurowane
+    Bucket:
+      Internal: Błąd wewnętrzny podczas tworzenia kosza
+      AlreadyExists: Kosz już istnieje
+      CreateFailed: Kosz nie został utworzony
+      ListFailed: Kosze nie mogły zostać odczytane
+      RemoveFailed: Kosz nie został usunięty
+      SetPublicFailed: Nie można ustawić kosza jako publiczny
+    Object:
+      PutFailed: Obiekt nie został utworzony
+      GetFailed: Obiekt nie mógł zostać odczytany
+      NotFound: Obiekt nie został znaleziony
+      PresignedTokenFailed: Podpisany token nie mógł zostać utworzony
+      ListFailed: Lista obiektów nie mogła zostać odczytana
+      RemoveFailed: Obiekt nie mógł zostać usunięty
+  Limit:
+    ExceedsDefault: Limit przekracza domyślny limit
+  Language:
+    NotParsed: Nie można przeanalizować języka
+  OIDCSettings:
+    NotFound: Konfiguracja OIDC nie znaleziona
+    AlreadyExists: Konfiguracja OIDC już istnieje
+  SecretGenerator:
+    AlreadyExists: Generator tajnego już istnieje
+    TypeMissing: Typ generatora tajnego brakuje
+    NotFound: Generator tajnego nie znaleziony
+  SMSConfig:
+    NotFound: Konfiguracja SMS nie znaleziona
+    AlreadyActive: Konfiguracja SMS już aktywna
+    AlreadyDeactivated: Konfiguracja SMS już dezaktywowana
+  SMTPConfig:
+    NotFound: Konfiguracja SMTP nie znaleziona
+    AlreadyExists: Konfiguracja SMTP już istnieje
+    SenderAdressNotCustomDomain: Adres nadawcy musi być skonfigurowany jako domena niestandardowa na instancji.
+  Notification:
+    NoDomain: Nie znaleziono domeny dla wiadomości
+  User:
+    NotFound: Nie znaleziono użytkownika
+    AlreadyExists: Użytkownik już istnieje
+    NotFoundOnOrg: Użytkownik nie został znaleziony w wybranej organizacji
+    NotAllowedOrg: Użytkownik nie jest członkiem wymaganej organizacji
+    UserIDMissing: Brakuje ID użytkownika
+    DomainPolicyNil: Polityka organizacji jest pusta
+    EmailAsUsernameNotAllowed: Adres e-mail nie jest dozwolony jako nazwa użytkownika
+    Invalid: Dane użytkownika są nieprawidłowe
+    DomainNotAllowedAsUsername: Domena jest już zarezerwowana i nie może być używana
+    AlreadyInactive: Użytkownik już nieaktywny
+    NotInactive: Użytkownik nie jest nieaktywny
+    CantDeactivateInitial: Użytkownik o stanie początkowym może być tylko usunięty, a nie dezaktywowany
+    ShouldBeActiveOrInitial: Użytkownik nie jest aktywny lub początkowy
+    AlreadyInitialised: Użytkownik już został zainicjowany
+    NotInitialised: Użytkownik jeszcze nie został zainicjowany
+    NotLocked: Użytkownik nie jest zablokowany
+    NoChanges: Nie znaleziono zmian
+    InitCodeNotFound: Kod inicjalizacji nie znaleziony
+    UsernameNotChanged: Nazwa użytkownika nie została zmieniona
+    Profile:
+      NotFound: Profil nie znaleziony
+      NotChanged: Profil nie zmieniony
+      Invalid: Nieprawidłowe dane profilu
+    Email:
+      NotFound: Adres e-mail nie znaleziony
+      Invalid: Adres e-mail jest nieprawidłowy
+      AlreadyVerified: Adres e-mail jest już zweryfikowany
+      NotChanged: Adres e-mail nie zmieniony
+    Phone:
+      NotFound: Numer telefonu nie znaleziony
+      Invalid: Numer telefonu jest nieprawidłowy
+      AlreadyVerified: Numer telefonu już zweryfikowany
+    Address:
+      NotFound: Adres nie znaleziony
+      NotChanged: Adres nie zmieniony
+    Machine:
+      Key:
+        NotFound: Klucz maszyny nie znaleziony
+        AlreadyExisting: Klucz maszyny już istnieje
+      Secret:
+        NotExisting: Sekret nie istnieje
+        Invalid: Sekret jest nieprawidłowy
+        CouldNotGenerate: Sekret nie mógł zostać wygenerowany
+    PAT:
+      NotFound: Osobisty token dostępu nie znaleziony
+    NotHuman: Użytkownik musi być osobą
+    NotMachine: Użytkownik musi być techniczny
+    WrongType: Niedozwolone dla tego typu użytkownika
+    NotAllowedToLink: Użytkownik nie ma uprawnień do połączenia z dostawcą logowania zewnętrznego
+    Username:
+      AlreadyExists: Nazwa użytkownika jest już zajęta
+      Reserved: Nazwa użytkownika jest już zajęta
+    Code:
+      Empty: Kod jest pusty
+      NotFound: Kod nie znaleziony
+      Expired: Kod jest przedawniony
+      GeneratorAlgNotSupported: Nieobsługiwany algorytm generatora
+    Password:
+      NotFound: Hasło nie znalezione
+      Empty: Hasło jest puste
+      Invalid: Hasło jest nieprawidłowe
+      NotSet: Użytkownik nie ustawił hasła
+    PasswordComplexityPolicy:
+      NotFound: Polityka hasła nie znaleziona
+      MinLength: Hasło jest zbyt krótkie
+      MinLengthNotAllowed: Podana minimalna długość jest niedozwolona
+      HasLower: Hasło musi zawierać małe litery
+      HasUpper: Hasło musi zawierać duże litery
+      HasNumber: Hasło musi zawierać liczbę
+      HasSymbol: Hasło musi zawierać symbol
+    ExternalIDP:
+      Invalid: Nieprawidłowy IDP zewnętrzny
+      IDPConfigNotExisting: Dostawca IDP jest nieprawidłowy dla tej organizacji
+      NotAllowed: IDP zewnętrzne nie jest dozwolone w tej organizacji
+      MinimumExternalIDPNeeded: Przynajmniej jeden IDP musi być dodany
+      AlreadyExists: IDP zewnętrzne już istnieje
+      NotFound: IDP zewnętrzne nie znaleziony
+    MFA:
+      OTP:
+        AlreadyReady: Wieloskładnikowe OTP (OneTimePassword) jest już skonfigurowane
+        NotExisting: Wieloskładnikowe OTP (OneTimePassword) nie istnieje
+        NotReady: Wieloskładnikowe OTP (OneTimePassword) nie jest gotowe
+        InvalidCode: Nieprawidłowy kod
+      U2F:
+        NotExisting: U2F nie istnieje
+      Passwordless:
+        NotExisting: Bezhasłowe nie istnieje
+    WebAuthN:
+      NotFound: Token WebAuthN nie został znaleziony
+      BeginRegisterFailed: Rozpoczęcie rejestracji WebAuthN nie powiodło się
+      MarshalError: Błąd podczas marshalowania danych
+      ErrorOnParseCredential: Błąd podczas parsowania danych poświadczeń
+      CreateCredentialFailed: Błąd podczas tworzenia poświadczeń
+      BeginLoginFailed: Rozpoczęcie logowania WebAuthN nie powiodło się
+      ValidateLoginFailed: Błąd podczas walidacji poświadczeń logowania
+      CloneWarning: Poświadczenia mogą być klonowane
+    RefreshToken:
+      Invalid: Refresh Token jest nieprawidłowy
+      NotFound: Refresh Token nie znaleziony
+  Instance:
+    NotFound: Instancja nie znaleziona
+    AlreadyExists: Instancja już istnieje
+    NotChanged: Instancja nie zmieniona
+  Org:
+    AlreadyExists: Nazwa organizacji jest już zajęta
+    Invalid: Organizacja jest nieprawidłowa
+    AlreadyDeactivated: Organizacja jest już deaktywowana
+    AlreadyActive: Organizacja jest już aktywna
+    Empty: Organizacja jest pusta
+    NotFound: Organizacja nie znaleziona
+    NotChanged: Organizacja nie zmieniona
+    DefaultOrgNotDeletable: Domyślna organizacja nie może być usunięta
+    ZitadelOrgNotDeletable: Organizacja z projektem ZITADEL nie może być usunięta
+    InvalidDomain: Nieprawidłowa domena
+    DomainMissing: Brak domeny
+    DomainNotOnOrg: Domena nie istnieje w organizacji
+    DomainNotVerified: Domena nie jest zweryfikowana
+    DomainAlreadyVerified: Domena jest już zweryfikowana
+    DomainVerificationTypeInvalid: Typ weryfikacji domeny jest nieprawidłowy
+    DomainVerificationMissing: Weryfikacja domeny nie została jeszcze rozpoczęta
+    DomainVerificationFailed: Weryfikacja domeny nie powiodła się
+    PrimaryDomainNotDeletable: Domena główna nie może być usunięta
+    DomainNotFound: Domena nie znaleziona
+    MemberIDMissing: Brak identyfikatora członka
+    MemberNotFound: Członek organizacji nie znaleziony
+    InvalidMember: Członek organizacji jest nieprawidłowy
+    UserIDMissing: Brak identyfikatora użytkownika
+    PolicyAlreadyExists: Polityka już istnieje
+    PolicyNotExisting: Polityka nie istnieje
+    IdpInvalid: Konfiguracja IDP jest nieprawidłowa
+    IdpNotExisting: Konfiguracja IDP nie istnieje
+    OIDCConfigInvalid: Konfiguracja IDP OIDC jest nieprawidłowa
+    IdpIsNotOIDC: Konfiguracja IDP nie jest typu oidc
+    Domain:
+      AlreadyExists: Domena już istnieje
+      InvalidCharacter: Tylko znaki alfanumeryczne, . i - są dozwolone dla domeny
+    IDP:
+      InvalidSearchQuery: Nieprawidłowe zapytanie wyszukiwania
+    LoginPolicy:
+      NotFound: Polityka logowania nie znaleziona
+      Invalid: Polityka logowania jest nieprawidłowa
+      RedirectURIInvalid: Domyślny URI przekierowania jest nieprawidłowy
+      NotExisting: Polityka logowania nie istnieje
+      AlreadyExists: Polityka logowania już istnieje
+      IdpProviderAlreadyExisting: Dostawca tożsamości już istnieje
+      IdpProviderNotExisting: Dostawca tożsamości nie istnieje
+      RegistrationNotAllowed: Rejestracja nie jest dozwolona
+      UsernamePasswordNotAllowed: Logowanie za pomocą nazwy użytkownika / hasła nie jest dozwolone
+      MFA:
+        AlreadyExists: Wieloskładnikowy już istnieje
+        NotExisting: Wieloskładnikowy nie istnieje
+        Unspecified: Wieloskładnikowy jest nieprawidłowy
+    MailTemplate:
+      NotFound: Domyślny szablon e-mail nie znaleziony
+      NotChanged: Domyślny szablon e-mail nie został zmieniony
+      AlreadyExists: Domyślny szablon e-mail już istnieje
+      Invalid: Domyślny szablon e-mail jest nieprawidłowy
+    CustomMessageText:
+      NotFound: Domyślny tekst wiadomości nie znaleziony
+      NotChanged: Domyślny tekst wiadomości nie został zmieniony
+      AlreadyExists: Domyślny tekst wiadomości już istnieje
+      Invalid: Domyślny tekst wiadomości jest nieprawidłowy
+    PasswordComplexityPolicy:
+      NotFound: Polityka złożoności hasła nie znaleziona
+      Empty: Polityka złożoności hasła jest pusta
+      NotExisting: Polityka złożoności hasła nie istnieje
+      AlreadyExists: Polityka złożoności hasła już istnieje
+    PasswordLockoutPolicy:
+      NotFound: Polityka blokowania hasła nie znaleziona
+      Empty: Polityka blokowania hasła jest pusta
+      NotExisting: Polityka blokowania hasła nie istnieje
+      AlreadyExists: Polityka blokowania hasła już istnieje
+    PasswordAgePolicy:
+      NotFound: Polityka wieku hasła nie znaleziona
+      Empty: Polityka wieku hasła jest pusta
+      NotExisting: Polityka wieku hasła nie istnieje
+      AlreadyExists: Polityka wieku hasła już istnieje
+    OrgIAMPolicy:
+      Empty: Polityka IAM organizacji jest pusta
+      NotExisting: Polityka IAM organizacji nie istnieje
+      AlreadyExists: Polityka IAM organizacji już istnieje
+    NotificationPolicy:
+      NotFound: Polityka powiadomień nie znaleziona
+      NotChanged: Polityka powiadomień nie zmieniona
+      AlreadyExists: Polityka powiadomień już istnieje
+  Project:
+    ProjectIDMissing: Identyfikator projektu brak
+    AlreadyExists: Projekt już istnieje w organizacji
+    OrgNotExisting: Organizacja nie istnieje
+    UserNotExisting: Użytkownik nie istnieje
+    CouldNotGenerateClientSecret: Nie można wygenerować tajnego klienta
+    Invalid: Projekt jest nieprawidłowy
+    NotActive: Projekt nie jest aktywny
+    NotInactive: Projekt nie jest deaktywowany
+    NotFound: Projekt nie znaleziony
+    UserIDMissing: Brak identyfikatora użytkownika
+    Member:
+      NotFound: Członek projektu nie znaleziony
+      Invalid: Członek projektu jest nieprawidłowy
+      AlreadyExists: Członek projektu już istnieje
+      NotExisting: Członek projektu nie istnieje
+    MinimumOneRoleNeeded: Musi być przynajmniej jedna rola dodana
+    Role:
+      AlreadyExists: Rola już istnieje
+      Invalid: Rola jest nieprawidłowa
+      NotExisting: Rola nie istnieje
+    IDMissing: ID brakuje
+    App:
+      AlreadyExists: Aplikacja już istnieje
+      NotFound: Aplikacja nie znaleziona
+      Invalid: Aplikacja jest nieprawidłowa
+      NotExisting: Aplikacja nie istnieje
+      NotActive: Aplikacja nie jest aktywna
+      NotInactive: Aplikacja nie jest nieaktywna
+      OIDCConfigInvalid: Konfiguracja OIDC jest nieprawidłowa
+      APIConfigInvalid: Konfiguracja API jest nieprawidłowa
+      SAMLConfigInvalid: Konfiguracja SAML jest nieprawidłowa
+      IsNotOIDC: Aplikacja nie jest typu OIDC
+      IsNotAPI: Aplikacja nie jest typu API
+      IsNotSAML: Aplikacja nie jest typu SAML
+      SAMLMetadataMissing: Metadane SAML brak
+      SAMLMetadataFormat: Błąd formatu metadanych SAML
+      SAMLEntityIDAlreadyExisting: ID jednostki SAML już istnieje
+      OIDCAuthMethodNoSecret: Wybrany metoda uwierzytelniania OIDC nie wymaga tajnego
+      APIAuthMethodNoSecret: Wybrany metoda uwierzytelniania API nie wymaga tajnego
+      AuthMethodNoPrivateKeyJWT: Wybrana metoda uwierzytelniania nie wymaga klucza
+      ClientSecretInvalid: Tajne klienta jest nieprawidłowe
+      Key:
+        AlreadyExisting: Klucz aplikacji już istnieje
+        NotFound: Klucz aplikacji nie znaleziony
+    RequiredFieldsMissing: Brakuje niektórych wymaganych pól
+    Grant:
+      AlreadyExists: Grant projektu już istnieje
+      NotFound: Grant nie znaleziony
+      Invalid: Grant projektu jest nieprawidłowy
+      NotExisting: Grant projektu nie istnieje
+      HasNotExistingRole: Jedna rola nie istnieje w projekcie
+      NotActive: Grant projektu jest nieaktywny
+      NotInactive: Grant projektu nie jest nieaktywny
+  IAM:
+    NotFound: Instancja nie znaleziona
+    Member:
+      RolesNotChanged: Role nie zmienione
+    MemberInvalid: Członek jest nieprawidłowy
+    MemberAlreadyExisting: Członek już istnieje
+    MemberNotExisting: Członek nie istnieje
+    IDMissing: Id brakuje
+    IAMProjectIDMissing: Brak identyfikatora projektu IAM
+    IamProjectAlreadySet: Identyfikator projektu IAM został już ustawiony
+    IdpInvalid: Konfiguracja IDP jest nieprawidłowa
+    IdpNotExisting: Konfiguracja IDP nie istnieje
+    OIDCConfigInvalid: Konfiguracja OIDC IDP jest nieprawidłowa
+    IdpIsNotOIDC: Konfiguracja IDP nie jest typu oidc
+    LoginPolicyInvalid: Polityka logowania jest nieprawidłowa
+    LoginPolicyNotExisting: Polityka logowania nie istnieje
+    IdpProviderInvalid: Dostawca tożsamości jest nieprawidłowy
+    LoginPolicy:
+      NotFound: Domyślna polityka logowania nie znaleziona
+      NotChanged: Domyślna polityka logowania nie została zmieniona
+      NotExisting: Domyślna polityka logowania nie istnieje
+      AlreadyExists: Domyślna polityka logowania już istnieje
+      RedirectURIInvalid: Domyślny URI przekierowania jest nieprawidłowy
+      MFA:
+        AlreadyExists: Wielopoziomowe uwierzytelnianie już istnieje
+        NotExisting: Wielopoziomowe uwierzytelnianie nie istnieje
+        Unspecified: Wielopoziomowe uwierzytelnianie jest nieokreślone
+      IDP:
+        AlreadyExists: Dostawca tożsamości już istnieje
+        NotExisting: Dostawca tożsamości nie istnieje
+        Invalid: Dostawca tożsamości jest nieprawidłowy
+      IDPConfig:
+        AlreadyExists: Konfiguracja dostawcy tożsamości już istnieje
+        NotInactive: Konfiguracja dostawcy tożsamości nie jest nieaktywna
+        NotActive: Konfiguracja dostawcy tożsamości nie jest aktywna
+    LabelPolicy:
+      NotFound: Domyślna polityka etykiet prywatnych nie znaleziona
+      NotChanged: Domyślna polityka etykiet prywatnych nie została zmieniona
+    MailTemplate:
+      NotFound: Domyślny szablon poczty nie znaleziony
+      NotChanged: Domyślny szablon poczty nie został zmieniony
+      AlreadyExists: Domyślny szablon poczty już istnieje
+      Invalid: Domyślny szablon poczty jest nieprawidłowy
+    CustomMessageText:
+      NotFound: Domyślny tekst wiadomości nie znaleziony
+      NotChanged: Domyślny tekst wiadomości nie został zmieniony
+      AlreadyExists: Domyślny tekst wiadomości już istnieje
+      Invalid: Domyślny tekst wiadomości jest nieprawidłowy
+    PasswordComplexityPolicy:
+      NotFound: Domyślna polityka złożoności hasła nie znaleziona
+      NotExisting: Domyślna polityka złożoności hasła nie istnieje
+      AlreadyExists: Domyślna polityka złożoności hasła już istnieje
+      Empty: Domyślna polityka złożoności hasła jest pusta
+      NotChanged: Domyślna polityka złożoności hasła nie została zmieniona
+    PasswordAgePolicy:
+      NotFound: Domyślna polityka wieku hasła nie znaleziona
+      NotExisting: Domyślna polityka wieku hasła nie istnieje
+      AlreadyExists: Domyślna polityka wieku hasła już istnieje
+      Empty: Domyślna polityka wieku hasła jest pusta
+      NotChanged: Domyślna polityka wieku hasła nie została zmieniona
+    PasswordLockoutPolicy:
+      NotFound: Domyślna polityka blokowania hasła nie znaleziona
+      NotExisting: Domyślna polityka blokowania hasła nie istnieje
+      AlreadyExists: Domyślna polityka blokowania hasła już istnieje
+      Empty: Domyślna polityka blokowania hasła jest pusta
+      NotChanged: Domyślna polityka blokowania hasła nie została zmieniona
+    DomainPolicy:
+      NotFound: Polityka IAM organizacji nie znaleziona
+      Empty: Polityka IAM organizacji jest pusta
+      NotExisting: Polityka IAM organizacji nie istnieje
+      AlreadyExists: Polityka IAM organizacji już istnieje
+      NotChanged: Polityka IAM organizacji nie została zmieniona
+    NotificationPolicy:
+      NotFound: Domyślna polityka powiadomień nie znaleziona
+      NotChanged: Domyślna polityka powiadomień nie zmieniona
+      AlreadyExists: Domyślna polityka powiadomień już istnieje
+  Policy:
+    AlreadyExists: Polityka już istnieje
+    Label:
+      Invalid:
+        PrimaryColor: Główny kolor nie jest prawidłową wartością Hex koloru
+        BackgroundColor: Kolor tła nie jest prawidłową wartością Hex koloru
+        WarnColor: Kolor ostrzegawczy nie jest prawidłową wartością Hex koloru
+        FontColor: Kolor czcionki nie jest prawidłową wartością Hex koloru
+        PrimaryColorDark: Główny kolor (tryb ciemny) nie jest prawidłową wartością Hex koloru
+        BackgroundColorDark: Kolor tła (tryb ciemny) nie jest prawidłową wartością Hex koloru
+        WarnColorDark: Kolor ostrzegawczy (tryb ciemny) nie jest prawidłową wartością Hex koloru
+        FontColorDark: Kolor czcionki (tryb ciemny) nie jest prawidłową wartością Hex koloru
+  UserGrant:
+    AlreadyExists: Uprawnienie użytkownika już istnieje
+    NotFound: Uprawnienie użytkownika nie znalezione
+    Invalid: Uprawnienie użytkownika jest nieprawidłowe
+    NotChanged: Uprawnienie użytkownika nie zostało zmienione
+    IDMissing: Brak ID
+    NotActive: Uprawnienie użytkownika nie jest aktywne
+    NotInactive: Uprawnienie użytkownika nie jest dezaktywowane
+    NoPermissionForProject: Użytkownik nie ma uprawnień do tego projektu
+    RoleKeyNotFound: Rola nie znaleziona
+  Member:
+    AlreadyExists: Członek już istnieje
+  IDPConfig:
+    AlreadyExists: Konfiguracja IDP z tą nazwą już istnieje
+    NotExisting: Konfiguracja dostawcy tożsamości nie istnieje
+  Changes:
+    NotFound: Nie znaleziono historii
+    AuditRetention: Historia jest poza zasięgiem retencji dziennika audytu
+  Token:
+    NotFound: Token nie znaleziony
+  UserSession:
+    NotFound: Sesja użytkownika nie znaleziona
+  Key:
+    ExpireBeforeNow: Data ważności jest już przeszła
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Wymagane jest wieloskładnikowe uwierzytelnianie, ale nie skonfigurowano żadnych dostawców. Skontaktuj się z administratorem systemu.
+  Step:
+    Started:
+      AlreadyExists: Krok rozpoczęty już istnieje
+    Done:
+      AlreadyExists: Krok zakończony już istnieje
+  CustomText:
+    AlreadyExists: Tekst niestandardowy już istnieje
+    Invalid: Tekst niestandardowy jest nieprawidłowy
+    NotFound: Tekst niestandardowy nie znaleziony
+  TranslationFile:
+    ReadError: Błąd podczas odczytu pliku tłumaczenia
+    MergeError: Plik tłumaczenia nie może zostać złączony z tłumaczeniami niestandardowymi
+    NotFound: Plik tłumaczenia nie istnieje
+  Metadata:
+    NotFound: Metadane nie znalezione
+    NoData: Lista metadanych jest pusta
+    Invalid: Metadane są nieprawidłowe
+    KeyNotExisting: Jeden lub więcej kluczy nie istnieje
+  Action:
+    Invalid: Działanie jest nieprawidłowe
+    NotFound: Działanie nie znalezione
+    NotActive: Działanie nie jest aktywne
+    NotInactive: Działanie nie jest dezaktywowane
+    MaxAllowed: Nie dopuszcza się dodatkowych aktywnych działań.
+  Flow:
+    FlowTypeMissing: Typ przepływu brakuje
+    Empty: Przepływ jest już pusty
+    WrongTriggerType: Typ wyzwalacza jest nieprawidłowy
+    NoChanges: Brak zmian
+    ActionIDsNotExist: Identyfikatory działań nie istnieją
+  Query:
+    CloseRows: Instrukcja SQL nie mogła zostać zakończona
+    SQLStatement: Instrukcja SQL nie mogła zostać utworzona
+    InvalidRequest: Żądanie jest nieprawidłowe
+  Quota:
+    AlreadyExists: Limit już istnieje dla tej jednostki
+    NotFound: Nie znaleziono limitu dla tej jednostki
+    Invalid:
+      CallURL: Adres URL połączenia z limitem jest nieprawidłowy
+      Percent: Wartość procentowa limitu jest niższa niż 1
+      Unimplemented: Limit nie jest zaimplementowany dla tej jednostki
+      Amount: Wysokość limitu jest mniejsza niż 1
+      Interval: Interwał limitu jest krótszy niż minuta
+      Noop: Nieograniczony limit bez powiadomień nie ma żadnego wpływu
+    Access:
+      Exhausted: Limit dla uwierzytelnionych żądań został wykorzystany
+    Execution:
+      Exhausted: Limit dla sekund wykonywania akcji został wykorzystany
+  LogStore:
+    Access:
+      StorageFailed: Zapisywanie dziennika dostępu do bazy danych nie powiodło się
+      ScanFailed: Zapytanie o użycie dla uwierzytelnionych żądań nie powiodło się
+    Execution:
+      StorageFailed: Zapisywanie dziennika wykonania akcji do bazy danych nie powiodło się
+      ScanFailed: Zapytanie o użycie dla sekund wykonania akcji nie powiodło się
+
+AggregateTypes:
+  action: Działanie
+  instance: Instancja
+  key_pair: Para kluczy
+  org: Organizacja
+  project: Projekt
+  user: Użytkownik
+  usergrant: Uprawnienie użytkownika
+  quota: Limit
+
+EventTypes:
+  user:
+    added: Użytkownik dodany
+    selfregistered: Użytkownik zarejestrował się
+    initialization:
+      code:
+        added: Kod inicjujący wygenerowany
+        sent: Kod inicjujący wysłany
+      check:
+        succeeded: Sprawdzenie inicjujące powiodło się
+        failed: Sprawdzenie inicjujące nie powiodło się
+    token:
+      added: Token dostępu utworzony
+      removed: Token dostępu usunięty
+    username:
+      reserved: Nazwa użytkownika zarezerwowana
+      released: Nazwa użytkownika zwolniona
+      changed: Nazwa użytkownika zmieniona
+    email:
+      reserved: Adres e-mail zarezerwowany
+      released: Adres e-mail zwolniony
+      changed: Adres e-mail zmieniony
+      verified: Adres e-mail zweryfikowany
+      verification:
+        failed: Weryfikacja adresu e-mail nie powiodła się
+      code:
+        added: Kod weryfikacyjny adresu e-mail wygenerowany
+        sent: Kod weryfikacyjny adresu e-mail wysłany
+    machine:
+      added: Dodano użytkownika technicznego
+      changed: Zmieniono użytkownika technicznego
+      key:
+        added: Dodano klucz
+        removed: Usunięto klucz
+      secret:
+        set: Sekret ustawiony
+        removed: Sekret usunięty
+        check:
+          succeeded: Sprawdzenie sekretu powiodło się
+          failed: Sprawdzenie sekretu nie powiodło się
+    human:
+      added: Dodano osobę
+      selfregistered: Osoba zarejestrowała się sama
+      avatar:
+        added: Dodano awatar
+        removed: Usunięto awatar
+      initialization:
+        code:
+          added: Wygenerowano kod inicjalizacji
+          sent: Wysłano kod inicjalizacji
+        check:
+          succeeded: Sprawdzenie inicjalizacji zakończone powodzeniem
+          failed: Sprawdzenie inicjalizacji nie powiodło się
+      username:
+        reserved: Zarezerwowano nazwę użytkownika
+        released: Zwolniono nazwę użytkownika
+      email:
+        changed: Adres email zmieniony
+        verified: Adres email zweryfikowany
+        verification:
+          failed: Weryfikacja adresu email nie powiodła się
+        code:
+          added: Wygenerowano kod weryfikacji adresu email
+          sent: Wysłano kod weryfikacji adresu email
+      password:
+        changed: Hasło zmienione
+        code:
+          added: Wygenerowano kod hasła
+          sent: Wysłano kod hasła
+        check:
+          succeeded: Sprawdzenie hasła zakończone powodzeniem
+          failed: Sprawdzenie hasła nie powiodło się
+      externallogin:
+        check:
+          succeeded: Zewnętrzne logowanie zakończone powodzeniem
+      externalidp:
+        added: Dodano zewnętrzne IDP
+        removed: Usunięto zewnętrzne IDP
+        cascade:
+          removed: Usunięto kaskadę zewnętrznego IDP
+      phone:
+        changed: Numer telefonu zmieniony
+        verified: Numer telefonu zweryfikowany
+        verification:
+          failed: Weryfikacja numeru telefonu nie powiodła się
+        code:
+          added: Wygenerowano kod numeru telefonu
+          sent: Wysłano kod numeru telefonu
+        removed: Usunięto numer telefonu
+      profile:
+        changed: Zmieniono profil użytkownika
+      address:
+        changed: Zmieniono adres użytkownika
+      mfa:
+        otp:
+          added: Dodano wielofaktorowe OTP
+          verified: Wielofaktorowe OTP zweryfikowane
+          removed: Usunięto wielofaktorowe OTP
+          check:
+            succeeded: Sprawdzenie wielofaktorowego OTP zakończone powodzeniem
+            failed: Sprawdzenie wielofaktorowego OTP nie powiodło się
+        u2f:
+          token:
+            added: Dodano token wielofaktorowego U2F
+            verified: Token wielofaktorowego U2F zweryfikowany
+            removed: Usunięto token wielofaktorowego U2F
+            begin:
+              login: Rozpoczęto sprawdzanie wielofaktorowego U2F
+            check:
+              succeeded: Sprawdzanie wielofaktorowego U2F zakończone powodzeniem
+              failed: Sprawdzanie wielofaktorowego U2F nie powiodło się
+            signcount:
+              changed: Zmieniono sumę kontrolną tokenu wielofaktorowego U2F
+        init:
+          skipped: Pominięto inicjalizację wielofaktorową
+      passwordless:
+        token:
+          added: Dodano token dla logowania bez hasła
+          verified: Token dla logowania bez hasła zweryfikowany
+          removed: Usunięto token dla logowania bez hasła
+          begin:
+            login: Rozpoczęto sprawdzanie logowania bez hasła
+          check:
+            succeeded: Sprawdzanie logowania bez hasła zakończone powodzeniem
+            failed: Sprawdzanie logowania bez hasła nie powiodło się
+          signcount:
+            changed: Zmieniono sumę kontrolną tokenu logowania bez hasła
+        initialization:
+          code:
+            added: Dodano kod inicjalizacji bez hasła
+            sent: Wysłano kod inicjalizacji bez hasła
+            requested: Poproszono o kod inicjalizacji bez hasła
+            check:
+              succeeded: Pomyślnie sprawdzono kod inicjalizacji bez hasła
+              failed: Sprawdzenie kodu inicjalizacji bez hasła nie powiodło się
+      signed:
+        out: Użytkownik wylogowany
+      refresh:
+        token:
+          added: Utworzono token odświeżania
+          renewed: Odnowiono token odświeżania
+          removed: Usunięto token odświeżania
+    locked: Zablokowano użytkownika
+    unlocked: Odblokowano użytkownika
+    deactivated: Dezaktywowano użytkownika
+    reactivated: Aktywowano ponownie użytkownika
+    removed: Usunięto użytkownika
+    password:
+      changed: Hasło zmienione
+      code:
+        added: Wygenerowano kod hasła
+        sent: Wysłano kod hasła
+      check:
+        succeeded: Sprawdzenie hasła zakończone powodzeniem
+        failed: Sprawdzenie hasła nie powiodło się
+    phone:
+      changed: Numer telefonu zmieniony
+      verified: Numer telefonu zweryfikowany
+      verification:
+        failed: Weryfikacja numeru telefonu nie powiodła się
+      code:
+        added: Wygenerowano kod numeru telefonu
+        sent: Wysłano kod numeru telefonu
+      removed: Usunięto numer telefonu
+    profile:
+      changed: Zmieniono profil użytkownika
+    address:
+      changed: Zmieniono adres użytkownika
+    mfa:
+      otp:
+        added: Dodano wielofaktorowe OTP
+        verified: Wielofaktorowe OTP zweryfikowane
+        removed: Usunięto wielofaktorowe OTP
+        check:
+          succeeded: Sprawdzenie wielofaktorowego OTP zakończone powodzeniem
+          failed: Sprawdzenie wielofaktorowego OTP nie powiodło się
+        init:
+          skipped: Pominięto inicjalizację wielofaktorowego OTP
+      init:
+        skipped: Pominięto inicjalizację wielofaktorową
+    signed:
+      out: Użytkownik wylogowany
+    grant:
+      added: Dodano autoryzację
+      changed: Zmieniono autoryzację
+      removed: Usunięto autoryzację
+      deactivated: Dezaktywowano autoryzację
+      reactivated: Aktywowano ponownie autoryzację
+      reserved: Zarezerwowano autoryzację
+      released: Zwolniono autoryzację
+      cascade:
+        removed: Usunięto autoryzację
+        changed: Zmieniono autoryzację
+    metadata:
+      set: Ustawiono metadane użytkownika
+      removed: Usunięto metadane użytkownika
+      removed.all: Usunięto wszystkie metadane użytkownika
+    domain:
+      claimed: Zadeklarowano domenę
+      claimed.sent: Wysłano powiadomienie o zadeklarowaniu domeny
+    pat:
+      added: Dodano osobisty token dostępu
+      removed: Usunięto osobisty token dostępu
+  org:
+    added: Dodano organizację
+    changed: Zmieniono organizację
+    deactivated: Dezaktywowano organizację
+    reactivated: Aktywowano ponownie organizację
+    removed: Usunięto organizację
+    domain:
+      added: Dodano domenę
+      verification:
+        added: Dodano weryfikację domeny
+        failed: Weryfikacja domeny nie powiodła się
+      verified: Domena zweryfikowana
+      removed: Usunięto domenę
+      primary:
+        set: Ustawiono domenę główną
+      reserved: Zarezerwowano domenę
+      released: Zwolniono domenę
+    name:
+      reserved: Zarezerwowano nazwę organizacji
+      released: Zwolniono nazwę organizacji
+    member:
+      added: Dodano członka organizacji
+      changed: Zmieniono członka organizacji
+      removed: Usunięto członka organizacji
+      cascade:
+        removed: Usunięto kaskadowo członka organizacji
+    iam:
+      policy:
+        added: Dodano politykę systemową
+        changed: Zmieniono politykę systemową
+        removed: Usunięto politykę systemową
+    idp:
+      config:
+        added: Dodano konfigurację IDP
+        changed: Zmieniono konfigurację IDP
+        removed: Usunięto konfigurację IDP
+        deactivated: Dezaktywowano konfigurację IDP
+        reactivated: Aktywowano ponownie konfigurację IDP
+      oidc:
+        config:
+          added: Dodano konfigurację OIDC IDP
+          changed: Zmieniono konfigurację OIDC IDP
+      saml:
+        config:
+          added: Dodano konfigurację SAML IDP
+          changed: Zmieniono konfigurację SAML IDP
+      jwt:
+        config:
+          added: Dodano konfigurację JWT IDP
+          changed: Zmieniono konfigurację JWT IDP
+    customtext:
+      set: Ustawiono tekst niestandardowy
+      removed: Usunięto tekst niestandardowy
+      template:
+        removed: Usunięto szablon tekstu niestandardowego
+    policy:
+      login:
+        added: Dodano politykę logowania
+        changed: Zmieniono politykę logowania
+        removed: Usunięto politykę logowania
+        idpprovider:
+          added: Dodano dostawcę tożsamości do polityki logowania
+          removed: Usunięto dostawcę tożsamości z polityki logowania
+          cascade:
+            removed: Usunięto kaskadowo dostawcę tożsamości z polityki logowania
+        secondfactor:
+          added: Dodano drugi czynnik do polityki logowania
+          removed: Usunięto drugi czynnik z polityki logowania
+        multifactor:
+          added: Dodano wieloczynnikowy do polityki logowania
+          removed: Usunięto wieloczynnikowy z polityki logowania
+      password:
+        complexity:
+          added: Dodano politykę złożoności hasła
+          changed: Zmieniono politykę złożoności hasła
+          removed: Usunięto politykę złożoności hasła
+        age:
+          added: Dodano politykę wieku hasła
+          changed: Zmieniono politykę wieku hasła
+          removed: Usunięto politykę wieku hasła
+        lockout:
+          added: Dodano politykę blokowania hasła
+          changed: Zmieniono politykę blokowania hasła
+          removed: Usunięto politykę blokowania hasła
+      label:
+        added: Dodano politykę etykiety
+        changed: Zmieniono politykę etykiety
+        activated: Aktywowano politykę etykiety
+        removed: Usunięto politykę etykiety
+        logo:
+          added: Dodano logo do polityki etykiety
+          removed: Usunięto logo z polityki etykiety
+          dark:
+            added: Dodano logo (tryb ciemny) do polityki etykiety
+            removed: Usunięto logo (tryb ciemny) z polityki etykiety
+        icon:
+          added: Dodano ikonę do polityki etykiety
+          removed: Usunięto ikonę z polityki etykiety
+          dark:
+            added: Dodano ikonę (tryb ciemny) do polityki etykiety
+            removed: Usunięto ikonę (tryb ciemny) z polityki etykiety
+        font:
+          added: Dodano czcionkę do polityki etykiety
+          removed: Usunięto czcionkę z polityki etykiety
+        assets:
+          removed: Usunięto zasoby z polityki etykiety
+      privacy:
+        added: Dodano politykę prywatności i regulamin
+        changed: Zmieniono politykę prywatności i regulamin
+        removed: Usunięto politykę prywatności i regulamin
+      domain:
+        added: Dodano politykę domenową
+        changed: Zmieniono politykę domenową
+        removed: Usunięto politykę domenową
+      lockout:
+        added: Dodano politykę blokady
+        changed: Zmieniono politykę blokady
+        removed: Usunięto politykę blokady
+      notification:
+        added: Dodano politykę powiadomień
+        changed: Zmieniono politykę powiadomień
+        removed: Usunięto politykę powiadomień
+    flow:
+      trigger_actions:
+        set: Ustawiono działanie
+        cascade:
+          removed: Usunięto kaskadę działań
+        removed: Usunięto działania
+      cleared: Czyszczenie przepływu
+    mail:
+      template:
+        added: Dodano szablon e-mail
+        changed: Zmieniono szablon e-mail
+        removed: Usunięto szablon e-mail
+      text:
+        added: Dodano tekst e-maila
+        changed: Zmieniono tekst e-maila
+        removed: Usunięto tekst e-maila
+    metadata:
+      removed: Usunięto metadane
+      removed.all: Usunięto wszystkie metadane
+      set: Ustawiono metadane
+  project:
+    added: Projekt dodany
+    changed: Projekt zmieniony
+    deactivated: Projekt deaktywowany
+    reactivated: Projekt aktywowany ponownie
+    removed: Projekt usunięty
+    member:
+      added: Członek projektu dodany
+      changed: Członek projektu zmieniony
+      removed: Członek projektu usunięty
+      cascade:
+        removed: Członek projektu usunięty w kaskadzie
+    role:
+      added: Rola projektu dodana
+      changed: Rola projektu zmieniona
+      removed: Rola projektu usunięta
+    grant:
+      added: Dodano dostęp zarządzania
+      changed: Zmieniono dostęp zarządzania
+      removed: Usunięto dostęp zarządzania
+      deactivated: Dezaktywowano dostęp zarządzania
+      reactivated: Aktywowano ponownie dostęp zarządzania
+      cascade:
+        changed: Zmieniono dostęp zarządzania
+      member:
+        added: Dodano członka dostępu zarządzania
+        changed: Zmieniono członka dostępu zarządzania
+        removed: Usunięto członka dostępu zarządzania
+        cascade:
+          removed: Usunięto kaskadowo dostęp zarządzania
+    application:
+      added: Dodano aplikację
+      changed: Zmieniono aplikację
+      removed: Usunięto aplikację
+      deactivated: Dezaktywowano aplikację
+      reactivated: Aktywowano ponownie aplikację
+      oidc:
+        secret:
+          check:
+            succeeded: Sprawdzenie sekretu OIDC Klienta powiodło się
+            failed: Sprawdzenie sekretu OIDC Klienta nie powiodło się
+        key:
+          added: Dodano klucz aplikacji
+          removed: Usunięto klucz aplikacji
+      config:
+        saml:
+          added: Dodano konfigurację SAML
+          changed: Zmieniono konfigurację SAML
+        oidc:
+          added: Dodano konfigurację OIDC
+          changed: Zmieniono konfigurację OIDC
+          secret:
+            changed: Zmieniono sekret OIDC
+        api:
+          added: Dodano konfigurację API
+          changed: Zmieniono konfigurację API
+          secret:
+            changed: Zmieniono sekret API
+  policy:
+    password:
+      complexity:
+        added: Dodano politykę złożoności hasła
+        changed: Zmieniono politykę złożoności hasła
+      age:
+        added: Dodano politykę wieku hasła
+        changed: Zmieniono politykę wieku hasła
+      lockout:
+        added: Dodano politykę blokowania hasła
+        changed: Zmieniono politykę blokowania hasła
+  iam:
+    setup:
+      started: rozpoczęta konfiguracja ZITADEL
+      done: ukończona konfiguracja ZITADEL
+    global:
+      org:
+        set: Ustawienie globalnej organizacji
+    project:
+      iam:
+        set: Ustawiono projekt ZITADEL
+    member:
+      added: Dodano członka ZITADEL
+      changed: Zmieniono członka ZITADEL
+      removed: Usunięto członka ZITADEL
+      cascade:
+        removed: Usunięto kaskadowo członka ZITADEL
+    idp:
+      config:
+        added: Dodano konfigurację IDP
+        changed: Zmieniono konfigurację IDP
+        removed: Usunięto konfigurację IDP
+        deactivated: Deaktywowano konfigurację IDP
+        reactivated: Reaktywowano konfigurację IDP
+      oidc:
+        config:
+          added: Dodano konfigurację OIDC IDP
+          changed: Zmieniono konfigurację OIDC IDP
+      saml:
+        config:
+          added: Dodano konfigurację IDP SAML
+          changed: Zmieniono konfigurację IDP SAML
+      jwt:
+        config:
+          added: Dodano konfigurację IDP JWT
+          changed: Zmieniono konfigurację IDP JWT
+    customtext:
+      set: Ustawiono tekst niestandardowy
+      removed: Usunięto tekst niestandardowy
+    policy:
+      login:
+        added: Dodano politykę logowania
+        changed: Zmieniono politykę logowania
+        idpprovider:
+          added: Dodano dostawcę tożsamości do polityki logowania
+          removed: Usunięto dostawcę tożsamości z polityki logowania
+      label:
+        added: Dodano politykę etykiety
+        changed: Zmieniono politykę etykiety
+        activated: Aktywowano politykę etykiety
+        logo:
+          added: Dodano logo do polityki etykiety
+          removed: Usunięto logo z polityki etykiety
+          dark:
+            added: Dodano logo (tryb ciemny) do polityki etykiety
+            removed: Usunięto logo (tryb ciemny) z polityki etykiety
+        icon:
+          added: Dodano ikonę do polityki etykiety
+          removed: Usunięto ikonę z polityki etykiety
+          dark:
+            added: Dodano ikonę (tryb ciemny) do polityki etykiety
+            removed: Usunięto ikonę (tryb ciemny) z polityki etykiety
+        font:
+          added: Dodano czcionkę do polityki etykiety
+          removed: Usunięto czcionkę z polityki etykiety
+        assets:
+          removed: Usunięto zasoby z polityki etykiety
+    default:
+      language:
+        set: Ustawiono domyślny język
+    oidc:
+      settings:
+        added: Dodano konfigurację OIDC
+        changed: Zmieniono konfigurację OIDC
+        removed: Usunięto konfigurację OIDC
+    secret:
+      generator:
+        added: Dodano generator sekretów
+        changed: Zmieniono generator sekretów
+        removed: Usunięto generator sekretów
+    smtp:
+      config:
+        added: Dodano konfigurację SMTP
+        changed: Zmieniono konfigurację SMTP
+        password:
+          changed: Zmieniono sekret konfiguracji SMTP
+    sms:
+      config:
+        twilio:
+          added: Dodano dostawcę SMS Twilio
+          changed: Zmieniono dostawcę SMS Twilio
+          token:
+            changed: Zmieniono token dostawcy SMS Twilio
+          removed: Usunięto dostawcę SMS Twilio
+          activated: Aktywowano dostawcę SMS Twilio
+          deactivated: Deaktywowano dostawcę SMS Twilio
+  key_pair:
+    added: Para kluczy dodana
+    certificate:
+      added: Certyfikat dodany
+  action:
+    added: Akcja dodana
+    changed: Akcja zmieniona
+    deactivated: Akcja dezaktywowana
+    reactivated: Akcja aktywowana ponownie
+    removed: Akcja usunięta
+  instance:
+    added: Instancja dodana
+    changed: Instancja zmieniona
+    customtext:
+      removed: Niestandardowy tekst usunięty
+      set: Niestandardowy tekst ustawiony
+      template:
+        removed: Szablon niestandardowego tekstu usunięty
+    default:
+      language:
+        set: Domyślny język ustawiony
+      org:
+        set: Domyślna organizacja ustawiona
+    domain:
+      added: Domena dodana
+      primary:
+        set: Domena główna ustawiona
+      removed: Domena usunięta
+    iam:
+      console:
+        set: Ustawienie aplikacji ZITADEL Console
+      project:
+        set: Ustawienie projektu ZITADEL
+    mail:
+      template:
+        added: Dodanie szablonu e-mail
+        changed: Zmiana szablonu e-mail
+      text:
+        added: Dodanie tekstu e-mail
+        changed: Zmiana tekstu e-mail
+    member:
+      added: Dodanie członka instancji
+      changed: Zmiana członka instancji
+      removed: Usunięcie członka instancji
+      cascade:
+        removed: Usunięcie kaskadowe członka instancji
+    notification:
+      provider:
+        debug:
+          fileadded: Dodanie dostawcy powiadomień debugowania pliku
+          filechanged: Zmiana dostawcy powiadomień debugowania pliku
+          fileremoved: Usunięcie dostawcy powiadomień debugowania pliku
+          logadded: Dodanie dostawcy powiadomień debugowania logów
+          logchanged: Zmiana dostawcy powiadomień debugowania logów
+          logremoved: Usunięcie dostawcy powiadomień debugowania logów
+    oidc:
+      settings:
+        added: Ustawienia OIDC zostały dodane
+        changed: Ustawienia OIDC zostały zmienione
+    policy:
+      domain:
+        added: Polityka domeny została dodana
+        changed: Polityka domeny została zmieniona
+      label:
+        activated: Polityka etykiety została aktywowana
+        added: Polityka etykiety została dodana
+        assets:
+          removed: Zasób z polityki etykiety został usunięty
+        changed: Polityka etykiety została zmieniona
+        font:
+          added: Czcionka została dodana do polityki etykiety
+          removed: Czcionka została usunięta z polityki etykiety
+        icon:
+          added: Ikona została dodana do polityki etykiety
+          removed: Ikona została usunięta z polityki etykiety
+          dark:
+            added: Ikona została dodana do polityki etykiety (tryb ciemny)
+            removed: Ikona została usunięta z polityki etykiety (tryb ciemny
+        logo:
+          added: Logo zostało dodane do polityki etykietowania
+          removed: Logo zostało usunięte z polityki etykietowania
+          dark:
+            added: Logo zostało dodane do ciemnej polityki etykietowania
+            removed: Logo zostało usunięte z ciemnej polityki etykietowania
+      lockout:
+        added: Policy blokady dodana
+        changed: Policy blokady zmieniona
+      login:
+        added: Policy logowania dodana
+        changed: Policy logowania zmieniona
+        idpprovider:
+          added: Dostawca tożsamości dodany do polityki logowania
+          cascade:
+            removed: Usunięcie kaskady dostawcy tożsamości z polityki logowania
+          removed: Dostawca tożsamości usunięty z polityki logowania
+        multifactor:
+          added: Wielokrotny czynnik zabezpieczeń dodany do polityki logowania
+          removed: Wielokrotny czynnik zabezpieczeń usunięty z polityki logowania
+        secondfactor:
+          added: Drugi czynnik zabezpieczeń dodany do polityki logowania
+          removed: Drugi czynnik zabezpieczeń usunięty z polityki logowania
+      password:
+        age:
+          added: Policy wieku hasła dodana
+          changed: Policy wieku hasła zmieniona
+        complexity:
+          added: Policy złożoności hasła dodana
+          changed: Policy złożoności hasła usunięta
+      privacy:
+        added: Policy prywatności dodana
+        changed: Policy prywatności zmieniona
+      security:
+        set: Policy bezpieczeństwa ustawiona
+
+    removed: Usunięto instancję
+    secret:
+      generator:
+        added: Generator tajnego dodany
+        changed: Generator tajnego zmieniony
+        removed: Generator tajnego usunięty
+    sms:
+      configtwilio:
+        activated: Konfiguracja SMS Twilio aktywowana
+        added: Konfiguracja SMS Twilio dodana
+        changed: Konfiguracja SMS Twilio zmieniona
+        deactivated: Konfiguracja SMS Twilio dezaktywowana
+        removed: Konfiguracja SMS Twilio usunięta
+        token:
+          changed: Token konfiguracji SMS Twilio zmieniony
+    smtp:
+      config:
+        added: Konfiguracja SMTP dodana
+        changed: Konfiguracja SMTP zmieniona
+        password:
+          changed: Hasło konfiguracji SMTP zmienione
+        removed: Konfiguracja SMTP usunięta
+
+Application:
+  OIDC:
+    UnsupportedVersion: Twoja wersja OIDC nie jest obsługiwana
+    V1:
+      NotCompliant: Twoja konfiguracja nie jest zgodna i różni się od standardu OIDC 1.0.
+      NoRedirectUris: Musi być zarejestrowany co najmniej jednen adres przekierowania URI.
+      NotAllCombinationsAreAllowed: Konfiguracja jest zgodna, ale nie wszystkie możliwe kombinacje są dozwolone.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Typ kodu grantu pozwala tylko na adres http przekierowania URI dla aplikacji typu web.
+          CustomOnlyForNative: Typ kodu grantu tylko pozwala na niestandardowe adresy przekierowania URI dla aplikacji typu natywna (np. appname://).
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Typ grantu implicit nie pozwala na niestandardowe adresy przekierowania URI
+          HttpNotAllowed: Typ grantu implicit nie pozwala na adresy http przekierowania URI
+          HttpLocalhostOnlyForNative: Tylko aplikacje natywne mogą używać adresu przekierowania URI http://localhost
+      Native:
+        AuthMethodType:
+          NotNone: Aplikacje natywne powinny nie mieć metody uwierzytelniania.
+        RedirectUris:
+          MustBeHttpLocalhost: Adresy przekierowań URI muszą zaczynać się od własnego protokołu, http://127.0.0.1, http://[::1] lub http://localhost.
+      UserAgent:
+        AuthMethodType:
+          NotNone: Aplikacja User Agent powinna nie mieć metody uwierzytelniania.
+      GrantType:
+        Refresh:
+          NoAuthCode: Token odświeżania jest dozwolony tylko w połączeniu z Authorization Code.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Nieokreślony
+      ExternalAuthentication: Autentykacja zewnętrzna
+      CustomiseToken: Uzupełnienie tokenu
+      InternalAuthentication: Autentykacja wewnętrzna
+  TriggerType:
+    Unspecified: Nieokreślony
+    PostAuthentication: Po autentykacji
+    PreCreation: Przed utworzeniem
+    PostCreation: Po utworzeniu
+    PreUserinfoCreation: Przed tworzeniem informacji o użytkowniku
+    PreAccessTokenCreation: Przed tworzeniem tokenu dostępu

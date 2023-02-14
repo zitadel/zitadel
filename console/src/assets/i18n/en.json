@@ -848,6 +848,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
       "ORGDETAILUSER_TITLE": "Configure Organization Owner",
       "DELETE": "Delete organization",
+      "DEFAULTLABEL": "Default",
+      "SETASDEFAULT": "Set as default organization",
+      "DEFAULTORGSET": "Default organization changed successfully",
       "RENAME": {
         "ACTION": "Rename",
         "TITLE": "Rename Organization",
@@ -978,7 +981,8 @@
       "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1169,7 +1173,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1943,7 +1948,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Add a Manager",
