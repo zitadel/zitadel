@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Definiere ein Ablaufdatum",
       "CREATIONDATE": "Erstelldatum",
       "KEYDETAILS": "Schlüssel Details",
+      "ACCESSTOKENTYPE": "Access Token Typ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Schlüssel hinzufügen",
         "DESCRIPTION": "Wähle den Typ und selektiere ein optionales Ablaufdatum."

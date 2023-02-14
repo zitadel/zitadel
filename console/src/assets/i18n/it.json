@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Seleziona una data di scadenza",
       "CREATIONDATE": "Data di creazione",
       "KEYDETAILS": "Dettagli chiave",
+      "ACCESSTOKENTYPE": "Tipo Access Token",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Aggiungi chiave",
         "DESCRIPTION": "Seleziona il tuo tipo di chiave e scegli una data di scadenza opzionale."

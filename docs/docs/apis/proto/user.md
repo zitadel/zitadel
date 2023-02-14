@@ -134,7 +134,7 @@ title: zitadel/user.proto
 | name |  string | - |  |
 | description |  string | - |  |
 | has_secret |  bool | - |  |
-| access_token_typ |  AccessTokenType | - |  |
+| access_token_type |  AccessTokenType | - |  |
 
 
 

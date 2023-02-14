@@ -473,6 +473,7 @@ import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zita
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
 import { GrantedProject, Project, ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
 import {
+  AccessTokenType,
   Gender,
   MembershipQuery,
   SearchQuery as UserSearchQuery,
@@ -901,7 +902,12 @@ export class ManagementService {
     return this.grpcService.mgmt.addMachineUser(req, null).then((resp) => resp.toObject());
   }
 
-  public updateMachine(userId: string, name?: string, description?: string): Promise<UpdateMachineResponse.AsObject> {
+  public updateMachine(
+    userId: string,
+    name?: string,
+    description?: string,
+    accessTokenType?: AccessTokenType,
+  ): Promise<UpdateMachineResponse.AsObject> {
     const req = new UpdateMachineRequest();
     req.setUserId(userId);
     if (name) {
@@ -909,6 +915,9 @@ export class ManagementService {
     }
     if (description) {
       req.setDescription(description);
+    }
+    if (accessTokenType !== undefined) {
+      req.setAccessTokenType(accessTokenType);
     }
     return this.grpcService.mgmt.updateMachine(req, null).then((resp) => resp.toObject());
   }
