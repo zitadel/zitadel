@@ -9,7 +9,7 @@
     "prebuild": "npm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
-    "generate": "buf generate ../proto"
+    "generate": "buf generate ../proto --include-imports --include-wkt"
   },
   "private": true,
   "dependencies": {
