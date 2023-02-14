@@ -150,3 +150,34 @@ func (s *Server) UpdateIDPJWTConfig(ctx context.Context, req *admin_pb.UpdateIDP
 		),
 	}, nil
 }
+
+func (s *Server) AddLDAPProvider(ctx context.Context, req *admin_pb.AddLDAPProviderRequest) (*admin_pb.AddLDAPProviderResponse, error) {
+	id, details, err := s.command.AddInstanceLDAPProvider(ctx, addLDAPProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddLDAPProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateLDAPProvider(ctx context.Context, req *admin_pb.UpdateLDAPProviderRequest) (*admin_pb.UpdateLDAPProviderResponse, error) {
+	details, err := s.command.UpdateInstanceLDAPProvider(ctx, req.Id, updateLDAPProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateLDAPProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) DeleteProvider(ctx context.Context, req *admin_pb.DeleteProviderRequest) (*admin_pb.DeleteProviderResponse, error) {
+	details, err := s.command.DeleteInstanceProvider(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.DeleteProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}

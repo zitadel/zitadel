@@ -3025,16 +3025,28 @@ Change JWT identity provider configuration of the organisation
     PUT: /idps/{idp_id}/jwt_config
 
 
-### ListIDPs
+### ListProviders
 
-> **rpc** ListIDPs([ListIDPsRequest](#listidpsrequest))
-[ListIDPsResponse](#listidpsresponse)
+> **rpc** ListProviders([ListProvidersRequest](#listprovidersrequest))
+[ListProvidersResponse](#listprovidersresponse)
 
 
 
 
 
     POST: /idps/templates/_search
+
+
+### GetProviderByID
+
+> **rpc** GetProviderByID([GetProviderByIDRequest](#getproviderbyidrequest))
+[GetProviderByIDResponse](#getproviderbyidresponse)
+
+
+
+
+
+    GET: /idps/templates/{id}
 
 
 ### AddLDAPProvider
@@ -5642,6 +5654,28 @@ This is an empty request
 
 
 
+### GetProviderByIDRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetProviderByIDResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp |  zitadel.idp.v1.Provider | - |  |
+
+
+
+
 ### GetSupportedLanguagesRequest
 This is an empty request
 
@@ -6189,29 +6223,6 @@ This is an empty response
 
 
 
-### ListIDPsRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
-
-
-
-
-### ListIDPsResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.idp.v1.Provider | - |  |
-
-
-
-
 ### ListLoginPolicyIDPsRequest
 
 
@@ -6666,6 +6677,29 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.project.v1.Project | - |  |
+
+
+
+
+### ListProvidersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListProvidersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.idp.v1.Provider | - |  |
 
 
 
