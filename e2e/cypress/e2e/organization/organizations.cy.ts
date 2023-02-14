@@ -15,7 +15,7 @@ describe('organizations', () => {
   describe('rename', () => {
     beforeEach(() => {
       cy.get<Context>('@ctx').then((ctx) => {
-        ensureOrgExists(ctx.api, orgNameOnCreation).then((newOrgId) => {
+        ensureOrgExists(ctx, orgNameOnCreation).then((newOrgId) => {
           cy.visit(`${orgPath}?org=${newOrgId}`).as('orgsite');
         });
       });
@@ -38,13 +38,13 @@ describe('organizations', () => {
     describe('set default org', () => {
       beforeEach(() => {
         cy.get<Context>('@ctx').then((ctx) => {
-          ensureOrgExists(ctx.api, orgNameForNewDefault)
+          ensureOrgExists(ctx, orgNameForNewDefault)
             .as('newDefaultOrgId')
             .then(() => {
-              ensureOrgExists(ctx.api, initialDefaultOrg)
+              ensureOrgExists(ctx, initialDefaultOrg)
                 .as('defaultOrg')
                 .then((id) => {
-                  ensureOrgIsDefault(ctx.api, parseInt(id))
+                  ensureOrgIsDefault(ctx, id)
                     .as('orgWasDefault')
                     .then(() => {
                       cy.visit(`${orgOverviewPath}`).as('orgsite');
@@ -60,8 +60,8 @@ describe('organizations', () => {
           cy.get(rowSelector).find('[data-e2e="table-actions-button"]').click({ force: true });
           cy.get('[data-e2e="set-default-button"]', { timeout: 1000 }).should('be.visible').click();
           cy.shouldConfirmSuccess();
-          cy.get<number>('@newDefaultOrgId').then((newDefaultOrgId) => {
-            isDefaultOrg(ctx.api, newDefaultOrgId);
+          cy.get<string>('@newDefaultOrgId').then((newDefaultOrgId) => {
+            isDefaultOrg(ctx, newDefaultOrgId);
           });
         });
       });
