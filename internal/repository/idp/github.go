@@ -218,6 +218,7 @@ type GitHubEnterpriseIDPChangedEvent struct {
 func NewGitHubEnterpriseIDPChangedEvent(
 	base *eventstore.BaseEvent,
 	id string,
+	oldName string,
 	changes []OAuthIDPChanges,
 ) (*GitHubEnterpriseIDPChangedEvent, error) {
 	if len(changes) == 0 {
@@ -227,6 +228,7 @@ func NewGitHubEnterpriseIDPChangedEvent(
 		OAuthIDPChangedEvent: OAuthIDPChangedEvent{
 			BaseEvent: *base,
 			ID:        id,
+			oldName:   oldName,
 		},
 	}
 	for _, change := range changes {

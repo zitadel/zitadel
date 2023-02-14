@@ -486,6 +486,7 @@ func NewGitHubEnterpriseIDPChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
+	oldName string,
 	changes []idp.OAuthIDPChanges,
 ) (*GitHubEnterpriseIDPChangedEvent, error) {
 
@@ -496,6 +497,7 @@ func NewGitHubEnterpriseIDPChangedEvent(
 			GitHubEnterpriseIDPChangedEventType,
 		),
 		id,
+		oldName,
 		changes,
 	)
 	if err != nil {

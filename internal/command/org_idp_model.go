@@ -610,7 +610,7 @@ func (wm *OrgGitHubEnterpriseIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	changeEvent, err := org.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, changes)
+	changeEvent, err := org.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, wm.Name, changes)
 	if err != nil {
 		return nil, err
 	}
