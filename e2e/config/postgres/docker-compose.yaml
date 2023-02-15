@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  zitadel:
+    user: '$UID'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    volumes:
+      - ./zitadel.yaml:/zitadel.yaml
+    restart: 'on-failure'
+    network_mode: host
+
+  db:
+    image: 'postgres'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD: pw
+      POSTGRES_DATABASE: zitadel
+    network_mode: host
+    restart: 'on-failure'
+
+  prepare:
+    extends:
+      file: ../cypress/docker-compose.yaml
+      service: prepare
+
+  e2e:
+    extends:
+      file: ../cypress/docker-compose.yaml
+      service: e2e
+
+networks:
+  zitadel:
