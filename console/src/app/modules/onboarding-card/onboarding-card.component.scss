@@ -15,12 +15,9 @@
     border-radius: 0.5rem;
     z-index: 200;
     border: 1px solid #ffffff30;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0;
+    position: relative;
     min-width: 220px;
-    max-width: 240px;
+    max-width: 280px;
     padding-bottom: 0.5rem;
     position: relative;
     color: map-get($foreground, text);
@@ -36,10 +33,83 @@
       align-items: center;
     }
 
+    .progress-header {
+      padding: 1rem 1rem 0 1rem;
+
+      h2 {
+        margin-top: 0;
+      }
+      p {
+        font-size: 14px;
+      }
+    }
+
     .actions-list {
       display: flex;
       flex-direction: column;
-      min-height: 300px;
+      padding: 0 0 1rem 0;
+
+      .action-element {
+        display: flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem 0.25rem 1rem;
+        text-decoration: none;
+        color: map-get($foreground, text);
+
+        .state-circle {
+          flex-shrink: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 1.5rem;
+          width: 1.5rem;
+          border-radius: 50vw;
+          margin-right: 1rem;
+          background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
+          box-shadow: 0 0 3px #0000001a;
+
+          i {
+            font-size: 1rem;
+          }
+        }
+
+        .name {
+          font-size: 14px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-width: 0;
+          flex: 1;
+        }
+
+        .fill-space {
+          flex: 1;
+        }
+
+        .arrow-right {
+        }
+
+        &.done {
+          .state-circle i {
+            color: var(--success);
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+          background-color: #00000010;
+        }
+      }
+    }
+
+    .no-thanks-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 1rem 0.5rem 1rem;
+
+      .no-thanks-btn {
+        font-style: italic;
+        cursor: pointer;
+      }
     }
   }
 }

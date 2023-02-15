@@ -10,6 +10,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
 import { OnboardingCardComponent } from './onboarding-card.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [OnboardingCardComponent],
@@ -20,6 +21,7 @@ import { OnboardingCardComponent } from './onboarding-card.component';
     MatButtonModule,
     TranslateModule,
     MatTooltipModule,
+    RouterModule,
     MatProgressSpinnerModule,
     ShortcutsModule,
     MatRippleModule,

@@ -1,6 +1,8 @@
 import { Component, EventEmitter } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, switchMap } from 'rxjs';
+import { AuthServiceClient } from 'src/app/proto/generated/zitadel/AuthServiceClientPb';
 import { AdminService } from 'src/app/services/admin.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Component({
   selector: 'cnsl-onboarding-card',
@@ -10,6 +12,16 @@ import { AdminService } from 'src/app/services/admin.service';
 export class OnboardingCardComponent {
   public percentageChanged: EventEmitter<number> = new EventEmitter<number>();
   public loading$: BehaviorSubject<any> = new BehaviorSubject(false);
+  public actions = this.adminService.progressEvents;
+  //   .pipe(
+  //     switchMap((events) => {
+  //       console.log(events);
+  //       return events;
+  //     }),
+  //   );
+  constructor(public adminService: AdminService, private authService: GrpcAuthService) {}
 
-  constructor(public adminService: AdminService) {}
+  public dismiss(): void {
+    // this.authService.set
+  }
 }

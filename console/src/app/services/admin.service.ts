@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, catchError, from, map, Observable, of, Subject, switchMap } from 'rxjs';
 
 import {
   ActivateLabelPolicyRequest,
@@ -225,15 +226,78 @@ import {
   SetDefaultOrgRequest,
   SetDefaultOrgResponse,
 } from '../proto/generated/zitadel/admin_pb';
+import { Event } from '../proto/generated/zitadel/event_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
+
+interface OnboardingActions {
+  eventType: string;
+  link: string;
+}
+
+const ONBOARDING_EVENTS: OnboardingActions[] = [
+  { eventType: 'project.added', link: '/projects/create' },
+  { eventType: 'project.application.added', link: '/projects' },
+  { eventType: 'org.policy.label.added', link: '/settings?id=branding' },
+  { eventType: 'org.policy.notification.added', link: '/settings?id=notifications' },
+  //   { eventType: 'org.policy.notification.added', link: '/settings?id=notifications' },
+];
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
-  constructor(private readonly grpcService: GrpcService) {}
+  private loadEvents: Subject<string[]> = new Subject();
+
+  public progressEvents$: Observable<{ [type: string]: { link: string; event: Event.AsObject } | undefined }> =
+    this.loadEvents.pipe(
+      switchMap((types) => {
+        const eventsReq = new ListEventsRequest().setEventTypesList(types).setAsc(false);
+        return from(this.listEvents(eventsReq)).pipe(
+          map((events) => {
+            const eventList = events.getEventsList().map((event) => event.toObject());
+
+            let obj = {};
+            types.map((type) => {
+              const filtered = eventList.filter((event) => event.type?.type === type);
+              console.log(filtered);
+              (obj as any)[type] = filtered.length
+                ? { link: ONBOARDING_EVENTS.find((oe) => oe.eventType === type), event: filtered[0] }
+                : //   filtered.reduce((prev, current) => {
+                  //       const prevTs: Date = new Date(
+                  //         (prev.creationDate?.seconds ?? 0) * 1000 + (prev.creationDate?.nanos ?? 0) / 1000 / 1000,
+                  //       );
+                  //       const currentTs: Date = new Date(
+                  //         (prev.creationDate?.seconds ?? 0) * 1000 + (prev.creationDate?.nanos ?? 0) / 1000 / 1000,
+                  //       );
+                  //       const check = prevTs > currentTs;
+                  //       return check ? prev : current;
+                  //     })
+                  { link: ONBOARDING_EVENTS.find((oe) => oe.eventType === type), event: undefined };
+            });
+
+            console.log(obj);
+            //filter(event => event.type?.type)
+            return obj;
+          }),
+          catchError((error) => {
+            console.error(error);
+            return of({});
+          }),
+        );
+      }),
+    );
+
+  public progressEvents: BehaviorSubject<{ [type: string]: { link: string; event: Event.AsObject } | undefined }> =
+    new BehaviorSubject<{
+      [type: string]: { link: string; event: Event.AsObject } | undefined;
+    }>({});
+
+  constructor(private readonly grpcService: GrpcService) {
+    this.progressEvents$.subscribe(this.progressEvents);
+    this.loadEvents.next(ONBOARDING_EVENTS.map((oe) => oe.eventType));
+  }
 
   public setDefaultOrg(orgId: string): Promise<SetDefaultOrgResponse.AsObject> {
     const req = new SetDefaultOrgRequest();

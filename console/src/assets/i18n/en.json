@@ -42,6 +42,14 @@
       "ADD": "Hold and drag a tile to add"
     }
   },
+  "ONBOARDING": {
+    "EVENTS": {
+      "org.policy.label.added": "Setup your brand",
+      "org.policy.notification.added": "Setup your notifications and SMTP settings",
+      "project.added": "Create your first project",
+      "project.application.added": "Create your first application"
+    }
+  },
   "MENU": {
     "INSTANCE": "Instance",
     "DASHBOARD": "Home",

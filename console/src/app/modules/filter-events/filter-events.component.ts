@@ -175,6 +175,7 @@ export class FilterEventsComponent implements OnInit {
     return this.adminService
       .listEventTypes(req)
       .then((list) => {
+        console.log(list.eventTypesList);
         this.eventTypes = list.eventTypesList ?? [];
       })
       .catch((error) => {
