@@ -34,6 +34,7 @@ func (wm *LDAPIDPWriteModel) Reduce() error {
 			if wm.ID != e.ID {
 				continue
 			}
+			wm.reduceAddeddEvent(e)
 		case *idp.LDAPIDPChangedEvent:
 			if wm.ID != e.ID {
 				continue
