@@ -77,12 +77,6 @@ module.exports = {
         },
         {
           type: "doc",
-          label: "SDKs",
-          docId: "sdks/introduction",
-          position: "left",
-        },
-        {
-          type: "doc",
           label: "APIs",
           docId: "apis/introduction",
           position: "left",
