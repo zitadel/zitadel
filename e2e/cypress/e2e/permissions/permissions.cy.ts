@@ -192,7 +192,7 @@ describe('permissions', () => {
               ensureProjectExists(ctx.api, 'e2eprojectgrants', foreignOrgId)
                 .as('foreignProjectId')
                 .then((foreignProjectId) => {
-                  ensureProjectGrantExists(ctx.api, foreignOrgId, foreignProjectId).as('grantId');
+                  ensureProjectGrantExists(ctx, foreignOrgId, foreignProjectId).as('grantId');
                 });
             });
           });

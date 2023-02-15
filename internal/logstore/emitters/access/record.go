@@ -1,7 +1,6 @@
 package access
 
 import (
-	"net/http"
 	"strings"
 	"time"
 
@@ -12,16 +11,20 @@ import (
 var _ logstore.LogRecord = (*Record)(nil)
 
 type Record struct {
-	LogDate         time.Time   `json:"logDate"`
-	Protocol        Protocol    `json:"protocol"`
-	RequestURL      string      `json:"requestUrl"`
-	ResponseStatus  uint32      `json:"responseStatus"`
-	RequestHeaders  http.Header `json:"requestHeaders"`
-	ResponseHeaders http.Header `json:"responseHeaders"`
-	InstanceID      string      `json:"instanceId"`
-	ProjectID       string      `json:"projectId"`
-	RequestedDomain string      `json:"requestedDomain"`
-	RequestedHost   string      `json:"requestedHost"`
+	LogDate        time.Time `json:"logDate"`
+	Protocol       Protocol  `json:"protocol"`
+	RequestURL     string    `json:"requestUrl"`
+	ResponseStatus uint32    `json:"responseStatus"`
+	// RequestHeaders are plain maps so varying implementation
+	// between HTTP and gRPC don't interfere with each other
+	RequestHeaders map[string][]string `json:"requestHeaders"`
+	// ResponseHeaders are plain maps so varying implementation
+	// between HTTP and gRPC don't interfere with each other
+	ResponseHeaders map[string][]string `json:"responseHeaders"`
+	InstanceID      string              `json:"instanceId"`
+	ProjectID       string              `json:"projectId"`
+	RequestedDomain string              `json:"requestedDomain"`
+	RequestedHost   string              `json:"requestedHost"`
 }
 
 type Protocol uint8
@@ -44,21 +47,31 @@ func (a Record) Normalize() logstore.LogRecord {
 const maxValuesPerKey = 10
 
 // normalizeHeaders lowers all header keys and redacts secrets
-func normalizeHeaders(header http.Header, redactKeysLower ...string) {
-	// set readacted values where needed
-	for _, key := range redactKeysLower {
-		if len(header.Values(key)) > 0 {
-			header.Set(key, redacted)
+func normalizeHeaders(header map[string][]string, redactKeysLower ...string) {
+	lowerKeys(header)
+	redactKeys(header, redactKeysLower...)
+	pruneKeys(header)
+}
+
+func lowerKeys(header map[string][]string) {
+	for k, v := range header {
+		delete(header, k)
+		header[strings.ToLower(k)] = v
+	}
+}
+
+func redactKeys(header map[string][]string, redactKeysLower ...string) {
+	for _, redactKey := range redactKeysLower {
+		if _, ok := header[redactKey]; ok {
+			header[redactKey] = []string{redacted}
 		}
 	}
+}
 
-	// normalize keys to lowercase and ensure limit
-	for key, values := range header {
-		lowerKey := strings.ToLower(key)
-		delete(header, key)
-
+func pruneKeys(header map[string][]string) {
+	for key, value := range header {
 		vItems := make([]string, 0, maxValuesPerKey)
-		for i, vitem := range values {
+		for i, vitem := range value {
 			// Max 10 header values per key
 			if i > maxValuesPerKey {
 				break
@@ -66,7 +79,7 @@ func normalizeHeaders(header http.Header, redactKeysLower ...string) {
 			// Max 200 value length
 			vItems = append(vItems, cutString(vitem, 200))
 		}
-		header[lowerKey] = vItems
+		header[key] = vItems
 	}
 }
 

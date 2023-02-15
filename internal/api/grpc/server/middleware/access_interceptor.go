@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"google.golang.org/grpc"
@@ -42,8 +41,8 @@ func AccessStorageInterceptor(svc *logstore.Service) grpc.UnaryServerInterceptor
 			Protocol:        access.GRPC,
 			RequestURL:      info.FullMethod,
 			ResponseStatus:  respStatus,
-			RequestHeaders:  http.Header(reqMd),
-			ResponseHeaders: http.Header(resMd),
+			RequestHeaders:  reqMd,
+			ResponseHeaders: resMd,
 			InstanceID:      instance.InstanceID(),
 			ProjectID:       instance.ProjectID(),
 			RequestedDomain: instance.RequestedDomain(),
