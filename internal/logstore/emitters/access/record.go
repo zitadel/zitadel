@@ -77,7 +77,7 @@ func pruneKeys(header map[string][]string) {
 				break
 			}
 			// Max 200 value length
-			valueItems[i] = cutString(valueItem, 200)
+			valueItems = append(valueItems, cutString(valueItem, 200))
 		}
 		header[key] = valueItems
 	}
@@ -87,5 +87,5 @@ func cutString(str string, pos int) string {
 	if len(str) <= pos {
 		return str
 	}
-	return str[:pos]
+	return str[:pos-1]
 }

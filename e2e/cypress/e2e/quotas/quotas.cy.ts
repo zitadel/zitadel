@@ -93,7 +93,7 @@ describe('quotas', () => {
         });
       });
 
-      it.only('authenticated requests are limited', () => {
+      it('authenticated requests are limited', () => {
         cy.get<Array<string>>('@authenticatedUrls').then((urls) => {
           cy.get<Context>('@ctx').then((ctx) => {
             const start = new Date();
