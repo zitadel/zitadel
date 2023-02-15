@@ -1,0 +1,45 @@
+@mixin onboarding-card-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .onboarding-card {
+    border-radius: 0.5rem;
+    z-index: 200;
+    border: 1px solid #ffffff30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    min-width: 220px;
+    max-width: 240px;
+    padding-bottom: 0.5rem;
+    position: relative;
+    color: map-get($foreground, text);
+    background: map-get($background, cards);
+
+    .spinner-w {
+      top: 1rem;
+      left: 0;
+      right: 0;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .actions-list {
+      display: flex;
+      flex-direction: column;
+      min-height: 300px;
+    }
+  }
+}

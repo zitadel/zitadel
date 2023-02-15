@@ -1,5 +1,6 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
@@ -73,6 +74,7 @@ export class NavComponent implements OnDestroy {
 
   @Input() public isDarkTheme: boolean = true;
   @Input() public user!: User.AsObject;
+  public showInstanceProgress: boolean = false;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
       return result.matches;
@@ -88,6 +90,13 @@ export class NavComponent implements OnDestroy {
 
   public BreadcrumbType: any = BreadcrumbType;
   public customerPortalLink: string = '';
+
+  public positions: ConnectedPosition[] = [
+    new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
+    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+  ];
+
+  public progressPercentage$: BehaviorSubject<number> = new BehaviorSubject<number>(40);
 
   constructor(
     public authService: GrpcAuthService,
