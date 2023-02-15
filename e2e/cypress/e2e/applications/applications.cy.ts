@@ -1,22 +1,26 @@
 import { Apps, ensureProjectExists, ensureProjectResourceDoesntExist } from '../../support/api/projects';
-import { apiAuth } from '../../support/api/apiauth';
+import { Context } from 'support/commands';
+
+const testProjectName = 'e2eprojectapplication';
+const testAppName = 'e2eappundertest';
 
 describe('applications', () => {
-  const testProjectName = 'e2eprojectapplication';
-  const testAppName = 'e2eappundertest';
-
   beforeEach(() => {
-    apiAuth()
-      .as('api')
-      .then((api) => {
-        ensureProjectExists(api, testProjectName).as('projectId');
+    cy.context()
+      .as('ctx')
+      .then((ctx) => {
+        ensureProjectExists(ctx.api, testProjectName).as('projectId');
       });
   });
 
-  describe('add app', function () {
-    beforeEach(`ensure it doesn't exist already`, function () {
-      ensureProjectResourceDoesntExist(this.api, this.projectId, Apps, testAppName);
-      cy.visit(`/projects/${this.projectId}`);
+  describe('add app', () => {
+    beforeEach(`ensure it doesn't exist already`, () => {
+      cy.get<Context>('@ctx').then((ctx) => {
+        cy.get<string>('@projectId').then((projectId) => {
+          ensureProjectResourceDoesntExist(ctx.api, projectId, Apps, testAppName);
+          cy.visit(`/projects/${projectId}`);
+        });
+      });
     });
 
     it('add app', () => {
