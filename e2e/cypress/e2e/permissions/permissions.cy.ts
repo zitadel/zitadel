@@ -6,36 +6,46 @@ import {
   ensureHumanIsProjectMember,
 } from 'support/api/members';
 import { ensureOrgExists } from 'support/api/orgs';
+import { ensureDomainPolicy } from 'support/api/policies';
 import { ensureHumanUserExists, ensureUserDoesntExist } from 'support/api/users';
-import { loginname } from 'support/login/users';
-import { apiAuth } from '../../support/api/apiauth';
+import { Context } from 'support/commands';
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from '../../support/api/projects';
 
 describe('permissions', () => {
   beforeEach(() => {
-    apiAuth().as('api');
+    cy.context()
+      .as('ctx')
+      .then((ctx) => {
+        ensureDomainPolicy(ctx.api, false, true, false);
+      });
   });
 
   describe('management', () => {
-    const testManagerLoginname = loginname('e2ehumanmanager', Cypress.env('ORGANIZATION'));
+    const testManagerUsername = 'e2ehumanmanager';
     function testAuthorizations(
       roles: string[],
-      beforeCreate: Mocha.HookFunction,
-      beforeMutate: Mocha.HookFunction,
-      navigate: Mocha.HookFunction,
+      beforeCreate: (ctx: Context) => void,
+      beforeMutate: (ctx: Context) => void,
+      navigate: () => void,
     ) {
-      beforeEach(function () {
-        ensureUserDoesntExist(this.api, testManagerLoginname);
-        ensureHumanUserExists(this.api, testManagerLoginname);
+      beforeEach(() => {
+        cy.get<Context>('@ctx').then((ctx) => {
+          ensureUserDoesntExist(ctx.api, testManagerUsername);
+          ensureHumanUserExists(ctx.api, testManagerUsername);
+        });
       });
 
       describe('create authorization', () => {
-        beforeEach(beforeCreate);
-        beforeEach(navigate);
+        beforeEach(() => {
+          cy.get<Context>('@ctx').then((ctx) => {
+            beforeCreate(ctx);
+            navigate();
+          });
+        });
 
         it('should add a manager', () => {
           cy.get('[data-e2e="add-member-button"]').click();
-          cy.get('[data-e2e="add-member-input"]').type(testManagerLoginname);
+          cy.get('[data-e2e="add-member-input"]').type(testManagerUsername);
           cy.get('[data-e2e="user-option"]').first().click();
           cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
           cy.get('[data-e2e="confirm-add-member-button"]').click();
@@ -45,14 +55,15 @@ describe('permissions', () => {
       });
 
       describe('mutate authorization', () => {
-        const rowSelector = `tr:contains(${testManagerLoginname})`;
-
-        beforeEach(beforeMutate);
-        beforeEach(navigate);
+        const rowSelector = `tr:contains(${testManagerUsername})`;
 
         beforeEach(() => {
-          cy.contains('[data-e2e="member-avatar"]', 'ee').click();
-          cy.get(rowSelector).as('managerRow');
+          cy.get<Context>('@ctx').then((ctx) => {
+            beforeMutate(ctx);
+            navigate();
+            cy.contains('[data-e2e="member-avatar"]', 'ee').click();
+            cy.get(rowSelector).as('managerRow');
+          });
         });
 
         it('should remove a manager', () => {
@@ -88,14 +99,14 @@ describe('permissions', () => {
 
       testAuthorizations(
         roles.map((role) => role.display),
-        function () {
-          ensureHumanIsNotOrgMember(this.api, testManagerLoginname);
+        function (ctx: Context) {
+          ensureHumanIsNotOrgMember(ctx.api, testManagerUsername);
         },
-        function () {
-          ensureHumanIsNotOrgMember(this.api, testManagerLoginname);
+        function (ctx: Context) {
+          ensureHumanIsNotOrgMember(ctx.api, testManagerUsername);
           ensureHumanIsOrgMember(
-            this.api,
-            testManagerLoginname,
+            ctx.api,
+            testManagerUsername,
             roles.map((role) => role.internal),
           );
         },
@@ -108,12 +119,16 @@ describe('permissions', () => {
 
     describe('projects', () => {
       describe('owned projects', () => {
-        beforeEach(function () {
-          ensureProjectExists(this.api, 'e2eprojectpermission').as('projectId');
+        beforeEach(() => {
+          cy.get<Context>('@ctx').then((ctx) => {
+            ensureProjectExists(ctx.api, 'e2eprojectpermission').as('projectId');
+          });
         });
 
-        const visitOwnedProject: Mocha.HookFunction = function () {
-          cy.visit(`/projects/${this.projectId}`);
+        const visitOwnedProject = () => {
+          cy.get<number>('@projectId').then((projectId) => {
+            cy.visit(`/projects/${projectId}`);
+          });
         };
 
         describe('authorizations', () => {
@@ -124,17 +139,21 @@ describe('permissions', () => {
 
           testAuthorizations(
             roles.map((role) => role.display),
-            function () {
-              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname);
+            function (ctx) {
+              cy.get<string>('@projectId').then((projectId) => {
+                ensureHumanIsNotProjectMember(ctx.api, projectId, testManagerUsername);
+              });
             },
-            function () {
-              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname);
-              ensureHumanIsProjectMember(
-                this.api,
-                this.projectId,
-                testManagerLoginname,
-                roles.map((role) => role.internal),
-              );
+            function (ctx) {
+              cy.get<string>('@projectId').then((projectId) => {
+                ensureHumanIsNotProjectMember(ctx.api, projectId, testManagerUsername);
+                ensureHumanIsProjectMember(
+                  ctx.api,
+                  projectId,
+                  testManagerUsername,
+                  roles.map((role) => role.internal),
+                );
+              });
             },
             visitOwnedProject,
           );
@@ -143,11 +162,14 @@ describe('permissions', () => {
         describe('roles', () => {
           const testRoleName = 'e2eroleundertestname';
 
-          beforeEach(function () {
-            ensureProjectResourceDoesntExist(this.api, this.projectId, Roles, testRoleName);
+          beforeEach(() => {
+            cy.get<Context>('@ctx').then((ctx) => {
+              cy.get<string>('@projectId').then((projectId) => {
+                ensureProjectResourceDoesntExist(ctx.api, projectId, Roles, testRoleName);
+                visitOwnedProject();
+              });
+            });
           });
-
-          beforeEach(visitOwnedProject);
 
           it('should add a role', () => {
             cy.get('[data-e2e="sidenav-element-roles"]').click();
@@ -164,21 +186,25 @@ describe('permissions', () => {
       });
 
       describe('granted projects', () => {
-        beforeEach(function () {
-          ensureOrgExists(this.api, 'e2eforeignorg')
-            .as('foreignOrgId')
-            .then((foreignOrgId) => {
-              ensureProjectExists(this.api, 'e2eprojectgrants', foreignOrgId)
-                .as('projectId')
-                .then((projectId) => {
-                  ensureProjectGrantExists(this.api, foreignOrgId, projectId).as('grantId');
+        beforeEach(() => {
+          cy.get<Context>('@ctx').then((ctx) => {
+            ensureOrgExists(ctx, 'e2eforeignorg').then((foreignOrgId) => {
+              ensureProjectExists(ctx.api, 'e2eprojectgrants', foreignOrgId)
+                .as('foreignProjectId')
+                .then((foreignProjectId) => {
+                  ensureProjectGrantExists(ctx, foreignOrgId, foreignProjectId).as('grantId');
                 });
             });
+          });
         });
 
-        const visitGrantedProject: Mocha.HookFunction = function () {
-          cy.visit(`/granted-projects/${this.projectId}/grant/${this.grantId}`);
-        };
+        function visitGrantedProject() {
+          cy.get<string>('@foreignProjectId').then((foreignProjectId) => {
+            cy.get<string>('@grantId').then((grantId) => {
+              cy.visit(`/granted-projects/${foreignProjectId}/grant/${grantId}`);
+            });
+          });
+        }
 
         describe('authorizations', () => {
           const roles = [
@@ -188,18 +214,26 @@ describe('permissions', () => {
 
           testAuthorizations(
             roles.map((role) => role.display),
-            function () {
-              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname, this.grantId);
+            function (ctx: Context) {
+              cy.get<string>('@foreignProjectId').then((foreignProjectId) => {
+                cy.get<string>('@grantId').then((grantId) => {
+                  ensureHumanIsNotProjectMember(ctx.api, foreignProjectId, testManagerUsername, grantId);
+                });
+              });
             },
-            function () {
-              ensureHumanIsNotProjectMember(this.api, this.projectId, testManagerLoginname, this.grantId);
-              ensureHumanIsProjectMember(
-                this.api,
-                this.projectId,
-                testManagerLoginname,
-                roles.map((role) => role.internal),
-                this.grantId,
-              );
+            function (ctx: Context) {
+              cy.get<string>('@foreignProjectId').then((foreignProjectId) => {
+                cy.get<string>('@grantId').then((grantId) => {
+                  ensureHumanIsNotProjectMember(ctx.api, foreignProjectId, testManagerUsername, grantId);
+                  ensureHumanIsProjectMember(
+                    ctx.api,
+                    foreignProjectId,
+                    testManagerUsername,
+                    roles.map((role) => role.internal),
+                    grantId,
+                  );
+                });
+              });
             },
             visitGrantedProject,
           );
@@ -207,42 +241,42 @@ describe('permissions', () => {
       });
     });
   });
+});
 
-  describe('validations', () => {
-    describe('owned projects', () => {
-      describe('no ownership', () => {
-        it('a user without project global ownership can ...');
-        it('a user without project global ownership can not ...');
-      });
-      describe('project owner viewer global', () => {
-        it('a project owner viewer global additionally can ...');
-        it('a project owner viewer global still can not ...');
-      });
-      describe('project owner global', () => {
-        it('a project owner global additionally can ...');
-        it('a project owner global still can not ...');
-      });
+describe('validations', () => {
+  describe('owned projects', () => {
+    describe('no ownership', () => {
+      it('a user without project global ownership can ...');
+      it('a user without project global ownership can not ...');
     });
+    describe('project owner viewer global', () => {
+      it('a project owner viewer global additionally can ...');
+      it('a project owner viewer global still can not ...');
+    });
+    describe('project owner global', () => {
+      it('a project owner global additionally can ...');
+      it('a project owner global still can not ...');
+    });
+  });
 
-    describe('granted projects', () => {
-      describe('no ownership', () => {
-        it('a user without project grant ownership can ...');
-        it('a user without project grant ownership can not ...');
-      });
-      describe('project grant owner viewer', () => {
-        it('a project grant owner viewer additionally can ...');
-        it('a project grant owner viewer still can not ...');
-      });
-      describe('project grant owner', () => {
-        it('a project grant owner additionally can ...');
-        it('a project grant owner still can not ...');
-      });
+  describe('granted projects', () => {
+    describe('no ownership', () => {
+      it('a user without project grant ownership can ...');
+      it('a user without project grant ownership can not ...');
     });
-    describe('organization', () => {
-      describe('org owner', () => {
-        it('a project owner global can ...');
-        it('a project owner global can not ...');
-      });
+    describe('project grant owner viewer', () => {
+      it('a project grant owner viewer additionally can ...');
+      it('a project grant owner viewer still can not ...');
+    });
+    describe('project grant owner', () => {
+      it('a project grant owner additionally can ...');
+      it('a project grant owner still can not ...');
+    });
+  });
+  describe('organization', () => {
+    describe('org owner', () => {
+      it('a project owner global can ...');
+      it('a project owner global can not ...');
     });
   });
 });

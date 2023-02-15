@@ -22,7 +22,7 @@ export function ensureDomainPolicy(
   userLoginMustBeDomain: boolean,
   validateOrgDomains: boolean,
   smtpSenderAddressMatchesInstanceDomain: boolean,
-): Cypress.Chainable<number> {
+) {
   return ensureSetting(
     api,
     `${api.adminBaseURL}/policies/domain`,

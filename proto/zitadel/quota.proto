@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+package zitadel.quota.v1;
+
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/quota";
+
+enum Unit {
+    UNIT_UNIMPLEMENTED = 0;
+    /* The sum of all requests to the ZITADEL API with an authorization header,
+    excluding the following exceptions
+    - Calls to the System API
+    - Calls that cause internal server errors
+    - Failed authorizations
+    - Requests after the quota already exceeded
+    */
+    UNIT_REQUESTS_ALL_AUTHENTICATED = 1;
+    // The sum of all actions run durations in seconds
+    UNIT_ACTIONS_ALL_RUN_SECONDS = 2;
+}
+
+message Notification {
+    // The percentage relative to the quotas amount on which the call_url should be called.
+    uint32 percent = 1 [
+        (validate.rules).uint32.gt = 0,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The percentage relative to the quotas amount on which the call_url should be called.";
+        }
+    ];
+    // If true, the call_url is called each time a factor of percentage is reached.
+    bool repeat = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "If true, the call_url is called each time a factor of percentage is reached.";
+    }];
+    // The URL, which is called with HTTP method POST and a JSON payload with the properties "unit", "id" (notification id), "callURL", "periodStart", "threshold" and "usage".
+    string call_url = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The URL, which is called with HTTP method POST and a JSON payload with the properties \"unit\", \"id\" (notification id), \"callURL\", \"periodStart\", \"threshold\" and \"usage\".";
+        }
+    ];
+}

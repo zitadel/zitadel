@@ -156,7 +156,6 @@ func Start() {
 
 func ApplyCustomConfig(customConfig CustomConfig) crdb.StatementHandlerConfig {
 	return applyCustomConfig(projectionConfig, customConfig)
-
 }
 
 func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomConfig) crdb.StatementHandlerConfig {
