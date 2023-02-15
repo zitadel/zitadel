@@ -52,7 +52,12 @@
       <th mat-header-cell *matHeaderCellDef>
         {{ 'ORG.PAGES.NAME' | translate }}
       </th>
-      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">{{ org.name }}</td>
+      <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
+        <span>{{ org.name }}</span
+        ><span *ngIf="defaultOrgId === org.id" class="state orgdefaultlabel">{{
+          'ORG.PAGES.DEFAULTLABEL' | translate
+        }}</span>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="state">
@@ -85,6 +90,17 @@
       </th>
       <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
         {{ org.details?.changeDate | timestampToDate | localizedDate : 'fromNow' }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions" stickyEnd>
+      <th mat-header-cell *matHeaderCellDef class="user-tr-actions"></th>
+      <td mat-cell *matCellDef="let org" class="user-tr-actions">
+        <cnsl-table-actions [hasActions]="true">
+          <button menuActions mat-menu-item (click)="setDefaultOrg(org)" data-e2e="set-default-button">
+            {{ 'ORG.PAGES.SETASDEFAULT' | translate }}
+          </button>
+        </cnsl-table-actions>
       </td>
     </ng-container>
 

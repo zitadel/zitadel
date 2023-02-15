@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Seleziona una data di scadenza",
       "CREATIONDATE": "Data di creazione",
       "KEYDETAILS": "Dettagli chiave",
+      "ACCESSTOKENTYPE": "Tipo Access Token",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Aggiungi chiave",
         "DESCRIPTION": "Seleziona il tuo tipo di chiave e scegli una data di scadenza opzionale."
@@ -844,6 +849,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
       "DELETE": "Elimina organizzazione",
+      "DEFAULTLABEL": "Standard",
+      "SETASDEFAULT": "Imposta come organizzazione predefinita",
+      "DEFAULTORGSET": "Organizzazione predefinita cambiata con successo",
       "RENAME": {
         "ACTION": "Rinomina",
         "TITLE": "Rinomina organizzazione",

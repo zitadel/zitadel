@@ -244,6 +244,10 @@ func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, host string) (a
 	return &mockInstance{}, nil
 }
 
+func (m *mockInstanceVerifier) InstanceByID(context.Context) (authz.Instance, error) {
+	return nil, nil
+}
+
 type mockInstance struct{}
 
 func (m *mockInstance) InstanceID() string {

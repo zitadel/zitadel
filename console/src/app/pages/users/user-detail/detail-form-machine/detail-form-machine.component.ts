@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Human, Machine } from 'src/app/proto/generated/zitadel/user_pb';
+import { AccessTokenType, Human, Machine } from 'src/app/proto/generated/zitadel/user_pb';
 
 @Component({
   selector: 'cnsl-detail-form-machine',
@@ -16,6 +16,11 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
 
   public machineForm!: UntypedFormGroup;
 
+  public accessTokenTypes: AccessTokenType[] = [
+    AccessTokenType.ACCESS_TOKEN_TYPE_BEARER,
+    AccessTokenType.ACCESS_TOKEN_TYPE_JWT,
+  ];
+
   private sub: Subscription = new Subscription();
 
   constructor(private fb: UntypedFormBuilder) {
@@ -23,6 +28,7 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
       userName: [{ value: '', disabled: true }, [Validators.required]],
       name: [{ value: '', disabled: this.disabled }, Validators.required],
       description: [{ value: '', disabled: this.disabled }],
+      accessTokenType: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, [Validators.required]],
     });
   }
 
@@ -40,10 +46,6 @@ export class DetailFormMachineComponent implements OnInit, OnDestroy {
 
   public get name(): AbstractControl | null {
     return this.machineForm.get('name');
-  }
-
-  public get description(): AbstractControl | null {
-    return this.machineForm.get('description');
   }
 
   public get userName(): AbstractControl | null {

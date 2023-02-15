@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Select an expiration date",
       "CREATIONDATE": "Creation Date",
       "KEYDETAILS": "Key Details",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Add Key",
         "DESCRIPTION": "Select your key type and choose an optional expiration date."
@@ -843,6 +848,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
       "ORGDETAILUSER_TITLE": "Configure Organization Owner",
       "DELETE": "Delete organization",
+      "DEFAULTLABEL": "Default",
+      "SETASDEFAULT": "Set as default organization",
+      "DEFAULTORGSET": "Default organization changed successfully",
       "RENAME": {
         "ACTION": "Rename",
         "TITLE": "Rename Organization",

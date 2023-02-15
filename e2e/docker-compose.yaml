@@ -2,20 +2,16 @@ version: '3.8'
 
 services:
   zitadel:
+    user: '$UID'
     restart: 'always'
     image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
-    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
-    environment:
-      ZITADEL_DATABASE_COCKROACH_HOST: db
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
-      ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MFAINITSKIPLIFETIME: 0
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     depends_on:
       db:
         condition: 'service_healthy'
-    ports:
-      - '8080:8080'
-    networks:
-      - zitadel
+    volumes:
+      - ./docker-compose-zitadel.yaml:/zitadel.yaml
+    network_mode: host
 
   db:
     restart: 'always'
@@ -27,11 +23,7 @@ services:
       timeout: '30s'
       retries: 5
       start_period: '20s'
-    ports:
-      - '9090:8080'
-      - '26257:26257'
-    networks:
-      - zitadel
+    network_mode: host
 
   prepare:
     image: node:18-alpine3.15
@@ -43,7 +35,7 @@ services:
     network_mode: host
 
   e2e:
-    image: cypress/included:10.9.0
+    image: cypress/included:12.2.0
     depends_on:
       zitadel:
         condition: 'service_started'

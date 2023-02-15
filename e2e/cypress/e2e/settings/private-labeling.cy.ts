@@ -1,4 +1,5 @@
-import { apiAuth, API } from '../../support/api/apiauth';
+import { Context } from 'mocha';
+import { apiAuth } from '../../support/api/apiauth';
 import { Policy, resetPolicy } from '../../support/api/policies';
 import { login, User } from '../../support/login/users';
 
@@ -7,8 +8,6 @@ describe('private labeling', () => {
 
   [User.OrgOwner].forEach((user) => {
     describe(`as user "${user}"`, () => {
-      let api: API;
-
       beforeEach(() => {
         login(user);
         cy.visit(orgPath);
@@ -37,34 +36,27 @@ function customize(theme: string, user: User) {
       });
 
       it('should update a logo', () => {
-        cy.get('[data-e2e="image-part-logo"]')
-          .find('input')
-          .then(function (el) {
-            const blob = Cypress.Blob.base64StringToBlob(this.logo, 'image/png');
-            const file = new File([blob], 'images/logo.png', { type: 'image/png' });
-            const list = new DataTransfer();
+        cy.get<Context>('@ctx').then((ctx) => {
+          cy.get('[data-e2e="image-part-logo"]')
+            .find('input')
+            .then(function (el) {
+              const blob = Cypress.Blob.base64StringToBlob(ctx.logo, 'image/png');
+              const file = new File([blob], 'images/logo.png', { type: 'image/png' });
+              const list = new DataTransfer();
 
-            list.items.add(file);
-            const myFileList = list.files;
+              list.items.add(file);
+              const myFileList = list.files;
 
-            el[0].files = myFileList;
-            el[0].dispatchEvent(new Event('change', { bubbles: true }));
-          });
+              el[0].files = myFileList;
+              el[0].dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
       });
       it('should delete a logo');
     });
     it('should update an icon');
     it('should delete an icon');
-    it.skip('should update the background color', () => {
-      cy.contains('[data-e2e="color"]', 'Background Color').find('button').click(); // TODO: select data-e2e
-      cy.get('color-editable-input').find('input').clear().type('#ae44dc');
-      cy.get('[data-e2e="save-colors-button"]').click();
-      cy.get('[data-e2e="header-user-avatar"]').click();
-      cy.contains('Logout All Users').click(); // TODO: select data-e2e
-      login(User.LoginPolicyUser, undefined, true, null, () => {
-        cy.pause();
-      });
-    });
+    it('should update the background color');
     it('should update the primary color');
     it('should update the warning color');
     it('should update the font color');

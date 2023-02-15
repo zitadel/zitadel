@@ -119,6 +119,7 @@ const (
 	ColumnTypeJSONB
 	ColumnTypeBytes
 	ColumnTypeTimestamp
+	ColumnTypeInterval
 	ColumnTypeEnum
 	ColumnTypeEnumArray
 	ColumnTypeInt64
@@ -389,6 +390,8 @@ func columnType(columnType ColumnType) string {
 		return "TEXT[]"
 	case ColumnTypeTimestamp:
 		return "TIMESTAMPTZ"
+	case ColumnTypeInterval:
+		return "INTERVAL"
 	case ColumnTypeEnum:
 		return "SMALLINT"
 	case ColumnTypeEnumArray:

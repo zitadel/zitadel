@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "选择过期时间",
       "CREATIONDATE": "创建于",
       "KEYDETAILS": "秘钥详情",
+      "ACCESSTOKENTYPE": "访问令牌类型 ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "添加秘钥",
         "DESCRIPTION": "选择您的密钥类型并选择一个可选的到期日期。"
@@ -843,6 +848,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
       "DELETE": "删除组织",
+      "DEFAULTLABEL": "默认情况下",
+      "SETASDEFAULT": "设置为默认组织",
+      "DEFAULTORGSET": "默认的组织已经改变",
       "RENAME": {
         "ACTION": "改名",
         "TITLE": "重命名组织",

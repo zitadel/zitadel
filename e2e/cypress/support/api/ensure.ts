@@ -1,20 +1,20 @@
 import { requestHeaders } from './apiauth';
 import { findFromList as mapFromList, searchSomething } from './search';
-import { API, Entity, SearchResult } from './types';
+import { API, Entity, SearchResult, Token } from './types';
 
 export function ensureItemExists(
-  api: API,
+  token: Token,
   searchPath: string,
   findInList: (entity: Entity) => boolean,
   createPath: string,
   body: Entity,
-  orgId?: number,
+  orgId?: string,
   newItemIdField: string = 'id',
   searchItemIdField?: string,
-): Cypress.Chainable<number> {
+) {
   return ensureSomething(
-    api,
-    () => searchSomething(api, searchPath, 'POST', mapFromList(findInList, searchItemIdField), orgId),
+    token,
+    () => searchSomething(token, searchPath, 'POST', mapFromList(findInList, searchItemIdField), orgId),
     () => createPath,
     'POST',
     body,
@@ -25,15 +25,15 @@ export function ensureItemExists(
 }
 
 export function ensureItemDoesntExist(
-  api: API,
+  token: Token,
   searchPath: string,
   findInList: (entity: Entity) => boolean,
   deletePath: (entity: Entity) => string,
-  orgId?: number,
+  orgId?: string,
 ): Cypress.Chainable<null> {
   return ensureSomething(
-    api,
-    () => searchSomething(api, searchPath, 'POST', mapFromList(findInList), orgId),
+    token,
+    () => searchSomething(token, searchPath, 'POST', mapFromList(findInList), orgId),
     deletePath,
     'DELETE',
     null,
@@ -47,8 +47,8 @@ export function ensureSetting(
   mapResult: (entity: any) => SearchResult,
   createPath: string,
   body: any,
-  orgId?: number,
-): Cypress.Chainable<number> {
+  orgId?: string,
+): Cypress.Chainable<string> {
   return ensureSomething(
     api,
     () => searchSomething(api, path, 'GET', mapResult, orgId),
@@ -79,38 +79,38 @@ function awaitDesired(
 }
 
 interface EnsuredResult {
-  id: number;
+  id: string;
   sequence: number;
 }
 
 export function ensureSomething(
-  api: API,
+  token: Token,
   search: () => Cypress.Chainable<SearchResult>,
   apiPath: (entity: Entity) => string,
   ensureMethod: string,
   body: Entity,
   expectEntity: (entity: Entity) => boolean,
-  mapId?: (body: any) => number,
-  orgId?: number,
-): Cypress.Chainable<number> {
+  mapId?: (body: any) => string,
+  orgId?: string,
+): Cypress.Chainable<string> {
   return search()
-    .then<EnsuredResult>((sRes) => {
+    .then((sRes) => {
       if (expectEntity(sRes.entity)) {
-        return cy.wrap({ id: sRes.id, sequence: sRes.sequence });
+        return cy.wrap(<EnsuredResult>{ id: sRes.id, sequence: sRes.sequence });
       }
 
       return cy
         .request({
           method: ensureMethod,
           url: apiPath(sRes.entity),
-          headers: requestHeaders(api, orgId),
+          headers: requestHeaders(token, orgId),
           body: body,
           failOnStatusCode: false,
           followRedirect: false,
         })
         .then((cRes) => {
           expect(cRes.status).to.equal(200);
-          return {
+          return <EnsuredResult>{
             id: mapId ? mapId(cRes.body) : undefined,
             sequence: sRes.sequence,
           };
@@ -118,7 +118,7 @@ export function ensureSomething(
     })
     .then((data) => {
       return awaitDesired(90, expectEntity, search, data.sequence).then(() => {
-        return cy.wrap<number>(data.id);
+        return cy.wrap(data.id);
       });
     });
 }

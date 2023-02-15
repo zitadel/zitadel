@@ -137,6 +137,14 @@ func Test_Extract(t *testing.T) {
 			true,
 		},
 		{
+			"exhausted",
+			args{caos_errs.ThrowResourceExhausted(nil, "id", "exhausted")},
+			codes.ResourceExhausted,
+			"exhausted",
+			"id",
+			true,
+		},
+		{
 			"unknown",
 			args{errors.New("unknown")},
 			codes.Unknown,
