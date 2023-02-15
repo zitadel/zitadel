@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	IDPTemplateTable        = "projections.idp_template"
+	IDPTemplateTable        = "projections.idp_templates"
 	IDPTemplateOIDCTable    = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable     = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
 	IDPTemplateGoogleTable  = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
@@ -40,7 +40,6 @@ const (
 	IDPTemplateInstanceIDCol        = "instance_id"
 	IDPTemplateStateCol             = "state"
 	IDPTemplateNameCol              = "name"
-	IDPTemplateStylingTypeCol       = "styling_type"
 	IDPTemplateOwnerTypeCol         = "owner_type"
 	IDPTemplateTypeCol              = "type"
 	IDPTemplateOwnerRemovedCol      = "owner_removed"
@@ -105,7 +104,7 @@ type idpTemplateProjection struct {
 
 func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerConfig) *idpTemplateProjection {
 	p := new(idpTemplateProjection)
-	config.ProjectionName = IDPTable
+	config.ProjectionName = IDPTemplateTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewMultiTableCheck(
 		crdb.NewTable([]*crdb.Column{
@@ -117,7 +116,6 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(IDPTemplateInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPTemplateStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(IDPTemplateNameCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(IDPTemplateStylingTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(IDPTemplateOwnerTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(IDPTemplateTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(IDPTemplateOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
@@ -280,6 +278,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Event:  instance.AzureADIDPChangedEventType,
 					Reduce: p.reduceAzureADIDPChanged,
 				},
+				{
+					Event:  instance.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
+				},
 			},
 		},
 		{
@@ -341,6 +343,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Event:  org.AzureADIDPChangedEventType,
 					Reduce: p.reduceAzureADIDPChanged,
 				},
+				{
+					Event:  org.IDPRemovedEventType,
+					Reduce: p.reduceIDPRemoved,
+				},
 			},
 		},
 	}
@@ -370,7 +376,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPConfigStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOIDC),
@@ -498,7 +504,7 @@ func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*hand
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPConfigStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeJWT),
@@ -626,7 +632,7 @@ func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPConfigStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
@@ -746,7 +752,7 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPConfigStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOAuth),
@@ -882,7 +888,7 @@ func (p *idpTemplateProjection) reduceGitHubIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPConfigStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitHub),
 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
@@ -1002,7 +1008,7 @@ func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPConfigStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGitLab),
 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
@@ -1122,7 +1128,7 @@ func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(IDPTemplateStateCol, domain.IDPConfigStateActive),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
@@ -1226,5 +1232,25 @@ func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) 
 	return crdb.NewMultiStatement(
 		&idpEvent,
 		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.RemovedEvent
+	switch e := event.(type) {
+	case *org.IDPRemovedEvent:
+		idpEvent = e.RemovedEvent
+	case *instance.IDPRemovedEvent:
+		idpEvent = e.RemovedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
+	}
+
+	return crdb.NewDeleteStatement(
+		&idpEvent,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		},
 	), nil
 }

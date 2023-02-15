@@ -22,7 +22,7 @@ func (s IDPState) Exists() bool {
 type IDPType int32
 
 const (
-	IDPTypeUnspecified IDPState = iota
+	IDPTypeUnspecified IDPType = iota
 	IDPTypeOIDC
 	IDPTypeJWT
 	IDPTypeGoogle
