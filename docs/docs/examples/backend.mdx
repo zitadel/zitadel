@@ -1,0 +1,79 @@
+---
+title: Backend / API
+---
+
+### Scope
+
+**Authorization**
+- Service User with PAT Token
+
+**RBAC**
+- Public Endpoint
+- Private Endpoint / Route
+- Private Scoped Endpoint / Route (read:messages)
+
+**Check token against introspection_endpoint**
+- Use roles scope (Don’t use “assert roles on authentication”)
+
+### Examples
+
+<table>
+  <tr>
+    <th></th>
+    <th>Language</th>
+    <th>Authorization</th>
+    <th>RBAC</th>
+    <th>Introspection</th>
+    <th>Link</th>
+    <th>Quicksstart</th>
+    <th>SDK</th>
+  </tr>
+  <tr>
+    <td>
+      <img style={{width: '50px'}} src="/docs/img/tech/golang.svg" alt="golang"/>
+    </td>
+    <td>Golang</td>
+    <td><i class="las la-check"></i></td>
+    <td><i class="las la-check"></i></td>
+    <td><i class="las la-check"></i></td>
+    <td><a href="github.com/zitadel/zitadel-go" target="_blank"><i class="lab la-github"></i></a></td>
+    <td><a href="./secure-api/go">Guide</a></td>
+    <td><a href="github.com/zitadel/zitadel-go" target="_blank">SDK</a></td>
+  </tr>
+   <tr>
+      <td>
+        <img style={{width: '50px'}} src="/docs/img/tech/phyton.svg" alt="phyton"/>
+      </td>
+      <td>Phyton Flask</td>
+      <td><i class="las la-check"></i></td>
+      <td><i class="las la-check"></i></td>
+      <td><i class="las la-check"></i></td>
+      <td><a href="https://github.com/zitadel/example-api-python3-flask" target="_blank"><i class="lab la-github"></i></a></td>
+      <td><a href="./secure-api/python-flask">Guide</a></td>
+      <td><a href="github.com/zitadel/zitadel-go" target="_blank">SDKs</a></td>
+    </tr>
+     <tr>
+          <td>
+            <img style={{width: '50px'}} src="/docs/img/tech/dotnet.svg" alt="dotnet"/>
+          </td>
+          <td>ASP.NET Core WebAPI</td>
+          <td><i class="las la-times"></i></td>
+          <td><i class="las la-times"></i></td>
+          <td><i class="las la-times"></i></td>
+          <td></td>
+          <td><a href="./call-zitadel-api/dot-net">Guide</a></td>
+          <td><a href="https://github.com/smartive/zitadel-net">SDK</a></td>
+        </tr>
+    <tr>
+      <td>
+        <img style={{width: '50px'}} src="/docs/img/tech/java.svg" alt="java"/>
+      </td>
+      <td>Java Spring Boot API</td>
+      <td><i class="las la-check"></i></td>
+      <td><i class="las la-check"></i></td>
+      <td><i class="las la-check"></i></td>
+      <td><a href="https://github.com/zitadel/zitadel-java" target="_blank"><i class="lab la-github"></i></a></td>
+      <td></td>
+      <td></td>
+    </tr>
+</table>
