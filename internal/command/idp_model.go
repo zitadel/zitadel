@@ -34,26 +34,34 @@ func (wm *LDAPIDPWriteModel) Reduce() error {
 			if wm.ID != e.ID {
 				continue
 			}
-			wm.Name = e.Name
-			wm.Host = e.Host
-			wm.Port = e.Port
-			wm.TLS = e.TLS
-			wm.BaseDN = e.BaseDN
-			wm.UserObjectClass = e.UserObjectClass
-			wm.UserUniqueAttribute = e.UserUniqueAttribute
-			wm.Admin = e.Admin
-			wm.Password = e.Password
-			wm.LDAPAttributes = e.LDAPAttributes
-			wm.Options = e.Options
-			wm.State = domain.IDPStateActive
 		case *idp.LDAPIDPChangedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
 			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.State = domain.IDPStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func (wm *LDAPIDPWriteModel) reduceAddeddEvent(e *idp.LDAPIDPAddedEvent) {
+	wm.Name = e.Name
+	wm.Host = e.Host
+	wm.Port = e.Port
+	wm.TLS = e.TLS
+	wm.BaseDN = e.BaseDN
+	wm.UserObjectClass = e.UserObjectClass
+	wm.UserUniqueAttribute = e.UserUniqueAttribute
+	wm.Admin = e.Admin
+	wm.Password = e.Password
+	wm.LDAPAttributes = e.LDAPAttributes
+	wm.Options = e.Options
+	wm.State = domain.IDPStateActive
 }
 
 func (wm *LDAPIDPWriteModel) reduceChangedEvent(e *idp.LDAPIDPChangedEvent) {

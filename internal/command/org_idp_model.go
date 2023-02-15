@@ -140,6 +140,8 @@ func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *org.LDAPIDPChangedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.RemovedEvent)
 		default:
 			wm.IDPRemoveWriteModel.AppendEvents(e)
 		}
