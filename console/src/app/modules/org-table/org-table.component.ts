@@ -11,6 +11,8 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PaginatorComponent } from '../paginator/paginator.component';
+import { AdminService } from 'src/app/services/admin.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 enum OrgListSearchKey {
   NAME = 'NAME',
@@ -30,7 +32,7 @@ export class OrgTableComponent {
   @ViewChild('input') public filter!: Input;
 
   public dataSource: MatTableDataSource<Org.AsObject> = new MatTableDataSource<Org.AsObject>([]);
-  public displayedColumns: string[] = ['name', 'state', 'primaryDomain', 'creationDate', 'changeDate'];
+  public displayedColumns: string[] = ['name', 'state', 'primaryDomain', 'creationDate', 'changeDate', 'actions'];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public activeOrg!: Org.AsObject;
@@ -50,10 +52,13 @@ export class OrgTableComponent {
     offset: 0,
     queries: [],
   });
+  public defaultOrgId: string = '';
   private requestOrgsObservable$ = this.requestOrgs$.pipe(takeUntil(this.destroy$));
 
   constructor(
     private authService: GrpcAuthService,
+    private mgmtService: ManagementService,
+    private adminService: AdminService,
     private router: Router,
     private toast: ToastService,
     private _liveAnnouncer: LiveAnnouncer,
@@ -64,6 +69,10 @@ export class OrgTableComponent {
 
     this.requestOrgsObservable$.pipe(switchMap((req) => this.loadOrgs(req))).subscribe((orgs) => {
       this.dataSource = new MatTableDataSource<Org.AsObject>(orgs);
+    });
+
+    this.mgmtService.getIAM().then((iam) => {
+      this.defaultOrgId = iam.defaultOrgId;
     });
   }
 
@@ -109,6 +118,18 @@ export class OrgTableComponent {
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }
+  }
+
+  public setDefaultOrg(org: Org.AsObject) {
+    this.adminService
+      .setDefaultOrg(org.id)
+      .then(() => {
+        this.toast.showInfo('ORG.PAGES.DEFAULTORGSET', true);
+        this.defaultOrgId = org.id;
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public applySearchQuery(searchQueries: OrgQuery[]): void {

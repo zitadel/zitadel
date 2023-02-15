@@ -12,6 +12,7 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.8.0
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
+	github.com/benbjohnson/clock v1.2.0
 	github.com/boombuler/barcode v1.0.1
 	github.com/cockroachdb/cockroach-go/v2 v2.2.18
 	github.com/dop251/goja v0.0.0-20220815083517-0c74f9139fd6
@@ -19,6 +20,7 @@ require (
 	github.com/drone/envsubst v1.0.3
 	github.com/duo-labs/webauthn v0.0.0-20211216225436-9a12cd078b8a
 	github.com/envoyproxy/protoc-gen-validate v0.6.7
+	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/golang/glog v1.0.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
@@ -55,7 +57,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.3.4
-	github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.7
+	github.com/zitadel/oidc/v2 v2.0.0-dynamic-issuer.8
 	github.com/zitadel/saml v0.0.9
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.27.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.27.0
@@ -68,11 +70,11 @@ require (
 	go.opentelemetry.io/otel/sdk/export/metric v0.25.0
 	go.opentelemetry.io/otel/sdk/metric v0.25.0
 	go.opentelemetry.io/otel/trace v1.2.0
-	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
-	golang.org/x/net v0.5.0
+	golang.org/x/crypto v0.6.0
+	golang.org/x/net v0.6.0
 	golang.org/x/oauth2 v0.4.0
 	golang.org/x/sync v0.1.0
-	golang.org/x/text v0.6.0
+	golang.org/x/text v0.7.0
 	golang.org/x/tools v0.1.13-0.20220928184430-f80e98464e27
 	google.golang.org/api v0.106.0
 	google.golang.org/genproto v0.0.0-20230106154932-a12b697841d9
@@ -88,6 +90,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.10.0 // indirect
 	cloud.google.com/go/trace v1.4.0 // indirect
+	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/amdonov/xmlsig v0.1.0 // indirect
@@ -112,6 +115,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/fxamacker/cbor/v2 v2.2.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
+	github.com/go-asn1-ber/asn1-ber v1.5.4 // indirect
 	github.com/go-errors/errors v1.0.2 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20191208150333-d5b6f63a941b // indirect
@@ -170,7 +174,7 @@ require (
 	github.com/rs/xid v1.2.1 // indirect
 	github.com/russellhaering/goxmldsig v1.2.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/afero v1.8.1 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -186,7 +190,7 @@ require (
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect

@@ -2,6 +2,9 @@
 title: Gitlab OmniAuth Provider
 ---
 
+import CreateApp from "./application/_application.mdx";
+
+
 This guide shows how to enable login with ZITADEL on self-hosted Gitlab instances.
 
 It covers how to:
@@ -15,8 +18,6 @@ Prerequisites:
 - existing ZITADEL Organization, if not present follow [this guide](../../guides/manage/console/organizations)
 - existing ZITADEL project, if not present follow the first 3 steps [here](../../guides/manage/console/projects)
 - running Gitlab instance see [installation guide](https://docs.gitlab.com/ee/install/)
-
-import CreateApp from "./application/application.mdx";
 
 <CreateApp appType="web" authType="code" appName="Gitlab" redirectURI="https://<your_gitlab_url>/users/auth/openid_connect/callback"/>
 

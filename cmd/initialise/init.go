@@ -37,7 +37,7 @@ func New() *cobra.Command {
 		Short: "initialize ZITADEL instance",
 		Long: `Sets up the minimum requirements to start ZITADEL.
 
-Prereqesits:
+Prerequisites:
 - cockroachdb
 
 The user provided by flags needs privileges to
