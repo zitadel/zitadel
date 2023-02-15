@@ -241,7 +241,11 @@
         (backdropClick)="showInstanceProgress = false"
         (detach)="showInstanceProgress = false"
       >
-        <cnsl-onboarding-card *ngIf="org && showInstanceProgress" (closedCard)="showInstanceProgress = false">
+        <cnsl-onboarding-card
+          class="onboarding_card"
+          *ngIf="org && showInstanceProgress"
+          (closedCard)="showInstanceProgress = false"
+        >
         </cnsl-onboarding-card>
       </ng-template>
     </ng-template>
