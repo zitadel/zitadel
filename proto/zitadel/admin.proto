@@ -1009,7 +1009,8 @@ service AdminService {
         };
     }
 
-
+    // Returns all identity providers, which match the query
+    // Limit should always be set, there is a default limit set by the service
     rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {
         option (google.api.http) = {
             post: "/idps/templates/_search"
@@ -1021,6 +1022,7 @@ service AdminService {
         };
     }
 
+    // Returns an identity provider of the instance
     rpc GetProviderByID(GetProviderByIDRequest) returns (GetProviderByIDResponse) {
         option (google.api.http) = {
             get: "/idps/templates/{id}"
@@ -1031,6 +1033,7 @@ service AdminService {
         };
     }
 
+    // Add a new ldap identity provider on the instance
     rpc AddLDAPProvider(AddLDAPProviderRequest) returns (AddLDAPProviderResponse) {
         option (google.api.http) = {
             post: "/idps/ldap"
@@ -1042,6 +1045,7 @@ service AdminService {
         };
     }
 
+    // Change an existing ldap identity provider on the instance
     rpc UpdateLDAPProvider(UpdateLDAPProviderRequest) returns (UpdateLDAPProviderResponse) {
         option (google.api.http) = {
             post: "/idps/ldap/{id}"
@@ -1053,6 +1057,8 @@ service AdminService {
         };
     }
 
+    // Remove an identity provider
+    // Will remove all linked providers of this configuration on the users
     rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
         option (google.api.http) = {
             post: "/idps/templates/{id}"
@@ -3708,7 +3714,7 @@ message GetProviderByIDResponse {
 message AddLDAPProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string host = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string port = 3 [(validate.rules).string = {max_len: 5}]; // TODO: int?
+    string port = 3 [(validate.rules).string = {max_len: 5}];
     bool tls = 4;
     string base_dn = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_object_class = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -3728,7 +3734,7 @@ message UpdateLDAPProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string host = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string port = 4 [(validate.rules).string = {max_len: 5}]; // TODO: int?
+    string port = 4 [(validate.rules).string = {max_len: 5}];
     bool tls = 5;
     string base_dn = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_object_class = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];

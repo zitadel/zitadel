@@ -573,7 +573,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 > **rpc** ListProviders([ListProvidersRequest](#listprovidersrequest))
 [ListProvidersResponse](#listprovidersresponse)
 
-
+Returns all identity providers, which match the query
+Limit should always be set, there is a default limit set by the service
 
 
 
@@ -585,7 +586,7 @@ all fields are updated. If no value is provided the field will be empty afterwar
 > **rpc** GetProviderByID([GetProviderByIDRequest](#getproviderbyidrequest))
 [GetProviderByIDResponse](#getproviderbyidresponse)
 
-
+Returns an identity provider of the instance
 
 
 
@@ -597,7 +598,7 @@ all fields are updated. If no value is provided the field will be empty afterwar
 > **rpc** AddLDAPProvider([AddLDAPProviderRequest](#addldapproviderrequest))
 [AddLDAPProviderResponse](#addldapproviderresponse)
 
-
+Add a new ldap identity provider on the instance
 
 
 
@@ -609,7 +610,7 @@ all fields are updated. If no value is provided the field will be empty afterwar
 > **rpc** UpdateLDAPProvider([UpdateLDAPProviderRequest](#updateldapproviderrequest))
 [UpdateLDAPProviderResponse](#updateldapproviderresponse)
 
-
+Change an existing ldap identity provider on the instance
 
 
 
@@ -621,7 +622,8 @@ all fields are updated. If no value is provided the field will be empty afterwar
 > **rpc** DeleteProvider([DeleteProviderRequest](#deleteproviderrequest))
 [DeleteProviderResponse](#deleteproviderresponse)
 
-
+Remove an identity provider
+Will remove all linked providers of this configuration on the users
 
 
 
@@ -1929,7 +1931,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| port |  string | TODO: int? | string.max_len: 5<br />  |
+| port |  string | - | string.max_len: 5<br />  |
 | tls |  bool | - |  |
 | base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
@@ -4897,7 +4899,7 @@ this is en empty request
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| port |  string | TODO: int? | string.max_len: 5<br />  |
+| port |  string | - | string.max_len: 5<br />  |
 | tls |  bool | - |  |
 | base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
