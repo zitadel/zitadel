@@ -70,16 +70,16 @@ func redactKeys(header map[string][]string, redactKeysLower ...string) {
 
 func pruneKeys(header map[string][]string) {
 	for key, value := range header {
-		vItems := make([]string, 0, maxValuesPerKey)
-		for i, vitem := range value {
+		valueItems := make([]string, 0, maxValuesPerKey)
+		for i, valueItem := range value {
 			// Max 10 header values per key
 			if i > maxValuesPerKey {
 				break
 			}
 			// Max 200 value length
-			vItems = append(vItems, cutString(vitem, 200))
+			valueItems[i] = cutString(valueItem, 200)
 		}
-		header[key] = vItems
+		header[key] = valueItems
 	}
 }
 
