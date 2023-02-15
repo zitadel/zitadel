@@ -1,6 +1,8 @@
 module.exports = {
   examples: [
     "examples/introduction",
+    "examples/frontend",
+    "examples/backend",
     {
       type: "category",
       label: "Integrate ZITADEL Login in your App",
