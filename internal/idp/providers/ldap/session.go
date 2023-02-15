@@ -35,7 +35,7 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 	defer l.Close()
 
 	if s.Provider.tls {
-		err = l.StartTLS(&tls.Config{InsecureSkipVerify: true})
+		err = l.StartTLS(&tls.Config{ServerName: s.Provider.host})
 		if err != nil {
 			return nil, err
 		}
