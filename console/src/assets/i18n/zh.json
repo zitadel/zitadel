@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "选择过期时间",
       "CREATIONDATE": "创建于",
       "KEYDETAILS": "秘钥详情",
+      "ACCESSTOKENTYPE": "访问令牌类型 ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "添加秘钥",
         "DESCRIPTION": "选择您的密钥类型并选择一个可选的到期日期。"
@@ -843,6 +848,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
       "DELETE": "删除组织",
+      "DEFAULTLABEL": "默认情况下",
+      "SETASDEFAULT": "设置为默认组织",
+      "DEFAULTORGSET": "默认的组织已经改变",
       "RENAME": {
         "ACTION": "改名",
         "TITLE": "重命名组织",
@@ -973,7 +981,8 @@
       "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1159,11 +1168,12 @@
       "UNSAVED_DESCRIPTION": "您在未保存的情况下进行了更改。您现在要保存吗？",
       "LOCALE": "本地化",
       "LOCALES": {
-        "de": "德语",
-        "en": "英语",
-        "it": "意大利语",
-        "fr": "法语",
-        "zh": "简体中文"
+        "de": "Deutsch",
+        "en": "English",
+        "it": "Italiano",
+        "fr": "Français",
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1921,11 +1931,12 @@
     "3": "其他"
   },
   "LANGUAGES": {
-    "de": "德语",
-    "en": "英语",
-    "it": "意大利语",
-    "fr": "法语",
-    "zh": "简体中文"
+    "de": "Deutsch",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "添加管理者",
