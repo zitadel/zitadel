@@ -23,13 +23,14 @@ func WithAllowedToFail() Option {
 
 type runConfig struct {
 	allowedToFail bool
-	timeout,
-	prepareTimeout time.Duration
-	modules map[string]require.ModuleLoader
-
-	vm       *goja.Runtime
-	ctxParam *ctxConfig
-	apiParam *apiConfig
+	functionTimeout,
+	scriptTimeout time.Duration
+	modules    map[string]require.ModuleLoader
+	logger     *logger
+	instanceID string
+	vm         *goja.Runtime
+	ctxParam   *ctxConfig
+	apiParam   *apiConfig
 }
 
 func newRunConfig(ctx context.Context, opts ...Option) *runConfig {
@@ -42,10 +43,10 @@ func newRunConfig(ctx context.Context, opts ...Option) *runConfig {
 	vm.SetFieldNameMapper(goja.UncapFieldNameMapper())
 
 	config := &runConfig{
-		timeout:        time.Until(deadline),
-		prepareTimeout: maxPrepareTimeout,
-		modules:        map[string]require.ModuleLoader{},
-		vm:             vm,
+		functionTimeout: time.Until(deadline),
+		scriptTimeout:   maxPrepareTimeout,
+		modules:         map[string]require.ModuleLoader{},
+		vm:              vm,
 		ctxParam: &ctxConfig{
 			FieldConfig: FieldConfig{
 				Runtime: vm,
@@ -64,23 +65,37 @@ func newRunConfig(ctx context.Context, opts ...Option) *runConfig {
 		opt(config)
 	}
 
-	if config.prepareTimeout > config.timeout {
-		config.prepareTimeout = config.timeout
+	if config.scriptTimeout > config.functionTimeout {
+		config.scriptTimeout = config.functionTimeout
 	}
 
 	return config
 }
 
-func (c *runConfig) Start() *time.Timer {
+func (c *runConfig) StartFunction() *time.Timer {
 	c.vm.ClearInterrupt()
-	return time.AfterFunc(c.timeout, func() {
+	return time.AfterFunc(c.functionTimeout, func() {
 		c.vm.Interrupt(ErrHalt)
 	})
 }
 
-func (c *runConfig) Prepare() *time.Timer {
+func (c *runConfig) StartScript() *time.Timer {
 	c.vm.ClearInterrupt()
-	return time.AfterFunc(c.prepareTimeout, func() {
+	return time.AfterFunc(c.scriptTimeout, func() {
 		c.vm.Interrupt(ErrHalt)
 	})
+}
+
+func (c *runConfig) cutTimeouts(remainingSeconds *uint64) {
+	if remainingSeconds == nil {
+		return
+	}
+
+	remainingDur := time.Duration(*remainingSeconds) * time.Second
+	if c.functionTimeout > remainingDur {
+		c.functionTimeout = remainingDur
+	}
+	if c.scriptTimeout > remainingDur {
+		c.scriptTimeout = remainingDur
+	}
 }

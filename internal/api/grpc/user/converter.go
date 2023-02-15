@@ -70,10 +70,10 @@ func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 
 func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
-		Name:           view.Name,
-		Description:    view.Description,
-		HasSecret:      view.HasSecret,
-		AccessTokenTyp: AccessTokenTypeToPb(view.AccessTokenType),
+		Name:            view.Name,
+		Description:     view.Description,
+		HasSecret:       view.HasSecret,
+		AccessTokenType: AccessTokenTypeToPb(view.AccessTokenType),
 	}
 }
 

@@ -5,9 +5,11 @@ import (
 	"testing"
 
 	"github.com/dop251/goja"
+	"github.com/zitadel/zitadel/internal/logstore"
 )
 
 func TestSetFields(t *testing.T) {
+	SetLogstoreService(logstore.New(nil, nil, nil))
 	primitveFn := func(a string) { fmt.Println(a) }
 	complexFn := func(*FieldConfig) interface{} {
 		return primitveFn

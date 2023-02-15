@@ -1,31 +1,23 @@
+import { requestHeaders } from './apiauth';
 import { ensureItemDoesntExist, ensureItemExists } from './ensure';
 import { API } from './types';
 
-export function ensureHumanUserExists(api: API, username: string): Cypress.Chainable<number> {
+export function ensureHumanUserExists(api: API, username: string) {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/users/_search`,
     (user: any) => user.userName === username,
     `${api.mgmtBaseURL}/users/human`,
     {
+      ...defaultHuman,
       user_name: username,
-      profile: {
-        first_name: 'e2efirstName',
-        last_name: 'e2elastName',
-      },
-      email: {
-        email: 'e2e@email.ch',
-      },
-      phone: {
-        phone: '+41 123456789',
-      },
     },
     undefined,
     'userId',
   );
 }
 
-export function ensureMachineUserExists(api: API, username: string): Cypress.Chainable<number> {
+export function ensureMachineUserExists(api: API, username: string) {
   return ensureItemExists(
     api,
     `${api.mgmtBaseURL}/users/_search`,
@@ -41,7 +33,7 @@ export function ensureMachineUserExists(api: API, username: string): Cypress.Cha
   );
 }
 
-export function ensureUserDoesntExist(api: API, username: string): Cypress.Chainable<null> {
+export function ensureUserDoesntExist(api: API, username: string) {
   return ensureItemDoesntExist(
     api,
     `${api.mgmtBaseURL}/users/_search`,
@@ -49,3 +41,31 @@ export function ensureUserDoesntExist(api: API, username: string): Cypress.Chain
     (user) => `${api.mgmtBaseURL}/users/${user.id}`,
   );
 }
+
+export function createHumanUser(api: API, username: string, failOnStatusCode = true) {
+  return cy.request({
+    method: 'POST',
+    url: `${api.mgmtBaseURL}/users/human`,
+    body: {
+      ...defaultHuman,
+      user_name: username,
+    },
+    auth: {
+      bearer: api.token,
+    },
+    failOnStatusCode: failOnStatusCode,
+  });
+}
+
+const defaultHuman = {
+  profile: {
+    first_name: 'e2efirstName',
+    last_name: 'e2elastName',
+  },
+  email: {
+    email: 'e2e@email.ch',
+  },
+  phone: {
+    phone: '+41 123456789',
+  },
+};

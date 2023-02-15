@@ -437,6 +437,27 @@ Errors:
     CloseRows: L'instruction SQL n'a pas pu être terminée
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
+  Quota:
+    AlreadyExists: Contingent existe déjà pour cette unité
+    NotFound: Contingent non trouvé pour cette unité
+    Invalid:
+      CallURL: L'URL d'appel du contingent n'est pas valide
+      Percent: Pourcent du contingent est inférieure à 1
+      Unimplemented: Les contingents ne sont pas implémentés pour cette unité
+      Amount: Quantité contingentée est inférieure à 1
+      ResetInterval: L'intervalle de réinitialisation entre les contingents est inférieur à une minute
+      Noop: Un contingent illimité sans notifications n'a aucun effet
+    Access:
+      Exhausted: Le quota de requêtes authentifiées est épuisé
+    Execution:
+      Exhausted: Le quota de secondes d'action est épuisé
+  LogStore:
+    Access:
+      StorageFailed: L'enregistrement du journal d'accès dans la base de données a échoué
+      ScanFailed: L'interrogation des requêtes authentifiées consommées a échoué
+    Execution:
+      StorageFailed: L'enregistrement du journal d'action dans la base de données a échoué
+      ScanFailed: L'interrogation des secondes d'action consommées a échoué
 
 AggregateTypes:
   action: Action
@@ -446,6 +467,7 @@ AggregateTypes:
   project: Projet
   user: Utilisateur
   usergrant: Subvention de l'utilisateur
+  quota: Contingent
 
 EventTypes:
   user:

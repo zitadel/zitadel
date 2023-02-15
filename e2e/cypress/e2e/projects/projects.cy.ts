@@ -1,18 +1,20 @@
-import { apiAuth } from '../../support/api/apiauth';
+import { Context } from 'support/commands';
 import { ensureProjectDoesntExist, ensureProjectExists } from '../../support/api/projects';
 
 describe('projects', () => {
   beforeEach(() => {
-    apiAuth().as('api');
+    cy.context().as('ctx');
   });
 
   const testProjectNameCreate = 'e2eprojectcreate';
   const testProjectNameDelete = 'e2eprojectdelete';
 
   describe('add project', () => {
-    beforeEach(`ensure it doesn't exist already`, function () {
-      ensureProjectDoesntExist(this.api, testProjectNameCreate);
-      cy.visit(`/projects`);
+    beforeEach(`ensure it doesn't exist already`, () => {
+      cy.get<Context>('@ctx').then((ctx) => {
+        ensureProjectDoesntExist(ctx.api, testProjectNameCreate);
+        cy.visit(`/projects`);
+      });
     });
 
     it('should add a project', () => {
@@ -26,9 +28,11 @@ describe('projects', () => {
   });
 
   describe('edit project', () => {
-    beforeEach('ensure it exists', function () {
-      ensureProjectExists(this.api, testProjectNameDelete);
-      cy.visit(`/projects`);
+    beforeEach('ensure it exists', () => {
+      cy.get<Context>('@ctx').then((ctx) => {
+        ensureProjectExists(ctx.api, testProjectNameDelete);
+        cy.visit(`/projects`);
+      });
     });
 
     describe('remove project', () => {

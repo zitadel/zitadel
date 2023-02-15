@@ -1,29 +1,8 @@
 import 'cypress-wait-until';
-//
-//namespace Cypress {
-//    interface Chainable {
-//        /**
-//         * Custom command that authenticates a user.
-//         *
-//         * @example cy.consolelogin('hodor', 'hodor1234')
-//         */
-//        consolelogin(username: string, password: string): void
-//    }
-//}
-//
-//Cypress.Commands.add('consolelogin', { prevSubject: false }, (username: string, password: string) => {
-//
-//    window.sessionStorage.removeItem("zitadel:access_token")
-//    cy.visit(Cypress.config('baseUrl')/ui/console).then(() => {
-//        // fill the fields and push button
-//        cy.get('#loginName').type(username, { log: false })
-//        cy.get('#submit-button').click()
-//        cy.get('#password').type(password, { log: false })
-//        cy.get('#submit-button').click()
-//        cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
-//    })
-//})
-//
+import { apiAuth, systemAuth } from './api/apiauth';
+import { API, SystemAPI } from './api/types';
+import { ensureQuotaIsRemoved, Unit } from './api/quota';
+import { instanceUnderTest } from './api/instances';
 
 interface ShouldNotExistOptions {
   selector: string;
@@ -46,13 +25,25 @@ declare global {
       /**
        * Custom command that waits until the selector finds zero elements.
        */
-      shouldNotExist(options: ShouldNotExistOptions): Cypress.Chainable<null>;
+      shouldNotExist(options?: ShouldNotExistOptions): Cypress.Chainable<null>;
+
+      /**
+       * Custom command that ensures a reliable testing context and returns it
+       */
+      context(): Cypress.Chainable<Context>;
+
       /**
        * Custom command that asserts success is printed after a change.
        */
       shouldConfirmSuccess(): Cypress.Chainable<null>;
     }
   }
+}
+
+export interface Context {
+  api: API;
+  system: SystemAPI;
+  instanceId: number;
 }
 
 Cypress.Commands.add('clipboardMatches', { prevSubject: false }, (pattern: RegExp | string) => {
@@ -105,4 +96,36 @@ Cypress.Commands.add('shouldConfirmSuccess', { prevSubject: false }, () => {
   cy.get('.data-e2e-message');
   cy.shouldNotExist({ selector: '.data-e2e-failure' });
   cy.get('.data-e2e-success');
+});
+
+Cypress.Commands.add('context', { prevSubject: false }, () => {
+  return systemAuth().then((system) => {
+    return instanceUnderTest(system).then((instanceId) => {
+      return ensureQuotaIsRemoved(
+        {
+          system: system,
+          api: null,
+          instanceId: instanceId,
+        },
+        Unit.AuthenticatedRequests,
+      ).then(() => {
+        return ensureQuotaIsRemoved(
+          {
+            system: system,
+            api: null,
+            instanceId: instanceId,
+          },
+          Unit.ExecutionSeconds,
+        ).then(() => {
+          return apiAuth().then((api) => {
+            return {
+              system: system,
+              api: api,
+              instanceId: instanceId,
+            };
+          });
+        });
+      });
+    });
+  });
 });

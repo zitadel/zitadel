@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Sélectionnez une date d'expiration",
       "CREATIONDATE": "Date de création",
       "KEYDETAILS": "Détails de la clé",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Ajouter une clé",
         "DESCRIPTION": "Sélectionnez votre type de clé et choisissez une date d'expiration facultative."

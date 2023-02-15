@@ -16,6 +16,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -36,7 +37,18 @@ type health interface {
 	Instance(ctx context.Context, shouldTriggerBulk bool) (*query.Instance, error)
 }
 
-func New(port uint16, router *mux.Router, queries *query.Queries, verifier *internal_authz.TokenVerifier, authZ internal_authz.Config, externalSecure bool, tlsConfig *tls.Config, http2HostName, http1HostName string) *API {
+func New(
+	port uint16,
+	router *mux.Router,
+	queries *query.Queries,
+	verifier *internal_authz.TokenVerifier,
+	authZ internal_authz.Config,
+	externalSecure bool,
+	tlsConfig *tls.Config,
+	http2HostName,
+	http1HostName string,
+	accessSvc *logstore.Service,
+) *API {
 	api := &API{
 		port:           port,
 		verifier:       verifier,
@@ -45,7 +57,8 @@ func New(port uint16, router *mux.Router, queries *query.Queries, verifier *inte
 		externalSecure: externalSecure,
 		http1HostName:  http1HostName,
 	}
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig)
+
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessSvc)
 	api.routeGRPC()
 
 	api.RegisterHandler("/debug", api.healthHandler())
