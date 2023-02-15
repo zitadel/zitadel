@@ -11,6 +11,8 @@ import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
+import OnboardingModule from 'src/app/modules/onboarding/onboarding.module';
 
 @NgModule({
   declarations: [HomeComponent],
@@ -20,10 +22,12 @@ import { HomeComponent } from './home.component';
     HasRoleModule,
     HomeRoutingModule,
     MatButtonModule,
+    HasRolePipeModule,
     TranslateModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
     ShortcutsModule,
+    OnboardingModule,
     MatRippleModule,
   ],
 })

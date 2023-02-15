@@ -71,6 +71,20 @@
           i {
             font-size: 1rem;
           }
+
+          .success-icon {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            color: var(--success);
+          }
+
+          .warn-icon {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            width: 1.2rem;
+            color: map-get($background, alert);
+          }
         }
 
         .name {

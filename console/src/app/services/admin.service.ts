@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, from, map, Observable, of, Subject, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, from, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
 
 import {
   ActivateLabelPolicyRequest,
@@ -233,14 +233,14 @@ import { GrpcService } from './grpc.service';
 
 interface OnboardingActions {
   eventType: string;
-  link: string;
+  link: string | string[];
 }
 
 const ONBOARDING_EVENTS: OnboardingActions[] = [
-  { eventType: 'project.added', link: '/projects/create' },
-  { eventType: 'project.application.added', link: '/projects' },
-  { eventType: 'org.policy.label.added', link: '/settings?id=branding' },
-  { eventType: 'org.policy.notification.added', link: '/settings?id=notifications' },
+  { eventType: 'project.added', link: ['/projects/create'] },
+  { eventType: 'project.application.added', link: ['/projects'] },
+  { eventType: 'org.policy.label.added', link: ['/settings?id=branding'] },
+  { eventType: 'org.policy.notification.added', link: ['/settings?id=notifications'] },
   //   { eventType: 'org.policy.notification.added', link: '/settings?id=notifications' },
 ];
 
@@ -261,9 +261,8 @@ export class AdminService {
             let obj = {};
             types.map((type) => {
               const filtered = eventList.filter((event) => event.type?.type === type);
-              console.log(filtered);
               (obj as any)[type] = filtered.length
-                ? { link: ONBOARDING_EVENTS.find((oe) => oe.eventType === type), event: filtered[0] }
+                ? { link: ONBOARDING_EVENTS.find((oe) => oe.eventType === type)?.link, event: filtered[0] }
                 : //   filtered.reduce((prev, current) => {
                   //       const prevTs: Date = new Date(
                   //         (prev.creationDate?.seconds ?? 0) * 1000 + (prev.creationDate?.nanos ?? 0) / 1000 / 1000,
@@ -274,12 +273,19 @@ export class AdminService {
                   //       const check = prevTs > currentTs;
                   //       return check ? prev : current;
                   //     })
-                  { link: ONBOARDING_EVENTS.find((oe) => oe.eventType === type), event: undefined };
+                  { link: ONBOARDING_EVENTS.find((oe) => oe.eventType === type)?.link, event: undefined };
             });
 
             console.log(obj);
-            //filter(event => event.type?.type)
             return obj;
+          }),
+          tap((events) => {
+            const total = Object.keys(events).length;
+            const done = Object.keys(events)
+              .map((type) => (events as any)[type].event !== undefined)
+              .filter((res) => !!res).length;
+            const percentage = Math.round((done / total) * 100);
+            this.progressPercentage.next(percentage);
           }),
           catchError((error) => {
             console.error(error);
@@ -293,9 +299,15 @@ export class AdminService {
     new BehaviorSubject<{
       [type: string]: { link: string; event: Event.AsObject } | undefined;
     }>({});
+  public progressPercentage: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor(private readonly grpcService: GrpcService) {
     this.progressEvents$.subscribe(this.progressEvents);
+    this.initOnboarding();
+  }
+
+  public initOnboarding(): void {
+    console.log('init onboarding');
     this.loadEvents.next(ONBOARDING_EVENTS.map((oe) => oe.eventType));
   }
 

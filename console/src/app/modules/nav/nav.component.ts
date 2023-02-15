@@ -5,9 +5,10 @@ import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, forkJoin, map, merge, Observable, Subject, switchMap, take } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, merge, Observable, Subject, switchMap, take, tap } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { AdminService } from 'src/app/services/admin.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -96,10 +97,9 @@ export class NavComponent implements OnDestroy {
     new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
   ];
 
-  public progressPercentage$: BehaviorSubject<number> = new BehaviorSubject<number>(40);
-
   constructor(
     public authService: GrpcAuthService,
+    public adminService: AdminService,
     public authenticationService: AuthenticationService,
     public breadcrumbService: BreadcrumbService,
     public mgmtService: ManagementService,

@@ -9,7 +9,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
-import { OnboardingRoutingModule } from './onboarding-routing.module';
 import { OnboardingComponent } from './onboarding.component';
 
 @NgModule({
@@ -18,7 +17,6 @@ import { OnboardingComponent } from './onboarding.component';
     CommonModule,
     MatIconModule,
     HasRoleModule,
-    OnboardingRoutingModule,
     MatButtonModule,
     TranslateModule,
     MatTooltipModule,
@@ -26,5 +24,6 @@ import { OnboardingComponent } from './onboarding.component';
     ShortcutsModule,
     MatRippleModule,
   ],
+  exports: [OnboardingComponent],
 })
 export default class OnboardingModule {}

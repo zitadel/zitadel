@@ -190,9 +190,14 @@
     padding: 2px;
     border-radius: 50vw;
 
+    &:hover {
+      background: if($is-dark-theme, #ffffff, $primary-color);
+      transition: background ease 0.15s;
+    }
+
     .progress {
       border-radius: 50vw;
-      height: 6px;
+      height: 8px;
 
       .mat-progress-bar-buffer {
         background-color: if($is-dark-theme, rgb(69, 91, 84), #cccccc) !important;
