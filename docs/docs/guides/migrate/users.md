@@ -36,9 +36,10 @@ flowchart LR
 
 In case all your applications depend on ZITADEL after the migration date, and ZITADEL is able to retrieve the required user information, including secrets, from the legacy system, then the recommended way is to let [ZITADEL orchestrate the user migration](#just-in-time-zitadel).
 
-For all other cases, the legacy system needs to orchestrate the migration of users to ZITADEL for most flexibility.
-
 #### Legacy System orchestrates migration
+
+For all other cases, we recommend that the [legacy system orchestrates the migration](#legacy-system-orchestrates-migration) of users to ZITADEL for more flexibility.
+In this case the migration can also be done as an import job or also allowing to create user session in both the legacy auth solution and ZITADEL in parallel.
 
 ```mermaid
 %%{init: {'theme':'dark'}}%%
@@ -50,6 +51,16 @@ flowchart LR
 
 ### Migrating Secrets
 
+:::info
+
+:::
+
+TODO: 
+
+- Where to find current supported hashes
+- Info about https://github.com/zitadel/zitadel/issues/4157
+- Info about secret import (OTP, Passkeys, ...)
+- Info that for passkeys to work the domain needs to remain the same.
 - Hashes
 - Passkeys
 - OTP
@@ -81,6 +92,31 @@ TODO: Example API Call - import user
 TODO: Example API Call - password reset
 
 ### Just-in-time: ZITADEL
+
+```mermaid
+%%{init: {'theme':'dark'}}%%
+sequenceDiagram
+    actor U as User
+    participant A as App
+    participant L as Legacy
+    participant Z as ZITADEL
+    
+    U ->> A: login
+    A -->> Z: redirect
+    U ->> Z: enter username
+    Z -->> Z: Action: Check if was migrated
+    opt not migrated (Action: pre-authentication)
+        Z ->> L: request user data
+        L ->> Z: user data
+        Z ->> Z: create user
+    end
+    Z -->> Z: authenticate user
+    opt not migrated (Action: post-authentication)
+        Z ->> L: flag user as migrated
+    end
+    Z ->> A: redirect with token
+```
+
 
 TODO: Chart
 TODO: Example Action (HTTP, Metadata)?
