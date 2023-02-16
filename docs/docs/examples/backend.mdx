@@ -5,15 +5,19 @@ title: Backend / API
 ### Scope
 
 **Authorization**
-- Service User with PAT Token
+
+In the examples we will use a service account with a personal access token which can be used directly to access the example API.
 
 **RBAC**
-- Public Endpoint
-- Private Endpoint / Route
-- Private Scoped Endpoint / Route (read:messages)
+
+To show how role-based access control (RBAC) works the examples include multiple endpoints.
+- Public Endpoint: An endpoint that is accessible by everyone, no matter if the user is authenticated or has some roles.
+- Private Endpoint: And endpoint where the is has to be authenticated (Authentication Header) to be able to call it.
+- Private Endpoint with Role: The user has to be authenticated and have a specific role/permission "read:messages" to be able to call the endpoint
 
 **Check token against introspection_endpoint**
-- Use roles scope (Don’t use “assert roles on authentication”)
+The token of a requesting user will be checked against the [introspection_endpoint](../apis/openidoauth/endpoints#introspection_endpoint)
+For this the roles scopes will be used instead of the "assert roles on authentication" setting, that can be configured on the project.
 
 ### Examples
 
