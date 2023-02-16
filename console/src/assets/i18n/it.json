@@ -42,6 +42,36 @@
       "ADD": "Per aggiungere, tieni premuto e trascina il riquadro"
     }
   },
+  "ONBOARDING": {
+    "DESCRIPTION": "Your onboarding process",
+    "COMPLETED": "completed",
+    "EVENTS": {
+      "org.policy.label.added": {
+        "title": "Setup your brand",
+        "description": "Define coloring and shape of your login and upload your logo and icons."
+      },
+      "org.policy.notification.added": {
+        "title": "Setup your notifications and SMTP settings",
+        "description": "Set your own mail server, and SMS settings."
+      },
+      "project.added": {
+        "title": "Create your first project",
+        "description": "Add your first project and define its roles and authorizations."
+      },
+      "project.application.added": {
+        "title": "Create your first application",
+        "description": "Create a web, native, api or saml application and setup your authentication flow."
+      },
+      "users.added": {
+        "title": "Add users",
+        "description": "Add your application users"
+      },
+      "user.grant.added": {
+        "title": "Grant users",
+        "description": "Allow users to access your application and setup their role."
+      }
+    }
+  },
   "MENU": {
     "INSTANCE": "Istanza",
     "DASHBOARD": "Pagina iniziale",
