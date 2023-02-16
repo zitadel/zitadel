@@ -1207,14 +1207,64 @@ service AdminService {
         };
     }
 
-    rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
+    // Returns all identity providers, which match the query
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {
         option (google.api.http) = {
-            post: "/idps/{id}"
+            post: "/idps/templates/_search"
             body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.idp.write"
+            permission: "org.idp.read"
+        };
+    }
+
+    // Returns an identity provider of the instance
+    rpc GetProviderByID(GetProviderByIDRequest) returns (GetProviderByIDResponse) {
+        option (google.api.http) = {
+            get: "/idps/templates/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.read"
+        };
+    }
+
+    // Add a new ldap identity provider on the instance
+    rpc AddLDAPProvider(AddLDAPProviderRequest) returns (AddLDAPProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/ldap"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing ldap identity provider on the instance
+    rpc UpdateLDAPProvider(UpdateLDAPProviderRequest) returns (UpdateLDAPProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/ldap/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Remove an identity provider
+    // Will remove all linked providers of this configuration on the users
+    rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/templates/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
         };
     }
 
@@ -3832,6 +3882,79 @@ message UpdateIDPJWTConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ListProvidersRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criteria the client is looking for
+    repeated ProviderQuery queries = 2;
+}
+
+message ProviderQuery {
+    oneof query {
+        zitadel.idp.v1.IDPIDQuery idp_id_query = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name_query = 2;
+    }
+}
+
+message ListProvidersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.idp.v1.Provider result = 2;
+}
+
+message GetProviderByIDRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetProviderByIDResponse {
+    zitadel.idp.v1.Provider idp = 1;
+}
+
+message AddLDAPProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string host = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string port = 3 [(validate.rules).string = {max_len: 5}];
+    bool tls = 4;
+    string base_dn = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_object_class = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_unique_attribute = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string admin = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string password = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.LDAPAttributes attributes = 10;
+    zitadel.idp.v1.Options provider_options = 11;
+}
+
+message AddLDAPProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateLDAPProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string host = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string port = 4 [(validate.rules).string = {max_len: 5}];
+    bool tls = 5;
+    string base_dn = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_object_class = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_unique_attribute = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string admin = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string password = 10 [(validate.rules).string = {max_len: 200}];
+    zitadel.idp.v1.LDAPAttributes attributes = 11;
+    zitadel.idp.v1.Options provider_options = 12;
+}
+
+message UpdateLDAPProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeleteProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message AddGenericOAuthProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -4080,14 +4203,6 @@ message UpdateGoogleProviderRequest {
 }
 
 message UpdateGoogleProviderResponse {
-    zitadel.v1.ObjectDetails details = 1;
-}
-
-message DeleteProviderRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message DeleteProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

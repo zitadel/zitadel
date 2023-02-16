@@ -8,31 +8,20 @@ import (
 
 func TestProvider_Options(t *testing.T) {
 	type fields struct {
-		name                       string
-		host                       string
-		baseDN                     string
-		userObjectClass            string
-		userUniqueAttribute        string
-		admin                      string
-		password                   string
-		loginUrl                   string
-		opts                       []ProviderOpts
-		idAttribute                string
-		firstNameAttribute         string
-		lastNameAttribute          string
-		displayNameAttribute       string
-		nickNameAttribute          string
-		preferredUsernameAttribute string
-		emailAttribute             string
-		emailVerifiedAttribute     string
-		phoneAttribute             string
-		phoneVerifiedAttribute     string
-		preferredLanguageAttribute string
-		avatarURLAttribute         string
-		profileAttribute           string
+		name                string
+		host                string
+		baseDN              string
+		userObjectClass     string
+		userUniqueAttribute string
+		admin               string
+		password            string
+		loginUrl            string
+		opts                []ProviderOpts
 	}
 	type want struct {
 		name                       string
+		port                       string
+		tls                        bool
 		linkingAllowed             bool
 		creationAllowed            bool
 		autoCreation               bool
@@ -71,6 +60,8 @@ func TestProvider_Options(t *testing.T) {
 			},
 			want: want{
 				name:            "ldap",
+				port:            DefaultPort,
+				tls:             true,
 				linkingAllowed:  false,
 				creationAllowed: false,
 				autoCreation:    false,
@@ -98,6 +89,8 @@ func TestProvider_Options(t *testing.T) {
 			},
 			want: want{
 				name:            "ldap",
+				port:            DefaultPort,
+				tls:             true,
 				linkingAllowed:  true,
 				creationAllowed: true,
 				autoCreation:    true,
@@ -116,6 +109,8 @@ func TestProvider_Options(t *testing.T) {
 				password:            "password",
 				loginUrl:            "url",
 				opts: []ProviderOpts{
+					Insecure(),
+					WithCustomPort("port"),
 					WithLinkingAllowed(),
 					WithCreationAllowed(),
 					WithAutoCreation(),
@@ -137,6 +132,8 @@ func TestProvider_Options(t *testing.T) {
 			},
 			want: want{
 				name:                       "ldap",
+				port:                       "port",
+				tls:                        false,
 				linkingAllowed:             true,
 				creationAllowed:            true,
 				autoCreation:               true,
@@ -163,6 +160,8 @@ func TestProvider_Options(t *testing.T) {
 			provider := New(tt.fields.name, tt.fields.host, tt.fields.baseDN, tt.fields.userObjectClass, tt.fields.userUniqueAttribute, tt.fields.admin, tt.fields.password, tt.fields.loginUrl, tt.fields.opts...)
 
 			a.Equal(tt.want.name, provider.Name())
+			a.Equal(tt.want.port, provider.port)
+			a.Equal(tt.want.tls, provider.tls)
 			a.Equal(tt.want.linkingAllowed, provider.IsLinkingAllowed())
 			a.Equal(tt.want.creationAllowed, provider.IsCreationAllowed())
 			a.Equal(tt.want.autoCreation, provider.IsAutoCreation())

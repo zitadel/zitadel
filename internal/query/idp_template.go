@@ -1,17 +1,22 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	errs "errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type IDPTemplate struct {
@@ -20,7 +25,7 @@ type IDPTemplate struct {
 	Sequence          uint64
 	ResourceOwner     string
 	ID                string
-	State             domain.IDPConfigState
+	State             domain.IDPState
 	Name              string
 	Type              domain.IDPType
 	OwnerType         domain.IdentityProviderType
@@ -28,6 +33,7 @@ type IDPTemplate struct {
 	IsLinkingAllowed  bool
 	IsAutoCreation    bool
 	IsAutoUpdate      bool
+	*LDAPIDPTemplate
 	*OIDCIDPTemplate
 	*JWTIDPTemplate
 	*GoogleIDPTemplate
@@ -35,6 +41,25 @@ type IDPTemplate struct {
 	*GitHubIDPTemplate
 	*GitLabIDPTemplate
 	*AzureADIDPTemplate
+}
+
+type IDPTemplates struct {
+	SearchResponse
+	Templates []*IDPTemplate
+}
+
+type LDAPIDPTemplate struct {
+	IDPID               string
+	Host                string
+	Port                string
+	TLS                 bool
+	BaseDN              string
+	UserObjectClass     string
+	UserUniqueAttribute string
+	Admin               string
+	Password            *crypto.CryptoValue
+	idp.LDAPAttributes
+	idp.Options
 }
 
 type OIDCIDPTemplate struct {
@@ -157,6 +182,105 @@ var (
 	IDPTemplateIsAutoUpdateCol = Column{
 		name:  projection.IDPTemplateIsAutoUpdateCol,
 		table: idpTemplateTable,
+	}
+)
+
+var (
+	ldapIdpTemplateTable = table{
+		name:          projection.IDPTemplateLDAPTable,
+		instanceIDCol: projection.IDPTemplateInstanceIDCol,
+	}
+	LDAPIDCol = Column{
+		name:  projection.LDAPIDCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPInstanceIDCol = Column{
+		name:  projection.LDAPInstanceIDCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPHostCol = Column{
+		name:  projection.LDAPHostCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPPortCol = Column{
+		name:  projection.LDAPPortCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPTlsCol = Column{
+		name:  projection.LDAPTlsCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPBaseDNCol = Column{
+		name:  projection.LDAPBaseDNCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPUserObjectClassCol = Column{
+		name:  projection.LDAPUserObjectClassCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPUserUniqueAttributeCol = Column{
+		name:  projection.LDAPUserUniqueAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPAdminCol = Column{
+		name:  projection.LDAPAdminCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPPasswordCol = Column{
+		name:  projection.LDAPPasswordCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPIDAttributeCol = Column{
+		name:  projection.LDAPIDAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPFirstNameAttributeCol = Column{
+		name:  projection.LDAPFirstNameAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPLastNameAttributeCol = Column{
+		name:  projection.LDAPLastNameAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPDisplayNameAttributeCol = Column{
+		name:  projection.LDAPDisplayNameAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPNickNameAttributeCol = Column{
+		name:  projection.LDAPNickNameAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPPreferredUsernameAttributeCol = Column{
+		name:  projection.LDAPPreferredUsernameAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPEmailAttributeCol = Column{
+		name:  projection.LDAPEmailAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPEmailVerifiedAttributeCol = Column{
+		name:  projection.LDAPEmailVerifiedAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPPhoneAttributeCol = Column{
+		name:  projection.LDAPPhoneAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPPhoneVerifiedAttributeCol = Column{
+		name:  projection.LDAPPhoneVerifiedAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPPreferredLanguageAttributeCol = Column{
+		name:  projection.LDAPPreferredLanguageAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPAvatarURLAttributeCol = Column{
+		name:  projection.LDAPAvatarURLAttributeCol,
+		table: ldapIdpTemplateTable,
+	}
+	LDAPProfileAttributeCol = Column{
+		name:  projection.LDAPProfileAttributeCol,
+		table: ldapIdpTemplateTable,
 	}
 )
 
@@ -377,6 +501,106 @@ var (
 	}
 )
 
+// IDPTemplateByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
+func (q *Queries) IDPTemplateByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk bool, id, resourceOwner string, withOwnerRemoved bool) (_ *IDPTemplate, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		err := projection.IDPTemplateProjection.Trigger(ctx)
+		logging.OnError(err).WithField("projection", idpTemplateTable.identifier()).Warn("could not trigger projection for query")
+	}
+
+	eq := sq.Eq{
+		IDPTemplateIDCol.identifier():         id,
+		IDPTemplateInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[IDPTemplateOwnerRemovedCol.identifier()] = false
+	}
+	where := sq.And{
+		eq,
+		sq.Or{
+			sq.Eq{IDPTemplateResourceOwnerCol.identifier(): resourceOwner},
+			sq.Eq{IDPTemplateResourceOwnerCol.identifier(): authz.GetInstance(ctx).InstanceID()},
+		},
+	}
+	stmt, scan := prepareIDPTemplateByIDQuery()
+	query, args, err := stmt.Where(where).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-SFAew", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+// IDPTemplates searches idp templates matching the query
+func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQueries, withOwnerRemoved bool) (idps *IDPTemplates, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareIDPTemplatesQuery()
+	eq := sq.Eq{
+		IDPTemplateInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}
+	if !withOwnerRemoved {
+		eq[IDPTemplateOwnerRemovedCol.identifier()] = false
+	}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-SAF34", "Errors.Query.InvalidRequest")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-BDFrq", "Errors.Internal")
+	}
+	idps, err = scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	idps.LatestSequence, err = q.latestSequence(ctx, idpTemplateTable)
+	return idps, err
+}
+
+type IDPTemplateSearchQueries struct {
+	SearchRequest
+	Queries []SearchQuery
+}
+
+func NewIDPTemplateIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(IDPTemplateIDCol, id, TextEquals)
+}
+
+func NewIDPTemplateOwnerTypeSearchQuery(ownerType domain.IdentityProviderType) (SearchQuery, error) {
+	return NewNumberQuery(IDPTemplateOwnerTypeCol, ownerType, NumberEquals)
+}
+
+func NewIDPTemplateNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
+	return NewTextQuery(IDPTemplateNameCol, value, method)
+}
+
+func NewIDPTemplateResourceOwnerSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPTemplateResourceOwnerCol, value, TextEquals)
+}
+
+func NewIDPTemplateResourceOwnerListSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(IDPTemplateResourceOwnerCol, list, ListIn)
+}
+
+func (q *IDPTemplateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.toQuery(query)
+	}
+	return query
+}
+
 func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTemplate, error)) {
 	return sq.Select(
 			IDPTemplateIDCol.identifier(),
@@ -392,6 +616,28 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			LDAPIDCol.identifier(),
+			LDAPHostCol.identifier(),
+			LDAPPortCol.identifier(),
+			LDAPTlsCol.identifier(),
+			LDAPBaseDNCol.identifier(),
+			LDAPUserObjectClassCol.identifier(),
+			LDAPUserUniqueAttributeCol.identifier(),
+			LDAPAdminCol.identifier(),
+			LDAPPasswordCol.identifier(),
+			LDAPIDAttributeCol.identifier(),
+			LDAPFirstNameAttributeCol.identifier(),
+			LDAPLastNameAttributeCol.identifier(),
+			LDAPDisplayNameAttributeCol.identifier(),
+			LDAPNickNameAttributeCol.identifier(),
+			LDAPPreferredUsernameAttributeCol.identifier(),
+			LDAPEmailAttributeCol.identifier(),
+			LDAPEmailVerifiedAttributeCol.identifier(),
+			LDAPPhoneAttributeCol.identifier(),
+			LDAPPhoneVerifiedAttributeCol.identifier(),
+			LDAPPreferredLanguageAttributeCol.identifier(),
+			LDAPAvatarURLAttributeCol.identifier(),
+			LDAPProfileAttributeCol.identifier(),
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
 			OIDCClientIDCol.identifier(),
@@ -428,6 +674,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			AzureADTenantCol.identifier(),
 			AzureADIsEmailVerified.identifier(),
 		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
@@ -437,7 +684,30 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			LeftJoin(join(AzureADIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
-			idp := new(IDPTemplate)
+			idpTemplate := new(IDPTemplate)
+
+			ldapID := sql.NullString{}
+			ldapHost := sql.NullString{}
+			ldapPort := sql.NullString{}
+			ldapTls := sql.NullBool{}
+			ldapBaseDN := sql.NullString{}
+			ldapUserObjectClass := sql.NullString{}
+			ldapUserUniqueAttribute := sql.NullString{}
+			ldapAdmin := sql.NullString{}
+			ldapPassword := new(crypto.CryptoValue)
+			ldapIDAttribute := sql.NullString{}
+			ldapFirstNameAttribute := sql.NullString{}
+			ldapLastNameAttribute := sql.NullString{}
+			ldapDisplayNameAttribute := sql.NullString{}
+			ldapNickNameAttribute := sql.NullString{}
+			ldapPreferredUsernameAttribute := sql.NullString{}
+			ldapEmailAttribute := sql.NullString{}
+			ldapEmailVerifiedAttribute := sql.NullString{}
+			ldapPhoneAttribute := sql.NullString{}
+			ldapPhoneVerifiedAttribute := sql.NullString{}
+			ldapPreferredLanguageAttribute := sql.NullString{}
+			ldapAvatarURLAttribute := sql.NullString{}
+			ldapProfileAttribute := sql.NullString{}
 
 			oidcID := sql.NullString{}
 			oidcClientID := sql.NullString{}
@@ -482,19 +752,41 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			azureadIsEmailVerified := sql.NullBool{}
 
 			err := row.Scan(
-				&idp.ID,
-				&idp.ResourceOwner,
-				&idp.CreationDate,
-				&idp.ChangeDate,
-				&idp.Sequence,
-				&idp.State,
-				&idp.Name,
-				&idp.Type,
-				&idp.OwnerType,
-				&idp.IsCreationAllowed,
-				&idp.IsLinkingAllowed,
-				&idp.IsAutoCreation,
-				&idp.IsAutoUpdate,
+				&idpTemplate.ID,
+				&idpTemplate.ResourceOwner,
+				&idpTemplate.CreationDate,
+				&idpTemplate.ChangeDate,
+				&idpTemplate.Sequence,
+				&idpTemplate.State,
+				&idpTemplate.Name,
+				&idpTemplate.Type,
+				&idpTemplate.OwnerType,
+				&idpTemplate.IsCreationAllowed,
+				&idpTemplate.IsLinkingAllowed,
+				&idpTemplate.IsAutoCreation,
+				&idpTemplate.IsAutoUpdate,
+				&ldapID,
+				&ldapHost,
+				&ldapPort,
+				&ldapTls,
+				&ldapBaseDN,
+				&ldapUserObjectClass,
+				&ldapUserUniqueAttribute,
+				&ldapAdmin,
+				&ldapPassword,
+				&ldapIDAttribute,
+				&ldapFirstNameAttribute,
+				&ldapLastNameAttribute,
+				&ldapDisplayNameAttribute,
+				&ldapNickNameAttribute,
+				&ldapPreferredUsernameAttribute,
+				&ldapEmailAttribute,
+				&ldapEmailVerifiedAttribute,
+				&ldapPhoneAttribute,
+				&ldapPhoneVerifiedAttribute,
+				&ldapPreferredLanguageAttribute,
+				&ldapAvatarURLAttribute,
+				&ldapProfileAttribute,
 				&oidcID,
 				&oidcClientID,
 				&oidcClientSecret,
@@ -539,7 +831,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			}
 
 			if oidcID.Valid {
-				idp.OIDCIDPTemplate = &OIDCIDPTemplate{
+				idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
 					IDPID:        oidcID.String,
 					ClientID:     oidcClientID.String,
 					ClientSecret: oidcClientSecret,
@@ -547,7 +839,7 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					Scopes:       oidcScopes,
 				}
 			} else if jwtID.Valid {
-				idp.JWTIDPTemplate = &JWTIDPTemplate{
+				idpTemplate.JWTIDPTemplate = &JWTIDPTemplate{
 					IDPID:        jwtID.String,
 					Issuer:       jwtIssuer.String,
 					KeysEndpoint: jwtKeysEndpoint.String,
@@ -555,14 +847,14 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					Endpoint:     jwtEndpoint.String,
 				}
 			} else if googleID.Valid {
-				idp.GoogleIDPTemplate = &GoogleIDPTemplate{
+				idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
 					IDPID:        googleID.String,
 					ClientID:     googleClientID.String,
 					ClientSecret: googleClientSecret,
 					Scopes:       googleScopes,
 				}
 			} else if oauthID.Valid {
-				idp.OAuthIDPTemplate = &OAuthIDPTemplate{
+				idpTemplate.OAuthIDPTemplate = &OAuthIDPTemplate{
 					IDPID:                 oauthID.String,
 					ClientID:              oauthClientID.String,
 					ClientSecret:          oauthClientSecret,
@@ -572,21 +864,21 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					Scopes:                oauthScopes,
 				}
 			} else if githubID.Valid {
-				idp.GitHubIDPTemplate = &GitHubIDPTemplate{
+				idpTemplate.GitHubIDPTemplate = &GitHubIDPTemplate{
 					IDPID:        githubID.String,
 					ClientID:     githubClientID.String,
 					ClientSecret: githubClientSecret,
 					Scopes:       githubScopes,
 				}
 			} else if gitlabID.Valid {
-				idp.GitLabIDPTemplate = &GitLabIDPTemplate{
+				idpTemplate.GitLabIDPTemplate = &GitLabIDPTemplate{
 					IDPID:        gitlabID.String,
 					ClientID:     gitlabClientID.String,
 					ClientSecret: gitlabClientSecret,
 					Scopes:       gitlabScopes,
 				}
 			} else if azureadID.Valid {
-				idp.AzureADIDPTemplate = &AzureADIDPTemplate{
+				idpTemplate.AzureADIDPTemplate = &AzureADIDPTemplate{
 					IDPID:           azureadID.String,
 					ClientID:        azureadClientID.String,
 					ClientSecret:    azureadClientSecret,
@@ -594,8 +886,192 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 					Tenant:          azureadTenant.String,
 					IsEmailVerified: azureadIsEmailVerified.Bool,
 				}
+			} else if ldapID.Valid {
+				idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
+					IDPID:               ldapID.String,
+					Host:                ldapHost.String,
+					Port:                ldapPort.String,
+					TLS:                 ldapTls.Bool,
+					BaseDN:              ldapBaseDN.String,
+					UserObjectClass:     ldapUserObjectClass.String,
+					UserUniqueAttribute: ldapUserUniqueAttribute.String,
+					Admin:               ldapAdmin.String,
+					Password:            ldapPassword,
+					LDAPAttributes: idp.LDAPAttributes{
+						IDAttribute:                ldapIDAttribute.String,
+						FirstNameAttribute:         ldapFirstNameAttribute.String,
+						LastNameAttribute:          ldapLastNameAttribute.String,
+						DisplayNameAttribute:       ldapDisplayNameAttribute.String,
+						NickNameAttribute:          ldapNickNameAttribute.String,
+						PreferredUsernameAttribute: ldapPreferredUsernameAttribute.String,
+						EmailAttribute:             ldapEmailAttribute.String,
+						EmailVerifiedAttribute:     ldapEmailVerifiedAttribute.String,
+						PhoneAttribute:             ldapPhoneAttribute.String,
+						PhoneVerifiedAttribute:     ldapPhoneVerifiedAttribute.String,
+						PreferredLanguageAttribute: ldapPreferredLanguageAttribute.String,
+						AvatarURLAttribute:         ldapAvatarURLAttribute.String,
+						ProfileAttribute:           ldapProfileAttribute.String,
+					},
+				}
 			}
 
-			return idp, nil
+			return idpTemplate, nil
+		}
+}
+
+func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplates, error)) {
+	return sq.Select(
+			IDPTemplateIDCol.identifier(),
+			IDPTemplateResourceOwnerCol.identifier(),
+			IDPTemplateCreationDateCol.identifier(),
+			IDPTemplateChangeDateCol.identifier(),
+			IDPTemplateSequenceCol.identifier(),
+			IDPTemplateStateCol.identifier(),
+			IDPTemplateNameCol.identifier(),
+			IDPTemplateTypeCol.identifier(),
+			IDPTemplateOwnerTypeCol.identifier(),
+			IDPTemplateIsCreationAllowedCol.identifier(),
+			IDPTemplateIsLinkingAllowedCol.identifier(),
+			IDPTemplateIsAutoCreationCol.identifier(),
+			IDPTemplateIsAutoUpdateCol.identifier(),
+			LDAPIDCol.identifier(),
+			LDAPHostCol.identifier(),
+			LDAPPortCol.identifier(),
+			LDAPTlsCol.identifier(),
+			LDAPBaseDNCol.identifier(),
+			LDAPUserObjectClassCol.identifier(),
+			LDAPUserUniqueAttributeCol.identifier(),
+			LDAPAdminCol.identifier(),
+			LDAPPasswordCol.identifier(),
+			LDAPIDAttributeCol.identifier(),
+			LDAPFirstNameAttributeCol.identifier(),
+			LDAPLastNameAttributeCol.identifier(),
+			LDAPDisplayNameAttributeCol.identifier(),
+			LDAPNickNameAttributeCol.identifier(),
+			LDAPPreferredUsernameAttributeCol.identifier(),
+			LDAPEmailAttributeCol.identifier(),
+			LDAPEmailVerifiedAttributeCol.identifier(),
+			LDAPPhoneAttributeCol.identifier(),
+			LDAPPhoneVerifiedAttributeCol.identifier(),
+			LDAPPreferredLanguageAttributeCol.identifier(),
+			LDAPAvatarURLAttributeCol.identifier(),
+			LDAPProfileAttributeCol.identifier(),
+			countColumn.identifier(),
+		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*IDPTemplates, error) {
+			templates := make([]*IDPTemplate, 0)
+			var count uint64
+			for rows.Next() {
+				idpTemplate := new(IDPTemplate)
+
+				ldapID := sql.NullString{}
+				ldapHost := sql.NullString{}
+				ldapPort := sql.NullString{}
+				ldapTls := sql.NullBool{}
+				ldapBaseDN := sql.NullString{}
+				ldapUserObjectClass := sql.NullString{}
+				ldapUserUniqueAttribute := sql.NullString{}
+				ldapAdmin := sql.NullString{}
+				ldapPassword := new(crypto.CryptoValue)
+				ldapIDAttribute := sql.NullString{}
+				ldapFirstNameAttribute := sql.NullString{}
+				ldapLastNameAttribute := sql.NullString{}
+				ldapDisplayNameAttribute := sql.NullString{}
+				ldapNickNameAttribute := sql.NullString{}
+				ldapPreferredUsernameAttribute := sql.NullString{}
+				ldapEmailAttribute := sql.NullString{}
+				ldapEmailVerifiedAttribute := sql.NullString{}
+				ldapPhoneAttribute := sql.NullString{}
+				ldapPhoneVerifiedAttribute := sql.NullString{}
+				ldapPreferredLanguageAttribute := sql.NullString{}
+				ldapAvatarURLAttribute := sql.NullString{}
+				ldapProfileAttribute := sql.NullString{}
+
+				err := rows.Scan(
+					&idpTemplate.ID,
+					&idpTemplate.ResourceOwner,
+					&idpTemplate.CreationDate,
+					&idpTemplate.ChangeDate,
+					&idpTemplate.Sequence,
+					&idpTemplate.State,
+					&idpTemplate.Name,
+					&idpTemplate.Type,
+					&idpTemplate.OwnerType,
+					&idpTemplate.IsCreationAllowed,
+					&idpTemplate.IsLinkingAllowed,
+					&idpTemplate.IsAutoCreation,
+					&idpTemplate.IsAutoUpdate,
+					&ldapID,
+					&ldapHost,
+					&ldapPort,
+					&ldapTls,
+					&ldapBaseDN,
+					&ldapUserObjectClass,
+					&ldapUserUniqueAttribute,
+					&ldapAdmin,
+					&ldapPassword,
+					&ldapIDAttribute,
+					&ldapFirstNameAttribute,
+					&ldapLastNameAttribute,
+					&ldapDisplayNameAttribute,
+					&ldapNickNameAttribute,
+					&ldapPreferredUsernameAttribute,
+					&ldapEmailAttribute,
+					&ldapEmailVerifiedAttribute,
+					&ldapPhoneAttribute,
+					&ldapPhoneVerifiedAttribute,
+					&ldapPreferredLanguageAttribute,
+					&ldapAvatarURLAttribute,
+					&ldapProfileAttribute,
+					&count,
+				)
+
+				if err != nil {
+					return nil, err
+				}
+
+				if ldapID.Valid {
+					idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
+						IDPID:               ldapID.String,
+						Host:                ldapHost.String,
+						Port:                ldapPort.String,
+						TLS:                 ldapTls.Bool,
+						BaseDN:              ldapBaseDN.String,
+						UserObjectClass:     ldapUserObjectClass.String,
+						UserUniqueAttribute: ldapUserUniqueAttribute.String,
+						Admin:               ldapAdmin.String,
+						Password:            ldapPassword,
+						LDAPAttributes: idp.LDAPAttributes{
+							IDAttribute:                ldapIDAttribute.String,
+							FirstNameAttribute:         ldapFirstNameAttribute.String,
+							LastNameAttribute:          ldapLastNameAttribute.String,
+							DisplayNameAttribute:       ldapDisplayNameAttribute.String,
+							NickNameAttribute:          ldapNickNameAttribute.String,
+							PreferredUsernameAttribute: ldapPreferredUsernameAttribute.String,
+							EmailAttribute:             ldapEmailAttribute.String,
+							EmailVerifiedAttribute:     ldapEmailVerifiedAttribute.String,
+							PhoneAttribute:             ldapPhoneAttribute.String,
+							PhoneVerifiedAttribute:     ldapPhoneVerifiedAttribute.String,
+							PreferredLanguageAttribute: ldapPreferredLanguageAttribute.String,
+							AvatarURLAttribute:         ldapAvatarURLAttribute.String,
+							ProfileAttribute:           ldapProfileAttribute.String,
+						},
+					}
+				}
+				templates = append(templates, idpTemplate)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-SAGrt", "Errors.Query.CloseRows")
+			}
+
+			return &IDPTemplates{
+				Templates: templates,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
 		}
 }

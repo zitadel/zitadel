@@ -13,6 +13,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
+var ErrNoSingleUser = errors.New("user does not exist or too many entries returned")
+
 var _ idp.Session = (*Session)(nil)
 
 type Session struct {
@@ -33,7 +35,7 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 	defer l.Close()
 
 	if s.Provider.tls {
-		err = l.StartTLS(&tls.Config{InsecureSkipVerify: true})
+		err = l.StartTLS(&tls.Config{ServerName: s.Provider.host})
 		if err != nil {
 			return nil, err
 		}
@@ -59,7 +61,7 @@ func (s *Session) FetchUser(_ context.Context) (idp.User, error) {
 		return nil, err
 	}
 	if len(sr.Entries) != 1 {
-		return nil, errors.New("User does not exist or too many entries returned")
+		return nil, ErrNoSingleUser
 	}
 
 	user := sr.Entries[0]

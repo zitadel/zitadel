@@ -6,6 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp"
 )
 
+const DefaultPort = "389"
+
 var _ idp.Provider = (*Provider)(nil)
 
 // Provider is the [idp.Provider] implementation for a generic LDAP provider
@@ -191,7 +193,7 @@ func New(
 	provider := &Provider{
 		name:                name,
 		host:                host,
-		port:                "389",
+		port:                DefaultPort,
 		tls:                 true,
 		baseDN:              baseDN,
 		userObjectClass:     userObjectClass,
@@ -221,12 +223,15 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 func (p *Provider) IsLinkingAllowed() bool {
 	return p.isLinkingAllowed
 }
+
 func (p *Provider) IsCreationAllowed() bool {
 	return p.isCreationAllowed
 }
+
 func (p *Provider) IsAutoCreation() bool {
 	return p.isAutoCreation
 }
+
 func (p *Provider) IsAutoUpdate() bool {
 	return p.isAutoUpdate
 }

@@ -109,6 +109,7 @@ func TestAddMember(t *testing.T) {
 								"name",
 								"description",
 								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						}, nil
 					}).
@@ -148,6 +149,7 @@ func TestAddMember(t *testing.T) {
 								"name",
 								"description",
 								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						}, nil
 					}).

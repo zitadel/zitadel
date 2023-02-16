@@ -28,8 +28,100 @@ const (
 	GitLabSelfHostedIDPChangedEventType eventstore.EventType = "org.idp.gitlab_self_hosted.changed"
 	GoogleIDPAddedEventType             eventstore.EventType = "org.idp.google.added"
 	GoogleIDPChangedEventType           eventstore.EventType = "org.idp.google.changed"
+	LDAPIDPAddedEventType               eventstore.EventType = "org.idp.ldap.added"
+	LDAPIDPChangedEventType             eventstore.EventType = "org.idp.ldap.changed"
 	IDPRemovedEventType                 eventstore.EventType = "instance.idp.removed"
 )
+
+type LDAPIDPAddedEvent struct {
+	idp.LDAPIDPAddedEvent
+}
+
+func NewLDAPIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	host,
+	port string,
+	tls bool,
+	baseDN,
+	userObjectClass,
+	userUniqueAttribute,
+	admin string,
+	password *crypto.CryptoValue,
+	attributes idp.LDAPAttributes,
+	options idp.Options,
+) *LDAPIDPAddedEvent {
+
+	return &LDAPIDPAddedEvent{
+		LDAPIDPAddedEvent: *idp.NewLDAPIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				LDAPIDPAddedEventType,
+			),
+			id,
+			name,
+			host,
+			port,
+			tls,
+			baseDN,
+			userObjectClass,
+			userUniqueAttribute,
+			admin,
+			password,
+			attributes,
+			options,
+		),
+	}
+}
+
+func LDAPIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.LDAPIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LDAPIDPAddedEvent{LDAPIDPAddedEvent: *e.(*idp.LDAPIDPAddedEvent)}, nil
+}
+
+type LDAPIDPChangedEvent struct {
+	idp.LDAPIDPChangedEvent
+}
+
+func NewLDAPIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	oldName string,
+	changes []idp.LDAPIDPChanges,
+) (*LDAPIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewLDAPIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			LDAPIDPChangedEventType,
+		),
+		id,
+		oldName,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &LDAPIDPChangedEvent{LDAPIDPChangedEvent: *changedEvent}, nil
+}
+
+func LDAPIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.LDAPIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LDAPIDPChangedEvent{LDAPIDPChangedEvent: *e.(*idp.LDAPIDPChangedEvent)}, nil
+}
 
 type OAuthIDPAddedEvent struct {
 	idp.OAuthIDPAddedEvent

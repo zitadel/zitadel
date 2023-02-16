@@ -784,16 +784,66 @@ all fields are updated. If no value is provided the field will be empty afterwar
     POST: /idps/google/{id}
 
 
+### ListProviders
+
+> **rpc** ListProviders([ListProvidersRequest](#listprovidersrequest))
+[ListProvidersResponse](#listprovidersresponse)
+
+Returns all identity providers, which match the query
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /idps/templates/_search
+
+
+### GetProviderByID
+
+> **rpc** GetProviderByID([GetProviderByIDRequest](#getproviderbyidrequest))
+[GetProviderByIDResponse](#getproviderbyidresponse)
+
+Returns an identity provider of the instance
+
+
+
+    GET: /idps/templates/{id}
+
+
+### AddLDAPProvider
+
+> **rpc** AddLDAPProvider([AddLDAPProviderRequest](#addldapproviderrequest))
+[AddLDAPProviderResponse](#addldapproviderresponse)
+
+Add a new ldap identity provider on the instance
+
+
+
+    POST: /idps/ldap
+
+
+### UpdateLDAPProvider
+
+> **rpc** UpdateLDAPProvider([UpdateLDAPProviderRequest](#updateldapproviderrequest))
+[UpdateLDAPProviderResponse](#updateldapproviderresponse)
+
+Change an existing ldap identity provider on the instance
+
+
+
+    POST: /idps/ldap/{id}
+
+
 ### DeleteProvider
 
 > **rpc** DeleteProvider([DeleteProviderRequest](#deleteproviderrequest))
 [DeleteProviderResponse](#deleteproviderresponse)
 
+Remove an identity provider
+Will remove all linked providers of this configuration on the users
 
 
 
-
-    POST: /idps/{id}
+    POST: /idps/templates/{id}
 
 
 ### GetOrgIAMPolicy
@@ -2340,6 +2390,39 @@ This is an empty request
 
 
 
+### AddLDAPProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| port |  string | - | string.max_len: 5<br />  |
+| tls |  bool | - |  |
+| base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_unique_attribute |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| admin |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| password |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| attributes |  zitadel.idp.v1.LDAPAttributes | - |  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
+
+
+
+
+### AddLDAPProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
 ### AddMultiFactorToLoginPolicyRequest
 
 
@@ -3425,6 +3508,28 @@ This is an empty request
 
 
 
+### GetProviderByIDRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetProviderByIDResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp |  zitadel.idp.v1.Provider | - |  |
+
+
+
+
 ### GetSMSProviderRequest
 
 
@@ -4042,6 +4147,30 @@ This is an empty request
 
 
 
+### ListProvidersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated ProviderQuery | criteria the client is looking for |  |
+
+
+
+
+### ListProvidersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.idp.v1.Provider | - |  |
+
+
+
+
 ### ListSMSProvidersRequest
 
 
@@ -4102,6 +4231,18 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | result | repeated View | TODO: list details |  |
+
+
+
+
+### ProviderQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_id_query |  zitadel.idp.v1.IDPIDQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_name_query |  zitadel.idp.v1.IDPNameQuery | - |  |
 
 
 
@@ -5457,6 +5598,39 @@ this is en empty request
 
 
 ### UpdateJWTProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateLDAPProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| port |  string | - | string.max_len: 5<br />  |
+| tls |  bool | - |  |
+| base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_unique_attribute |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| admin |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| password |  string | - | string.max_len: 200<br />  |
+| attributes |  zitadel.idp.v1.LDAPAttributes | - |  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
+
+
+
+
+### UpdateLDAPProviderResponse
 
 
 

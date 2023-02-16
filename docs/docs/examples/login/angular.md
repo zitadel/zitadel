@@ -13,8 +13,8 @@ At the end of the guide, your application has login functionality and has access
 
 Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
 You will need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
-Select Web application type and continue.
-We recommend you use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
+Select **User Agent** application type and continue.
+We recommend you use [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
 
 ![Create app in console](/img/angular/app-create.png)
 
