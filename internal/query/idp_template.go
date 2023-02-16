@@ -710,16 +710,16 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			ldapProfileAttribute := sql.NullString{}
 
 			oidcID := sql.NullString{}
+			oidcIssuer := sql.NullString{}
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
-			oidcIssuer := sql.NullString{}
 			oidcScopes := database.StringArray{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
+			jwtEndpoint := sql.NullString{}
 			jwtKeysEndpoint := sql.NullString{}
 			jwtHeaderName := sql.NullString{}
-			jwtEndpoint := sql.NullString{}
 
 			googleID := sql.NullString{}
 			googleClientID := sql.NullString{}
@@ -788,15 +788,15 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&ldapAvatarURLAttribute,
 				&ldapProfileAttribute,
 				&oidcID,
+				&oidcIssuer,
 				&oidcClientID,
 				&oidcClientSecret,
-				&oidcIssuer,
 				&oidcScopes,
 				&jwtID,
 				&jwtIssuer,
+				&jwtEndpoint,
 				&jwtKeysEndpoint,
 				&jwtHeaderName,
-				&jwtEndpoint,
 				&googleID,
 				&googleClientID,
 				&googleClientSecret,
@@ -825,9 +825,9 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-rhR2o", "Errors.IDPConfig.NotExisting")
+					return nil, errors.ThrowNotFound(err, "QUERY-aps02m", "Errors.IDPConfig.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-zE3Ro", "Errors.Internal")
+				return nil, errors.ThrowInternal(err, "QUERY-x900okn2", "Errors.Internal")
 			}
 
 			if oidcID.Valid {
@@ -956,9 +956,51 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			LDAPPreferredLanguageAttributeCol.identifier(),
 			LDAPAvatarURLAttributeCol.identifier(),
 			LDAPProfileAttributeCol.identifier(),
+			OIDCIDCol.identifier(),
+			OIDCIssuerCol.identifier(),
+			OIDCClientIDCol.identifier(),
+			OIDCClientSecretCol.identifier(),
+			OIDCScopesCol.identifier(),
+			JWTIDCol.identifier(),
+			JWTIssuerCol.identifier(),
+			JWTEndpointCol.identifier(),
+			JWTKeysEndpointCol.identifier(),
+			JWTHeaderNameCol.identifier(),
+			GoogleIDCol.identifier(),
+			GoogleClientIDCol.identifier(),
+			GoogleClientSecretCol.identifier(),
+			GoogleScopesCol.identifier(),
+			OAuthIDCol.identifier(),
+			OAuthClientIDCol.identifier(),
+			OAuthClientSecretCol.identifier(),
+			OAuthAuthorizationEndpointCol.identifier(),
+			OAuthTokenEndpointCol.identifier(),
+			OAuthUserEndpointCol.identifier(),
+			OAuthScopesCol.identifier(),
+			GitHubIDCol.identifier(),
+			GitHubClientIDCol.identifier(),
+			GitHubClientSecretCol.identifier(),
+			GitHubScopesCol.identifier(),
+			GitLabIDCol.identifier(),
+			GitLabClientIDCol.identifier(),
+			GitLabClientSecretCol.identifier(),
+			GitLabScopesCol.identifier(),
+			AzureADIDCol.identifier(),
+			AzureADClientIDCol.identifier(),
+			AzureADClientSecretCol.identifier(),
+			AzureADScopesCol.identifier(),
+			AzureADTenantCol.identifier(),
+			AzureADIsEmailVerified.identifier(),
 			countColumn.identifier(),
 		).From(idpTemplateTable.identifier()).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(OIDCIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(JWTIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(OAuthIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitHubIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(GitLabIDCol, IDPTemplateIDCol)).
+			LeftJoin(join(AzureADIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
 			templates := make([]*IDPTemplate, 0)
@@ -989,6 +1031,47 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 				ldapAvatarURLAttribute := sql.NullString{}
 				ldapProfileAttribute := sql.NullString{}
 
+				oidcID := sql.NullString{}
+				oidcIssuer := sql.NullString{}
+				oidcClientID := sql.NullString{}
+				oidcClientSecret := new(crypto.CryptoValue)
+				oidcScopes := database.StringArray{}
+
+				jwtID := sql.NullString{}
+				jwtIssuer := sql.NullString{}
+				jwtEndpoint := sql.NullString{}
+				jwtKeysEndpoint := sql.NullString{}
+				jwtHeaderName := sql.NullString{}
+
+				googleID := sql.NullString{}
+				googleClientID := sql.NullString{}
+				googleClientSecret := new(crypto.CryptoValue)
+				googleScopes := database.StringArray{}
+
+				oauthID := sql.NullString{}
+				oauthClientID := sql.NullString{}
+				oauthClientSecret := new(crypto.CryptoValue)
+				oauthAuthorizationEndpoint := sql.NullString{}
+				oauthTokenEndpoint := sql.NullString{}
+				oauthUserEndpoint := sql.NullString{}
+				oauthScopes := database.StringArray{}
+
+				githubID := sql.NullString{}
+				githubClientID := sql.NullString{}
+				githubClientSecret := new(crypto.CryptoValue)
+				githubScopes := database.StringArray{}
+
+				gitlabID := sql.NullString{}
+				gitlabClientID := sql.NullString{}
+				gitlabClientSecret := new(crypto.CryptoValue)
+				gitlabScopes := database.StringArray{}
+
+				azureadID := sql.NullString{}
+				azureadClientID := sql.NullString{}
+				azureadClientSecret := new(crypto.CryptoValue)
+				azureadScopes := database.StringArray{}
+				azureadTenant := sql.NullString{}
+				azureadIsEmailVerified := sql.NullBool{}
 				err := rows.Scan(
 					&idpTemplate.ID,
 					&idpTemplate.ResourceOwner,
@@ -1025,6 +1108,41 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&ldapPreferredLanguageAttribute,
 					&ldapAvatarURLAttribute,
 					&ldapProfileAttribute,
+					&oidcID,
+					&oidcIssuer,
+					&oidcClientID,
+					&oidcClientSecret,
+					&oidcScopes,
+					&jwtID,
+					&jwtIssuer,
+					&jwtEndpoint,
+					&jwtKeysEndpoint,
+					&jwtHeaderName,
+					&googleID,
+					&googleClientID,
+					&googleClientSecret,
+					&googleScopes,
+					&oauthID,
+					&oauthClientID,
+					&oauthClientSecret,
+					&oauthAuthorizationEndpoint,
+					&oauthTokenEndpoint,
+					&oauthUserEndpoint,
+					&oauthScopes,
+					&githubID,
+					&githubClientID,
+					&githubClientSecret,
+					&githubScopes,
+					&gitlabID,
+					&gitlabClientID,
+					&gitlabClientSecret,
+					&gitlabScopes,
+					&azureadID,
+					&azureadClientID,
+					&azureadClientSecret,
+					&azureadScopes,
+					&azureadTenant,
+					&azureadIsEmailVerified,
 					&count,
 				)
 
@@ -1032,7 +1150,63 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					return nil, err
 				}
 
-				if ldapID.Valid {
+				if oidcID.Valid {
+					idpTemplate.OIDCIDPTemplate = &OIDCIDPTemplate{
+						IDPID:        oidcID.String,
+						ClientID:     oidcClientID.String,
+						ClientSecret: oidcClientSecret,
+						Issuer:       oidcIssuer.String,
+						Scopes:       oidcScopes,
+					}
+				} else if jwtID.Valid {
+					idpTemplate.JWTIDPTemplate = &JWTIDPTemplate{
+						IDPID:        jwtID.String,
+						Issuer:       jwtIssuer.String,
+						KeysEndpoint: jwtKeysEndpoint.String,
+						HeaderName:   jwtHeaderName.String,
+						Endpoint:     jwtEndpoint.String,
+					}
+				} else if googleID.Valid {
+					idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
+						IDPID:        googleID.String,
+						ClientID:     googleClientID.String,
+						ClientSecret: googleClientSecret,
+						Scopes:       googleScopes,
+					}
+				} else if oauthID.Valid {
+					idpTemplate.OAuthIDPTemplate = &OAuthIDPTemplate{
+						IDPID:                 oauthID.String,
+						ClientID:              oauthClientID.String,
+						ClientSecret:          oauthClientSecret,
+						AuthorizationEndpoint: oauthAuthorizationEndpoint.String,
+						TokenEndpoint:         oauthTokenEndpoint.String,
+						UserEndpoint:          oauthUserEndpoint.String,
+						Scopes:                oauthScopes,
+					}
+				} else if githubID.Valid {
+					idpTemplate.GitHubIDPTemplate = &GitHubIDPTemplate{
+						IDPID:        githubID.String,
+						ClientID:     githubClientID.String,
+						ClientSecret: githubClientSecret,
+						Scopes:       githubScopes,
+					}
+				} else if gitlabID.Valid {
+					idpTemplate.GitLabIDPTemplate = &GitLabIDPTemplate{
+						IDPID:        gitlabID.String,
+						ClientID:     gitlabClientID.String,
+						ClientSecret: gitlabClientSecret,
+						Scopes:       gitlabScopes,
+					}
+				} else if azureadID.Valid {
+					idpTemplate.AzureADIDPTemplate = &AzureADIDPTemplate{
+						IDPID:           azureadID.String,
+						ClientID:        azureadClientID.String,
+						ClientSecret:    azureadClientSecret,
+						Scopes:          azureadScopes,
+						Tenant:          azureadTenant.String,
+						IsEmailVerified: azureadIsEmailVerified.Bool,
+					}
+				} else if ldapID.Valid {
 					idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 						IDPID:               ldapID.String,
 						Host:                ldapHost.String,
