@@ -1803,7 +1803,7 @@ func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
 					nil,
 				), instance.InstanceRemovedEventMapper),
 			},
-			reduce: reduceInstanceRemovedHelper(IDPInstanceIDCol),
+			reduce: reduceInstanceRemovedHelper(IDPTemplateInstanceIDCol),
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
@@ -2241,7 +2241,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 		},
 		{
 			name:   "org.reduceOwnerRemoved",
-			reduce: (&idpProjection{}).reduceOwnerRemoved,
+			reduce: (&idpTemplateProjection{}).reduceOwnerRemoved,
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.OrgRemovedEventType),

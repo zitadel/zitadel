@@ -264,7 +264,7 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(AzureADIsEmailVerified, crdb.ColumnTypeBool),
 		},
 			crdb.NewPrimaryKey(AzureADInstanceIDCol, AzureADIDCol),
-			IDPTemplateGitLabSuffix,
+			IDPTemplateAzureADSuffix,
 			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
 		),
 	)
@@ -616,22 +616,22 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
 	cols = append(cols,
-		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
 	oidcCols := make([]handler.Column, 0, 4)
 	if idpEvent.ClientID != nil {
-		oidcCols = append(oidcCols, handler.NewCol(OIDCConfigClientIDCol, *idpEvent.ClientID))
+		oidcCols = append(oidcCols, handler.NewCol(OIDCClientIDCol, *idpEvent.ClientID))
 	}
 	if idpEvent.ClientSecret != nil {
-		oidcCols = append(oidcCols, handler.NewCol(OIDCConfigClientSecretCol, *idpEvent.ClientSecret))
+		oidcCols = append(oidcCols, handler.NewCol(OIDCClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Issuer != nil {
-		oidcCols = append(oidcCols, handler.NewCol(OIDCConfigIssuerCol, *idpEvent.Issuer))
+		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
 	}
 	if idpEvent.Scopes != nil {
-		oidcCols = append(oidcCols, handler.NewCol(OIDCConfigScopesCol, database.StringArray(idpEvent.Scopes)))
+		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
 	}
 	if len(cols) == 0 && len(oidcCols) == 0 {
 		return crdb.NewNoOpStatement(&idpEvent), nil
@@ -643,8 +643,8 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 			crdb.AddUpdateStatement(
 				cols,
 				[]handler.Condition{
-					handler.NewCond(IDPIDCol, idpEvent.ID),
-					handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 			),
 		)
@@ -744,8 +744,8 @@ func (p *idpTemplateProjection) reduceJWTIDPChanged(event eventstore.Event) (*ha
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
 	cols = append(cols,
-		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
 	jwtCols := make([]handler.Column, 0, 4)
@@ -771,8 +771,8 @@ func (p *idpTemplateProjection) reduceJWTIDPChanged(event eventstore.Event) (*ha
 			crdb.AddUpdateStatement(
 				cols,
 				[]handler.Condition{
-					handler.NewCond(IDPIDCol, idpEvent.ID),
-					handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 			),
 		)
@@ -867,8 +867,8 @@ func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
 	cols = append(cols,
-		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
 	googleCols := make([]handler.Column, 0, 3)
@@ -891,8 +891,8 @@ func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (
 			crdb.AddUpdateStatement(
 				cols,
 				[]handler.Condition{
-					handler.NewCond(IDPIDCol, idpEvent.ID),
-					handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 			),
 		)
@@ -994,8 +994,8 @@ func (p *idpTemplateProjection) reduceOAuthIDPChanged(event eventstore.Event) (*
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
 	cols = append(cols,
-		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
 	oauthCols := make([]handler.Column, 0, 6)
@@ -1027,8 +1027,8 @@ func (p *idpTemplateProjection) reduceOAuthIDPChanged(event eventstore.Event) (*
 			crdb.AddUpdateStatement(
 				cols,
 				[]handler.Condition{
-					handler.NewCond(IDPIDCol, idpEvent.ID),
-					handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 			),
 		)
@@ -1123,8 +1123,8 @@ func (p *idpTemplateProjection) reduceGitHubIDPChanged(event eventstore.Event) (
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
 	cols = append(cols,
-		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
 	githubCols := make([]handler.Column, 0, 3)
@@ -1147,8 +1147,8 @@ func (p *idpTemplateProjection) reduceGitHubIDPChanged(event eventstore.Event) (
 			crdb.AddUpdateStatement(
 				cols,
 				[]handler.Condition{
-					handler.NewCond(IDPIDCol, idpEvent.ID),
-					handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 			),
 		)
@@ -1243,8 +1243,8 @@ func (p *idpTemplateProjection) reduceGitLabIDPChanged(event eventstore.Event) (
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
 	cols = append(cols,
-		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
 	gitlabCols := make([]handler.Column, 0, 3)
@@ -1267,8 +1267,8 @@ func (p *idpTemplateProjection) reduceGitLabIDPChanged(event eventstore.Event) (
 			crdb.AddUpdateStatement(
 				cols,
 				[]handler.Condition{
-					handler.NewCond(IDPIDCol, idpEvent.ID),
-					handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 			),
 		)
@@ -1368,8 +1368,8 @@ func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) 
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
 	}
 	cols = append(cols,
-		handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
 	AzureADCols := make([]handler.Column, 0, 5)
@@ -1398,8 +1398,8 @@ func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) 
 			crdb.AddUpdateStatement(
 				cols,
 				[]handler.Condition{
-					handler.NewCond(IDPIDCol, idpEvent.ID),
-					handler.NewCond(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
 			),
 		)
