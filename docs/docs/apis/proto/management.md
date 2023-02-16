@@ -3071,7 +3071,7 @@ Change an existing ldap identity provider in the organisation
 
 
 
-    POST: /idps/ldap/{id}
+    PUT: /idps/ldap/{id}
 
 
 ### DeleteProvider
@@ -3084,7 +3084,7 @@ Will remove all linked providers of this configuration on the users
 
 
 
-    POST: /idps/templates/{id}
+    DELETE: /idps/templates/{id}
 
 
 ### ListActions
