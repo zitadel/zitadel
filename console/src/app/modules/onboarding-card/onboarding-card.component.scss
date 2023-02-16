@@ -14,7 +14,6 @@
   .onboarding-card {
     border-radius: 0.5rem;
     z-index: 200;
-    border: 1px solid #ffffff30;
     position: relative;
     min-width: 220px;
     max-width: 280px;
@@ -42,6 +41,12 @@
       p {
         font-size: 14px;
       }
+    }
+
+    .prog-desc {
+      font-style: italic;
+      font-size: 14px;
+      padding: 0 1rem 1rem 1rem;
     }
 
     .actions-list {
@@ -100,6 +105,7 @@
         }
 
         .arrow-right {
+          visibility: hidden;
         }
 
         &.done {
@@ -111,6 +117,10 @@
         &:hover {
           cursor: pointer;
           background-color: #00000010;
+
+          .arrow-right {
+            visibility: visible;
+          }
         }
       }
     }

@@ -1,3 +1,50 @@
 <div class="onboarding-header">
   <h1 class="title" data-e2e="authenticated-welcome">{{ 'HOME.WELCOME' | translate }}</h1>
+  <h1 class="desc cnsl-secondary-text">{{ 'ONBOARDING.DESCRIPTION' | translate }}</h1>
+
+  <div class="onboarding-progress-bar-wrapper">
+    <mat-progress-bar
+      class="progress"
+      mode="determinate"
+      [value]="adminService.progressPercentage | async"
+    ></mat-progress-bar>
+
+    <div class="prog-desc cnsl-secondary-text">
+      {{ adminService.progressDone | async }} / {{ adminService.progressTotal | async }}
+      {{ 'ONBOARDING.COMPLETED' | translate }}
+    </div>
+  </div>
+
+  <div class="action-card-wrapper">
+    <ng-container *ngFor="let action of actions | async | keyvalue">
+      <a
+        [routerLink]="action.value?.link"
+        [queryParams]="{ id: action.value?.fragment }"
+        class="action-card card"
+        [ngClass]="{ done: action.value?.event !== undefined }"
+      >
+        <div class="state-circle">
+          <!-- <i *ngIf="action.value?.event !== undefined" class="las la-check"></i> -->
+
+          <mat-icon class="success-icon" *ngIf="action.value?.event !== undefined" svgIcon="mdi_shield_check"></mat-icon>
+          <mat-icon class="warn-icon" *ngIf="action.value?.event === undefined" svgIcon="mdi_shield_alert"></mat-icon>
+        </div>
+
+        <div class="action-content">
+          <div class="text-block">
+            <span class="name">{{ 'ONBOARDING.EVENTS.' + action.key + '.title' | translate }}</span>
+            <span class="cnsl-secondary-text description">{{
+              'ONBOARDING.EVENTS.' + action.key + '.description' | translate
+            }}</span>
+          </div>
+
+          <span class="fill-space"></span>
+          <div class="action-row">
+            <span>{{ 'ACTIONS.SETUP' | translate }}</span>
+            <mat-icon class="icon">keyboard_arrow_right</mat-icon>
+          </div>
+        </div>
+      </a>
+    </ng-container>
+  </div>
 </div>

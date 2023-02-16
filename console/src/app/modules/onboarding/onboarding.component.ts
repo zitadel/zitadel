@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
@@ -8,12 +9,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
   styleUrls: ['./onboarding.component.scss'],
 })
 export class OnboardingComponent {
-  constructor(public authService: GrpcAuthService, breadcrumbService: BreadcrumbService) {
-    const bread: Breadcrumb = {
-      type: BreadcrumbType.ORG,
-      routerLink: ['/org'],
-    };
+  public actions = this.adminService.progressEvents;
 
-    breadcrumbService.setBreadcrumb([bread]);
-  }
+  constructor(public adminService: AdminService) {}
 }

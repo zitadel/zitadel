@@ -232,15 +232,19 @@ import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
 
 interface OnboardingActions {
+  order: number;
   eventType: string;
   link: string | string[];
+  fragment?: string | undefined;
 }
 
 const ONBOARDING_EVENTS: OnboardingActions[] = [
-  { eventType: 'project.added', link: ['/projects/create'] },
-  { eventType: 'project.application.added', link: ['/projects'] },
-  { eventType: 'org.policy.label.added', link: ['/settings?id=branding'] },
-  { eventType: 'org.policy.notification.added', link: ['/settings?id=notifications'] },
+  { order: 0, eventType: 'project.added', link: ['/projects/create'] },
+  { order: 1, eventType: 'project.application.added', link: ['/projects'] },
+  { order: 2, eventType: 'org.policy.label.added', link: ['/settings'], fragment: 'branding' },
+  { order: 3, eventType: 'org.policy.notification.added', link: ['/settings'], fragment: 'notifications' },
+  { order: 4, eventType: 'users.added', link: ['/users/create'] },
+  { order: 5, eventType: 'user.grant.added', link: ['/grant-create'] },
   //   { eventType: 'org.policy.notification.added', link: '/settings?id=notifications' },
 ];
 
@@ -250,56 +254,63 @@ const ONBOARDING_EVENTS: OnboardingActions[] = [
 export class AdminService {
   private loadEvents: Subject<string[]> = new Subject();
 
-  public progressEvents$: Observable<{ [type: string]: { link: string; event: Event.AsObject } | undefined }> =
-    this.loadEvents.pipe(
-      switchMap((types) => {
-        const eventsReq = new ListEventsRequest().setEventTypesList(types).setAsc(false);
-        return from(this.listEvents(eventsReq)).pipe(
-          map((events) => {
-            const eventList = events.getEventsList().map((event) => event.toObject());
+  public progressEvents$: Observable<{
+    [type: string]: { order?: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
+  }> = this.loadEvents.pipe(
+    switchMap((types) => {
+      const eventsReq = new ListEventsRequest().setEventTypesList(types).setAsc(false);
+      return from(this.listEvents(eventsReq)).pipe(
+        map((events) => {
+          const eventList = events.getEventsList().map((event) => event.toObject());
 
-            let obj = {};
-            types.map((type) => {
-              const filtered = eventList.filter((event) => event.type?.type === type);
-              (obj as any)[type] = filtered.length
-                ? { link: ONBOARDING_EVENTS.find((oe) => oe.eventType === type)?.link, event: filtered[0] }
-                : //   filtered.reduce((prev, current) => {
-                  //       const prevTs: Date = new Date(
-                  //         (prev.creationDate?.seconds ?? 0) * 1000 + (prev.creationDate?.nanos ?? 0) / 1000 / 1000,
-                  //       );
-                  //       const currentTs: Date = new Date(
-                  //         (prev.creationDate?.seconds ?? 0) * 1000 + (prev.creationDate?.nanos ?? 0) / 1000 / 1000,
-                  //       );
-                  //       const check = prevTs > currentTs;
-                  //       return check ? prev : current;
-                  //     })
-                  { link: ONBOARDING_EVENTS.find((oe) => oe.eventType === type)?.link, event: undefined };
-            });
+          let obj = {};
+          types.map((type) => {
+            const filtered = eventList.filter((event) => event.type?.type === type);
+            const el = ONBOARDING_EVENTS.find((oe) => oe.eventType === type);
+            (obj as any)[type] = filtered.length
+              ? { order: el?.order, link: el?.link, fragment: el?.fragment, event: filtered[0] }
+              : //   filtered.reduce((prev, current) => {
+                //       const prevTs: Date = new Date(
+                //         (prev.creationDate?.seconds ?? 0) * 1000 + (prev.creationDate?.nanos ?? 0) / 1000 / 1000,
+                //       );
+                //       const currentTs: Date = new Date(
+                //         (prev.creationDate?.seconds ?? 0) * 1000 + (prev.creationDate?.nanos ?? 0) / 1000 / 1000,
+                //       );
+                //       const check = prevTs > currentTs;
+                //       return check ? prev : current;
+                //     })
+                { order: el?.order, link: el?.link, fragment: el?.fragment, event: undefined };
+          });
 
-            console.log(obj);
-            return obj;
-          }),
-          tap((events) => {
-            const total = Object.keys(events).length;
-            const done = Object.keys(events)
-              .map((type) => (events as any)[type].event !== undefined)
-              .filter((res) => !!res).length;
-            const percentage = Math.round((done / total) * 100);
-            this.progressPercentage.next(percentage);
-          }),
-          catchError((error) => {
-            console.error(error);
-            return of({});
-          }),
-        );
-      }),
-    );
+          console.log(obj);
+          return obj;
+        }),
+        tap((events) => {
+          const total = Object.keys(events).length;
+          const done = Object.keys(events)
+            .map((type) => (events as any)[type].event !== undefined)
+            .filter((res) => !!res).length;
+          const percentage = Math.round((done / total) * 100);
+          this.progressDone.next(done);
+          this.progressTotal.next(total);
+          this.progressPercentage.next(percentage);
+        }),
+        catchError((error) => {
+          console.error(error);
+          return of({});
+        }),
+      );
+    }),
+  );
 
-  public progressEvents: BehaviorSubject<{ [type: string]: { link: string; event: Event.AsObject } | undefined }> =
-    new BehaviorSubject<{
-      [type: string]: { link: string; event: Event.AsObject } | undefined;
-    }>({});
+  public progressEvents: BehaviorSubject<{
+    [type: string]: { order?: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
+  }> = new BehaviorSubject<{
+    [type: string]: { order?: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
+  }>({});
   public progressPercentage: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressDone: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor(private readonly grpcService: GrpcService) {
     this.progressEvents$.subscribe(this.progressEvents);

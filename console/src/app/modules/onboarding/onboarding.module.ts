@@ -10,6 +10,8 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
 import { OnboardingComponent } from './onboarding.component';
+import { RouterModule } from '@angular/router';
+import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
 
 @NgModule({
   declarations: [OnboardingComponent],
@@ -23,6 +25,8 @@ import { OnboardingComponent } from './onboarding.component';
     MatProgressSpinnerModule,
     ShortcutsModule,
     MatRippleModule,
+    RouterModule,
+    MatLegacyProgressBarModule,
   ],
   exports: [OnboardingComponent],
 })

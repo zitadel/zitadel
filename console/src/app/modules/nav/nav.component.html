@@ -242,9 +242,9 @@
         (detach)="showInstanceProgress = false"
       >
         <cnsl-onboarding-card
+          (close)="showInstanceProgress = false"
           class="onboarding_card"
           *ngIf="org && showInstanceProgress"
-          (closedCard)="showInstanceProgress = false"
         >
         </cnsl-onboarding-card>
       </ng-template>

@@ -13,7 +13,10 @@ export class OnboardingCardComponent {
   public percentageChanged: EventEmitter<number> = new EventEmitter<number>();
   public loading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public actions = this.adminService.progressEvents;
-  constructor(public adminService: AdminService, private authService: GrpcAuthService) {}
+  public close: EventEmitter<void> = new EventEmitter();
+  constructor(public adminService: AdminService) {}
 
-  public dismiss(): void {}
+  public dismiss(): void {
+    this.close.emit();
+  }
 }
