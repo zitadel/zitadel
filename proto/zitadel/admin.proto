@@ -1048,7 +1048,7 @@ service AdminService {
     // Change an existing ldap identity provider on the instance
     rpc UpdateLDAPProvider(UpdateLDAPProviderRequest) returns (UpdateLDAPProviderResponse) {
         option (google.api.http) = {
-            post: "/idps/ldap/{id}"
+            put: "/idps/ldap/{id}"
             body: "*"
         };
 
@@ -1061,8 +1061,7 @@ service AdminService {
     // Will remove all linked providers of this configuration on the users
     rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
         option (google.api.http) = {
-            post: "/idps/templates/{id}"
-            body: "*"
+            delete: "/idps/templates/{id}"
         };
 
         option (zitadel.v1.auth_option) = {
