@@ -19,18 +19,18 @@ jobs:
       DOCKER_BUILDKIT: 1
     steps:
       - name: Source checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: get stable tag
         run: echo STABLE_RELEASE=$(yq eval '.stable' release-channels.yaml) >> $GITHUB_ENV
       - name: checkout stable tag
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           ref: ${{ env.STABLE_RELEASE }}
       - name: GitHub Container Registry Login
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -41,7 +41,7 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Google Artifact Registry Login
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: europe-docker.pkg.dev
           username: _json_key_base64
