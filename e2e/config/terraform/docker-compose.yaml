@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  zitadel:
+    extends:
+      file: ../cockroach/docker-compose.yaml
+      service: zitadel
+    volumes:
+      - ./machinekey:/machinekey
+      - ./zitadel.yaml:/zitadel.yaml
+
+  db:
+    extends:
+      file: ../cockroach/docker-compose.yaml
+      service: db
+
+  prepare:
+    extends:
+      file: ../cypress/docker-compose.yaml
+      service: prepare
+
+  e2e:
+    extends:
+      file: ../cypress/docker-compose.yaml
+      service: e2e
+
+networks:
+  zitadel:
