@@ -1570,9 +1570,14 @@ This is an empty request
 | org_id |  string | - |  |
 | project_id |  string | - |  |
 | user_id |  string | - |  |
-| roles | repeated string | - |  |
+| roles | repeated string | Deprecated: user role_keys |  |
 | org_name |  string | - |  |
 | grant_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| org_domain |  string | - |  |
+| project_name |  string | - |  |
+| project_grant_id |  string | - |  |
+| role_keys | repeated string | - |  |
 
 
 

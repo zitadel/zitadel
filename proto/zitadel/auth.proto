@@ -1008,9 +1008,15 @@ message UserGrant {
     string org_id = 1;
     string project_id = 2;
     string user_id = 3;
+    // Deprecated: user role_keys
     repeated string roles = 4;
     string org_name = 5;
     string grant_id = 6;
+    zitadel.v1.ObjectDetails details = 7;
+    string org_domain = 8;
+    string project_name = 9;
+    string project_grant_id = 10;
+    repeated string role_keys = 11;
 }
 
 message ListMyProjectOrgsRequest {
