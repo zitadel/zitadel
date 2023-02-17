@@ -39,36 +39,41 @@ const (
 func (a Record) Normalize() logstore.LogRecord {
 	a.RequestedDomain = cutString(a.RequestedDomain, 200)
 	a.RequestURL = cutString(a.RequestURL, 200)
-	normalizeHeaders(a.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "grpcgateway-authorization", "cookie", "grpcgateway-cookie")
-	normalizeHeaders(a.ResponseHeaders, "set-cookie")
+	a.RequestHeaders = normalizeHeaders(a.RequestHeaders, strings.ToLower(zitadel_http.Authorization), "grpcgateway-authorization", "cookie", "grpcgateway-cookie")
+	a.ResponseHeaders = normalizeHeaders(a.ResponseHeaders, "set-cookie")
 	return &a
+}
+
+// normalizeHeaders lowers all header keys and redacts secrets
+func normalizeHeaders(header map[string][]string, redactKeysLower ...string) map[string][]string {
+	return pruneKeys(redactKeys(lowerKeys(header), redactKeysLower...))
+}
+
+func lowerKeys(header map[string][]string) map[string][]string {
+	lower := make(map[string][]string, len(header))
+	for k, v := range header {
+		lower[strings.ToLower(k)] = v
+	}
+	return lower
+}
+
+func redactKeys(header map[string][]string, redactKeysLower ...string) map[string][]string {
+	redactedKeys := make(map[string][]string, len(header))
+	for k, v := range header {
+		redactedKeys[k] = v
+	}
+	for _, redactKey := range redactKeysLower {
+		if _, ok := redactedKeys[redactKey]; ok {
+			redactedKeys[redactKey] = []string{redacted}
+		}
+	}
+	return redactedKeys
 }
 
 const maxValuesPerKey = 10
 
-// normalizeHeaders lowers all header keys and redacts secrets
-func normalizeHeaders(header map[string][]string, redactKeysLower ...string) {
-	lowerKeys(header)
-	redactKeys(header, redactKeysLower...)
-	pruneKeys(header)
-}
-
-func lowerKeys(header map[string][]string) {
-	for k, v := range header {
-		delete(header, k)
-		header[strings.ToLower(k)] = v
-	}
-}
-
-func redactKeys(header map[string][]string, redactKeysLower ...string) {
-	for _, redactKey := range redactKeysLower {
-		if _, ok := header[redactKey]; ok {
-			header[redactKey] = []string{redacted}
-		}
-	}
-}
-
-func pruneKeys(header map[string][]string) {
+func pruneKeys(header map[string][]string) map[string][]string {
+	prunedKeys := make(map[string][]string, len(header))
 	for key, value := range header {
 		valueItems := make([]string, 0, maxValuesPerKey)
 		for i, valueItem := range value {
@@ -79,8 +84,9 @@ func pruneKeys(header map[string][]string) {
 			// Max 200 value length
 			valueItems = append(valueItems, cutString(valueItem, 200))
 		}
-		header[key] = valueItems
+		prunedKeys[key] = valueItems
 	}
+	return prunedKeys
 }
 
 func cutString(str string, pos int) string {
