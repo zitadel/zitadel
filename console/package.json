@@ -4,11 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "prodbuild": "ng build --configuration production --base-href=/ui/console/",
+    "build": "ng build --configuration production --base-href=/ui/console/",
+    "prelint": "npm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
-    "generate": "DOCKER_BUILDKIT=1 docker build -f ../build/grpc/Dockerfile -t zitadel-base:local .. && DOCKER_BUILDKIT=1 docker build -f ../build/console/Dockerfile .. --target npm-copy -o .."
+    "generate": "buf generate ../proto --include-imports --include-wkt"
   },
   "private": true,
   "dependencies": {
@@ -61,6 +61,7 @@
     "@angular/cli": "^15.1.5",
     "@angular/compiler-cli": "^15.1.4",
     "@angular/language-service": "^15.1.4",
+    "@bufbuild/buf": "^1.14.0",
     "@types/jasmine": "~4.3.0",
     "@types/jasminewd2": "~2.0.10",
     "@types/jsonwebtoken": "^9.0.1",

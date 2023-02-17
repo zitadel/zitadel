@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "选择过期时间",
       "CREATIONDATE": "创建于",
       "KEYDETAILS": "秘钥详情",
+      "ACCESSTOKENTYPE": "访问令牌类型 ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "添加秘钥",
         "DESCRIPTION": "选择您的密钥类型并选择一个可选的到期日期。"
