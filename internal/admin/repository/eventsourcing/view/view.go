@@ -1,16 +1,15 @@
 package view
 
 import (
-	"database/sql"
-
 	"github.com/jinzhu/gorm"
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 type View struct {
 	Db *gorm.DB
 }
 
-func StartView(sqlClient *sql.DB) (*View, error) {
+func StartView(sqlClient *database.DB) (*View, error) {
 	gorm, err := gorm.Open("postgres", sqlClient)
 	if err != nil {
 		return nil, err

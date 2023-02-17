@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -19,7 +20,7 @@ var (
 type StatementHandlerConfig struct {
 	handler.ProjectionHandlerConfig
 
-	Client            *sql.DB
+	Client            *database.DB
 	SequenceTable     string
 	LockTable         string
 	FailedEventsTable string
@@ -34,7 +35,7 @@ type StatementHandler struct {
 	*handler.ProjectionHandler
 	Locker
 
-	client                  *sql.DB
+	client                  *database.DB
 	sequenceTable           string
 	currentSequenceStmt     string
 	updateSequencesBaseStmt string
@@ -74,7 +75,7 @@ func NewStatementHandler(
 		aggregates:              aggregateTypes,
 		reduces:                 reduces,
 		bulkLimit:               config.BulkLimit,
-		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionName),
+		Locker:                  NewLocker(config.Client.DB, config.LockTable, config.ProjectionName),
 		initCheck:               config.InitCheck,
 		initialized:             make(chan bool),
 	}

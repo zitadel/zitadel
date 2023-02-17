@@ -73,7 +73,7 @@ func verifyZitadel(config database.Config) error {
 		return err
 	}
 
-	if err := VerifyZitadel(db, config); err != nil {
+	if err := VerifyZitadel(db.DB, config); err != nil {
 		return err
 	}
 

@@ -3,7 +3,6 @@ package start
 import (
 	"context"
 	"crypto/tls"
-	"database/sql"
 	_ "embed"
 	"fmt"
 	"net"
@@ -95,7 +94,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("cannot start client for projection: %w", err)
 	}
 
-	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient.DB, masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
@@ -120,7 +119,7 @@ func startZitadel(config *Config, masterKey string) error {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
 
-	storage, err := config.AssetStorage.NewStorage(dbClient)
+	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	if err != nil {
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
@@ -189,7 +188,7 @@ func startAPIs(
 	commands *command.Commands,
 	queries *query.Queries,
 	eventstore *eventstore.Eventstore,
-	dbClient *sql.DB,
+	dbClient *database.DB,
 	config *Config,
 	store static.Storage,
 	authZRepo authz_repo.Repository,

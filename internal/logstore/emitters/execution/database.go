@@ -2,13 +2,13 @@ package execution
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -29,10 +29,10 @@ var _ logstore.UsageQuerier = (*databaseLogStorage)(nil)
 var _ logstore.LogCleanupper = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {
-	dbClient *sql.DB
+	dbClient *database.DB
 }
 
-func NewDatabaseLogStorage(dbClient *sql.DB) *databaseLogStorage {
+func NewDatabaseLogStorage(dbClient *database.DB) *databaseLogStorage {
 	return &databaseLogStorage{dbClient: dbClient}
 }
 

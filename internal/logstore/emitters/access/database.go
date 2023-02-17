@@ -2,7 +2,6 @@ package access
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
 	"strings"
@@ -13,6 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -36,10 +36,10 @@ var _ logstore.UsageQuerier = (*databaseLogStorage)(nil)
 var _ logstore.LogCleanupper = (*databaseLogStorage)(nil)
 
 type databaseLogStorage struct {
-	dbClient *sql.DB
+	dbClient *database.DB
 }
 
-func NewDatabaseLogStorage(dbClient *sql.DB) *databaseLogStorage {
+func NewDatabaseLogStorage(dbClient *database.DB) *databaseLogStorage {
 	return &databaseLogStorage{dbClient: dbClient}
 }
 

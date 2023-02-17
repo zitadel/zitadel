@@ -13,6 +13,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -97,10 +98,10 @@ const (
 )
 
 type CRDB struct {
-	client *sql.DB
+	client *database.DB
 }
 
-func NewCRDB(client *sql.DB) *CRDB {
+func NewCRDB(client *database.DB) *CRDB {
 	return &CRDB{client}
 }
 
@@ -109,7 +110,7 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
-	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
+	err := crdb.ExecuteTx(ctx, db.client.DB, nil, func(tx *sql.Tx) error {
 
 		var (
 			previousAggregateSequence     Sequence
@@ -249,7 +250,7 @@ func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQ
 }
 
 func (db *CRDB) db() *sql.DB {
-	return db.client
+	return db.client.DB
 }
 
 func (db *CRDB) orderByEventSequence(desc bool) string {

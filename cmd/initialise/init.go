@@ -82,7 +82,7 @@ func initialise(config database.Config, steps ...func(*sql.DB) error) error {
 	}
 	defer db.Close()
 
-	return Init(db, steps...)
+	return Init(db.DB, steps...)
 }
 
 func Init(db *sql.DB, steps ...func(*sql.DB) error) error {

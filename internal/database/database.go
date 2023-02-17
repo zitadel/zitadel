@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"reflect"
+	"time"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -19,7 +20,24 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 	c.connector = connector
 }
 
-func Connect(config Config, useAdmin bool) (*sql.DB, error) {
+type DB struct {
+	*sql.DB
+	database dialect.Database
+}
+
+func (db *DB) Database() string {
+	return db.database.DatabaseName()
+}
+
+func (db *DB) Type() string {
+	return db.database.Type()
+}
+
+func (db *DB) AsOfSystemTime(d time.Duration) string {
+	return db.database.Timetravel(d)
+}
+
+func Connect(config Config, useAdmin bool) (*DB, error) {
 	client, err := config.connector.Connect(useAdmin)
 	if err != nil {
 		return nil, err
@@ -29,7 +47,10 @@ func Connect(config Config, useAdmin bool) (*sql.DB, error) {
 		return nil, errors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
 
-	return client, nil
+	return &DB{
+		DB:       client,
+		database: config.connector,
+	}, nil
 }
 
 func DecodeHook(from, to reflect.Value) (interface{}, error) {
