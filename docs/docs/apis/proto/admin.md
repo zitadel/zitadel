@@ -614,7 +614,7 @@ Change an existing ldap identity provider on the instance
 
 
 
-    POST: /idps/ldap/{id}
+    PUT: /idps/ldap/{id}
 
 
 ### DeleteProvider
@@ -627,7 +627,7 @@ Will remove all linked providers of this configuration on the users
 
 
 
-    POST: /idps/templates/{id}
+    DELETE: /idps/templates/{id}
 
 
 ### GetOrgIAMPolicy
