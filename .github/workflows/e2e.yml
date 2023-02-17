@@ -22,7 +22,7 @@ jobs:
       ZITADEL_IMAGE_REGISTRY: 'ghcr.io/zitadel/zitadel'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set TAG env manual trigger
         if: github.event_name == 'workflow_dispatch'
         run: echo "ZITADEL_IMAGE=${ZITADEL_IMAGE_REGISTRY}:${{ github.event.inputs.releaseversion }}" >> $GITHUB_ENV
