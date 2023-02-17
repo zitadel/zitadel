@@ -25,6 +25,9 @@ export enum UserGrantListSearchKey {
   PROJECT_NAME,
   ROLE_KEY,
 }
+
+type UserGrantAsObject = AuthUserGrant.AsObject | MgmtUserGrant.AsObject;
+
 @Component({
   selector: 'cnsl-user-grants',
   templateUrl: './user-grants.component.html',
@@ -40,11 +43,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() refreshOnPreviousRoutes: string[] = [];
 
   public dataSource: UserGrantsDataSource = new UserGrantsDataSource(this.authService, this.userService);
-  public selection: SelectionModel<MgmtUserGrant.AsObject | AuthUserGrant.AsObject> = new SelectionModel<
-    MgmtUserGrant.AsObject | AuthUserGrant.AsObject
-  >(true, []);
+  public selection: SelectionModel<UserGrantAsObject> = new SelectionModel<UserGrantAsObject>(true, []);
   @ViewChild(PaginatorComponent) public paginator?: PaginatorComponent;
-  @ViewChild(MatTable) public table?: MatTable<AuthUserGrant.AsObject | MgmtUserGrant.AsObject>;
+  @ViewChild(MatTable) public table?: MatTable<UserGrantAsObject>;
 
   @Input() disableWrite: boolean = false;
   @Input() disableDelete: boolean = false;

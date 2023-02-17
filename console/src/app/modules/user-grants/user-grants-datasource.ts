@@ -1,6 +1,6 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ListMyUserGrantsResponse, UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
 import { ListUserGrantResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import {
@@ -21,13 +21,13 @@ export enum UserGrantContext {
   GRANTED_PROJECT = 'granted',
 }
 
-export class UserGrantsDataSource extends DataSource<AuthUserGrant.AsObject | MgmtUserGrant.AsObject> {
+type UserGrantAsObject = AuthUserGrant.AsObject | MgmtUserGrant.AsObject;
+
+export class UserGrantsDataSource extends DataSource<UserGrantAsObject> {
   public totalResult: number = 0;
   public viewTimestamp!: Timestamp.AsObject;
 
-  public grantsSubject: BehaviorSubject<AuthUserGrant.AsObject[] | MgmtUserGrant.AsObject[]> = new BehaviorSubject<
-    AuthUserGrant.AsObject[] | MgmtUserGrant.AsObject[]
-  >([]);
+  public grantsSubject: BehaviorSubject<Array<UserGrantAsObject>> = new BehaviorSubject<Array<UserGrantAsObject>>([]);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -152,7 +152,7 @@ export class UserGrantsDataSource extends DataSource<AuthUserGrant.AsObject | Mg
    * the returned stream emits new items.
    * @returns A stream of the items to be rendered.
    */
-  public connect(): Observable<AuthUserGrant.AsObject[] | MgmtUserGrant.AsObject[]> {
+  public connect(): Observable<Array<UserGrantAsObject>> {
     return this.grantsSubject.asObservable();
   }
 
