@@ -219,6 +219,10 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 	return scan(row)
 }
 
+func (q *Queries) InstanceByID(ctx context.Context) (_ authz.Instance, err error) {
+	return q.Instance(ctx, true)
+}
+
 func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	instance, err := q.Instance(ctx, false)
 	if err != nil {

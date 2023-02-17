@@ -37,6 +37,7 @@ var (
 	AppProjection                       *appProjection
 	IDPUserLinkProjection               *idpUserLinkProjection
 	IDPLoginPolicyLinkProjection        *idpLoginPolicyLinkProjection
+	IDPTemplateProjection               *idpTemplateProjection
 	MailTemplateProjection              *mailTemplateProjection
 	MessageTextProjection               *messageTextProjection
 	CustomTextProjection                *customTextProjection
@@ -111,6 +112,7 @@ func Create(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, c
 	AppProjection = newAppProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["apps"]))
 	IDPUserLinkProjection = newIDPUserLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_user_links"]))
 	IDPLoginPolicyLinkProjection = newIDPLoginPolicyLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_login_policy_links"]))
+	IDPTemplateProjection = newIDPTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_templates"]))
 	MailTemplateProjection = newMailTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["mail_templates"]))
 	MessageTextProjection = newMessageTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["message_texts"]))
 	CustomTextProjection = newCustomTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["custom_texts"]))
@@ -156,7 +158,6 @@ func Start() {
 
 func ApplyCustomConfig(customConfig CustomConfig) crdb.StatementHandlerConfig {
 	return applyCustomConfig(projectionConfig, customConfig)
-
 }
 
 func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomConfig) crdb.StatementHandlerConfig {
@@ -200,6 +201,7 @@ func newProjectionsList() {
 		OrgDomainProjection,
 		LoginPolicyProjection,
 		IDPProjection,
+		IDPTemplateProjection,
 		AppProjection,
 		IDPUserLinkProjection,
 		IDPLoginPolicyLinkProjection,

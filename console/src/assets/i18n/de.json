@@ -452,6 +452,11 @@
       "CHOOSEEXPIRY": "Definiere ein Ablaufdatum",
       "CREATIONDATE": "Erstelldatum",
       "KEYDETAILS": "Schlüssel Details",
+      "ACCESSTOKENTYPE": "Access Token Typ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Schlüssel hinzufügen",
         "DESCRIPTION": "Wähle den Typ und selektiere ein optionales Ablaufdatum."
@@ -843,6 +848,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Geben Sie den Namen der neuen Organisation ein.",
       "ORGDETAILUSER_TITLE": "Organisationsbesitzer hinzufügen",
       "DELETE": "Organisation löschen",
+      "DEFAULTLABEL": "Standard",
+      "SETASDEFAULT": "Als Standardorganisation festlegen",
+      "DEFAULTORGSET": "Standardorganisation erfolgreich geändert",
       "RENAME": {
         "ACTION": "Umbenennen",
         "TITLE": "Organisation umbenennen",
@@ -973,7 +981,8 @@
       "en": "English",
       "it": "Italiano",
       "fr": "Français",
-      "zh": "Chinese"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1164,7 +1173,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "Chinese"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1938,7 +1948,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "Chinese"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

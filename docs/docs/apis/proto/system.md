@@ -88,7 +88,7 @@ This might take some time
 > **rpc** RemoveInstance([RemoveInstanceRequest](#removeinstancerequest))
 [RemoveInstanceResponse](#removeinstanceresponse)
 
-Removes a instances
+Removes an instance
 This might take some time
 
 
@@ -228,6 +228,30 @@ failed event. You can find out if it worked on the `failure_count`
     DELETE: /failedevents/{database}/{view_name}/{failed_sequence}
 
 
+### AddQuota
+
+> **rpc** AddQuota([AddQuotaRequest](#addquotarequest))
+[AddQuotaResponse](#addquotaresponse)
+
+Creates a new quota
+
+
+
+    POST: /instances/{instance_id}/quotas
+
+
+### RemoveQuota
+
+> **rpc** RemoveQuota([RemoveQuotaRequest](#removequotarequest))
+[RemoveQuotaResponse](#removequotaresponse)
+
+Removes a quota
+
+
+
+    DELETE: /instances/{instance_id}/quotas/{unit}
+
+
 
 
 
@@ -321,6 +345,34 @@ failed event. You can find out if it worked on the `failure_count`
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance_id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddQuotaRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| unit |  zitadel.quota.v1.Unit | the unit a quota should be imposed on | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| from |  google.protobuf.Timestamp | the starting time from which the current quota period is calculated from. This is relevant for querying the current usage. | timestamp.required: true<br />  |
+| reset_interval |  google.protobuf.Duration | the quota periods duration | duration.required: true<br />  |
+| amount |  uint64 | the quota amount of units | uint64.gt: 0<br />  |
+| limit |  bool | whether ZITADEL should block further usage when the configured amount is used |  |
+| notifications | repeated zitadel.quota.v1.Notification | the handlers, ZITADEL executes when certain quota percentages are reached |  |
+
+
+
+
+### AddQuotaResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 
 
@@ -558,19 +610,6 @@ This is an empty response
 
 
 
-### GetUsageResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| executed_requests |  uint64 | - |  |
-| executed_action_mins |  uint64 | - |  |
-
-
-
-
 ### HealthzRequest
 This is an empty request
 
@@ -750,6 +789,29 @@ This is an empty response
 
 
 ### RemoveInstanceResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveQuotaRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| instance_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| unit |  zitadel.quota.v1.Unit | - |  |
+
+
+
+
+### RemoveQuotaResponse
 
 
 
