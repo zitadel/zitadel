@@ -7,6 +7,69 @@ This guide gives you an overview of technical considerations, explains the most 
 
 We will also offer more detailed guides how to migrate users from a specific auth provider to ZITADEL.
 
+## User data and secrets
+
+### Import users
+
+Use our APIs to import users.
+
+For bulk import use this endpoint:
+TODO: tbc. bulk import
+
+Creating individual users can be done with this endpoint: [ImportHumanUser](http://localhost:3000/docs/apis/proto/management#importhumanuser)
+
+Please also consult our [guide](/docs/guides/manage/user/reg-create-user) on how to create users.
+
+### Migrate secrets
+
+Besides user data you need to migrate secrets, such as password hashes, OTP seeds, and public keys for passkeys (FIDO2).
+
+#### Passwords
+
+Passwords are stored only as hash.
+You can transfer the hashes as long as ZITADEL [supports the same hash algorithm](/docs/concepts/architecture/secrets#hashed-secrets).
+
+In case the hashes can't be transferred directly, you always have the option to create a user in ZITADEL without password and prompt users to create a new password.
+
+If your legacy system receives the passwords in clear text (eg, login form) you could also directly create users via ZITADEL API. We will explain this pattern in more detail in this guide.
+
+:::info
+In case the hash algorithm you are using is not supported by ZITADEL, please let us know after searching our discussions, issues, and chat for similar requests.
+:::
+
+#### One-time-passwords (OTP)
+
+TODO:
+- How to import OTP
+
+### Passkeys
+
+TODO:
+- tbc. can passkey material be imported?
+- how to import passkeys data?
+
+For passkeys to work on the new system you need to make sure that the new auth server has the same domain as the legacy auth server.
+
+### Users linked to an external IDP
+
+A users `sub` is bound to the external [IDP's Client ID](https://zitadel.com/docs/guides/manage/console/instance-settings#identity-providers).
+This means that the IDP Client ID configured in ZITADEL must be the same ID as in the legacy system.
+
+Users should be imported with their `externalId`.
+
+TODO: how to set externalId? (that's the name in the actions, how is it called in the api calls?)
+
+You can use an Action with [post-creation flow](https://zitadel.com/docs/apis/actions/external-authentication#post-creation) to pull information such as roles from the old system and apply them to the user in ZITADEL.
+
+### Metadata
+
+You can store arbitrary key-value information on a user (or Organization) in ZITADEL.
+Use metadata to store additional attributes of the users, such as organizational unit, backend-id, etc.
+
+Request metadata from the userinfo endpoint by passing the required [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) in your auth request.
+
+With the [complement token flow](/docs/apis/actions/complement-token), you can also transform metadata (or roles) to custom claims.
+
 ## Technical Considerations
 
 ### Evaluating migration patterns
@@ -48,36 +111,6 @@ flowchart LR
     parallel -- No --> import([Import user or</br> password reset])
     parallel -- Yes --> brokering([Identity Brokering + Action])
 ```
-
-### Migrating Secrets
-
-:::info
-
-:::
-
-TODO: 
-
-- Where to find current supported hashes
-- Info about https://github.com/zitadel/zitadel/issues/4157
-- Info about secret import (OTP, Passkeys, ...)
-- Info that for passkeys to work the domain needs to remain the same.
-- Hashes
-- Passkeys
-- OTP
-- For simplicity only once mentioned: If the hash algorithm is not available or the password can't be migrated, then use password reset flow; or
-- Can also capture credentials behind login and provision user to ZITADEL
-
-```mermaid
-%%{init: {'theme':'dark'}}%%
-flowchart LR
-    batch[[Batch migration]] --> hash{Hash algo.</br>supported?}
-    hash -- No --> reset([Use password reset])
-    hash -- Yes --> import([Import user])
-```
-
-### Users linked to an external IDP
-
-TODO: https://github.com/zitadel/zitadel/issues/5176
 
 ### JWT IDP
 
