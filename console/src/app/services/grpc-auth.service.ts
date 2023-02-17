@@ -108,7 +108,7 @@ import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { LabelPolicy } from '../proto/generated/zitadel/policy_pb';
-import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
+import { Gender, MembershipQuery, User, UserGrantQuery, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
 import { ThemeService } from './theme.service';
@@ -426,11 +426,7 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyUserSessions(req, null).then((resp) => resp.toObject());
   }
 
-  public listMyUserGrants(
-    limit?: number,
-    offset?: number,
-    queryList?: ListQuery[],
-  ): Promise<ListMyUserGrantsResponse.AsObject> {
+  public listMyUserGrants(limit?: number, offset?: number, asc?: boolean): Promise<ListMyUserGrantsResponse.AsObject> {
     const req = new ListMyUserGrantsRequest();
     const query = new ListQuery();
     if (limit) {
@@ -438,6 +434,9 @@ export class GrpcAuthService {
     }
     if (offset) {
       query.setOffset(offset);
+    }
+    if (asc !== undefined) {
+      query.setAsc(asc);
     }
     req.setQuery(query);
     return this.grpcService.auth.listMyUserGrants(req, null).then((resp) => resp.toObject());

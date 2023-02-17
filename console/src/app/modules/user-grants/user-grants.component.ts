@@ -7,8 +7,10 @@ import { MatLegacyTable as MatTable } from '@angular/material/legacy-table';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
+import { UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
-import { Type, UserGrant, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { Type, UserGrant as MgmtUserGrant, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -38,10 +40,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() context: UserGrantContext = UserGrantContext.NONE;
   @Input() refreshOnPreviousRoutes: string[] = [];
 
-  public dataSource: UserGrantsDataSource = new UserGrantsDataSource(this.userService);
-  public selection: SelectionModel<UserGrant.AsObject> = new SelectionModel<UserGrant.AsObject>(true, []);
+  public dataSource: UserGrantsDataSource = new UserGrantsDataSource(this.authService, this.userService);
+  public selection: SelectionModel<MgmtUserGrant.AsObject | AuthUserGrant.AsObject> = new SelectionModel<
+    MgmtUserGrant.AsObject | AuthUserGrant.AsObject
+  >(true, []);
   @ViewChild(PaginatorComponent) public paginator?: PaginatorComponent;
-  @ViewChild(MatTable) public table?: MatTable<UserGrant.AsObject>;
+  @ViewChild(MatTable) public table?: MatTable<AuthUserGrant.AsObject | MgmtUserGrant.AsObject>;
 
   @Input() disableWrite: boolean = false;
   @Input() disableDelete: boolean = false;
@@ -66,6 +70,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public filterOpen: boolean = false;
 
   constructor(
+    private authService: GrpcAuthService,
     private userService: ManagementService,
     private toast: ToastService,
     private dialog: MatDialog,
@@ -119,8 +124,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     this.loadGrantsPage(type);
   }
 
-  public getType(grant: UserGrant.AsObject): string {
-    if (grant.projectGrantId) {
+  public getType(grant: AuthUserGrant.AsObject | MgmtUserGrant.AsObject): string {
+    if (
+      (grant as unknown as MgmtUserGrant.AsObject).projectGrantId ||
+      (grant as unknown as AuthUserGrant.AsObject).grantId
+    ) {
       return 'Project Grant';
     } else if (grant.projectId) {
       return 'Project';
@@ -161,11 +169,13 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       : this.dataSource.grantsSubject.value.forEach((row) => this.selection.select(row));
   }
 
-  public openEditDialog(grant: UserGrant.AsObject): void {
+  public openEditDialog(grant: AuthUserGrant.AsObject | MgmtUserGrant.AsObject): void {
     const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
       data: {
         projectId: grant.projectId,
-        grantId: grant.projectGrantId,
+        grantId:
+          (grant as unknown as MgmtUserGrant.AsObject)?.projectGrantId ??
+          (grant as unknown as AuthUserGrant.AsObject).grantId,
         selectedRoleKeysList: grant.roleKeysList,
         i18nTitle: 'GRANTS.EDIT.TITLE',
       },
