@@ -437,6 +437,38 @@ Errors:
     CloseRows: SQL 语句无法完成
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
+  Quota:
+    AlreadyExists: 这个单位的配额已经存在
+    NotFound: 没有找到该单位的配额
+    Invalid:
+      CallURL: 配额调用的URL是无效的
+      Percent: 配额百分比低于1
+      Unimplemented: 该单位没有实施配额
+      Amount: 配额数量低于1
+      ResetInterval: 配额重置时间间隔短于1分钟
+      Noop: 没有通知的无限配额没有效果
+    Access:
+      Exhausted: 认证请求的配额已用完
+    Execution:
+      Exhausted: 行动秒数的配额已用完
+  LogStore:
+    Access:
+      StorageFailed: 存储访问日志到数据库失败
+      ScanFailed: 查询已认证请求的使用情况失败
+    Execution:
+      StorageFailed: 将行动执行日志存储到数据库失败
+      ScanFailed: Q查询动作执行秒数的使用情况失败
+
+AggregateTypes:
+  action: 动作
+  instance: 实例
+  key_pair: 密钥对
+  org: 组织
+  project: 项目
+  user: 用户
+  usergrant: 用户授权
+  quota: 配额
+
 EventTypes:
   user:
     added: 已添加用户

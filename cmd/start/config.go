@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
@@ -62,6 +63,12 @@ type Config struct {
 	Machine           *id.Config
 	Actions           *actions.Config
 	Eventstore        *eventstore.Config
+	LogStore          *logstore.Configs
+	Quotas            *QuotasConfig
+}
+
+type QuotasConfig struct {
+	Access *middleware.AccessConfig
 }
 
 func MustNewConfig(v *viper.Viper) *Config {

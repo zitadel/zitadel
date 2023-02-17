@@ -427,7 +427,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 			apiFields,
 			action.Script,
 			action.Name,
-			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -541,7 +541,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
 						if _, ok := claims[key]; !ok {
-							claims[key] = value
+							claims = appendClaim(claims, key, value)
 							return
 						}
 						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
@@ -583,7 +583,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 			apiFields,
 			action.Script,
 			action.Name,
-			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
