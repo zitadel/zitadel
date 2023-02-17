@@ -5,7 +5,7 @@ services:
     restart: 'always'
     networks:
       - 'zitadel'
-    image: 'ghcr.io/zitadel/zitadel:stable'
+    image: 'ghcr.io/zitadel/zitadel:latest'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
       - 'ZITADEL_DATABASE_COCKROACH_HOST=crdb'
