@@ -11,7 +11,7 @@ Metrics:
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
   Type: none
-  Fraction: 1
+  Fraction: 1.0
   MetricPrefix: zitadel
 
 # Port ZITADEL will listen on
