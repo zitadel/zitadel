@@ -20,8 +20,15 @@ var (
 
 type jsAction func(fields, fields) error
 
-func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) error {
+func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) (err error) {
 	config, err := prepareRun(ctx, ctxParam, apiParam, script, opts)
+	// only return the error if the function is not allowed to fail
+	// in each case prepareRun always returns a config
+	defer func() {
+		if err != nil && config.allowedToFail {
+			err = nil
+		}
+	}()
 	if err != nil {
 		return err
 	}
