@@ -2,7 +2,6 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatLegacyInput as MatInput } from '@angular/material/legacy-input';
-import { MatLegacySelectChange as MatSelectChange } from '@angular/material/legacy-select';
 import { MatLegacyTable as MatTable } from '@angular/material/legacy-table';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -125,10 +124,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public getType(grant: AuthUserGrant.AsObject | MgmtUserGrant.AsObject): string {
-    if (
-      (grant as unknown as MgmtUserGrant.AsObject).projectGrantId ||
-      (grant as unknown as AuthUserGrant.AsObject).grantId
-    ) {
+    if (grant.projectGrantId) {
       return 'Project Grant';
     } else if (grant.projectId) {
       return 'Project';
@@ -169,13 +165,11 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       : this.dataSource.grantsSubject.value.forEach((row) => this.selection.select(row));
   }
 
-  public openEditDialog(grant: AuthUserGrant.AsObject | MgmtUserGrant.AsObject): void {
+  public openEditDialog(grant: MgmtUserGrant.AsObject): void {
     const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
       data: {
         projectId: grant.projectId,
-        grantId:
-          (grant as unknown as MgmtUserGrant.AsObject)?.projectGrantId ??
-          (grant as unknown as AuthUserGrant.AsObject).grantId,
+        grantId: grant?.projectGrantId,
         selectedRoleKeysList: grant.roleKeysList,
         i18nTitle: 'GRANTS.EDIT.TITLE',
       },
@@ -197,18 +191,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateRoles(grant: UserGrant.AsObject, selectionChange: MatSelectChange): void {
-    this.userService
-      .updateUserGrant(grant.id, grant.userId, selectionChange.value)
-      .then(() => {
-        this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
-  public deleteGrant(event: any, grant: UserGrant.AsObject): void {
+  public deleteGrant(event: any, grant: MgmtUserGrant.AsObject): void {
     event.stopPropagation();
 
     const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -229,7 +212,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
             this.toast.showInfo('GRANTS.TOAST.REMOVED', true);
             const data = this.dataSource.grantsSubject.getValue();
 
-            const index = data.findIndex((i) => i.id === grant.id);
+            const index = data.findIndex(
+              (i) => (i as MgmtUserGrant.AsObject).id && (i as MgmtUserGrant.AsObject).id === grant.id,
+            );
             if (index > -1) {
               data.splice(index, 1);
               this.dataSource.grantsSubject.next(data);
@@ -256,12 +241,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         this.userService
-          .bulkRemoveUserGrant(this.selection.selected.map((grant) => grant.id))
+          .bulkRemoveUserGrant(this.selection.selected.map((grant) => (grant as MgmtUserGrant.AsObject).id))
           .then(() => {
             this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
             const data = this.dataSource.grantsSubject.getValue();
             this.selection.selected.forEach((item) => {
-              const index = data.findIndex((i) => i.id === item.id);
+              const index = data.findIndex((i) => (i as MgmtUserGrant.AsObject).id === (item as MgmtUserGrant.AsObject).id);
               if (index > -1) {
                 data.splice(index, 1);
                 this.dataSource.grantsSubject.next(data);
