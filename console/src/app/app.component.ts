@@ -166,6 +166,11 @@ export class AppComponent implements OnDestroy {
     );
 
     this.matIconRegistry.addSvgIcon(
+      'mdi_arrow_expand',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-expand.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
       'mdi_numeric',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/numeric.svg'),
     );
@@ -202,7 +207,6 @@ export class AppComponent implements OnDestroy {
           .getActiveOrg()
           .then(async (org) => {
             this.org = org;
-
             // TODO add when console storage is implemented
             // this.startIntroWorkflow();
           })
@@ -258,15 +262,15 @@ export class AppComponent implements OnDestroy {
   }
 
   private setLanguage(): void {
-    this.translate.addLangs(['en', 'de', 'zh']);
+    this.translate.addLangs(['en', 'de', 'fr', 'it', 'pl', 'zh']);
     this.translate.setDefaultLang('en');
 
     this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de|it|zh/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/en|de|fr|it|pl|zh/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it|zh/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|fr|it|pl|zh/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

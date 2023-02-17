@@ -30,6 +30,15 @@
           <cnsl-label>{{ 'USER.MACHINE.DESCRIPTION' | translate }}</cnsl-label>
           <input cnslInput formControlName="description" />
         </cnsl-form-field>
+
+        <cnsl-form-field class="formfield">
+          <cnsl-label>{{ 'USER.MACHINE.ACCESSTOKENTYPE' | translate }}</cnsl-label>
+          <mat-select formControlName="accessTokenType" required>
+            <mat-option *ngFor="let aTT of accessTokenTypes" [value]="aTT">
+              {{ 'USER.MACHINE.ACCESSTOKENTYPES.' + aTT | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
       </div>
       <div class="machine-btn-container">
         <button color="primary" data-e2e="create-button" [disabled]="userForm.invalid" type="submit" mat-raised-button>

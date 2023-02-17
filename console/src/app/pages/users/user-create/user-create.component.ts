@@ -1,10 +1,9 @@
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import parsePhoneNumber from 'libphonenumber-js';
+import { parsePhoneNumber, CountryCode } from 'libphonenumber-js';
 import { Subject } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -14,6 +13,8 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../validators';
+import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
+import { formatPhone } from 'src/app/utils/formatPhone';
 
 function passwordConfirmValidator(c: AbstractControl): any {
   if (!c.parent || !c) {
@@ -40,10 +41,12 @@ function passwordConfirmValidator(c: AbstractControl): any {
   templateUrl: './user-create.component.html',
   styleUrls: ['./user-create.component.scss'],
 })
-export class UserCreateComponent implements OnDestroy {
+export class UserCreateComponent implements OnInit, OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = ['de', 'en', 'it', 'fr'];
+  public languages: string[] = ['de', 'en', 'it', 'fr', 'pl', 'zh'];
+  public selected: CountryPhoneCode | undefined;
+  public countryPhoneCodes: CountryPhoneCode[] = [];
   public userForm!: UntypedFormGroup;
   public pwdForm!: UntypedFormGroup;
   private destroyed$: Subject<void> = new Subject();
@@ -63,6 +66,7 @@ export class UserCreateComponent implements OnDestroy {
     private mgmtService: ManagementService,
     private changeDetRef: ChangeDetectorRef,
     private _location: Location,
+    private countryCallingCodesService: CountryCallingCodesService,
     breadcrumbService: BreadcrumbService,
   ) {
     breadcrumbService.setBreadcrumb([
@@ -151,17 +155,6 @@ export class UserCreateComponent implements OnDestroy {
         });
       }
     });
-
-    this.userForm.controls['phone'].valueChanges.pipe(takeUntil(this.destroyed$), debounceTime(300)).subscribe((value) => {
-      const phoneNumber = parsePhoneNumber(value ?? '', 'CH');
-      if (phoneNumber) {
-        const formmatted = phoneNumber.formatInternational();
-        const country = phoneNumber.country;
-        if (this.phone && country && this.phone.value && this.phone.value !== formmatted) {
-          this.phone.setValue(formmatted);
-        }
-      }
-    });
   }
 
   public createUser(): void {
@@ -190,7 +183,10 @@ export class UserCreateComponent implements OnDestroy {
     }
 
     if (this.phone && this.phone.value) {
-      humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(this.phone.value));
+      // Try to parse number and format it according to country
+      const phoneNumber = formatPhone(this.phone.value);
+      this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
+      humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(phoneNumber.phone));
     }
 
     this.mgmtService
@@ -204,6 +200,18 @@ export class UserCreateComponent implements OnDestroy {
         this.loading = false;
         this.toast.showError(error);
       });
+  }
+
+  public setCountryCallingCode(): void {
+    let value = (this.phone?.value as string) || '';
+    this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value.replace(/\+[0-9]*\s/, ''));
+  }
+
+  ngOnInit(): void {
+    // Set default selected country for phone numbers
+    const defaultCountryCallingCode = 'CH';
+    this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
+    this.selected = this.countryPhoneCodes.find((code) => code.countryCode === defaultCountryCallingCode);
   }
 
   ngOnDestroy(): void {

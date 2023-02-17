@@ -659,7 +659,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 func (s *Server) getTriggerActions(ctx context.Context, org string, processedActions []string) (_ []*management_pb.SetTriggerActionsRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication}
+	flowTypes := []domain.FlowType{domain.FlowTypeExternalAuthentication, domain.FlowTypeInternalAuthentication}
 	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
 
 	for _, flowType := range flowTypes {

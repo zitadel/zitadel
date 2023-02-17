@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -14,9 +15,12 @@ type MachineWriteModel struct {
 
 	UserName string
 
-	Name        string
-	Description string
-	UserState   domain.UserState
+	Name            string
+	Description     string
+	UserState       domain.UserState
+	AccessTokenType domain.OIDCTokenType
+
+	ClientSecret *crypto.CryptoValue
 }
 
 func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
@@ -35,6 +39,7 @@ func (wm *MachineWriteModel) Reduce() error {
 			wm.UserName = e.UserName
 			wm.Name = e.Name
 			wm.Description = e.Description
+			wm.AccessTokenType = e.AccessTokenType
 			wm.UserState = domain.UserStateActive
 		case *user.UsernameChangedEvent:
 			wm.UserName = e.UserName
@@ -44,6 +49,9 @@ func (wm *MachineWriteModel) Reduce() error {
 			}
 			if e.Description != nil {
 				wm.Description = *e.Description
+			}
+			if e.AccessTokenType != nil {
+				wm.AccessTokenType = *e.AccessTokenType
 			}
 		case *user.UserLockedEvent:
 			if wm.UserState != domain.UserStateDeleted {
@@ -63,6 +71,10 @@ func (wm *MachineWriteModel) Reduce() error {
 			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
+		case *user.MachineSecretSetEvent:
+			wm.ClientSecret = e.ClientSecret
+		case *user.MachineSecretRemovedEvent:
+			wm.ClientSecret = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -81,7 +93,9 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserUnlockedType,
 			user.UserDeactivatedType,
 			user.UserReactivatedType,
-			user.UserRemovedType).
+			user.UserRemovedType,
+			user.MachineSecretSetType,
+			user.MachineSecretRemovedType).
 		Builder()
 }
 
@@ -90,6 +104,7 @@ func (wm *MachineWriteModel) NewChangedEvent(
 	aggregate *eventstore.Aggregate,
 	name,
 	description string,
+	accessTokenType domain.OIDCTokenType,
 ) (*user.MachineChangedEvent, bool, error) {
 	changes := make([]user.MachineChanges, 0)
 	var err error
@@ -99,6 +114,9 @@ func (wm *MachineWriteModel) NewChangedEvent(
 	}
 	if wm.Description != description {
 		changes = append(changes, user.ChangeDescription(description))
+	}
+	if wm.AccessTokenType != accessTokenType {
+		changes = append(changes, user.ChangeAccessTokenType(accessTokenType))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil

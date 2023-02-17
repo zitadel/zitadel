@@ -16,7 +16,7 @@ module.exports = {
     {
       type: "category",
       label: "Secure your API",
-      items: ["examples/secure-api/go", "examples/secure-api/dot-net"],
+      items: ["examples/secure-api/go", "examples/secure-api/python-flask", "examples/secure-api/dot-net"],
       collapsed: false,
     },
     {
@@ -109,9 +109,11 @@ module.exports = {
           items: [
             "guides/integrate/serviceusers",
             "guides/integrate/access-zitadel-apis",
+            "guides/integrate/client-credentials",
             "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/export-and-import",
+            "guides/integrate/event-api",
           ],
         },
         {
@@ -232,8 +234,9 @@ module.exports = {
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
-        "apis/actions/login-flow",
-        "apis/actions/register-flow",
+        "apis/actions/internal-authentication",
+        "apis/actions/external-authentication",
+        "apis/actions/complement-token",
         "apis/actions/objects",
       ]
     },
@@ -262,7 +265,7 @@ module.exports = {
         "self-hosting/deploy/compose",
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
-        "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
+        "self-hosting/deploy/loadbalancing-example/loadbalancing-example"
       ],
     },
     {
@@ -271,6 +274,7 @@ module.exports = {
       collapsed: false,
       items: [
         "self-hosting/manage/production",
+        "self-hosting/manage/productionchecklist",
         "self-hosting/manage/configure/configure",
         "self-hosting/manage/reverseproxy/reverse_proxy",
         "self-hosting/manage/custom-domain",
@@ -278,6 +282,7 @@ module.exports = {
         "self-hosting/manage/tls_modes",
         "self-hosting/manage/database/database",
         "self-hosting/manage/updating_scaling",
+        "self-hosting/manage/quotas"
       ],
     },
   ],
@@ -330,7 +335,10 @@ module.exports = {
       type: "category",
       label: "Features",
       collapsed: false,
-      items: ["concepts/features/actions", "concepts/features/selfservice"],
+      items: [
+        "concepts/features/actions",
+        "concepts/features/selfservice"
+      ],
     },
   ],
   manuals: [

@@ -4,7 +4,7 @@
       <span>{{ length }} </span>{{ 'PAGINATOR.COUNT' | translate }}
     </p>
     <p class="ts cnsl-secondary-text" *ngIf="timestamp" data-e2e="timestamp">
-      {{ timestamp | timestampToDate | localizedDate: 'EEEE dd. MMM YYYY, HH:mm' }}
+      {{ timestamp | timestampToDate | localizedDate : 'EEEE dd. MMM YYYY, HH:mm' }}
     </p>
   </div>
   <span class="fill-space"></span>
@@ -24,6 +24,12 @@
     </button>
     <button *ngIf="nextPossible" (click)="next()" [disabled]="!nextPossible" mat-stroked-button>
       {{ 'PAGINATOR.NEXT' | translate }}
+    </button>
+  </div>
+
+  <div class="row" *ngIf="showMoreButton">
+    <button (click)="moreRequested.emit()" mat-stroked-button [disabled]="disableShowMore">
+      {{ 'PAGINATOR.MORE' | translate }}
     </button>
   </div>
 </div>

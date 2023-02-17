@@ -11,7 +11,7 @@ const routes: Routes = [
       roles: ['project.read'],
     },
     canActivate: [RoleGuard],
-    loadChildren: () => import('./owned-project-detail/owned-project-detail.module').then((m) => m.OwnedProjectDetailModule),
+    loadChildren: () => import('./owned-project-detail/owned-project-detail.module'),
   },
   {
     path: 'members',
@@ -20,7 +20,7 @@ const routes: Routes = [
       roles: ['project.member.read'],
     },
     canActivate: [RoleGuard],
-    loadChildren: () => import('src/app/modules/project-members/project-members.module').then((m) => m.ProjectMembersModule),
+    loadChildren: () => import('src/app/modules/project-members/project-members.module'),
   },
   {
     path: 'apps',
@@ -29,7 +29,7 @@ const routes: Routes = [
       roles: ['project.app.read'],
     },
     canActivate: [RoleGuard],
-    loadChildren: () => import('src/app/pages/projects/apps/apps.module').then((m) => m.AppsModule),
+    loadChildren: () => import('src/app/pages/projects/apps/apps.module'),
   },
   {
     path: 'projectgrants',
@@ -38,27 +38,23 @@ const routes: Routes = [
       // roles: ['project.grant.read:' + ':projectid', 'project.grant.read'],
     },
     // canActivate: [RoleGuard],
-    loadChildren: () =>
-      import('src/app/pages/projects/owned-projects/project-grants/project-grants.module').then(
-        (m) => m.ProjectGrantsModule,
-      ),
+    loadChildren: () => import('src/app/pages/projects/owned-projects/project-grants/project-grants.module'),
   },
   {
     path: 'roles',
-    loadChildren: () =>
-      import('src/app/pages/projects/owned-projects/project-roles/project-roles.module').then((m) => m.ProjectRolesModule),
+    loadChildren: () => import('src/app/pages/projects/owned-projects/project-roles/project-roles.module'),
   },
   {
     path: 'roles/create',
-    loadChildren: () => import('./project-role-create/project-role-create.module').then((m) => m.ProjectRoleCreateModule),
+    loadChildren: () => import('./project-role-create/project-role-create.module'),
   },
   {
     path: 'projectgrants/create',
-    loadChildren: () => import('./project-grant-create/project-grant-create.module').then((m) => m.ProjectGrantCreateModule),
+    loadChildren: () => import('./project-grant-create/project-grant-create.module'),
   },
   {
     path: 'projectgrants/:grantid',
-    loadChildren: () => import('./project-grant-detail/project-grant-detail.module').then((m) => m.ProjectGrantDetailModule),
+    loadChildren: () => import('./project-grant-detail/project-grant-detail.module'),
   },
 ];
 

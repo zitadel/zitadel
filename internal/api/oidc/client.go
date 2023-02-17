@@ -94,29 +94,7 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 	if err != nil {
 		return nil, err
 	}
-	for i := len(scopes) - 1; i >= 0; i-- {
-		scope := scopes[i]
-		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
-			var orgID string
-			org, err := o.query.OrgByPrimaryDomain(ctx, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
-			if err == nil {
-				orgID = org.ID
-			}
-			if orgID != user.ResourceOwner {
-				scopes[i] = scopes[len(scopes)-1]
-				scopes[len(scopes)-1] = ""
-				scopes = scopes[:len(scopes)-1]
-			}
-		}
-		if strings.HasPrefix(scope, domain.OrgIDScope) {
-			if strings.TrimPrefix(scope, domain.OrgIDScope) != user.ResourceOwner {
-				scopes[i] = scopes[len(scopes)-1]
-				scopes[len(scopes)-1] = ""
-				scopes = scopes[:len(scopes)-1]
-			}
-		}
-	}
-	return scopes, nil
+	return o.checkOrgScopes(ctx, user, scopes)
 }
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) (err error) {
@@ -207,6 +185,71 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		}
 	}
 	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+}
+
+func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID string, scope []string) (op.TokenRequest, error) {
+	loginname, err := query.NewUserLoginNamesSearchQuery(clientID)
+	if err != nil {
+		return nil, err
+	}
+	user, err := o.query.GetUser(ctx, false, false, loginname)
+	if err != nil {
+		return nil, err
+	}
+	scope, err = o.checkOrgScopes(ctx, user, scope)
+	if err != nil {
+		return nil, err
+	}
+	audience := domain.AddAudScopeToAudience(ctx, nil, scope)
+	return &clientCredentialsRequest{
+		sub:      user.ID,
+		scopes:   scope,
+		audience: audience,
+	}, nil
+}
+
+func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecret string) (op.Client, error) {
+	loginname, err := query.NewUserLoginNamesSearchQuery(clientID)
+	if err != nil {
+		return nil, err
+	}
+	user, err := o.query.GetUser(ctx, false, false, loginname)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := o.command.VerifyMachineSecret(ctx, user.ID, user.ResourceOwner, clientSecret); err != nil {
+		return nil, err
+	}
+	return &clientCredentialsClient{
+		id:        clientID,
+		tokenType: accessTokenTypeToOIDC(user.Machine.AccessTokenType),
+	}, nil
+}
+
+func (o *OPStorage) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {
+	for i := len(scopes) - 1; i >= 0; i-- {
+		scope := scopes[i]
+		if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+			var orgID string
+			org, err := o.query.OrgByPrimaryDomain(ctx, strings.TrimPrefix(scope, domain.OrgDomainPrimaryScope))
+			if err == nil {
+				orgID = org.ID
+			}
+			if orgID != user.ResourceOwner {
+				scopes[i] = scopes[len(scopes)-1]
+				scopes[len(scopes)-1] = ""
+				scopes = scopes[:len(scopes)-1]
+			}
+		}
+		if strings.HasPrefix(scope, domain.OrgIDScope) {
+			if strings.TrimPrefix(scope, domain.OrgIDScope) != user.ResourceOwner {
+				scopes[i] = scopes[len(scopes)-1]
+				scopes[len(scopes)-1] = ""
+				scopes = scopes[:len(scopes)-1]
+			}
+		}
+	}
+	return scopes, nil
 }
 
 func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
@@ -384,7 +427,7 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, resourceOwner string, use
 			apiFields,
 			action.Script,
 			action.Name,
-			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx))...,
 		)
 		cancel()
 		if err != nil {
@@ -498,7 +541,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
 						if _, ok := claims[key]; !ok {
-							claims[key] = value
+							claims = appendClaim(claims, key, value)
 							return
 						}
 						claimLogs = append(claimLogs, fmt.Sprintf("key %q already exists", key))
@@ -540,7 +583,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, claim
 			apiFields,
 			action.Script,
 			action.Name,
-			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx), actions.WithLogger(actions.ServerLog))...,
+			append(actions.ActionToOptions(action), actions.WithHTTP(actionCtx))...,
 		)
 		cancel()
 		if err != nil {

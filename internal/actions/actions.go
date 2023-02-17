@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"github.com/dop251/goja_nodejs/require"
+	"github.com/sirupsen/logrus"
+
 	z_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 )
@@ -14,15 +16,45 @@ type Config struct {
 	HTTP HTTPConfig
 }
 
-var (
-	ErrHalt = errors.New("interrupt")
-)
+var ErrHalt = errors.New("interrupt")
 
 type jsAction func(fields, fields) error
 
-func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) error {
-	config, err := prepareRun(ctx, ctxParam, apiParam, script, opts)
-	if err != nil {
+const (
+	actionStartedMessage   = "action run started"
+	actionSucceededMessage = "action run succeeded"
+)
+
+func actionFailedMessage(err error) string {
+	return fmt.Sprintf("action run failed: %s", err.Error())
+}
+
+func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) (err error) {
+	config := newRunConfig(ctx, append(opts, withLogger(ctx))...)
+	if config.functionTimeout == 0 {
+		return z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
+	}
+
+	remaining := logstoreService.Limit(ctx, config.instanceID)
+	config.cutTimeouts(remaining)
+
+	config.logger.Log(actionStartedMessage)
+	if remaining != nil && *remaining == 0 {
+		return z_errs.ThrowResourceExhausted(nil, "ACTIO-f19Ii", "Errors.Quota.Execution.Exhausted")
+	}
+
+	defer func() {
+		if err != nil {
+			config.logger.log(actionFailedMessage(err), logrus.ErrorLevel, true)
+		} else {
+			config.logger.log(actionSucceededMessage, logrus.InfoLevel, true)
+		}
+		if config.allowedToFail {
+			err = nil
+		}
+	}()
+
+	if err := executeScript(config, ctxParam, apiParam, script); err != nil {
 		return err
 	}
 
@@ -31,12 +63,11 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 	if jsFn == nil {
 		return errors.New("function not found")
 	}
-	err = config.vm.ExportTo(jsFn, &fn)
-	if err != nil {
+	if err := config.vm.ExportTo(jsFn, &fn); err != nil {
 		return err
 	}
 
-	t := config.Start()
+	t := config.StartFunction()
 	defer func() {
 		t.Stop()
 	}()
@@ -44,12 +75,8 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 	return executeFn(config, fn)
 }
 
-func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields, script string, opts []Option) (config *runConfig, err error) {
-	config = newRunConfig(ctx, opts...)
-	if config.timeout == 0 {
-		return nil, z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
-	}
-	t := config.Prepare()
+func executeScript(config *runConfig, ctxParam contextFields, apiParam apiFields, script string) (err error) {
+	t := config.StartScript()
 	defer func() {
 		t.Stop()
 	}()
@@ -67,7 +94,6 @@ func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields,
 	for name, loader := range config.modules {
 		registry.RegisterNativeModule(name, loader)
 	}
-
 	// overload error if function panics
 	defer func() {
 		r := recover()
@@ -76,29 +102,31 @@ func prepareRun(ctx context.Context, ctxParam contextFields, apiParam apiFields,
 			return
 		}
 	}()
+
 	_, err = config.vm.RunString(script)
-	return config, err
+	return err
 }
 
 func executeFn(config *runConfig, fn jsAction) (err error) {
 	defer func() {
 		r := recover()
-		if r != nil && !config.allowedToFail {
-			var ok bool
-			if err, ok = r.(error); ok {
-				return
-			}
-
-			e, ok := r.(string)
-			if ok {
-				err = errors.New(e)
-				return
-			}
-			err = fmt.Errorf("unknown error occured: %v", r)
+		if r == nil {
+			return
 		}
+		var ok bool
+		if err, ok = r.(error); ok {
+			return
+		}
+
+		e, ok := r.(string)
+		if ok {
+			err = errors.New(e)
+			return
+		}
+		err = fmt.Errorf("unknown error occurred: %v", r)
 	}()
-	err = fn(config.ctxParam.fields, config.apiParam.fields)
-	if err != nil && !config.allowedToFail {
+
+	if err = fn(config.ctxParam.fields, config.apiParam.fields); err != nil {
 		return err
 	}
 	return nil

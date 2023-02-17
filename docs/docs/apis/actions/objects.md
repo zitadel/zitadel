@@ -108,3 +108,62 @@ title: Objects
 - `phone`
   - `phone` *string*
   - `isPhoneVerified` *boolean*
+
+## Auth Request
+
+This object contains context information about the request to the [authorization endpoint](/docs/apis/openidoauth/endpoints#authorization_endpoint).
+
+- `id` *string*
+- `agentId` *string*
+- `creationDate` *Date*
+- `changeDate` *Date*
+- `browserInfo` *browserInfo*
+  - `userAgent` *string*
+  - `acceptLanguage` *string*
+  - `remoteIp` *string*
+- `applicationId` *string*
+- `callbackUri` *string*
+- `transferState` *string*
+- `prompt` Array of *Number*  
+   <ul><li>0: not specified</li><li>1: none</li><li>2: login</li><li>3: consent</li><li>4: select_account</li><li>5: create</li></ul>
+- `uiLocales` Array of *string*
+- `loginHint` *string*
+- `maxAuthAge` *Number*  
+  Duration in nanoseconds
+- `instanceId` *string*
+- `request`
+  - `oidc`
+    - `scopes` Array of *string*
+- `userId` *string*
+- `userName` *string*
+- `loginName` *string*
+- `displayName` *string*
+- `resourceOwner` *string*
+- `requestedOrgId` *string*
+- `requestedOrgName` *string*
+- `requestedPrimaryDomain` *string*
+- `requestedOrgDomain` *bool*
+- `applicationResourceOwner` *string*
+- `privateLabelingSetting` *Number*
+  <ul><li>0: Unspecified</li><li>1: Enforce project resource owner policy</li><li>2: Allow login user resource owner policy</li></ul>
+- `selectedIdpConfigId` *string*
+- `linkingUsers` Array of [*ExternalUser*](#external-user)
+- `passwordVerified` *bool*
+- `mfasVerified` Array of *Number*  
+  <ul><li>0: OTP</li><li>1: U2F</li><li>2: U2F User verification</li></ul>
+- `audience` Array of *string*
+- `authTime` *Date*
+
+## HTTP Request
+
+This object is based on the Golang struct [http.Request](https://pkg.go.dev/net/http#Request), some attributes are removed as not all provided information is usable in this context.
+
+- `method` *string*
+- `url` *string*
+- `proto` *string*
+- `contentLength` *number*
+- `host` *string*
+- `form` Map *string* of Array of *string*
+- `postForm` Map *string* of Array of *string*
+- `remoteAddr` *string*
+- `headers` Map *string* of Array of *string*
