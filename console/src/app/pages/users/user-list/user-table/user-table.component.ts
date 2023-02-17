@@ -200,6 +200,9 @@ export class UserTableComponent implements OnInit {
         case 'state':
           sortingField = UserFieldName.USER_FIELD_NAME_STATE;
           break;
+        case 'creationDate':
+          sortingField = UserFieldName.USER_FIELD_NAME_CREATION_DATE;
+          break;
       }
     this.userService
       .listUsers(

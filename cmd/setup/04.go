@@ -18,7 +18,7 @@ type EventstoreIndexes struct {
 }
 
 func (mig *EventstoreIndexes) Execute(ctx context.Context) error {
-	stmt, err := readStmt(mig.dbType)
+	stmt, err := readStmt(stmts, "04", mig.dbType, "index.sql")
 	if err != nil {
 		return err
 	}
@@ -30,7 +30,7 @@ func (mig *EventstoreIndexes) String() string {
 	return "04_eventstore_indexes"
 }
 
-func readStmt(typ string) (string, error) {
-	stmt, err := stmts.ReadFile("04/" + typ + "/index.sql")
+func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
+	stmt, err := fs.ReadFile(folder + "/" + typ + "/" + filename)
 	return string(stmt), err
 }

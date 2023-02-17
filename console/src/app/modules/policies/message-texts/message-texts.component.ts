@@ -441,7 +441,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   };
 
   public locale: string = 'en';
-  public LOCALES: string[] = ['en', 'de', 'it'];
+  public LOCALES: string[] = ['en', 'de', 'it', 'fr', 'pl', 'zh'];
   private sub: Subscription = new Subscription();
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN

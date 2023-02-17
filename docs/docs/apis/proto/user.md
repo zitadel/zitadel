@@ -134,7 +134,7 @@ title: zitadel/user.proto
 | name |  string | - |  |
 | description |  string | - |  |
 | has_secret |  bool | - |  |
-| access_token_typ |  AccessTokenType | - |  |
+| access_token_type |  AccessTokenType | - |  |
 
 
 
@@ -709,6 +709,7 @@ UserTypeQuery is always equals
 | USER_FIELD_NAME_EMAIL | 6 | - |
 | USER_FIELD_NAME_STATE | 7 | - |
 | USER_FIELD_NAME_TYPE | 8 | - |
+| USER_FIELD_NAME_CREATION_DATE | 9 | - |
 
 
 
