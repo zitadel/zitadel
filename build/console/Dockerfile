@@ -14,9 +14,7 @@ RUN npm ci
 
 # Sources
 COPY console .
-COPY --from=zitadel-base:local /proto /proto
-COPY --from=zitadel-base:local /usr/local/bin /usr/local/bin/.
-COPY build/console build/console/
+COPY proto/ /proto/
 
 #######################
 ## angular lint workspace and prod build
