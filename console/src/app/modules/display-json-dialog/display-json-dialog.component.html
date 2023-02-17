@@ -1,0 +1,79 @@
+<h2 class="title" mat-dialog-title>{{ 'IAM.EVENTS.DIALOG.TITLE' | translate }}</h2>
+<div mat-dialog-content>
+  <div class="event-data-column" *ngIf="event && (event | toobject) as event">
+    <div class="data-row" *ngIf="event && event.type && event.type.localized && event.type.localized.localizedMessage">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.TYPE' | translate }}</span>
+      <span>{{ event.type.localized.localizedMessage }}</span>
+    </div>
+
+    <div class="data-row" *ngIf="event && event.creationDate">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.CREATIONDATE' | translate }}</span>
+      <span>{{ event.creationDate | timestampToDate | localizedDate : 'EEE dd. MMM, HH:mm' }}</span>
+    </div>
+
+    <div class="data-row" *ngIf="event && event.aggregate && event.aggregate.id">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.AGGREGATEID' | translate }}</span>
+      <span>{{ event.aggregate.id }}</span>
+    </div>
+
+    <div class="data-row" *ngIf="event && event.aggregate && event.aggregate.resourceOwner">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.RESOURCEOWNER' | translate }}</span>
+      <span>{{ event.aggregate.resourceOwner }}</span>
+    </div>
+
+    <div
+      class="data-row"
+      *ngIf="
+        event &&
+        event.aggregate &&
+        event.aggregate.type &&
+        event.aggregate.type.localized &&
+        event.aggregate.type.localized.localizedMessage
+      "
+    >
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.AGGREGATETYPE' | translate }}</span>
+      <span class="state aggregate-type">{{ event.aggregate.type.localized.localizedMessage }}</span>
+    </div>
+
+    <div class="data-row" *ngIf="event && event.editor?.userId">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.EDITORID' | translate }}</span>
+      <span>{{ event.editor?.userId }}</span>
+    </div>
+
+    <div class="data-row" *ngIf="event && event.editor?.displayName">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.EDITOR' | translate }}</span>
+      <span>{{ event.editor?.displayName }}</span>
+    </div>
+
+    <div class="data-row" *ngIf="event && event.sequence">
+      <span class="label cnsl-secondary-text">{{ 'IAM.EVENTS.SEQUENCE' | translate }}</span>
+      <span>{{ event.sequence }}</span>
+    </div>
+  </div>
+
+  <div class="code" *ngIf="opened$ | async">
+    <ngx-codemirror
+      *ngIf="event"
+      [ngModel]="event | topayload | json"
+      [options]="{
+        height: 'auto',
+        readOnly: true,
+        lineNumbers: true,
+        lineWrapping: true,
+        indentWithTabs: false,
+        tabSize: 2,
+        theme: 'material',
+        mode: {
+          name: 'javascript',
+          json: true,
+          statementIndent: 2
+        }
+      }"
+    ></ngx-codemirror>
+  </div>
+</div>
+<div mat-dialog-actions class="action">
+  <button mat-stroked-button (click)="closeDialog()">
+    {{ 'ACTIONS.CANCEL' | translate }}
+  </button>
+</div>

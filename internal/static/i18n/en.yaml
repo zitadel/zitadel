@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: Machine key not found
         AlreadyExisting: Machine key already existing
+      Secret:
+        NotExisting: Secret doesn't exist
+        Invalid: Secret is invalid
+        CouldNotGenerate: Secret could not be generated
     PAT:
       NotFound: Personal Access Token not found
     NotHuman: The User must be personal
@@ -433,6 +437,28 @@ Errors:
     CloseRows: SQL Statement could not be finished
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
+  Quota:
+    AlreadyExists: Quota already exists for this unit
+    NotFound: Quota not found for this unit
+    Invalid:
+      CallURL: Quota call URL is invalid
+      Percent: Quota percent is lower than 1
+      Unimplemented: Quotas are not implemented for this unit
+      Amount: Quota amount is lower than 1
+      ResetInterval: Quota reset interval is shorter than a minute
+      Noop: An unlimited quota without notifications has no effect
+    Access:
+      Exhausted: The quota for authenticated requests is exhausted
+    Execution:
+      Exhausted: The quota for execution seconds is exhausted
+  LogStore:
+    Access:
+      StorageFailed: Storing access log to database failed
+      ScanFailed: Querying usage for authenticated requests failed
+    Execution:
+      StorageFailed: Storing action execution log to database failed
+      ScanFailed: Querying usage for action execution seconds failed
+
 
 AggregateTypes:
   action: Action
@@ -442,6 +468,7 @@ AggregateTypes:
   project: Project
   user: User
   usergrant: User grant
+  quota: Quota
 
 EventTypes:
   user:
@@ -477,6 +504,12 @@ EventTypes:
       key:
         added: Key added
         removed: Key removed
+      secret:
+        set: Secret set
+        removed: Secret removed
+        check:
+          succeeded: Secret check succeeded
+          failed: Secret check failed
     human:
       added: Person added
       selfregistered: Person registered himself

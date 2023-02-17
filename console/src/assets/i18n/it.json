@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Precedente",
     "NEXT": "Avanti",
-    "COUNT": "Risultati totali"
+    "COUNT": "Risultati totali",
+    "MORE": "avanti"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Istanza",
     "ORGS": "Organizzazioni",
     "VIEWS": "Views",
+    "EVENTS": "Eventi",
     "FAILEDEVENTS": "Eventi falliti",
     "ORGANIZATION": "Organizzazione",
     "DOMAINS": "Domini",
@@ -240,6 +242,8 @@
       "STATE": "Stato",
       "DELETE": "Elimina utente",
       "UNLOCK": "Sblocca utente",
+      "GENERATESECRET": "Genera Client Secret",
+      "REMOVESECRET": "Elimina Client Secret",
       "LOCKEDDESCRIPTION": "Questo utente \u00e8 stato bloccato a causa del superamento dei tentativi massimi di accesso e deve essere sbloccato per essere utilizzato di nuovo.",
       "DELETEACCOUNT": "Elimina account personale",
       "DELETEACCOUNT_DESC": "Se esegui questa azione, sarai disconnesso e non avrai più accesso al tuo account. Questa azione non può essere invertita.",
@@ -264,6 +268,10 @@
       "TITLE": "Invia una notifica via e-mail",
       "DESCRIPTION": "Clicca il pulsante qui sotto per inviare una notifica all'indirizzo email corrente o cambiare l'indirizzo email nel campo.",
       "NEWEMAIL": "Nuovo indirizzo e-mail"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Salvate il Client Secret in un luogo sicuro, perch\u00e9 non sarà più disponibile dopo aver chiuso la finestra di dialogo"
     },
     "TABLE": {
       "DEACTIVATE": "Disattiva",
@@ -405,6 +413,7 @@
       "TITLE": "Profilo",
       "EMAIL": "E-mail",
       "PHONE": "Numero di telefono",
+      "PHONE_HINT": "Utilizza 00 o il simbolo + seguito dal prefisso del paese, o seleziona il paese ed inserisci il numero di telefono",
       "USERNAME": "Nome utente",
       "CHANGEUSERNAME": "cambia",
       "CHANGEUSERNAME_TITLE": "Cambia nome utente",
@@ -424,7 +433,8 @@
         "PREVIEW": "Anteprima",
         "DELETESUCCESS": "Rimosso con successo!",
         "CROPPERERROR": "È successo un errore durante il caricamento del tuo file. Prova un formato e una dimensione diversi, se necessario."
-      }
+      },
+      "COUNTRY": "Paese"
     },
     "MACHINE": {
       "TITLE": "Dettagli dell'utente del servizio",
@@ -442,6 +452,11 @@
       "CHOOSEEXPIRY": "Seleziona una data di scadenza",
       "CREATIONDATE": "Data di creazione",
       "KEYDETAILS": "Dettagli chiave",
+      "ACCESSTOKENTYPE": "Tipo Access Token",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Aggiungi chiave",
         "DESCRIPTION": "Seleziona il tuo tipo di chiave e scegli una data di scadenza opzionale."
@@ -589,7 +604,9 @@
       "MACHINEADDED": "Utente di servizio creato!",
       "DELETED": "Utente cancellato con successo!",
       "UNLOCKED": "Utente sbloccato con successo!",
-      "PASSWORDLESSREGISTRATIONSENT": "Link per la registrazione inviato con successo."
+      "PASSWORDLESSREGISTRATIONSENT": "Link per la registrazione inviato con successo.",
+      "SECRETGENERATED": "Secret generato con successo!",
+      "SECRETREMOVED": "Secret rimosso con successo!"
     },
     "MEMBERSHIPS": {
       "TITLE": "Memberships di ZITADEL",
@@ -750,6 +767,56 @@
       "DELETE": "Rimuovi",
       "DELETESUCCESS": "Eventi falliti rimossi."
     },
+    "EVENTS": {
+      "TITLE": "Eventi",
+      "DESCRIPTION": "Questa vista mostra tutti gli eventi in arrivo",
+      "EDITOR": "Editore",
+      "EDITORID": "ID Editore",
+      "AGGREGATE": "Aggregato",
+      "AGGREGATEID": "ID aggregato",
+      "AGGREGATETYPE": "Tipo aggregato",
+      "RESOURCEOWNER": "Resouce owner",
+      "SEQUENCE": "Sequenza",
+      "CREATIONDATE": "Creato",
+      "TYPE": "Tipo",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtra",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "filtra per editore"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "filtra per aggregato"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtra per tipo"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filter per Resource Owner"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequence",
+          "CHECKBOX": "Filter per sequenza",
+          "SORT": "",
+          "ASC": "Ascending",
+          "DESC": "Descending"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Creation Date",
+          "CHECKBOX": "Filter by Creation Date"
+        },
+        "OTHER": "altro",
+        "OTHERS": "altri"
+      },
+      "DIALOG": {
+        "TITLE": "Dettaglio dell'evento"
+      }
+    },
     "TOAST": {
       "MEMBERREMOVED": "Manager rimosso.",
       "MEMBERSADDED": "I manager sono stati aggiunti con successo.",
@@ -782,6 +849,9 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
       "DELETE": "Elimina organizzazione",
+      "DEFAULTLABEL": "Standard",
+      "SETASDEFAULT": "Imposta come organizzazione predefinita",
+      "DEFAULTORGSET": "Organizzazione predefinita cambiata con successo",
       "RENAME": {
         "ACTION": "Rinomina",
         "TITLE": "Rinomina organizzazione",
@@ -912,7 +982,8 @@
       "en": "English",
       "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1103,7 +1174,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1877,7 +1949,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

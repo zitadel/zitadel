@@ -31,7 +31,16 @@ func AddAudScopeToAudience(ctx context.Context, audience, scopes []string) []str
 		if projectID == ProjectIDScopeZITADEL {
 			projectID = authz.GetInstance(ctx).ProjectID()
 		}
-		audience = append(audience, projectID)
+		audience = addProjectID(audience, projectID)
 	}
 	return audience
+}
+
+func addProjectID(audience []string, projectID string) []string {
+	for _, a := range audience {
+		if a == projectID {
+			return audience
+		}
+	}
+	return append(audience, projectID)
 }

@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: Maschinen Schlüssel nicht gefunden
         AlreadyExisting: Machine Schlüssel exisiert bereits
+      Secret:
+        NotExisting: Secret existiert nicht
+        Invalid: Secret ist ungültig
+        CouldNotGenerate: Secret konnte nicht generiert werden
     PAT:
       NotFound: Persönliches Access Token nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
@@ -433,6 +437,27 @@ Errors:
     CloseRows: SQL Statement konnte nicht abgeschlossen werden
     SQLStatement: SQL Statement konnte nicht erstellt werden
     InvalidRequest: Anfrage ist ungültig
+  Quota:
+    AlreadyExists: Das Kontingent existiert bereits für diese Einheit
+    NotFound: Kontingent für diese Einheit nicht gefunden
+    Invalid:
+      CallURL: Aufruf URL für Kontingent ist ungültig
+      Percent: Kontingent Prozent is unter 1
+      Unimplemented: Kontingente sind für diese Einheit nicht implementiert
+      Amount: Kontingent Menge ist kleiner als 1
+      ResetInterval: Das Rücksetzungsintervall für das Kontingent ist kürzer als eine Minute
+      Noop: Ein unlimitiertes Kontingent ohne Benachrichtigungen hat keinen Effekt
+    Access:
+      Exhausted: Das Kontingent für authentifizierte Requests ist aufgebraucht
+    Execution:
+      Exhausted: Das Kontingent für Action Sekunden ist aufgebraucht
+  LogStore:
+    Access:
+      StorageFailed: Das Speichern des Access Logs in der Datenbank ist fehlgeschlagen
+      ScanFailed: Das Abfragen der verbrauchten authentifizierten Requests ist fehlgeschlagen
+    Execution:
+      StorageFailed: Das Speichern des Action Logs in der Datenbank ist fehlgeschlagen
+      ScanFailed: Das Abfragen der verbrauchten Actions Sekunden ist fehlgeschlagen
 
 AggregateTypes:
   action: Action
@@ -442,6 +467,7 @@ AggregateTypes:
   project: Projekt
   user: Benutzer
   usergrant: Benutzerberechtigung
+  quota: Kontingent
 
 EventTypes:
   user:
@@ -475,8 +501,14 @@ EventTypes:
       added: Technischer Benutzer hinzugefügt
       changed: Technischer Benutzer geändert
       key:
-        added: Key added
-        removed: Key removed
+        added: Key hinzugefügt
+        removed: Key entfernt
+      secret:
+        set: Secret gesetzt
+        removed: Secret entfernt
+        check:
+          succeeded: Secret Überprüfung erfolgreich
+          failed: Secret Überprüfung fehlgeschlagen
     human:
       added: Benutzer hinzugefügt
       selfregistered: Benutzer hat sich selbst registriert

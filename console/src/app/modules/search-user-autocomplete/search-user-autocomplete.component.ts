@@ -64,6 +64,15 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
       this.filteredUsers = [];
       this.unsubscribed$.next(); // clear old subscription
     } else if (this.target === UserTarget.SELF) {
+      // feat-3916 show users as soon as I am in the input field of the user
+      const query = new SearchQuery();
+      const lnQuery = new LoginNameQuery();
+      lnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+      query.setLoginNameQuery(lnQuery);
+      this.userService.listUsers(10, 0, [query]).then((users) => {
+        this.filteredUsers = users.resultList;
+      });
+
       this.getFilteredResults(); // new subscription
     }
   }

@@ -87,6 +87,10 @@ Errors:
       Key:
         NotFound: Clé de la machine non trouvée
         AlreadyExisting: Clé de la machine déjà existante
+      Secret:
+        NotExisting: Secret n'existe pas
+        Invalid: Secret n'est pas valide
+        CouldNotGenerate: Secret n'a pas pu être généré
     PAT:
       NotFound: Token d'accès personnel non trouvé
     NotHuman: L'utilisateur doit être personnel
@@ -433,6 +437,27 @@ Errors:
     CloseRows: L'instruction SQL n'a pas pu être terminée
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
+  Quota:
+    AlreadyExists: Contingent existe déjà pour cette unité
+    NotFound: Contingent non trouvé pour cette unité
+    Invalid:
+      CallURL: L'URL d'appel du contingent n'est pas valide
+      Percent: Pourcent du contingent est inférieure à 1
+      Unimplemented: Les contingents ne sont pas implémentés pour cette unité
+      Amount: Quantité contingentée est inférieure à 1
+      ResetInterval: L'intervalle de réinitialisation entre les contingents est inférieur à une minute
+      Noop: Un contingent illimité sans notifications n'a aucun effet
+    Access:
+      Exhausted: Le quota de requêtes authentifiées est épuisé
+    Execution:
+      Exhausted: Le quota de secondes d'action est épuisé
+  LogStore:
+    Access:
+      StorageFailed: L'enregistrement du journal d'accès dans la base de données a échoué
+      ScanFailed: L'interrogation des requêtes authentifiées consommées a échoué
+    Execution:
+      StorageFailed: L'enregistrement du journal d'action dans la base de données a échoué
+      ScanFailed: L'interrogation des secondes d'action consommées a échoué
 
 AggregateTypes:
   action: Action
@@ -442,6 +467,7 @@ AggregateTypes:
   project: Projet
   user: Utilisateur
   usergrant: Subvention de l'utilisateur
+  quota: Contingent
 
 EventTypes:
   user:
@@ -475,6 +501,12 @@ EventTypes:
       key:
         added: Clé ajoutée
         removed: Clé supprimée
+      secret:
+        set: Secret défini
+        removed: Secret supprimée
+        check:
+          succeeded: La vérification de Secret réussie
+          failed: La vérification de Secret a échoué
     human:
       added: Personne ajoutée
       selfregistered: La personne s'est enregistrée elle-même

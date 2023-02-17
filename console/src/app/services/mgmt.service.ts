@@ -98,6 +98,8 @@ import {
   DeactivateUserResponse,
   DeleteActionRequest,
   DeleteActionResponse,
+  GenerateMachineSecretRequest,
+  GenerateMachineSecretResponse,
   GenerateOrgDomainValidationRequest,
   GenerateOrgDomainValidationResponse,
   GetActionRequest,
@@ -310,6 +312,8 @@ import {
   RemoveIDPFromLoginPolicyResponse,
   RemoveMachineKeyRequest,
   RemoveMachineKeyResponse,
+  RemoveMachineSecretRequest,
+  RemoveMachineSecretResponse,
   RemoveMultiFactorFromLoginPolicyRequest,
   RemoveMultiFactorFromLoginPolicyResponse,
   RemoveOrgDomainRequest,
@@ -469,6 +473,7 @@ import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zita
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
 import { GrantedProject, Project, ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
 import {
+  AccessTokenType,
   Gender,
   MembershipQuery,
   SearchQuery as UserSearchQuery,
@@ -717,6 +722,18 @@ export class ManagementService {
     return this.grpcService.mgmt.unlockUser(req, null).then((resp) => resp.toObject());
   }
 
+  public generateMachineSecret(userId: string): Promise<GenerateMachineSecretResponse.AsObject> {
+    const req = new GenerateMachineSecretRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.generateMachineSecret(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeMachineSecret(userId: string): Promise<RemoveMachineSecretResponse.AsObject> {
+    const req = new RemoveMachineSecretRequest();
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removeMachineSecret(req, null).then((resp) => resp.toObject());
+  }
+
   public getPrivacyPolicy(): Promise<GetPrivacyPolicyResponse.AsObject> {
     const req = new GetPrivacyPolicyRequest();
     return this.grpcService.mgmt.getPrivacyPolicy(req, null).then((resp) => resp.toObject());
@@ -885,7 +902,12 @@ export class ManagementService {
     return this.grpcService.mgmt.addMachineUser(req, null).then((resp) => resp.toObject());
   }
 
-  public updateMachine(userId: string, name?: string, description?: string): Promise<UpdateMachineResponse.AsObject> {
+  public updateMachine(
+    userId: string,
+    name?: string,
+    description?: string,
+    accessTokenType?: AccessTokenType,
+  ): Promise<UpdateMachineResponse.AsObject> {
     const req = new UpdateMachineRequest();
     req.setUserId(userId);
     if (name) {
@@ -893,6 +915,9 @@ export class ManagementService {
     }
     if (description) {
       req.setDescription(description);
+    }
+    if (accessTokenType !== undefined) {
+      req.setAccessTokenType(accessTokenType);
     }
     return this.grpcService.mgmt.updateMachine(req, null).then((resp) => resp.toObject());
   }

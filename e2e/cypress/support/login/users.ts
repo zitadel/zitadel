@@ -82,8 +82,10 @@ export function login(
 
         onAuthenticated ? onAuthenticated() : null;
 
+        cy.visit('/');
+
         cy.get('[data-e2e=authenticated-welcome]', {
-          timeout: 10_000,
+          timeout: 50_000,
         });
       },
       {

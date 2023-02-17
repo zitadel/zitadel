@@ -581,6 +581,30 @@ Changes a machine user
     PUT: /users/{user_id}/machine
 
 
+### GenerateMachineSecret
+
+> **rpc** GenerateMachineSecret([GenerateMachineSecretRequest](#generatemachinesecretrequest))
+[GenerateMachineSecretResponse](#generatemachinesecretresponse)
+
+Generates and sets a new machine secret
+
+
+
+    PUT: /users/{user_id}/secret
+
+
+### RemoveMachineSecret
+
+> **rpc** RemoveMachineSecret([RemoveMachineSecretRequest](#removemachinesecretrequest))
+[RemoveMachineSecretResponse](#removemachinesecretresponse)
+
+Removes the machine secret
+
+
+
+    DELETE: /users/{user_id}/secret
+
+
 ### GetMachineKeyByIDs
 
 > **rpc** GetMachineKeyByIDs([GetMachineKeyByIDsRequest](#getmachinekeybyidsrequest))
@@ -3001,6 +3025,68 @@ Change JWT identity provider configuration of the organisation
     PUT: /idps/{idp_id}/jwt_config
 
 
+### ListProviders
+
+> **rpc** ListProviders([ListProvidersRequest](#listprovidersrequest))
+[ListProvidersResponse](#listprovidersresponse)
+
+Returns all identity providers, which match the query
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /idps/templates/_search
+
+
+### GetProviderByID
+
+> **rpc** GetProviderByID([GetProviderByIDRequest](#getproviderbyidrequest))
+[GetProviderByIDResponse](#getproviderbyidresponse)
+
+Returns an identity provider of the organisation
+
+
+
+    GET: /idps/templates/{id}
+
+
+### AddLDAPProvider
+
+> **rpc** AddLDAPProvider([AddLDAPProviderRequest](#addldapproviderrequest))
+[AddLDAPProviderResponse](#addldapproviderresponse)
+
+Add a new ldap identity provider in the organisation
+
+
+
+    POST: /idps/ldap
+
+
+### UpdateLDAPProvider
+
+> **rpc** UpdateLDAPProvider([UpdateLDAPProviderRequest](#updateldapproviderrequest))
+[UpdateLDAPProviderResponse](#updateldapproviderresponse)
+
+Change an existing ldap identity provider in the organisation
+
+
+
+    PUT: /idps/ldap/{id}
+
+
+### DeleteProvider
+
+> **rpc** DeleteProvider([DeleteProviderRequest](#deleteproviderrequest))
+[DeleteProviderResponse](#deleteproviderresponse)
+
+Remove an identity provider
+Will remove all linked providers of this configuration on the users
+
+
+
+    DELETE: /idps/templates/{id}
+
+
 ### ListActions
 
 > **rpc** ListActions([ListActionsRequest](#listactionsrequest))
@@ -3527,6 +3613,39 @@ This is an empty request
 
 
 
+### AddLDAPProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| port |  string | - | string.max_len: 5<br />  |
+| tls |  bool | - |  |
+| base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_unique_attribute |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| admin |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| password |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| attributes |  zitadel.idp.v1.LDAPAttributes | - |  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
+
+
+
+
+### AddLDAPProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
 ### AddMachineKeyRequest
 
 
@@ -3562,6 +3681,7 @@ This is an empty request
 | user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | description |  string | - | string.max_len: 500<br />  |
+| access_token_type |  zitadel.user.v1.AccessTokenType | - | enum.defined_only: true<br />  |
 
 
 
@@ -4421,6 +4541,52 @@ This is an empty request
 
 ### DeleteActionResponse
 
+
+
+
+
+### DeleteProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### DeleteProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### GenerateMachineSecretRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+
+
+
+
+### GenerateMachineSecretResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| client_secret |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -5490,6 +5656,28 @@ This is an empty request
 
 
 
+### GetProviderByIDRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetProviderByIDResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp |  zitadel.idp.v1.Provider | - |  |
+
+
+
+
 ### GetSupportedLanguagesRequest
 This is an empty request
 
@@ -6495,6 +6683,30 @@ This is an empty request
 
 
 
+### ListProvidersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated ProviderQuery | criteria the client is looking for |  |
+
+
+
+
+### ListProvidersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.idp.v1.Provider | - |  |
+
+
+
+
 ### ListUserChangesRequest
 
 
@@ -6636,6 +6848,19 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ProviderQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_id_query |  zitadel.idp.v1.IDPIDQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.idp_name_query |  zitadel.idp.v1.IDPNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.owner_type_query |  zitadel.idp.v1.IDPOwnerTypeQuery | - |  |
 
 
 
@@ -7165,6 +7390,28 @@ This is an empty request
 
 
 ### RemoveMachineKeyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveMachineSecretRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveMachineSecretResponse
 
 
 
@@ -8689,6 +8936,39 @@ This is an empty request
 
 
 
+### UpdateLDAPProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| port |  string | - | string.max_len: 5<br />  |
+| tls |  bool | - |  |
+| base_dn |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_object_class |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_unique_attribute |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| admin |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| password |  string | - | string.max_len: 200<br />  |
+| attributes |  zitadel.idp.v1.LDAPAttributes | - |  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
+
+
+
+
+### UpdateLDAPProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateMachineRequest
 
 
@@ -8698,6 +8978,7 @@ This is an empty request
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | description |  string | - | string.max_len: 500<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| access_token_type |  zitadel.user.v1.AccessTokenType | - | enum.defined_only: true<br />  |
 
 
 

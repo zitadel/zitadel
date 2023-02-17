@@ -280,8 +280,16 @@ docker compose down
 ## Contribute Docs
 
 Project documentation is made with docusaurus and is located under [./docs](./docs).
+
+### Local Testing
 Please refer to the [README](./docs/README.md) for more information and local testing.
 
+### Style Guide
+
+- **Code with variables**: Make sure that code snippets can be used by setting environment variables, instead of manually replacing a placeholder.
+- **Embedded files**: When embedding mdx files, make sure the template ist prefixed by "_" (lowdash). The content will be rendered inside the parent page, but is not accessible individually (eg, by search).
+
+### Docs Pull Request
 When making a pull request use `docs(<scope>): <short summary>` as title for the semantic release.
 Scope can be left empty (omit the brackets) or refer to the top navigation sections.
 
@@ -308,41 +316,60 @@ You can find an installation guide for all the different environments here:
 ## Product Management
 
 The ZITADEL Team works with an agile product management methodology.
-You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/1/views/2).
+You can find all the issues prioritized and ordered in the [product board](https://github.com/orgs/zitadel/projects/2/views/1).
 
-Every two weeks the team goes through all the new issues and decided about the priority, effort and if it is ready to start or in the backlog.
-If it is something critical or urgent we will have a look at it earlier.
-To show the community the needed information, each issue gets labels.
+### Sprint
 
-## About the Labels
+We want to deliver a new release every second week. So we plan everything in two-week sprints.
+Each Tuesday we estimate new issues and on Wednesday the last sprint will be reviewed and the next one will be planned.
+After a sprint ends a new version of ZITADEL will be released, and publish to [ZITADEL Cloud](https://zitadel.cloud) the following Monday.
 
-There are a few general labels that don't belong to a specific category.
+If there are some critical or urgent issues we will have a look at it earlier, than the two weeks.
+To show the community the needed information, each issue gets attributes and labels.
 
-- **good first issue**: This label shows contibuters, that it is an easy entry point to start developing on ZITADEL.
-- **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
+### About the attributes
 
-### Priority
+You can find the attributes on the project "Product Management".
 
-Priority shows you the priority the ZITADEL team has given this issue. In general the more customers want a feature the higher the priority gets.
-
-- **priority: critical**: This is a security issue or something that has to be fixed urgently, because customers can't work anymore.
-- **priority: high**: These are the issues the ZITADEL Team is currently focusing on and will be implemented as soon as possible.
-- **priority: medium**: After all the high issues are done these will be next.
-- **priority: low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
-
-### State
+#### State
 
 The state should reflect the progress of the issue and what is going on right now.
 
-- **state: triage**: Each issue gets this state automatically on creating and it means the ZITADEL team should have a look at it, prioritize and sort into categories or ask for more information if needed.
-- **state: tbd**: If the issue has the state tbd (to be defined) it means the team does need more information either from the author or internal.
-- **state: backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be processed in the future. Issues with this state do not have to be completely defined yet.
-- **state: ready**: An issue with the state ready is ready to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
-- **state: in progress**: Someone is working on this issue right now.
-- **state: waiting**: For some reason, this issue will have to wait. This can be a feedback that is being waited for, a dependent issue or anything else.
-- **state: duplicate**: The same issue already exists. This issue will probably be closed with a reference to the other issue.
+- **No status**: Issue just got added and has to be looked at.
+- **🧐 Investigating**: We are currently investigating to find out what the problem is, which priority it should have and what has to be implemented. Or we need some more information from the author.
+- **📨 Product Backlog**: If an issue is in the backlog, it is not currently being worked on. These are recorded so that they can be worked on in the future. Issues with this state do not have to be completely defined yet.
+- **📝 Prioritized Product Backlog**: An issue with the state "Prioritized Backlog" is ready for the refinement from the perspective of the product owner (PO) to implement. This means the developer can find all the relevant information and acceptance criteria in the issue.
+- **🔖 Ready**: The issue is ready to take into a sprint. Difference to "prioritized..." is that the complexity is defined by the team.
+- **📋 Sprint Backlog**: The issue is scheduled for the current sprint.
+- **🏗 In progress**: Someone is working on this issue right now. The issue will get an assignee as soon as it is in progress.
+- **👀 In review**: The issue is in review. Please add someone to review your issue or let us know that it is ready to review with a comment on your pull request.
+- **✅ Done**: The issue is implemented and merged to main.
 
-### Category
+#### Priority
+
+Priority shows you the priority the ZITADEL team has given this issue. In general the higher the demand from customers and community for the feature, the higher the priority.
+
+- **🌋 Critical**: This is a security issue or something that has to be fixed urgently, because the software is not usable or highly vulnerable.
+- **🏔 High**: These are the issues the ZITADEL team is currently focusing on and will be implemented as soon as possible.
+- **🏕 Medium**: After all the high issues are done these will be next.
+- **🏝 Low**: This is low in priority and will probably not be implemented in the next time or just if someone has some time in between.
+
+
+#### Complexity
+
+This should give you an indication how complex the issue is. It's not about the hours or effort it takes.
+Everything that is higher than 8 should be split in smaller parts.
+
+**1**, **2**, **3**, **5**, **8**, **13**
+
+### About the Labels
+
+There are a few general labels that don't belong to a specific category.
+
+- **good first issue**: This label shows contributors, that it is an easy entry point to start developing on ZITADEL.
+- **help wanted**: The author is seeking help on this topic, this may be from an internal ZITADEL team member or external contributors.
+
+#### Category
 
 The category shows which part of ZITADEL is affected.
 
@@ -354,7 +381,7 @@ The category shows which part of ZITADEL is affected.
 - **category: infra**: Infrastructure does include many different parts. E.g Terraform-provider, docker, metrics, etc.
 - **category: translation**: Everything concerning translations or new languages
 
-### Language
+#### Language
 
 The language shows you in which programming language the affected part is written
 
@@ -362,13 +389,3 @@ The language shows you in which programming language the affected part is writte
 - **lang: go**
 - **lang: javascript**
 
-### Effort
-
-The effort should give you an indication how much work it takes. This is based on a rough estimation.
-Everything that is higher than 8 should be split in smaller parts.
-
-- **effort: 1**
-- **effort: 2**
-- **effort: 3**
-- **effort: 5**
-- **effort: 8**

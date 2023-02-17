@@ -10,6 +10,12 @@
   [hasActions]="['user.write$', 'user.write:' + user.id] | hasRole | async"
 >
   <ng-template topActions cnslHasRole [hasRole]="['user.write$', 'user.write:' + user.id]">
+    <button mat-menu-item color="warn" *ngIf="user?.machine" (click)="generateMachineSecret()">
+      {{ 'USER.PAGES.GENERATESECRET' | translate }}
+    </button>
+    <button mat-menu-item color="warn" *ngIf="user?.machine?.hasSecret" (click)="removeMachineSecret()">
+      {{ 'USER.PAGES.REMOVESECRET' | translate }}
+    </button>
     <button mat-menu-item color="warn" *ngIf="user?.state === UserState.USER_STATE_LOCKED" (click)="unlockUser()">
       {{ 'USER.PAGES.UNLOCK' | translate }}
     </button>
