@@ -252,6 +252,54 @@ func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Contex
 	}, nil
 }
 
+func (s *Server) GetCustomPasswordChangeMessageText(ctx context.Context, req *mgmt_pb.GetCustomPasswordChangeMessageTextRequest) (*mgmt_pb.GetCustomPasswordChangeMessageTextResponse, error) {
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordChangeMessageType, req.Language, false)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetCustomPasswordChangeMessageTextResponse{
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) GetDefaultPasswordChangeMessageText(ctx context.Context, req *mgmt_pb.GetDefaultPasswordChangeMessageTextRequest) (*mgmt_pb.GetDefaultPasswordChangeMessageTextResponse, error) {
+	msg, err := s.query.IAMMessageTextByTypeAndLanguage(ctx, domain.PasswordChangeMessageType, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetDefaultPasswordChangeMessageTextResponse{
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) SetCustomPasswordChangeMessageCustomText(ctx context.Context, req *mgmt_pb.SetCustomPasswordChangeMessageTextRequest) (*mgmt_pb.SetCustomPasswordChangeMessageTextResponse, error) {
+	result, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, SetPasswordChangeCustomTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.SetCustomPasswordChangeMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomPasswordChangeMessageTextToDefault(ctx context.Context, req *mgmt_pb.ResetCustomPasswordChangeMessageTextToDefaultRequest) (*mgmt_pb.ResetCustomPasswordChangeMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveOrgMessageTexts(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordChangeMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ResetCustomPasswordChangeMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) GetCustomPasswordlessRegistrationMessageText(ctx context.Context, req *mgmt_pb.GetCustomPasswordlessRegistrationMessageTextRequest) (*mgmt_pb.GetCustomPasswordlessRegistrationMessageTextResponse, error) {
 	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordlessRegistrationMessageType, req.Language, false)
 	if err != nil {

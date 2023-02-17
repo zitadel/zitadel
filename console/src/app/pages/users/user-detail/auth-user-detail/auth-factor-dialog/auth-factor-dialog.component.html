@@ -6,7 +6,13 @@
     <p class="desc cnsl-secondary-text">{{ 'USER.MFA.DIALOG.ADD_MFA_DESCRIPTION' | translate }}</p>
 
     <div class="type-selection">
-      <button mat-raised-button color="primary" [disabled]="data.otpDisabled" (click)="selectType(AuthFactorType.OTP)">
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="data.otpDisabled$ | async"
+        (click)="selectType(AuthFactorType.OTP)"
+        data-e2e="add-factor-otp"
+      >
         <div class="otp-btn">
           <mat-icon class="icon" svgIcon="mdi_radar"></mat-icon>
           <span>{{ 'USER.MFA.OTP' | translate }}</span>
@@ -29,7 +35,7 @@
     <p class="desc cnsl-secondary-text">{{ 'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate }}</p>
 
     <div class="qrcode-wrapper">
-      <qr-code *ngIf="otpurl" class="qrcode" [value]="otpurl" [size]="150" [errorCorrectionLevel]="'M'"></qr-code>
+      <qrcode *ngIf="otpurl" class="qrcode" qrcode [qrdata]="otpurl" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
 
       <div class="otp-flex" *ngIf="otpsecret">
         <span class="overflow-auto">{{ otpsecret }}</span>

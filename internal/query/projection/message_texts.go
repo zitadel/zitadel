@@ -273,7 +273,8 @@ func isMessageTemplate(template string) bool {
 		template == domain.VerifyEmailMessageType ||
 		template == domain.VerifyPhoneMessageType ||
 		template == domain.DomainClaimedMessageType ||
-		template == domain.PasswordlessRegistrationMessageType
+		template == domain.PasswordlessRegistrationMessageType ||
+		template == domain.PasswordChangeMessageType
 }
 func isTitle(key string) bool {
 	return key == domain.MessageTitle

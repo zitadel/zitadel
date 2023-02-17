@@ -7,9 +7,11 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
+	"github.com/zitadel/zitadel/internal/logstore"
 )
 
 func TestRun(t *testing.T) {
+	SetLogstoreService(logstore.New(nil, nil, nil))
 	type args struct {
 		timeout time.Duration
 		api     apiFields

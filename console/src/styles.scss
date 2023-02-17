@@ -1,19 +1,14 @@
 @use '@angular/material' as mat;
 
-@import '~codemirror/lib/codemirror';
+@import 'codemirror/lib/codemirror.css';
 @import './component-themes';
 @import './styles/lato-font.scss';
 @import '@angular/material/theming';
+@import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 $material-design-icons-font-directory-path: '~material-design-icons-iconfont/dist/fonts/';
 
-@import '~material-design-icons-iconfont/src/material-design-icons';
-
-// Plus imports for other components in your app.
-
-// Include the common styles for Angular Material. We include this here so that you only
-// have to load a single css file for Angular Material in your app.
-// Be sure that you only ever include this mixin once!
+@import 'material-design-icons-iconfont/src/material-design-icons.scss';
 
 @font-face {
   font-family: ailerons;
@@ -369,11 +364,12 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
-$custom-typography: mat.define-typography-config(
+$custom-typography: mat.define-legacy-typography-config(
   $font-family: 'Lato',
 );
 
-@include mat.core($custom-typography);
+@include mat.all-legacy-component-typographies($custom-typography);
+@include mat.legacy-core();
 
 .mat-dialog-container,
 .mat-raised-button,
@@ -416,16 +412,15 @@ $custom-typography: mat.define-typography-config(
 }
 
 @include component-themes($caos-dark-app-theme);
-@include mat.all-component-themes($caos-dark-app-theme);
+@include mat.all-legacy-component-themes($caos-dark-app-theme);
 
 .light-theme {
   @include component-themes($caos-light-app-theme);
-  @include mat.all-component-themes($caos-light-app-theme);
+  @include mat.all-legacy-component-themes($caos-light-app-theme);
 
   $background: map-get($caos-light-app-theme, background);
   $foreground: map-get($caos-light-app-theme, foreground);
 
-  --color-main: var(--theme-light-primary-500);
   --warn: #cd3d56;
   --success: #10b981;
   $border-color: map-get($foreground, divider);
@@ -493,7 +488,6 @@ $custom-typography: mat.define-typography-config(
   $background: map-get($caos-dark-app-theme, background);
   $foreground: map-get($caos-dark-app-theme, foreground);
 
-  --color-main: var(--theme-dark-primary-500);
   --warn: #ff3b5b;
   --success: #10b981;
   $border-color: map-get($foreground, divider);

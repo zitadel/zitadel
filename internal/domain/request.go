@@ -42,7 +42,6 @@ func (a *AuthRequestOIDC) IsValid() bool {
 
 type AuthRequestSAML struct {
 	ID          string
-	RequestID   string
 	BindingType string
 	Code        string
 	Issuer      string

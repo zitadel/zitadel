@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -82,6 +83,9 @@ type InstanceSetup struct {
 		SecondFactorCheckLifetime  time.Duration
 		MultiFactorCheckLifetime   time.Duration
 	}
+	NotificationPolicy struct {
+		PasswordChange bool
+	}
 	PrivacyPolicy struct {
 		TOSLink     string
 		PrivacyLink string
@@ -112,6 +116,9 @@ type InstanceSetup struct {
 		IdTokenLifetime            time.Duration
 		RefreshTokenIdleExpiration time.Duration
 		RefreshTokenExpiration     time.Duration
+	}
+	Quotas *struct {
+		Items []*AddQuota
 	}
 }
 
@@ -236,6 +243,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
 		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(
@@ -255,6 +263,19 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		prepareActivateDefaultLabelPolicy(instanceAgg),
 
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
+	}
+
+	if setup.Quotas != nil {
+		for _, q := range setup.Quotas.Items {
+			quotaId, err := c.idGenerator.Next()
+			if err != nil {
+				return "", "", nil, nil, err
+			}
+
+			quotaAggregate := quota.NewAggregate(quotaId, instanceID, instanceID)
+
+			validations = append(validations, c.AddQuotaCommand(quotaAggregate, q))
+		}
 	}
 
 	for _, msg := range setup.MessageTexts {

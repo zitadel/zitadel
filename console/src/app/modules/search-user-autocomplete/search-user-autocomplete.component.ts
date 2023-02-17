@@ -11,8 +11,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent } from '@angular/material/chips';
+import {
+  MatLegacyAutocomplete as MatAutocomplete,
+  MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent,
+} from '@angular/material/legacy-autocomplete';
+import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListUsersResponse } from 'src/app/proto/generated/zitadel/management_pb';
@@ -61,6 +64,15 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
       this.filteredUsers = [];
       this.unsubscribed$.next(); // clear old subscription
     } else if (this.target === UserTarget.SELF) {
+      // feat-3916 show users as soon as I am in the input field of the user
+      const query = new SearchQuery();
+      const lnQuery = new LoginNameQuery();
+      lnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+      query.setLoginNameQuery(lnQuery);
+      this.userService.listUsers(10, 0, [query]).then((users) => {
+        this.filteredUsers = users.resultList;
+      });
+
       this.getFilteredResults(); // new subscription
     }
   }
