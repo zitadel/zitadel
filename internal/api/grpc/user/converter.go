@@ -70,9 +70,10 @@ func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 
 func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
-		Name:        view.Name,
-		Description: view.Description,
-		HasSecret:   view.HasSecret,
+		Name:           view.Name,
+		Description:    view.Description,
+		HasSecret:      view.HasSecret,
+		AccessTokenTyp: AccessTokenTypeToPb(view.AccessTokenType),
 	}
 }
 
@@ -129,6 +130,17 @@ func GenderToDomain(gender user_pb.Gender) domain.Gender {
 	}
 }
 
+func AccessTokenTypeToDomain(accessTokenType user_pb.AccessTokenType) domain.OIDCTokenType {
+	switch accessTokenType {
+	case user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER:
+		return domain.OIDCTokenTypeBearer
+	case user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_JWT:
+		return domain.OIDCTokenTypeJWT
+	default:
+		return -1
+	}
+}
+
 func UserStateToPb(state domain.UserState) user_pb.UserState {
 	switch state {
 	case domain.UserStateActive:
@@ -158,6 +170,17 @@ func GenderToPb(gender domain.Gender) user_pb.Gender {
 		return user_pb.Gender_GENDER_MALE
 	default:
 		return user_pb.Gender_GENDER_UNSPECIFIED
+	}
+}
+
+func AccessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user_pb.AccessTokenType {
+	switch accessTokenType {
+	case domain.OIDCTokenTypeBearer:
+		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER
+	case domain.OIDCTokenTypeJWT:
+		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_JWT
+	default:
+		return user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER
 	}
 }
 

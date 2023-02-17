@@ -8,18 +8,20 @@ import (
 )
 
 type clientCredentialsRequest struct {
-	sub    string
-	scopes []string
+	sub      string
+	audience []string
+	scopes   []string
 }
 
+// GetSubject returns the subject for token to be created because of the client credentials request
+// the subject will be the id of the service user
 func (c *clientCredentialsRequest) GetSubject() string {
 	return c.sub
 }
 
 // GetAudience returns the audience for token to be created because of the client credentials request
-// return nil as the audience is set during the token creation in command.addUserToken
 func (c *clientCredentialsRequest) GetAudience() []string {
-	return nil
+	return c.audience
 }
 
 func (c *clientCredentialsRequest) GetScopes() []string {
@@ -27,13 +29,14 @@ func (c *clientCredentialsRequest) GetScopes() []string {
 }
 
 type clientCredentialsClient struct {
-	id string
+	id        string
+	tokenType op.AccessTokenType
 }
 
 // AccessTokenType returns the AccessTokenType for the token to be created because of the client credentials request
 // machine users currently only have opaque tokens ([op.AccessTokenTypeBearer])
 func (c *clientCredentialsClient) AccessTokenType() op.AccessTokenType {
-	return op.AccessTokenTypeBearer
+	return c.tokenType
 }
 
 // GetID returns the client_id (username of the machine user) for the token to be created because of the client credentials request

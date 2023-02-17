@@ -113,6 +113,7 @@ module.exports = {
             "guides/integrate/pat",
             "guides/integrate/access-zitadel-system-api",
             "guides/integrate/export-and-import",
+            "guides/integrate/event-api",
           ],
         },
         {

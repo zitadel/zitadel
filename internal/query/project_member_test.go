@@ -20,20 +20,20 @@ var (
 		", members.user_id" +
 		", members.roles" +
 		", projections.login_names2.login_name" +
-		", projections.users7_humans.email" +
-		", projections.users7_humans.first_name" +
-		", projections.users7_humans.last_name" +
-		", projections.users7_humans.display_name" +
-		", projections.users7_machines.name" +
-		", projections.users7_humans.avatar_key" +
+		", projections.users8_humans.email" +
+		", projections.users8_humans.first_name" +
+		", projections.users8_humans.last_name" +
+		", projections.users8_humans.display_name" +
+		", projections.users8_machines.name" +
+		", projections.users8_humans.avatar_key" +
 		", COUNT(*) OVER () " +
 		"FROM projections.project_members3 AS members " +
-		"LEFT JOIN projections.users7_humans " +
-		"ON members.user_id = projections.users7_humans.user_id " +
-		"AND members.instance_id = projections.users7_humans.instance_id " +
-		"LEFT JOIN projections.users7_machines " +
-		"ON members.user_id = projections.users7_machines.user_id " +
-		"AND members.instance_id = projections.users7_machines.instance_id " +
+		"LEFT JOIN projections.users8_humans " +
+		"ON members.user_id = projections.users8_humans.user_id " +
+		"AND members.instance_id = projections.users8_humans.instance_id " +
+		"LEFT JOIN projections.users8_machines " +
+		"ON members.user_id = projections.users8_machines.user_id " +
+		"AND members.instance_id = projections.users8_machines.instance_id " +
 		"LEFT JOIN projections.login_names2 " +
 		"ON members.user_id = projections.login_names2.user_id " +
 		"AND members.instance_id = projections.login_names2.instance_id " +

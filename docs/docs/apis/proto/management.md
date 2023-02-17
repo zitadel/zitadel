@@ -3586,6 +3586,7 @@ This is an empty request
 | user_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | description |  string | - | string.max_len: 500<br />  |
+| access_token_type |  zitadel.user.v1.AccessTokenType | - | enum.defined_only: true<br />  |
 
 
 
@@ -8768,6 +8769,7 @@ This is an empty request
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | description |  string | - | string.max_len: 500<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| access_token_type |  zitadel.user.v1.AccessTokenType | - | enum.defined_only: true<br />  |
 
 
 

@@ -170,9 +170,10 @@ func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resource
 		ObjectRoot: models.ObjectRoot{
 			ResourceOwner: resourceowner,
 		},
-		Username:    req.UserName,
-		Name:        req.Name,
-		Description: req.Description,
+		Username:        req.UserName,
+		Name:            req.Name,
+		Description:     req.Description,
+		AccessTokenType: user_grpc.AccessTokenTypeToDomain(req.AccessTokenType),
 	}
 }
 
@@ -226,8 +227,9 @@ func UpdateMachineRequestToCommand(req *mgmt_pb.UpdateMachineRequest, orgID stri
 			AggregateID:   req.UserId,
 			ResourceOwner: orgID,
 		},
-		Name:        req.Name,
-		Description: req.Description,
+		Name:            req.Name,
+		Description:     req.Description,
+		AccessTokenType: user_grpc.AccessTokenTypeToDomain(req.AccessTokenType),
 	}
 }
 
