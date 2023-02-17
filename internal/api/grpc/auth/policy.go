@@ -27,3 +27,13 @@ func (s *Server) GetMyPrivacyPolicy(ctx context.Context, _ *auth_pb.GetMyPrivacy
 		Policy: policy_grpc.ModelPrivacyPolicyToPb(policy),
 	}, nil
 }
+
+func (s *Server) GetMyLoginPolicy(ctx context.Context, _ *auth_pb.GetMyLoginPolicyRequest) (*auth_pb.GetMyLoginPolicyResponse, error) {
+	policy, err := s.query.LoginPolicyByID(ctx, true, authz.GetCtxData(ctx).OrgID, false)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.GetMyLoginPolicyResponse{
+		Policy: policy_grpc.ModelLoginPolicyToPb(policy),
+	}, nil
+}

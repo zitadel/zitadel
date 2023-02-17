@@ -62,6 +62,7 @@ type Steps struct {
 	s4EventstoreIndexes  *EventstoreIndexes
 	s5LastFailed         *LastFailed
 	s6OwnerRemoveColumns *OwnerRemoveColumns
+	s7LogstoreTables     *LogstoreTables
 }
 
 type encryptionKeyConfig struct {

@@ -19,6 +19,7 @@ profile.cov
 __debug_bin
 debug
 sandbox.go
+/cmd/dev/
 
 # IDE
 .idea
@@ -67,3 +68,5 @@ migrations/cockroach/migrate_cloud.go
 
 go.work
 go.work.sum
+# Local Netlify folder
+.netlify

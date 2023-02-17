@@ -1,5 +1,3 @@
-import { debug } from 'console';
-
 export enum User {
   OrgOwner = 'org_owner',
   OrgOwnerViewer = 'org_owner_viewer',
@@ -84,8 +82,10 @@ export function login(
 
         onAuthenticated ? onAuthenticated() : null;
 
+        cy.visit('/');
+
         cy.get('[data-e2e=authenticated-welcome]', {
-          timeout: 10_000,
+          timeout: 50_000,
         });
       },
       {

@@ -11,4 +11,4 @@ import { InstanceSettingsComponent } from './instance-settings.component';
   declarations: [InstanceSettingsComponent],
   imports: [CommonModule, InstanceSettingsRoutingModule, SettingsListModule, HasRolePipeModule, TranslateModule],
 })
-export class InstanceSettingsModule {}
+export default class InstanceSettingsModule {}

@@ -60,7 +60,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:     "from@domain.ch",
 					FromName: "name",
 					SMTP: smtp.SMTP{
-						Host:     "host",
+						Host:     "host:587",
 						User:     "user",
 						Password: "password",
 					},
@@ -95,7 +95,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
-								"host",
+								"host:587",
 								"user",
 								&crypto.CryptoValue{},
 							),
@@ -110,7 +110,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:     "from@domain.ch",
 					FromName: "name",
 					SMTP: smtp.SMTP{
-						Host:     "host",
+						Host:     "host:587",
 						User:     "user",
 						Password: "password",
 					},
@@ -150,7 +150,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 									true,
 									"from@domain.ch",
 									"name",
-									"host",
+									"host:587",
 									"user",
 									&crypto.CryptoValue{
 										CryptoType: crypto.TypeEncryption,
@@ -172,7 +172,115 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 					From:     "from@domain.ch",
 					FromName: "name",
 					SMTP: smtp.SMTP{
+						Host:     "host:587",
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "smtp config, port is missing",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				smtp: &smtp.EmailConfig{
+					Tls:      true,
+					From:     "from@domain.ch",
+					FromName: "name",
+					SMTP: smtp.SMTP{
 						Host:     "host",
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "smtp config, host is empty",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				smtp: &smtp.EmailConfig{
+					Tls:      true,
+					From:     "from@domain.ch",
+					FromName: "name",
+					SMTP: smtp.SMTP{
+						Host:     "   ",
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add smtp config, ipv6 works",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, false,
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								instance.NewSMTPConfigAddedEvent(
+									context.Background(),
+									&instance.NewAggregate("INSTANCE").Aggregate,
+									true,
+									"from@domain.ch",
+									"name",
+									"[2001:db8::1]:2525",
+									"user",
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("password"),
+									},
+								),
+							),
+						},
+					),
+				),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				smtp: &smtp.EmailConfig{
+					Tls:      true,
+					From:     "from@domain.ch",
+					FromName: "name",
+					SMTP: smtp.SMTP{
+						Host:     "[2001:db8::1]:2525",
 						User:     "user",
 						Password: "password",
 					},
@@ -253,7 +361,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:     "from@domain.ch",
 					FromName: "name",
 					SMTP: smtp.SMTP{
-						Host: "host",
+						Host: "host:587",
 						User: "user",
 					},
 				},
@@ -288,7 +396,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
-								"host",
+								"host:587",
 								"user",
 								&crypto.CryptoValue{},
 							),
@@ -303,7 +411,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:     "from@wrongdomain.ch",
 					FromName: "name",
 					SMTP: smtp.SMTP{
-						Host: "host",
+						Host: "host:587",
 						User: "user",
 					},
 				},
@@ -338,7 +446,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
-								"host",
+								"host:587",
 								"user",
 								&crypto.CryptoValue{},
 							),
@@ -353,7 +461,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:     "from@domain.ch",
 					FromName: "name",
 					SMTP: smtp.SMTP{
-						Host: "host",
+						Host: "host:587",
 						User: "user",
 					},
 				},
@@ -388,7 +496,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								true,
 								"from@domain.ch",
 								"name",
-								"host",
+								"host:587",
 								"user",
 								&crypto.CryptoValue{},
 							),
@@ -403,7 +511,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 									false,
 									"from2@domain.ch",
 									"name2",
-									"host2",
+									"host2:587",
 									"user2",
 								),
 							),
@@ -418,7 +526,118 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 					From:     "from2@domain.ch",
 					FromName: "name2",
 					SMTP: smtp.SMTP{
-						Host: "host2",
+						Host: "host2:587",
+						User: "user2",
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "smtp config, port is missing",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				smtp: &smtp.EmailConfig{
+					Tls:      true,
+					From:     "from@domain.ch",
+					FromName: "name",
+					SMTP: smtp.SMTP{
+						Host:     "host",
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "smtp config, host is empty",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				smtp: &smtp.EmailConfig{
+					Tls:      true,
+					From:     "from@domain.ch",
+					FromName: "name",
+					SMTP: smtp.SMTP{
+						Host:     "   ",
+						User:     "user",
+						Password: "password",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "smtp config change, ipv6 works",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewDomainAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"domain.ch",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewDomainPolicyAddedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true, true, true,
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMTPConfigAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								true,
+								"from@domain.ch",
+								"name",
+								"host:587",
+								"user",
+								&crypto.CryptoValue{},
+							),
+						),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusherWithInstanceID(
+								"INSTANCE",
+								newSMTPConfigChangedEvent(
+									context.Background(),
+									false,
+									"from2@domain.ch",
+									"name2",
+									"[2001:db8::1]:2525",
+									"user2",
+								),
+							),
+						},
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				smtp: &smtp.EmailConfig{
+					Tls:      false,
+					From:     "from2@domain.ch",
+					FromName: "name2",
+					SMTP: smtp.SMTP{
+						Host: "[2001:db8::1]:2525",
 						User: "user2",
 					},
 				},
@@ -497,7 +716,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 								true,
 								"from",
 								"name",
-								"host",
+								"host:587",
 								"user",
 								&crypto.CryptoValue{},
 							),
@@ -600,7 +819,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 								true,
 								"from",
 								"name",
-								"host",
+								"host:587",
 								"user",
 								&crypto.CryptoValue{},
 							),

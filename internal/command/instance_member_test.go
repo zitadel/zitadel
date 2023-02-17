@@ -480,7 +480,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 			},
 		},
 		{
-			name: "member not existing, nil result",
+			name: "member not existing, empty object details result",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -492,7 +492,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: nil,
+				want: &domain.ObjectDetails{},
 			},
 		},
 		{

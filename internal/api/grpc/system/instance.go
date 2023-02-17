@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
+	"github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
@@ -30,7 +31,6 @@ func (s *Server) ListInstances(ctx context.Context, req *system_pb.ListInstances
 }
 
 func (s *Server) GetInstance(ctx context.Context, req *system_pb.GetInstanceRequest) (*system_pb.GetInstanceResponse, error) {
-	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 	instance, err := s.query.Instance(ctx, true)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,6 @@ func (s *Server) AddInstance(ctx context.Context, req *system_pb.AddInstanceRequ
 }
 
 func (s *Server) UpdateInstance(ctx context.Context, req *system_pb.UpdateInstanceRequest) (*system_pb.UpdateInstanceResponse, error) {
-	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 	details, err := s.command.UpdateInstance(ctx, req.InstanceName)
 	if err != nil {
 		return nil, err
@@ -85,13 +84,28 @@ func (s *Server) CreateInstance(ctx context.Context, req *system_pb.CreateInstan
 }
 
 func (s *Server) RemoveInstance(ctx context.Context, req *system_pb.RemoveInstanceRequest) (*system_pb.RemoveInstanceResponse, error) {
-	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 	details, err := s.command.RemoveInstance(ctx, req.InstanceId)
 	if err != nil {
 		return nil, err
 	}
 	return &system_pb.RemoveInstanceResponse{
 		Details: object.AddToDetailsPb(details.Sequence, details.EventDate, details.ResourceOwner),
+	}, nil
+}
+
+func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembersRequest) (*system_pb.ListIAMMembersResponse, error) {
+	queries, err := ListIAMMembersRequestToQuery(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IAMMembers(ctx, queries, false)
+	if err != nil {
+		return nil, err
+	}
+	return &system_pb.ListIAMMembersResponse{
+		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		//TODO: resource owner of user of the member instead of the membership resource owner
+		Result: member.MembersToPb("", res.Members),
 	}, nil
 }
 
@@ -121,7 +135,6 @@ func (s *Server) ExistsDomain(ctx context.Context, req *system_pb.ExistsDomainRe
 }
 
 func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequest) (*system_pb.ListDomainsResponse, error) {
-	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 	queries, err := ListInstanceDomainsRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -138,8 +151,6 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 }
 
 func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest) (*system_pb.AddDomainResponse, error) {
-	//TODO: should be solved in interceptor
-	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 	instance, err := s.query.Instance(ctx, true)
 	if err != nil {
 		return nil, err
@@ -156,7 +167,6 @@ func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest)
 }
 
 func (s *Server) RemoveDomain(ctx context.Context, req *system_pb.RemoveDomainRequest) (*system_pb.RemoveDomainResponse, error) {
-	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 	details, err := s.command.RemoveInstanceDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err
@@ -167,7 +177,6 @@ func (s *Server) RemoveDomain(ctx context.Context, req *system_pb.RemoveDomainRe
 }
 
 func (s *Server) SetPrimaryDomain(ctx context.Context, req *system_pb.SetPrimaryDomainRequest) (*system_pb.SetPrimaryDomainResponse, error) {
-	ctx = authz.WithInstanceID(ctx, req.InstanceId)
 	details, err := s.command.SetPrimaryInstanceDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err

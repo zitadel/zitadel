@@ -1,13 +1,22 @@
 ---
-title: Production Checklist
+title: Production Setup
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/self-hosting/deploy/overview),
 you are ready to configure ZITADEL for production usage.
 
+
+## TL;DR
+We created a [Production Checklist](./productionchecklist.md) as a technical step by step guide.
+
 ## High Availability
 
-We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers, like [Kubernetes]/docs/self-hosting/deploy/kubernetes). For keeping startup times fast when scaling ZITADEL, you should also consider using separate jobs with `zitadel init` and `zitadel setup`, so your workload containers just have to execute `zitadel start`.
+We recommend running ZITADEL highly available using an orchestrator that schedules ZITADEL on multiple servers,
+like [Kubernetes](/docs/self-hosting/deploy/kubernetes).
+For keeping startup times fast when scaling ZITADEL,
+you should also consider using separate jobs with `zitadel init` and `zitadel setup`,
+so your workload containers just have to execute `zitadel start`.
+Read more about separating the init and setup phases on the [Updating and Scaling page](/docs/self-hosting/manage/updating_scaling).
 
 ## Configuration
 
@@ -130,3 +139,8 @@ DefaultInstance:
 - Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).
+
+## Quotas
+
+If you host ZITADEL as a service,
+you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/quotas).

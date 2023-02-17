@@ -607,6 +607,17 @@ service AuthService {
             permission: "authenticated"
         };
     }
+
+    // Returns the login policy of the current organisation
+    rpc GetMyLoginPolicy(GetMyLoginPolicyRequest) returns (GetMyLoginPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/login"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
 }
 
 //This is an empty request
@@ -1052,4 +1063,11 @@ message GetMyPrivacyPolicyRequest {}
 
 message GetMyPrivacyPolicyResponse {
     zitadel.policy.v1.PrivacyPolicy policy = 1;
+}
+
+//This is an empty request
+message GetMyLoginPolicyRequest {}
+
+message GetMyLoginPolicyResponse {
+    zitadel.policy.v1.LoginPolicy policy = 1;
 }

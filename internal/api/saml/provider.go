@@ -40,7 +40,8 @@ func NewProvider(
 	es *eventstore.Eventstore,
 	projections *sql.DB,
 	instanceHandler,
-	userAgentCookie func(http.Handler) http.Handler,
+	userAgentCookie,
+	accessHandler func(http.Handler) http.Handler,
 ) (*provider.Provider, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
@@ -64,6 +65,7 @@ func NewProvider(
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
+			accessHandler,
 			http_utils.CopyHeadersToContext,
 		),
 	}

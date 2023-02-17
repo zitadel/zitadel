@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/quota"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/static"
@@ -110,6 +111,7 @@ func StartCommands(es *eventstore.Eventstore,
 	proj_repo.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
+	quota.RegisterEventMappers(repo.eventstore)
 
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
@@ -129,6 +131,7 @@ func StartCommands(es *eventstore.Eventstore,
 
 func AppendAndReduce(object interface {
 	AppendEvents(...eventstore.Event)
+	// TODO: Why is it allowed to return an error here?
 	Reduce() error
 }, events ...eventstore.Event) error {
 	object.AppendEvents(events...)

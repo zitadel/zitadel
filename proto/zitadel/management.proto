@@ -625,6 +625,29 @@ service ManagementService {
         };
     }
 
+    // Generates and sets a new machine secret
+    rpc GenerateMachineSecret(GenerateMachineSecretRequest) returns (GenerateMachineSecretResponse) {
+        option (google.api.http) = {
+            put: "/users/{user_id}/secret"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Removes the machine secret
+    rpc RemoveMachineSecret(RemoveMachineSecretRequest) returns (RemoveMachineSecretResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/secret"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
     // Returns a machine key of a (machine) user
     rpc GetMachineKeyByIDs(GetMachineKeyByIDsRequest) returns (GetMachineKeyByIDsResponse) {
         option (google.api.http) = {
@@ -2248,7 +2271,7 @@ service ManagementService {
         };
     }
 
-    // Update the privacy complexity policy for the organisation
+    // Update the privacy policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
     // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
@@ -2267,6 +2290,68 @@ service ManagementService {
     rpc ResetPrivacyPolicyToDefault(ResetPrivacyPolicyToDefaultRequest) returns (ResetPrivacyPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/privacy"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
+    // Returns the notification policy of the organisation
+    // With this notification policy it can be configured how users should be notified
+    rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/notification"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    // Returns the default notification policy of the IAM
+    // With this notification privacy it can be configured how users should be notified
+    rpc GetDefaultNotificationPolicy(GetDefaultNotificationPolicyRequest) returns (GetDefaultNotificationPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/default/notification"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read"
+        };
+    }
+
+    // Add a custom notification policy for the organisation
+    // With this notification privacy it can be configured how users should be notified
+    rpc AddCustomNotificationPolicy(AddCustomNotificationPolicyRequest) returns (AddCustomNotificationPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/notification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Update the notification policy for the organisation
+    // With this notification privacy it can be configured how users should be notified
+    rpc UpdateCustomNotificationPolicy(UpdateCustomNotificationPolicyRequest) returns (UpdateCustomNotificationPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/notification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write"
+        };
+    }
+
+    // Removes the notification policy of the organisation
+    // The default policy of the IAM will trigger after
+    rpc ResetNotificationPolicyToDefault(ResetNotificationPolicyToDefaultRequest) returns (ResetNotificationPolicyToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/policies/notification"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2487,7 +2572,7 @@ service ManagementService {
 
     // Sets the custom text for password reset message
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetCustomPasswordResetMessageText(SetCustomPasswordResetMessageTextRequest) returns (SetCustomPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordreset/{language}";
@@ -2535,7 +2620,7 @@ service ManagementService {
 
     // Sets the custom text for verify email message
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetCustomVerifyEmailMessageText(SetCustomVerifyEmailMessageTextRequest) returns (SetCustomVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyemail/{language}";
@@ -2583,7 +2668,7 @@ service ManagementService {
 
     // Sets the default custom text for verify email message
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetCustomVerifyPhoneMessageText(SetCustomVerifyPhoneMessageTextRequest) returns (SetCustomVerifyPhoneMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyphone/{language}";
@@ -2631,7 +2716,7 @@ service ManagementService {
 
     // Sets the custom text for domain claimed message
     // The Following Variables can be used:
-    // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetCustomDomainClaimedMessageCustomText(SetCustomDomainClaimedMessageTextRequest) returns (SetCustomDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/domainclaimed/{language}";
@@ -2679,7 +2764,7 @@ service ManagementService {
 
     // Sets the custom text for passwordless link message
     // The Following Variables can be used:
-    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetCustomPasswordlessRegistrationMessageCustomText(SetCustomPasswordlessRegistrationMessageTextRequest) returns (SetCustomPasswordlessRegistrationMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordless_registration/{language}";
@@ -2696,6 +2781,54 @@ service ManagementService {
     rpc ResetCustomPasswordlessRegistrationMessageTextToDefault(ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest) returns (ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/message/passwordless_registration/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+    }
+
+    //Returns the custom text for password change message
+    rpc GetCustomPasswordChangeMessageText(GetCustomPasswordChangeMessageTextRequest) returns (GetCustomPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/password_change/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+    }
+
+    //Returns the custom text for password change link message
+    rpc GetDefaultPasswordChangeMessageText(GetDefaultPasswordChangeMessageTextRequest) returns (GetDefaultPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/password_change/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+    }
+
+    // Sets the custom text for password change message
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
+    rpc SetCustomPasswordChangeMessageCustomText(SetCustomPasswordChangeMessageTextRequest) returns (SetCustomPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/password_change/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write";
+        };
+    }
+
+    // Removes the custom password change message text of the organisation
+    // The default text of the IAM will trigger after
+    rpc ResetCustomPasswordChangeMessageTextToDefault(ResetCustomPasswordChangeMessageTextToDefaultRequest) returns (ResetCustomPasswordChangeMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/password_change/{language}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2867,6 +3000,66 @@ service ManagementService {
         option (google.api.http) = {
             put: "/idps/{idp_id}/jwt_config"
             body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Returns all identity providers, which match the query
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {
+        option (google.api.http) = {
+            post: "/idps/templates/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.read"
+        };
+    }
+
+    // Returns an identity provider of the organisation
+    rpc GetProviderByID(GetProviderByIDRequest) returns (GetProviderByIDResponse) {
+        option (google.api.http) = {
+            get: "/idps/templates/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.read"
+        };
+    }
+
+    // Add a new ldap identity provider in the organisation
+    rpc AddLDAPProvider(AddLDAPProviderRequest) returns (AddLDAPProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/ldap"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing ldap identity provider in the organisation
+    rpc UpdateLDAPProvider(UpdateLDAPProviderRequest) returns (UpdateLDAPProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/ldap/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Remove an identity provider
+    // Will remove all linked providers of this configuration on the users
+    rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
+        option (google.api.http) = {
+            delete: "/idps/templates/{id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -3180,6 +3373,7 @@ message AddMachineUserRequest {
 
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string description = 3 [(validate.rules).string = {max_len: 500}];
+    zitadel.user.v1.AccessTokenType access_token_type = 4 [(validate.rules).enum = {defined_only: true}];
 }
 
 message AddMachineUserResponse {
@@ -3500,9 +3694,28 @@ message UpdateMachineRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string description = 2 [(validate.rules).string.max_len = 500];
     string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.user.v1.AccessTokenType access_token_type = 4 [(validate.rules).enum = {defined_only: true}];
 }
 
 message UpdateMachineResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GenerateMachineSecretRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GenerateMachineSecretResponse {
+    string client_id = 1;
+    string client_secret = 2;
+    zitadel.v1.ObjectDetails details = 3;
+}
+
+message RemoveMachineSecretRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMachineSecretResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -4942,6 +5155,43 @@ message ResetPrivacyPolicyToDefaultResponse {
 }
 
 //This is an empty request
+message GetNotificationPolicyRequest {}
+
+message GetNotificationPolicyResponse {
+    zitadel.policy.v1.NotificationPolicy policy = 1;
+}
+
+//This is an empty request
+message GetDefaultNotificationPolicyRequest {}
+
+message GetDefaultNotificationPolicyResponse {
+    zitadel.policy.v1.NotificationPolicy policy = 1;
+}
+
+message AddCustomNotificationPolicyRequest {
+    bool password_change = 1;
+}
+
+message AddCustomNotificationPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateCustomNotificationPolicyRequest {
+    bool password_change = 1;
+}
+
+message UpdateCustomNotificationPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message ResetNotificationPolicyToDefaultRequest {}
+
+message ResetNotificationPolicyToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
 message GetLabelPolicyRequest {}
 
 message GetLabelPolicyResponse {
@@ -5393,6 +5643,51 @@ message ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+
+message GetCustomPasswordChangeMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomPasswordChangeMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetDefaultPasswordChangeMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultPasswordChangeMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetCustomPasswordChangeMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetCustomPasswordChangeMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomPasswordChangeMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomPasswordChangeMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetOrgIDPByIDRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -5682,6 +5977,80 @@ message UpdateOrgIDPJWTConfigRequest {
 }
 
 message UpdateOrgIDPJWTConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListProvidersRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criteria the client is looking for
+    repeated ProviderQuery queries = 2;
+}
+
+message ProviderQuery {
+    oneof query {
+        zitadel.idp.v1.IDPIDQuery idp_id_query = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name_query = 2;
+        zitadel.idp.v1.IDPOwnerTypeQuery owner_type_query = 3;
+    }
+}
+
+message ListProvidersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.idp.v1.Provider result = 2;
+}
+
+message GetProviderByIDRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetProviderByIDResponse {
+    zitadel.idp.v1.Provider idp = 1;
+}
+
+message AddLDAPProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string host = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string port = 3 [(validate.rules).string = {max_len: 5}];
+    bool tls = 4;
+    string base_dn = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_object_class = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_unique_attribute = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string admin = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string password = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.LDAPAttributes attributes = 10;
+    zitadel.idp.v1.Options provider_options = 11;
+}
+
+message AddLDAPProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateLDAPProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string host = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string port = 4 [(validate.rules).string = {max_len: 5}];
+    bool tls = 5;
+    string base_dn = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_object_class = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_unique_attribute = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string admin = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string password = 10 [(validate.rules).string = {max_len: 200}];
+    zitadel.idp.v1.LDAPAttributes attributes = 11;
+    zitadel.idp.v1.Options provider_options = 12;
+}
+
+message UpdateLDAPProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeleteProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

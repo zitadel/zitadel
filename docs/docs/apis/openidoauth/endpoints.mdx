@@ -325,6 +325,53 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 | refresh_token | An new opaque refresh_token.                                                          |
 | token_type    | Type of the `access_token`. Value is always `Bearer`                                  |
 
+### Client Credentials Grant
+
+#### Required request Parameters
+
+| Parameter  | Description                                                                                                             |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| grant_type | Must be `client_credentials`                                                                                            |
+| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid profile`        |
+
+Additionally, you need to authenticate your client by either sending `client_id` and `client_secret` as Basic Auth Header.
+Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+
+```BASH
+curl --request POST \
+  --url {your_domain}/oauth/v2/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Authorization: Basic ${BASIC_AUTH}' \
+  --data grant_type=client_credentials \
+  --data scope=openid profile
+```
+
+Or you can also send your `client_id` and `client_secret` as parameters in the body:
+
+| Parameter     | Description                      |
+| ------------- | -------------------------------- |
+| client_id     | client_id of the application     |
+| client_secret | client_secret of the application |
+
+```BASH
+curl --request POST \
+  --url {your_domain}/oauth/v2/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data grant_type=client_credentials \
+  --data client_id=${CLIENT_ID} \
+  --data client_secret=${CLIENT_SECRET} \
+  --data scope=openid profile
+```
+
+#### Successful Client Credentials response {#token-client-credentials-response}
+
+| Property     | Description                                                                           |
+| ------------ | ------------------------------------------------------------------------------------- |
+| access_token | An `access_token` as JWT or opaque token                                              |
+| expires_in   | Number of second until the expiration of the `access_token`                           |
+| scope        | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
+| token_type   | Type of the `access_token`. Value is always `Bearer`                                  |
+
 ### Error response
 
 | error_type             | Possible reason                                                                                                                                                                                                                                              |
