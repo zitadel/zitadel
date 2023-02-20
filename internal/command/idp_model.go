@@ -38,6 +38,11 @@ func (wm *GoogleIDPWriteModel) Reduce() error {
 				continue
 			}
 			wm.reduceChangedEvent(e)
+		case *idp.RemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.State = domain.IDPStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
