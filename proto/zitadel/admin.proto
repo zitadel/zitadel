@@ -45,10 +45,40 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     tags: [
         {
+            name: "Authentication Methods"
+        },
+        {
+            name: "Branding",
+        },
+        {
+            name: "Domain Settings"
+        },
+        {
             name: "General"
         },
         {
+            name: "Identity Providers"
+        },
+        {
             name: "Instance"
+        },
+        {
+            name: "Login Settings"
+        },
+        {
+           name: "Notification Providers"
+        },
+        {
+            name: "Notification Settings"
+        },
+        {
+            name: "Organizations"
+        },
+        {
+            name: "Password Settings",
+        },
+        {
+            name: "Privacy Settings",
         },
         {
             name: "Secrets"
@@ -58,6 +88,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "SMTP"
+        },
+        {
+            name: "Settings"
         }
     ];
     schemes: HTTPS;
@@ -265,7 +298,6 @@ service AdminService {
         };
     }
 
-    // Get Secret Generator by type (e.g PasswordResetCode)
     rpc GetSecretGenerator(GetSecretGeneratorRequest) returns (GetSecretGeneratorResponse) {
         option (google.api.http) = {
             get: "/secretgenerators/{generator_type}";
@@ -516,7 +548,6 @@ service AdminService {
         };
     }
 
-    // Get OIDC settings (e.g token lifetimes, etc.)
     rpc GetOIDCSettings(GetOIDCSettingsRequest) returns (GetOIDCSettingsResponse) {
         option (google.api.http) = {
             get: "/settings/oidc";
@@ -525,9 +556,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            summary: "Get OIDC Settings";
+            description: "The OIDC Settings define the lifetimes of the different tokens in OIDC."
+        };
     }
 
-    // Add oidc settings (e.g token lifetimes, etc)
     rpc AddOIDCSettings(AddOIDCSettingsRequest) returns (AddOIDCSettingsResponse) {
         option (google.api.http) = {
             post: "/settings/oidc";
@@ -537,9 +573,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            summary: "Add OIDC Settings";
+            description: "Create new OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and clients."
+        };
     }
 
-    // Update oidc settings (e.g token lifetimes, etc)
     rpc UpdateOIDCSettings(UpdateOIDCSettingsRequest) returns (UpdateOIDCSettingsResponse) {
         option (google.api.http) = {
             put: "/settings/oidc";
@@ -549,9 +590,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            summary: "Add OIDC Settings";
+            description: "Update existing OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and clients."
+        };
     }
 
-    // Get file system notification provider
     rpc GetFileSystemNotificationProvider(GetFileSystemNotificationProviderRequest) returns (GetFileSystemNotificationProviderResponse) {
         option (google.api.http) = {
             get: "/notification/provider/file";
@@ -560,9 +606,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Notification Providers";
+            summary: "Get Notification Provider Filesystem";
+            description: "Returns a filesystem notification provider if configured. This provider is only used for testing purpose. The notifications will be written to the filesystem."
+        };
     }
 
-    // Get log notification provider
     rpc GetLogNotificationProvider(GetLogNotificationProviderRequest) returns (GetLogNotificationProviderResponse) {
         option (google.api.http) = {
             get: "/notification/provider/log";
@@ -571,9 +622,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Notification Providers";
+            summary: "Get Notification Provider Log";
+            description: "Returns a log notification provider if configured. This provider is only used for testing purpose. The notifications will be written to the logs."
+        };
     }
 
-    // Get the security policy
     rpc GetSecurityPolicy(GetSecurityPolicyRequest) returns (GetSecurityPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/security";
@@ -582,9 +638,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            summary: "Get Security Settings";
+            description: "Returns the security settings of the ZITADEL instance. The settings define if iframe is allowed and from which origins."
+        };
     }
 
-    // set the security policy
     rpc SetSecurityPolicy(SetSecurityPolicyRequest) returns (SetSecurityPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/security";
@@ -594,9 +655,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            summary: "Set Security Settings";
+            description: "Set the security settings of the ZITADEL instance. The settings define if iframe is allowed and from which origins."
+        };
     }
 
-    // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
             get: "/orgs/{id}";
@@ -607,8 +673,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "orgs";
-            tags: "global";
+            tags: "Organizations";
+            summary: "Get Organization By ID";
+            description: "Returns an organization by its ID. Make sure the user has the permissions to access the organization."
             responses: {
                 key: "200";
                 value: {
@@ -618,7 +685,6 @@ service AdminService {
         };
     }
 
-    //Checks whether an organisation exists by the given parameters
     rpc IsOrgUnique(IsOrgUniqueRequest) returns (IsOrgUniqueResponse) {
         option (google.api.http) = {
             get: "/orgs/_is_unique";
@@ -629,8 +695,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "orgs";
-            tags: "global";
+            tags: "Organizations";
+            summary: "Is Organization Unique";
+            description: "Checks if an organization with the searched parameters already exists or not."
             responses: {
                 key: "200";
                 value: {
@@ -646,7 +713,6 @@ service AdminService {
         };
     }
 
-    // Set the default org
     rpc SetDefaultOrg(SetDefaultOrgRequest) returns (SetDefaultOrgResponse) {
         option (google.api.http) = {
             put: "/orgs/default/{org_id}";
@@ -655,9 +721,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            tags: "Settings";
+            summary: "Set Default Organization";
+            description: "Sets the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization."
+        };
     }
 
-    // Set the default org
     rpc GetDefaultOrg(GetDefaultOrgRequest) returns (GetDefaultOrgResponse) {
         option (google.api.http) = {
             get: "/orgs/default";
@@ -666,10 +738,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Organizations";
+            tags: "Settings";
+            summary: "Get Default Organization";
+            description: "Get the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization."
+        };
     }
 
-    //Returns all organisations matching the request
-    // all queries need to match (AND)
     rpc ListOrgs(ListOrgsRequest) returns (ListOrgsResponse) {
         option (google.api.http) = {
             post: "/orgs/_search";
@@ -681,8 +758,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "orgs";
-            tags: "global";
+            tags: "Organizations";
+            summary: "Search Organization";
+            description: "Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition."
             responses: {
                 key: "200";
                 value: {
@@ -703,8 +781,6 @@ service AdminService {
         };
     }
 
-    //Creates a new org and user
-    // and adds the user to the orgs members as ORG_OWNER
     rpc SetUpOrg(SetUpOrgRequest) returns (SetUpOrgResponse) {
         option (google.api.http) = {
             post: "/orgs/_setup";
@@ -716,8 +792,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "orgs";
-            tags: "global";
+            tags: "Organizations";
+            summary: "Setup Organization";
+            description: "Create a new organization with an administration user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER."
             responses: {
                 key: "200";
                 value: {
@@ -738,9 +815,6 @@ service AdminService {
         };
     }
 
-
-    // Sets the state of the organisation and all its resource (Users, Projects, Grants to and from the org) to removed
-    // Users of this organisation will not be able login
     rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}"
@@ -750,8 +824,9 @@ service AdminService {
             permission: "iam.write";
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "orgs";
-            tags: "global";
+            tags: "Organizations";
+            summary: "Remove Organization";
+            description: "Sets the state of the organisation and all its resource (Users, Projects, Grants to and from the org) to removed. Users of this organisation will not be able login."
             responses: {
                 key: "200";
                 value: {
@@ -773,7 +848,6 @@ service AdminService {
     }
 
 
-    // Returns a identity provider configuration of the IAM instance
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
             get: "/idps/{id}";
@@ -784,7 +858,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
+            tags: "Identity Providers";
+            summary: "Get Identity Provider (IDP) by ID";
+            description: "Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc."
             responses: {
                 key: "200";
                 value: {
@@ -805,7 +881,6 @@ service AdminService {
         };
     }
 
-    // Returns all identity provider configurations of the IAM instance
     rpc ListIDPs(ListIDPsRequest) returns (ListIDPsResponse) {
         option (google.api.http) = {
             post: "/idps/_search";
@@ -817,7 +892,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
+            tags: "Identity Providers";
+            summary: "Search Identity Providers (IDP)";
+            description: "Returns a list of identity provider (social/enterprise login) configured on an instance level. e.g Google, AzureAD, etc."
             responses: {
                 key: "200";
                 value: {
@@ -838,7 +915,6 @@ service AdminService {
         };
     }
 
-    // Adds a new oidc identity provider configuration the IAM instance
     rpc AddOIDCIDP(AddOIDCIDPRequest) returns (AddOIDCIDPResponse) {
         option (google.api.http) = {
             post: "/idps/oidc";
@@ -850,9 +926,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
-            tags: "oidc";
-
+            tags: "Identity Providers";
+            summary: "Add OIDC Identity Provider (IDP)";
+            description: "Create a new identity provider configuration to enable your users to login with social/enterprise login. The provider has to be OIDC compliant."
             responses: {
                 key: "200";
                 value: {
@@ -873,7 +949,6 @@ service AdminService {
         };
     }
 
-    // Adds a new jwt identity provider configuration the IAM instance
     rpc AddJWTIDP(AddJWTIDPRequest) returns (AddJWTIDPResponse) {
         option (google.api.http) = {
             post: "/idps/jwt";
@@ -885,9 +960,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
-            tags: "jwt";
-
+            tags: "Identity Providers";
+            summary: "Add JWT Identity Provider (IDP)";
+            description: "Create a new identity provider configuration to enable your users to login with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token."
             responses: {
                 key: "200";
                 value: {
@@ -908,8 +983,6 @@ service AdminService {
         };
     }
 
-    //Updates the specified idp
-    // all fields are updated. If no value is provided the field will be empty afterwards.
     rpc UpdateIDP(UpdateIDPRequest) returns (UpdateIDPResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}";
@@ -921,7 +994,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
+            tags: "Identity Providers";
+            summary: "Update Identity Provider (IDP)";
+            description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterwards."
             responses: {
                 key: "200";
                 value: {
@@ -942,8 +1017,6 @@ service AdminService {
         };
     }
 
-    //Sets the state of the idp to IDP_STATE_INACTIVE
-    // the state MUST be IDP_STATE_ACTIVE for this call
     rpc DeactivateIDP(DeactivateIDPRequest) returns (DeactivateIDPResponse) {
         option (google.api.http) = {
             post: "/idps/{idp_id}/_deactivate";
@@ -954,7 +1027,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
+            tags: "Identity Providers";
+            summary: "Deactivate Identity Provider (IDP)";
+            description: "Sets the state of the provider to inactive. It can only be called for provider with the state active. Users will not be able to login with the given provider afterwards. It might cause troubles, if it is the only authentication method of the user."
             responses: {
                 key: "200";
                 value: {
@@ -975,8 +1050,6 @@ service AdminService {
         };
     }
 
-    //Sets the state of the idp to IDP_STATE_ACTIVE
-    // the state MUST be IDP_STATE_INACTIVE for this call
     rpc ReactivateIDP(ReactivateIDPRequest) returns (ReactivateIDPResponse) {
         option (google.api.http) = {
             post: "/idps/{idp_id}/_reactivate";
@@ -987,7 +1060,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
+            tags: "Identity Providers";
+            summary: "Reactivate Identity Provider (IDP)";
+            description: "Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to login again with the given provider."
             responses: {
                 key: "200";
                 value: {
@@ -1008,7 +1083,6 @@ service AdminService {
         };
     }
 
-    //RemoveIDP deletes the IDP permanetly
     rpc RemoveIDP(RemoveIDPRequest) returns (RemoveIDPResponse) {
         option (google.api.http) = {
             delete: "/idps/{idp_id}";
@@ -1020,6 +1094,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "identity provider";
+            summary: "Remove Identity Provider (IDP)";
+            description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to login with the provider afterwards. If it is there only authentication possibility it might cause problems.."
             responses: {
                 key: "200";
                 value: {
@@ -1040,8 +1116,6 @@ service AdminService {
         };
     }
 
-    //Updates the oidc configuration of the specified idp
-    // all fields are updated. If no value is provided the field will be empty afterwards.
     rpc UpdateIDPOIDCConfig(UpdateIDPOIDCConfigRequest) returns (UpdateIDPOIDCConfigResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}/oidc_config";
@@ -1053,8 +1127,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
-            tags: "oidc";
+            tags: "Identity Providers";
+            summary: "Update OIDC Identity Provider (IDP)";
+            description: "Update the OIDC specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterwards."
             responses: {
                 key: "200";
                 value: {
@@ -1086,8 +1161,6 @@ service AdminService {
         };
     }
 
-    //Updates the jwt configuration of the specified idp
-    // all fields are updated. If no value is provided the field will be empty afterwards.
     rpc UpdateIDPJWTConfig(UpdateIDPJWTConfigRequest) returns (UpdateIDPJWTConfigResponse) {
         option (google.api.http) = {
             put: "/idps/{idp_id}/jwt_config";
@@ -1099,8 +1172,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
-            tags: "jwt";
+            tags: "Identity Providers";
+            summary: "Update JWT Identity Provider (IDP)";
+            description: "Update the JWT specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterwards."
             responses: {
                 key: "200";
                 value: {
@@ -1142,17 +1216,6 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
-            responses: {
-                key: "200";
-                value: {
-                    description: "default domain policy";
-                };
-            };
-        };
     }
 
     //deprecated: please use DomainPolicy instead
@@ -1167,17 +1230,6 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
-            responses: {
-                key: "200";
-                value: {
-                    description: "default domain policy updated";
-                };
-            };
-        };
     }
 
     //deprecated: please use DomainPolicy instead
@@ -1189,17 +1241,6 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
-            responses: {
-                key: "200";
-                value: {
-                    description: "domain policy of the org or the default policy if not customized";
-                };
-            };
         };
     }
 
@@ -1214,17 +1255,6 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
-            responses: {
-                key: "200";
-                value: {
-                    description: "domain policy created";
-                };
-            };
-        };
     }
 
     //deprecated: please use DomainPolicy instead
@@ -1237,17 +1267,6 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
-            responses: {
-                key: "200";
-                value: {
-                    description: "domain policy updated";
-                };
-            };
         };
     }
 
@@ -1262,20 +1281,8 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete";
         };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "orgiam";
-            tags: "policy";
-            responses: {
-                key: "200";
-                value: {
-                    description: "resets the custom orgiam to the default policy";
-                };
-            };
-        };
     }
 
-    //Returns the Domain policy defined by the administrators of ZITADEL
     rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/domain";
@@ -1286,8 +1293,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Domain Settings";
+            summary: "Get Domain Settings";
+            description: "Returns the domains settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation.."
             responses: {
                 key: "200";
                 value: {
@@ -1297,8 +1306,6 @@ service AdminService {
         };
     }
 
-    //Updates the default Domain policy.
-    // it impacts all organisations without a customised policy
     rpc UpdateDomainPolicy(UpdateDomainPolicyRequest) returns (UpdateDomainPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/domain";
@@ -1310,8 +1317,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Domain Settings";
+            summary: "Update Domain Settings";
+            description: "Update the domain settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation. It affects all organization that do not have a overwritten the settings."
             responses: {
                 key: "200";
                 value: {
@@ -1321,7 +1330,6 @@ service AdminService {
         };
     }
 
-    //Returns the customised policy or the default if not customised
     rpc GetCustomDomainPolicy(GetCustomDomainPolicyRequest) returns (GetCustomDomainPolicyResponse) {
         option (google.api.http) = {
             get: "/orgs/{org_id}/policies/domain";
@@ -1332,8 +1340,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Domain Settings";
+            tags: "Organizations";
+            summary: "Get Domain Settings for Organization";
+            description: "Get the domains settings configured on a specific organization. If the organization doesn't have a custom setting, the default will be returned. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -1343,7 +1354,6 @@ service AdminService {
         };
     }
 
-    //Defines a custom Domain policy as specified
     rpc AddCustomDomainPolicy(AddCustomDomainPolicyRequest) returns (AddCustomDomainPolicyResponse) {
         option (google.api.http) = {
             post: "/orgs/{org_id}/policies/domain";
@@ -1355,8 +1365,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Domain Settings";
+            tags: "Organizations";
+            summary: "Get Domain Settings for Organization";
+            description: "Create the domains settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -1366,7 +1379,6 @@ service AdminService {
         };
     }
 
-    //Updates a custom Domain policy as specified
     rpc UpdateCustomDomainPolicy(UpdateCustomDomainPolicyRequest) returns (UpdateCustomDomainPolicyResponse) {
         option (google.api.http) = {
             put: "/orgs/{org_id}/policies/domain";
@@ -1378,8 +1390,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domain policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Domain Settings";
+            tags: "Organizations";
+            summary: "Get Domain Settings for Organization";
+            description: "Update the domains settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -1389,8 +1404,6 @@ service AdminService {
         };
     }
 
-    //Resets the org iam policy of the organisation to default
-    // ZITADEL will fallback to the default policy defined by the ZITADEL administrators
     rpc ResetCustomDomainPolicyToDefault(ResetCustomDomainPolicyToDefaultRequest) returns (ResetCustomDomainPolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/orgs/{org_id}/policies/domain";
@@ -1401,8 +1414,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "domainpolicy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Domain Settings";
+            tags: "Organizations";
+            summary: "Reset Domain Settings of Organization";
+            description: "Resets the domains settings configured on a specific organization to the settings configured on the instance. Domain settings specify how ZITADEL should handle domains, in regards of usernames, emails and validation."
             responses: {
                 key: "200";
                 value: {
@@ -1412,7 +1428,6 @@ service AdminService {
         };
     }
 
-    //Returns the label policy defined by the administrators of ZITADEL
     rpc GetLabelPolicy(GetLabelPolicyRequest) returns (GetLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/label";
@@ -1423,8 +1438,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "label policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Get Private Labeling/Branding Settings";
+            description: "Returns the currently active private labeling / branding configured on the instance level. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
                 key: "200";
                 value: {
@@ -1434,7 +1451,6 @@ service AdminService {
         };
     }
 
-    //Returns the preview label policy defined by the administrators of ZITADEL
     rpc GetPreviewLabelPolicy(GetPreviewLabelPolicyRequest) returns (GetPreviewLabelPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/label/_preview";
@@ -1445,8 +1461,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "label policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Get Preview Private Labeling/Branding Settings";
+            description: "Returns the preview private labeling / branding configured on the instance level. The preview is used to show you how it will look like, and not activate it directly for your users. In the future it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
                 key: "200";
                 value: {
@@ -1456,9 +1474,7 @@ service AdminService {
         };
     }
 
-    //Updates the default label policy of ZITADEL
-    // it impacts all organisations without a customised policy
-    rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
+   rpc UpdateLabelPolicy(UpdateLabelPolicyRequest) returns (UpdateLabelPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/label";
             body: "*";
@@ -1469,8 +1485,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "label policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Update Labeling/Branding Settings";
+            description: "Update the preview private labeling / branding configured on the instance level. It affects all organizations, that don't overwrite the settings. The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
                 key: "200";
                 value: {
@@ -1480,7 +1498,6 @@ service AdminService {
         };
     }
 
-    // Activates all changes of the label policy
     rpc ActivateLabelPolicy(ActivateLabelPolicyRequest) returns (ActivateLabelPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/label/_activate"
@@ -1490,9 +1507,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Activate Labeling/Branding Settings";
+            description: "Activates  the preview private labeling / branding configured on the instance level. It will be shown to the users afterwards. It affects all organizations, that don't overwrite the settings.. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
+        };
     }
 
-    // Removes the logo of the label policy
     rpc RemoveLabelPolicyLogo(RemoveLabelPolicyLogoRequest) returns (RemoveLabelPolicyLogoResponse) {
         option (google.api.http) = {
             delete: "/policies/label/logo"
@@ -1501,9 +1524,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Logo Light";
+            description: "Removes the logo of the light theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+        };
     }
 
-    // Removes the logo dark of the label policy
     rpc RemoveLabelPolicyLogoDark(RemoveLabelPolicyLogoDarkRequest) returns (RemoveLabelPolicyLogoDarkResponse) {
         option (google.api.http) = {
             delete: "/policies/label/logo_dark"
@@ -1512,9 +1541,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Logo Dark";
+            description: "Removes the logo of the dark theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+        };
     }
 
-    // Removes the icon of the label policy
     rpc RemoveLabelPolicyIcon(RemoveLabelPolicyIconRequest) returns (RemoveLabelPolicyIconResponse) {
         option (google.api.http) = {
             delete: "/policies/label/icon"
@@ -1523,9 +1558,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Icon Light";
+            description: "Removes the icon of the light theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+        };
     }
 
-    // Removes the logo dark of the label policy
     rpc RemoveLabelPolicyIconDark(RemoveLabelPolicyIconDarkRequest) returns (RemoveLabelPolicyIconDarkResponse) {
         option (google.api.http) = {
             delete: "/policies/label/icon_dark"
@@ -1534,9 +1575,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Icon Dark";
+            description: "Removes the icon of the dark theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+        };
     }
 
-    // Removes the font of the label policy
     rpc RemoveLabelPolicyFont(RemoveLabelPolicyFontRequest) returns (RemoveLabelPolicyFontResponse) {
         option (google.api.http) = {
             delete: "/policies/label/font"
@@ -1545,9 +1592,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Branding";
+            summary: "Remove Font";
+            description: "Removes the font from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterwards."
+        };
     }
 
-    //Returns the login policy defined by the administrators of ZITADEL
     rpc GetLoginPolicy(GetLoginPolicyRequest) returns (GetLoginPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/login";
@@ -1558,8 +1611,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "login policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Login Settings";
+            summary: "Get Login Settings";
+            description: "Returns the login settings defined on the instance level. It will trigger for all organizations, that don't overwrite the settings. The login policy definges what kind of authentication possibilities the user should have. Generally speaking the behaviour of the login and register UI."
             responses: {
                 key: "200";
                 value: {
@@ -1569,8 +1624,6 @@ service AdminService {
         };
     }
 
-    //Updates the default login policy of ZITADEL
-    // it impacts all organisations without a customised policy
     rpc UpdateLoginPolicy(UpdateLoginPolicyRequest) returns (UpdateLoginPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/login";
@@ -1582,8 +1635,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "login policy";
-            tags: "policy";
+            tags: "Settings";
+            tags: "Login Settings";
+            summary: "Update Login Settings";
+            description: "Update the default login settings defined on the instance level. It will trigger for all organizations, that don't overwrite the settings. The login policy definges what kind of authentication possibilities the user should have. Generally speaking the behaviour of the login and register UI."
             responses: {
                 key: "200";
                 value: {
@@ -1593,8 +1648,6 @@ service AdminService {
         };
     }
 
-    //Returns the idps linked to the default login policy,
-    // defined by the administrators of ZITADEL
     rpc ListLoginPolicyIDPs(ListLoginPolicyIDPsRequest) returns (ListLoginPolicyIDPsResponse) {
         option (google.api.http) = {
             post: "/policies/login/idps/_search";
@@ -1606,9 +1659,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "login policy";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Identity Providers"
+            summary: "List Linked Identity Providers";
+            description: "Returns a list of identity providers that are linked in the login policy. This means, that they are configured for the instance and will be shown to the users. It affects all organizations, without custom login settings."
             responses: {
                 key: "200";
                 value: {
@@ -1618,8 +1673,6 @@ service AdminService {
         };
     }
 
-    //Adds the povided idp to the default login policy.
-    // It impacts all organisations without a customised policy
     rpc AddIDPToLoginPolicy(AddIDPToLoginPolicyRequest) returns (AddIDPToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/idps";
@@ -1631,9 +1684,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "login policy";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Identity Providers"
+            summary: "Add Linked Identity Providers";
+            description: "Add/link a pre-configured identity provider to the login settings of the instance. This means that it will be shown to the users on the login page. It affects all organizations, without custom login settings."
             responses: {
                 key: "200";
                 value: {
@@ -1643,8 +1698,6 @@ service AdminService {
         };
     }
 
-    //Removes the povided idp from the default login policy.
-    // It impacts all organisations without a customised policy
     rpc RemoveIDPFromLoginPolicy(RemoveIDPFromLoginPolicyRequest) returns (RemoveIDPFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/idps/{idp_id}";
@@ -1655,9 +1708,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "login policy";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Identity Providers"
+            summary: "Remove Linked Identity Providers";
+            description: "Remove an identity provider from the login settings of the instance. This means that it will not be shown to the users on the login page. It affects all organizations, without custom login settings."
             responses: {
                 key: "200";
                 value: {
@@ -1667,7 +1722,6 @@ service AdminService {
         };
     }
 
-    //Returns the available second factors defined by the administrators of ZITADEL
     rpc ListLoginPolicySecondFactors(ListLoginPolicySecondFactorsRequest) returns (ListLoginPolicySecondFactorsResponse) {
         option (google.api.http) = {
             post: "/policies/login/second_factors/_search";
@@ -1678,9 +1732,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "second factor";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "List Second Factors (2FA)";
+            description: "Returns a list of second factors (2FA) configured on the login settings of the instance. It affects all organizations, without custom login settings. </br> Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). </br> Per definition it is called second factor as it is used as second authentication after a password. In the UI we generalize it as multi factor."
             responses: {
                 key: "200";
                 value: {
@@ -1690,8 +1746,6 @@ service AdminService {
         };
     }
 
-    //Adds a second factor to the default login policy.
-    // It impacts all organisations without a customised policy
     rpc AddSecondFactorToLoginPolicy(AddSecondFactorToLoginPolicyRequest) returns (AddSecondFactorToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/second_factors";
@@ -1703,9 +1757,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "second factor";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "Add Second Factor (2FA)";
+            description: "Add a new second factors (2FA) to the login settings of the instance. </br> Users will have the possibility to authenticate with the configured factor afterwards. It affects all organizations, without custom login settings. Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). </br> Per definition it is called second factor as it is used as second authentication after a password. In the UI we generalize it as multi factor."
             responses: {
                 key: "200";
                 value: {
@@ -1726,8 +1782,6 @@ service AdminService {
         };
     }
 
-    //Removes a second factor from the default login policy.
-    // It impacts all organisations without a customised policy
     rpc RemoveSecondFactorFromLoginPolicy(RemoveSecondFactorFromLoginPolicyRequest) returns (RemoveSecondFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/second_factors/{type}";
@@ -1738,9 +1792,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "second factor";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "Remove Second Factor (2FA)";
+            description: "Remove a configured second factors (2FA) from the login settings of the instance. It affects all organizations, without custom login settings. </br> Users will not be able to authenticate with the configured factor afterwards. Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). </br> Per definition it is called second factor as it is used as second authentication after a password. In the UI we generalize it as multi factor."
             responses: {
                 key: "200";
                 value: {
@@ -1761,7 +1817,6 @@ service AdminService {
         };
     }
 
-    //Returns the available multi factors defined by the administrators of ZITADEL
     rpc ListLoginPolicyMultiFactors(ListLoginPolicyMultiFactorsRequest) returns (ListLoginPolicyMultiFactorsResponse) {
         option (google.api.http) = {
             post: "/policies/login/multi_factors/_search";
@@ -1772,9 +1827,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "multi factor";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "List Multi Factors (MFA)";
+            description: "Returns a list of multi factors (MFA) configured on the login settings of the instance. It affects all organizations, without custom login settings. </br> Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  </br> Per definition it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
                 key: "200";
                 value: {
@@ -1784,8 +1841,6 @@ service AdminService {
         };
     }
 
-    //Adds a multi factor to the default login policy.
-    // It impacts all organisations without a customised policy
     rpc AddMultiFactorToLoginPolicy(AddMultiFactorToLoginPolicyRequest) returns (AddMultiFactorToLoginPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/login/multi_factors";
@@ -1797,9 +1852,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "multi factor";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "Add Multi Factor (MFA)";
+            description: "Add a multi factors (MFA) to the login settings of the instance. It affects all organizations, without custom login settings. </br> Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  </br> Per definition it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
                 key: "200";
                 value: {
@@ -1820,8 +1877,6 @@ service AdminService {
         };
     }
 
-    //Removes a multi factor from the default login policy.
-    // It impacts all organisations without a customised policy
     rpc RemoveMultiFactorFromLoginPolicy(RemoveMultiFactorFromLoginPolicyRequest) returns (RemoveMultiFactorFromLoginPolicyResponse) {
         option (google.api.http) = {
             delete: "/policies/login/multi_factors/{type}";
@@ -1832,9 +1887,11 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "multi factor";
-            tags: "policy";
-            tags: "identity provider";
+            tags: "Settings";
+            tags: "Login Settings";
+            tags: "Authentication Methods"
+            summary: "Remove Multi Factor (MFA)";
+            description: "Remove a multi factors (MFA) from the login settings of the instance. It affects all organizations, without custom login settings. </br> Authentication factors are used as additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  </br> Per definition it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
                 key: "200";
                 value: {
@@ -1855,7 +1912,6 @@ service AdminService {
         };
     }
 
-    //Returns the password complexity policy defined by the administrators of ZITADEL
     rpc GetPasswordComplexityPolicy(GetPasswordComplexityPolicyRequest) returns (GetPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/complexity";
@@ -1866,9 +1922,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "password policy";
-            tags: "password complexity";
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Password Complexity Settings";
+            description: "Returns the password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify how a password should look like (characters, length, etc.)"
             responses: {
                 key: "200";
                 value: {
@@ -1878,8 +1935,6 @@ service AdminService {
         };
     }
 
-    //Updates the default password complexity policy of ZITADEL
-    // it impacts all organisations without a customised policy
     rpc UpdatePasswordComplexityPolicy(UpdatePasswordComplexityPolicyRequest) returns (UpdatePasswordComplexityPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/complexity";
@@ -1891,9 +1946,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "password policy";
-            tags: "password complexity";
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Update Password Complexity Settings";
+            description: "Updates the default password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify how a password should look like (characters, length, etc.)"
             responses: {
                 key: "200";
                 value: {
@@ -1914,7 +1970,6 @@ service AdminService {
         };
     }
 
-    //Returns the password age policy defined by the administrators of ZITADEL
     rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/age";
@@ -1925,9 +1980,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "password policy";
-            tags: "password age";
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Password Age Settings";
+            description: "Not implemented"
             responses: {
                 key: "200";
                 value: {
@@ -1937,8 +1993,6 @@ service AdminService {
         };
     }
 
-    //Updates the default password age policy of ZITADEL
-    // it impacts all organisations without a customised policy
     rpc UpdatePasswordAgePolicy(UpdatePasswordAgePolicyRequest) returns (UpdatePasswordAgePolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/age";
@@ -1950,9 +2004,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "password policy";
-            tags: "password age";
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Update Password Age Settings";
+            description: "Not implemented"
             responses: {
                 key: "200";
                 value: {
@@ -1973,7 +2028,6 @@ service AdminService {
         };
     }
 
-    //Returns the lockout policy defined by the administrators of ZITADEL
     rpc GetLockoutPolicy(GetLockoutPolicyRequest) returns (GetLockoutPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/lockout";
@@ -1984,8 +2038,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "lockout policy";
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Get Password Lockout Settings";
+            description: "Returns the password lockout settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify when a user should be locked (e.g how many password attempts). </br> The user has to be unlocked by an administrator afterwards."
             responses: {
                 key: "200";
                 value: {
@@ -1995,8 +2051,6 @@ service AdminService {
         };
     }
 
-    //Updates the default lockout policy of ZITADEL
-    // it impacts all organisations without a customised policy
     rpc UpdateLockoutPolicy(UpdateLockoutPolicyRequest) returns (UpdateLockoutPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/lockout";
@@ -2006,9 +2060,15 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Settings";
+            tags: "Password Settings";
+            summary: "Update Password Lockout Settings";
+            description: "Update the password lockout settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify when a user should be locked (e.g how many password attempts). </br> The user has to be unlocked by an administrator afterwards."
+        };
     }
 
-    //Returns the privacy policy defined by the administrators of ZITADEL
     rpc GetPrivacyPolicy(GetPrivacyPolicyRequest) returns (GetPrivacyPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/privacy";
@@ -2019,9 +2079,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "privacy policy";
-            tags: "privacy";
+            tags: "Settings";
+            tags: "Privacy Settings";
+            summary: "Get Privacy Settings";
+            description: "Returns the privacy settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
             responses: {
                 key: "200";
                 value: {
@@ -2031,9 +2092,6 @@ service AdminService {
         };
     }
 
-    //Updates the default privacy policy of ZITADEL
-    // it impacts all organisations without a customised policy
-    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdatePrivacyPolicy(UpdatePrivacyPolicyRequest) returns (UpdatePrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy";
@@ -2045,9 +2103,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "privacy policy";
-            tags: "privacy";
+            tags: "Settings";
+            tags: "Privacy Settings";
+            summary: "Update Privacy Settings";
+            description: "Update the privacy settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings. </br> Variable {{.Lang}} can be set to have different links based on the language."
             responses: {
                 key: "200";
                 value: {
@@ -2068,8 +2127,6 @@ service AdminService {
         };
     }
 
-    //Add a default notification policy for ZITADEL
-    // it impacts all organisations without a customised policy
     rpc AddNotificationPolicy(AddNotificationPolicyRequest) returns (AddNotificationPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/notification"
@@ -2081,9 +2138,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "notification policy";
-            tags: "notification";
+            tags: "Settings";
+            tags: "Notification Settings";
+            summary: "Add Notification Settings";
+            description: "Add new the notification settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             responses: {
                 key: "200";
                 value: {
@@ -2093,8 +2151,6 @@ service AdminService {
         };
     }
 
-
-    //Returns the notification policy defined by the administrators of ZITADEL
     rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
         option (google.api.http) = {
             get: "/policies/notification";
@@ -2105,9 +2161,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "notification policy";
-            tags: "notification";
+            tags: "Settings";
+            tags: "Notification Settings";
+            summary: "Return Notification Settings";
+            description: "Return the notification settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             responses: {
                 key: "200";
                 value: {
@@ -2117,8 +2174,6 @@ service AdminService {
         };
     }
 
-    //Updates the default notification policy of ZITADEL
-    // it impacts all organisations without a customised policy
     rpc UpdateNotificationPolicy(UpdateNotificationPolicyRequest) returns (UpdateNotificationPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/notification";
@@ -2130,9 +2185,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "policy";
-            tags: "notification policy";
-            tags: "notification";
+            tags: "Settings";
+            tags: "Notification Settings";
+            summary: "Update Notification Settings";
+            description: "Update the notification settings configured on the instance. It affects all organizations, that do not have a custom setting configured. </br> The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             responses: {
                 key: "200";
                 value: {
