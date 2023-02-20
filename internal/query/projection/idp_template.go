@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -264,50 +265,17 @@ func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
 
-	cols := make([]handler.Column, 0, 6)
-	if idpEvent.IsCreationAllowed != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateIsCreationAllowedCol, *idpEvent.IsCreationAllowed))
-	}
-	if idpEvent.IsLinkingAllowed != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateIsLinkingAllowedCol, *idpEvent.IsLinkingAllowed))
-	}
-	if idpEvent.IsAutoCreation != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateIsAutoCreationCol, *idpEvent.IsAutoCreation))
-	}
-	if idpEvent.IsAutoUpdate != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
-	}
-	cols = append(cols,
-		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
-	)
-
-	googleCols := make([]handler.Column, 0, 3)
-	if idpEvent.ClientID != nil {
-		googleCols = append(googleCols, handler.NewCol(GoogleClientIDCol, *idpEvent.ClientID))
-	}
-	if idpEvent.ClientSecret != nil {
-		googleCols = append(googleCols, handler.NewCol(GoogleClientSecretCol, *idpEvent.ClientSecret))
-	}
-	if idpEvent.Scopes != nil {
-		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)))
-	}
-	if len(cols) == 0 && len(googleCols) == 0 {
-		return crdb.NewNoOpStatement(&idpEvent), nil
-	}
-
 	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
-	if len(cols) > 0 {
-		ops = append(ops,
-			crdb.AddUpdateStatement(
-				cols,
-				[]handler.Condition{
-					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
-					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				},
-			),
-		)
-	}
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(nil, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	googleCols := reduceGoogleIDPChangedColumns(idpEvent)
 	if len(googleCols) > 0 {
 		ops = append(ops,
 			crdb.AddUpdateStatement(
@@ -403,13 +371,10 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
 	}
 
-	cols := reduceLDAPIDPChangedTemplateColumns(idpEvent)
-	ldapCols := reduceLDAPIDPChangedLDAPColumns(idpEvent)
-
 	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
 	ops = append(ops,
 		crdb.AddUpdateStatement(
-			cols,
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -417,6 +382,7 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 		),
 	)
 
+	ldapCols := reduceLDAPIDPChangedColumns(idpEvent)
 	if len(ldapCols) > 0 {
 		ops = append(ops,
 			crdb.AddUpdateStatement(
@@ -476,30 +442,44 @@ func (p *idpTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 	), nil
 }
 
-func reduceLDAPIDPChangedTemplateColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
+func reduceIDPChangedTemplateColumns(name *string, creationDate time.Time, sequence uint64, optionChanges idp.OptionChanges) []handler.Column {
 	cols := make([]handler.Column, 0, 7)
-	if idpEvent.Name != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *idpEvent.Name))
+	if name != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateNameCol, *name))
 	}
-	if idpEvent.IsCreationAllowed != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateIsCreationAllowedCol, *idpEvent.IsCreationAllowed))
+	if optionChanges.IsCreationAllowed != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsCreationAllowedCol, *optionChanges.IsCreationAllowed))
 	}
-	if idpEvent.IsLinkingAllowed != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateIsLinkingAllowedCol, *idpEvent.IsLinkingAllowed))
+	if optionChanges.IsLinkingAllowed != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsLinkingAllowedCol, *optionChanges.IsLinkingAllowed))
 	}
-	if idpEvent.IsAutoCreation != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateIsAutoCreationCol, *idpEvent.IsAutoCreation))
+	if optionChanges.IsAutoCreation != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsAutoCreationCol, *optionChanges.IsAutoCreation))
 	}
-	if idpEvent.IsAutoUpdate != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
+	if optionChanges.IsAutoUpdate != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *optionChanges.IsAutoUpdate))
 	}
 	return append(cols,
-		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
-		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+		handler.NewCol(IDPTemplateChangeDateCol, creationDate),
+		handler.NewCol(IDPTemplateSequenceCol, sequence),
 	)
 }
 
-func reduceLDAPIDPChangedLDAPColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
+func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler.Column {
+	googleCols := make([]handler.Column, 0, 3)
+	if idpEvent.ClientID != nil {
+		googleCols = append(googleCols, handler.NewCol(GoogleClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		googleCols = append(googleCols, handler.NewCol(GoogleClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Scopes != nil {
+		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	return googleCols
+}
+
+func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
 	ldapCols := make([]handler.Column, 0, 4)
 	if idpEvent.Host != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPHostCol, *idpEvent.Host))
