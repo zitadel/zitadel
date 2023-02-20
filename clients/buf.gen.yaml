@@ -1,0 +1,21 @@
+# buf.gen.yaml
+version: v1
+managed:
+  enabled: true
+  # go_package_prefix:
+  #   default: github.com/zitadel/zitadel/v1
+  #   except:
+  #     - buf.build/googleapis/googleapis
+plugins:
+  ## Web
+  - plugin: buf.build/bufbuild/es
+    out: web
+  - plugin: buf.build/bufbuild/connect-es
+    out: web
+  ## Go
+  - plugin: buf.build/protocolbuffers/go
+    out: go
+    opt: paths=source_relative
+  - plugin: buf.build/bufbuild/connect-go
+    out: go
+    opt: paths=source_relative
