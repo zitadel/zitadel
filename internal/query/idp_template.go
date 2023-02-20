@@ -60,7 +60,6 @@ type LDAPIDPTemplate struct {
 	Admin               string
 	Password            *crypto.CryptoValue
 	idp.LDAPAttributes
-	//idp.Options
 }
 
 var (
