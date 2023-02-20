@@ -17,16 +17,16 @@
   <div class="actions-list">
     <ng-container *ngFor="let action of actions | async | keyvalue">
       <a
-        [routerLink]="action.value?.link"
-        [queryParams]="{ id: action.value?.fragment }"
+        [routerLink]="action.value.link"
+        [queryParams]="{ id: action.value.fragment }"
         class="action-element"
-        [ngClass]="{ done: action.value?.event !== undefined }"
+        [ngClass]="{ done: action.value.event !== undefined }"
       >
         <div class="state-circle">
-          <!-- <i *ngIf="action.value?.event !== undefined" class="las la-check"></i> -->
+          <mat-icon *ngIf="action.value?.event !== undefined" class="success-icon">check_circle</mat-icon>
 
-          <mat-icon class="success-icon" *ngIf="action.value?.event !== undefined" svgIcon="mdi_shield_check"></mat-icon>
-          <mat-icon class="warn-icon" *ngIf="action.value?.event === undefined" svgIcon="mdi_shield_alert"></mat-icon>
+          <!-- <mat-icon class="success-icon" *ngIf="action.value?.event !== undefined" svgIcon="mdi_shield_check"></mat-icon> -->
+          <!-- <mat-icon class="warn-icon" *ngIf="action.value?.event === undefined" svgIcon="mdi_shield_alert"></mat-icon> -->
         </div>
 
         <span class="name">{{ 'ONBOARDING.EVENTS.' + action.key + '.title' | translate }}</span>
