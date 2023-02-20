@@ -54,10 +54,19 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Domain Settings"
         },
         {
+            name: "Events"
+        },
+        {
+            name: "Failed Events"
+        },
+        {
             name: "General"
         },
         {
             name: "Identity Providers"
+        },
+        {
+            name: "Import/Export",
         },
         {
             name: "Instance"
@@ -67,6 +76,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Login Settings"
+        },
+        {
+            name: "Members",
         },
         {
             name: "Message Texts"
@@ -97,6 +109,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         },
         {
             name: "Settings"
+        },
+        {
+            name: "Views/Projections"
+        },
+        {
+            name: "ZITADEL Administrators"
         }
     ];
     schemes: HTTPS;
@@ -1099,7 +1117,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "identity provider";
+            tags: "Identity Providers";
             summary: "Remove Identity Provider (IDP)";
             description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to login with the provider afterwards. If it is there only authentication possibility it might cause problems.."
             responses: {
@@ -2735,7 +2753,6 @@ service AdminService {
         };
     }
 
-    //Returns the IAM roles visible for the requested user
     rpc ListIAMMemberRoles(ListIAMMemberRolesRequest) returns (ListIAMMemberRolesResponse) {
         option (google.api.http) = {
             post: "/members/roles/_search";
@@ -2746,9 +2763,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "iam";
-            tags: "member";
-            tags: "roles";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "List IAM Member Roles";
+            description: "Members are users with permissions to administrate ZITADEL on different levels. </br> This request returns all roles possible for a ZITADEL member on the instance level."
             responses: {
                 key: "200";
                 value: {
@@ -2758,8 +2776,6 @@ service AdminService {
         };
     }
 
-    //Returns all members matching the request
-    // all queries need to match (ANDed)
     rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
         option (google.api.http) = {
             post: "/members/_search";
@@ -2771,9 +2787,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "iam";
-            tags: "member";
-            tags: "iam member";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "List IAM Members";
+            description: "Members are users with permissions to administrate ZITADEL on different levels. </br> This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked."
             responses: {
                 key: "200";
                 value: {
@@ -2796,9 +2813,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "iam";
-            tags: "member";
-            tags: "iam member";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Add IAM Member";
+            description: "Members are users with permissions to administrate ZITADEL on different levels. </br> This request adds a new user to the members list with one or multiple roles."
             responses: {
                 key: "200";
                 value: {
@@ -2819,8 +2837,6 @@ service AdminService {
         };
     }
 
-    //Sets the given roles on a member.
-    // The member has only roles provided by this call
     rpc UpdateIAMMember(UpdateIAMMemberRequest) returns (UpdateIAMMemberResponse) {
         option (google.api.http) = {
             put: "/members/{user_id}";
@@ -2832,9 +2848,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "iam";
-            tags: "member";
-            tags: "iam member";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Update IAM Member";
+            description: "Members are users with permissions to administrate ZITADEL on different levels. </br> This request changes the roles of an existing member. The whole roles list will updated. Make sure to include roles that you don't want to change (remove)."
             responses: {
                 key: "200";
                 value: {
@@ -2855,7 +2872,6 @@ service AdminService {
         };
     }
 
-    //Removes the user from the membership list of ZITADEL
     rpc RemoveIAMMember(RemoveIAMMemberRequest) returns (RemoveIAMMemberResponse) {
         option (google.api.http) = {
             delete: "/members/{user_id}";
@@ -2866,9 +2882,10 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "iam";
-            tags: "member";
-            tags: "iam member";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Remove IAM Member";
+            description: "Members are users with permissions to administrate ZITADEL on different levels. </br> This request removes a user of the members list on an instance level. The user can still have roles on an other level (organization, project)"
             responses: {
                 key: "200";
                 value: {
@@ -2889,9 +2906,6 @@ service AdminService {
         };
     }
 
-    //Returns all stored read models of ZITADEL
-    // views are used for search optimisation and optimise request latencies
-    // they represent the delta of the event happend on the objects
     rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
         option (google.api.http) = {
             post: "/views/_search";
@@ -2902,7 +2916,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "views";
+            tags: "Views/Projections";
+            summary: "List Views/Projections";
+            description: "Returns all stored read models of ZITADEL. </br> Views are used for search optimisation and optimise request latencies. </br> They represent the delta of the event happend on the objects"
             responses: {
                 key: "200";
                 value: {
@@ -2912,9 +2928,6 @@ service AdminService {
         };
     }
 
-    //Returns event descriptions which cannot be processed.
-    // It's possible that some events need some retries.
-    // For example if the SMTP-API wasn't able to send an email at the first time
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
             post: "/failedevents/_search";
@@ -2925,7 +2938,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "failed events";
+            tags: "Failed Events";
+            summary: "List Failed Events";
+            description: "Returns a list of events that could not be proceeded in the views/projections. </br> Some events need an amount of retries till they succeed. </br> For example if the SMTP-API wasn't able to send an email at the first time."
             responses: {
                 key: "200";
                 value: {
@@ -2935,11 +2950,6 @@ service AdminService {
         };
     }
 
-    //Deletes the event from failed events view.
-    // the event is not removed from the change stream
-    // This call is usefull if the system was able to process the event later.
-    // e.g. if the second try of sending an email was successful. the first try produced a
-    // failed event. You can find out if it worked on the `failure_count`
     rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
         option (google.api.http) = {
             delete: "/failedevents/{database}/{view_name}/{failed_sequence}";
@@ -2950,7 +2960,9 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "failed events";
+            tags: "Failed Events";
+            summary: "Remove Failed Events";
+            description: "Removes the event from the failed evens view, but not from the change stream. </br> This call is useful if the system was able to process the event after some retries. </br> e.g. if the second try of sending an email was successful. the first try produced an failed event. You can find out if it worked on the `failure_count` "
             responses: {
                 key: "200";
                 value: {
@@ -2981,8 +2993,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Import/Export";
+            summary: "Import Data";
+            description: "Import data on an instance level to ZITADEL. It can be either directly in the request or you can point to a file on an S3 storage, from which the data should be loaded."
+        };
     }
-    // Exports data from instance
+
     rpc ExportData(ExportDataRequest) returns (ExportDataResponse) {
         option (google.api.http) = {
             post: "/export";
@@ -2991,6 +3009,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Import/Export";
+            summary: "Export Data";
+            description: "Export data on an instance level to ZITADEL. It can be either directly exported in the response or you can point to a file on an S3 storage, where the data should be written."
         };
     }
 
@@ -3003,6 +3027,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "events.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Events";
+            summary: "Event types";
+            description: "Returns a list of the possible event types in ZITADEL. This is used to filter the event types in the list events reqeust."
+        };
     }
 
     rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
@@ -3014,6 +3044,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "events.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Events";
+            summary: "List Event Types";
+            description: "Returns a list of the possible event types in ZITADEL. This is used to filter the event types in the list events request."
+        };
     }
 
     rpc ListAggregateTypes(ListAggregateTypesRequest) returns (ListAggregateTypesResponse) {
@@ -3024,6 +3060,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "events.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Events";
+            summary: "List Aggregate Types";
+            description: "Returns a list of the possible aggregate types in ZITADEL. This is used to filter the aggregate types in the list events request."
         };
     }
 }
