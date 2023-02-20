@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Previous",
     "NEXT": "Next",
-    "COUNT": "Total Results"
+    "COUNT": "Total Results",
+    "MORE": "More"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Instance",
     "ORGS": "Organizations",
     "VIEWS": "Views",
+    "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
     "DOMAINS": "Domains",
@@ -231,6 +233,7 @@
       "CREATE": "Create",
       "MY": "My Information",
       "LOGINNAMES": "Login names",
+      "LOGINMETHODS": "Login methods",
       "LOGINNAMESDESC": "These are your login names:",
       "NOUSER": "No associated user.",
       "REACTIVATE": "Reactivate",
@@ -239,6 +242,8 @@
       "STATE": "Status",
       "DELETE": "Delete User",
       "UNLOCK": "Unlock User",
+      "GENERATESECRET": "Generate Client Secret",
+      "REMOVESECRET": "Remove Client Secret",
       "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again.",
       "DELETEACCOUNT": "Delete Account",
       "DELETEACCOUNT_DESC": "If you perform this action, you will be logged out and will no longer have access to your account. This action is not reversible, so please continue with caution.",
@@ -263,6 +268,10 @@
       "TITLE": "Send Email Notification",
       "DESCRIPTION": "Click the button below to send a notification to the current email address or change the email address in the field.",
       "NEWEMAIL": "New email address"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed."
     },
     "TABLE": {
       "DEACTIVATE": "Deactivate",
@@ -404,6 +413,7 @@
       "TITLE": "Profile",
       "EMAIL": "E-mail",
       "PHONE": "Phone number",
+      "PHONE_HINT": "Use 00 or the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
       "USERNAME": "User Name",
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
@@ -423,7 +433,8 @@
         "PREVIEW": "Preview",
         "DELETESUCCESS": "Deleted successfully!",
         "CROPPERERROR": "An error while uploading your file occurred. Try a different format and size if necessary."
-      }
+      },
+      "COUNTRY": "Country"
     },
     "MACHINE": {
       "TITLE": "Service User Details",
@@ -441,6 +452,11 @@
       "CHOOSEEXPIRY": "Select an expiration date",
       "CREATIONDATE": "Creation Date",
       "KEYDETAILS": "Key Details",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Add Key",
         "DESCRIPTION": "Select your key type and choose an optional expiration date."
@@ -588,7 +604,9 @@
       "MACHINEADDED": "Service User created!",
       "DELETED": "User deleted successfully!",
       "UNLOCKED": "User unlocked successfully!",
-      "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully."
+      "PASSWORDLESSREGISTRATIONSENT": "Registration Link sent successfully.",
+      "SECRETGENERATED": "Secret generated successfully!",
+      "SECRETREMOVED": "Secret removed successfully!"
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",
@@ -749,6 +767,56 @@
       "DELETE": "Remove",
       "DELETESUCCESS": "Failed events removed."
     },
+    "EVENTS": {
+      "TITLE": "Events",
+      "DESCRIPTION": "This view shows all occured events.",
+      "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "Aggregate",
+      "AGGREGATEID": "Aggregate ID",
+      "AGGREGATETYPE": "Aggregate Type",
+      "RESOURCEOWNER": "Resource Owner",
+      "SEQUENCE": "Sequence",
+      "CREATIONDATE": "Created At",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by Editor"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter by Aggregate"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filter by Type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filter by Resource Owner"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sequence",
+          "CHECKBOX": "Filter by Sequence",
+          "SORT": "Sorting",
+          "ASC": "Ascending",
+          "DESC": "Descending"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Creation Date",
+          "CHECKBOX": "Filter by Creation Date"
+        },
+        "OTHER": "other",
+        "OTHERS": "others"
+      },
+      "DIALOG": {
+        "TITLE": "Event Detail"
+      }
+    },
     "TOAST": {
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERSADDED": "Managers added.",
@@ -779,6 +847,10 @@
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
       "ORGDETAILUSER_TITLE": "Configure Organization Owner",
+      "DELETE": "Delete organization",
+      "DEFAULTLABEL": "Default",
+      "SETASDEFAULT": "Set as default organization",
+      "DEFAULTORGSET": "Default organization changed successfully",
       "RENAME": {
         "ACTION": "Rename",
         "TITLE": "Rename Organization",
@@ -845,7 +917,9 @@
       "MEMBERADDED": "Manager added.",
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
-      "SETPRIMARY": "Primary domain set."
+      "SETPRIMARY": "Primary domain set.",
+      "DELETED": "Organisation deleted successfully",
+      "ORG_WAS_DELETED": "Organisation has been deleted."
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -855,6 +929,13 @@
       "REACTIVATE": {
         "TITLE": "Reactivate organization",
         "DESCRIPTION": "You are about to reactivate your organization. Users will be able to login again. Are you sure to proceed?"
+      },
+      "DELETE": {
+        "TITLE": "Delete organization",
+        "DESCRIPTION": "You are about to delete your organization. This initiates a process where all organization related data will be deleted. You can not revert this action as for now.",
+        "TYPENAME": "Type '{{value}}', to delete your organization.",
+        "ORGNAME": "Name",
+        "BTN": "Delete"
       }
     }
   },
@@ -872,7 +953,7 @@
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notification providers and SMTP",
+      "NOTIFICATIONS": "Notification settings",
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
@@ -900,13 +981,14 @@
       "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
-      "SENDERADDRESS": "Sender Email address",
+      "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
-      "HOST": "Host",
+      "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
       "SETPASSWORD": "Set SMTP Password",
@@ -995,6 +1077,11 @@
       "SYMBOLERROR": "Must include a symbol/punctuation mark.",
       "NUMBERERROR": "Must include a digit.",
       "PATTERNERROR": "The password does not meet the required pattern."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notification",
+      "DESCRIPTION": "Determines on which changes, notifications will be sent.",
+      "PASSWORDCHANGE": "Password change"
     },
     "PRIVATELABELING": {
       "TITLE": "Branding",
@@ -1086,7 +1173,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1135,7 +1223,8 @@
         "VP": "Verify Phone",
         "PR": "Password Reset",
         "DC": "Domain Claim",
-        "PL": "Passwordless"
+        "PL": "Passwordless",
+        "PC": "Password Change"
       },
       "CHIPS": {
         "firstname": "Firstname",
@@ -1472,6 +1561,12 @@
       "UPDATED": "Project changed.",
       "GRANTUPDATED": "Grant changed.",
       "DELETED": "Project deleted."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Delete role",
+      "DELETE_DESCRIPTION": "You are about to delete a role. Are you sure?"
     }
   },
   "NEXTSTEPS": {
@@ -1853,7 +1948,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

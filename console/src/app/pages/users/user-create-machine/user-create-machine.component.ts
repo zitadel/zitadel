@@ -4,6 +4,7 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } fro
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AddMachineUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { AccessTokenType } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -19,6 +20,11 @@ export class UserCreateMachineComponent implements OnDestroy {
 
   private sub: Subscription = new Subscription();
   public loading: boolean = false;
+
+  public accessTokenTypes: AccessTokenType[] = [
+    AccessTokenType.ACCESS_TOKEN_TYPE_BEARER,
+    AccessTokenType.ACCESS_TOKEN_TYPE_JWT,
+  ];
 
   constructor(
     private router: Router,
@@ -42,6 +48,7 @@ export class UserCreateMachineComponent implements OnDestroy {
       userName: ['', [Validators.required, Validators.minLength(2)]],
       name: ['', [Validators.required]],
       description: ['', []],
+      accessTokenType: [AccessTokenType.ACCESS_TOKEN_TYPE_BEARER, []],
     });
   }
 
@@ -54,6 +61,7 @@ export class UserCreateMachineComponent implements OnDestroy {
     machineReq.setDescription(this.description?.value);
     machineReq.setName(this.name?.value);
     machineReq.setUserName(this.userName?.value);
+    machineReq.setAccessTokenType(this.accessTokenType?.value);
 
     this.userService
       .addMachineUser(machineReq)
@@ -87,5 +95,8 @@ export class UserCreateMachineComponent implements OnDestroy {
   }
   public get userName(): AbstractControl | null {
     return this.userForm.get('userName');
+  }
+  public get accessTokenType(): AbstractControl | null {
+    return this.userForm.get('accessTokenType');
   }
 }

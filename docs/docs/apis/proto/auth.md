@@ -594,6 +594,18 @@ Returns the privacy policy of the current organisation
     GET: /policies/privacy
 
 
+### GetMyLoginPolicy
+
+> **rpc** GetMyLoginPolicy([GetMyLoginPolicyRequest](#getmyloginpolicyrequest))
+[GetMyLoginPolicyResponse](#getmyloginpolicyresponse)
+
+Returns the login policy of the current organisation
+
+
+
+    GET: /policies/login
+
+
 
 
 
@@ -763,6 +775,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
+
+
+
+
+### GetMyLoginPolicyRequest
+This is an empty request
+
+
+
+
+### GetMyLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LoginPolicy | - |  |
 
 
 

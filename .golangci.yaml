@@ -1,6 +1,9 @@
 issues:
-  new: true
-  fix: false
+  new-from-rev: main
+  # Set to 0 to disable.
+  max-issues-per-linter: 0
+  # Set to 0 to disable.
+  max-same-issues: 0
 
 run:
   concurrency: 2
@@ -50,8 +53,6 @@ linters:
     - gosimple
     # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string [fast: false, auto-fix: false]
     - govet
-    # In addition to fixing imports, goimports also formats your code in the same style as gofmt. [fast: true, auto-fix: true]
-    - goimports
     # Detects when assignments to existing variables are not used [fast: true, auto-fix: false]
     - ineffassign
     # Finds commonly misspelled English words in comments [fast: true, auto-fix: true]
@@ -157,6 +158,9 @@ linters:
     # Checks is file header matches to pattern [fast: true, auto-fix: false]
     # ignored because we don't write licenses as headers
     - goheader
+    # In addition to fixing imports, goimports also formats your code in the same style as gofmt. [fast: true, auto-fix: true]
+    # ignored in favor of gci
+    - goimports
     #deprecated]: Golint differs from gofmt. Gofmt reformats Go source code, whereas golint prints out style mistakes [fast: false, auto-fix: false]
     # ignored in favor of goimports
     - golint
@@ -301,3 +305,4 @@ linters-settings:
       - standard # Standard section: captures all standard packages.
       - default # Default section: contains all imports that could not be matched to another section type.
       - prefix(github.com/zitadel/zitadel) # Custom section: groups all imports with the specified Prefix.
+    custom-order: true

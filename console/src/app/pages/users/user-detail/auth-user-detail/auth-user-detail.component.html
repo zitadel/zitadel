@@ -8,7 +8,7 @@
   (backRouterLink)="(['/'])"
 >
   <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
-  <cnsl-info-row topContent *ngIf="user" [user]="user"></cnsl-info-row>
+  <cnsl-info-row topContent *ngIf="user" [user]="user" [loginPolicy]="loginPolicy"></cnsl-info-row>
 </cnsl-top-view>
 
 <div *ngIf="loading" class="max-width-container">

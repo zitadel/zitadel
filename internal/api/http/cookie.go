@@ -72,7 +72,9 @@ func WithPath(path string) CookieHandlerOpt {
 func WithMaxAge(maxAge int) CookieHandlerOpt {
 	return func(c *CookieHandler) {
 		c.maxAge = maxAge
-		c.securecookie.MaxAge(maxAge)
+		if c.securecookie != nil {
+			c.securecookie.MaxAge(maxAge)
+		}
 	}
 }
 

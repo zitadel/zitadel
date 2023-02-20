@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "上一页",
     "NEXT": "下一页",
-    "COUNT": "总数"
+    "COUNT": "总数",
+    "MORE": "显示更多"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "实例",
     "ORGS": "组织",
     "VIEWS": "数据表",
+    "EVENTS": "活动",
     "FAILEDEVENTS": "失败事件",
     "ORGANIZATION": "组织",
     "DOMAINS": "域名",
@@ -231,6 +233,7 @@
       "CREATE": "创建",
       "MY": "我的信息",
       "LOGINNAMES": "登录名称",
+      "LOGINMETHODS": "登录方式",
       "LOGINNAMESDESC": "这些是您的登录名:",
       "NOUSER": "没有关联的用户。",
       "REACTIVATE": "重新启用",
@@ -239,6 +242,8 @@
       "STATE": "状态",
       "DELETE": "删除用户",
       "UNLOCK": "解锁用户",
+      "GENERATESECRET": "生成客户密匙",
+      "REMOVESECRET": "删除客户密匙",
       "LOCKEDDESCRIPTION": "此用户因超过最大登录尝试次数而被锁定，必须解锁才能再次使用。",
       "DELETEACCOUNT": "删除账户",
       "DELETEACCOUNT_DESC": "如果您执行此操作，您将被注销并且无法再访问您的帐户。此操作不可逆，因此请谨慎操作。",
@@ -263,6 +268,10 @@
       "TITLE": "发送电子邮件通知",
       "DESCRIPTION": "单击下面的按钮可向当前电子邮件地址发送通知或更改电子邮件地址。",
       "NEWEMAIL": "新的电子邮件地址"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "客户端秘钥",
+      "CLIENTSECRET_DESCRIPTION": "将您的客户保密在一个安全的地方，因为一旦对话框关闭，便无法再次查看。"
     },
     "TABLE": {
       "DEACTIVATE": "停用",
@@ -404,6 +413,7 @@
       "TITLE": "信息",
       "EMAIL": "电子邮件",
       "PHONE": "手机号码",
+      "PHONE_HINT": "使用 00 或 + 符号后跟呼叫者的国家代码，或从下拉列表中选择国家，最后输入电话号码",
       "USERNAME": "用户名",
       "CHANGEUSERNAME": "修改",
       "CHANGEUSERNAME_TITLE": "修改用户名称",
@@ -423,7 +433,8 @@
         "PREVIEW": "预览",
         "DELETESUCCESS": "删除成功！",
         "CROPPERERROR": "上传文件时出错。如有必要，请尝试不同的格式和大小。"
-      }
+      },
+      "COUNTRY": "国家"
     },
     "MACHINE": {
       "TITLE": "服务用户详情",
@@ -441,6 +452,11 @@
       "CHOOSEEXPIRY": "选择过期时间",
       "CREATIONDATE": "创建于",
       "KEYDETAILS": "秘钥详情",
+      "ACCESSTOKENTYPE": "访问令牌类型 ",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "添加秘钥",
         "DESCRIPTION": "选择您的密钥类型并选择一个可选的到期日期。"
@@ -588,7 +604,9 @@
       "MACHINEADDED": "服务用户已创建成功!",
       "DELETED": "用户删除成功!",
       "UNLOCKED": "用户解锁成功!",
-      "PASSWORDLESSREGISTRATIONSENT": "注册链接发送成功。"
+      "PASSWORDLESSREGISTRATIONSENT": "注册链接发送成功。",
+      "SECRETGENERATED": "秘密成功生成!",
+      "SECRETREMOVED": "秘密被成功删除!"
     },
     "MEMBERSHIPS": {
       "TITLE": "CITADEL 管理角色",
@@ -749,6 +767,56 @@
       "DELETE": "删除",
       "DELETESUCCESS": "失败的事件被移除。"
     },
+    "EVENTS": {
+      "TITLE": "活动",
+      "DESCRIPTION": "该视图显示所有传入的事件",
+      "EDITOR": "编辑",
+      "EDITORID": "编者号",
+      "AGGREGATE": "总数",
+      "AGGREGATEID": "汇总的ID",
+      "AGGREGATETYPE": "骨料类型",
+      "RESOURCEOWNER": "所有者",
+      "SEQUENCE": "序列",
+      "CREATIONDATE": "创建日期",
+      "TYPE": "类型",
+      "PAYLOAD": "有效载荷",
+      "FILTERS": {
+        "BTN": "过滤器",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "按用户过滤"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "骨料类型",
+          "IDLABEL": "ID",
+          "CHECKBOX": "按总量过滤"
+        },
+        "TYPE": {
+          "TYPELABEL": "类型",
+          "CHECKBOX": "按类型过滤"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "按资源所有者过滤"
+        },
+        "SEQUENCE": {
+          "LABEL": "序列",
+          "CHECKBOX": "按顺序过滤",
+          "SORT": "分拣",
+          "ASC": "上升中",
+          "DESC": "下降"
+        },
+        "CREATIONDATE": {
+          "LABEL": "创建日期",
+          "CHECKBOX": "按创建日期过滤"
+        },
+        "OTHER": "其他",
+        "OTHERS": "其他"
+      },
+      "DIALOG": {
+        "TITLE": "事件的细节"
+      }
+    },
     "TOAST": {
       "MEMBERREMOVED": "管理者已删除。",
       "MEMBERSADDED": "已添加多个管理者。",
@@ -779,6 +847,10 @@
       "ORGDETAIL_TITLE": "输入新组织的名称和域名。",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "输入新组织的名称。",
       "ORGDETAILUSER_TITLE": "配置组织所有者",
+      "DELETE": "删除组织",
+      "DEFAULTLABEL": "默认情况下",
+      "SETASDEFAULT": "设置为默认组织",
+      "DEFAULTORGSET": "默认的组织已经改变",
       "RENAME": {
         "ACTION": "改名",
         "TITLE": "重命名组织",
@@ -845,7 +917,9 @@
       "MEMBERADDED": "管理者已添加。",
       "MEMBERREMOVED": "管理者已删除。",
       "MEMBERCHANGED": "管理者以改变。",
-      "SETPRIMARY": "已设为主域名。"
+      "SETPRIMARY": "已设为主域名。",
+      "DELETED": "成功删除的组织",
+      "ORG_WAS_DELETED": "组织被删除"
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -855,6 +929,13 @@
       "REACTIVATE": {
         "TITLE": "重新启用组织",
         "DESCRIPTION": "您即将重新启用您的组织。用户将能够再次登录。你确定要继续吗？"
+      },
+      "DELETE": {
+        "TITLE": "删除组织",
+        "DESCRIPTION": "你即将删除你的组织。这将启动一个过程，所有与组织有关的数据将被删除。你现在还不能恢复这一行动。",
+        "TYPENAME": "键入'{价值}'，以删除您的组织。",
+        "ORGNAME": "组织名称",
+        "BTN": "删除"
       }
     }
   },
@@ -872,7 +953,7 @@
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
       "COMPLEXITY": "密码复杂性",
-      "NOTIFICATIONS": "通知服务商",
+      "NOTIFICATIONS": "通知设置",
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",
@@ -900,13 +981,14 @@
       "it": "Italiano",
       "en": "English",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
-      "HOST": "服务器地址",
+      "HOSTANDPORT": "主机和端口",
       "USER": "用户名",
       "PASSWORD": "密码",
       "SETPASSWORD": "设置 SMTP 密码",
@@ -996,6 +1078,11 @@
       "NUMBERERROR": "密码必须包含数字。",
       "PATTERNERROR": "密码不符合要求。"
     },
+    "NOTIFICATION": {
+      "TITLE": "通知",
+      "DESCRIPTION": "确定将发送哪些更改、通知",
+      "PASSWORDCHANGE": "更改密码"
+    },
     "PRIVATELABELING": {
       "TITLE": "品牌标识",
       "DESCRIPTION": "为登录提供您的个性化风格并修改其行为。",
@@ -1081,11 +1168,12 @@
       "UNSAVED_DESCRIPTION": "您在未保存的情况下进行了更改。您现在要保存吗？",
       "LOCALE": "本地化",
       "LOCALES": {
-        "de": "德语",
-        "en": "英语",
-        "it": "意大利语",
-        "fr": "法语",
-        "zh": "简体中文"
+        "de": "Deutsch",
+        "en": "English",
+        "it": "Italiano",
+        "fr": "Français",
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1134,7 +1222,8 @@
         "VP": "验证手机号码",
         "PR": "重置密码",
         "DC": "域名声明",
-        "PL": "无密码身份验证"
+        "PL": "无密码身份验证",
+        "PC": "修改密码"
       },
       "CHIPS": {
         "firstname": "名",
@@ -1471,6 +1560,12 @@
       "UPDATED": "项目已修改。",
       "GRANTUPDATED": "授权已更新。",
       "DELETED": "项目已删除"
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "删除角色",
+      "DELETE_DESCRIPTION": "您即将删除一个角色。你确定吗？"
     }
   },
   "NEXTSTEPS": {
@@ -1836,11 +1931,12 @@
     "3": "其他"
   },
   "LANGUAGES": {
-    "de": "德语",
-    "en": "英语",
-    "it": "意大利语",
-    "fr": "法语",
-    "zh": "简体中文"
+    "de": "Deutsch",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "添加管理者",

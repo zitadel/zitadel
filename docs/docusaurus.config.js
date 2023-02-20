@@ -29,6 +29,22 @@ module.exports = {
         content:
           "zitadel, documentation, jwt, saml, oauth2, authentication, serverless, login, auth, authorization, sso, openid-connect, oidc, mfa, 2fa, passkeys, fido2, docker",
       },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      { property: "og:url", content: "https://www.zitadel.com/docs" },
+      {
+        property: "og:image",
+        content: "https://www.zitadel.com/docs/img/preview.png",
+      },
+      { property: "twitter:card", content: "summary_large_image" },
+      { property: "twitter:url", content: "https://www.zitadel.com/docs" },
+      { property: "twitter:title", content: "ZITADEL Docs" },
+      {
+        property: "twitter:image",
+        content: "https://www.zitadel.com/docs/img/preview.png",
+      },
     ],
     zoom: {
       selector: ".markdown :not(em) > img",
@@ -167,11 +183,7 @@ module.exports = {
             {
               label: "Status",
               href: "https://status.zitadel.com/",
-            },
-            {
-              label: "Docs v1 (deprecated)",
-              href: "https://docs-v1.zitadel.com/",
-            },
+            }
           ],
         },
       ],

@@ -95,6 +95,19 @@ title: zitadel/policy.proto
 
 
 
+### NotificationPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| is_default |  bool | - |  |
+| password_change |  bool | - |  |
+
+
+
+
 ### OrgIAMPolicy
 deprecated: please use DomainPolicy instead
 

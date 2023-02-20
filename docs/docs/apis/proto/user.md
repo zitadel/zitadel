@@ -133,6 +133,8 @@ title: zitadel/user.proto
 | ----- | ---- | ----------- | ----------- |
 | name |  string | - |  |
 | description |  string | - |  |
+| has_secret |  bool | - |  |
+| access_token_type |  AccessTokenType | - |  |
 
 
 
@@ -632,6 +634,17 @@ UserTypeQuery is always equals
 ## Enums
 
 
+### AccessTokenType {#accesstokentype}
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ACCESS_TOKEN_TYPE_BEARER | 0 | - |
+| ACCESS_TOKEN_TYPE_JWT | 1 | - |
+
+
+
+
 ### AuthFactorState {#authfactorstate}
 
 
@@ -696,6 +709,7 @@ UserTypeQuery is always equals
 | USER_FIELD_NAME_EMAIL | 6 | - |
 | USER_FIELD_NAME_STATE | 7 | - |
 | USER_FIELD_NAME_TYPE | 8 | - |
+| USER_FIELD_NAME_CREATION_DATE | 9 | - |
 
 
 

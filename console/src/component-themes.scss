@@ -25,6 +25,7 @@
 @import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
 @import 'src/app/pages/projects/apps/redirect-uris/redirect-uris.component';
+@import 'src/app/modules/filter-events/filter-events.component';
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
 @import 'src/app/modules/edit-text/edit-text.component.scss';
@@ -33,6 +34,7 @@
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
 @import 'src/app/pages/users/user-detail/contact/contact.component';
 @import 'src/app/pages/projects/project-grid/project-grid.component';
+@import 'src/app/pages/actions/actions.component';
 @import 'src/app/app.component.scss';
 @import './styles/color.scss';
 @import 'src/app/pages/instance/instance.component.scss';
@@ -52,6 +54,7 @@
 @import 'src/app/modules/idp-create/idp-type-radio/idp-type-radio.component.scss';
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
+@import 'src/app/pages/events/events.component';
 @import 'src/app/pages/home/home.component.scss';
 @import 'src/app/modules/policies/security-policy/security-policy.component.scss';
 @import 'src/app/modules/search-user-autocomplete/search-user-autocomplete.component.scss';
@@ -67,6 +70,7 @@
   @include nav-toggle-theme($theme);
   @include header-theme($theme);
   @include app-type-radio-theme($theme);
+  @include events-theme($theme);
   @include projects-theme($theme);
   @include idp-type-radio-theme($theme);
   @include top-view-theme($theme);
@@ -76,6 +80,7 @@
   @include search-user-autocomplete-theme($theme);
   @include project-role-chips-theme($theme);
   @include card-theme($theme);
+  @include filter-events-theme($theme);
   @include footer-theme($theme);
   @include table-theme($theme);
   @include detail-layout-theme($theme);
@@ -109,6 +114,7 @@
   @include accounts-card-theme($theme);
   @include sidenav-theme($theme);
   @include info-section-theme($theme);
+  @include actions-theme($theme);
   @include filter-theme($theme);
   @include private-label-theme($theme);
   @include project-grid-theme($theme);

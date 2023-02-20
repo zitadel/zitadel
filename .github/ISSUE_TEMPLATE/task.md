@@ -1,15 +1,14 @@
 ---
-name: Task
-about: A task describes what is to be implemented and which acceptance criteria must
-  be met.
+name: User Story
+about: A user story is a brief	description of a feature that has to be implemented from the perspective of the end user.
 title: ''
-labels: 'state: triage'
 assignees: ''
 
 ---
 
-Description
+As a [type of user], I want [some goal] so that [some reason].
 
-**Acceptance criteria**
+```[tasklist]
+### Acceptance Criteria
 - [ ] ...
-- [ ] ...
+```

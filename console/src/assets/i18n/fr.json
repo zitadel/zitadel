@@ -3,7 +3,8 @@
   "PAGINATOR": {
     "PREVIOUS": "Précédent",
     "NEXT": "Suivant",
-    "COUNT": "Résultats totaux"
+    "COUNT": "Résultats totaux",
+    "MORE": "plus"
   },
   "FOOTER": {
     "LINKS": {
@@ -49,6 +50,7 @@
     "INSTANCEOVERVIEW": "Instance",
     "ORGS": "Organisations",
     "VIEWS": "Vues",
+    "EVENTS": "Événements",
     "FAILEDEVENTS": "Événements échoués",
     "ORGANIZATION": "Organisation",
     "DOMAINS": "Domaines",
@@ -231,6 +233,7 @@
       "CREATE": "Créer",
       "MY": "Mes informations",
       "LOGINNAMES": "Noms de connexion",
+      "LOGINMETHODS": "Méthodes de connexion",
       "LOGINNAMESDESC": "Ce sont vos noms de connexion",
       "NOUSER": "Aucun utilisateur associé.",
       "REACTIVATE": "Réactiver",
@@ -239,6 +242,8 @@
       "STATE": "Statut",
       "DELETE": "Supprimer l'utilisateur",
       "UNLOCK": "Déverrouiller l'utilisateur",
+      "GENERATESECRET": "Générer Client Secret",
+      "REMOVESECRET": "Supprimer Client Secret",
       "LOCKEDDESCRIPTION": "Cet utilisateur a été verrouillé pour avoir dépassé le nombre maximum de tentatives de connexion et doit être déverrouillé pour être à nouveau utilisé.",
       "DELETEACCOUNT": "Supprimer le compte",
       "DELETEACCOUNT_DESC": "Si vous effectuez cette action, vous serez déconnecté et n'aurez plus accès à votre compte. Cette action n'est pas réversible, veuillez donc continuer avec prudence.",
@@ -263,6 +268,10 @@
       "TITLE": "Envoyer une notification par e-mail",
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour envoyer une notification à l'adresse e-mail actuelle ou modifier l'adresse e-mail dans le champ.",
       "NEWEMAIL": "Nouvelle adresse e-mail"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Conservez votre secret client dans un endroit sûr car il disparaîtra une fois la boîte de dialogue fermée."
     },
     "TABLE": {
       "DEACTIVATE": "Désactiver",
@@ -404,6 +413,7 @@
       "TITLE": "Profil",
       "EMAIL": "Courriel",
       "PHONE": "Numéro de téléphone",
+      "PHONE_HINT": "Utilisez 00 ou le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -423,7 +433,8 @@
         "PREVIEW": "Prévisualiser",
         "DELETESUCCESS": "Supprimé avec succès !",
         "CROPPERERROR": "Une erreur s'est produite lors du téléchargement de votre fichier. Essayez un autre format et une autre taille si nécessaire."
-      }
+      },
+      "COUNTRY": "Pays"
     },
     "MACHINE": {
       "TITLE": "Détails de l'utilisateur du service",
@@ -441,6 +452,11 @@
       "CHOOSEEXPIRY": "Sélectionnez une date d'expiration",
       "CREATIONDATE": "Date de création",
       "KEYDETAILS": "Détails de la clé",
+      "ACCESSTOKENTYPE": "Access Token Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
       "ADD": {
         "TITLE": "Ajouter une clé",
         "DESCRIPTION": "Sélectionnez votre type de clé et choisissez une date d'expiration facultative."
@@ -588,7 +604,9 @@
       "MACHINEADDED": "Utilisateur de service créé !",
       "DELETED": "Utilisateur supprimé avec succès !",
       "UNLOCKED": "Utilisateur déverrouillé avec succès !",
-      "PASSWORDLESSREGISTRATIONSENT": "Lien d'enregistrement envoyé avec succès."
+      "PASSWORDLESSREGISTRATIONSENT": "Lien d'enregistrement envoyé avec succès.",
+      "SECRETGENERATED": "Secret généré avec succès !",
+      "SECRETREMOVED": "Secret supprimé avec succès !"
     },
     "MEMBERSHIPS": {
       "TITLE": "Rôles du gestionnaire ZITADEL",
@@ -749,6 +767,56 @@
       "DELETE": "Supprimer",
       "DELETESUCCESS": "Événements échoués supprimés."
     },
+    "EVENTS": {
+      "TITLE": "Événements",
+      "DESCRIPTION": "Cette vue montre les événements de ZITADEL.",
+      "EDITOR": "Éditeur",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "agrégat",
+      "AGGREGATEID": "agrégat ID",
+      "AGGREGATETYPE": "type d'agrégat",
+      "RESOURCEOWNER": "Propriétaire",
+      "SEQUENCE": "séquence",
+      "CREATIONDATE": "Créé à",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filtre",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer par éditeur"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregate Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrer par agrégat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filtrer par type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrer par propriétaire"
+        },
+        "SEQUENCE": {
+          "LABEL": "séquence",
+          "CHECKBOX": "Filtrer par séquence",
+          "SORT": "Triage",
+          "ASC": "Ascendant",
+          "DESC": "Descendant"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Date de création",
+          "CHECKBOX": "Filtrer par date de création"
+        },
+        "OTHER": "autre",
+        "OTHERS": "autres"
+      },
+      "DIALOG": {
+        "TITLE": "Détail de l'événement"
+      }
+    },
     "TOAST": {
       "MEMBERREMOVED": "Gestionnaire supprimé.",
       "MEMBERSADDED": "Gestionnaires ajoutés.",
@@ -779,6 +847,10 @@
       "ORGDETAIL_TITLE": "Saisissez le nom et le domaine de votre nouvelle organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Saisissez le nom de votre nouvelle organisation.",
       "ORGDETAILUSER_TITLE": "Configurer le propriétaire de l'organisation",
+      "DELETE": "Supprimer l'organisation",
+      "DEFAULTLABEL": "Défaut",
+      "SETASDEFAULT": "Définir comme organisation par défaut",
+      "DEFAULTORGSET": "L'organisation par défaut a été modifiée avec succès",
       "RENAME": {
         "ACTION": "Renommer",
         "TITLE": "Renommer l'organisation",
@@ -845,7 +917,9 @@
       "MEMBERADDED": "Gestionnaire ajouté.",
       "MEMBERREMOVED": "Gestionnaire supprimé.",
       "MEMBERCHANGED": "Gestionnaire modifié.",
-      "SETPRIMARY": "Domaine primaire défini."
+      "SETPRIMARY": "Domaine primaire défini.",
+      "DELETED": "Organisation supprimée avec succès",
+      "ORG_WAS_DELETED": "L'organisation a été supprimée"
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -855,6 +929,13 @@
       "REACTIVATE": {
         "TITLE": "Réactiver l'organisation",
         "DESCRIPTION": "Vous êtes sur le point de réactiver votre organisation. Les utilisateurs peuvent ensuite se reconnecter ? Voulez-vous continuer ?"
+      },
+      "DELETE": {
+        "TITLE": "Supprimer l'organisation",
+        "DESCRIPTION": "Vous êtes sur le point de supprimer votre organisation. Cela déclenche un processus au cours duquel toutes les données relatives à l'organisation seront supprimées. Vous ne pouvez pas revenir sur cette action pour le moment.",
+        "TYPENAME": "Tapez '{{value}}', pour supprimer votre organisation.",
+        "ORGNAME": "Nom",
+        "BTN": "Supprimer"
       }
     }
   },
@@ -872,7 +953,7 @@
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
       "COMPLEXITY": "Complexité du mot de passe",
-      "NOTIFICATIONS": "Fournisseurs de notifications et SMTP",
+      "NOTIFICATIONS": "Paramètres de notification",
       "NOTIFICATIONS_DESC": "Paramètres SMTP et SMS",
       "MESSAGETEXTS": "Textes des messages",
       "IDP": "Fournisseurs d'identité",
@@ -900,19 +981,20 @@
       "en": "English",
       "it": "Italiano",
       "fr": "Français",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "pl": "Polski"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
       "SENDERADDRESS": "Adresse e-mail de l'expéditeur",
       "SENDERNAME": "Nom de l'expéditeur",
-      "HOST": "Hôte",
+      "HOSTANDPORT": "Hôte et port",
       "USER": "Utilisateur",
       "PASSWORD": "Mot de passe",
       "SETPASSWORD": "Définir le mot de passe SMTP",
       "PASSWORDSET": "Le mot de passe SMTP a été défini avec succès.",
       "TLS": "Sécurité de la couche de transport (TLS)",
-      "SAVED": "Enregistré avec succès !",
+      "SAVED": "Enregistré avec succès!",
       "REQUIREDWARN": "Pour envoyer des notifications depuis votre domaine, vous devez entrer vos données SMTP."
     },
     "SMS": {
@@ -995,6 +1077,11 @@
       "SYMBOLERROR": "Doit inclure un symbole/un signe de ponctuation.",
       "NUMBERERROR": "Doit inclure un chiffre.",
       "PATTERNERROR": "Le mot de passe ne correspond pas au modèle requis."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notifications",
+      "DESCRIPTION": "Détermine sur quels changements, les notifications seront envoyées",
+      "PASSWORDCHANGE": "Changement de mot de passe"
     },
     "PRIVATELABELING": {
       "TITLE": "Image de marque",
@@ -1086,7 +1173,8 @@
         "en": "English",
         "it": "Italiano",
         "fr": "Français",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "pl": "Polski"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1135,7 +1223,8 @@
         "VP": "Vérifier le téléphone",
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
-        "PL": "Sans mot de passe"
+        "PL": "Sans mot de passe",
+        "PC": "Changement de mot de passe"
       },
       "CHIPS": {
         "firstname": "Prénom",
@@ -1472,6 +1561,12 @@
       "UPDATED": "Projet modifié.",
       "GRANTUPDATED": "Subvention modifiée.",
       "DELETED": "Projet supprimé."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Supprimer un rôle",
+      "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un rôle. Êtes-vous sûr ?"
     }
   },
   "NEXTSTEPS": {
@@ -1841,7 +1936,8 @@
     "en": "English",
     "it": "Italiano",
     "fr": "Français",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "pl": "Polski"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

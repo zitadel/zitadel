@@ -9,7 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
+	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -68,7 +68,7 @@ type Org struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	State         domain.OrgState
+	State         domain_pkg.OrgState
 	Sequence      uint64
 
 	Name   string
@@ -155,15 +155,19 @@ func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUniqu
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
-				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+				OrgColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+				OrgDomainIsVerifiedCol.identifier(): true,
 			},
 			sq.Or{
-				sq.Eq{
-					OrgColumnDomain.identifier(): domain,
+				sq.ILike{
+					OrgDomainDomainCol.identifier(): domain,
 				},
-				sq.Eq{
+				sq.ILike{
 					OrgColumnName.identifier(): name,
 				},
+			},
+			sq.NotEq{
+				OrgColumnState.identifier(): domain_pkg.OrgStateRemoved,
 			},
 		}).ToSql()
 	if err != nil {
@@ -213,6 +217,10 @@ func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, 
 
 func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(OrgColumnName, value, method)
+}
+
+func NewOrgStateSearchQuery(value int32) (SearchQuery, error) {
+	return NewNumberQuery(OrgColumnState, value, NumberEquals)
 }
 
 func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
@@ -342,7 +350,9 @@ func prepareOrgWithDomainsQuery() (sq.SelectBuilder, func(*sql.Row) (*Org, error
 
 func prepareOrgUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 	return sq.Select(uniqueColumn.identifier()).
-			From(orgsTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(orgsTable.identifier()).
+			LeftJoin(join(OrgDomainOrgIDCol, OrgColumnID)).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (isUnique bool, err error) {
 			err = row.Scan(&isUnique)
 			if err != nil {

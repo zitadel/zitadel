@@ -261,7 +261,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 	if err != nil {
 		return nil, nil, err
 	}
-	if !isUserStateExists(userWriteModel.UserState) {
+	if userWriteModel.UserState != domain.UserStateActive {
 		return nil, nil, errors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 

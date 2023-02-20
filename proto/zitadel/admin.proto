@@ -10,8 +10,10 @@ import "zitadel/policy.proto";
 import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
+import "zitadel/event.proto";
 import "zitadel/management.proto";
 import "zitadel/v1.proto";
+import "zitadel/message.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -613,6 +615,41 @@ service AdminService {
         };
     }
 
+
+    // Sets the state of the organisation and all its resource (Users, Projects, Grants to and from the org) to removed
+    // Users of this organisation will not be able login
+    rpc RemoveOrg(RemoveOrgRequest) returns (RemoveOrgResponse) {
+        option (google.api.http) = {
+            delete: "/orgs/{org_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "orgs";
+            tags: "global";
+            responses: {
+                key: "200";
+                value: {
+                    description: "org removed successfully";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid org";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+
     // Returns a identity provider configuration of the IAM instance
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
@@ -969,6 +1006,66 @@ service AdminService {
                     };
                 };
             };
+        };
+    }
+
+    // Returns all identity providers, which match the query
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListProviders(ListProvidersRequest) returns (ListProvidersResponse) {
+        option (google.api.http) = {
+            post: "/idps/templates/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.read"
+        };
+    }
+
+    // Returns an identity provider of the instance
+    rpc GetProviderByID(GetProviderByIDRequest) returns (GetProviderByIDResponse) {
+        option (google.api.http) = {
+            get: "/idps/templates/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.read"
+        };
+    }
+
+    // Add a new ldap identity provider on the instance
+    rpc AddLDAPProvider(AddLDAPProviderRequest) returns (AddLDAPProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/ldap"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing ldap identity provider on the instance
+    rpc UpdateLDAPProvider(UpdateLDAPProviderRequest) returns (UpdateLDAPProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/ldap/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Remove an identity provider
+    // Will remove all linked providers of this configuration on the users
+    rpc DeleteProvider(DeleteProviderRequest) returns (DeleteProviderResponse) {
+        option (google.api.http) = {
+            delete: "/idps/templates/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
         };
     }
 
@@ -1908,6 +2005,91 @@ service AdminService {
         };
     }
 
+    //Add a default notification policy for ZITADEL
+    // it impacts all organisations without a customised policy
+    rpc AddNotificationPolicy(AddNotificationPolicyRequest) returns (AddNotificationPolicyResponse) {
+        option (google.api.http) = {
+            post: "/policies/notification"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy";
+                };
+            };
+        };
+    }
+
+
+    //Returns the notification policy defined by the administrators of ZITADEL
+    rpc GetNotificationPolicy(GetNotificationPolicyRequest) returns (GetNotificationPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/notification";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy";
+                };
+            };
+        };
+    }
+
+    //Updates the default notification policy of ZITADEL
+    // it impacts all organisations without a customised policy
+    rpc UpdateNotificationPolicy(UpdateNotificationPolicyRequest) returns (UpdateNotificationPolicyResponse) {
+        option (google.api.http) = {
+            put: "/policies/notification";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "policy";
+            tags: "notification policy";
+            tags: "notification";
+            responses: {
+                key: "200";
+                value: {
+                    description: "default notification policy updated";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "invalid argument";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
     //Returns the default text for initial message (translation file)
     rpc GetDefaultInitMessageText(GetDefaultInitMessageTextRequest) returns (GetDefaultInitMessageTextResponse) {
         option (google.api.http) = {
@@ -1930,10 +2112,11 @@ service AdminService {
         };
     }
 
+
     //Sets the default custom text for initial message
     // it impacts all organisations without customized initial message text
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultInitMessageText(SetDefaultInitMessageTextRequest) returns (SetDefaultInitMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/init/{language}";
@@ -1982,7 +2165,7 @@ service AdminService {
     //Sets the default custom text for password reset message
     // it impacts all organisations without customized password reset message text
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultPasswordResetMessageText(SetDefaultPasswordResetMessageTextRequest) returns (SetDefaultPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordreset/{language}";
@@ -2032,7 +2215,7 @@ service AdminService {
     //Sets the default custom text for verify email message
     // it impacts all organisations without customized verify email message text
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultVerifyEmailMessageText(SetDefaultVerifyEmailMessageTextRequest) returns (SetDefaultVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyemail/{language}";
@@ -2081,7 +2264,7 @@ service AdminService {
     //Sets the default custom text for verify phone message
     // it impacts all organisations without customized verify phone message text
     // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultVerifyPhoneMessageText(SetDefaultVerifyPhoneMessageTextRequest) returns (SetDefaultVerifyPhoneMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyphone/{language}";
@@ -2127,10 +2310,10 @@ service AdminService {
         };
     }
 
-    //Sets the default custom text for domain claimed phone message
+    //Sets the default custom text for domain claimed message
     // it impacts all organisations without customized domain claimed message text
     // The Following Variables can be used:
-    // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultDomainClaimedMessageText(SetDefaultDomainClaimedMessageTextRequest) returns (SetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/domainclaimed/{language}";
@@ -2179,7 +2362,7 @@ service AdminService {
     //Sets the default custom text for passwordless registration message
     // it impacts all organisations without customized passwordless registration message text
     // The Following Variables can be used:
-    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}}
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultPasswordlessRegistrationMessageText(SetDefaultPasswordlessRegistrationMessageTextRequest) returns (SetDefaultPasswordlessRegistrationMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordless_registration/{language}";
@@ -2202,6 +2385,57 @@ service AdminService {
             permission: "policy.delete"
         };
     }
+
+
+    //Returns the default text for password change message (translation file)
+    rpc GetDefaultPasswordChangeMessageText(GetDefaultPasswordChangeMessageTextRequest) returns (GetDefaultPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/password_change/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Returns the custom text for password change message (overwritten in eventstore)
+    rpc GetCustomPasswordChangeMessageText(GetCustomPasswordChangeMessageTextRequest) returns (GetCustomPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/password_change/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+    }
+
+    //Sets the default custom text for password change message
+    // it impacts all organisations without customized password change message text
+    // The Following Variables can be used:
+    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
+    rpc SetDefaultPasswordChangeMessageText(SetDefaultPasswordChangeMessageTextRequest) returns (SetDefaultPasswordChangeMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/password_change/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+    }
+
+    // Removes the custom password change message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomPasswordChangeMessageTextToDefault(ResetCustomPasswordChangeMessageTextToDefaultRequest) returns (ResetCustomPasswordChangeMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/password_change/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
 
     //Returns the default custom texts for login ui (translation file)
     rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
@@ -2507,6 +2741,39 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
+        };
+    }
+
+    rpc ListEventTypes(ListEventTypesRequest) returns (ListEventTypesResponse) {
+        option (google.api.http) = {
+            post: "/events/types/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
+        };
+    }
+
+    rpc ListEvents(ListEventsRequest) returns (ListEventsResponse) {
+        option (google.api.http) = {
+            post: "/events/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
+        };
+    }
+
+    rpc ListAggregateTypes(ListAggregateTypesRequest) returns (ListAggregateTypesResponse) {
+        option (google.api.http) = {
+            post: "/aggregates/types/_search";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "events.read";
         };
     }
 }
@@ -3018,6 +3285,28 @@ message SetUpOrgResponse {
     string user_id = 3;
 }
 
+message RemoveOrgRequest {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            required: ["org_id"]
+        };
+    };
+
+    string org_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message RemoveOrgResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+
 message GetIDPByIDRequest {
     string id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -3391,6 +3680,79 @@ message UpdateIDPJWTConfigRequest {
 }
 
 message UpdateIDPJWTConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListProvidersRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criteria the client is looking for
+    repeated ProviderQuery queries = 2;
+}
+
+message ProviderQuery {
+    oneof query {
+        zitadel.idp.v1.IDPIDQuery idp_id_query = 1;
+        zitadel.idp.v1.IDPNameQuery idp_name_query = 2;
+    }
+}
+
+message ListProvidersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.idp.v1.Provider result = 2;
+}
+
+message GetProviderByIDRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetProviderByIDResponse {
+    zitadel.idp.v1.Provider idp = 1;
+}
+
+message AddLDAPProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string host = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string port = 3 [(validate.rules).string = {max_len: 5}];
+    bool tls = 4;
+    string base_dn = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_object_class = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_unique_attribute = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string admin = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string password = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.idp.v1.LDAPAttributes attributes = 10;
+    zitadel.idp.v1.Options provider_options = 11;
+}
+
+message AddLDAPProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateLDAPProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string host = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string port = 4 [(validate.rules).string = {max_len: 5}];
+    bool tls = 5;
+    string base_dn = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_object_class = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_unique_attribute = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string admin = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string password = 10 [(validate.rules).string = {max_len: 200}];
+    zitadel.idp.v1.LDAPAttributes attributes = 11;
+    zitadel.idp.v1.Options provider_options = 12;
+}
+
+message UpdateLDAPProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeleteProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeleteProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -4019,6 +4381,29 @@ message UpdatePrivacyPolicyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message AddNotificationPolicyRequest {
+    bool password_change = 1;
+}
+
+message AddNotificationPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetNotificationPolicyRequest {}
+
+message GetNotificationPolicyResponse {
+    zitadel.policy.v1.NotificationPolicy policy = 1;
+}
+
+message UpdateNotificationPolicyRequest {
+   bool password_change = 1;
+}
+
+message UpdateNotificationPolicyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultInitMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -4238,6 +4623,51 @@ message ResetCustomDomainClaimedMessageTextToDefaultRequest {
 message ResetCustomDomainClaimedMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
+
+message GetDefaultPasswordChangeMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultPasswordChangeMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomPasswordChangeMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomPasswordChangeMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultPasswordChangeMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [(validate.rules).string = {max_len: 200}];
+    string pre_header = 3 [(validate.rules).string = {max_len: 200}];
+    string subject = 4 [(validate.rules).string = {max_len: 200}];
+    string greeting = 5  [(validate.rules).string = {max_len: 200}];
+    string text = 6 [(validate.rules).string = {max_len: 800}];
+    string button_text = 7 [(validate.rules).string = {max_len: 200}];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultPasswordChangeMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomPasswordChangeMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomPasswordChangeMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 
 message GetDefaultPasswordlessRegistrationMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -4739,4 +5169,82 @@ message ExportDataRequest {
 
 message ExportDataResponse {
     repeated DataOrg orgs = 1;
+}
+
+message ListEventsRequest {
+    // sequence represents the order of events. It's always upcounting
+    // if asc is false sequence is used as less than filter
+    // if asc is true sequence is used as greater than filter
+    // if sequence is 0 the field is ignored
+    uint64 sequence = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2\"";
+        }
+    ];
+    uint32 limit = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "20";
+            description: "Maximum amount of events returned.";
+        }
+    ];
+    bool asc = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "default is descending sorting order"
+        }
+    ];
+    string editor_user_id = 4 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    // the types are or filtered and must match the type exatly
+    repeated string event_types = 5 [
+        (validate.rules).repeated = {max_items: 30},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"user.human.added\", \"user.machine\"]";
+        }
+    ];
+    string aggregate_id = 6 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    repeated string aggregate_types = 7 [
+        (validate.rules).repeated = {max_items: 10},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"user\"";
+        }
+    ];
+    string resource_owner = 8 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    // if asc is false creation_date is used as less than filter
+    // if asc is true creation_date is used as greater than filter
+    // if creation_date is not set the field is ignored
+    google.protobuf.Timestamp creation_date = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2019-04-01T08:45:00.000000Z\"";
+        }
+    ];
+}
+
+message ListEventsResponse {
+    repeated zitadel.event.v1.Event events = 1;
+}
+
+message ListEventTypesRequest {}
+
+message ListEventTypesResponse {
+    repeated zitadel.event.v1.EventType event_types = 1;
+}
+
+message ListAggregateTypesRequest {}
+
+message ListAggregateTypesResponse {
+    repeated zitadel.event.v1.AggregateType aggregate_types = 1;
 }

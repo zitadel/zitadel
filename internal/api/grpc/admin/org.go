@@ -27,6 +27,16 @@ func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgR
 	}, nil
 }
 
+func (s *Server) RemoveOrg(ctx context.Context, req *admin_pb.RemoveOrgRequest) (*admin_pb.RemoveOrgResponse, error) {
+	details, err := s.command.RemoveOrg(ctx, req.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.RemoveOrgResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
 func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
 	org, err := s.query.OrgByID(ctx, true, authz.GetInstance(ctx).DefaultOrganisationID())
 	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err

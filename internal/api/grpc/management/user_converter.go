@@ -57,6 +57,8 @@ func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 		return query.UserTypeCol
 	case user.UserFieldName_USER_FIELD_NAME_NICK_NAME:
 		return query.HumanNickNameCol
+	case user.UserFieldName_USER_FIELD_NAME_CREATION_DATE:
+		return query.UserCreationDateCol
 	default:
 		return query.UserIDCol
 	}
@@ -170,9 +172,10 @@ func AddMachineUserRequestToCommand(req *mgmt_pb.AddMachineUserRequest, resource
 		ObjectRoot: models.ObjectRoot{
 			ResourceOwner: resourceowner,
 		},
-		Username:    req.UserName,
-		Name:        req.Name,
-		Description: req.Description,
+		Username:        req.UserName,
+		Name:            req.Name,
+		Description:     req.Description,
+		AccessTokenType: user_grpc.AccessTokenTypeToDomain(req.AccessTokenType),
 	}
 }
 
@@ -226,8 +229,9 @@ func UpdateMachineRequestToCommand(req *mgmt_pb.UpdateMachineRequest, orgID stri
 			AggregateID:   req.UserId,
 			ResourceOwner: orgID,
 		},
-		Name:        req.Name,
-		Description: req.Description,
+		Name:            req.Name,
+		Description:     req.Description,
+		AccessTokenType: user_grpc.AccessTokenTypeToDomain(req.AccessTokenType),
 	}
 }
 
@@ -373,7 +377,7 @@ func ListUserMembershipsRequestToModel(ctx context.Context, req *mgmt_pb.ListUse
 	if err != nil {
 		return nil, err
 	}
-	ownerQuery, err := query.NewMembershipResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	ownerQuery, err := query.NewMembershipResourceOwnersSearchQuery(authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

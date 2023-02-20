@@ -128,6 +128,10 @@ protoc \
   ${PROTO_PATH}/change.proto
 protoc \
   -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,event.md \
+  ${PROTO_PATH}/event.proto
+protoc \
+  -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,idp.md \
   ${PROTO_PATH}/idp.proto
 protoc \

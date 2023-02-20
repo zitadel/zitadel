@@ -1,7 +1,7 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription, take } from 'rxjs';
@@ -20,6 +20,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { Buffer } from 'buffer';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
+import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { formatPhone } from 'src/app/utils/formatPhone';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -29,7 +31,7 @@ import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-comp
 export class AuthUserDetailComponent implements OnDestroy {
   public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'fr', 'it', 'zh'];
+  public languages: string[] = ['de', 'en', 'fr', 'it', 'pl', 'zh'];
 
   private subscription: Subscription = new Subscription();
 
@@ -58,6 +60,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     },
   ];
   public currentSetting: string | undefined = this.settingsList[0].id;
+  public loginPolicy?: LoginPolicy.AsObject;
 
   constructor(
     public translate: TranslateService,
@@ -92,6 +95,12 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     this.userService.getSupportedLanguages().then((lang) => {
       this.languages = lang.languagesList;
+    });
+
+    this.userService.getMyLoginPolicy().then((policy) => {
+      if (policy.policy) {
+        this.loginPolicy = policy.policy;
+      }
     });
   }
 
@@ -263,6 +272,9 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public savePhone(phone: string): void {
     if (this.user?.human) {
+      // Format phone before save (add +)
+      phone = formatPhone(phone).phone;
+
       this.userService
         .setMyPhone(phone)
         .then(() => {

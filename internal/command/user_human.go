@@ -235,12 +235,12 @@ func userValidateDomain(ctx context.Context, a *user.Aggregate, username string,
 		return nil
 	}
 
-	usernameSplit := strings.Split(username, "@")
-	if len(usernameSplit) != 2 {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-Dfd21", "Errors.User.Invalid")
+	index := strings.LastIndex(username, "@")
+	if index < 0 {
+		return nil
 	}
 
-	domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit[1])
+	domainCheck := NewOrgDomainVerifiedWriteModel(username[index+1:])
 	events, err := filter(ctx, domainCheck.Query())
 	if err != nil {
 		return err
@@ -443,16 +443,15 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	human.Username = strings.TrimSpace(human.Username)
 	human.EmailAddress = strings.TrimSpace(human.EmailAddress)
 	if !domainPolicy.UserLoginMustBeDomain {
-		usernameSplit := strings.Split(human.Username, "@")
-		if len(usernameSplit) != 2 {
-			return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-Dfd21", "Errors.User.Invalid")
-		}
-		domainCheck := NewOrgDomainVerifiedWriteModel(usernameSplit[1])
-		if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
-			return nil, nil, err
-		}
-		if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-			return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
+		index := strings.LastIndex(human.Username, "@")
+		if index > 1 {
+			domainCheck := NewOrgDomainVerifiedWriteModel(human.Username[index+1:])
+			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
+				return nil, nil, err
+			}
+			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
+				return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
+			}
 		}
 	}
 

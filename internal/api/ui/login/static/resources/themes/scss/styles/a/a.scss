@@ -1,6 +1,5 @@
 a {
   text-decoration: none;
-  outline: none;
   cursor: pointer;
   margin: 2px 0;
 
@@ -10,5 +9,6 @@ a {
 
   &.sub-formfield-link {
     margin: 10px 0;
+    text-decoration: underline;
   }
 }

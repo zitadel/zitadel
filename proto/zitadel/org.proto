@@ -80,6 +80,7 @@ message OrgQuery {
 
         OrgNameQuery name_query = 1;
         OrgDomainQuery domain_query = 2;
+        OrgStateQuery state_query = 3;
     }
 }
 
@@ -109,6 +110,15 @@ message OrgDomainQuery {
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines which text equality method is used";
+        }
+    ];
+}
+
+message OrgStateQuery {
+    OrgState state = 1 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the organisation";
         }
     ];
 }
