@@ -11,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -32,12 +33,20 @@ type IDPTemplate struct {
 	IsLinkingAllowed  bool
 	IsAutoCreation    bool
 	IsAutoUpdate      bool
+	*GoogleIDPTemplate
 	*LDAPIDPTemplate
 }
 
 type IDPTemplates struct {
 	SearchResponse
 	Templates []*IDPTemplate
+}
+
+type GoogleIDPTemplate struct {
+	IDPID        string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       database.StringArray
 }
 
 type LDAPIDPTemplate struct {
@@ -51,7 +60,7 @@ type LDAPIDPTemplate struct {
 	Admin               string
 	Password            *crypto.CryptoValue
 	idp.LDAPAttributes
-	idp.Options
+	//idp.Options
 }
 
 var (
@@ -118,6 +127,33 @@ var (
 	IDPTemplateIsAutoUpdateCol = Column{
 		name:  projection.IDPTemplateIsAutoUpdateCol,
 		table: idpTemplateTable,
+	}
+)
+
+var (
+	googleIdpTemplateTable = table{
+		name:          projection.IDPTemplateGoogleTable,
+		instanceIDCol: projection.GoogleInstanceIDCol,
+	}
+	GoogleIDCol = Column{
+		name:  projection.GoogleIDCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleInstanceIDCol = Column{
+		name:  projection.GoogleInstanceIDCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleClientIDCol = Column{
+		name:  projection.GoogleClientIDCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleClientSecretCol = Column{
+		name:  projection.GoogleClientSecretCol,
+		table: googleIdpTemplateTable,
+	}
+	GoogleScopesCol = Column{
+		name:  projection.GoogleScopesCol,
+		table: googleIdpTemplateTable,
 	}
 )
 
@@ -335,6 +371,10 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			GoogleIDCol.identifier(),
+			GoogleClientIDCol.identifier(),
+			GoogleClientSecretCol.identifier(),
+			GoogleScopesCol.identifier(),
 			LDAPIDCol.identifier(),
 			LDAPHostCol.identifier(),
 			LDAPPortCol.identifier(),
@@ -358,10 +398,18 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 			LDAPAvatarURLAttributeCol.identifier(),
 			LDAPProfileAttributeCol.identifier(),
 		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
+
+			name := sql.NullString{}
+
+			googleID := sql.NullString{}
+			googleClientID := sql.NullString{}
+			googleClientSecret := new(crypto.CryptoValue)
+			googleScopes := database.StringArray{}
 
 			ldapID := sql.NullString{}
 			ldapHost := sql.NullString{}
@@ -393,13 +441,17 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				&idpTemplate.ChangeDate,
 				&idpTemplate.Sequence,
 				&idpTemplate.State,
-				&idpTemplate.Name,
+				&name,
 				&idpTemplate.Type,
 				&idpTemplate.OwnerType,
 				&idpTemplate.IsCreationAllowed,
 				&idpTemplate.IsLinkingAllowed,
 				&idpTemplate.IsAutoCreation,
 				&idpTemplate.IsAutoUpdate,
+				&googleID,
+				&googleClientID,
+				&googleClientSecret,
+				&googleScopes,
 				&ldapID,
 				&ldapHost,
 				&ldapPort,
@@ -430,7 +482,16 @@ func prepareIDPTemplateByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDPTempla
 				return nil, errors.ThrowInternal(err, "QUERY-ADG42", "Errors.Internal")
 			}
 
-			if ldapID.Valid {
+			idpTemplate.Name = name.String
+
+			if googleID.Valid {
+				idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
+					IDPID:        googleID.String,
+					ClientID:     googleClientID.String,
+					ClientSecret: googleClientSecret,
+					Scopes:       googleScopes,
+				}
+			} else if ldapID.Valid {
 				idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 					IDPID:               ldapID.String,
 					Host:                ldapHost.String,
@@ -478,6 +539,10 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			GoogleIDCol.identifier(),
+			GoogleClientIDCol.identifier(),
+			GoogleClientSecretCol.identifier(),
+			GoogleScopesCol.identifier(),
 			LDAPIDCol.identifier(),
 			LDAPHostCol.identifier(),
 			LDAPPortCol.identifier(),
@@ -502,6 +567,7 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			LDAPProfileAttributeCol.identifier(),
 			countColumn.identifier(),
 		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(GoogleIDCol, IDPTemplateIDCol)).
 			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
@@ -509,6 +575,13 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 			var count uint64
 			for rows.Next() {
 				idpTemplate := new(IDPTemplate)
+
+				name := sql.NullString{}
+
+				googleID := sql.NullString{}
+				googleClientID := sql.NullString{}
+				googleClientSecret := new(crypto.CryptoValue)
+				googleScopes := database.StringArray{}
 
 				ldapID := sql.NullString{}
 				ldapHost := sql.NullString{}
@@ -540,13 +613,17 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					&idpTemplate.ChangeDate,
 					&idpTemplate.Sequence,
 					&idpTemplate.State,
-					&idpTemplate.Name,
+					&name,
 					&idpTemplate.Type,
 					&idpTemplate.OwnerType,
 					&idpTemplate.IsCreationAllowed,
 					&idpTemplate.IsLinkingAllowed,
 					&idpTemplate.IsAutoCreation,
 					&idpTemplate.IsAutoUpdate,
+					&googleID,
+					&googleClientID,
+					&googleClientSecret,
+					&googleScopes,
 					&ldapID,
 					&ldapHost,
 					&ldapPort,
@@ -576,7 +653,16 @@ func prepareIDPTemplatesQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPTemplate
 					return nil, err
 				}
 
-				if ldapID.Valid {
+				idpTemplate.Name = name.String
+
+				if googleID.Valid {
+					idpTemplate.GoogleIDPTemplate = &GoogleIDPTemplate{
+						IDPID:        googleID.String,
+						ClientID:     googleClientID.String,
+						ClientSecret: googleClientSecret,
+						Scopes:       googleScopes,
+					}
+				} else if ldapID.Valid {
 					idpTemplate.LDAPIDPTemplate = &LDAPIDPTemplate{
 						IDPID:               ldapID.String,
 						Host:                ldapHost.String,

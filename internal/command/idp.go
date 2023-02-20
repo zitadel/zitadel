@@ -2,6 +2,13 @@ package command
 
 import "github.com/zitadel/zitadel/internal/repository/idp"
 
+type GoogleProvider struct {
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
 type LDAPProvider struct {
 	Name                string
 	Host                string

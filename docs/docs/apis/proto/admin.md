@@ -593,12 +593,36 @@ Returns an identity provider of the instance
     GET: /idps/templates/{id}
 
 
+### AddGoogleProvider
+
+> **rpc** AddGoogleProvider([AddGoogleProviderRequest](#addgoogleproviderrequest))
+[AddGoogleProviderResponse](#addgoogleproviderresponse)
+
+Add a new Google identity provider on the instance
+
+
+
+    POST: /idps/google
+
+
+### UpdateGoogleProvider
+
+> **rpc** UpdateGoogleProvider([UpdateGoogleProviderRequest](#updategoogleproviderrequest))
+[UpdateGoogleProviderResponse](#updategoogleproviderresponse)
+
+Change an existing Google identity provider on the instance
+
+
+
+    POST: /idps/google/{id}
+
+
 ### AddLDAPProvider
 
 > **rpc** AddLDAPProvider([AddLDAPProviderRequest](#addldapproviderrequest))
 [AddLDAPProviderResponse](#addldapproviderresponse)
 
-Add a new ldap identity provider on the instance
+Add a new LDAP identity provider on the instance
 
 
 
@@ -610,7 +634,7 @@ Add a new ldap identity provider on the instance
 > **rpc** UpdateLDAPProvider([UpdateLDAPProviderRequest](#updateldapproviderrequest))
 [UpdateLDAPProviderResponse](#updateldapproviderresponse)
 
-Change an existing ldap identity provider on the instance
+Change an existing LDAP identity provider on the instance
 
 
 
@@ -1845,6 +1869,32 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddGoogleProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### AddGoogleProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
 
 
 
@@ -4778,6 +4828,32 @@ this is en empty request
 
 
 ### UpdateDomainPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGoogleProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+
+
+
+
+### UpdateGoogleProviderResponse
 
 
 

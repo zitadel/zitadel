@@ -9,6 +9,89 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
+type OrgGoogleIDPWriteModel struct {
+	GoogleIDPWriteModel
+}
+
+func NewGoogleOrgIDPWriteModel(orgID, id string) *OrgGoogleIDPWriteModel {
+	return &OrgGoogleIDPWriteModel{
+		GoogleIDPWriteModel{
+			WriteModel: eventstore.WriteModel{
+				AggregateID:   orgID,
+				ResourceOwner: orgID,
+			},
+			ID: id,
+		},
+	}
+}
+
+func (wm *OrgGoogleIDPWriteModel) Reduce() error {
+	return wm.GoogleIDPWriteModel.Reduce()
+}
+
+func (wm *OrgGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *org.GoogleIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
+		case *org.GoogleIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
+		case *org.IDPRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.GoogleIDPWriteModel.AppendEvents(&e.RemovedEvent)
+		default:
+			wm.GoogleIDPWriteModel.AppendEvents(e)
+		}
+	}
+}
+
+func (wm *OrgGoogleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(org.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			org.GoogleIDPAddedEventType,
+			org.GoogleIDPChangedEventType,
+			org.IDPRemovedEventType,
+		).
+		Builder()
+}
+
+func (wm *OrgGoogleIDPWriteModel) NewChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) (*org.GoogleIDPChangedEvent, error) {
+
+	changes, err := wm.GoogleIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, scopes, options)
+	if err != nil {
+		return nil, err
+	}
+	if len(changes) == 0 {
+		return nil, nil
+	}
+	changeEvent, err := org.NewGoogleIDPChangedEvent(ctx, aggregate, id, changes)
+	if err != nil {
+		return nil, err
+	}
+	return changeEvent, nil
+}
+
 type OrgLDAPIDPWriteModel struct {
 	LDAPIDPWriteModel
 }
@@ -136,6 +219,8 @@ func (wm *OrgIDPRemoveWriteModel) Reduce() error {
 func (wm *OrgIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
+		case *org.GoogleIDPAddedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *org.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *org.LDAPIDPChangedEvent:
@@ -155,6 +240,7 @@ func (wm *OrgIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			org.GoogleIDPAddedEventType,
 			org.LDAPIDPAddedEventType,
 			org.LDAPIDPChangedEventType,
 			org.IDPRemovedEventType,

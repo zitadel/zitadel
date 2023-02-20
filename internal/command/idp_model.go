@@ -1,12 +1,88 @@
 package command
 
 import (
+	"reflect"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
+
+type GoogleIDPWriteModel struct {
+	eventstore.WriteModel
+
+	ID           string
+	ClientID     string
+	ClientSecret *crypto.CryptoValue
+	Scopes       []string
+	idp.Options
+
+	State domain.IDPState
+}
+
+func (wm *GoogleIDPWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *idp.GoogleIDPAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.ClientID = e.ClientID
+			wm.ClientSecret = e.ClientSecret
+			wm.Scopes = e.Scopes
+			wm.State = domain.IDPStateActive
+		case *idp.GoogleIDPChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.reduceChangedEvent(e)
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *GoogleIDPWriteModel) reduceChangedEvent(e *idp.GoogleIDPChangedEvent) {
+	if e.ClientID != nil {
+		wm.ClientID = *e.ClientID
+	}
+	if e.ClientSecret != nil {
+		wm.ClientSecret = e.ClientSecret
+	}
+	wm.Options.ReduceChanges(e.OptionChanges)
+}
+
+func (wm *GoogleIDPWriteModel) NewChanges(
+	clientID string,
+	clientSecretString string,
+	secretCrypto crypto.Crypto,
+	scopes []string,
+	options idp.Options,
+) ([]idp.GoogleIDPChanges, error) {
+	changes := make([]idp.GoogleIDPChanges, 0)
+	var clientSecret *crypto.CryptoValue
+	var err error
+	if clientSecretString != "" {
+		clientSecret, err = crypto.Crypt([]byte(clientSecretString), secretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		changes = append(changes, idp.ChangeGoogleClientSecret(clientSecret))
+	}
+	if wm.ClientID != clientID {
+		changes = append(changes, idp.ChangeGoogleClientID(clientID))
+	}
+	if !reflect.DeepEqual(wm.Scopes, scopes) {
+		changes = append(changes, idp.ChangeGoogleScopes(scopes))
+	}
+
+	opts := wm.Options.Changes(options)
+	if !opts.IsZero() {
+		changes = append(changes, idp.ChangeGoogleOptions(opts))
+	}
+	return changes, nil
+}
 
 type LDAPIDPWriteModel struct {
 	eventstore.WriteModel
@@ -170,6 +246,8 @@ type IDPRemoveWriteModel struct {
 func (wm *IDPRemoveWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *idp.GoogleIDPAddedEvent:
+			wm.reduceAdded(e.ID, "")
 		case *idp.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID, e.Name)
 		case *idp.LDAPIDPChangedEvent:

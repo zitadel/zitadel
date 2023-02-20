@@ -10,10 +10,86 @@ import (
 )
 
 const (
-	LDAPIDPAddedEventType   eventstore.EventType = "org.idp.ldap.added"
-	LDAPIDPChangedEventType eventstore.EventType = "org.idp.ldap.changed"
-	IDPRemovedEventType     eventstore.EventType = "org.idp.removed"
+	GoogleIDPAddedEventType   eventstore.EventType = "org.idp.google.added"
+	GoogleIDPChangedEventType eventstore.EventType = "org.idp.google.changed"
+	LDAPIDPAddedEventType     eventstore.EventType = "org.idp.ldap.added"
+	LDAPIDPChangedEventType   eventstore.EventType = "org.idp.ldap.changed"
+	IDPRemovedEventType       eventstore.EventType = "org.idp.removed"
 )
+
+type GoogleIDPAddedEvent struct {
+	idp.GoogleIDPAddedEvent
+}
+
+func NewGoogleIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	clientID string,
+	clientSecret *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+) *GoogleIDPAddedEvent {
+
+	return &GoogleIDPAddedEvent{
+		GoogleIDPAddedEvent: *idp.NewGoogleIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				GoogleIDPAddedEventType,
+			),
+			id,
+			clientID,
+			clientSecret,
+			scopes,
+			options,
+		),
+	}
+}
+
+func GoogleIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.GoogleIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GoogleIDPAddedEvent{GoogleIDPAddedEvent: *e.(*idp.GoogleIDPAddedEvent)}, nil
+}
+
+type GoogleIDPChangedEvent struct {
+	idp.GoogleIDPChangedEvent
+}
+
+func NewGoogleIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.GoogleIDPChanges,
+) (*GoogleIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewGoogleIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GoogleIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &GoogleIDPChangedEvent{GoogleIDPChangedEvent: *changedEvent}, nil
+}
+
+func GoogleIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e, err := idp.GoogleIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GoogleIDPChangedEvent{GoogleIDPChangedEvent: *e.(*idp.GoogleIDPChangedEvent)}, nil
+}
 
 type LDAPIDPAddedEvent struct {
 	idp.LDAPIDPAddedEvent

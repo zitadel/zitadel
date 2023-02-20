@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,10 +15,12 @@ import (
 )
 
 const (
-	IDPTemplateTable     = "projections.idp_templates"
-	IDPTemplateLDAPTable = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
+	IDPTemplateTable       = "projections.idp_templates"
+	IDPTemplateGoogleTable = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
+	IDPTemplateLDAPTable   = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 
-	IDPTemplateLDAPSuffix = "ldap"
+	IDPTemplateGoogleSuffix = "google"
+	IDPTemplateLDAPSuffix   = "ldap"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -34,6 +37,12 @@ const (
 	IDPTemplateIsLinkingAllowedCol  = "is_linking_allowed"
 	IDPTemplateIsAutoCreationCol    = "is_auto_creation"
 	IDPTemplateIsAutoUpdateCol      = "is_auto_update"
+
+	GoogleIDCol           = "idp_id"
+	GoogleInstanceIDCol   = "instance_id"
+	GoogleClientIDCol     = "client_id"
+	GoogleClientSecretCol = "client_secret"
+	GoogleScopesCol       = "scopes"
 
 	LDAPIDCol                         = "idp_id"
 	LDAPInstanceIDCol                 = "instance_id"
@@ -91,6 +100,17 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{IDPTemplateOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(GoogleIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GoogleInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GoogleClientIDCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(GoogleClientSecretCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(GoogleScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(GoogleInstanceIDCol, GoogleIDCol),
+			IDPTemplateGoogleSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LDAPIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LDAPInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LDAPHostCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -130,6 +150,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
+					Event:  instance.GoogleIDPAddedEventType,
+					Reduce: p.reduceGoogleIDPAdded,
+				},
+				{
+					Event:  instance.GoogleIDPChangedEventType,
+					Reduce: p.reduceGoogleIDPChanged,
+				},
+				{
 					Event:  instance.LDAPIDPAddedEventType,
 					Reduce: p.reduceLDAPIDPAdded,
 				},
@@ -151,6 +179,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 			Aggregate: org.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
+					Event:  org.GoogleIDPAddedEventType,
+					Reduce: p.reduceGoogleIDPAdded,
+				},
+				{
+					Event:  org.GoogleIDPChangedEventType,
+					Reduce: p.reduceGoogleIDPChanged,
+				},
+				{
 					Event:  org.LDAPIDPAddedEventType,
 					Reduce: p.reduceLDAPIDPAdded,
 				},
@@ -169,6 +205,126 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 	}
+}
+
+func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.GoogleIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.GoogleIDPAddedEvent:
+		idpEvent = e.GoogleIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.GoogleIDPAddedEvent:
+		idpEvent = e.GoogleIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPAddedEventType, instance.GoogleIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(GoogleIDCol, idpEvent.ID),
+				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
+				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.GoogleIDPChangedEvent
+	switch e := event.(type) {
+	case *org.GoogleIDPChangedEvent:
+		idpEvent = e.GoogleIDPChangedEvent
+	case *instance.GoogleIDPChangedEvent:
+		idpEvent = e.GoogleIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
+	}
+
+	cols := make([]handler.Column, 0, 6)
+	if idpEvent.IsCreationAllowed != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsCreationAllowedCol, *idpEvent.IsCreationAllowed))
+	}
+	if idpEvent.IsLinkingAllowed != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsLinkingAllowedCol, *idpEvent.IsLinkingAllowed))
+	}
+	if idpEvent.IsAutoCreation != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsAutoCreationCol, *idpEvent.IsAutoCreation))
+	}
+	if idpEvent.IsAutoUpdate != nil {
+		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *idpEvent.IsAutoUpdate))
+	}
+	cols = append(cols,
+		handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+	)
+
+	googleCols := make([]handler.Column, 0, 3)
+	if idpEvent.ClientID != nil {
+		googleCols = append(googleCols, handler.NewCol(GoogleClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		googleCols = append(googleCols, handler.NewCol(GoogleClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.Scopes != nil {
+		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	if len(cols) == 0 && len(googleCols) == 0 {
+		return crdb.NewNoOpStatement(&idpEvent), nil
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	if len(cols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				cols,
+				[]handler.Condition{
+					handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+					handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+			),
+		)
+	}
+	if len(googleCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				googleCols,
+				[]handler.Condition{
+					handler.NewCond(GoogleIDCol, idpEvent.ID),
+					handler.NewCond(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
 }
 
 func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*handler.Statement, error) {
