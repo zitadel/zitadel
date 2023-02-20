@@ -63,7 +63,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Instance"
         },
         {
+            name: "Login Messages",
+        },
+        {
             name: "Login Settings"
+        },
+        {
+            name: "Message Texts"
         },
         {
            name: "Notification Providers"
@@ -2209,7 +2215,6 @@ service AdminService {
         };
     }
 
-    //Returns the default text for initial message (translation file)
     rpc GetDefaultInitMessageText(GetDefaultInitMessageTextRequest) returns (GetDefaultInitMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/default/message/init/{language}";
@@ -2218,9 +2223,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Init Message Text";
+            description: "Get the default text of the initialize user message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user is created and has either no password or a non verified email address."
+        };
     }
 
-    //Returns the custom text for initial message (overwritten in eventstore)
     rpc GetCustomInitMessageText(GetCustomInitMessageTextRequest) returns (GetCustomInitMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/message/init/{language}";
@@ -2229,13 +2239,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Init Message Text";
+            description: "Get the custom text of the initialize user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user is created and has either no password or a non verified email address."
+        };
     }
 
-
-    //Sets the default custom text for initial message
-    // it impacts all organisations without customized initial message text
-    // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultInitMessageText(SetDefaultInitMessageTextRequest) returns (SetDefaultInitMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/init/{language}";
@@ -2245,10 +2256,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Custom Init Message Text";
+            description: "Set the custom text of the initialize user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user is created and has either no password or a non verified email address. </br></br> The Following Variables can be used: </br> {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
     }
 
-    // Removes the custom init message text of the system
-    // The default text from the translation file will trigger after
     rpc ResetCustomInitMessageTextToDefault(ResetCustomInitMessageTextToDefaultRequest) returns (ResetCustomInitMessageTextToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/message/init/{language}"
@@ -2257,9 +2272,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Init Message Text to Default";
+            description: "Removes the custom text of the initialize user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. </br>"
+        };
     }
 
-    //Returns the default text for password reset message (translation file)
     rpc GetDefaultPasswordResetMessageText(GetDefaultPasswordResetMessageTextRequest) returns (GetDefaultPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/deafult/message/passwordreset/{language}";
@@ -2268,9 +2288,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Password Reset Message Text";
+            description: "Get the default text of the password reset message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user triggers the password forgot request."
+        };
     }
 
-    //Returns the custom text for password reset message (overwritten in eventstore)
     rpc GetCustomPasswordResetMessageText(GetCustomPasswordResetMessageTextRequest) returns (GetCustomPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/message/passwordreset/{language}";
@@ -2279,12 +2304,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Password Reset Message Text";
+            description: "Get the custom text of the password reset message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user triggers the password forgot request."
+        };
     }
 
-    //Sets the default custom text for password reset message
-    // it impacts all organisations without customized password reset message text
-    // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultPasswordResetMessageText(SetDefaultPasswordResetMessageTextRequest) returns (SetDefaultPasswordResetMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordreset/{language}";
@@ -2295,10 +2322,13 @@ service AdminService {
             permission: "iam.policy.write";
         };
 
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Custom Password Reset Message Text";
+            description: "Set the custom text of the password reset user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user triggers the password forgot request. </br></br> The Following Variables can be used: </br> {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
     }
 
-    // Removes the custom password reset message text of the system
-    // The default text from the translation file will trigger after
     rpc ResetCustomPasswordResetMessageTextToDefault(ResetCustomPasswordResetMessageTextToDefaultRequest) returns (ResetCustomPasswordResetMessageTextToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/message/verifyemail/{language}"
@@ -2307,9 +2337,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Password Reset Message Text to Default";
+            description: "Removes the custom text of the password reset user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-    //Returns the default text for verify email message (translation files)
     rpc GetDefaultVerifyEmailMessageText(GetDefaultVerifyEmailMessageTextRequest) returns (GetDefaultVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/default/message/verifyemail/{language}";
@@ -2318,9 +2353,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Verify Email Message Text";
+            description: "Get the default text of the verify email message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user adds a new non verified email address."
+        };
     }
 
-    //Returns the custom text for verify email message (overwritten in eventstore)
     rpc GetCustomVerifyEmailMessageText(GetCustomVerifyEmailMessageTextRequest) returns (GetCustomVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/message/verifyemail/{language}";
@@ -2329,12 +2369,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Verify Email Message Text";
+            description: "Get the custom text of the verify email message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user adds a new non verified email address."
+        };
     }
 
-    //Sets the default custom text for verify email message
-    // it impacts all organisations without customized verify email message text
-    // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultVerifyEmailMessageText(SetDefaultVerifyEmailMessageTextRequest) returns (SetDefaultVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyemail/{language}";
@@ -2344,10 +2386,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Verify Email Reset Message Text";
+            description: "Set the custom text of the verify email user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The email is sent when a user adds a new non verified email address. </br></br> The Following Variables can be used: </br> {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
     }
 
-    // Removes the custom verify email message text of the system
-    // The default text from the translation file will trigger after
     rpc ResetCustomVerifyEmailMessageTextToDefault(ResetCustomVerifyEmailMessageTextToDefaultRequest) returns (ResetCustomVerifyEmailMessageTextToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/message/verifyemail/{language}"
@@ -2356,9 +2402,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Verify Email Message Text to Default";
+            description: "Removes the custom text of the email verify user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-    //Returns the default text for verify phone message (translation file)
     rpc GetDefaultVerifyPhoneMessageText(GetDefaultVerifyPhoneMessageTextRequest) returns (GetDefaultVerifyPhoneMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/default/message/verifyphone/{language}";
@@ -2367,9 +2418,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Verify Phone Message Text";
+            description: "Get the default text of the verify phone message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when a user adds a new non verified phone number and a notification provider is configured."
+        };
     }
 
-    //Returns the custom text for verify phone message
     rpc GetCustomVerifyPhoneMessageText(GetCustomVerifyPhoneMessageTextRequest) returns (GetCustomVerifyPhoneMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/message/verifyphone/{language}";
@@ -2378,12 +2434,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Verify Phone Message Text";
+            description: "Get the custom text of the verify phone message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when a user adds a new non verified phone number and a notification provider is configured."
+        };
     }
 
-    //Sets the default custom text for verify phone message
-    // it impacts all organisations without customized verify phone message text
-    // The Following Variables can be used:
-    // {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultVerifyPhoneMessageText(SetDefaultVerifyPhoneMessageTextRequest) returns (SetDefaultVerifyPhoneMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/verifyphone/{language}";
@@ -2393,10 +2451,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Verify Phone Reset Message Text";
+            description: "Set the custom text of the verify phone user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when a user adds a new non verified phone number and a notification provider is configured. </br></br> The Following Variables can be used: </br> {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
     }
 
-    // Removes the custom verify phone text of the system
-    // The default text from the translation file will trigger after
     rpc ResetCustomVerifyPhoneMessageTextToDefault(ResetCustomVerifyPhoneMessageTextToDefaultRequest) returns (ResetCustomVerifyPhoneMessageTextToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/message/verifyphone/{language}"
@@ -2405,9 +2467,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Verify Phone Message Text to Default";
+            description: "Removes the custom text of the verify phone message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-    //Returns the default text for domain claimed message (translation file)
     rpc GetDefaultDomainClaimedMessageText(GetDefaultDomainClaimedMessageTextRequest) returns (GetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/default/message/domainclaimed/{language}";
@@ -2416,9 +2483,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Domain Claimed Message Text";
+            description: "Get the default text of the domain claimed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when an organization claims a domain and a user of this domain exists in another organization."
+        };
     }
 
-    //Returns the custom text for domain claimed message (overwritten in eventstore)
     rpc GetCustomDomainClaimedMessageText(GetCustomDomainClaimedMessageTextRequest) returns (GetCustomDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/message/domainclaimed/{language}";
@@ -2427,12 +2499,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Domain Claimed Message Text";
+            description: "Get the custom text of the domain claimed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when an organization claims a domain and a user of this domain exists in another organization."
+        };
     }
 
-    //Sets the default custom text for domain claimed message
-    // it impacts all organisations without customized domain claimed message text
-    // The Following Variables can be used:
-    // {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultDomainClaimedMessageText(SetDefaultDomainClaimedMessageTextRequest) returns (SetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/domainclaimed/{language}";
@@ -2442,10 +2516,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Domain Claimed Message Text";
+            description: "Set the custom text of the domain claimed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message/email is sent when an organization claims a domain and a user of this domain exists in another organization. </br></br> The Following Variables can be used: </br> {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
     }
 
-    // Removes the custom domain claimed message text of the system
-    // The default text from the translation file will trigger after
     rpc ResetCustomDomainClaimedMessageTextToDefault(ResetCustomDomainClaimedMessageTextToDefaultRequest) returns (ResetCustomDomainClaimedMessageTextToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/message/domainclaimed/{language}"
@@ -2454,9 +2532,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Domain Claimed Message Text to Default";
+            description: "Removes the custom text of the domain claimed message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-    //Returns the default text for passwordless registration message (translation file)
     rpc GetDefaultPasswordlessRegistrationMessageText(GetDefaultPasswordlessRegistrationMessageTextRequest) returns (GetDefaultPasswordlessRegistrationMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/default/message/passwordless_registration/{language}";
@@ -2465,9 +2548,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Passwordless Registration Message Text";
+            description: "Get the default text of the domain claimed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device."
+        };
     }
 
-    //Returns the custom text for passwordless registration message (overwritten in eventstore)
     rpc GetCustomPasswordlessRegistrationMessageText(GetCustomPasswordlessRegistrationMessageTextRequest) returns (GetCustomPasswordlessRegistrationMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/message/passwordless_registration/{language}";
@@ -2476,12 +2564,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Passwordless Registration Message Text";
+            description: "Get the custom text of the passwordless/passkey registration message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device."
+        };
     }
 
-    //Sets the default custom text for passwordless registration message
-    // it impacts all organisations without customized passwordless registration message text
-    // The Following Variables can be used:
-    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultPasswordlessRegistrationMessageText(SetDefaultPasswordlessRegistrationMessageTextRequest) returns (SetDefaultPasswordlessRegistrationMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/passwordless_registration/{language}";
@@ -2491,10 +2581,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Passwordless Registration Message Text";
+            description: "Set the custom text of the passwordless/passkey registration message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message/email is sent when user requests passwordless/passkey registration as email, to be able to configure on another device. </br></br> The Following Variables can be used: </br> {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
     }
 
-    // Removes the custom passwordless link message text of the system
-    // The default text from the translation file will trigger after
     rpc ResetCustomPasswordlessRegistrationMessageTextToDefault(ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest) returns (ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/message/passwordless_registration/{language}"
@@ -2503,10 +2597,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Passwordless Registration Message Text to Default";
+            description: "Removes the custom text of the passwordless/passkey registration message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-
-    //Returns the default text for password change message (translation file)
     rpc GetDefaultPasswordChangeMessageText(GetDefaultPasswordChangeMessageTextRequest) returns (GetDefaultPasswordChangeMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/default/message/password_change/{language}";
@@ -2515,9 +2613,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Password Change Message Text";
+            description: "Get the default text of the password changed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when the password of a user has been changed."
+        };
     }
 
-    //Returns the custom text for password change message (overwritten in eventstore)
     rpc GetCustomPasswordChangeMessageText(GetCustomPasswordChangeMessageTextRequest) returns (GetCustomPasswordChangeMessageTextResponse) {
         option (google.api.http) = {
             get: "/text/message/password_change/{language}";
@@ -2526,12 +2629,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Password Change Message Text";
+            description: "Get the custom text of the password changed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message is sent when the password of a user has been changed."
+        };
     }
 
-    //Sets the default custom text for password change message
-    // it impacts all organisations without customized password change message text
-    // The Following Variables can be used:
-    // {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}
     rpc SetDefaultPasswordChangeMessageText(SetDefaultPasswordChangeMessageTextRequest) returns (SetDefaultPasswordChangeMessageTextResponse) {
         option (google.api.http) = {
             put: "/text/message/password_change/{language}";
@@ -2541,10 +2646,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Password Changed Message Text";
+            description: "Set the custom text of the password changed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. </br> The message/email is sent when the password of a user has been changed. </br></br> The Following Variables can be used: </br> {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
     }
 
-    // Removes the custom password change message text of the system
-    // The default text from the translation file will trigger after
     rpc ResetCustomPasswordChangeMessageTextToDefault(ResetCustomPasswordChangeMessageTextToDefaultRequest) returns (ResetCustomPasswordChangeMessageTextToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/message/password_change/{language}"
@@ -2553,10 +2662,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Password Changed Message Text to Default";
+            description: "Removes the custom text of the password changed message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-
-    //Returns the default custom texts for login ui (translation file)
     rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
         option (google.api.http) = {
             get: "/text/default/login/{language}";
@@ -2565,9 +2678,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Login Texts";
+            summary: "Get Default Login Text";
+            description: "Get the default texts for the login and register ui of ZITADEL, that are stored as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-    //Returns the custom texts for login ui
     rpc GetCustomLoginTexts(GetCustomLoginTextsRequest) returns (GetCustomLoginTextsResponse) {
         option (google.api.http) = {
             get: "/text/login/{language}";
@@ -2576,10 +2694,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Login Texts";
+            summary: "Get Custom Login Text";
+            description: "Get the custom texts for the login and register ui of ZITADEL, that are overwritten on the instance as settings/database. The text will be shown to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-    //Sets the custom text for login ui
-    //it impacts all organisations without customized login ui texts
     rpc SetCustomLoginText(SetCustomLoginTextsRequest) returns (SetCustomLoginTextsResponse) {
         option (google.api.http) = {
             put: "/text/login/{language}";
@@ -2589,11 +2711,14 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Login Texts";
+            summary: "Set Default Login Text";
+            description: "Set the custom texts for the login and register ui of ZITADEL, that are overwritten on the instance as settings/database. The text will be shown to the users of all organizations, that do not have a custom text configured."
+        };
     }
 
-    // Removes the custom texts for login ui
-    // it impacts all organisations without customized login ui texts
-    // The default text form translation file will trigger after
     rpc ResetCustomLoginTextToDefault(ResetCustomLoginTextsToDefaultRequest) returns (ResetCustomLoginTextsToDefaultResponse) {
         option (google.api.http) = {
             delete: "/text/login/{language}"
@@ -2601,6 +2726,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Login Texts";
+            summary: "Reset Custom Login Text to Default";
+            description: "Removes the custom texts for the login and register ui of ZITADEL, that are overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
     }
 
