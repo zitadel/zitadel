@@ -257,7 +257,9 @@ func (wm *IDPRemoveWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *idp.GoogleIDPAddedEvent:
-			wm.reduceAdded(e.ID, "")
+			wm.reduceAdded(e.ID, e.Name)
+		case *idp.GoogleIDPChangedEvent:
+			wm.reduceChanged(e.ID, e.Name)
 		case *idp.LDAPIDPAddedEvent:
 			wm.reduceAdded(e.ID, e.Name)
 		case *idp.LDAPIDPChangedEvent:

@@ -33,19 +33,10 @@ func (wm *InstanceGoogleIDPWriteModel) AppendEvents(events ...eventstore.Event) 
 	for _, event := range events {
 		switch e := event.(type) {
 		case *instance.GoogleIDPAddedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
 		case *instance.GoogleIDPChangedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GoogleIDPWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
 		case *instance.IDPRemovedEvent:
-			if wm.ID != e.ID {
-				continue
-			}
 			wm.GoogleIDPWriteModel.AppendEvents(&e.RemovedEvent)
 		}
 	}
@@ -62,6 +53,7 @@ func (wm *InstanceGoogleIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
 			instance.GoogleIDPChangedEventType,
 			instance.IDPRemovedEventType,
 		).
+		EventData(map[string]interface{}{"id": wm.ID}).
 		Builder()
 }
 
@@ -220,6 +212,8 @@ func (wm *InstanceIDPRemoveWriteModel) AppendEvents(events ...eventstore.Event) 
 		switch e := event.(type) {
 		case *instance.GoogleIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPAddedEvent)
+		case *instance.GoogleIDPChangedEvent:
+			wm.IDPRemoveWriteModel.AppendEvents(&e.GoogleIDPChangedEvent)
 		case *instance.LDAPIDPAddedEvent:
 			wm.IDPRemoveWriteModel.AppendEvents(&e.LDAPIDPAddedEvent)
 		case *instance.LDAPIDPChangedEvent:
@@ -240,6 +234,7 @@ func (wm *InstanceIDPRemoveWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			instance.GoogleIDPAddedEventType,
+			instance.GoogleIDPChangedEventType,
 			instance.LDAPIDPAddedEventType,
 			instance.LDAPIDPChangedEventType,
 			instance.IDPRemovedEventType,
