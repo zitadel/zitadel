@@ -43,32 +43,32 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "Your onboarding process",
-    "COMPLETED": "completed",
+    "DESCRIPTION": "Twój proces wprowadzania na rynek",
+    "COMPLETED": "zakończone",
     "EVENTS": {
-      "org.policy.label.added": {
-        "title": "Setup your brand",
-        "description": "Define coloring and shape of your login and upload your logo and icons."
+      "instance.policy.label.added": {
+        "title": "Skonfiguruj swoją markę",
+        "description": "Zdefiniuj kolorystykę i kształt swojego loginu oraz wgraj swoje logo i ikony."
       },
-      "org.policy.notification.added": {
-        "title": "Setup your notifications and SMTP settings",
-        "description": "Set your own mail server, and SMS settings."
+      "instance.policy.notification.added": {
+        "title": "Skonfiguruj powiadomienia i ustawienia SMTP",
+        "description": "Ustawienie własnego serwera pocztowego i ustawień SMS"
       },
       "project.added": {
-        "title": "Create your first project",
-        "description": "Add your first project and define its roles and authorizations."
+        "title": "Stwórz swój pierwszy projekt",
+        "description": "Dodaj swój pierwszy projekt i określ jego role i uprawnienia."
       },
       "project.application.added": {
-        "title": "Create your first application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow."
+        "title": "Utwórz swoją pierwszą aplikację",
+        "description": "Utwórz aplikację internetową, natywną, api lub saml i skonfiguruj swój przepływ uwierzytelniania."
       },
       "users.added": {
-        "title": "Add users",
-        "description": "Add your application users"
+        "title": "Dodaj użytkowników",
+        "description": "Dodaj użytkowników aplikacji"
       },
       "user.grant.added": {
-        "title": "Grant users",
-        "description": "Allow users to access your application and setup their role."
+        "title": "Użytkownicy dotacji",
+        "description": "Pozwól użytkownikom na dostęp do Twojej aplikacji i ustaw ich rolę."
       }
     }
   },

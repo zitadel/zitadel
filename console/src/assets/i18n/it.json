@@ -46,29 +46,29 @@
     "DESCRIPTION": "Your onboarding process",
     "COMPLETED": "completed",
     "EVENTS": {
-      "org.policy.label.added": {
-        "title": "Setup your brand",
-        "description": "Define coloring and shape of your login and upload your logo and icons."
+      "instance.policy.label.added": {
+        "title": "Imposta il tuo marchio",
+        "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone."
       },
-      "org.policy.notification.added": {
-        "title": "Setup your notifications and SMTP settings",
-        "description": "Set your own mail server, and SMS settings."
+      "instance.policy.notification.added": {
+        "title": "Configura le notifiche e le impostazioni SMTP",
+        "description": "Imposta il proprio server di posta e le impostazioni degli SMS."
       },
       "project.added": {
-        "title": "Create your first project",
-        "description": "Add your first project and define its roles and authorizations."
+        "title": "Crea il tuo primo progetto",
+        "description": "Aggiungere il primo progetto e definire i ruoli e le autorizzazioni."
       },
       "project.application.added": {
-        "title": "Create your first application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow."
+        "title": "Crea la tua prima applicazione",
+        "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione."
       },
       "users.added": {
-        "title": "Add users",
-        "description": "Add your application users"
+        "title": "Aggiungi utenti",
+        "description": "Aggiungi gli utenti dell'applicazione"
       },
       "user.grant.added": {
-        "title": "Grant users",
-        "description": "Allow users to access your application and setup their role."
+        "title": "Crea autorizzazioni per gli utenti",
+        "description": "Consenti agli utenti di accedere alla tua applicazione e imposta il loro ruolo."
       }
     }
   },

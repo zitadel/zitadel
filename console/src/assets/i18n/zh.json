@@ -43,32 +43,32 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "Your onboarding process",
-    "COMPLETED": "completed",
+    "DESCRIPTION": "你的入职过程",
+    "COMPLETED": "已完成",
     "EVENTS": {
-      "org.policy.label.added": {
-        "title": "Setup your brand",
-        "description": "Define coloring and shape of your login and upload your logo and icons."
+      "instance.policy.label.added": {
+        "title": "设置你的品牌",
+        "description": "定义你的登录的颜色和形状，上传你的标志和图标。"
       },
-      "org.policy.notification.added": {
-        "title": "Setup your notifications and SMTP settings",
-        "description": "Set your own mail server, and SMS settings."
+      "instance.policy.notification.added": {
+        "title": "设置你的通知和SMTP设置",
+        "description": "设置你自己的邮件服务器，和短信设置"
       },
       "project.added": {
-        "title": "Create your first project",
-        "description": "Add your first project and define its roles and authorizations."
+        "title": "创建你的第一个项目",
+        "description": "添加你的第一个项目并定义其角色和授权。"
       },
       "project.application.added": {
-        "title": "Create your first application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow."
+        "title": "创建你的第一个应用程序",
+        "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。"
       },
       "users.added": {
-        "title": "Add users",
-        "description": "Add your application users"
+        "title": "添加用户",
+        "description": "添加你的应用程序用户"
       },
       "user.grant.added": {
-        "title": "Grant users",
-        "description": "Allow users to access your application and setup their role."
+        "title": "授予用户",
+        "description": "允许用户访问你的应用程序并设置他们的角色。"
       }
     }
   },

@@ -46,11 +46,11 @@
     "DESCRIPTION": "Your onboarding process",
     "COMPLETED": "completed",
     "EVENTS": {
-      "org.policy.label.added": {
+      "instance.policy.label.added": {
         "title": "Setup your brand",
         "description": "Define coloring and shape of your login and upload your logo and icons."
       },
-      "org.policy.notification.added": {
+      "instance.policy.notification.added": {
         "title": "Setup your notifications and SMTP settings",
         "description": "Set your own mail server, and SMS settings."
       },
@@ -62,7 +62,7 @@
         "title": "Create your first application",
         "description": "Create a web, native, api or saml application and setup your authentication flow."
       },
-      "users.added": {
+      "user.added": {
         "title": "Add users",
         "description": "Add your application users"
       },

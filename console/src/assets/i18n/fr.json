@@ -43,32 +43,32 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "Your onboarding process",
-    "COMPLETED": "completed",
+    "DESCRIPTION": "Votre processus d'intégration",
+    "COMPLETED": "terminé",
     "EVENTS": {
-      "org.policy.label.added": {
-        "title": "Setup your brand",
-        "description": "Define coloring and shape of your login and upload your logo and icons."
+      "instance.policy.label.added": {
+        "title": "Créez votre marque",
+        "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes."
       },
-      "org.policy.notification.added": {
-        "title": "Setup your notifications and SMTP settings",
-        "description": "Set your own mail server, and SMS settings."
+      "instance.policy.notification.added": {
+        "title": "Configurez vos notifications et vos paramètres SMTP",
+        "description": "Définissez votre propre serveur de messagerie et vos paramètres SMS."
       },
       "project.added": {
-        "title": "Create your first project",
-        "description": "Add your first project and define its roles and authorizations."
+        "title": "Créez votre premier projet",
+        "description": "Ajoutez votre premier projet et définissez ses rôles et autorisations."
       },
       "project.application.added": {
-        "title": "Create your first application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow."
+        "title": "Créez votre première application",
+        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification."
       },
       "users.added": {
-        "title": "Add users",
-        "description": "Add your application users"
+        "title": "Ajouter des utilisateurs",
+        "description": "Ajouter les utilisateurs de votre application"
       },
       "user.grant.added": {
-        "title": "Grant users",
-        "description": "Allow users to access your application and setup their role."
+        "title": "Utilisateurs de subventions",
+        "description": "Autorisez les utilisateurs à accéder à votre application et définissez leur rôle."
       }
     }
   },
