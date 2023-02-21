@@ -9,6 +9,18 @@ title: zitadel/idp.proto
 ## Messages
 
 
+### GoogleConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| scopes | repeated string | - |  |
+
+
+
+
 ### IDP
 
 
@@ -201,6 +213,7 @@ title: zitadel/idp.proto
 | ----- | ---- | ----------- | ----------- |
 | options |  Options | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.ldap |  LDAPConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.google |  GoogleConfig | - |  |
 
 
 
