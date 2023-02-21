@@ -77,7 +77,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     produces: "application/grpc";
     produces: "application/grpc-web+proto";
 
-    host: "api.zitadel.ch";
+    host: "*.zitadel.cloud";
     base_path: "/auth/v1";
 
     external_docs: {

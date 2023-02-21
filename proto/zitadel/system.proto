@@ -48,7 +48,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "api.zitadel.ch";
+  host: "*.zitadel.cloud";
   base_path: "/system/v1";
 
   external_docs: {
