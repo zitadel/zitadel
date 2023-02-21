@@ -1927,22 +1927,6 @@ This is an empty request
 
 
 
-### AddGenericOIDCProviderRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
-
-
-
-
 ### AddGoogleProviderRequest
 
 
