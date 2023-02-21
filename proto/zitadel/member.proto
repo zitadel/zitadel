@@ -17,7 +17,7 @@ message Member {
     zitadel.v1.ObjectDetails details = 2;
     repeated string roles = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"role.super.man\"]";
+            example: "[\"IAM_OWNER\"]";
             description: "the role keys granted to the user"
         }
     ];
