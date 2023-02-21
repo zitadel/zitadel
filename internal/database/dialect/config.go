@@ -30,13 +30,13 @@ type Matcher interface {
 
 type Connector interface {
 	Connect(useAdmin bool) (*sql.DB, error)
+	Password() string
 	Database
 }
 
 type Database interface {
 	DatabaseName() string
 	Username() string
-	Password() string
 	Type() string
 	Timetravel(time.Duration) string
 }

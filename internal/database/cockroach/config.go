@@ -96,8 +96,7 @@ func (c *Config) Timetravel(d time.Duration) string {
 		d = time.Microsecond
 	}
 
-	// TODO: do we have to round up to microsecond
-	return fmt.Sprintf("AS OF SYSTEM TIME %f ms", float32(d)/float32(time.Microsecond))
+	return fmt.Sprintf(" AS OF SYSTEM TIME '-%d µs' ", d.Microseconds())
 }
 
 type User struct {

@@ -59,8 +59,8 @@ The user provided by flags needs privileges to
 func InitAll(config *Config) {
 	err := initialise(config.Database,
 		VerifyUser(config.Database.Username(), config.Database.Password()),
-		VerifyDatabase(config.Database.Database()),
-		VerifyGrant(config.Database.Database(), config.Database.Username()),
+		VerifyDatabase(config.Database.DatabaseName()),
+		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
 	)
 	logging.OnError(err).Fatal("unable to initialize the database")
 
