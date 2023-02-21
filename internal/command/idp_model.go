@@ -56,6 +56,9 @@ func (wm *GoogleIDPWriteModel) reduceChangedEvent(e *idp.GoogleIDPChangedEvent) 
 	if e.ClientSecret != nil {
 		wm.ClientSecret = e.ClientSecret
 	}
+	if e.Scopes != nil {
+		wm.Scopes = e.Scopes
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 

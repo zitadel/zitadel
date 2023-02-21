@@ -614,7 +614,7 @@ Change an existing Google identity provider on the instance
 
 
 
-    POST: /idps/google/{id}
+    PUT: /idps/google/{id}
 
 
 ### AddLDAPProvider
@@ -1879,7 +1879,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| name |  string | - | string.max_len: 200<br />  |
+| name |  string | Google will be used as default, if no name is provided | string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
@@ -4848,7 +4848,7 @@ this is en empty request
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_secret |  string | - | string.max_len: 200<br />  |
+| client_secret |  string | client_secret will only be updated if provided | string.max_len: 200<br />  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
 | provider_options |  zitadel.idp.v1.Options | - |  |
 

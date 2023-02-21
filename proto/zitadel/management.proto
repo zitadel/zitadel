@@ -3047,7 +3047,7 @@ service ManagementService {
     // Change an existing Google identity provider in the organisation
     rpc UpdateGoogleProvider(UpdateGoogleProviderRequest) returns (UpdateGoogleProviderResponse) {
         option (google.api.http) = {
-            post: "/idps/google/{id}"
+            put: "/idps/google/{id}"
             body: "*"
         };
 
@@ -6051,6 +6051,7 @@ message UpdateGoogleProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {max_len: 200}];
     string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // client_secret will only be updated if provided
     string client_secret = 4 [(validate.rules).string = {max_len: 200}];
     repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
     zitadel.idp.v1.Options provider_options = 6;
