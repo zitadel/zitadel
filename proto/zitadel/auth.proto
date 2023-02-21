@@ -277,6 +277,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Users";
             summary: "Change My Username";
             description: "Changes the username of the authenticated user. The user has to login with the newly created username afterwards."
         };
@@ -510,6 +511,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "User";
             summary: "Remove My Avatar";
             description: "Remove the avatar of the authenticated user. If no avatar is set a shortcut of the name of the user will be presented."
         };
