@@ -8,7 +8,7 @@ import (
 
 var (
 	//go:embed 08.sql
-	tokenIndexes07 string
+	tokenIndexes08 string
 )
 
 type AuthTokenIndexes struct {
@@ -16,7 +16,7 @@ type AuthTokenIndexes struct {
 }
 
 func (mig *AuthTokenIndexes) Execute(ctx context.Context) error {
-	_, err := mig.dbClient.ExecContext(ctx, tokenIndexes07)
+	_, err := mig.dbClient.ExecContext(ctx, tokenIndexes08)
 	return err
 }
 
