@@ -16,15 +16,15 @@
   </div>
 
   <div class="action-card-wrapper">
-    <ng-container *ngFor="let action of actions | async | keyvalue">
+    <ng-container *ngFor="let action of actions | async">
       <a
-        [routerLink]="action.value.link"
-        [queryParams]="{ id: action.value.fragment }"
+        [routerLink]="action[1].link"
+        [queryParams]="{ id: action[1].fragment }"
         class="action-card card"
-        [ngClass]="{ done: action.value.event !== undefined }"
+        [ngClass]="{ done: action[1].event !== undefined }"
       >
         <div class="state-circle">
-          <mat-icon *ngIf="action.value?.event !== undefined" class="success-icon">check_circle</mat-icon>
+          <mat-icon *ngIf="action[1]?.event !== undefined" class="success-icon">check_circle</mat-icon>
 
           <!-- <mat-icon class="success-icon" *ngIf="action.value?.event !== undefined" svgIcon="mdi_shield_check"></mat-icon> -->
           <!-- <mat-icon class="warn-icon" *ngIf="action.value?.event === undefined" svgIcon="mdi_shield_alert"></mat-icon> -->
@@ -32,9 +32,9 @@
 
         <div class="action-content">
           <div class="text-block">
-            <span class="name">{{ 'ONBOARDING.EVENTS.' + action.key + '.title' | translate }}</span>
+            <span class="name">{{ 'ONBOARDING.EVENTS.' + action[0] + '.title' | translate }}</span>
             <span class="cnsl-secondary-text description">{{
-              'ONBOARDING.EVENTS.' + action.key + '.description' | translate
+              'ONBOARDING.EVENTS.' + action[0] + '.description' | translate
             }}</span>
           </div>
 

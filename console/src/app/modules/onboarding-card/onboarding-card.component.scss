@@ -112,6 +112,11 @@
           .state-circle i {
             color: var(--success);
           }
+
+          .name {
+            text-decoration: line-through;
+            opacity: 0.5;
+          }
         }
 
         &:hover {
