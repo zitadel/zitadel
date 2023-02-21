@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -175,7 +176,8 @@ func preparePersonalAccessTokenQuery(ctx context.Context, db prepareDatabase) (s
 			PersonalAccessTokenColumnUserID.identifier(),
 			PersonalAccessTokenColumnExpiration.identifier(),
 			PersonalAccessTokenColumnScopes.identifier()).
-			From(personalAccessTokensTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(personalAccessTokensTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PersonalAccessToken, error) {
 			p := new(PersonalAccessToken)
 			err := row.Scan(
@@ -209,7 +211,8 @@ func preparePersonalAccessTokensQuery(ctx context.Context, db prepareDatabase) (
 			PersonalAccessTokenColumnExpiration.identifier(),
 			PersonalAccessTokenColumnScopes.identifier(),
 			countColumn.identifier()).
-			From(personalAccessTokensTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(personalAccessTokensTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*PersonalAccessTokens, error) {
 			personalAccessTokens := make([]*PersonalAccessToken, 0)
 			var count uint64

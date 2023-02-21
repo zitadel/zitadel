@@ -123,10 +123,10 @@ func prepareInstanceMembersQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
 			countColumn.identifier(),
-		).From(instanceMemberTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(instanceMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, InstanceMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, InstanceMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, InstanceMemberUserID)).
+			LeftJoin(join(LoginNameUserIDCol, InstanceMemberUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

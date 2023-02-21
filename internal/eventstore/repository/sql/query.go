@@ -37,8 +37,10 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 	if where == "" || query == "" {
 		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
-	if travel := prepareTimeTravel(ctx, criteria, searchQuery.AllowTimeTravel); travel != "" {
-		query += travel
+	if searchQuery.Tx == nil {
+		if travel := prepareTimeTravel(ctx, criteria, searchQuery.AllowTimeTravel); travel != "" {
+			query += travel
+		}
 	}
 	query += where
 

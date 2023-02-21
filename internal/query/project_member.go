@@ -125,10 +125,10 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
 			countColumn.identifier(),
-		).From(projectMemberTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(projectMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, ProjectMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID)).
+			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

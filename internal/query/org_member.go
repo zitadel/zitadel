@@ -125,10 +125,10 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
 			countColumn.identifier(),
-		).From(orgMemberTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(orgMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, OrgMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, OrgMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, OrgMemberUserID)).
+			LeftJoin(join(LoginNameUserIDCol, OrgMemberUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

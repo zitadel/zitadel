@@ -303,12 +303,12 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			UserGrantProjectID.identifier(),
 			ProjectColumnName.identifier(),
 		).
-			From(userGrantTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(userGrantTable.identifier()).
 			LeftJoin(join(UserIDCol, UserGrantUserID)).
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
@@ -413,12 +413,12 @@ func prepareUserGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 
 			countColumn.identifier(),
 		).
-			From(userGrantTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(userGrantTable.identifier()).
 			LeftJoin(join(UserIDCol, UserGrantUserID)).
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
-			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID)).
+			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

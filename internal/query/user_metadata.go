@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -172,7 +173,7 @@ func prepareUserMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			UserMetadataKeyCol.identifier(),
 			UserMetadataValueCol.identifier(),
 		).
-			From(userMetadataTable.identifier()).
+			From(userMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*UserMetadata, error) {
 			m := new(UserMetadata)
@@ -204,7 +205,7 @@ func prepareUserMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.S
 			UserMetadataKeyCol.identifier(),
 			UserMetadataValueCol.identifier(),
 			countColumn.identifier()).
-			From(userMetadataTable.identifier()).
+			From(userMetadataTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*UserMetadataList, error) {
 			metadata := make([]*UserMetadata, 0)

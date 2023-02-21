@@ -256,8 +256,8 @@ func preparePublicKeysQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			KeyPublicColExpiry.identifier(),
 			KeyPublicColKey.identifier(),
 			countColumn.identifier(),
-		).From(keyTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(KeyPublicColID, KeyColID)).
+		).From(keyTable.identifier()).
+			LeftJoin(join(KeyPublicColID, KeyColID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*PublicKeys, error) {
 			keys := make([]PublicKey, 0)
@@ -312,8 +312,8 @@ func preparePrivateKeysQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			KeyPrivateColExpiry.identifier(),
 			KeyPrivateColKey.identifier(),
 			countColumn.identifier(),
-		).From(keyTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(KeyPrivateColID, KeyColID)).
+		).From(keyTable.identifier()).
+			LeftJoin(join(KeyPrivateColID, KeyColID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*PrivateKeys, error) {
 			keys := make([]PrivateKey, 0)

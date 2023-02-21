@@ -762,7 +762,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier(),
 		).
-			From(userTable.identifier()+db.Timetravel(call.Took(ctx))).
+			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
 			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
@@ -771,7 +771,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*User, error) {
@@ -879,8 +879,8 @@ func prepareProfileQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			HumanPreferredLanguageCol.identifier(),
 			HumanGenderCol.identifier(),
 			HumanAvatarURLCol.identifier()).
-			From(userTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			From(userTable.identifier()).
+			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Profile, error) {
 			p := new(Profile)
@@ -940,8 +940,8 @@ func prepareEmailQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			HumanUserIDCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
-			From(userTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			From(userTable.identifier()).
+			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Email, error) {
 			e := new(Email)
@@ -987,8 +987,8 @@ func preparePhoneQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			HumanUserIDCol.identifier(),
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier()).
-			From(userTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			From(userTable.identifier()).
+			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Phone, error) {
 			e := new(Phone)
@@ -1060,7 +1060,7 @@ func prepareNotifyUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			NotifyPasswordSetCol.identifier(),
 			countColumn.identifier(),
 		).
-			From(userTable.identifier()+db.Timetravel(call.Took(ctx))).
+			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(NotifyUserIDCol, UserIDCol)).
 			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
@@ -1069,7 +1069,7 @@ func prepareNotifyUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*NotifyUser, error) {
@@ -1164,8 +1164,8 @@ func prepareUserUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			HumanUserIDCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
-			From(userTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			From(userTable.identifier()).
+			LeftJoin(join(HumanUserIDCol, UserIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (bool, error) {
 			userID := sql.NullString{}
@@ -1231,7 +1231,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			MachineHasSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier()).
-			From(userTable.identifier()+db.Timetravel(call.Took(ctx))).
+			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
 			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
@@ -1240,7 +1240,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				loginNamesArgs...).
 			LeftJoin("("+preferredLoginNameQuery+") AS "+userPreferredLoginNameTable.alias+" ON "+
 				userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier(),
+				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Users, error) {

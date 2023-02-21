@@ -198,8 +198,8 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			SMSTwilioConfigColumnSID.identifier(),
 			SMSTwilioConfigColumnToken.identifier(),
 			SMSTwilioConfigColumnSenderNumber.identifier(),
-		).From(smsConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID)).
+		).From(smsConfigsTable.identifier()).
+			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*SMSConfig, error) {
 			config := new(SMSConfig)
 
@@ -250,8 +250,8 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMSTwilioConfigColumnToken.identifier(),
 			SMSTwilioConfigColumnSenderNumber.identifier(),
 			countColumn.identifier(),
-		).From(smsConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID)).
+		).From(smsConfigsTable.identifier()).
+			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*SMSConfigs, error) {
 			configs := &SMSConfigs{Configs: []*SMSConfig{}}
 

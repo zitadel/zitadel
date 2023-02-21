@@ -116,9 +116,9 @@ func prepareCertificateQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			CertificateColCertificate.identifier(),
 			KeyPrivateColKey.identifier(),
 			countColumn.identifier(),
-		).From(keyTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(keyTable.identifier()).
 			LeftJoin(join(CertificateColID, KeyColID)).
-			LeftJoin(join(KeyPrivateColID, KeyColID)).
+			LeftJoin(join(KeyPrivateColID, KeyColID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Certificates, error) {
 			certificates := make([]Certificate, 0)

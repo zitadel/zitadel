@@ -312,9 +312,9 @@ func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			JWTIDPColKeysEndpoint.identifier(),
 			JWTIDPColHeaderName.identifier(),
 			JWTIDPColEndpoint.identifier(),
-		).From(idpTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(idpTable.identifier()).
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
-			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
+			LeftJoin(join(JWTIDPColIDPID, IDPIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDP, error) {
 			idp := new(IDP)
@@ -421,9 +421,9 @@ func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			JWTIDPColHeaderName.identifier(),
 			JWTIDPColEndpoint.identifier(),
 			countColumn.identifier(),
-		).From(idpTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(idpTable.identifier()).
 			LeftJoin(join(OIDCIDPColIDPID, IDPIDCol)).
-			LeftJoin(join(JWTIDPColIDPID, IDPIDCol)).
+			LeftJoin(join(JWTIDPColIDPID, IDPIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPs, error) {
 			idps := make([]*IDP, 0)

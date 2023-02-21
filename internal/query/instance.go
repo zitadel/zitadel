@@ -394,8 +394,8 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase, host st
 			InstanceDomainChangeDateCol.identifier(),
 			InstanceDomainSequenceCol.identifier(),
 		).
-			From(instanceTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
+			From(instanceTable.identifier()).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
@@ -478,9 +478,9 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 			SecurityPolicyColumnEnabled.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier(),
 		).
-			From(instanceTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
-			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID)).
+			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{

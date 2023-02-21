@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -201,11 +202,11 @@ var (
 	}
 )
 
-func getMembershipFromQuery(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (string, []interface{}) {
-	orgMembers, orgMembersArgs := prepareOrgMember(ctx, db, withOwnerRemoved)
-	iamMembers, iamMembersArgs := prepareIAMMember(ctx, db, withOwnerRemoved)
-	projectMembers, projectMembersArgs := prepareProjectMember(ctx, db, withOwnerRemoved)
-	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(ctx, db, withOwnerRemoved)
+func getMembershipFromQuery(withOwnerRemoved bool) (string, []interface{}) {
+	orgMembers, orgMembersArgs := prepareOrgMember(withOwnerRemoved)
+	iamMembers, iamMembersArgs := prepareIAMMember(withOwnerRemoved)
+	projectMembers, projectMembersArgs := prepareProjectMember(withOwnerRemoved)
+	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(withOwnerRemoved)
 	args := make([]interface{}, 0)
 	args = append(append(append(append(args, orgMembersArgs...), iamMembersArgs...), projectMembersArgs...), projectGrantMembersArgs...)
 
@@ -222,7 +223,7 @@ func getMembershipFromQuery(ctx context.Context, db prepareDatabase, withOwnerRe
 }
 
 func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
-	query, args := getMembershipFromQuery(ctx, db, withOwnerRemoved)
+	query, args := getMembershipFromQuery(withOwnerRemoved)
 	return sq.Select(
 			membershipUserID.identifier(),
 			membershipRoles.identifier(),
@@ -241,7 +242,7 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerR
 		).From(query).
 			LeftJoin(join(ProjectColumnID, membershipProjectID)).
 			LeftJoin(join(OrgColumnID, membershipOrgID)).
-			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, membershipGrantID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		args,
 		func(rows *sql.Rows) (*Memberships, error) {
@@ -321,7 +322,7 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, withOwnerR
 		}
 }
 
-func prepareOrgMember(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (string, []interface{}) {
+func prepareOrgMember(withOwnerRemoved bool) (string, []interface{}) {
 	builder := sq.Select(
 		OrgMemberUserID.identifier(),
 		OrgMemberRoles.identifier(),
@@ -343,7 +344,7 @@ func prepareOrgMember(ctx context.Context, db prepareDatabase, withOwnerRemoved 
 	return builder.MustSql()
 }
 
-func prepareIAMMember(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (string, []interface{}) {
+func prepareIAMMember(withOwnerRemoved bool) (string, []interface{}) {
 	builder := sq.Select(
 		InstanceMemberUserID.identifier(),
 		InstanceMemberRoles.identifier(),
@@ -365,7 +366,7 @@ func prepareIAMMember(ctx context.Context, db prepareDatabase, withOwnerRemoved 
 	return builder.MustSql()
 }
 
-func prepareProjectMember(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (string, []interface{}) {
+func prepareProjectMember(withOwnerRemoved bool) (string, []interface{}) {
 	builder := sq.Select(
 		ProjectMemberUserID.identifier(),
 		ProjectMemberRoles.identifier(),
@@ -387,7 +388,7 @@ func prepareProjectMember(ctx context.Context, db prepareDatabase, withOwnerRemo
 	return builder.MustSql()
 }
 
-func prepareProjectGrantMember(ctx context.Context, db prepareDatabase, withOwnerRemoved bool) (string, []interface{}) {
+func prepareProjectGrantMember(withOwnerRemoved bool) (string, []interface{}) {
 	builder := sq.Select(
 		ProjectGrantMemberUserID.identifier(),
 		ProjectGrantMemberRoles.identifier(),

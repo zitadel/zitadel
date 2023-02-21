@@ -116,8 +116,9 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase) (s
 			IDPNameCol.identifier(),
 			IDPTypeCol.identifier(),
 			countColumn.identifier()).
-			From(idpLoginPolicyLinkTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(IDPIDCol, IDPLoginPolicyLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
+			From(idpLoginPolicyLinkTable.identifier()).
+			LeftJoin(join(IDPIDCol, IDPLoginPolicyLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPLoginPolicyLinks, error) {
 			links := make([]*IDPLoginPolicyLink, 0)
 			var count uint64

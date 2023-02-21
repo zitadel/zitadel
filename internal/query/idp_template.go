@@ -358,8 +358,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LDAPPreferredLanguageAttributeCol.identifier(),
 			LDAPAvatarURLAttributeCol.identifier(),
 			LDAPProfileAttributeCol.identifier(),
-		).From(idpTemplateTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
+		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IDPTemplate, error) {
 			idpTemplate := new(IDPTemplate)
@@ -502,8 +502,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LDAPAvatarURLAttributeCol.identifier(),
 			LDAPProfileAttributeCol.identifier(),
 			countColumn.identifier(),
-		).From(idpTemplateTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol)).
+		).From(idpTemplateTable.identifier()).
+			LeftJoin(join(LDAPIDCol, IDPTemplateIDCol) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPTemplates, error) {
 			templates := make([]*IDPTemplate, 0)

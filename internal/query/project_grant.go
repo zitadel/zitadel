@@ -291,11 +291,11 @@ func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			ProjectGrantColumnGrantedOrgName.identifier(),
 			ProjectGrantColumnGrantedRoleKeys.identifier(),
 			ProjectGrantColumnResourceOwnerName.identifier()).
-			From(projectGrantsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(projectGrantsTable.identifier()).
 			PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID) + db.Timetravel(call.Took(ctx))),
 		func(row *sql.Row) (*ProjectGrant, error) {
 			grant := new(ProjectGrant)
 			var (
@@ -351,11 +351,11 @@ func prepareProjectGrantsQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 			ProjectGrantColumnGrantedRoleKeys.identifier(),
 			ProjectGrantColumnResourceOwnerName.identifier(),
 			countColumn.identifier()).
-			From(projectGrantsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			From(projectGrantsTable.identifier()).
 			PlaceholderFormat(sq.Dollar).
 			LeftJoin(join(ProjectColumnID, ProjectGrantColumnProjectID)).
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
-			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
+			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID) + db.Timetravel(call.Took(ctx))),
 		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
 			var (

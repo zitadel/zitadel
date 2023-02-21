@@ -540,10 +540,10 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 			AppSAMLConfigColumnEntityID.identifier(),
 			AppSAMLConfigColumnMetadata.identifier(),
 			AppSAMLConfigColumnMetadataURL.identifier(),
-		).From(appsTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
 			app := new(App)
 
@@ -608,10 +608,10 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 func prepareProjectIDByAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
 	return sq.Select(
 			AppColumnProjectID.identifier(),
-		).From(appsTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (projectID string, err error) {
 			err = row.Scan(
 				&projectID,
@@ -641,11 +641,11 @@ func prepareProjectByAppQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			ProjectColumnProjectRoleCheck.identifier(),
 			ProjectColumnHasProjectCheck.identifier(),
 			ProjectColumnPrivateLabelingSetting.identifier(),
-		).From(projectsTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(projectsTable.identifier()).
 			Join(join(AppColumnProjectID, ProjectColumnID)).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
@@ -709,10 +709,10 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			AppSAMLConfigColumnMetadata.identifier(),
 			AppSAMLConfigColumnMetadataURL.identifier(),
 			countColumn.identifier(),
-		).From(appsTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*Apps, error) {
 			apps := &Apps{Apps: []*App{}}
 
@@ -782,9 +782,9 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 	return sq.Select(
 			AppAPIConfigColumnClientID.identifier(),
 			AppOIDCConfigColumnClientID.identifier(),
-		).From(appsTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
-			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
 			ids := database.StringArray{}
 

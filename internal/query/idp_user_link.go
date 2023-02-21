@@ -137,8 +137,9 @@ func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			IDPTypeCol.identifier(),
 			IDPUserLinkResourceOwnerCol.identifier(),
 			countColumn.identifier()).
-			From(idpUserLinkTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(IDPIDCol, IDPUserLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
+			From(idpUserLinkTable.identifier()).
+			LeftJoin(join(IDPIDCol, IDPUserLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*IDPUserLinks, error) {
 			idps := make([]*IDPUserLink, 0)
 			var count uint64

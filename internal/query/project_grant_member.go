@@ -139,11 +139,11 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
 			countColumn.identifier(),
-		).From(projectGrantMemberTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(projectGrantMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(LoginNameUserIDCol, ProjectGrantMemberUserID)).
-			LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),
