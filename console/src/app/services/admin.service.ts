@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, from, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, from, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { ONBOARDING_EVENTS } from '../modules/onboarding/onboarding.component';
 
 import {
@@ -231,6 +231,7 @@ import { Event } from '../proto/generated/zitadel/event_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
+import { StorageLocation, StorageService } from './storage.service';
 
 export interface OnboardingActions {
   order: number;
@@ -246,15 +247,16 @@ type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
   providedIn: 'root',
 })
 export class AdminService {
+  public hideOnboarding: boolean = false;
   public loadEvents: Subject<string[]> = new Subject();
-
+  public onboardingLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public progressEvents$: Observable<OnboardingEventEntries> = this.loadEvents.pipe(
+    tap(() => this.onboardingLoading.next(true)),
     switchMap((types) => {
       const eventsReq = new ListEventsRequest().setEventTypesList(types).setAsc(false);
       return from(this.listEvents(eventsReq)).pipe(
         map((events) => {
           const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
-          console.log(el);
 
           let obj: { [type: string]: OnboardingEvent } = {};
           types.map((type) => {
@@ -285,6 +287,7 @@ export class AdminService {
           console.error(error);
           return of([]);
         }),
+        finalize(() => this.onboardingLoading.next(false)),
       );
     }),
   );
@@ -295,8 +298,11 @@ export class AdminService {
   public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
-  constructor(private readonly grpcService: GrpcService) {
+  constructor(private readonly grpcService: GrpcService, private storageService: StorageService) {
     this.progressEvents$.subscribe(this.progressEvents);
+
+    this.hideOnboarding =
+      this.storageService.getItem('onboarding-dismissed', StorageLocation.local) === 'true' ? true : false;
   }
 
   public setDefaultOrg(orgId: string): Promise<SetDefaultOrgResponse.AsObject> {

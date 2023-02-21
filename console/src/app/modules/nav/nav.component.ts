@@ -87,7 +87,6 @@ export class NavComponent implements OnDestroy {
   public filterControl: UntypedFormControl = new UntypedFormControl('');
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public showAccount: boolean = false;
-  public hideOnboarding: boolean = false;
   private destroy$: Subject<void> = new Subject();
 
   public BreadcrumbType: any = BreadcrumbType;
@@ -111,9 +110,6 @@ export class NavComponent implements OnDestroy {
     private storageService: StorageService,
   ) {
     this.loadEnvironment();
-
-    this.hideOnboarding =
-      this.storageService.getItem('onboarding-dismissed', StorageLocation.local) === 'true' ? true : false;
   }
 
   public loadEnvironment(): void {
@@ -134,8 +130,9 @@ export class NavComponent implements OnDestroy {
 
   public dismissOnboarding(): void {
     this.showInstanceProgress = false;
-    this.hideOnboarding = true;
+    this.adminService.hideOnboarding = true;
     this.storageService.setItem('onboarding-dismissed', 'true', StorageLocation.local);
+    this.adminService.progressAllDone.next(true);
   }
 
   public get isUserLinkActive(): boolean {

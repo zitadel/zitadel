@@ -24,6 +24,7 @@ import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
     ShortcutsModule,
     MatRippleModule,
     RouterModule,
+    MatProgressSpinnerModule,
     MatLegacyProgressBarModule,
     EventPipeModule,
   ],

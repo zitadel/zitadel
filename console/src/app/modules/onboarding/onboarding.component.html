@@ -3,7 +3,10 @@
 
   <p class="desc cnsl-secondary-text">{{ 'ONBOARDING.DESCRIPTION' | translate }}</p>
 
-  <ng-container *ngIf="(adminService.progressAllDone | async) === false">
+  <div class="onboarding-spinner">
+    <mat-spinner diameter="20" *ngIf="adminService.onboardingLoading | async"></mat-spinner>
+  </div>
+  <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
     <div class="onboarding-progress-bar-wrapper">
       <mat-progress-bar
         class="progress"
@@ -18,7 +21,10 @@
     </div>
   </ng-container>
 
-  <div class="action-card-wrapper" [ngClass]="{ alldone: (adminService.progressAllDone | async) }">
+  <div
+    class="action-card-wrapper"
+    [ngClass]="{ alldone: adminService.hideOnboarding || (adminService.progressAllDone | async) }"
+  >
     <ng-container *ngFor="let action of actions | async">
       <a
         [routerLink]="action[1].link"
