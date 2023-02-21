@@ -3031,6 +3031,29 @@ service ManagementService {
         };
     }
 
+    // Add a new OAuth2 identity provider in the organisation
+    rpc AddGenericOAuthProvider(AddGenericOAuthProviderRequest) returns (AddGenericOAuthProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/oauth"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
+
+    // Change an existing OAuth2 identity provider in the organisation
+    rpc UpdateGenericOAuthProvider(UpdateGenericOAuthProviderRequest) returns (UpdateGenericOAuthProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/oauth/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+    }
 
     // Add a new Google identity provider in the organisation
     rpc AddGoogleProvider(AddGoogleProviderRequest) returns (AddGoogleProviderResponse) {
@@ -6031,6 +6054,39 @@ message GetProviderByIDRequest {
 
 message GetProviderByIDResponse {
     zitadel.idp.v1.Provider idp = 1;
+}
+
+message AddGenericOAuthProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string authorization_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 8;
+}
+
+message AddGenericOAuthProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateGenericOAuthProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // client_secret will only be updated if provided
+    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    string authorization_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_endpoint = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string scopes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.Options provider_options = 9;
+}
+
+message UpdateGenericOAuthProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message AddGoogleProviderRequest {

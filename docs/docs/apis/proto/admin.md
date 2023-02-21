@@ -593,6 +593,30 @@ Returns an identity provider of the instance
     GET: /idps/templates/{id}
 
 
+### AddGenericOAuthProvider
+
+> **rpc** AddGenericOAuthProvider([AddGenericOAuthProviderRequest](#addgenericoauthproviderrequest))
+[AddGenericOAuthProviderResponse](#addgenericoauthproviderresponse)
+
+Add a new OAuth2 identity provider on the instance
+
+
+
+    POST: /idps/oauth
+
+
+### UpdateGenericOAuthProvider
+
+> **rpc** UpdateGenericOAuthProvider([UpdateGenericOAuthProviderRequest](#updategenericoauthproviderrequest))
+[UpdateGenericOAuthProviderResponse](#updategenericoauthproviderresponse)
+
+Change an existing OAuth2 identity provider on the instance
+
+
+
+    PUT: /idps/oauth/{id}
+
+
 ### AddGoogleProvider
 
 > **rpc** AddGoogleProvider([AddGoogleProviderRequest](#addgoogleproviderrequest))
@@ -1869,6 +1893,52 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### AddGenericOAuthProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| authorization_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
+
+
+
+
+### AddGenericOAuthProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### AddGenericOIDCProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
 
 
 
@@ -4829,6 +4899,36 @@ this is en empty request
 
 
 ### UpdateDomainPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateGenericOAuthProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| client_secret |  string | client_secret will only be updated if provided | string.max_len: 200<br />  |
+| authorization_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
+
+
+
+
+### UpdateGenericOAuthProviderResponse
 
 
 
