@@ -46,13 +46,13 @@
     "DESCRIPTION": "Your onboarding process",
     "COMPLETED": "completed",
     "EVENTS": {
-      "instance.policy.label.added": {
+      "instance.policy.label.changed": {
         "title": "Imposta il tuo marchio",
         "description": "Definisci la colorazione e il design del vostro login e caricate il vostro logo e le vostre icone."
       },
-      "instance.policy.notification.added": {
-        "title": "Configura le notifiche e le impostazioni SMTP",
-        "description": "Imposta il proprio server di posta e le impostazioni degli SMS."
+      "instance.smtp.config.changed": {
+        "title": "Configura le impostazioni SMTP",
+        "description": "Imposta il proprio server di posta"
       },
       "project.added": {
         "title": "Crea il tuo primo progetto",

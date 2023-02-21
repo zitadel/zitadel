@@ -12,6 +12,7 @@ import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 import { OnboardingComponent } from './onboarding.component';
 import { RouterModule } from '@angular/router';
 import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
 
 @NgModule({
   declarations: [OnboardingComponent],
@@ -27,6 +28,7 @@ import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-ba
     MatRippleModule,
     RouterModule,
     MatLegacyProgressBarModule,
+    EventPipeModule,
   ],
   exports: [OnboardingComponent],
 })

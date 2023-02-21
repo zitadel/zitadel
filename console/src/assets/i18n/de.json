@@ -46,13 +46,13 @@
     "DESCRIPTION": "Dein Onboarding-prozess",
     "COMPLETED": "abgeschlossen",
     "EVENTS": {
-      "instance.policy.label.added": {
+      "instance.policy.label.changed": {
         "title": "Branding anpassen",
         "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons."
       },
-      "instance.policy.notification.added": {
-        "title": "Benachrichtigungseinstellungen und SMTP",
-        "description": "Konfiguriere deinen Mailserver und SMS Einstellungen."
+      "instance.smtp.config.changed": {
+        "title": "SMTP Benachrichtigungseinstellungen",
+        "description": "Konfiguriere deinen Mailserver."
       },
       "project.added": {
         "title": "Erstelle ein Projekt",

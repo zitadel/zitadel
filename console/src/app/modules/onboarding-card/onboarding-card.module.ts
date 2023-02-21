@@ -11,6 +11,9 @@ import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
 import { OnboardingCardComponent } from './onboarding-card.component';
 import { RouterModule } from '@angular/router';
+import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
+import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
+import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
 
 @NgModule({
   declarations: [OnboardingCardComponent],
@@ -20,11 +23,14 @@ import { RouterModule } from '@angular/router';
     HasRoleModule,
     MatButtonModule,
     TranslateModule,
-    MatTooltipModule,
     RouterModule,
     MatProgressSpinnerModule,
     ShortcutsModule,
     MatRippleModule,
+    TimestampToDatePipeModule,
+    LocalizedDatePipeModule,
+    EventPipeModule,
+    MatTooltipModule,
   ],
   exports: [OnboardingCardComponent],
 })

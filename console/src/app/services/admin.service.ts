@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, from, map, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { ONBOARDING_EVENTS } from '../modules/onboarding/onboarding.component';
 
 import {
   ActivateLabelPolicyRequest,
@@ -231,7 +232,7 @@ import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
 
-interface OnboardingActions {
+export interface OnboardingActions {
   order: number;
   eventType: string;
   link: string | string[];
@@ -241,36 +242,27 @@ interface OnboardingActions {
 type OnboardingEvent = { order: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
 type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 
-const ONBOARDING_EVENTS: OnboardingActions[] = [
-  { order: 0, eventType: 'instance.policy.label.added', link: ['/settings'], fragment: 'branding' },
-  { order: 1, eventType: 'project.added', link: ['/projects/create'] },
-  { order: 2, eventType: 'project.application.added', link: ['/projects/app-create'] },
-  { order: 3, eventType: 'user.human.added', link: ['/users/create'] },
-  { order: 4, eventType: 'instance.policy.notification.added', link: ['/settings'], fragment: 'notifications' },
-  { order: 5, eventType: 'user.grant.added', link: ['/grant-create'] },
-  //   { eventType: 'org.policy.notification.added', link: '/settings?id=notifications' },
-];
-
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
-  private loadEvents: Subject<string[]> = new Subject();
+  public loadEvents: Subject<string[]> = new Subject();
 
   public progressEvents$: Observable<OnboardingEventEntries> = this.loadEvents.pipe(
     switchMap((types) => {
       const eventsReq = new ListEventsRequest().setEventTypesList(types).setAsc(false);
       return from(this.listEvents(eventsReq)).pipe(
         map((events) => {
-          const eventList = events.getEventsList().map((event) => event.toObject());
+          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
+          console.log(el);
 
           let obj: { [type: string]: OnboardingEvent } = {};
           types.map((type) => {
-            const filtered = eventList.filter((event) => event.type?.type === type);
-            const el = ONBOARDING_EVENTS.find((oe) => oe.eventType === type);
+            const filtered = el.filter((event) => event.type?.type === type);
+            const ele = ONBOARDING_EVENTS.find((oe) => oe.eventType === type);
             (obj as any)[type] = filtered.length
-              ? { order: el?.order, link: el?.link, fragment: el?.fragment, event: filtered[0] }
-              : { order: el?.order, link: el?.link, fragment: el?.fragment, event: undefined };
+              ? { order: ele?.order, link: ele?.link, fragment: ele?.fragment, event: filtered[0] }
+              : { order: ele?.order, link: ele?.link, fragment: ele?.fragment, event: undefined };
           });
 
           const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
@@ -301,16 +293,10 @@ export class AdminService {
   public progressPercentage: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressDone: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
-  public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
   constructor(private readonly grpcService: GrpcService) {
     this.progressEvents$.subscribe(this.progressEvents);
-    this.initOnboarding();
-  }
-
-  public initOnboarding(): void {
-    console.log('init onboarding');
-    this.loadEvents.next(ONBOARDING_EVENTS.map((oe) => oe.eventType));
   }
 
   public setDefaultOrg(orgId: string): Promise<SetDefaultOrgResponse.AsObject> {

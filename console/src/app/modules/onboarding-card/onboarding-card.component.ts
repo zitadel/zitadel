@@ -1,6 +1,7 @@
 import { Component, EventEmitter } from '@angular/core';
 import { BehaviorSubject, switchMap } from 'rxjs';
 import { AuthServiceClient } from 'src/app/proto/generated/zitadel/AuthServiceClientPb';
+import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 

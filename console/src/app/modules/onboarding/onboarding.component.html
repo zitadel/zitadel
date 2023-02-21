@@ -27,7 +27,9 @@
         [ngClass]="{ done: action[1].event !== undefined }"
       >
         <div class="state-circle">
-          <mat-icon *ngIf="action[1]?.event !== undefined" class="success-icon">check_circle</mat-icon>
+          <mat-icon *ngIf="action[1]?.event !== undefined" matTooltip="{{ action[1].event | event }}" class="success-icon"
+            >check_circle</mat-icon
+          >
 
           <!-- <mat-icon class="success-icon" *ngIf="action.value?.event !== undefined" svgIcon="mdi_shield_check"></mat-icon> -->
           <!-- <mat-icon class="warn-icon" *ngIf="action.value?.event === undefined" svgIcon="mdi_shield_alert"></mat-icon> -->

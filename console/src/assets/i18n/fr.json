@@ -46,13 +46,13 @@
     "DESCRIPTION": "Votre processus d'intégration",
     "COMPLETED": "terminé",
     "EVENTS": {
-      "instance.policy.label.added": {
+      "instance.policy.label.changed": {
         "title": "Créez votre marque",
         "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes."
       },
-      "instance.policy.notification.added": {
-        "title": "Configurez vos notifications et vos paramètres SMTP",
-        "description": "Définissez votre propre serveur de messagerie et vos paramètres SMS."
+      "instance.smtp.config.changed": {
+        "title": "Configurez vos paramètres SMTP",
+        "description": "Définissez vos propres paramètres de serveur de messagerie"
       },
       "project.added": {
         "title": "Créez votre premier projet",

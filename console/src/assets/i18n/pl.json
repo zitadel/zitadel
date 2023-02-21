@@ -46,13 +46,13 @@
     "DESCRIPTION": "Twój proces wprowadzania na rynek",
     "COMPLETED": "zakończone",
     "EVENTS": {
-      "instance.policy.label.added": {
+      "instance.policy.label.changed": {
         "title": "Skonfiguruj swoją markę",
         "description": "Zdefiniuj kolorystykę i kształt swojego loginu oraz wgraj swoje logo i ikony."
       },
-      "instance.policy.notification.added": {
-        "title": "Skonfiguruj powiadomienia i ustawienia SMTP",
-        "description": "Ustawienie własnego serwera pocztowego i ustawień SMS"
+      "instance.smtp.config.changed": {
+        "title": "Ustawienia SMTP",
+        "description": "Ustawienie własnego serwera pocztowego"
       },
       "project.added": {
         "title": "Stwórz swój pierwszy projekt",

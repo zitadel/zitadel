@@ -46,13 +46,13 @@
     "DESCRIPTION": "你的入职过程",
     "COMPLETED": "已完成",
     "EVENTS": {
-      "instance.policy.label.added": {
+      "instance.policy.label.changed": {
         "title": "设置你的品牌",
         "description": "定义你的登录的颜色和形状，上传你的标志和图标。"
       },
-      "instance.policy.notification.added": {
-        "title": "设置你的通知和SMTP设置",
-        "description": "设置你自己的邮件服务器，和短信设置"
+      "instance.smtp.config.changed": {
+        "title": "SMTP设置",
+        "description": "设置你自己的邮件服务器设置"
       },
       "project.added": {
         "title": "创建你的第一个项目",
