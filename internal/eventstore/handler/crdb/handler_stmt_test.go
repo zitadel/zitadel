@@ -12,6 +12,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
@@ -171,7 +172,9 @@ func TestProjectionHandler_SearchQuery(t *testing.T) {
 				},
 				SequenceTable: tt.fields.sequenceTable,
 				BulkLimit:     tt.fields.bulkLimit,
-				Client:        client,
+				Client: &database.DB{
+					DB: client,
+				},
 			})
 
 			h.aggregates = tt.fields.aggregates
@@ -549,7 +552,9 @@ func TestStatementHandler_Update(t *testing.T) {
 				sequenceTable:           "my_sequences",
 				currentSequenceStmt:     fmt.Sprintf(currentSequenceStmtFormat, "my_sequences"),
 				updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, "my_sequences"),
-				client:                  client,
+				client: &database.DB{
+					DB: client,
+				},
 			}
 
 			h.aggregates = tt.fields.aggregates
@@ -1121,7 +1126,9 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 						ProjectionName: tt.fields.projectionName,
 						RequeueEvery:   0,
 					},
-					Client:            client,
+					Client: &database.DB{
+						DB: client,
+					},
 					FailedEventsTable: tt.fields.failedEventsTable,
 					MaxFailureCount:   tt.fields.maxFailureCount,
 				},

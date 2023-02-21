@@ -437,8 +437,9 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{DB: testCRDBClient},
 			}
+			db.SetDatabase(new(testDB))
 			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
 				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField, tt.args.uniqueDataInstanceID)
 				if err != nil {
@@ -561,8 +562,9 @@ func TestCRDB_Push_MultipleAggregate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{DB: testCRDBClient},
 			}
+			db.SetDatabase(new(testDB))
 			if err := db.Push(context.Background(), tt.args.events); (err != nil) != tt.res.wantErr {
 				t.Errorf("CRDB.Push() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
@@ -638,7 +640,7 @@ func TestCRDB_CreateInstance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{DB: testCRDBClient},
 			}
 
 			if err := db.CreateInstance(context.Background(), tt.args.instanceID); (err != nil) != tt.res.wantErr {
@@ -776,8 +778,9 @@ func TestCRDB_Push_Parallel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{DB: testCRDBClient},
 			}
+			db.SetDatabase(new(testDB))
 			wg := sync.WaitGroup{}
 
 			errs := make([]error, 0, tt.res.errCount)
@@ -897,8 +900,9 @@ func TestCRDB_Filter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{DB: testCRDBClient},
 			}
+			db.SetDatabase(new(testDB))
 
 			// setup initial data for query
 			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
@@ -987,8 +991,9 @@ func TestCRDB_LatestSequence(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{DB: testCRDBClient},
 			}
+			db.SetDatabase(new(testDB))
 
 			// setup initial data for query
 			if err := db.Push(context.Background(), tt.fields.existingEvents); err != nil {
@@ -1131,8 +1136,9 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := &CRDB{
-				client: testCRDBClient,
+				DB: &database.DB{DB: testCRDBClient},
 			}
+			db.SetDatabase(new(testDB))
 			if err := db.Push(context.Background(), tt.args.events); err != nil {
 				t.Errorf("CRDB.Push() error = %v", err)
 			}
