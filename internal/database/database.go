@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"reflect"
-	"time"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -22,28 +21,12 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 
 type DB struct {
 	*sql.DB
-	database dialect.Database
+	dialect.Database
 }
 
 // SetDatabase is used for testing purposes
 func (db *DB) SetDatabase(database dialect.Database) {
-	db.database = database
-}
-
-func (db *DB) DatabaseName() string {
-	return db.database.DatabaseName()
-}
-
-func (db *DB) Username() string {
-	return db.database.Username()
-}
-
-func (db *DB) Type() string {
-	return db.database.Type()
-}
-
-func (db *DB) Timetravel(d time.Duration) string {
-	return db.database.Timetravel(d)
+	db.Database = database
 }
 
 func Connect(config Config, useAdmin bool) (*DB, error) {
