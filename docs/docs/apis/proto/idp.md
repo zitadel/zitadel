@@ -9,6 +9,33 @@ title: zitadel/idp.proto
 ## Messages
 
 
+### GitHubConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| scopes | repeated string | - |  |
+
+
+
+
+### GitHubEnterpriseServerConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| authorization_endpoint |  string | - |  |
+| token_endpoint |  string | - |  |
+| user_endpoint |  string | - |  |
+| scopes | repeated string | - |  |
+
+
+
+
 ### GoogleConfig
 
 
@@ -230,6 +257,8 @@ title: zitadel/idp.proto
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.ldap |  LDAPConfig | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.google |  GoogleConfig | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oauth |  OAuthConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.github |  GitHubConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.github_es |  GitHubEnterpriseServerConfig | - |  |
 
 
 
@@ -321,7 +350,7 @@ authorization framework of the identity provider
 | PROVIDER_TYPE_OAUTH | 4 | - |
 | PROVIDER_TYPE_AZURE_AD | 5 | - |
 | PROVIDER_TYPE_GITHUB | 6 | - |
-| PROVIDER_TYPE_GITHUB_EE | 7 | - |
+| PROVIDER_TYPE_GITHUB_ES | 7 | - |
 | PROVIDER_TYPE_GITLAB | 8 | - |
 | PROVIDER_TYPE_GITLAB_SELF_HOSTED | 9 | - |
 | PROVIDER_TYPE_GOOGLE | 10 | - |

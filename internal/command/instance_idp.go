@@ -47,6 +47,74 @@ func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, id st
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+func (c *Commands) AddInstanceGitHubProvider(ctx context.Context, provider GitHubProvider) (string, *domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitHubProvider(instanceAgg, id, provider))
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) UpdateInstanceGitHubProvider(ctx context.Context, id string, provider GitHubProvider) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitHubProvider(instanceAgg, id, provider))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) AddInstanceGitHubEnterpriseProvider(ctx context.Context, provider GitHubEnterpriseProvider) (string, *domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceGitHubEnterpriseProvider(instanceAgg, id, provider))
+	if err != nil {
+		return "", nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
+}
+
+func (c *Commands) UpdateInstanceGitHubEnterpriseProvider(ctx context.Context, id string, provider GitHubEnterpriseProvider) (*domain.ObjectDetails, error) {
+	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceGitHubEnterpriseProvider(instanceAgg, id, provider))
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) == 0 {
+		// no change, so return directly
+		return &domain.ObjectDetails{}, nil
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return pushedEventsToObjectDetails(pushedEvents), nil
+}
+
 func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, provider GoogleProvider) (string, *domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	id, err := c.idGenerator.Next()
@@ -216,6 +284,188 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(a *instance.Aggregate, id 
 				&a.Aggregate,
 				id,
 				writeModel.Name,
+				provider.Name,
+				provider.ClientID,
+				provider.ClientSecret,
+				c.idpConfigEncryption,
+				provider.AuthorizationEndpoint,
+				provider.TokenEndpoint,
+				provider.UserEndpoint,
+				provider.Scopes,
+				provider.IDPOptions,
+			)
+			if err != nil {
+				return nil, err
+			}
+			if event == nil {
+				return nil, nil
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareAddInstanceGitHubProvider(a *instance.Aggregate, id string, provider GitHubProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Jdsgf", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-dsgz3", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewGitHubInstanceIDPWriteModel(a.InstanceID, id)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				instance.NewGitHubIDPAddedEvent(ctx, &a.Aggregate, id, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareUpdateInstanceGitHubProvider(a *instance.Aggregate, id string, provider GitHubProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdf4h", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-fdh5z", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewGitHubInstanceIDPWriteModel(a.InstanceID, id)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INST-Dr1gs", "Errors.Instance.IDPConfig.NotExisting")
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				id,
+				provider.ClientID,
+				provider.ClientSecret,
+				c.idpConfigEncryption,
+				provider.Scopes,
+				provider.IDPOptions,
+			)
+			if err != nil {
+				return nil, err
+			}
+			if event == nil {
+				return nil, nil
+			}
+			return []eventstore.Command{event}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareAddInstanceGitHubEnterpriseProvider(a *instance.Aggregate, id string, provider GitHubEnterpriseProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Dg4td", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-dgj53", "Errors.Invalid.Argument")
+		}
+		if provider.ClientSecret = strings.TrimSpace(provider.ClientSecret); provider.ClientSecret == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-Ghjjs", "Errors.Invalid.Argument")
+		}
+		if provider.AuthorizationEndpoint = strings.TrimSpace(provider.AuthorizationEndpoint); provider.AuthorizationEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sani2", "Errors.Invalid.Argument")
+		}
+		if provider.TokenEndpoint = strings.TrimSpace(provider.TokenEndpoint); provider.TokenEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-agj42", "Errors.Invalid.Argument")
+		}
+		if provider.UserEndpoint = strings.TrimSpace(provider.UserEndpoint); provider.UserEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sd5hn", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewGitHubEnterpriseInstanceIDPWriteModel(a.InstanceID, id)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			secret, err := crypto.Encrypt([]byte(provider.ClientSecret), c.idpConfigEncryption)
+			if err != nil {
+				return nil, err
+			}
+			return []eventstore.Command{
+				instance.NewGitHubEnterpriseIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					id,
+					provider.Name,
+					provider.ClientID,
+					secret,
+					provider.AuthorizationEndpoint,
+					provider.TokenEndpoint,
+					provider.UserEndpoint,
+					provider.Scopes,
+					provider.IDPOptions,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+func (c *Commands) prepareUpdateInstanceGitHubEnterpriseProvider(a *instance.Aggregate, id string, provider GitHubEnterpriseProvider) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		if id = strings.TrimSpace(id); id == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdfh3", "Errors.Invalid.Argument")
+		}
+		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-shj42", "Errors.Invalid.Argument")
+		}
+		if provider.ClientID = strings.TrimSpace(provider.ClientID); provider.ClientID == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-sdh73", "Errors.Invalid.Argument")
+		}
+		if provider.AuthorizationEndpoint = strings.TrimSpace(provider.AuthorizationEndpoint); provider.AuthorizationEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-acx2w", "Errors.Invalid.Argument")
+		}
+		if provider.TokenEndpoint = strings.TrimSpace(provider.TokenEndpoint); provider.TokenEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-dgj6q", "Errors.Invalid.Argument")
+		}
+		if provider.UserEndpoint = strings.TrimSpace(provider.UserEndpoint); provider.UserEndpoint == "" {
+			return nil, caos_errs.ThrowInvalidArgument(nil, "INST-ybj62", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			writeModel := NewGitHubEnterpriseInstanceIDPWriteModel(a.InstanceID, id)
+			events, err := filter(ctx, writeModel.Query())
+			if err != nil {
+				return nil, err
+			}
+			writeModel.AppendEvents(events...)
+			if err = writeModel.Reduce(); err != nil {
+				return nil, err
+			}
+			if !writeModel.State.Exists() {
+				return nil, caos_errs.ThrowNotFound(nil, "INST-GBr42", "Errors.Instance.IDPConfig.NotExisting")
+			}
+			event, err := writeModel.NewChangedEvent(
+				ctx,
+				&a.Aggregate,
+				id,
 				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,

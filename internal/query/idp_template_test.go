@@ -36,6 +36,19 @@ var (
 		` projections.idp_templates_oauth.token_endpoint,` +
 		` projections.idp_templates_oauth.user_endpoint,` +
 		` projections.idp_templates_oauth.scopes,` +
+		// github
+		` projections.idp_templates_github.idp_id,` +
+		` projections.idp_templates_github.client_id,` +
+		` projections.idp_templates_github.client_secret,` +
+		` projections.idp_templates_github.scopes,` +
+		// github enterprise
+		` projections.idp_templates_github_enterprise.idp_id,` +
+		` projections.idp_templates_github_enterprise.client_id,` +
+		` projections.idp_templates_github_enterprise.client_secret,` +
+		` projections.idp_templates_github_enterprise.authorization_endpoint,` +
+		` projections.idp_templates_github_enterprise.token_endpoint,` +
+		` projections.idp_templates_github_enterprise.user_endpoint,` +
+		` projections.idp_templates_github_enterprise.scopes,` +
 		// google
 		` projections.idp_templates_google.idp_id,` +
 		` projections.idp_templates_google.client_id,` +
@@ -66,6 +79,8 @@ var (
 		` projections.idp_templates_ldap.profile_attribute` +
 		` FROM projections.idp_templates` +
 		` LEFT JOIN projections.idp_templates_oauth ON projections.idp_templates.id = projections.idp_templates_oauth.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_oauth.instance_id` +
+		` LEFT JOIN projections.idp_templates_github ON projections.idp_templates.id = projections.idp_templates_github.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_github.instance_id` +
+		` LEFT JOIN projections.idp_templates_github_enterprise ON projections.idp_templates.id = projections.idp_templates_github_enterprise.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_github_enterprise.instance_id` +
 		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
 		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id`
 	idpTemplateCols = []string{
@@ -83,6 +98,19 @@ var (
 		"is_auto_creation",
 		"is_auto_update",
 		// oauth config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"authorization_endpoint",
+		"token_endpoint",
+		"user_endpoint",
+		"scopes",
+		// github config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// github enterprise config
 		"idp_id",
 		"client_id",
 		"client_secret",
@@ -140,6 +168,19 @@ var (
 		` projections.idp_templates_oauth.token_endpoint,` +
 		` projections.idp_templates_oauth.user_endpoint,` +
 		` projections.idp_templates_oauth.scopes,` +
+		// github
+		` projections.idp_templates_github.idp_id,` +
+		` projections.idp_templates_github.client_id,` +
+		` projections.idp_templates_github.client_secret,` +
+		` projections.idp_templates_github.scopes,` +
+		// github enterprise
+		` projections.idp_templates_github_enterprise.idp_id,` +
+		` projections.idp_templates_github_enterprise.client_id,` +
+		` projections.idp_templates_github_enterprise.client_secret,` +
+		` projections.idp_templates_github_enterprise.authorization_endpoint,` +
+		` projections.idp_templates_github_enterprise.token_endpoint,` +
+		` projections.idp_templates_github_enterprise.user_endpoint,` +
+		` projections.idp_templates_github_enterprise.scopes,` +
 		// google
 		` projections.idp_templates_google.idp_id,` +
 		` projections.idp_templates_google.client_id,` +
@@ -171,6 +212,8 @@ var (
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_templates` +
 		` LEFT JOIN projections.idp_templates_oauth ON projections.idp_templates.id = projections.idp_templates_oauth.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_oauth.instance_id` +
+		` LEFT JOIN projections.idp_templates_github ON projections.idp_templates.id = projections.idp_templates_github.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_github.instance_id` +
+		` LEFT JOIN projections.idp_templates_github_enterprise ON projections.idp_templates.id = projections.idp_templates_github_enterprise.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_github_enterprise.instance_id` +
 		` LEFT JOIN projections.idp_templates_google ON projections.idp_templates.id = projections.idp_templates_google.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_google.instance_id` +
 		` LEFT JOIN projections.idp_templates_ldap ON projections.idp_templates.id = projections.idp_templates_ldap.idp_id AND projections.idp_templates.instance_id = projections.idp_templates_ldap.instance_id`
 	idpTemplatesCols = []string{
@@ -188,6 +231,19 @@ var (
 		"is_auto_creation",
 		"is_auto_update",
 		// oauth config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"authorization_endpoint",
+		"token_endpoint",
+		"user_endpoint",
+		"scopes",
+		// github config
+		"idp_id",
+		"client_id",
+		"client_secret",
+		"scopes",
+		// github enterprise config
 		"idp_id",
 		"client_id",
 		"client_secret",
@@ -285,6 +341,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						"token",
 						"user",
 						database.StringArray{"profile"},
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
 						// google
 						nil,
 						nil,
@@ -342,6 +411,101 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 			},
 		},
 		{
+			name:    "prepareIDPTemplateByIDQuery github idp",
+			prepare: prepareIDPTemplateByIDQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(idpTemplateQuery),
+					idpTemplateCols,
+					[]driver.Value{
+						"idp-id",
+						"ro",
+						testNow,
+						testNow,
+						uint64(20211109),
+						domain.IDPConfigStateActive,
+						"idp-name",
+						domain.IDPTypeGitHub,
+						domain.IdentityProviderTypeOrg,
+						true,
+						true,
+						true,
+						true,
+						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						"idp-id",
+						"client_id",
+						nil,
+						database.StringArray{"profile"},
+						// github enterprise
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// google
+						nil,
+						nil,
+						nil,
+						nil,
+						// ldap config
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+					},
+				),
+			},
+			object: &IDPTemplate{
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				Sequence:          20211109,
+				ResourceOwner:     "ro",
+				ID:                "idp-id",
+				State:             domain.IDPStateActive,
+				Name:              "idp-name",
+				Type:              domain.IDPTypeGitHub,
+				OwnerType:         domain.IdentityProviderTypeOrg,
+				IsCreationAllowed: true,
+				IsLinkingAllowed:  true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+				GitHubIDPTemplate: &GitHubIDPTemplate{
+					IDPID:        "idp-id",
+					ClientID:     "client_id",
+					ClientSecret: nil,
+					Scopes:       []string{"profile"},
+				},
+			},
+		},
+		{
 			name:    "prepareIDPTemplateByIDQuery google idp",
 			prepare: prepareIDPTemplateByIDQuery,
 			want: want{
@@ -363,6 +527,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
 						nil,
 						nil,
 						nil,
@@ -445,6 +622,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
 						nil,
 						nil,
 						nil,
@@ -546,6 +736,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						// oauth
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						// github
+						nil,
+						nil,
+						nil,
+						nil,
+						// github enterprise
 						nil,
 						nil,
 						nil,
@@ -665,6 +868,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -775,6 +991,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -860,6 +1089,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google config
 							nil,
 							nil,
@@ -904,6 +1146,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							// oauth
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
 							nil,
 							nil,
 							nil,
@@ -962,6 +1217,19 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"token",
 							"user",
 							database.StringArray{"profile"},
+							// github
+							nil,
+							nil,
+							nil,
+							nil,
+							// github enterprise
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							nil,
 							// google
 							nil,
 							nil,

@@ -13,6 +13,24 @@ type GenericOAuthProvider struct {
 	IDPOptions            idp.Options
 }
 
+type GitHubProvider struct {
+	ClientID     string
+	ClientSecret string
+	Scopes       []string
+	IDPOptions   idp.Options
+}
+
+type GitHubEnterpriseProvider struct {
+	Name                  string
+	ClientID              string
+	ClientSecret          string
+	AuthorizationEndpoint string
+	TokenEndpoint         string
+	UserEndpoint          string
+	Scopes                []string
+	IDPOptions            idp.Options
+}
+
 type GoogleProvider struct {
 	ClientID     string
 	ClientSecret string

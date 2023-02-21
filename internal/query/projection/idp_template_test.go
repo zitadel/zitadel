@@ -395,6 +395,516 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	}
 }
 
+func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceGitHubIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitHubIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.GitHubIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitHubIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeGitHub,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates_github (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceGitHubIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.GitHubIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.GitHubIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitHubIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeGitHub,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates_github (idp_id, instance_id, client_id, client_secret, scopes) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceGitHubIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitHubIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"client_id": "id"
+}`),
+				), instance.GitHubIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitHubIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates_github SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceGitHubIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitHubIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.GitHubIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitHubIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedArgs: []interface{}{
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates_github SET (client_id, client_secret, scopes) = ($1, $2, $3) WHERE (idp_id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								database.StringArray{"profile"},
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if _, ok := err.(errors.InvalidArgument); !ok {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
+func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
+	type args struct {
+		event func(t *testing.T) eventstore.Event
+	}
+	tests := []struct {
+		name   string
+		args   args
+		reduce func(event eventstore.Event) (*handler.Statement, error)
+		want   wantReduce
+	}{
+		{
+			name: "instance reduceGitHubEnterpriseIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitHubEnterpriseIDPAddedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"authorizationEndpoint": "auth",
+	"tokenEndpoint": "token",
+ 	"userEndpoint": "user",
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.GitHubEnterpriseIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								domain.IdentityProviderTypeSystem,
+								domain.IDPTypeGitHubEnterprise,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates_github_enterprise (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								"auth",
+								"token",
+								"user",
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org reduceGitHubEnterpriseIDPAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.GitHubEnterpriseIDPAddedEventType),
+					org.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"authorizationEndpoint": "auth",
+	"tokenEndpoint": "token",
+ 	"userEndpoint": "user",
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), org.GitHubEnterpriseIDPAddedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPAdded,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								domain.IDPStateActive,
+								domain.IdentityProviderTypeOrg,
+								domain.IDPTypeGitHubEnterprise,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.idp_templates_github_enterprise (idp_id, instance_id, client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedArgs: []interface{}{
+								"idp-id",
+								"instance-id",
+								"client_id",
+								anyArg{},
+								"auth",
+								"token",
+								"user",
+								database.StringArray{"profile"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceGitHubEnterpriseIDPChanged minimal",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitHubEnterpriseIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"isCreationAllowed": true,
+	"client_id": "id"
+}`),
+				), instance.GitHubEnterpriseIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedArgs: []interface{}{
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates_github_enterprise SET client_id = $1 WHERE (idp_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"id",
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceGitHubEnterpriseIDPChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(instance.GitHubEnterpriseIDPChangedEventType),
+					instance.AggregateType,
+					[]byte(`{
+	"id": "idp-id",
+	"client_id": "client_id",
+	"client_secret": {
+        "cryptoType": 0,
+        "algorithm": "RSA-265",
+        "keyId": "key-id"
+    },
+	"authorizationEndpoint": "auth",
+	"tokenEndpoint": "token",
+ 	"userEndpoint": "user",
+	"scopes": ["profile"],
+	"isCreationAllowed": true,
+	"isLinkingAllowed": true,
+	"isAutoCreation": true,
+	"isAutoUpdate": true
+}`),
+				), instance.GitHubEnterpriseIDPChangedEventMapper),
+			},
+			reduce: (&idpTemplateProjection{}).reduceGitHubEnterpriseIDPChanged,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("instance"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_templates SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedArgs: []interface{}{
+								true,
+								true,
+								true,
+								true,
+								anyArg{},
+								uint64(15),
+								"idp-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.idp_templates_github_enterprise SET (client_id, client_secret, authorization_endpoint, token_endpoint, user_endpoint, scopes) = ($1, $2, $3, $4, $5, $6) WHERE (idp_id = $7) AND (instance_id = $8)",
+							expectedArgs: []interface{}{
+								"client_id",
+								anyArg{},
+								"auth",
+								"token",
+								"user",
+								database.StringArray{"profile"},
+								"idp-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := baseEvent(t)
+			got, err := tt.reduce(event)
+			if _, ok := err.(errors.InvalidArgument); !ok {
+				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
+			}
+
+			event = tt.args.event(t)
+			got, err = tt.reduce(event)
+			assertReduce(t, got, err, IDPTemplateTable, tt.want)
+		})
+	}
+}
+
 func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event

@@ -29,7 +29,7 @@ const (
 	IDPTypeLDAP
 	IDPTypeAzureAD
 	IDPTypeGitHub
-	IDPTypeGitHubEE
+	IDPTypeGitHubEnterprise
 	IDPTypeGitLab
 	IDPTypeGitLabSelfHosted
 	IDPTypeGoogle

@@ -378,8 +378,8 @@ func providerTypeToPb(idpType domain.IDPType) idp_pb.ProviderType {
 		return idp_pb.ProviderType_PROVIDER_TYPE_AZURE_AD
 	case domain.IDPTypeGitHub:
 		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB
-	case domain.IDPTypeGitHubEE:
-		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB_EE
+	case domain.IDPTypeGitHubEnterprise:
+		return idp_pb.ProviderType_PROVIDER_TYPE_GITHUB_ES
 	case domain.IDPTypeGitLab:
 		return idp_pb.ProviderType_PROVIDER_TYPE_GITLAB
 	case domain.IDPTypeGitLabSelfHosted:
@@ -406,6 +406,14 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		oauthConfigToPb(providerConfig, config.OAuthIDPTemplate)
 		return providerConfig
 	}
+	if config.GitHubIDPTemplate != nil {
+		githubConfigToPb(providerConfig, config.GitHubIDPTemplate)
+		return providerConfig
+	}
+	if config.GitHubEnterpriseIDPTemplate != nil {
+		githubEnterpriseConfigToPb(providerConfig, config.GitHubEnterpriseIDPTemplate)
+		return providerConfig
+	}
 	if config.GoogleIDPTemplate != nil {
 		googleConfigToPb(providerConfig, config.GoogleIDPTemplate)
 		return providerConfig
@@ -429,6 +437,27 @@ func googleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.Goo
 func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAuthIDPTemplate) {
 	providerConfig.Config = &idp_pb.ProviderConfig_Oauth{
 		Oauth: &idp_pb.OAuthConfig{
+			ClientId:              template.ClientID,
+			AuthorizationEndpoint: template.AuthorizationEndpoint,
+			TokenEndpoint:         template.TokenEndpoint,
+			UserEndpoint:          template.UserEndpoint,
+			Scopes:                template.Scopes,
+		},
+	}
+}
+
+func githubConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitHubIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_Github{
+		Github: &idp_pb.GitHubConfig{
+			ClientId: template.ClientID,
+			Scopes:   template.Scopes,
+		},
+	}
+}
+
+func githubEnterpriseConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.GitHubEnterpriseIDPTemplate) {
+	providerConfig.Config = &idp_pb.ProviderConfig_GithubEs{
+		GithubEs: &idp_pb.GitHubEnterpriseServerConfig{
 			ClientId:              template.ClientID,
 			AuthorizationEndpoint: template.AuthorizationEndpoint,
 			TokenEndpoint:         template.TokenEndpoint,
