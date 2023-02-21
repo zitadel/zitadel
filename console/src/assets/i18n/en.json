@@ -45,6 +45,7 @@
   "ONBOARDING": {
     "DESCRIPTION": "Your onboarding process",
     "COMPLETED": "completed",
+    "DISMISS": "No thanks, I'm a pro.",
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Setup your brand",

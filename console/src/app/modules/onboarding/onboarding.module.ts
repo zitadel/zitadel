@@ -19,11 +19,8 @@ import { EventPipeModule } from 'src/app/pipes/event-pipe/event-pipe.module';
   imports: [
     CommonModule,
     MatIconModule,
-    HasRoleModule,
-    MatButtonModule,
     TranslateModule,
     MatTooltipModule,
-    MatProgressSpinnerModule,
     ShortcutsModule,
     MatRippleModule,
     RouterModule,

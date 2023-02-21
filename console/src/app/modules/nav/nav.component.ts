@@ -14,6 +14,7 @@ import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.s
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { KeyboardShortcutsService } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 
 @Component({
   selector: 'cnsl-nav',
@@ -86,7 +87,7 @@ export class NavComponent implements OnDestroy {
   public filterControl: UntypedFormControl = new UntypedFormControl('');
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
   public showAccount: boolean = false;
-  public hideAdminWarn: boolean = true;
+  public hideOnboarding: boolean = false;
   private destroy$: Subject<void> = new Subject();
 
   public BreadcrumbType: any = BreadcrumbType;
@@ -107,9 +108,12 @@ export class NavComponent implements OnDestroy {
     private breakpointObserver: BreakpointObserver,
     private http: HttpClient,
     private shortcutService: KeyboardShortcutsService,
+    private storageService: StorageService,
   ) {
-    this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
     this.loadEnvironment();
+
+    this.hideOnboarding =
+      this.storageService.getItem('onboarding-dismissed', StorageLocation.local) === 'true' ? true : false;
   }
 
   public loadEnvironment(): void {
@@ -123,14 +127,15 @@ export class NavComponent implements OnDestroy {
       });
   }
 
-  public toggleAdminHide(): void {
-    this.hideAdminWarn = !this.hideAdminWarn;
-    localStorage.setItem('hideAdministratorWarning', this.hideAdminWarn.toString());
-  }
-
   public ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  public dismissOnboarding(): void {
+    this.showInstanceProgress = false;
+    this.hideOnboarding = true;
+    this.storageService.setItem('onboarding-dismissed', 'true', StorageLocation.local);
   }
 
   public get isUserLinkActive(): boolean {

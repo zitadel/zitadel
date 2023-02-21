@@ -45,6 +45,7 @@
   "ONBOARDING": {
     "DESCRIPTION": "Votre processus d'intégration",
     "COMPLETED": "terminé",
+    "DISMISS": "fermer",
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Créez votre marque",

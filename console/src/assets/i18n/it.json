@@ -45,6 +45,7 @@
   "ONBOARDING": {
     "DESCRIPTION": "Your onboarding process",
     "COMPLETED": "completed",
+    "DISMISS": "chiudi",
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Imposta il tuo marchio",

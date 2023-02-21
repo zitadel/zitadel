@@ -45,6 +45,7 @@
   "ONBOARDING": {
     "DESCRIPTION": "你的入职过程",
     "COMPLETED": "已完成",
+    "DISMISS": "隐藏",
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "设置你的品牌",

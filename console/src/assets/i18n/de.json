@@ -45,6 +45,7 @@
   "ONBOARDING": {
     "DESCRIPTION": "Dein Onboarding-prozess",
     "COMPLETED": "abgeschlossen",
+    "DISMISS": "schließen",
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Branding anpassen",

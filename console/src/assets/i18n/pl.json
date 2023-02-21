@@ -45,6 +45,7 @@
   "ONBOARDING": {
     "DESCRIPTION": "Twój proces wprowadzania na rynek",
     "COMPLETED": "zakończone",
+    "DISMISS": "zamknąć",
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Skonfiguruj swoją markę",
