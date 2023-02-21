@@ -4,15 +4,18 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "yarn generate:grpc && docusaurus start",
-    "build": "yarn generate:grpc && docusaurus build",
+    "start": "yarn generate && docusaurus start",
+    "build": "yarn generate && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "generate:grpc": "buf generate ../proto"
+    "generate": "yarn generate:grpc && yarn generate:apidocs",
+    "generate:grpc": "buf generate ../proto",
+    "generate:apidocs": "docusaurus clean-api-docs all && docusaurus gen-api-docs all"
+
   },
   "dependencies": {
     "@algolia/autocomplete-core": "1.5.2",
@@ -38,17 +41,17 @@
     "@colors/colors": "1.5.0",
     "@docsearch/css": "3.0.0",
     "@docsearch/react": "3.0.0",
-    "@docusaurus/core": "^2.1.0",
-    "@docusaurus/cssnano-preset": "^2.1.0",
-    "@docusaurus/module-type-aliases": "^2.1.0",
-    "@docusaurus/plugin-debug": "^2.1.0",
-    "@docusaurus/plugin-google-analytics": "^2.1.0",
-    "@docusaurus/plugin-google-gtag": "^2.1.0",
-    "@docusaurus/plugin-sitemap": "^2.1.0",
-    "@docusaurus/preset-classic": "^2.1.0",
-    "@docusaurus/theme-classic": "^2.1.0",
-    "@docusaurus/theme-search-algolia": "^2.1.0",
-    "@docusaurus/types": "^2.1.0",
+    "@docusaurus/core": "2.2.0",
+    "@docusaurus/cssnano-preset": "2.2.0",
+    "@docusaurus/module-type-aliases": "2.2.0",
+    "@docusaurus/plugin-debug": "2.2.0",
+    "@docusaurus/plugin-google-analytics": "2.2.0",
+    "@docusaurus/plugin-google-gtag": "2.2.0",
+    "@docusaurus/plugin-sitemap": "2.2.0",
+    "@docusaurus/preset-classic": "2.2.0",
+    "@docusaurus/theme-classic": "2.2.0",
+    "@docusaurus/theme-search-algolia": "2.2.0",
+    "@docusaurus/types": "2.2.0",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
     "@jridgewell/resolve-uri": "3.0.7",
@@ -89,8 +92,10 @@
     "cssnano-preset-advanced": "5.3.3",
     "dns-packet": "5.3.1",
     "docusaurus-plugin-image-zoom": "^0.1.1",
+    "docusaurus-plugin-openapi-docs": "1.4.7",
     "docusaurus-plugin-plausible": "^0.0.5",
     "docusaurus-protobuffet": "^0.3.2",
+    "docusaurus-theme-openapi-docs": "1.4.7",
     "docusaurus2-dotenv": "^1.4.0",
     "eastasianwidth": "0.2.0",
     "enhanced-resolve": "5.9.3",
@@ -177,6 +182,10 @@
     "widest-line": "4.0.1",
     "wrap-ansi": "8.0.1"
   },
+  "resolutions": {
+		"@docusaurus/theme-common": "2.2.0",
+		"@paloaltonetworks/postman-code-generators": "1.1.13"
+	},
   "browserslist": {
     "production": [
       ">0.5%",

@@ -206,8 +206,9 @@ module.exports = {
   },
   presets: [
     [
-      "@docusaurus/preset-classic",
-      {
+      "classic",
+      /** @type {import('@docusaurus/preset-classic').Options} */
+      ({
         docs: {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
@@ -215,47 +216,54 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
+          docLayoutComponent: "@theme/DocPage",
+          docItemComponent:  '@theme/ApiItem'
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-      },
+      })
     ],
-    [
-      'redocusaurus',{
-      specs: [
-        {
-          id: 'auth',
-          spec: '.artifacts/openapi/zitadel/auth.swagger.json',
-        },
-        {
-          id: 'mgmt',
-          spec: '.artifacts/openapi/zitadel/management.swagger.json',
-        },
-        {
-          id: 'admin',
-          spec: '.artifacts/openapi/zitadel/admin.swagger.json',
-        },
-        {
-          id: 'system',
-          spec: '.artifacts/openapi/zitadel/system.swagger.json',
-        }
-      ],
-      theme: {
-        /**
-         * Highlight color for docs
-         */
-        primaryColor: '#1890ff',
-        /**
-         * Options to pass to redoc
-         * @see https://github.com/redocly/redoc#redoc-options-object
-         */
-        options: { disableSearch: true },
-      },
-    },
-    ],
+
   ],
   plugins: [
+    [
+      'docusaurus-plugin-openapi-docs',
+      {
+        id: "apiDocs",
+        docsPluginId: "classic",
+        config: {
+          auth: {
+            specPath: ".artifacts/openapi/zitadel/auth.swagger.json",
+            outputDir: "docs/apis/generated/auth",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          mgmt: {
+            specPath: ".artifacts/openapi/zitadel/management.swagger.json",
+            outputDir: "docs/apis/generated/mgmt",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          admin: {
+            specPath: ".artifacts/openapi/zitadel/admin.swagger.json",
+            outputDir: "docs/apis/generated/admin",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          system: {
+            specPath: ".artifacts/openapi/zitadel/system.swagger.json",
+            outputDir: "docs/apis/generated/system",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          }
+        }
+      },
+    ],
     require.resolve("docusaurus-plugin-image-zoom"),
     async function myPlugin(context, options) {
       return {
@@ -269,5 +277,5 @@ module.exports = {
       };
     },
   ],
-  themes: ["@saucelabs/theme-github-codeblock"],
+  themes: ["@saucelabs/theme-github-codeblock", "docusaurus-theme-openapi-docs"],
 };

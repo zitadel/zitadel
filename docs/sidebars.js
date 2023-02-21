@@ -170,15 +170,56 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "Manage ZITADEL Resources",
-      collapsed: false,
-      items: [
-        "apis/reference/auth",
-        "apis/reference/mgmt",
-        "apis/reference/admin",
-        "apis/reference/system",
-        "apis/statuscodes",
-      ],
+      label: "Authenticated User (Auth API)",
+      link: {
+        type: "generated-index",
+        title: "Auth API",
+        description:
+          "Lorem",
+        slug: "/apis/auth",
+      },
+      items: require("./docs/apis/generated/auth/sidebar.js"),
+    },
+    {
+      type: "category",
+      label: "Organization Resources (Management API)",
+      link: {
+        type: "generated-index",
+        title: "mgmt API",
+        description:
+          "Lorem",
+        slug: "/apis/mgmt",
+      },
+      items: require("./docs/apis/generated/mgmt/sidebar.js"),
+    },
+    {
+      type: "category",
+      label: "Instance Resources (Admin API)",
+      link: {
+        type: "generated-index",
+        title: "admin API",
+        description:
+          "Lorem",
+        slug: "/apis/admin",
+      },
+      items: require("./docs/apis/generated/admin/sidebar.js"),
+    },
+    {
+      type: "category",
+      label: "Instance Lifecycle (System API)",
+      link: {
+        type: "generated-index",
+        title: "system API",
+        description:
+          "Lorem",
+        slug: "/apis/system",
+      },
+      items: require("./docs/apis/generated/system/sidebar.js"),
+    },
+    {
+      type: "doc",
+      label: "gRPC Status Codes",
+      id: "apis/statuscodes"
     },
     {
       type: "category",

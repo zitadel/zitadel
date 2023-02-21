@@ -57,6 +57,7 @@ openapi/**/*.json
 /internal/api/assets/authz.go
 /internal/api/assets/router.go
 /internal/api/ui/console/static/*
+generated/
 
 # local
 build/local/*.env
