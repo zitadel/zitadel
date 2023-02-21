@@ -41,7 +41,7 @@ func Connect(config Config, useAdmin bool) (*DB, error) {
 
 	return &DB{
 		DB:       client,
-		database: config.connector,
+		Database: config.connector,
 	}, nil
 }
 
