@@ -5,7 +5,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "yarn generate && docusaurus start",
-    "build": "DOCUSAURUS_SSR_CONCURRENCY=5 yarn generate && docusaurus build --no-minify",
+    "build": "DOCUSAURUS_SSR_CONCURRENCY=20 yarn generate && docusaurus build --no-minify",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
