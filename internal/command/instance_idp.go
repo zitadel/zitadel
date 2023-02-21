@@ -117,7 +117,16 @@ func (c *Commands) prepareAddInstanceGoogleProvider(a *instance.Aggregate, id st
 				return nil, err
 			}
 			return []eventstore.Command{
-				instance.NewGoogleIDPAddedEvent(ctx, &a.Aggregate, id, provider.ClientID, secret, provider.Scopes, provider.IDPOptions),
+				instance.NewGoogleIDPAddedEvent(
+					ctx,
+					&a.Aggregate,
+					id,
+					provider.Name,
+					provider.ClientID,
+					secret,
+					provider.Scopes,
+					provider.IDPOptions,
+				),
 			}, nil
 		}, nil
 	}
@@ -148,6 +157,7 @@ func (c *Commands) prepareUpdateInstanceGoogleProvider(a *instance.Aggregate, id
 				ctx,
 				&a.Aggregate,
 				id,
+				provider.Name,
 				provider.ClientID,
 				provider.ClientSecret,
 				c.idpConfigEncryption,

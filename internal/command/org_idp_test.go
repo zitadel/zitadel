@@ -81,6 +81,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 						eventPusherToEvents(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -118,6 +119,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 						eventPusherToEvents(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -258,6 +260,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -291,6 +294,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
+								"",
 								"clientID",
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,

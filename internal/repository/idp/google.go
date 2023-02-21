@@ -13,6 +13,7 @@ type GoogleIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID           string              `json:"id"`
+	Name         string              `json:"name,omitempty"`
 	ClientID     string              `json:"clientID"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret"`
 	Scopes       []string            `json:"scopes,omitempty"`
@@ -22,6 +23,7 @@ type GoogleIDPAddedEvent struct {
 func NewGoogleIDPAddedEvent(
 	base *eventstore.BaseEvent,
 	id,
+	name,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	scopes []string,
@@ -30,6 +32,7 @@ func NewGoogleIDPAddedEvent(
 	return &GoogleIDPAddedEvent{
 		BaseEvent:    *base,
 		ID:           id,
+		Name:         name,
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Scopes:       scopes,
@@ -62,6 +65,7 @@ type GoogleIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID           string              `json:"id"`
+	Name         *string             `json:"name,omitempty"`
 	ClientID     *string             `json:"clientID,omitempty"`
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
 	Scopes       []string            `json:"scopes,omitempty"`
@@ -88,6 +92,11 @@ func NewGoogleIDPChangedEvent(
 
 type GoogleIDPChanges func(*GoogleIDPChangedEvent)
 
+func ChangeGoogleName(name string) func(*GoogleIDPChangedEvent) {
+	return func(e *GoogleIDPChangedEvent) {
+		e.Name = &name
+	}
+}
 func ChangeGoogleClientID(clientID string) func(*GoogleIDPChangedEvent) {
 	return func(e *GoogleIDPChangedEvent) {
 		e.ClientID = &clientID

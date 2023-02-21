@@ -69,14 +69,15 @@ func (wm *InstanceGoogleIDPWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
-	clientID string,
+	name,
+	clientID,
 	clientSecretString string,
 	secretCrypto crypto.Crypto,
 	scopes []string,
 	options idp.Options,
 ) (*instance.GoogleIDPChangedEvent, error) {
 
-	changes, err := wm.GoogleIDPWriteModel.NewChanges(clientID, clientSecretString, secretCrypto, scopes, options)
+	changes, err := wm.GoogleIDPWriteModel.NewChanges(name, clientID, clientSecretString, secretCrypto, scopes, options)
 	if err != nil {
 		return nil, err
 	}

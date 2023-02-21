@@ -165,7 +165,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -174,6 +174,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 								"ro-id",
 								"instance-id",
 								domain.IDPStateActive,
+								"",
 								domain.IdentityProviderTypeSystem,
 								domain.IDPTypeGoogle,
 								true,
@@ -226,7 +227,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.idp_templates (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								anyArg{},
@@ -235,6 +236,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 								"ro-id",
 								"instance-id",
 								domain.IDPStateActive,
+								"",
 								domain.IdentityProviderTypeOrg,
 								domain.IDPTypeGoogle,
 								true,

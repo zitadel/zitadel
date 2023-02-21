@@ -233,6 +233,7 @@ func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
 				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
 				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
 				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
 				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
@@ -268,7 +269,7 @@ func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (
 	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
 	ops = append(ops,
 		crdb.AddUpdateStatement(
-			reduceIDPChangedTemplateColumns(nil, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
