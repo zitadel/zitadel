@@ -62,7 +62,7 @@
         "title": "Crea la tua prima applicazione",
         "description": "Crea un'applicazione web, nativa, api o saml e imposta il flusso di autenticazione."
       },
-      "users.added": {
+      "user.human.added": {
         "title": "Aggiungi utenti",
         "description": "Aggiungi gli utenti dell'applicazione"
       },

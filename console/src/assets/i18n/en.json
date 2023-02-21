@@ -62,7 +62,7 @@
         "title": "Create your first application",
         "description": "Create a web, native, api or saml application and setup your authentication flow."
       },
-      "user.added": {
+      "user.human.added": {
         "title": "Add users",
         "description": "Add your application users"
       },

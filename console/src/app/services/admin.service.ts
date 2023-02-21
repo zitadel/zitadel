@@ -245,7 +245,7 @@ const ONBOARDING_EVENTS: OnboardingActions[] = [
   { order: 0, eventType: 'instance.policy.label.added', link: ['/settings'], fragment: 'branding' },
   { order: 1, eventType: 'project.added', link: ['/projects/create'] },
   { order: 2, eventType: 'project.application.added', link: ['/projects/app-create'] },
-  { order: 3, eventType: 'user.added', link: ['/users/create'] },
+  { order: 3, eventType: 'user.human.added', link: ['/users/create'] },
   { order: 4, eventType: 'instance.policy.notification.added', link: ['/settings'], fragment: 'notifications' },
   { order: 5, eventType: 'user.grant.added', link: ['/grant-create'] },
   //   { eventType: 'org.policy.notification.added', link: '/settings?id=notifications' },
@@ -287,6 +287,7 @@ export class AdminService {
           this.progressDone.next(done);
           this.progressTotal.next(total);
           this.progressPercentage.next(percentage);
+          this.progressAllDone.next(done === total);
         }),
         catchError((error) => {
           console.error(error);
@@ -300,6 +301,7 @@ export class AdminService {
   public progressPercentage: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressDone: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
+  public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(private readonly grpcService: GrpcService) {
     this.progressEvents$.subscribe(this.progressEvents);

@@ -62,7 +62,7 @@
         "title": "Erstelle eine App",
         "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow."
       },
-      "users.added": {
+      "user.human.added": {
         "title": "Erfasse Benutzer",
         "description": "Erstelle Benutzer die später deine Apps nutzen können."
       },

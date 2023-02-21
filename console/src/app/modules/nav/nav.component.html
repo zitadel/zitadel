@@ -214,40 +214,42 @@
   <ng-container *ngIf="(isHandset$ | async) === false">
     <ng-template cnslHasRole [hasRole]="['iam.read']">
       <span class="fill-space"></span>
-      <button
-        cdkOverlayOrigin
-        #trigger="cdkOverlayOrigin"
-        matRipple
-        class="progress-bar"
-        (click)="showInstanceProgress = !showInstanceProgress"
-      >
-        <mat-progress-bar
-          class="progress"
-          mode="determinate"
-          [value]="adminService.progressPercentage | async"
-        ></mat-progress-bar>
-      </button>
-
-      <ng-template
-        cdkConnectedOverlay
-        [cdkConnectedOverlayOrigin]="trigger"
-        [flexibleDimensions]="true"
-        [lockPosition]="true"
-        [cdkConnectedOverlayOffsetY]="10"
-        [cdkConnectedOverlayHasBackdrop]="true"
-        [cdkConnectedOverlayPositions]="positions"
-        cdkConnectedOverlayBackdropClass="transparent-backdrop"
-        [cdkConnectedOverlayOpen]="showInstanceProgress"
-        (backdropClick)="showInstanceProgress = false"
-        (detach)="showInstanceProgress = false"
-      >
-        <cnsl-onboarding-card
-          (close)="showInstanceProgress = false"
-          class="onboarding_card"
-          *ngIf="org && showInstanceProgress"
+      <ng-container *ngIf="(adminService.progressAllDone | async) === false">
+        <button
+          cdkOverlayOrigin
+          #trigger="cdkOverlayOrigin"
+          matRipple
+          class="progress-bar"
+          (click)="showInstanceProgress = !showInstanceProgress"
         >
-        </cnsl-onboarding-card>
-      </ng-template>
+          <mat-progress-bar
+            class="progress"
+            mode="determinate"
+            [value]="adminService.progressPercentage | async"
+          ></mat-progress-bar>
+        </button>
+
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="trigger"
+          [flexibleDimensions]="true"
+          [lockPosition]="true"
+          [cdkConnectedOverlayOffsetY]="10"
+          [cdkConnectedOverlayHasBackdrop]="true"
+          [cdkConnectedOverlayPositions]="positions"
+          cdkConnectedOverlayBackdropClass="transparent-backdrop"
+          [cdkConnectedOverlayOpen]="showInstanceProgress"
+          (backdropClick)="showInstanceProgress = false"
+          (detach)="showInstanceProgress = false"
+        >
+          <cnsl-onboarding-card
+            (close)="showInstanceProgress = false"
+            class="onboarding_card"
+            *ngIf="org && showInstanceProgress"
+          >
+          </cnsl-onboarding-card>
+        </ng-template>
+      </ng-container>
     </ng-template>
 
     <div (click)="openHelp()" class="nav-shortcut-action-key" matTooltip="{{ 'MENU.OPENSHORTCUTSTOOLTIP' | translate }}">

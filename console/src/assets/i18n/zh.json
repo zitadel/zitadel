@@ -62,7 +62,7 @@
         "title": "创建你的第一个应用程序",
         "description": "创建一个web、native、api或saml应用程序并设置你的认证流程。"
       },
-      "users.added": {
+      "user.human.added": {
         "title": "添加用户",
         "description": "添加你的应用程序用户"
       },

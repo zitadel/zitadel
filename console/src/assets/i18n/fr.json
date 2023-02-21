@@ -62,7 +62,7 @@
         "title": "Créez votre première application",
         "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification."
       },
-      "users.added": {
+      "user.human.added": {
         "title": "Ajouter des utilisateurs",
         "description": "Ajouter les utilisateurs de votre application"
       },

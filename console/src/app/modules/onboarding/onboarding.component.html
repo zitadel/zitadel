@@ -1,21 +1,24 @@
 <div class="onboarding-header">
   <h1 class="title" data-e2e="authenticated-welcome">{{ 'HOME.WELCOME' | translate }}</h1>
-  <h1 class="desc cnsl-secondary-text">{{ 'ONBOARDING.DESCRIPTION' | translate }}</h1>
 
-  <div class="onboarding-progress-bar-wrapper">
-    <mat-progress-bar
-      class="progress"
-      mode="determinate"
-      [value]="adminService.progressPercentage | async"
-    ></mat-progress-bar>
+  <p class="desc cnsl-secondary-text">{{ 'ONBOARDING.DESCRIPTION' | translate }}</p>
 
-    <div class="prog-desc cnsl-secondary-text">
-      {{ adminService.progressDone | async }} / {{ adminService.progressTotal | async }}
-      {{ 'ONBOARDING.COMPLETED' | translate }}
+  <ng-container *ngIf="(adminService.progressAllDone | async) === false">
+    <div class="onboarding-progress-bar-wrapper">
+      <mat-progress-bar
+        class="progress"
+        mode="determinate"
+        [value]="adminService.progressPercentage | async"
+      ></mat-progress-bar>
+
+      <div class="prog-desc cnsl-secondary-text">
+        {{ adminService.progressDone | async }} / {{ adminService.progressTotal | async }}
+        {{ 'ONBOARDING.COMPLETED' | translate }}
+      </div>
     </div>
-  </div>
+  </ng-container>
 
-  <div class="action-card-wrapper">
+  <div class="action-card-wrapper" [ngClass]="{ alldone: (adminService.progressAllDone | async) }">
     <ng-container *ngFor="let action of actions | async">
       <a
         [routerLink]="action[1].link"
