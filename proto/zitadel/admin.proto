@@ -53,6 +53,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             description: "Defines the look of the login UI, E-Mails and ZITADEL Console. </br> For adding assets like logo, icon and font, have a look at the assets API."
         },
         {
+            name: "Deprecated"
+        },
+        {
             name: "Domain Settings"
         },
         {
@@ -1235,6 +1238,10 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Deprecated";
+        };
     }
 
     //deprecated: please use DomainPolicy instead
@@ -1249,6 +1256,10 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Deprecated";
+        };
     }
 
     //deprecated: please use DomainPolicy instead
@@ -1260,6 +1271,10 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Deprecated";
         };
     }
 
@@ -1274,6 +1289,10 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Deprecated";
+        };
     }
 
     //deprecated: please use DomainPolicy instead
@@ -1287,6 +1306,10 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Deprecated";
+        };
     }
 
     //deprecated: please use DomainPolicy instead
@@ -1299,6 +1322,10 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.delete";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Deprecated";
         };
     }
 

@@ -170,7 +170,7 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "Manage ZITADEL resources",
+      label: "Manage ZITADEL Resources",
       collapsed: false,
       items: [
         "apis/reference/auth",
@@ -178,12 +178,6 @@ module.exports = {
         "apis/reference/admin",
         "apis/reference/system",
         "apis/statuscodes",
-        {
-          type: "category",
-          label: "Assets",
-          collapsed: true,
-          items: ["apis/assets/assets"],
-        },
       ],
     },
     {
