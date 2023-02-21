@@ -31,6 +31,8 @@ title: zitadel/app.proto
 | details |  zitadel.v1.ObjectDetails | - |  |
 | state |  AppState | - |  |
 | name |  string | - |  |
+| external_url |  string | - |  |
+| is_visible_to_end_user |  bool | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oidc_config |  OIDCConfig | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.api_config |  APIConfig | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.saml_config |  SAMLConfig | - |  |

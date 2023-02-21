@@ -27,10 +27,20 @@ message App {
             example: "\"Console\"";
         }
     ];
+    string external_url = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "application's external url";
+        }
+    ];
+    bool is_visible_to_end_user = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "should the application be shown to the end user";
+        }
+    ];
     oneof config {
-        OIDCConfig oidc_config = 5;
-        APIConfig api_config = 6;
-        SAMLConfig saml_config = 7;
+        OIDCConfig oidc_config = 7;
+        APIConfig api_config = 8;
+        SAMLConfig saml_config = 9;
     }
 }
 
