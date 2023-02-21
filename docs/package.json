@@ -5,7 +5,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "yarn generate && docusaurus start",
-    "build": "yarn generate && docusaurus build --no-minify",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 yarn generate && docusaurus build --no-minify",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

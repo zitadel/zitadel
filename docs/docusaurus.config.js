@@ -217,7 +217,6 @@ module.exports = {
         },
         module: {
           type: isServer ? 'commonjs' : 'es6',
-          lazy: true
         },
       },
     }),
