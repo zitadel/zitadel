@@ -1756,6 +1756,8 @@
       "ID": "ID",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
       "CREATE": "Crea Applicazione",
+      "CREATE_SELECT_PROJECT": "Seleziona il tuo progetto",
+      "CREATE_NEW_PROJECT": "o crea uno nuovo <a href='{{url}}' title='Crea progetto'>qui</a>.",
       "CREATE_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",
       "CREATE_DESC_SUB": "Una configurazione raccomandata sar\u00e0 generata automaticamente.",
       "STATE": "Stato",

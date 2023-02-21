@@ -244,7 +244,7 @@ type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 const ONBOARDING_EVENTS: OnboardingActions[] = [
   { order: 0, eventType: 'org.policy.label.added', link: ['/settings'], fragment: 'branding' },
   { order: 1, eventType: 'project.added', link: ['/projects/create'] },
-  { order: 2, eventType: 'project.application.added', link: ['/projects'] },
+  { order: 2, eventType: 'project.application.added', link: ['/projects/app-create'] },
   { order: 3, eventType: 'users.added', link: ['/users/create'] },
   { order: 4, eventType: 'org.policy.notification.added', link: ['/settings'], fragment: 'notifications' },
   { order: 5, eventType: 'user.grant.added', link: ['/grant-create'] },

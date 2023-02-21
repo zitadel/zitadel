@@ -1,0 +1,26 @@
+<cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" (closed)="close()">
+  <div class="app-create-main-content">
+    <h1>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h1>
+
+    <cnsl-search-project-autocomplete
+      class="block"
+      [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
+      (selectionChanged)="selectProject($any($event.project))"
+    >
+    </cnsl-search-project-autocomplete>
+
+    <div [innerHtml]="'APP.PAGES.CREATE_NEW_PROJECT' | translate : { url: '/projects/create' }"></div>
+
+    <div class="app-create-btn-container">
+      <button
+        color="primary"
+        mat-raised-button
+        class="continue-button"
+        [disabled]="!projectId"
+        (click)="goToAppCreatePage()"
+      >
+        {{ 'ACTIONS.CONTINUE' | translate }}
+      </button>
+    </div>
+  </div>
+</cnsl-create-layout>
