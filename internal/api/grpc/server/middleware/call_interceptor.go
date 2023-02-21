@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 )
 
-func CallHandler() grpc.UnaryServerInterceptor {
+func CallDurationHandler() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		ctx = call.WithTimestamp(ctx)
 		return handler(ctx, req)
