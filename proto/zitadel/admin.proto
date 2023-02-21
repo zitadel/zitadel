@@ -3735,6 +3735,7 @@ message GetProviderByIDResponse {
 }
 
 message AddGoogleProviderRequest {
+    // Google will be used as default, if no name is provided
     string name = 1 [(validate.rules).string = {max_len: 200}];
     string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
