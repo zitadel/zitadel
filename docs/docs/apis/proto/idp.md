@@ -159,6 +159,21 @@ title: zitadel/idp.proto
 
 
 
+### OAuthConfig
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| client_id |  string | - |  |
+| authorization_endpoint |  string | - |  |
+| token_endpoint |  string | - |  |
+| user_endpoint |  string | - |  |
+| scopes | repeated string | - |  |
+
+
+
+
 ### OIDCConfig
 
 
@@ -214,6 +229,7 @@ title: zitadel/idp.proto
 | options |  Options | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.ldap |  LDAPConfig | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.google |  GoogleConfig | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) config.oauth |  OAuthConfig | - |  |
 
 
 

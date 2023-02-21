@@ -17,9 +17,11 @@ import (
 
 const (
 	IDPTemplateTable       = "projections.idp_templates"
+	IDPTemplateOAuthTable  = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateGoogleTable = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
 	IDPTemplateLDAPTable   = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 
+	IDPTemplateOAuthSuffix  = "oauth"
 	IDPTemplateGoogleSuffix = "google"
 	IDPTemplateLDAPSuffix   = "ldap"
 
@@ -38,6 +40,15 @@ const (
 	IDPTemplateIsLinkingAllowedCol  = "is_linking_allowed"
 	IDPTemplateIsAutoCreationCol    = "is_auto_creation"
 	IDPTemplateIsAutoUpdateCol      = "is_auto_update"
+
+	OAuthIDCol                    = "idp_id"
+	OAuthInstanceIDCol            = "instance_id"
+	OAuthClientIDCol              = "client_id"
+	OAuthClientSecretCol          = "client_secret"
+	OAuthAuthorizationEndpointCol = "authorization_endpoint"
+	OAuthTokenEndpointCol         = "token_endpoint"
+	OAuthUserEndpointCol          = "user_endpoint"
+	OAuthScopesCol                = "scopes"
 
 	GoogleIDCol           = "idp_id"
 	GoogleInstanceIDCol   = "instance_id"
@@ -101,6 +112,20 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{IDPTemplateOwnerRemovedCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(OAuthIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OAuthInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OAuthClientIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OAuthClientSecretCol, crdb.ColumnTypeJSONB),
+			crdb.NewColumn(OAuthAuthorizationEndpointCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OAuthTokenEndpointCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OAuthUserEndpointCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OAuthScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(OAuthInstanceIDCol, OAuthIDCol),
+			IDPTemplateOAuthSuffix,
+			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(GoogleIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GoogleInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GoogleClientIDCol, crdb.ColumnTypeText),
@@ -151,6 +176,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
+					Event:  instance.OAuthIDPAddedEventType,
+					Reduce: p.reduceOAuthIDPAdded,
+				},
+				{
+					Event:  instance.OAuthIDPChangedEventType,
+					Reduce: p.reduceOAuthIDPChanged,
+				},
+				{
 					Event:  instance.GoogleIDPAddedEventType,
 					Reduce: p.reduceGoogleIDPAdded,
 				},
@@ -180,6 +213,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 			Aggregate: org.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
+					Event:  org.OAuthIDPAddedEventType,
+					Reduce: p.reduceOAuthIDPAdded,
+				},
+				{
+					Event:  org.OAuthIDPChangedEventType,
+					Reduce: p.reduceOAuthIDPChanged,
+				},
+				{
 					Event:  org.GoogleIDPAddedEventType,
 					Reduce: p.reduceGoogleIDPAdded,
 				},
@@ -206,6 +247,97 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 	}
+}
+
+func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OAuthIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.OAuthIDPAddedEvent:
+		idpEvent = e.OAuthIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.OAuthIDPAddedEvent:
+		idpEvent = e.OAuthIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeOAuth),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(OAuthIDCol, idpEvent.ID),
+				handler.NewCol(OAuthInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(OAuthClientIDCol, idpEvent.ClientID),
+				handler.NewCol(OAuthClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(OAuthAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
+				handler.NewCol(OAuthTokenEndpointCol, idpEvent.TokenEndpoint),
+				handler.NewCol(OAuthUserEndpointCol, idpEvent.UserEndpoint),
+				handler.NewCol(OAuthScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateOAuthSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOAuthIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OAuthIDPChangedEvent
+	switch e := event.(type) {
+	case *org.OAuthIDPChangedEvent:
+		idpEvent = e.OAuthIDPChangedEvent
+	case *instance.OAuthIDPChangedEvent:
+		idpEvent = e.OAuthIDPChangedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops = append(ops,
+		crdb.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+	oauthCols := reduceOAuthIDPChangedColumns(idpEvent)
+	if len(oauthCols) > 0 {
+		ops = append(ops,
+			crdb.AddUpdateStatement(
+				oauthCols,
+				[]handler.Condition{
+					handler.NewCond(OAuthIDCol, idpEvent.ID),
+					handler.NewCond(OAuthInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				crdb.WithTableSuffix(IDPTemplateOAuthSuffix),
+			),
+		)
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
 }
 
 func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -463,6 +595,29 @@ func reduceIDPChangedTemplateColumns(name *string, creationDate time.Time, seque
 		handler.NewCol(IDPTemplateChangeDateCol, creationDate),
 		handler.NewCol(IDPTemplateSequenceCol, sequence),
 	)
+}
+
+func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.Column {
+	oauthCols := make([]handler.Column, 0, 6)
+	if idpEvent.ClientID != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthClientIDCol, *idpEvent.ClientID))
+	}
+	if idpEvent.ClientSecret != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthClientSecretCol, *idpEvent.ClientSecret))
+	}
+	if idpEvent.AuthorizationEndpoint != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthAuthorizationEndpointCol, *idpEvent.AuthorizationEndpoint))
+	}
+	if idpEvent.TokenEndpoint != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthTokenEndpointCol, *idpEvent.TokenEndpoint))
+	}
+	if idpEvent.UserEndpoint != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthUserEndpointCol, *idpEvent.UserEndpoint))
+	}
+	if idpEvent.Scopes != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthScopesCol, database.StringArray(idpEvent.Scopes)))
+	}
+	return oauthCols
 }
 
 func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler.Column {
