@@ -336,6 +336,46 @@ func updateGitHubEnterpriseProviderToCommand(req *mgmt_pb.UpdateGitHubEnterprise
 	}
 }
 
+func addGitLabProviderToCommand(req *mgmt_pb.AddGitLabProviderRequest) command.GitLabProvider {
+	return command.GitLabProvider{
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitLabProviderToCommand(req *mgmt_pb.UpdateGitLabProviderRequest) command.GitLabProvider {
+	return command.GitLabProvider{
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addGitLabSelfHostedProviderToCommand(req *mgmt_pb.AddGitLabSelfHostedProviderRequest) command.GitLabSelfHostedProvider {
+	return command.GitLabSelfHostedProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateGitLabSelfHostedProviderToCommand(req *mgmt_pb.UpdateGitLabSelfHostedProviderRequest) command.GitLabSelfHostedProvider {
+	return command.GitLabSelfHostedProvider{
+		Name:         req.Name,
+		Issuer:       req.Issuer,
+		ClientID:     req.ClientId,
+		ClientSecret: req.ClientSecret,
+		Scopes:       req.Scopes,
+		IDPOptions:   idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
 func addGoogleProviderToCommand(req *mgmt_pb.AddGoogleProviderRequest) command.GoogleProvider {
 	return command.GoogleProvider{
 		Name:         req.Name,
