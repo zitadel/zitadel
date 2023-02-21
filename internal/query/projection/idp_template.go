@@ -103,8 +103,8 @@ func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerC
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(GoogleIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(GoogleInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GoogleClientIDCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(GoogleClientSecretCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(GoogleClientIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(GoogleClientSecretCol, crdb.ColumnTypeJSONB),
 			crdb.NewColumn(GoogleScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
 			crdb.NewPrimaryKey(GoogleInstanceIDCol, GoogleIDCol),
