@@ -791,6 +791,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
     - Role: "ORG_USER_MANAGER"
       Permissions:
+        - "org.read"
         - "user.read"
         - "user.global.read"
         - "user.write"
@@ -799,6 +800,7 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "policy.read"
         - "project.read"
         - "project.role.read"
     - Role: "ORG_OWNER_VIEWER"
