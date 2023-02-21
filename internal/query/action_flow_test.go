@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -27,8 +28,8 @@ func Test_FlowPrepares(t *testing.T) {
 	}{
 		{
 			name: "prepareFlowQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -61,8 +62,8 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery one action",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -150,8 +151,8 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery multiple actions",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -271,8 +272,8 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery no action",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -345,8 +346,8 @@ func Test_FlowPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareFlowQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
-				return prepareFlowQuery(domain.FlowTypeExternalAuthentication)
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+				return prepareFlowQuery(ctx, db, domain.FlowTypeExternalAuthentication)
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -654,7 +655,7 @@ func Test_FlowPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }

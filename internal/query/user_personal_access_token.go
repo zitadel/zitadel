@@ -92,7 +92,7 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, shouldTriggerBulk
 		projection.PersonalAccessTokenProjection.Trigger(ctx)
 	}
 
-	query, scan := preparePersonalAccessTokenQuery()
+	query, scan := preparePersonalAccessTokenQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -116,7 +116,7 @@ func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *Perso
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := preparePersonalAccessTokensQuery()
+	query, scan := preparePersonalAccessTokensQuery(ctx, q.client)
 	eq := sq.Eq{
 		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
@@ -165,7 +165,7 @@ func (q *PersonalAccessTokenSearchQueries) toQuery(query sq.SelectBuilder) sq.Se
 	return query
 }
 
-func preparePersonalAccessTokenQuery() (sq.SelectBuilder, func(*sql.Row) (*PersonalAccessToken, error)) {
+func preparePersonalAccessTokenQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*PersonalAccessToken, error)) {
 	return sq.Select(
 			PersonalAccessTokenColumnID.identifier(),
 			PersonalAccessTokenColumnCreationDate.identifier(),
@@ -198,7 +198,7 @@ func preparePersonalAccessTokenQuery() (sq.SelectBuilder, func(*sql.Row) (*Perso
 		}
 }
 
-func preparePersonalAccessTokensQuery() (sq.SelectBuilder, func(*sql.Rows) (*PersonalAccessTokens, error)) {
+func preparePersonalAccessTokensQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*PersonalAccessTokens, error)) {
 	return sq.Select(
 			PersonalAccessTokenColumnID.identifier(),
 			PersonalAccessTokenColumnCreationDate.identifier(),

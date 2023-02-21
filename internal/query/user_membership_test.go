@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -447,14 +448,14 @@ func Test_MembershipPrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
 
-func prepareMembershipWrapper(withOwnerRemoved bool) func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-	builder, _, fun := prepareMembershipsQuery(withOwnerRemoved)
-	return func() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+func prepareMembershipWrapper(withOwnerRemoved bool) func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+	return func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+		builder, _, fun := prepareMembershipsQuery(ctx, db, withOwnerRemoved)
 		return builder, fun
 	}
 }

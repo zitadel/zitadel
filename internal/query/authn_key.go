@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -129,7 +130,7 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareAuthNKeysQuery()
+	query, scan := prepareAuthNKeysQuery(ctx, q.client)
 	query = queries.toQuery(query)
 	eq := sq.Eq{
 		AuthNKeyColumnEnabled.identifier():    true,
@@ -159,7 +160,7 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareAuthNKeysDataQuery()
+	query, scan := prepareAuthNKeysDataQuery(ctx, q.client)
 	query = queries.toQuery(query)
 	eq := sq.Eq{
 		AuthNKeyColumnEnabled.identifier():    true,
@@ -193,7 +194,7 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 		projection.AuthNKeyProjection.Trigger(ctx)
 	}
 
-	query, scan := prepareAuthNKeyQuery()
+	query, scan := prepareAuthNKeyQuery(ctx, q.client)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
@@ -218,7 +219,7 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareAuthNKeyPublicKeyQuery()
+	stmt, scan := prepareAuthNKeyPublicKeyQuery(ctx, q.client)
 	eq := sq.And{
 		sq.Eq{
 			AuthNKeyColumnID.identifier():         id,
@@ -265,7 +266,7 @@ func NewAuthNKeyObjectIDQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnObjectID, id, TextEquals)
 }
 
-func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys, error)) {
+func prepareAuthNKeysQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys, error)) {
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
@@ -275,7 +276,8 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 			AuthNKeyColumnExpiration.identifier(),
 			AuthNKeyColumnType.identifier(),
 			countColumn.identifier(),
-		).From(authNKeyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(authNKeyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthNKeys, error) {
 			authNKeys := make([]*AuthNKey, 0)
 			var count uint64
@@ -310,7 +312,7 @@ func prepareAuthNKeysQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys
 		}
 }
 
-func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, error)) {
+func prepareAuthNKeyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, error)) {
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
@@ -319,7 +321,8 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 			AuthNKeyColumnSequence.identifier(),
 			AuthNKeyColumnExpiration.identifier(),
 			AuthNKeyColumnType.identifier(),
-		).From(authNKeyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(authNKeyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*AuthNKey, error) {
 			authNKey := new(AuthNKey)
 			err := row.Scan(
@@ -341,10 +344,11 @@ func prepareAuthNKeyQuery() (sq.SelectBuilder, func(row *sql.Row) (*AuthNKey, er
 		}
 }
 
-func prepareAuthNKeyPublicKeyQuery() (sq.SelectBuilder, func(row *sql.Row) ([]byte, error)) {
+func prepareAuthNKeyPublicKeyQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) ([]byte, error)) {
 	return sq.Select(
 			AuthNKeyColumnPublicKey.identifier(),
-		).From(authNKeyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(authNKeyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) ([]byte, error) {
 			var publicKey []byte
 			err := row.Scan(
@@ -360,7 +364,7 @@ func prepareAuthNKeyPublicKeyQuery() (sq.SelectBuilder, func(row *sql.Row) ([]by
 		}
 }
 
-func prepareAuthNKeysDataQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeysData, error)) {
+func prepareAuthNKeysDataQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeysData, error)) {
 	return sq.Select(
 			AuthNKeyColumnID.identifier(),
 			AuthNKeyColumnCreationDate.identifier(),
@@ -372,7 +376,8 @@ func prepareAuthNKeysDataQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*AuthN
 			AuthNKeyColumnIdentifier.identifier(),
 			AuthNKeyColumnPublicKey.identifier(),
 			countColumn.identifier(),
-		).From(authNKeyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(authNKeyTable.identifier() + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthNKeysData, error) {
 			authNKeys := make([]*AuthNKeyData, 0)
 			var count uint64

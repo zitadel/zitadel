@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -89,8 +90,8 @@ func Test_InstancePrepares(t *testing.T) {
 	}{
 		{
 			name: "prepareInstanceQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+				return prepareInstanceQuery(ctx, db, "")
 			},
 			want: want{
 				sqlExpectations: mockQueries(
@@ -109,8 +110,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstanceQuery found",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+				return prepareInstanceQuery(ctx, db, "")
 			},
 			want: want{
 				sqlExpectations: mockQuery(
@@ -143,8 +144,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstanceQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
-				return prepareInstanceQuery("")
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Instance, error)) {
+				return prepareInstanceQuery(ctx, db, "")
 			},
 			want: want{
 				sqlExpectations: mockQueryErr(
@@ -162,8 +163,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery no result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(ctx, db)
 				return query(filter), scan
 			},
 			want: want{
@@ -177,8 +178,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery one result",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(ctx, db)
 				return query(filter), scan
 			},
 			want: want{
@@ -241,8 +242,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery multiple results",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(ctx, db)
 				return query(filter), scan
 			},
 			want: want{
@@ -374,8 +375,8 @@ func Test_InstancePrepares(t *testing.T) {
 		},
 		{
 			name: "prepareInstancesQuery sql err",
-			prepare: func() (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
-				filter, query, scan := prepareInstancesQuery()
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Instances, error)) {
+				filter, query, scan := prepareInstancesQuery(ctx, db)
 				return query(filter), scan
 			},
 			want: want{
@@ -395,7 +396,7 @@ func Test_InstancePrepares(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
 }
