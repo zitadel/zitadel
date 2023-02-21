@@ -39,7 +39,7 @@ The authentication API (aka Auth API) is used for all operations on the currentl
 ### GRPC
 
 Endpoint:
-{your_domain}/zitadel.auth.v1.AuthService/
+$ZITADEL_DOMAIN/zitadel.auth.v1.AuthService/
 
 Definition:
 [Auth Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/auth.proto)
@@ -47,7 +47,7 @@ Definition:
 ### REST
 
 Endpoint:
-{your_domain}/auth/v1/
+$ZITADEL_DOMAIN/auth/v1/
 
 API Reference:
 [OpenAPI Docs](/apis/reference/auth)
@@ -72,7 +72,7 @@ To identify the current organization you can send a header `x-zitadel-orgid` or 
 ### GRPC
 
 Endpoint:
-{your_domain}/zitadel.management.v1.ManagementService/
+$ZITADEL_DOMAIN/zitadel.management.v1.ManagementService/
 
 Definition:
 [Management Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/management.proto)
@@ -80,7 +80,7 @@ Definition:
 ### REST
 
 Endpoint:
-{your_domain}/management/v1/
+$ZITADEL_DOMAIN/management/v1/
 
 API Reference:
 [OpenAPI Docs](/apis/reference/mgmt)
@@ -103,7 +103,7 @@ This API is intended to configure and manage one ZITADEL instance itself.
 ### GRPC
 
 Endpoint:
-{your_domain}/zitadel.admin.v1.AdminService/
+$ZITADEL_DOMAIN/zitadel.admin.v1.AdminService/
 
 Definition:
 [Admin Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/admin.proto)
@@ -111,7 +111,7 @@ Definition:
 ### REST
 
 Endpoint:
-{your_domain}/admin/v1/
+$ZITADEL_DOMAIN/admin/v1/
 
 API Reference:
 [OpenAPI Docs](/apis/reference/admin)
@@ -136,7 +136,7 @@ Checkout the guide how to [access the ZITADEL System API](/guides/integrate/acce
 ### GRPC
 
 Endpoint:
-{your_domain}/zitadel.system.v1.SystemService/
+$ZITADEL_DOMAIN/zitadel.system.v1.SystemService/
 
 Definition:
 [System Proto](https://github.com/zitadel/zitadel/blob/main/proto/zitadel/system.proto)
@@ -144,7 +144,7 @@ Definition:
 ### REST
 
 Endpoint:
-{your_domain}/system/v1/
+$ZITADEL_DOMAIN/system/v1/
 
 API Reference:
 [OpenAPI Docs](/apis/reference/system)
@@ -167,7 +167,7 @@ The Assets API allows you to up- and download all kinds of assets. This can be f
 ### REST
 
 Endpoint:
-{your_domain}/assets/v1/
+$ZITADEL_DOMAIN/assets/v1/
 
 Definition:
 [Assets](./assets/assets.md)
@@ -199,12 +199,12 @@ In the table below you can see the URI of those calls.
 
 | Service | URI                                                 |
 | :------ | :-------------------------------------------------- |
-| REST    | {your_domain}/auth/v1/users/me                      |
-| GRPC    | {your_domain}/zitadel.auth.v1.AuthService/GetMyUser |
+| REST    | $ZITADEL_DOMAIN/auth/v1/users/me                      |
+| GRPC    | $ZITADEL_DOMAIN/zitadel.auth.v1.AuthService/GetMyUser |
 
 ## Domains
 
-ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your custom domain `{your_domain}`
+ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your custom domain `$ZITADEL_DOMAIN`
 
 :::note
 Changes from ZITADEL V1:
