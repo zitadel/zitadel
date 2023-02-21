@@ -176,7 +176,7 @@ module.exports = {
         title: "Auth API",
         description:
           "Lorem",
-        slug: "/apis/auth",
+        slug: "/apis/reference/auth",
       },
       items: require("./docs/apis/generated/auth/sidebar.js"),
     },
@@ -188,7 +188,7 @@ module.exports = {
         title: "mgmt API",
         description:
           "Lorem",
-        slug: "/apis/mgmt",
+        slug: "/apis/reference/mgmt",
       },
       items: require("./docs/apis/generated/mgmt/sidebar.js"),
     },
@@ -200,7 +200,7 @@ module.exports = {
         title: "admin API",
         description:
           "Lorem",
-        slug: "/apis/admin",
+        slug: "/apis/reference/admin",
       },
       items: require("./docs/apis/generated/admin/sidebar.js"),
     },
@@ -212,9 +212,15 @@ module.exports = {
         title: "system API",
         description:
           "Lorem",
-        slug: "/apis/system",
+        slug: "/apis/reference/system",
       },
       items: require("./docs/apis/generated/system/sidebar.js"),
+    },
+    {
+      type: "category",
+      label: "Assets API",
+      collapsed: true,
+      items: ["apis/assets/assets"],
     },
     {
       type: "doc",
