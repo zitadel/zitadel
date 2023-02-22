@@ -244,7 +244,6 @@ func NewGitHubEnterpriseIDPChangedEvent(
 			GitHubEnterpriseIDPChangedEventType,
 		),
 		id,
-		oldName,
 		changes,
 	)
 	if err != nil {

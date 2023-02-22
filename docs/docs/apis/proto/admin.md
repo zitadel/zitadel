@@ -1958,7 +1958,7 @@ This is an empty request
 | token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
 
 
 
@@ -1971,22 +1971,6 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | id |  string | - |  |
-
-
-
-
-### AddGenericOIDCProviderRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
 
 
 
@@ -2004,7 +1988,7 @@ This is an empty request
 | token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
 
 
 
@@ -2030,7 +2014,7 @@ This is an empty request
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_secret |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
 
 
 
@@ -5022,12 +5006,12 @@ this is en empty request
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_secret |  string | - | string.max_len: 200<br />  |
+| client_secret |  string | client_secret will only be updated if provided | string.max_len: 200<br />  |
 | authorization_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
 
 
 
@@ -5052,12 +5036,12 @@ this is en empty request
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_secret |  string | - | string.max_len: 200<br />  |
+| client_secret |  string | client_secret will only be updated if provided | string.max_len: 200<br />  |
 | authorization_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | token_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | user_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
 
 
 
@@ -5081,9 +5065,9 @@ this is en empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | client_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| client_secret |  string | - | string.max_len: 200<br />  |
+| client_secret |  string | client_secret will only be updated if provided | string.max_len: 200<br />  |
 | scopes | repeated string | - | repeated.max_items: 20<br /> repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 100<br />  |
-| provider_options |  zitadel.idp.v1.Options | - | message.required: true<br />  |
+| provider_options |  zitadel.idp.v1.Options | - |  |
 
 
 

@@ -5,7 +5,6 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 )
 
 type GitHubIDPAddedEvent struct {
@@ -127,7 +126,7 @@ func (e *GitHubEnterpriseIDPAddedEvent) Data() interface{} {
 }
 
 func (e *GitHubEnterpriseIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{idpconfig.NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	return nil
 }
 
 func GitHubEnterpriseIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
@@ -146,7 +145,6 @@ type GitHubEnterpriseIDPChangedEvent struct {
 func NewGitHubEnterpriseIDPChangedEvent(
 	base *eventstore.BaseEvent,
 	id string,
-	oldName string,
 	changes []OAuthIDPChanges,
 ) (*GitHubEnterpriseIDPChangedEvent, error) {
 	if len(changes) == 0 {
@@ -156,7 +154,6 @@ func NewGitHubEnterpriseIDPChangedEvent(
 		OAuthIDPChangedEvent: OAuthIDPChangedEvent{
 			BaseEvent: *base,
 			ID:        id,
-			oldName:   oldName,
 		},
 	}
 	for _, change := range changes {
@@ -170,13 +167,7 @@ func (e *GitHubEnterpriseIDPChangedEvent) Data() interface{} {
 }
 
 func (e *GitHubEnterpriseIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	if e.Name == nil || e.oldName == *e.Name { // TODO: nil check should be enough
-		return nil
-	}
-	return []*eventstore.EventUniqueConstraint{
-		idpconfig.NewRemoveIDPConfigNameUniqueConstraint(e.oldName, e.Aggregate().ResourceOwner),
-		idpconfig.NewAddIDPConfigNameUniqueConstraint(*e.Name, e.Aggregate().ResourceOwner),
-	}
+	return nil
 }
 
 func GitHubEnterpriseIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {

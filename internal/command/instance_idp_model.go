@@ -89,7 +89,7 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	return  instance.NewOAuthIDPChangedEvent(ctx, aggregate, id, oldName, changes)
+	return instance.NewOAuthIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceGitHubIDPWriteModel struct {
@@ -245,7 +245,7 @@ func (wm *InstanceGitHubEnterpriseIDPWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, nil
 	}
-	return instance.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, wm.Name, changes)
+	return instance.NewGitHubEnterpriseIDPChangedEvent(ctx, aggregate, id, changes)
 }
 
 type InstanceGoogleIDPWriteModel struct {

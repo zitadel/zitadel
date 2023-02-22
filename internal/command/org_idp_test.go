@@ -1074,7 +1074,6 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 								nil,
 								idp.Options{},
 							)),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "org1")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1125,7 +1124,6 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 									IsAutoUpdate:      true,
 								},
 							)),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name", "org1")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1394,7 +1392,6 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 								t := true
 								event, _ := org.NewGitHubEnterpriseIDPChangedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 									"id1",
-									"name",
 									[]idp.OAuthIDPChanges{
 										idp.ChangeOAuthName("new name"),
 										idp.ChangeOAuthClientID("clientID2"),
@@ -1419,8 +1416,6 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 								return event
 							}(),
 						),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name", "org1")),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("new name", "org1")),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
