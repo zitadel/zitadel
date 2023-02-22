@@ -170,66 +170,75 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "Authenticated User (Auth API)",
-      link: {
-        type: "generated-index",
-        title: "Auth API",
-        description:
-          "Lorem",
-        slug: "/apis/reference/auth",
-      },
-      items: require("./docs/apis/generated/auth/sidebar.js"),
+      label: "Core Resources",
+      collapsed: false,
+      items: [
+        {
+          type: "category",
+          label: "Authenticated User",
+          link: {
+            type: "generated-index",
+            title: "Auth API",
+            description:
+                "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+            slug: "/apis/reference/auth",
+          },
+          items: require("./docs/apis/generated/auth/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Organization Objects",
+          link: {
+            type: "generated-index",
+            title: "Management API",
+            description:
+                "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+            slug: "/apis/reference/mgmt",
+          },
+          items: require("./docs/apis/generated/mgmt/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Instance Objects",
+          link: {
+            type: "generated-index",
+            title: "Admin API",
+            description:
+                "This API is intended to configure and manage one ZITADEL instance itself.",
+            slug: "/apis/reference/admin",
+          },
+          items: require("./docs/apis/generated/admin/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Instance Lifecycle",
+          link: {
+            type: "generated-index",
+            title: "System API",
+            description:
+                "This API is intended to manage the different ZITADEL instances within the system.\n" +
+                "\n" +
+                "Checkout the guide how to access the ZITADEL System API.",
+            slug: "/apis/reference/system",
+          },
+          items: require("./docs/apis/generated/system/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Assets",
+          collapsed: true,
+          items: ["apis/assets/assets"],
+        },
+        {
+          type: "doc",
+          label: "gRPC Status Codes",
+          id: "apis/statuscodes"
+        },
+      ]
     },
     {
       type: "category",
-      label: "Organization Resources (Management API)",
-      link: {
-        type: "generated-index",
-        title: "mgmt API",
-        description:
-          "Lorem",
-        slug: "/apis/reference/mgmt",
-      },
-      items: require("./docs/apis/generated/mgmt/sidebar.js"),
-    },
-    {
-      type: "category",
-      label: "Instance Resources (Admin API)",
-      link: {
-        type: "generated-index",
-        title: "admin API",
-        description:
-          "Lorem",
-        slug: "/apis/reference/admin",
-      },
-      items: require("./docs/apis/generated/admin/sidebar.js"),
-    },
-    {
-      type: "category",
-      label: "Instance Lifecycle (System API)",
-      link: {
-        type: "generated-index",
-        title: "system API",
-        description:
-          "Lorem",
-        slug: "/apis/reference/system",
-      },
-      items: require("./docs/apis/generated/system/sidebar.js"),
-    },
-    {
-      type: "category",
-      label: "Assets API",
-      collapsed: true,
-      items: ["apis/assets/assets"],
-    },
-    {
-      type: "doc",
-      label: "gRPC Status Codes",
-      id: "apis/statuscodes"
-    },
-    {
-      type: "category",
-      label: "Authenticate Users",
+      label: "Sign In Users ",
       collapsed: false,
       items: [
         {
@@ -247,7 +256,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "SAML",
+          label: "SAML 2.0",
           collapsed: false,
           items: ["apis/saml/endpoints"],
         },

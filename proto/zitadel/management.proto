@@ -7896,9 +7896,19 @@ message ClearFlowResponse {
 
 message SetTriggerActionsRequest {
     // id of the flow type
-    string flow_type = 1;
+    string flow_type = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"1\"";
+            description: "At the moment you have to send the ID of the Flow Type: ExternalAuthentication=1, CustomiseToken=2, InternalAuthentication=3, PreUserinfoCreation=3";
+        }
+    ];
     // id of the trigger type
-    string trigger_type = 2;
+    string trigger_type = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"1\"";
+            description: "At the moment you have to send the ID of the Trigger Type: PostAuthentication=1, PreCreation=2, PostCreation=3, PreUserinfoCreation=4, PreAccessTokenCreation=5";
+         }
+    ];
     repeated string action_ids = 3;
 }
 
