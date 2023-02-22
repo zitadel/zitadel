@@ -1,3 +1,47 @@
 .cnsl-idp-table-wrapper {
   display: block;
 }
+
+.new-idp-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -1rem;
+  box-sizing: border-box;
+
+  .item {
+    position: relative;
+    z-index: 100;
+    margin: 1rem;
+    flex-basis: 215px;
+    display: flex;
+    text-decoration: none;
+    cursor: pointer;
+    padding-top: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    transition: box-shadow 0.1s ease-in;
+    align-items: center;
+
+    .idp-logo {
+      margin-right: 1rem;
+      height: 36px;
+      width: 36px;
+    }
+
+    .text-container {
+      display: flex;
+      flex-direction: column;
+
+      .title {
+      }
+    }
+
+    &.disabled {
+      filter: grayscale(1);
+      cursor: not-allowed;
+    }
+  }
+}

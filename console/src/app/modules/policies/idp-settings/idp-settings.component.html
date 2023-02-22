@@ -3,3 +3,36 @@
 <div class="cnsl-idp-table-wrapper">
   <cnsl-idp-table [service]="service" [serviceType]="serviceType"></cnsl-idp-table>
 </div>
+
+<h2>{{ 'IDP.CREATE.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'IDP.CREATE.DESCRIPTION' | translate }}</p>
+
+<div class="new-idp-wrapper">
+  <div class="item card" matRipple (click)="createGoogle()">
+    <img class="idp-logo" src="../../../assets/images/idp/google.png" alt="google" />
+    <div class="text-container">
+      <span class="title">Google</span>
+    </div>
+  </div>
+
+  <div class="item card disabled" matRipple (click)="createGoogle()">
+    <img class="idp-logo" src="../../../assets/images/idp/ms.svg" alt="microsoft" />
+    <div class="text-container">
+      <span class="title">Microsoft</span>
+    </div>
+  </div>
+
+  <div class="item card disabled" matRipple (click)="createGoogle()">
+    <img class="idp-logo" src="../../../assets/images/idp/github.svg" alt="GitHub" />
+    <div class="text-container">
+      <span class="title">GitHub</span>
+    </div>
+  </div>
+
+  <div class="item card disabled" matRipple (click)="createGoogle()">
+    <img class="idp-logo" src="../../../assets/images/idp/gitlab.svg" alt="GitLab" />
+    <div class="text-container">
+      <span class="title">GitLab</span>
+    </div>
+  </div>
+</div>
