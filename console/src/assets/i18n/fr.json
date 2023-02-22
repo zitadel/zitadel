@@ -46,6 +46,10 @@
     "DESCRIPTION": "Votre processus d'intégration",
     "COMPLETED": "terminé",
     "DISMISS": "fermer",
+    "CARD": {
+      "TITLE": "Faites fonctionner votre ZITADEL",
+      "DESCRIPTION": "Cette liste de contrôle vous aide à configurer votre instance et vous guide à travers les étapes les plus essentielles."
+    },
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Créez votre marque",

@@ -46,6 +46,10 @@
     "DESCRIPTION": "你的入职过程",
     "COMPLETED": "已完成",
     "DISMISS": "隐藏",
+    "CARD": {
+      "TITLE": "让你的ZITADEL运转起来",
+      "DESCRIPTION": "这份清单有助于设置你的实例，并指导你完成最重要的步骤"
+    },
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "设置你的品牌",

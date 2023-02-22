@@ -46,6 +46,10 @@
     "DESCRIPTION": "Your onboarding process",
     "COMPLETED": "completed",
     "DISMISS": "chiudi",
+    "CARD": {
+      "TITLE": "Fate funzionare il vostro ZITADEL",
+      "DESCRIPTION": "Questa lista di azioni aiuta a configurare la vostra istanza e vi guida attraverso i passaggi più essenziali."
+    },
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Imposta il tuo marchio",

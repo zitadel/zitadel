@@ -46,6 +46,10 @@
     "DESCRIPTION": "Your onboarding process",
     "COMPLETED": "completed",
     "DISMISS": "No thanks, I'm a pro.",
+    "CARD": {
+      "TITLE": "Get your ZITADEL running",
+      "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
+    },
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Setup your brand",

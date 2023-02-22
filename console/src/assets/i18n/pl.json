@@ -46,6 +46,10 @@
     "DESCRIPTION": "Twój proces wprowadzania na rynek",
     "COMPLETED": "zakończone",
     "DISMISS": "zamknąć",
+    "CARD": {
+      "TITLE": "Uruchom swój ZITADEL",
+      "DESCRIPTION": "Ta lista kontrolna pomoże Ci skonfigurować instancję i poprowadzi Cię przez najważniejsze kroki."
+    },
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Skonfiguruj swoją markę",

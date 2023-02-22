@@ -46,6 +46,10 @@
     "DESCRIPTION": "Dein Onboarding-prozess",
     "COMPLETED": "abgeschlossen",
     "DISMISS": "schließen",
+    "CARD": {
+      "TITLE": "Bringe deine Instanz zum Laufen",
+      "DESCRIPTION": "Diese Checkliste hilft bei der Einrichtung Ihrer Instanz und führt Sie durch die wichtigsten Schritte"
+    },
     "EVENTS": {
       "instance.policy.label.changed": {
         "title": "Branding anpassen",
